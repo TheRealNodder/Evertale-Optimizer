@@ -1,68 +1,83 @@
-// app.js (MODULE)
-
 let units = [];
-let draggedUnit = null;
 
-// Load units
+// Load data
 fetch("units.json")
-  .then(res => res.json())
+  .then(r => r.json())
   .then(data => {
     units = data;
     renderUnitPool();
-  })
-  .catch(err => console.error(err));
+    renderRoster();
+  });
 
-// Render unit pool
+// Tabs
+document.querySelectorAll(".tab").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".tab, .tab-content")
+      .forEach(el => el.classList.remove("active"));
+
+    btn.classList.add("active");
+    document.getElementById(btn.dataset.tab).classList.add("active");
+  });
+});
+
+// Unit pool
 function renderUnitPool() {
   const pool = document.getElementById("unitPool");
   pool.innerHTML = "";
 
-  units.forEach(unit => {
-    const div = document.createElement("div");
-    div.className = "unit";
-    div.textContent = unit.name;
-    div.draggable = true;
-
-    div.addEventListener("dragstart", () => {
-      draggedUnit = unit;
-    });
-
-    pool.appendChild(div);
+  units.forEach(u => {
+    pool.appendChild(unitCard(u));
   });
 }
 
-// OPTIMIZER FUNCTION
+// Full roster
+function renderRoster() {
+  const roster = document.getElementById("rosterGrid");
+  roster.innerHTML = "";
+
+  units.forEach(u => {
+    roster.appendChild(unitCard(u, true));
+  });
+}
+
+// Card
+function unitCard(u, detailed = false) {
+  const div = document.createElement("div");
+  div.className = "card";
+
+  div.innerHTML = `
+    <div class="name">${u.name}</div>
+    <div class="element">${u.element}</div>
+    <div>ATK ${u.atk}</div>
+    <div>HP ${u.hp}</div>
+    <div>SPD ${u.spd}</div>
+    ${detailed ? `<div>Rarity ★${u.rarity}</div>` : ""}
+  `;
+  return div;
+}
+
+// Optimizer
 function optimize() {
   const mode = document.getElementById("mode").value;
-  const teamSize = Number(document.getElementById("teamSize").value);
+  const size = Number(document.getElementById("teamSize").value);
   const results = document.getElementById("results");
 
-  if (!units.length) {
-    results.textContent = "No units loaded.";
-    return;
-  }
-
-  const scored = units.map(u => {
-    let score = 0;
-
-    if (mode === "PVE") score = u.atk + u.hp * 0.6 + u.spd * 0.5;
-    if (mode === "PVP") score = u.atk * 1.2 + u.spd * 1.5;
-    if (mode === "BOSS") score = u.atk * 1.6 + u.hp * 0.8;
-    if (mode === "STORY") score = u.atk + u.hp + u.spd;
-
-    return { ...u, score };
-  });
+  const scored = units.map(u => ({
+    ...u,
+    score:
+      mode === "PVP" ? u.atk * 1.3 + u.spd * 1.5 :
+      mode === "BOSS" ? u.atk * 1.6 + u.hp * 0.8 :
+      u.atk + u.hp + u.spd
+  }));
 
   scored.sort((a, b) => b.score - a.score);
-  const team = scored.slice(0, teamSize);
+  const team = scored.slice(0, size);
 
   results.innerHTML = `
-    <h3>Optimized ${mode} Team</h3>
     <ul>
-      ${team.map(u => `<li>${u.name} — ${Math.round(u.score)}</li>`).join("")}
+      ${team.map(u => `<li>${u.name}</li>`).join("")}
     </ul>
   `;
 }
 
-// 🔥 THIS IS THE CRITICAL LINE 🔥
 window.optimize = optimize;
