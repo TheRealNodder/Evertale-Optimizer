@@ -1,1 +1,72 @@
+name: Update Toolbox Data
 
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install deps (scraper)
+        working-directory: scraper
+        run: npm install
+
+      - name: Install Playwright Chromium
+        working-directory: scraper
+        run: npx playwright install --with-deps chromium
+
+      - name: Ensure data folder exists
+        run: |
+          mkdir -p data
+          mkdir -p scraper/data
+
+      - name: Run scrapers (repo root)
+        run: |
+          node scraper/scrape_toolbox_catalog.mjs
+          node scraper/scrape_viewer_characters_playwright.mjs
+
+      - name: Show outputs
+        run: |
+          echo "=== data/ ==="
+          ls -la data || true
+          echo "=== scraper/data/ ==="
+          ls -la scraper/data || true
+          echo "=== json files ==="
+          find . -maxdepth 3 -type f -name "*.json" -print
+
+      - name: Commit & Push
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: |
+          set -e
+
+          if [ -z "$GH_PAT" ]; then
+            echo "GH_PAT secret is missing"
+            exit 1
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Commit ANY json created under data/ (and debug html if present)
+          git add data/*.json data/_debug*.html || true
+          git diff --cached --quiet || git commit -m "Update toolbox data"
+
+          git remote set-url origin "https://x-access-token:${GH_PAT}@github.com/TheRealNodder/Evertale-Optimizer.git"
+          git fetch origin main
+          git rebase origin/main || (git rebase --abort && exit 1)
+          git push origin HEAD:main
