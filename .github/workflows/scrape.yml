@@ -18,9 +18,12 @@ jobs:
         with:
           node-version: "18"
 
-      - name: Install scraper deps
+      - name: Install dependencies
         working-directory: scraper
-        run: npm install
+        run: |
+          rm -rf node_modules package-lock.json
+          npm install
+
 
       - name: Run scrapers
         working-directory: scraper
