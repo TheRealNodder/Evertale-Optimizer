@@ -1,0 +1,34 @@
+name: Scrape Evertale Units
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * *" # runs daily at midnight UTC
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm install node-fetch cheerio
+
+      - name: Run scraper
+        run: |
+          node scrape_units.js
+          node scrape_unit_pages.js
+
+      - name: Commit updated units.json
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add units.json
+          git commit -m "Update units.json"
+          git push
+        continue-on-error: true
