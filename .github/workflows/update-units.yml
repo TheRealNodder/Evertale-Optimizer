@@ -1,4 +1,4 @@
-name: Update units.json (Toolbox)
+name: Update units.json (Toolbox Viewer)
 
 on:
   workflow_dispatch:
@@ -15,12 +15,10 @@ concurrency:
 jobs:
   scrape:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          # keep this if you previously needed PAT; otherwise it's harmless
           persist-credentials: false
           fetch-depth: 0
 
@@ -29,32 +27,22 @@ jobs:
         with:
           node-version: 18
 
-      - name: Install scraper dependencies
+      - name: Run toolbox viewer scraper
         working-directory: scraper
-        run: |
-          rm -rf node_modules package-lock.json
-          npm install
+        run: node scrape_toolbox_viewer.mjs
 
-      - name: Run toolbox scraper
-        working-directory: scraper
-        run: node scrape_toolbox_units.mjs
-
-      - name: Commit updated data/units.json
+      - name: Commit updated data files
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/units.json
-          git diff --cached --quiet || git commit -m "Update units.json (Toolbox)"
+          git add data/units.json data/weapons.json
+          git diff --cached --quiet || git commit -m "Update units/weapons from toolbox viewer"
 
       - name: Push changes
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
         run: |
-          # If you have GH_PAT set (recommended), use it.
-          # Otherwise fall back to the default token (works if repo settings allow it).
           if [ -n "$GH_PAT" ]; then
             git remote set-url origin "https://x-access-token:${GH_PAT}@github.com/TheRealNodder/Evertale-Optimizer.git"
           fi
-
-          # Push only if there was a commit
           git push origin HEAD:main
