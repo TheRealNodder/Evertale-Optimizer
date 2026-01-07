@@ -1,55 +1,64 @@
 import fs from "fs";
 import fetch from "node-fetch";
-import cheerio from "cheerio";
+import * as cheerio from "cheerio";
 
-const raw = fs.readFileSync("unit_links.json");
-const unitLinks = JSON.parse(raw);
+const links = JSON.parse(fs.readFileSync("unit_links.json"));
 
-function normalizeRarity(text) {
-  if (!text) return null;
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+function normalizeRarity(text = "") {
   if (text.includes("SSR")) return 5;
   if (text.includes("SR")) return 4;
   if (text.includes("R")) return 3;
   return 2;
 }
 
-async function fetchUnit(link) {
-  try {
-    const res = await fetch(link.url);
-    const html = await res.text();
-    const $ = cheerio.load(html);
+async function scrapeUnit(unit) {
+  const res = await fetch(unit.url);
+  if (!res.ok) throw new Error(`Fetch failed: ${unit.name}`);
 
-    const infobox = $(".portable-infobox");
-    const getInfo = (label) =>
-      infobox.find(`h3:contains("${label}")`).next().text().trim();
+  const html = await res.text();
+  const $ = cheerio.load(html);
+  const box = $(".portable-infobox");
 
-    return {
-      id: link.name.toLowerCase().replace(/\s+/g, "_"),
-      name: link.name,
-      element: getInfo("Element"),
-      rarity: normalizeRarity(getInfo("Rarity")),
-      stats: {
-        hp: Number(getInfo("HP")) || 0,
-        atk: Number(getInfo("Attack")) || 0,
-        spd: Number(getInfo("Speed")) || 0
-      },
-      weapons: getInfo("Weapon").split(",").map(w => w.trim()),
-      leaderSkill: getInfo("Leader Skill") || null
-    };
-  } catch (err) {
-    console.error("Failed:", link.name);
-    return null;
-  }
+  const get = label =>
+    box.find(`h3:contains("${label}")`).next().text().trim();
+
+  return {
+    id: unit.name.toLowerCase().replace(/\s+/g, "_"),
+    name: unit.name,
+    element: get("Element") || null,
+    rarity: normalizeRarity(get("Rarity")),
+    stats: {
+      hp: Number(get("HP")) || 0,
+      atk: Number(get("Attack")) || 0,
+      spd: Number(get("Speed")) || 0
+    },
+    weapons: get("Weapon")
+      ? get("Weapon").split(",").map(w => w.trim())
+      : [],
+    leaderSkill: get("Leader Skill") || null
+  };
 }
 
-async function main() {
+async function run() {
   const results = [];
-  for (const link of unitLinks) {
-    const unit = await fetchUnit(link);
-    if (unit) results.push(unit);
+
+  for (const unit of links) {
+    try {
+      console.log(`Scraping ${unit.name}`);
+      results.push(await scrapeUnit(unit));
+      await sleep(800);
+    } catch {
+      console.warn(`Skipped ${unit.name}`);
+    }
   }
+
   fs.writeFileSync("units.json", JSON.stringify(results, null, 2));
-  console.log(`Saved ${results.length} units.`);
+  console.log(`✔ Saved ${results.length} units`);
 }
 
-main();
+run().catch(err => {
+  console.error(err);
+  process.exit(1);
+});
