@@ -1,5 +1,46 @@
-- name: Install dependencies
-  working-directory: scraper
-  run: |
-    rm -rf node_modules package-lock.json
-    npm install
+name: Scrape Evertale Units
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 6 * * 0" # Runs every Sunday at 06:00 UTC
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Clean & install dependencies
+        working-directory: scraper
+        run: |
+          rm -rf node_modules package-lock.json
+          npm install
+
+      - name: Run unit list scraper
+        working-directory: scraper
+        run: node scrape_unit_list.js
+
+      - name: Run unit page scraper
+        working-directory: scraper
+        run: node scrape_unit_pages.js
+
+      - name: Move generated units.json
+        run: |
+          mkdir -p data
+          mv scraper/units.json data/units.json
+
+      - name: Commit updated units.json
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add data/units.json
+          git diff --cached --quiet || git commit -m "Update units.json"
+          git push
