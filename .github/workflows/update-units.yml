@@ -1,4 +1,4 @@
-name: Update units (Toolbox Explorer)
+name: Update toolbox data
 
 on:
   workflow_dispatch:
@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: update-units
+  group: update-toolbox-data
   cancel-in-progress: true
 
 jobs:
@@ -31,16 +31,16 @@ jobs:
         working-directory: scraper
         run: npm install
 
-      - name: Run toolbox explorer scraper
+      - name: Run toolbox scraper (recreates data/)
         working-directory: scraper
         run: node scrape_toolbox_units_full.mjs
 
-      - name: Commit updated data
+      - name: Commit generated data
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/characters.toolbox.json data/weapons.toolbox.json data/enemies.toolbox.json data/accessories.toolbox.json || true
-          git diff --cached --quiet || git commit -m "Update units.toolbox.json (toolbox explorer)"
+          git add data/*.json || true
+          git diff --cached --quiet || git commit -m "Update toolbox data"
 
       - name: Push changes (rebase if needed)
         env:
