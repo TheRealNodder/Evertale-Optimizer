@@ -1,5 +1,5 @@
 // scraper/scrape_toolbox_units_full.mjs
-// Multi-page Toolbox Viewer scraper (Characters)
+// Multi-page Toolbox Viewer scraper (no "Page X of Y" dependency)
 // Output: ../data/units.toolbox.json  => { updatedAt, units: [...] }
 
 import fs from "node:fs/promises";
@@ -53,8 +53,8 @@ function normalizeId(name, title) {
 function isJunk(line) {
   if (!line) return true;
   if (UI_JUNK.has(line)) return true;
-  if (line.startsWith("Page ")) return true;
-  if (line.endsWith(" items")) return true;
+  if (line.startsWith("Page ")) return true;       // harmless if present
+  if (line.endsWith(" items")) return true;        // harmless if present
   if (/^【\d+†Image】$/.test(line)) return true;
   return false;
 }
@@ -184,18 +184,10 @@ function parseUnitsFromHtml(html) {
   return units;
 }
 
-function getTotalPagesFromHtml(html) {
-  // Normalize HTML so "Page&nbsp;1&nbsp;of&nbsp;40" matches too
-  const normalized = decodeHtmlEntities(html).replace(/\s+/g, " ").trim();
-  const m = normalized.match(/Page\s+(\d+)\s+of\s+(\d+)/i);
-  if (!m) return null;
-  return { page: Number(m[1]), total: Number(m[2]) };
-}
-
 async function fetchHtml(url) {
   const res = await fetch(url, {
     headers: {
-      "user-agent": "Evertale-Optimizer-Scraper/MultiPage",
+      "user-agent": "Evertale-Optimizer-Scraper/MultiPage-NoPageText",
       "accept": "text/html,*/*"
     }
   });
@@ -204,12 +196,12 @@ async function fetchHtml(url) {
 }
 
 /**
- * Auto-discover a GET pagination parameter by trying common patterns.
- * If this throws, the site is likely using a JS/XHR POST for paging.
+ * Discover which GET param changes the Viewer page by:
+ * - Fetching candidate page 2
+ * - Parsing units
+ * - Ensuring it's not identical to page 1
  */
-async function discoverPager(totalPages) {
-  if (totalPages < 2) return (p) => VIEWER_URL;
-
+async function discoverPager(unitsPage1) {
   const candidates = [
     (p) => `${VIEWER_URL}?page=${p}`,
     (p) => `${VIEWER_URL}?Page=${p}`,
@@ -218,26 +210,30 @@ async function discoverPager(totalPages) {
     (p) => `${VIEWER_URL}?pageIndex=${p}`,
     (p) => `${VIEWER_URL}?PageIndex=${p}`,
     (p) => `${VIEWER_URL}?currentPage=${p}`,
-    (p) => `${VIEWER_URL}?CurrentPage=${p}`
+    (p) => `${VIEWER_URL}?CurrentPage=${p}`,
   ];
+
+  const page1Sig = unitsPage1.slice(0, 5).map(u => u.id).join("|");
 
   for (const build of candidates) {
     try {
       const html2 = await fetchHtml(build(2));
-      // Normalize before matching
-      const normalized = decodeHtmlEntities(html2).replace(/\s+/g, " ").trim();
-      if (new RegExp(`Page\\s+2\\s+of\\s+\\d+`, "i").test(normalized)) {
+      const units2 = parseUnitsFromHtml(html2);
+      if (!units2.length) continue;
+
+      const page2Sig = units2.slice(0, 5).map(u => u.id).join("|");
+      if (page2Sig && page2Sig !== page1Sig) {
         return build;
       }
     } catch {
-      // try next
+      // ignore and try next
     }
   }
 
   throw new Error(
-    "Could not auto-discover GET pagination URL. " +
-    "Paging is likely handled by a JS request (XHR/POST). " +
-    "If this happens, we’ll switch to scraping the Explorer API instead."
+    "Could not discover a GET paging parameter. " +
+    "This likely means paging uses JS/XHR (POST). " +
+    "If that happens, we’ll switch to an API/XHR-based scraper."
   );
 }
 
@@ -253,26 +249,50 @@ function mergeDedupe(units) {
 async function run() {
   console.log(`Fetching page 1: ${VIEWER_URL}`);
   const html1 = await fetchHtml(VIEWER_URL);
+  const units1 = parseUnitsFromHtml(html1);
 
-  const pageInfo = getTotalPagesFromHtml(html1);
-  if (!pageInfo) throw new Error("Could not read 'Page X of Y' from Viewer HTML.");
-  console.log(`Viewer pages: ${pageInfo.total}`);
+  if (!units1.length) throw new Error("Parsed 0 units on page 1.");
+  console.log(`Parsed page 1: ${units1.length}`);
+  console.log(`Page 1 first 5: ${units1.slice(0, 5).map(u => u.name).join(", ")}`);
 
-  const buildUrl = await discoverPager(pageInfo.total);
-  console.log("Pagination: OK");
+  const buildUrl = await discoverPager(units1);
+  console.log("Pagination: OK (GET param discovered)");
 
   const allUnits = [];
-
-  const units1 = parseUnitsFromHtml(html1);
-  console.log(`Parsed page 1: ${units1.length}`);
   allUnits.push(...units1);
 
-  for (let p = 2; p <= pageInfo.total; p++) {
-    const url = buildUrl(p);
+  // Loop until we stop seeing new units
+  let page = 2;
+  let stagnantPages = 0;
+  let lastCount = 0;
+
+  while (page <= 200) { // safety cap
+    const url = buildUrl(page);
     const html = await fetchHtml(url);
     const units = parseUnitsFromHtml(html);
-    console.log(`Parsed page ${p}: ${units.length}`);
+
+    if (!units.length) {
+      console.log(`Page ${page}: 0 units -> stopping`);
+      break;
+    }
+
     allUnits.push(...units);
+    const mergedNow = mergeDedupe(allUnits);
+
+    console.log(`Parsed page ${page}: ${units.length} (unique so far: ${mergedNow.length})`);
+
+    // stop if no growth for 3 pages (means we looped past the end or paging failed)
+    if (mergedNow.length === lastCount) stagnantPages++;
+    else stagnantPages = 0;
+
+    lastCount = mergedNow.length;
+
+    if (stagnantPages >= 3) {
+      console.log("No new units for 3 pages -> stopping");
+      break;
+    }
+
+    page++;
     await new Promise((r) => setTimeout(r, 150));
   }
 
