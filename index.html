@@ -79,7 +79,7 @@
         </div>
       </div>
 
-      <div class="hint">Tip: drag a card from Catalog into a slot. Click ✕ to remove.</div>
+      <div class="hint">Tip: drag a character card from Catalog into a slot. Click ✕ to remove.</div>
 
       <div class="teamWrap">
         <div class="team" id="teamSlots"></div>
@@ -99,37 +99,63 @@
     <section class="panel hidden" id="tab-optimizer">
       <div class="panelHeader">
         <h2>Optimizer</h2>
-        <button class="btn" id="autoFill">Auto-fill current team</button>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="btn" id="autoFill">Auto-fill current team</button>
+          <button class="btn primary" id="runOptimize">Optimize (preview)</button>
+        </div>
       </div>
 
       <div class="toolbar">
         <label class="field">
+          <span>Max Team Cost</span>
+          <input type="number" id="maxCost" value="999" step="1" />
+        </label>
+
+        <label class="field">
+          <span>Fill behavior</span>
+          <select id="fillMode">
+            <option value="emptyOnly" selected>Fill empty slots only</option>
+            <option value="replaceAll">Replace all slots</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>Locked slots</span>
+          <select id="lockMode">
+            <option value="keepPlaced" selected>Keep placed units</option>
+            <option value="none">No locks</option>
+          </select>
+        </label>
+
+        <label class="field">
           <span>ATK weight</span>
-          <input type="number" id="wAtk" value="1" step="0.1"/>
+          <input type="number" id="wAtk" value="1.0" step="0.1"/>
         </label>
         <label class="field">
           <span>HP weight</span>
-          <input type="number" id="wHp" value="1" step="0.1"/>
+          <input type="number" id="wHp" value="0.08" step="0.01"/>
         </label>
         <label class="field">
           <span>SPD weight</span>
-          <input type="number" id="wSpd" value="1" step="0.1"/>
+          <input type="number" id="wSpd" value="2.0" step="0.1"/>
         </label>
         <label class="field">
           <span>Cost penalty</span>
-          <input type="number" id="wCost" value="0.25" step="0.05"/>
+          <input type="number" id="wCost" value="0.8" step="0.1"/>
         </label>
-        <button class="btn primary" id="runOptimize">Optimize</button>
       </div>
 
       <div class="hint">
-        Score = atk*wAtk + hp*wHp + spd*wSpd − cost*wCost (from Viewer stats).
+        Score = atk*wAtk + hp*wHp + spd*wSpd − cost*wCost. Optimizer fills the current team mode (Story 8 or Platoon 5),
+        respects Max Cost, avoids duplicates, and can lock placed units.
       </div>
 
       <div class="tableWrap">
         <table class="table">
           <thead>
-            <tr><th>Rank</th><th>Unit</th><th>ATK</th><th>HP</th><th>SPD</th><th>Cost</th><th>Score</th></tr>
+            <tr>
+              <th>Rank</th><th>Unit</th><th>ATK</th><th>HP</th><th>SPD</th><th>Cost</th><th>Score</th>
+            </tr>
           </thead>
           <tbody id="optResults"></tbody>
         </table>
