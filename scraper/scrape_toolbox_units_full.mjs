@@ -185,9 +185,16 @@ function parseUnitsFromHtml(html) {
 }
 
 function getTotalPagesFromHtml(html) {
-  const m = html.match(/Page\s+(\d+)\s+of\s+(\d+)/i);
+  // Normalize HTML so "Page&nbsp;1&nbsp;of&nbsp;40" matches too
+  const normalized = decodeHtmlEntities(html)
+    .replace(/\s+/g, " ")
+    .trim();
+
+  const m = normalized.match(/Page\s+(\d+)\s+of\s+(\d+)/i);
   if (!m) return null;
+
   return { page: Number(m[1]), total: Number(m[2]) };
+}
 }
 
 async function fetchHtml(url) {
