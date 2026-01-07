@@ -198,7 +198,7 @@ function closeUnitModal() {
 }
 
 // ---------- load units (NEW FORMAT) ----------
-fetch("data/units.json")
+fetch("data/units.toolbox.json")
   .then((r) => r.json())
   .then((data) => {
     units = Array.isArray(data?.units) ? data.units : [];
