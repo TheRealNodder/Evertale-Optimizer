@@ -4,162 +4,143 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Evertale Optimizer</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="./style.css" />
 </head>
-
 <body>
   <header class="topbar">
     <div class="brand">
-      <div class="brand-title">Evertale Optimizer</div>
-      <div class="brand-sub">Catalog • Team Builder • Optimizer</div>
+      <div class="logo">E</div>
+      <div>
+        <div class="title">Evertale Optimizer</div>
+        <div class="subtitle">Catalog • Team Builder • Optimizer</div>
+      </div>
     </div>
 
     <nav class="tabs" id="tabs">
-      <button class="tab active" data-tab="tabCatalog">Catalog</button>
-      <button class="tab" data-tab="tabTeam">Team Builder</button>
-      <button class="tab" data-tab="tabOptimizer">Optimizer</button>
+      <button class="tab active" data-tab="catalog">Catalog</button>
+      <button class="tab" data-tab="team">Team Builder</button>
+      <button class="tab" data-tab="optimizer">Optimizer</button>
     </nav>
   </header>
 
-  <section class="system">
-    <div id="status" class="status">Loading…</div>
-    <div id="error" class="error" style="display:none; white-space:pre-wrap;"></div>
-  </section>
+  <main class="container">
+    <section class="panel" id="status">
+      <div class="status">
+        <div class="spinner"></div>
+        <div>
+          <div class="statusTitle">Loading…</div>
+          <div class="statusMsg" id="statusMsg">Fetching data files from /data</div>
+        </div>
+      </div>
+    </section>
 
-  <main class="main">
     <!-- CATALOG -->
-    <section id="tabCatalog" class="panel active">
-      <div class="panel-head">
+    <section class="panel" id="tab-catalog">
+      <div class="panelHeader">
         <h2>Catalog</h2>
-        <div class="panel-tools">
-          <select id="categorySelect" class="select" aria-label="Category"></select>
-          <input id="searchInput" type="search" placeholder="Search…" autocomplete="off" />
-          <span id="countBadge" class="badge">0</span>
+        <div class="counts">
+          <div class="pill"><span id="countAll">0</span> items</div>
+          <div class="pill"><span id="countChars">0</span> characters</div>
+          <div class="pill"><span id="countWeapons">0</span> weapons</div>
+          <div class="pill"><span id="countEnemies">0</span> enemies</div>
         </div>
       </div>
 
-      <div id="grid" class="grid"></div>
+      <div class="toolbar">
+        <label class="field">
+          <span>Category</span>
+          <select id="categorySelect">
+            <option value="all">All</option>
+            <option value="character">Characters</option>
+            <option value="weapon">Weapons</option>
+            <option value="enemy">Enemies</option>
+            <option value="boss">Bosses</option>
+            <option value="accessory">Accessories</option>
+          </select>
+        </label>
+
+        <label class="field grow">
+          <span>Search</span>
+          <input id="searchInput" placeholder="Type a name… (Rizette, Bahamut, etc)" />
+        </label>
+      </div>
+
+      <div class="grid" id="catalogGrid"></div>
     </section>
 
     <!-- TEAM BUILDER -->
-    <section id="tabTeam" class="panel">
-      <div class="panel-head">
+    <section class="panel hidden" id="tab-team">
+      <div class="panelHeader">
         <h2>Team Builder</h2>
-        <div class="panel-tools">
-          <select id="teamMode" class="select" aria-label="Team mode">
-            <option value="story">Story Team (8)</option>
-            <option value="platoon">Platoon (5) × 20</option>
-          </select>
-
-          <select id="platoonSelect" class="select" aria-label="Platoon number" style="display:none;"></select>
-
-          <button id="btnClearTeam" class="btn">Clear Team</button>
+        <div class="seg">
+          <button class="segBtn active" id="modeStory">Story Team (8)</button>
+          <button class="segBtn" id="modePlatoon">Platoon (5) × 20</button>
+          <button class="segBtn danger" id="clearTeam">Clear Team</button>
         </div>
       </div>
 
-      <div class="two-col">
-        <div class="col">
-          <div class="section-title">Drop units into slots</div>
+      <div class="hint">Tip: drag a card from Catalog into a slot. Click ✕ to remove.</div>
 
-          <div id="storyLayout" class="team-layout">
-            <div class="team-row">
-              <div class="slot" data-slot="story-main-1"><div class="slot-label">Main 1</div></div>
-              <div class="slot" data-slot="story-main-2"><div class="slot-label">Main 2</div></div>
-              <div class="slot" data-slot="story-main-3"><div class="slot-label">Main 3</div></div>
-              <div class="slot" data-slot="story-main-4"><div class="slot-label">Main 4</div></div>
-              <div class="slot" data-slot="story-main-5"><div class="slot-label">Main 5</div></div>
-            </div>
-            <div class="team-row">
-              <div class="slot" data-slot="story-backup-1"><div class="slot-label">Backup 1</div></div>
-              <div class="slot" data-slot="story-backup-2"><div class="slot-label">Backup 2</div></div>
-              <div class="slot" data-slot="story-backup-3"><div class="slot-label">Backup 3</div></div>
-            </div>
-          </div>
+      <div class="teamWrap">
+        <div class="team" id="teamSlots"></div>
 
-          <div id="platoonLayout" class="team-layout" style="display:none;">
-            <div class="team-row">
-              <div class="slot" data-slot="platoon-1"><div class="slot-label">Slot 1</div></div>
-              <div class="slot" data-slot="platoon-2"><div class="slot-label">Slot 2</div></div>
-              <div class="slot" data-slot="platoon-3"><div class="slot-label">Slot 3</div></div>
-              <div class="slot" data-slot="platoon-4"><div class="slot-label">Slot 4</div></div>
-              <div class="slot" data-slot="platoon-5"><div class="slot-label">Slot 5</div></div>
-            </div>
-          </div>
-
-          <div class="hint">
-            Tip: drag a card from <b>Catalog → Characters</b> into a slot. Click a slot’s ✕ to remove.
-          </div>
-        </div>
-
-        <div class="col">
-          <div class="section-title">Current Team Summary</div>
-          <div id="teamSummary" class="summary"></div>
-        </div>
+        <aside class="summary">
+          <h3>Current Team Summary</h3>
+          <div class="kv"><span>Units</span><span id="teamCount">0</span></div>
+          <div class="kv"><span>Total Cost</span><span id="teamCost">0</span></div>
+          <div class="kv"><span>Avg ATK</span><span id="teamAtk">0</span></div>
+          <div class="kv"><span>Avg HP</span><span id="teamHp">0</span></div>
+          <div class="kv"><span>Avg SPD</span><span id="teamSpd">0</span></div>
+        </aside>
       </div>
     </section>
 
     <!-- OPTIMIZER -->
-    <section id="tabOptimizer" class="panel">
-      <div class="panel-head">
+    <section class="panel hidden" id="tab-optimizer">
+      <div class="panelHeader">
         <h2>Optimizer</h2>
-        <div class="panel-tools">
-          <button id="btnAutofill" class="btn primary">Auto-fill current team</button>
-        </div>
+        <button class="btn" id="autoFill">Auto-fill current team</button>
       </div>
 
-      <div class="optimizer">
-        <div class="opt-row">
-          <label>ATK weight</label>
-          <input id="wAtk" type="number" step="0.1" value="1.0" />
-        </div>
-        <div class="opt-row">
-          <label>HP weight</label>
-          <input id="wHp" type="number" step="0.1" value="0.08" />
-        </div>
-        <div class="opt-row">
-          <label>SPD weight</label>
-          <input id="wSpd" type="number" step="0.1" value="2.0" />
-        </div>
-        <div class="opt-row">
-          <label>Cost penalty</label>
-          <input id="wCost" type="number" step="0.1" value="0.8" />
-        </div>
+      <div class="toolbar">
+        <label class="field">
+          <span>ATK weight</span>
+          <input type="number" id="wAtk" value="1" step="0.1"/>
+        </label>
+        <label class="field">
+          <span>HP weight</span>
+          <input type="number" id="wHp" value="1" step="0.1"/>
+        </label>
+        <label class="field">
+          <span>SPD weight</span>
+          <input type="number" id="wSpd" value="1" step="0.1"/>
+        </label>
+        <label class="field">
+          <span>Cost penalty</span>
+          <input type="number" id="wCost" value="0.25" step="0.05"/>
+        </label>
+        <button class="btn primary" id="runOptimize">Optimize</button>
+      </div>
 
-        <div class="hint">
-          This optimizer uses Viewer stats: <b>score = atk*wAtk + hp*wHp + spd*wSpd - cost*wCost</b>.
-          We can later add leader-skill logic, element filters, role filters, etc.
-        </div>
+      <div class="hint">
+        Score = atk*wAtk + hp*wHp + spd*wSpd − cost*wCost (from Viewer stats).
+      </div>
 
-        <div class="section-title">Top Picks (preview)</div>
-        <div id="topPicks" class="list"></div>
+      <div class="tableWrap">
+        <table class="table">
+          <thead>
+            <tr><th>Rank</th><th>Unit</th><th>ATK</th><th>HP</th><th>SPD</th><th>Cost</th><th>Score</th></tr>
+          </thead>
+          <tbody id="optResults"></tbody>
+        </table>
       </div>
     </section>
   </main>
 
-  <!-- MODAL -->
-  <div id="itemModal" class="modal" style="display:none;">
-    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="itemModalTitle">
-      <div class="modal-head">
-        <div id="itemModalTitle" class="modal-title">Item</div>
-        <button id="itemModalClose" class="icon-btn" aria-label="Close">✕</button>
-      </div>
-      <div id="itemModalBody" class="modal-body"></div>
-    </div>
-  </div>
+  <footer class="footer">
+    Data source: Evertale Toolbox Viewer/Explorer (scraped into /data). Images shown when available.
+  </footer>
 
-  <script>
-    // tabs
-    (function () {
-      const tabs = document.querySelectorAll(".tab");
-      const panels = document.querySelectorAll(".panel");
-      function setActive(id) {
-        panels.forEach(p => p.classList.toggle("active", p.id === id));
-        tabs.forEach(t => t.classList.toggle("active", t.dataset.tab === id));
-      }
-      tabs.forEach(t => t.addEventListener("click", () => setActive(t.dataset.tab)));
-    })();
-  </script>
-
-  <script src="app.js"></script>
+  <script type="module" src="./app.js"></script>
 </body>
 </html>
