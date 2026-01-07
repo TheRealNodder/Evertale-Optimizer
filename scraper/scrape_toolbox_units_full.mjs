@@ -1,9 +1,5 @@
 // scraper/scrape_toolbox_units_full.mjs
-// Scrape Toolbox Explorer and split into Characters / Weapons / Enemies.
-// Writes:
-//   ../data/characters.toolbox.json
-//   ../data/weapons.toolbox.json
-//   ../data/enemies.toolbox.json
+// Recreates ../data/ and writes categorized ID lists from Toolbox Explorer.
 
 import fs from "node:fs/promises";
 import path from "node:path";
@@ -16,6 +12,7 @@ const OUT_DIR = path.join(process.cwd(), "..", "data");
 const OUT_CHAR = path.join(OUT_DIR, "characters.toolbox.json");
 const OUT_WEAP = path.join(OUT_DIR, "weapons.toolbox.json");
 const OUT_ENEM = path.join(OUT_DIR, "enemies.toolbox.json");
+const OUT_ACC  = path.join(OUT_DIR, "accessories.toolbox.json");
 
 async function fetchText(url) {
   const res = await fetch(url, {
@@ -29,30 +26,19 @@ async function fetchText(url) {
   return await res.text();
 }
 
-// Normalize heading text
 function norm(s) {
-  return String(s ?? "")
-    .replace(/\s+/g, " ")
-    .trim()
-    .toLowerCase();
+  return String(s ?? "").replace(/\s+/g, " ").trim().toLowerCase();
 }
 
 function extractIdFromLine(t) {
-  // "RizetteBrave (Rizette)" -> RizetteBrave
-  const m = t.match(/^([A-Za-z0-9_]+)\s*\(/);
+  // "RizetteBrave (Rizette)" -> "RizetteBrave"
+  const m = String(t ?? "").match(/^([A-Za-z0-9_]+)\s*\(/);
   return m ? m[1] : null;
 }
 
-/**
- * We walk the DOM in order:
- * - when we hit a heading like "Character", set currentSection
- * - collect <li> text under that heading until next heading
- */
 function extractBySections(html) {
   const $ = cheerio.load(html);
 
-  // These are the section names the Toolbox uses in its nav/content.
-  // We map them to output keys.
   const sectionMap = new Map([
     ["character", "characters"],
     ["characters", "characters"],
@@ -73,28 +59,19 @@ function extractBySections(html) {
     accessories: new Set()
   };
 
-  // We attempt two strategies:
-  // (A) Heading-based DOM walk using h1/h2/h3/h4 text
-  // (B) Fallback: look for "Character" / "Weapon" / "Boss" labels near lists
-
-  // Strategy A: DOM walk
   let current = null;
 
-  // Select a broad set of possible heading containers
   const nodes = $("body").find("*").toArray();
-
   for (const el of nodes) {
     const tag = (el.tagName || "").toLowerCase();
 
-    // Detect headings
+    // detect headings
     if (["h1", "h2", "h3", "h4", "h5", "strong", "b"].includes(tag)) {
       const label = norm($(el).text());
-      if (sectionMap.has(label)) {
-        current = sectionMap.get(label);
-      }
+      if (sectionMap.has(label)) current = sectionMap.get(label);
     }
 
-    // Collect list items if we’re inside a known section
+    // collect items
     if (tag === "li" && current) {
       const text = $(el).text().replace(/\s+/g, " ").trim();
       const id = extractIdFromLine(text);
@@ -102,43 +79,27 @@ function extractBySections(html) {
     }
   }
 
-  // Strategy B: If A fails (no headings), collect all <li> and then classify by nearby label
-  const totalCollected =
+  const total =
     buckets.characters.size + buckets.weapons.size + buckets.enemies.size + buckets.accessories.size;
 
-  if (totalCollected === 0) {
-    // fallback: just collect all li
-    const li = $("li")
-      .map((_, el) => $(el).text().replace(/\s+/g, " ").trim())
-      .get()
-      .filter(Boolean);
-
-    for (const t of li) {
-      const id = extractIdFromLine(t);
-      if (!id) continue;
-
-      // Very rough classification fallback:
-      // Weapon IDs often end with numbers or include weapon-like words; enemies often include Boss-like names.
-      // If we can’t tell, dump into characters.
-      if (/(Sword|Axe|Staff|Spear|Katana|Hammer|Mace)/i.test(id)) buckets.weapons.add(id);
-      else buckets.characters.add(id);
-    }
+  if (total === 0) {
+    // fallback: collect all <li> items and dump into characters
+    $("li").each((_, el) => {
+      const text = $(el).text().replace(/\s+/g, " ").trim();
+      const id = extractIdFromLine(text);
+      if (id) buckets.characters.add(id);
+    });
   }
 
-  return {
-    characters: [...buckets.characters].sort((a, b) => a.localeCompare(b)),
-    weapons: [...buckets.weapons].sort((a, b) => a.localeCompare(b)),
-    enemies: [...buckets.enemies].sort((a, b) => a.localeCompare(b)),
-    accessories: [...buckets.accessories].sort((a, b) => a.localeCompare(b))
-  };
+  const out = {};
+  for (const [k, set] of Object.entries(buckets)) {
+    out[k] = [...set].sort((a, b) => a.localeCompare(b));
+  }
+  return out;
 }
 
-function wrapList(list, source) {
-  return {
-    updatedAt: new Date().toISOString(),
-    source,
-    ids: list
-  };
+function wrap(ids, source) {
+  return { updatedAt: new Date().toISOString(), source, ids };
 }
 
 async function run() {
@@ -147,20 +108,19 @@ async function run() {
 
   const { characters, weapons, enemies, accessories } = extractBySections(html);
 
-  if (!characters.length && !weapons.length && !enemies.length) {
-    throw new Error("No IDs extracted. Explorer HTML structure may have changed.");
+  if (!characters.length && !weapons.length && !enemies.length && !accessories.length) {
+    throw new Error("No IDs extracted. Explorer HTML may have changed.");
   }
 
+  // ✅ This recreates the folder every run
   await fs.mkdir(OUT_DIR, { recursive: true });
 
-  await fs.writeFile(OUT_CHAR, JSON.stringify(wrapList(characters, EXPLORER_URL), null, 2), "utf8");
-  await fs.writeFile(OUT_WEAP, JSON.stringify(wrapList(weapons, EXPLORER_URL), null, 2), "utf8");
-  await fs.writeFile(OUT_ENEM, JSON.stringify(wrapList(enemies, EXPLORER_URL), null, 2), "utf8");
+  await fs.writeFile(OUT_CHAR, JSON.stringify(wrap(characters, EXPLORER_URL), null, 2), "utf8");
+  await fs.writeFile(OUT_WEAP, JSON.stringify(wrap(weapons, EXPLORER_URL), null, 2), "utf8");
+  await fs.writeFile(OUT_ENEM, JSON.stringify(wrap(enemies, EXPLORER_URL), null, 2), "utf8");
 
-  // accessories is optional; write only if non-empty
   if (accessories.length) {
-    const outAcc = path.join(OUT_DIR, "accessories.toolbox.json");
-    await fs.writeFile(outAcc, JSON.stringify(wrapList(accessories, EXPLORER_URL), null, 2), "utf8");
+    await fs.writeFile(OUT_ACC, JSON.stringify(wrap(accessories, EXPLORER_URL), null, 2), "utf8");
     console.log(`Accessories: ${accessories.length} -> data/accessories.toolbox.json`);
   }
 
