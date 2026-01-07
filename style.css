@@ -1,344 +1,266 @@
-// app.js (module)
-
-const DATA = {
-  catalog: "./data/catalog.toolbox.json",
-  characters: "./data/characters.viewer.full.json",
-};
-
-let state = {
-  items: [],        // combined catalog items
-  byId: new Map(),  // id -> item
-  teamMode: "story", // story | platoon
-  teamSlots: [],     // array of item IDs (or null)
-};
-
-const $ = (sel) => document.querySelector(sel);
-
-function showStatus(msg) {
-  $("#status").classList.remove("hidden");
-  $("#statusMsg").textContent = msg;
-}
-function hideStatus() {
-  $("#status").classList.add("hidden");
+:root{
+  --bg:#0b1220;
+  --panel:#111a2e;
+  --panel2:#0f172a;
+  --muted:#93a4c7;
+  --text:#e7ecff;
+  --border:rgba(255,255,255,.10);
+  --accent:#6ea8ff;
+  --danger:#ff5c77;
+  --shadow:0 10px 30px rgba(0,0,0,.35);
+  --r:14px;
+  --r2:10px;
 }
 
-function normCat(x) {
-  const v = (x || "").toString().toLowerCase().trim();
-  if (["character", "characters", "unit", "units"].includes(v)) return "character";
-  if (["weapon", "weapons"].includes(v)) return "weapon";
-  if (["enemy", "enemies", "monster", "monsters"].includes(v)) return "enemy";
-  if (["boss", "bosses"].includes(v)) return "boss";
-  if (["accessory", "accessories"].includes(v)) return "accessory";
-  return v || "unknown";
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  background: radial-gradient(1000px 500px at 20% 0%, rgba(110,168,255,.22), transparent 60%),
+              radial-gradient(900px 600px at 80% 10%, rgba(51,214,159,.14), transparent 55%),
+              var(--bg);
+  color:var(--text);
 }
 
-function safeNum(v) {
-  const n = Number(v);
-  return Number.isFinite(n) ? n : 0;
+.hidden{display:none !important}
+
+.topbar{
+  position:sticky; top:0; z-index:10;
+  display:flex; gap:18px; align-items:center; justify-content:space-between;
+  padding:14px 18px;
+  background: rgba(9,14,26,.85);
+  backdrop-filter: blur(10px);
+  border-bottom:1px solid var(--border);
 }
 
-async function fetchJson(url) {
-  const res = await fetch(url, { cache: "no-store" });
-  if (!res.ok) throw new Error(`${url} -> HTTP ${res.status}`);
-  return await res.json();
+.brand{display:flex; gap:12px; align-items:center}
+.logo{
+  width:42px;height:42px;border-radius:12px;
+  display:grid;place-items:center;
+  background: linear-gradient(135deg, rgba(110,168,255,.9), rgba(51,214,159,.6));
+  color:#071024;
+  font-weight:900;
+  box-shadow: var(--shadow);
+}
+.title{font-weight:800; letter-spacing:.2px}
+.subtitle{font-size:12px; color:var(--muted)}
+
+.tabs{display:flex; gap:8px; flex-wrap:wrap}
+.tab{
+  border:1px solid var(--border);
+  background: rgba(255,255,255,.04);
+  color:var(--text);
+  padding:9px 12px;
+  border-radius: 999px;
+  cursor:pointer;
+}
+.tab.active{
+  border-color: rgba(110,168,255,.55);
+  background: rgba(110,168,255,.14);
 }
 
-function mergeData(catalogJson, charactersJson) {
-  // Expectation:
-  // catalog.toolbox.json: { items:[{id,name,category,image,url,...}] } OR array
-  // characters.viewer.full.json: { characters:[{id,name,atk,hp,spd,cost,element,image,...}] } OR array
-  const catalogItems = Array.isArray(catalogJson)
-    ? catalogJson
-    : (catalogJson.items || catalogJson.catalog || []);
-
-  const chars = Array.isArray(charactersJson)
-    ? charactersJson
-    : (charactersJson.characters || charactersJson.items || []);
-
-  // Build map of character stats by name (fallback) and id (preferred)
-  const charById = new Map();
-  const charByName = new Map();
-  for (const c of chars) {
-    const id = (c.id ?? c.unitId ?? c.key ?? c.name ?? "").toString();
-    const name = (c.name ?? "").toString();
-    if (id) charById.set(id, c);
-    if (name) charByName.set(name.toLowerCase(), c);
-  }
-
-  const merged = catalogItems.map((it) => {
-    const id = (it.id ?? it.key ?? it.name ?? "").toString();
-    const name = (it.name ?? "").toString();
-    const category = normCat(it.category ?? it.type);
-    const img = it.image || it.img || it.icon || null;
-
-    let stats = null;
-    if (category === "character") {
-      stats = charById.get(id) || charByName.get(name.toLowerCase()) || null;
-    }
-
-    return {
-      id,
-      name,
-      category,
-      element: stats?.element ?? it.element ?? "",
-      cost: safeNum(stats?.cost ?? it.cost),
-      atk: safeNum(stats?.atk ?? it.atk),
-      hp: safeNum(stats?.hp ?? it.hp),
-      spd: safeNum(stats?.spd ?? it.spd),
-      image: img || stats?.image || stats?.img || null,
-      url: it.url || stats?.url || null,
-      raw: it,
-      statsRaw: stats,
-    };
-  });
-
-  // Remove obvious garbage rows
-  return merged.filter((x) => x.name && x.id);
+.container{
+  width:min(1200px, 92vw);
+  margin: 18px auto 50px;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
 }
 
-function setCounts(items) {
-  const byCat = (cat) => items.filter((x) => x.category === cat).length;
-  $("#countAll").textContent = items.length;
-  $("#countChars").textContent = byCat("character");
-  $("#countWeapons").textContent = byCat("weapon");
-  $("#countEnemies").textContent = byCat("enemy") + byCat("boss");
+.panel{
+  background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+  border:1px solid var(--border);
+  border-radius: var(--r);
+  box-shadow: var(--shadow);
+  padding:14px;
 }
 
-function cardHtml(item) {
-  const img = item.image
-    ? `<img src="${item.image}" alt="${escapeHtml(item.name)}" loading="lazy" />`
-    : `<div class="ph">${escapeHtml(item.name.slice(0, 1).toUpperCase())}</div>`;
+.panelHeader{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:10px;
+}
+.panelHeader h2{margin:0; font-size:18px}
 
-  const tags = [
-    item.category !== "unknown" ? item.category : "",
-    item.element ? `elem: ${item.element}` : "",
-    item.cost ? `cost: ${item.cost}` : "",
-  ].filter(Boolean);
+.counts{display:flex; gap:8px; flex-wrap:wrap}
+.pill{
+  border:1px solid var(--border);
+  background: rgba(255,255,255,.04);
+  padding:6px 10px;
+  border-radius: 999px;
+  color:var(--muted);
+  font-size:12px;
+}
+.pill span{color:var(--text); font-weight:700}
 
-  return `
-    <div class="card" draggable="true" data-id="${escapeAttr(item.id)}">
-      <div class="thumb">${img}</div>
-      <div class="meta">
-        <div class="name">${escapeHtml(item.name)}</div>
-        <div class="sub">
-          ${escapeHtml(item.category)}${item.element ? " • " + escapeHtml(item.element) : ""}
-        </div>
-        <div class="tags">
-          ${tags.map(t => `<span class="tag">${escapeHtml(t)}</span>`).join("")}
-        </div>
-      </div>
-    </div>
-  `;
+.toolbar{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  align-items:end;
+  margin: 10px 0 12px;
+}
+.field{display:flex; flex-direction:column; gap:6px}
+.field span{font-size:12px; color:var(--muted)}
+.field input, .field select{
+  border:1px solid var(--border);
+  background: rgba(255,255,255,.04);
+  color:var(--text);
+  padding:10px 12px;
+  border-radius: var(--r2);
+  min-width: 180px;
+  outline:none;
+}
+.field.grow{flex:1}
+
+.grid{
+  display:grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap:10px;
 }
 
-function renderCatalog() {
-  const cat = $("#categorySelect").value;
-  const q = $("#searchInput").value.trim().toLowerCase();
+.card{
+  border:1px solid var(--border);
+  background: rgba(0,0,0,.18);
+  border-radius: var(--r);
+  padding:10px;
+  cursor:grab;
+  display:flex;
+  gap:10px;
+  min-height:76px;
+}
+.card:active{cursor:grabbing}
+.card:hover{border-color: rgba(110,168,255,.45)}
 
-  let filtered = state.items;
+.thumb{
+  width:56px;height:56px;border-radius:12px;
+  background: rgba(255,255,255,.06);
+  border:1px solid var(--border);
+  display:grid;place-items:center;
+  overflow:hidden;
+  flex:0 0 auto;
+}
+.thumb img{width:100%; height:100%; object-fit:cover}
+.thumb .ph{font-weight:900; color:rgba(255,255,255,.35)}
 
-  if (cat !== "all") {
-    filtered = filtered.filter((x) => x.category === cat);
-  }
-  if (q) {
-    filtered = filtered.filter((x) => x.name.toLowerCase().includes(q));
-  }
-
-  $("#catalogGrid").innerHTML = filtered.map(cardHtml).join("");
-
-  // attach drag handlers
-  for (const el of document.querySelectorAll(".card")) {
-    el.addEventListener("dragstart", (e) => {
-      e.dataTransfer.setData("text/plain", el.dataset.id);
-    });
-  }
+.meta{flex:1}
+.name{font-weight:800; margin-bottom:4px}
+.sub{font-size:12px; color:var(--muted); line-height:1.3}
+.tags{display:flex; gap:6px; flex-wrap:wrap; margin-top:8px}
+.tag{
+  font-size:11px;
+  padding:4px 8px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background: rgba(255,255,255,.03);
+  color:var(--muted);
 }
 
-function buildSlots(count, labels) {
-  const slots = [];
-  for (let i = 0; i < count; i++) {
-    slots.push({
-      label: labels?.[i] ?? `Slot ${i + 1}`,
-      id: null,
-    });
-  }
-  return slots;
+.seg{display:flex; gap:8px; flex-wrap:wrap}
+.segBtn{
+  border:1px solid var(--border);
+  background: rgba(255,255,255,.04);
+  color:var(--text);
+  padding:9px 12px;
+  border-radius: 999px;
+  cursor:pointer;
+}
+.segBtn.active{background: rgba(110,168,255,.14); border-color: rgba(110,168,255,.55)}
+.segBtn.danger{border-color: rgba(255,92,119,.55); background: rgba(255,92,119,.10)}
+
+.btn{
+  border:1px solid var(--border);
+  background: rgba(255,255,255,.04);
+  color:var(--text);
+  padding:10px 12px;
+  border-radius: var(--r2);
+  cursor:pointer;
+}
+.btn.primary{border-color: rgba(110,168,255,.55); background: rgba(110,168,255,.14)}
+.btn:hover{filter: brightness(1.07)}
+
+.hint{
+  font-size:12px;
+  color:var(--muted);
+  margin: 6px 0 10px;
 }
 
-function initTeam(mode) {
-  state.teamMode = mode;
-  if (mode === "story") {
-    state.teamSlots = buildSlots(8, [
-      "Main 1","Main 2","Main 3","Main 4","Main 5",
-      "Backup 1","Backup 2","Backup 3",
-    ]);
-  } else {
-    state.teamSlots = buildSlots(5, ["Slot 1","Slot 2","Slot 3","Slot 4","Slot 5"]);
-  }
-  renderTeam();
-  renderSummary();
+.teamWrap{
+  display:grid;
+  grid-template-columns: 1fr 280px;
+  gap:12px;
 }
-
-function renderTeam() {
-  const wrap = $("#teamSlots");
-  wrap.innerHTML = state.teamSlots.map((s, idx) => {
-    const item = s.id ? state.byId.get(s.id) : null;
-    return `
-      <div class="slot" data-slot="${idx}">
-        <button class="slotRemove" title="Remove" data-remove="${idx}">✕</button>
-        <div class="slotTitle">${escapeHtml(s.label)}</div>
-        ${item ? cardHtml(item) : `<div class="sub">Drop a unit here</div>`}
-      </div>
-    `;
-  }).join("");
-
-  // drop targets
-  for (const slotEl of wrap.querySelectorAll(".slot")) {
-    slotEl.addEventListener("dragover", (e) => e.preventDefault());
-    slotEl.addEventListener("drop", (e) => {
-      e.preventDefault();
-      const id = e.dataTransfer.getData("text/plain");
-      const idx = Number(slotEl.dataset.slot);
-      if (!state.byId.has(id)) return;
-      state.teamSlots[idx].id = id;
-      renderTeam();
-      renderSummary();
-    });
-  }
-
-  // remove buttons
-  for (const btn of wrap.querySelectorAll("[data-remove]")) {
-    btn.addEventListener("click", () => {
-      const idx = Number(btn.dataset.remove);
-      state.teamSlots[idx].id = null;
-      renderTeam();
-      renderSummary();
-    });
-  }
+@media (max-width: 900px){
+  .teamWrap{grid-template-columns:1fr}
 }
-
-function renderSummary() {
-  const ids = state.teamSlots.map(s => s.id).filter(Boolean);
-  const items = ids.map(id => state.byId.get(id)).filter(Boolean);
-
-  $("#teamCount").textContent = items.length.toString();
-
-  const cost = items.reduce((a,x)=>a + safeNum(x.cost), 0);
-  $("#teamCost").textContent = cost.toString();
-
-  const avg = (k) => items.length ? Math.round(items.reduce((a,x)=>a+safeNum(x[k]),0)/items.length) : 0;
-  $("#teamAtk").textContent = avg("atk").toString();
-  $("#teamHp").textContent  = avg("hp").toString();
-  $("#teamSpd").textContent = avg("spd").toString();
+.team{
+  display:grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap:10px;
 }
-
-function optimizeTop() {
-  const wAtk = safeNum($("#wAtk").value);
-  const wHp = safeNum($("#wHp").value);
-  const wSpd = safeNum($("#wSpd").value);
-  const wCost = safeNum($("#wCost").value);
-
-  const candidates = state.items
-    .filter(x => x.category === "character")
-    .map(x => ({
-      ...x,
-      score: (x.atk*wAtk) + (x.hp*wHp) + (x.spd*wSpd) - (x.cost*wCost),
-    }))
-    .sort((a,b)=>b.score - a.score)
-    .slice(0, 50);
-
-  $("#optResults").innerHTML = candidates.map((x,i)=>`
-    <tr>
-      <td>${i+1}</td>
-      <td>${escapeHtml(x.name)}</td>
-      <td>${x.atk}</td>
-      <td>${x.hp}</td>
-      <td>${x.spd}</td>
-      <td>${x.cost}</td>
-      <td>${Math.round(x.score)}</td>
-    </tr>
-  `).join("");
+.slot{
+  border:1px dashed rgba(255,255,255,.20);
+  background: rgba(255,255,255,.03);
+  border-radius: var(--r);
+  padding:10px;
+  min-height:88px;
+  position:relative;
 }
-
-function wireTabs() {
-  $("#tabs").addEventListener("click", (e) => {
-    const btn = e.target.closest(".tab");
-    if (!btn) return;
-    document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
-    btn.classList.add("active");
-
-    const tab = btn.dataset.tab;
-    $("#tab-catalog").classList.toggle("hidden", tab !== "catalog");
-    $("#tab-team").classList.toggle("hidden", tab !== "team");
-    $("#tab-optimizer").classList.toggle("hidden", tab !== "optimizer");
-  });
+.slotTitle{
+  font-size:12px;
+  color:var(--muted);
+  margin-bottom:8px;
 }
-
-function escapeHtml(s){return (s??"").toString().replace(/[&<>"']/g,(c)=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]))}
-function escapeAttr(s){return escapeHtml(s).replace(/"/g,"&quot;")}
-
-async function main() {
-  wireTabs();
-
-  $("#categorySelect").addEventListener("change", renderCatalog);
-  $("#searchInput").addEventListener("input", () => {
-    // small debounce feel without setTimeout spam
-    renderCatalog();
-  });
-
-  $("#modeStory").addEventListener("click", () => {
-    $("#modeStory").classList.add("active");
-    $("#modePlatoon").classList.remove("active");
-    initTeam("story");
-  });
-  $("#modePlatoon").addEventListener("click", () => {
-    $("#modePlatoon").classList.add("active");
-    $("#modeStory").classList.remove("active");
-    initTeam("platoon");
-  });
-  $("#clearTeam").addEventListener("click", () => {
-    initTeam(state.teamMode);
-  });
-
-  $("#runOptimize").addEventListener("click", optimizeTop);
-  $("#autoFill").addEventListener("click", () => {
-    // quick: fill empty slots with top optimizer picks
-    optimizeTop();
-    const rows = $("#optResults").querySelectorAll("tr");
-    const picks = [];
-    for (const r of rows) {
-      const name = r.children[1]?.textContent?.trim();
-      const found = state.items.find(x => x.category==="character" && x.name===name);
-      if (found) picks.push(found.id);
-    }
-    let pi = 0;
-    for (const s of state.teamSlots) {
-      if (!s.id && picks[pi]) s.id = picks[pi++];
-    }
-    renderTeam(); renderSummary();
-  });
-
-  try {
-    showStatus("Loading catalog + character stats…");
-    const [catalogJson, charsJson] = await Promise.all([
-      fetchJson(DATA.catalog),
-      fetchJson(DATA.characters),
-    ]);
-
-    const merged = mergeData(catalogJson, charsJson);
-    state.items = merged;
-    state.byId = new Map(merged.map(x => [x.id, x]));
-
-    setCounts(merged);
-    initTeam("story");
-    renderCatalog();
-    optimizeTop();
-
-    hideStatus();
-  } catch (err) {
-    console.error(err);
-    showStatus(`ERROR: ${err.message}`);
-  }
+.slotRemove{
+  position:absolute;
+  top:8px; right:8px;
+  border:none;
+  background: rgba(255,255,255,.08);
+  color: var(--text);
+  border-radius: 8px;
+  padding:4px 8px;
+  cursor:pointer;
 }
+.slotRemove:hover{background: rgba(255,255,255,.12)}
 
-main();
+.summary{
+  border:1px solid var(--border);
+  background: rgba(0,0,0,.18);
+  border-radius: var(--r);
+  padding:12px;
+}
+.summary h3{margin:0 0 10px; font-size:14px}
+.kv{display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(255,255,255,.07)}
+.kv:last-child{border-bottom:none}
+.kv span:first-child{color:var(--muted)}
+
+.tableWrap{overflow:auto; border:1px solid var(--border); border-radius: var(--r); background: rgba(0,0,0,.18)}
+.table{width:100%; border-collapse:collapse; min-width:680px}
+.table th,.table td{padding:10px 12px; border-bottom:1px solid rgba(255,255,255,.07); font-size:13px}
+.table th{color:var(--muted); font-weight:700; text-align:left}
+.table tr:hover td{background: rgba(255,255,255,.03)}
+
+.status{
+  display:flex; align-items:center; gap:12px;
+  padding:8px;
+}
+.spinner{
+  width:18px;height:18px;border-radius:50%;
+  border:2px solid rgba(255,255,255,.18);
+  border-top-color: var(--accent);
+  animation: spin .9s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.statusTitle{font-weight:800}
+.statusMsg{color:var(--muted); font-size:12px}
+
+.footer{
+  width:min(1200px, 92vw);
+  margin: 0 auto 30px;
+  color: rgba(231,236,255,.55);
+  font-size:12px;
+  text-align:center;
+}
