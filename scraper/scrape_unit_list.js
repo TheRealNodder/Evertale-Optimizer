@@ -12,7 +12,7 @@ async function run() {
 
   const units = [];
 
-  $("table.wikitable tbody tr").each((_, row) => {
+  $("table.article-table tbody tr").each((_, row) => {
     const link = $(row).find("td a").first();
     const name = link.text().trim();
     const href = link.attr("href");
