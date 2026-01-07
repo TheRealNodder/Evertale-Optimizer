@@ -1,23 +1,34 @@
-// app.js (module) — Roster + Drag/Drop Teams + Platoons + Save/Load + Leader bonus
+// app.js (module) — Roster + Drag/Drop Teams + Platoons + Save/Load + Optimizer (Leader + Weapons)
 
 let units = [];
 let unitById = new Map();
 
-// ---------- helpers ----------
 const el = (id) => document.getElementById(id);
-const LS_KEY = "evertale_optimizer_state_v1";
+const LS_KEY = "evertale_optimizer_state_v2";
 
+// ---------- CONFIG ----------
+const OPT_CONFIG = {
+  // weapon scoring bonus scale
+  weaponBonusPrimary: 0.03,  // +3% of base score if any weapon known
+  weaponBonusMatchBest: 0.07 // +7% of base score if best weapon matches
+};
+
+// ---------- helpers ----------
 function getStat(u, key) {
   if (u?.stats && typeof u.stats === "object") return Number(u.stats[key] || 0);
   return Number(u[key] || 0);
 }
 
-function normalizeWeaponList(u) {
-  if (Array.isArray(u.weapons)) return u.weapons.filter(Boolean);
-  const w = [];
-  if (u.weapon1) w.push(u.weapon1);
-  if (Array.isArray(u.secondaryWeapons)) w.push(...u.secondaryWeapons);
-  return [...new Set(w.filter(Boolean))];
+function safeId(u) {
+  return (u.id || u.name || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+}
+
+function elementLabel(e) {
+  if (!e) return "Unknown";
+  return String(e).trim();
 }
 
 function rarityLabel(r) {
@@ -27,28 +38,26 @@ function rarityLabel(r) {
   return "Other";
 }
 
-function elementLabel(e) {
-  if (!e) return "Unknown";
-  return String(e).trim();
+function normalizeWeaponList(u) {
+  // supports: weapons:[] or weapon1/secondaryWeapons
+  if (Array.isArray(u.weapons)) return u.weapons.filter(Boolean).map(String);
+  const w = [];
+  if (u.weapon1) w.push(u.weapon1);
+  if (Array.isArray(u.secondaryWeapons)) w.push(...u.secondaryWeapons);
+  return [...new Set(w.filter(Boolean).map(String))];
 }
 
-function safeId(u) {
-  // if scraper provides id use it, else derive from name
-  return (u.id || u.name || "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "_")
-    .replace(/^_+|_+$/g, "");
+function normalizeBestWeaponList(u) {
+  // supports: bestWeapons:[]
+  if (Array.isArray(u.bestWeapons)) return u.bestWeapons.filter(Boolean).map(String);
+  return [];
+}
+
+function clamp(n, a, b) {
+  return Math.max(a, Math.min(b, n));
 }
 
 // ---------- state ----------
-const state = loadState();
-
-// state structure:
-// {
-//   story: [unitId|null x8],
-//   platoons: [[unitId|null x5] x20]
-// }
-
 function defaultState() {
   return {
     story: Array(8).fill(null),
@@ -61,7 +70,6 @@ function loadState() {
     const raw = localStorage.getItem(LS_KEY);
     if (!raw) return defaultState();
     const parsed = JSON.parse(raw);
-    // validate shape quickly
     if (!Array.isArray(parsed.story) || parsed.story.length !== 8) return defaultState();
     if (!Array.isArray(parsed.platoons) || parsed.platoons.length !== 20) return defaultState();
     return parsed;
@@ -69,6 +77,8 @@ function loadState() {
     return defaultState();
   }
 }
+
+const state = loadState();
 
 function saveState() {
   localStorage.setItem(LS_KEY, JSON.stringify(state));
@@ -88,9 +98,8 @@ fetch("data/units.json")
   .then((r) => r.json())
   .then((data) => {
     units = Array.isArray(data) ? data : [];
-
-    // build id map
     unitById = new Map();
+
     units.forEach((u) => {
       const id = safeId(u);
       u.__id = id;
@@ -104,7 +113,6 @@ fetch("data/units.json")
     renderStoryTeam();
     renderPlatoons();
 
-    // handy: show a warning if any missing ids
     console.log(`Loaded ${units.length} units`);
   })
   .catch((err) => {
@@ -132,7 +140,7 @@ function unitCard(u, { draggable = true, onClickAdd = null } = {}) {
     });
   }
 
-  // Mobile-friendly: click to add to story team first empty slot
+  // click-to-add support
   div.addEventListener("click", () => {
     if (typeof onClickAdd === "function") onClickAdd(u.__id);
   });
@@ -214,7 +222,7 @@ function renderRoster() {
   const sortKey = (u) => {
     if (sortBy === "name") return (u.name || "").toLowerCase();
     if (sortBy === "rarity") return Number(u.rarity || 0);
-    return getStat(u, sortBy); // atk/hp/spd
+    return getStat(u, sortBy);
   };
 
   list.sort((a, b) => {
@@ -225,15 +233,13 @@ function renderRoster() {
   });
 
   grid.innerHTML = "";
-  // NOTE: for performance we cap to 400 cards
   list.slice(0, 400).forEach((u) => grid.appendChild(unitCard(u, { onClickAdd: addToStoryFirstEmpty })));
 }
 
-// ---------- Story Team (8) ----------
+// ---------- Story Team ----------
 function addToStoryFirstEmpty(unitId) {
   const idx = state.story.findIndex((x) => !x);
   if (idx === -1) return;
-  // prevent duplicates in story
   if (state.story.includes(unitId)) return;
   state.story[idx] = unitId;
   saveState();
@@ -241,7 +247,6 @@ function addToStoryFirstEmpty(unitId) {
 }
 
 function setStorySlot(index, unitId) {
-  // prevent duplicates
   if (unitId && state.story.includes(unitId)) return;
   state.story[index] = unitId;
   saveState();
@@ -262,25 +267,19 @@ function renderStoryTeam() {
   for (let i = 0; i < 8; i++) {
     const slot = document.createElement("div");
     slot.className = "slot" + (i === 0 ? " leader" : "") + (i >= 5 ? " backup" : "");
-    slot.dataset.storyIndex = String(i);
-
     const unitId = state.story[i];
     const u = unitId ? unitById.get(unitId) : null;
 
     slot.innerHTML = `
-      <div class="slotTitle">
-        Slot ${i + 1}${i === 0 ? " (Leader)" : ""}${i >= 5 ? " (Backup)" : ""}
-      </div>
+      <div class="slotTitle">Slot ${i + 1}${i === 0 ? " (Leader)" : ""}${i >= 5 ? " (Backup)" : ""}</div>
       <div class="slotBody"></div>
     `;
 
     const body = slot.querySelector(".slotBody");
-
     if (!u) {
       body.innerHTML = `<div class="muted">Drop unit here</div>`;
     } else {
-      const card = unitCard(u, { draggable: false });
-      // add remove button
+      body.appendChild(unitCard(u, { draggable: false }));
       const btn = document.createElement("button");
       btn.className = "btn";
       btn.style.marginTop = "10px";
@@ -289,12 +288,9 @@ function renderStoryTeam() {
         ev.stopPropagation();
         clearStorySlot(i);
       });
-
-      body.appendChild(card);
       body.appendChild(btn);
     }
 
-    // drop events
     slot.addEventListener("dragover", (ev) => ev.preventDefault());
     slot.addEventListener("drop", (ev) => {
       ev.preventDefault();
@@ -307,9 +303,8 @@ function renderStoryTeam() {
   }
 }
 
-// ---------- Platoons (20x5) ----------
+// ---------- Platoons ----------
 function setPlatoonSlot(pIndex, sIndex, unitId) {
-  // prevent duplicates inside that platoon
   if (unitId && state.platoons[pIndex].includes(unitId)) return;
   state.platoons[pIndex][sIndex] = unitId;
   saveState();
@@ -343,23 +338,16 @@ function renderPlatoons() {
     for (let s = 0; s < 5; s++) {
       const slot = document.createElement("div");
       slot.className = "slot";
-      slot.dataset.platoon = String(p);
-      slot.dataset.slot = String(s);
-
       const unitId = state.platoons[p][s];
       const u = unitId ? unitById.get(unitId) : null;
 
-      slot.innerHTML = `
-        <div class="slotTitle">Slot ${s + 1}</div>
-        <div class="slotBody"></div>
-      `;
-
+      slot.innerHTML = `<div class="slotTitle">Slot ${s + 1}</div><div class="slotBody"></div>`;
       const body = slot.querySelector(".slotBody");
 
       if (!u) {
         body.innerHTML = `<div class="muted">Drop unit here</div>`;
       } else {
-        const card = unitCard(u, { draggable: false });
+        body.appendChild(unitCard(u, { draggable: false }));
         const btn = document.createElement("button");
         btn.className = "btn";
         btn.style.marginTop = "10px";
@@ -368,8 +356,6 @@ function renderPlatoons() {
           ev.stopPropagation();
           clearPlatoonSlot(p, s);
         });
-
-        body.appendChild(card);
         body.appendChild(btn);
       }
 
@@ -389,34 +375,7 @@ function renderPlatoons() {
   }
 }
 
-// ---------- Optimizer (now with basic leader skill bonus) ----------
-function parseLeaderSkillText(text) {
-  // Very simple parser:
-  // Looks for element keywords + stat + % in the text.
-  // Example: "Allied Fire element units have their Attack increased by 15%."
-  if (!text) return null;
-
-  const t = String(text);
-  const elementMatch = t.match(/\b(Fire|Water|Earth|Light|Dark)\b/i);
-  const statMatch = t.match(/\b(Attack|ATK|HP|Speed|SPD)\b/i);
-  const pctMatch = t.match(/(\d+)\s*%/);
-
-  if (!pctMatch) return null;
-
-  const pct = Number(pctMatch[1]) / 100;
-  const element = elementMatch ? elementMatch[1].toLowerCase() : null;
-
-  let stat = null;
-  if (statMatch) {
-    const s = statMatch[1].toLowerCase();
-    if (s === "attack" || s === "atk") stat = "atk";
-    if (s === "hp") stat = "hp";
-    if (s === "speed" || s === "spd") stat = "spd";
-  }
-
-  return { element, stat, pct, text };
-}
-
+// ---------- Optimizer (Leader parsing + Weapon bonuses) ----------
 function scoreUnitBase(u, mode) {
   const atk = getStat(u, "atk");
   const hp = getStat(u, "hp");
@@ -428,16 +387,71 @@ function scoreUnitBase(u, mode) {
   return atk + hp * 0.6 + spd * 0.5; // PVE
 }
 
-function applyLeaderBonusToUnit(u, leaderParsed) {
+function getLeaderSkillText(leader) {
+  // supports leaderSkill string or leaderSkill.text object
+  if (typeof leader.leaderSkill === "string") return leader.leaderSkill;
+  if (leader?.leaderSkill?.text) return leader.leaderSkill.text;
+  return null;
+}
+
+function parseLeaderSkill(text) {
+  if (!text) return null;
+  const t = String(text).replace(/\s+/g, " ").trim();
+
+  // Detect element target (or all)
+  const elementMatch = t.match(/\b(Fire|Water|Earth|Light|Dark)\b/i);
+  const element = elementMatch ? elementMatch[1].toLowerCase() : "all";
+
+  // Detect stat affected
+  let stat = null;
+  if (/\b(Attack|ATK)\b/i.test(t)) stat = "atk";
+  else if (/\bHP\b/i.test(t)) stat = "hp";
+  else if (/\b(Speed|SPD)\b/i.test(t)) stat = "spd";
+
+  // Detect percentage
+  const pctMatch = t.match(/(\d+)\s*%/);
+  if (!pctMatch || !stat) return null;
+  const pct = Number(pctMatch[1]) / 100;
+
+  // Confidence: look for “allied”, “all allies”, “units”
+  const confidence = clamp(
+    (/\b(allied|all allies|all)\b/i.test(t) ? 0.5 : 0.25) +
+      (element !== "all" ? 0.25 : 0.1) +
+      (pct ? 0.25 : 0),
+    0,
+    1
+  );
+
+  return { element, stat, pct, text: t, confidence };
+}
+
+function leaderBonusForUnit(unit, leaderParsed) {
   if (!leaderParsed) return 0;
-
-  const unitElement = elementLabel(u.element).toLowerCase();
-  if (leaderParsed.element && unitElement !== leaderParsed.element) return 0;
-
-  if (!leaderParsed.stat) return 0;
-
-  const baseStat = getStat(u, leaderParsed.stat);
+  if (leaderParsed.element !== "all") {
+    const ue = elementLabel(unit.element).toLowerCase();
+    if (ue !== leaderParsed.element) return 0;
+  }
+  const baseStat = getStat(unit, leaderParsed.stat);
   return baseStat * leaderParsed.pct;
+}
+
+function weaponBonus(unit, baseScore) {
+  const weapons = normalizeWeaponList(unit);
+  const best = normalizeBestWeaponList(unit);
+
+  if (!weapons.length && !best.length) return 0;
+
+  // if best weapons exist and intersects current weapons -> bigger bonus
+  if (best.length) {
+    const set = new Set(weapons.map((x) => x.toLowerCase()));
+    const match = best.some((b) => set.has(String(b).toLowerCase()));
+    if (match) return baseScore * OPT_CONFIG.weaponBonusMatchBest;
+  }
+
+  // otherwise if any weapon exists -> small bonus
+  if (weapons.length) return baseScore * OPT_CONFIG.weaponBonusPrimary;
+
+  return 0;
 }
 
 function optimize() {
@@ -445,20 +459,20 @@ function optimize() {
   const size = Number(el("teamSize").value);
   const results = el("results");
 
-  // Try each unit as leader; pick best team total score.
-  // (Brute force leader choice; rest greedily chosen.)
   let best = null;
 
   for (const leader of units) {
-    const leaderParsed = parseLeaderSkillText(leader.leaderSkill || leader?.leaderSkill?.text);
+    const leaderText = getLeaderSkillText(leader);
+    const leaderParsed = parseLeaderSkill(leaderText);
 
+    // score each unit
     const scored = units.map((u) => {
       const base = scoreUnitBase(u, mode);
-      const leaderBonus = applyLeaderBonusToUnit(u, leaderParsed);
-      return { u, score: base + leaderBonus };
+      const lb = leaderBonusForUnit(u, leaderParsed);
+      const wb = weaponBonus(u, base);
+      return { u, base, score: base + lb + wb, leaderBonus: lb, weaponBonus: wb };
     });
 
-    // ensure leader is included
     const leaderId = leader.__id;
     const leaderEntry = scored.find((x) => x.u.__id === leaderId);
     if (!leaderEntry) continue;
@@ -466,7 +480,6 @@ function optimize() {
     scored.sort((a, b) => b.score - a.score);
 
     const team = [];
-    // add leader first
     team.push({ ...leaderEntry, isLeader: true });
 
     for (const entry of scored) {
@@ -486,38 +499,38 @@ function optimize() {
     return;
   }
 
-  const leaderText = best.leaderParsed?.text
-    ? `<div class="muted">Leader Skill: ${best.leaderParsed.text}</div>`
-    : `<div class="muted">Leader Skill: (none detected)</div>`;
+  const lp = best.leaderParsed;
+  const leaderLine = lp
+    ? `<div class="muted">Leader Skill (${Math.round(lp.confidence * 100)}% match): ${lp.text}</div>`
+    : `<div class="muted">Leader Skill: (none parsed)</div>`;
 
   results.innerHTML = `
-    <div class="muted">Best team by ${mode} score</div>
+    <div class="muted">Best team by ${mode} score (Leader+Weapons applied)</div>
     <div><b>Leader:</b> ${best.leader.name}</div>
-    ${leaderText}
+    ${leaderLine}
     <ul style="margin-top:10px">
       ${best.team
-        .map(
-          (x) =>
-            `<li>${x.isLeader ? "👑 " : ""}<b>${x.u.name}</b> — ${Math.round(x.score)}</li>`
-        )
+        .map((x) => {
+          const tags = [];
+          if (x.isLeader) tags.push("👑");
+          const lb = x.leaderBonus ? `LS +${Math.round(x.leaderBonus)}` : "";
+          const wb = x.weaponBonus ? `W +${Math.round(x.weaponBonus)}` : "";
+          const extras = [lb, wb].filter(Boolean).join(" · ");
+          return `<li>${tags.join(" ")} <b>${x.u.name}</b> — ${Math.round(x.score)}${extras ? ` <span class="muted">(${extras})</span>` : ""}</li>`;
+        })
         .join("")}
     </ul>
     <button class="btn primary" id="applyStory">Apply to Story Team (front slots)</button>
   `;
 
-  // Apply into story team (slots 1..size)
   const btn = document.getElementById("applyStory");
   btn?.addEventListener("click", () => {
-    // clear front slots
     for (let i = 0; i < 5; i++) state.story[i] = null;
-    // assign
     const ids = best.team.map((x) => x.u.__id);
-    for (let i = 0; i < Math.min(5, ids.length); i++) {
-      state.story[i] = ids[i];
-    }
+    for (let i = 0; i < Math.min(5, ids.length); i++) state.story[i] = ids[i];
     saveState();
     renderStoryTeam();
-    // jump user to Story tab
+
     document.querySelectorAll(".tab, .tab-content").forEach((x) => x.classList.remove("active"));
     document.querySelector(`.tab[data-tab="story"]`)?.classList.add("active");
     document.getElementById("story")?.classList.add("active");
