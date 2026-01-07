@@ -1,132 +1,104 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Evertale Optimizer</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
+  <!-- Top Bar -->
   <header class="topbar">
-    <h1>Evertale Optimizer</h1>
-
-    <div class="tabs">
-      <button class="tab active" data-tab="roster">Roster</button>
-      <button class="tab" data-tab="story">Story Team</button>
-      <button class="tab" data-tab="platoons">Platoons</button>
-      <button class="tab" data-tab="optimizer">Optimizer</button>
+    <div class="brand">
+      <div class="brand-title">Evertale Optimizer</div>
+      <div class="brand-sub">Roster • Team Builder • Optimizer</div>
     </div>
+
+    <nav class="tabs" id="tabs">
+      <button class="tab active" data-tab="rosterTab">Characters</button>
+      <button class="tab" data-tab="weaponsTab">Weapons</button>
+      <button class="tab" data-tab="enemiesTab">Enemies</button>
+    </nav>
   </header>
 
-  <!-- ROSTER -->
-  <section id="roster" class="tab-content active">
-    <div class="filters">
-      <input id="search" placeholder="Search unit name…" />
-
-      <select id="filterElement"></select>
-
-      <select id="filterRarity">
-        <option value="">All Rarity</option>
-        <option value="5">SSR</option>
-        <option value="4">SR</option>
-        <option value="3">R</option>
-      </select>
-
-      <select id="filterWeapon"></select>
-
-      <select id="sortBy">
-        <option value="atk">Sort by ATK</option>
-        <option value="hp">Sort by HP</option>
-        <option value="spd">Sort by SPD</option>
-        <option value="rarity">Sort by Rarity</option>
-        <option value="name">Sort by Name</option>
-      </select>
-    </div>
-
-    <div id="rosterGrid" class="grid"></div>
+  <!-- Status + Errors -->
+  <section class="system">
+    <div id="status" class="status">Loading…</div>
+    <div id="error" class="error" style="display:none;"></div>
   </section>
 
-  <!-- STORY TEAM -->
-  <section id="story" class="tab-content">
-    <h2>Story Team (8 Units)</h2>
-    <div id="storyTeam" class="teamGrid"></div>
-  </section>
-
-  <!-- PLATOONS -->
-  <section id="platoons" class="tab-content">
-    <h2>Platoons (20 × 5)</h2>
-    <div id="platoonList"></div>
-  </section>
-
-  <!-- OPTIMIZER -->
-  <section id="optimizer" class="tab-content">
-    <h2>Team Optimizer</h2>
-
-    <div class="optimizerControls">
-      <select id="mode">
-        <option value="PVE">PVE</option>
-        <option value="PVP">PVP</option>
-        <option value="BOSS">Boss</option>
-        <option value="STORY">Story</option>
-      </select>
-
-      <select id="teamSize">
-        <option value="5">5 Units</option>
-        <option value="8">8 Units</option>
-      </select>
-
-      <button class="btn primary" onclick="optimize()">Optimize</button>
-    </div>
-
-    <div id="results" class="results"></div>
-  </section>
-
-  <!-- UNIT DETAIL MODAL -->
-  <div id="unitModal" class="modalOverlay" aria-hidden="true">
-    <div class="modalCard">
-      <div class="modalHeader">
-        <div>
-          <div id="unitModalTitle" class="modalTitle"></div>
-          <div id="unitModalSubtitle" class="modalSubtitle"></div>
-        </div>
-        <button id="unitModalClose" class="iconBtn">✕</button>
-      </div>
-
-      <div class="modalBody">
-        <div id="unitModalBadges" class="modalBadges"></div>
-
-        <div class="modalGrid">
-          <div class="modalStat"><span>Cost</span><b id="unitModalCost"></b></div>
-          <div class="modalStat"><span>ATK</span><b id="unitModalAtk"></b></div>
-          <div class="modalStat"><span>HP</span><b id="unitModalHp"></b></div>
-          <div class="modalStat"><span>SPD</span><b id="unitModalSpd"></b></div>
-        </div>
-
-        <div class="modalSection">
-          <div class="modalSectionTitle">Leader Skill</div>
-          <div id="unitModalLeader" class="modalText"></div>
-        </div>
-
-        <div class="modalSection">
-          <div class="modalSectionTitle">Active Skills</div>
-          <ul id="unitModalActive" class="modalList"></ul>
-        </div>
-
-        <div class="modalSection">
-          <div class="modalSectionTitle">Passive Skills</div>
-          <ul id="unitModalPassive" class="modalList"></ul>
+  <!-- Main -->
+  <main class="main">
+    <!-- Characters -->
+    <section id="rosterTab" class="panel active">
+      <div class="panel-head">
+        <h2>Characters</h2>
+        <div class="panel-tools">
+          <input id="searchInput" type="search" placeholder="Search characters…" autocomplete="off" />
+          <span id="countBadge" class="badge">0</span>
         </div>
       </div>
 
-      <div class="modalFooter">
-        <button id="unitModalAddStory" class="btn primary">Add to Story Team</button>
-        <button id="unitModalClose2" class="btn">Close</button>
+      <div id="roster" class="grid"></div>
+    </section>
+
+    <!-- Weapons -->
+    <section id="weaponsTab" class="panel">
+      <div class="panel-head">
+        <h2>Weapons</h2>
+        <div class="panel-tools">
+          <input id="weaponSearchInput" type="search" placeholder="Search weapons…" autocomplete="off" />
+          <span id="weaponCountBadge" class="badge">0</span>
+        </div>
       </div>
+
+      <div id="weaponsList" class="list"></div>
+    </section>
+
+    <!-- Enemies -->
+    <section id="enemiesTab" class="panel">
+      <div class="panel-head">
+        <h2>Enemies</h2>
+        <div class="panel-tools">
+          <input id="enemySearchInput" type="search" placeholder="Search enemies…" autocomplete="off" />
+          <span id="enemyCountBadge" class="badge">0</span>
+        </div>
+      </div>
+
+      <div id="enemiesList" class="list"></div>
+    </section>
+  </main>
+
+  <!-- Unit Modal -->
+  <div id="unitModal" class="modal" style="display:none;">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="unitModalTitle">
+      <div class="modal-head">
+        <div id="unitModalTitle" class="modal-title">Unit</div>
+        <button id="unitModalClose" class="icon-btn" aria-label="Close">✕</button>
+      </div>
+      <div id="unitModalBody" class="modal-body"></div>
     </div>
   </div>
 
-  <!-- IMPORTANT: this MUST be here -->
+  <script>
+    // Simple tabs (no framework)
+    (function () {
+      const tabs = document.querySelectorAll(".tab");
+      const panels = document.querySelectorAll(".panel");
+
+      function setActive(tabId) {
+        panels.forEach(p => p.classList.toggle("active", p.id === tabId));
+        tabs.forEach(t => t.classList.toggle("active", t.dataset.tab === tabId));
+      }
+
+      tabs.forEach(t => {
+        t.addEventListener("click", () => setActive(t.dataset.tab));
+      });
+    })();
+  </script>
+
   <script src="app.js"></script>
 </body>
 </html>
