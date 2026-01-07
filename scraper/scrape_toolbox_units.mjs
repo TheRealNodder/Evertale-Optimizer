@@ -1,6 +1,7 @@
 // scraper/scrape_toolbox_units.mjs
-// Text-based parser for https://evertaletoolbox2.runasp.net/Viewer
-// (Viewer is not a real <table>, so we parse the rendered text blocks)
+// Robust text parser for https://evertaletoolbox2.runasp.net/Viewer
+// Does NOT depend on <table> OR "Image" tokens.
+// Output: ../data/units.json
 
 import fs from "node:fs";
 import path from "node:path";
@@ -9,7 +10,7 @@ const VIEWER_URL = "https://evertaletoolbox2.runasp.net/Viewer";
 const OUT_PATH = path.join(process.cwd(), "..", "data", "units.json");
 
 function decodeHtmlEntities(str) {
-  return str
+  return String(str ?? "")
     .replace(/&nbsp;/g, " ")
     .replace(/&amp;/g, "&")
     .replace(/&lt;/g, "<")
@@ -19,10 +20,9 @@ function decodeHtmlEntities(str) {
 }
 
 function stripToLines(html) {
-  // Turn HTML into text lines we can scan
   let t = html;
 
-  // Convert <br> and </p>/<li> etc into line breaks
+  // Preserve separators
   t = t.replace(/<br\s*\/?>/gi, "\n");
   t = t.replace(/<\/(p|div|li|tr|td|th|h1|h2|h3|h4|h5|h6)>/gi, "\n");
 
@@ -31,13 +31,42 @@ function stripToLines(html) {
 
   t = decodeHtmlEntities(t);
 
-  // Normalize and split
-  const lines = t
+  // Normalize
+  return t
     .split("\n")
     .map((s) => s.replace(/\s+/g, " ").trim())
     .filter(Boolean);
+}
 
-  return lines;
+function isHeaderWord(s) {
+  return (
+    s === "Name" ||
+    s === "Rarity" ||
+    s === "Element" ||
+    s === "Cost" ||
+    s === "ATK" ||
+    s === "HP" ||
+    s === "SPD" ||
+    s === "Weapon" ||
+    s === "Leader Skill" ||
+    s === "Active Skills" ||
+    s === "Passive Skills" ||
+    s === "Card View" ||
+    s === "Column:" ||
+    s === "Character" ||
+    s === "Weapon:" ||
+    s === "Weapon" ||
+    s === "Accessory" ||
+    s === "Boss" ||
+    s === "Elements:" ||
+    s === "Rarity:" ||
+    s === "ALL"
+  );
+}
+
+function isLinkImageToken(s) {
+  // Matches "" style text shown in the web viewer extraction
+  return /^【\d+†Image】$/.test(s) || s === "Image";
 }
 
 function isNumberLike(s) {
@@ -50,129 +79,146 @@ function toInt(s) {
 }
 
 function looksLikeLeaderName(s) {
-  // Examples: "Light HP Up", "Storm ATK & HP Up", "Fire Attack Up"
-  // Keep it permissive; the next line is usually the description sentence.
+  // Examples from page:
+  // "Light HP Up", "Storm ATK & HP Up", "Earth Attack Up"
   return (
+    typeof s === "string" &&
     s.length >= 3 &&
-    s.length <= 40 &&
-    /Up|ATK|HP|SPD|Speed|Attack|Def|Resist/i.test(s) &&
-    !s.endsWith(".")
+    s.length <= 60 &&
+    /Up|ATK|HP|SPD|Speed|Attack/i.test(s) &&
+    !/[.!?]$/.test(s)
   );
 }
 
-function looksLikeSentence(s) {
-  return s.length >= 15 && /[.!?]$/.test(s);
+function looksLikeLeaderDesc(s) {
+  // Example from page:
+  // "Allied Light element units have their max HP increased by 10%."
+  return typeof s === "string" && (s.includes("Allied") || /increased by/i.test(s));
 }
 
-function parseUnitsFromViewer(lines) {
-  // Find where the CHARACTER list begins (after headers)
-  const startIdx = lines.findIndex((x) => x === "Name");
-  if (startIdx === -1) throw new Error("Could not find Viewer header 'Name'.");
+function parseViewer(lines) {
+  // Limit to the Character area only, stop before Weapon section.
+  const weaponStart = lines.findIndex((x) => x === "Weapon:");
+  const trimmed = weaponStart !== -1 ? lines.slice(0, weaponStart) : lines;
 
-  // Stop before weapon list begins (Viewer page includes weapons after character section)
-  const weaponIdx = lines.findIndex((x) => x === "Weapon:");
-  const endIdx = weaponIdx !== -1 ? weaponIdx : lines.length;
+  // Find the header "Name" that begins the listing
+  const start = trimmed.findIndex((x) => x === "Name");
+  if (start === -1) throw new Error("Could not find listing start header 'Name'.");
 
-  const slice = lines.slice(startIdx, endIdx);
+  const slice = trimmed.slice(start);
 
-  // The unit blocks start with repeated "Image" tokens.
-  // We'll look for a pattern:
-  // "Image" then Name then Title then ... then Cost (number) then ATK (number) HP (number) SPD (number) then leader skill name + description then skill lists
   const units = [];
-  let i = 0;
 
-  while (i < slice.length) {
-    // Seek to the start of a card
-    if (slice[i] !== "Image") {
-      i++;
-      continue;
+  // Scan for Name + Title + (cost, atk, hp, spd)
+  // We do NOT rely on any image tokens.
+  for (let i = 0; i < slice.length - 10; i++) {
+    const name = slice[i];
+    const title = slice[i + 1];
+
+    // Basic filters: skip headers, links, numbers
+    if (!name || !title) continue;
+    if (isHeaderWord(name) || isHeaderWord(title)) continue;
+    if (isLinkImageToken(name) || isLinkImageToken(title)) continue;
+    if (isNumberLike(name) || isNumberLike(title)) continue;
+    if (name.includes("items") || name.startsWith("Page ")) continue;
+
+    // Find first 4 consecutive numbers within next 35 lines
+    let j = i + 2;
+    let cost = null, atk = null, hp = null, spd = null;
+    let statsPos = -1;
+
+    const searchLimit = Math.min(slice.length, i + 40);
+    while (j < searchLimit) {
+      if (
+        isNumberLike(slice[j]) &&
+        isNumberLike(slice[j + 1]) &&
+        isNumberLike(slice[j + 2]) &&
+        isNumberLike(slice[j + 3])
+      ) {
+        cost = toInt(slice[j]);
+        atk = toInt(slice[j + 1]);
+        hp = toInt(slice[j + 2]);
+        spd = toInt(slice[j + 3]);
+        statsPos = j;
+        break;
+      }
+      j++;
     }
 
-    // Candidate start
-    const name = slice[i + 1];
-    const title = slice[i + 2];
+    if (statsPos === -1 || cost == null || atk == null || hp == null || spd == null) continue;
 
-    // Basic sanity checks
-    if (!name || !title) {
-      i++;
-      continue;
-    }
-    if (name === "Name" || title === "Rarity") {
-      i++;
-      continue;
-    }
+    // Next: leader skill name + desc (best effort)
+    let k = statsPos + 4;
 
-    // Walk forward and find the first numeric trio: cost, atk, hp, spd
-    let j = i + 3;
-    while (j < slice.length && !isNumberLike(slice[j])) j++;
+    // skip link-image tokens + ALL
+    while (k < slice.length && (isLinkImageToken(slice[k]) || slice[k] === "ALL")) k++;
 
-    // Need cost+atk+hp+spd = 4 consecutive numeric lines
-    const cost = toInt(slice[j]);
-    const atk = toInt(slice[j + 1]);
-    const hp = toInt(slice[j + 2]);
-    const spd = toInt(slice[j + 3]);
-
-    if (cost == null || atk == null || hp == null || spd == null) {
-      // Not a valid card, advance
-      i++;
-      continue;
-    }
-
-    // After stats there’s usually "Image" (weapon icon) then leader skill name + description
-    let k = j + 4;
-
-    // Skip non-text noise (Images, ALL, etc.)
-    while (k < slice.length && (slice[k] === "Image" || slice[k] === "ALL")) k++;
-
-    // Leader skill name + description (best effort)
     let leaderSkillName = null;
     let leaderSkillText = null;
 
-    if (k < slice.length && looksLikeLeaderName(slice[k]) && looksLikeSentence(slice[k + 1] || "")) {
+    if (looksLikeLeaderName(slice[k]) && looksLikeLeaderDesc(slice[k + 1])) {
       leaderSkillName = slice[k];
       leaderSkillText = slice[k + 1];
       k += 2;
-    } else {
-      // Sometimes the leader name exists but description doesn't end with "."
-      if (k < slice.length && looksLikeLeaderName(slice[k])) {
-        leaderSkillName = slice[k];
-        // Grab next line as description if it looks sentence-ish
-        if (looksLikeSentence(slice[k + 1] || "") || (slice[k + 1] || "").includes("Allied")) {
-          leaderSkillText = slice[k + 1];
-          k += 2;
-        } else {
-          k += 1;
-        }
-      }
     }
 
-    // Next lines: active skills then passive skills, until the next "Image" that starts next card.
+    // Skills until we hit the next unit start (heuristic) or paging/footer
     const skills = [];
-    while (k < slice.length && slice[k] !== "Image") {
+    while (k < slice.length) {
       const s = slice[k];
-      // Remove obvious section labels
+
+      // break at footer / pagination / next filters
       if (
-        s !== "Rarity" &&
-        s !== "Element" &&
-        s !== "Cost" &&
-        s !== "ATK" &&
-        s !== "HP" &&
-        s !== "SPD" &&
-        s !== "Leader Skill" &&
-        s !== "Active Skills" &&
-        s !== "Passive Skills" &&
-        s !== "Card View" &&
-        s !== "Column:"
+        s === "397 items" ||
+        s.startsWith("Page ") ||
+        s === "Rarity:" ||
+        s === "Elements:" ||
+        s === "Weapon:"
+      )
+        break;
+
+      // break if we’re clearly at a new unit start:
+      // (a non-header, non-number line followed by another non-header line,
+      // and within a few lines after that there is a 4-number stat block)
+      if (
+        k + 1 < slice.length &&
+        !isHeaderWord(s) &&
+        !isHeaderWord(slice[k + 1]) &&
+        !isNumberLike(s) &&
+        !isNumberLike(slice[k + 1]) &&
+        !isLinkImageToken(s) &&
+        !isLinkImageToken(slice[k + 1])
       ) {
+        // look ahead a bit for 4 consecutive numbers; if yes, that indicates a new unit
+        let look = k + 2;
+        const lookLimit = Math.min(slice.length, k + 20);
+        let foundNewStats = false;
+        while (look < lookLimit) {
+          if (
+            isNumberLike(slice[look]) &&
+            isNumberLike(slice[look + 1]) &&
+            isNumberLike(slice[look + 2]) &&
+            isNumberLike(slice[look + 3])
+          ) {
+            foundNewStats = true;
+            break;
+          }
+          look++;
+        }
+        // but only treat as new unit if the next candidate also has a plausible title-ish line (not too long)
+        if (foundNewStats && s.length <= 40 && slice[k + 1].length <= 60) break;
+      }
+
+      // Collect skills, skip junk headers/images
+      if (!isHeaderWord(s) && !isLinkImageToken(s)) {
         skills.push(s);
       }
       k++;
     }
 
-    // Toolbox usually has 6 active skills and 4 passive skills, but we won’t hardcode it.
-    // Heuristic: passive skills often include "Up Lv" or "Resist Lv" or "Mastery"
-    const passiveSkills = skills.filter((s) => /Up Lv|Resist Lv|Mastery/i.test(s));
-    const activeSkills = skills.filter((s) => !/Up Lv|Resist Lv|Mastery/i.test(s));
+    // Heuristic split: passives usually contain "Up Lv" / "Resist Lv" / "Mastery"
+    const passiveSkills = skills.filter((x) => /Up Lv|Resist Lv|Mastery/i.test(x));
+    const activeSkills = skills.filter((x) => !/Up Lv|Resist Lv|Mastery/i.test(x));
 
     const id = `${name}__${title}`.toLowerCase().replace(/[^a-z0-9]+/g, "_");
 
@@ -186,44 +232,51 @@ function parseUnitsFromViewer(lines) {
       leaderSkillText,
       activeSkills,
       passiveSkills,
-      source: { viewer: VIEWER_URL }
+      source: { viewer: VIEWER_URL },
     });
 
-    // Continue from next card marker
-    i = k;
+    // Skip ahead a bit so we don’t re-detect inside same block
+    i = Math.max(i, statsPos);
   }
 
-  return units;
+  // Deduplicate (same name/title might appear once per page)
+  const seen = new Set();
+  const unique = [];
+  for (const u of units) {
+    if (seen.has(u.id)) continue;
+    seen.add(u.id);
+    unique.push(u);
+  }
+
+  return unique;
 }
 
 async function run() {
   console.log(`Fetching Viewer: ${VIEWER_URL}`);
   const res = await fetch(VIEWER_URL, {
-    headers: { "user-agent": "Evertale-Optimizer-Scraper/3.0" }
+    headers: { "user-agent": "Evertale-Optimizer-Scraper/4.0" },
   });
   if (!res.ok) throw new Error(`Viewer fetch failed: ${res.status}`);
 
   const html = await res.text();
   const lines = stripToLines(html);
 
-  // Quick sanity check that we actually got real content
-  if (!lines.includes("Rizette") && !lines.includes("Zeus")) {
-    // If this triggers, it means the runner is getting a blocked/blank response.
-    throw new Error("Viewer content looks empty or blocked (did not contain expected unit names).");
+  // Sanity: the viewer should contain at least these labels
+  if (!lines.includes("Name") || !lines.includes("ATK") || !lines.includes("HP") || !lines.includes("SPD")) {
+    throw new Error("Viewer response does not look like the unit listing (blocked or changed).");
   }
 
-  const units = parseUnitsFromViewer(lines);
+  const units = parseViewer(lines);
 
   if (!units.length) {
-    throw new Error("Parsed 0 units from Viewer text. The layout may have changed.");
+    // Dump a tiny debug sample into logs (first 120 lines) to see what runner received
+    console.log("DEBUG first 120 lines:");
+    console.log(lines.slice(0, 120).join("\n"));
+    throw new Error("Parsed 0 units from Viewer text. Need to adjust parsing markers.");
   }
 
   fs.mkdirSync(path.dirname(OUT_PATH), { recursive: true });
-  fs.writeFileSync(
-    OUT_PATH,
-    JSON.stringify({ updatedAt: new Date().toISOString(), units }, null, 2)
-  );
-
+  fs.writeFileSync(OUT_PATH, JSON.stringify({ updatedAt: new Date().toISOString(), units }, null, 2));
   console.log(`Wrote ${units.length} units to ${OUT_PATH}`);
 }
 
