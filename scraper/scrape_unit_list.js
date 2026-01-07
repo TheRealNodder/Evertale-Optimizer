@@ -2,32 +2,61 @@ import fs from "fs";
 import fetch from "node-fetch";
 import cheerio from "cheerio";
 
-const URL = "https://evertale2.fandom.com/wiki/Unit_List";
+const links = JSON.parse(fs.readFileSync("unit_links.json"));
 
-async function run() {
-  const res = await fetch(URL);
-  if (!res.ok) throw new Error("Failed to fetch unit list");
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+function normalizeRarity(text = "") {
+  if (text.includes("SSR")) return 5;
+  if (text.includes("SR")) return 4;
+  if (text.includes("R")) return 3;
+  return 2;
+}
+
+async function scrapeUnit(unit) {
+  const res = await fetch(unit.url);
+  if (!res.ok) throw new Error(`Fetch failed: ${unit.name}`);
 
   const html = await res.text();
   const $ = cheerio.load(html);
+  const box = $(".portable-infobox");
 
-  const units = [];
+  const get = label =>
+    box.find(`h3:contains("${label}")`).next().text().trim();
 
-  $("table.wikitable tbody tr").each((_, row) => {
-    const link = $(row).find("td a").first();
-    const name = link.text().trim();
-    const href = link.attr("href");
+  return {
+    id: unit.name.toLowerCase().replace(/\s+/g, "_"),
+    name: unit.name,
+    element: get("Element") || null,
+    rarity: normalizeRarity(get("Rarity")),
+    stats: {
+      hp: Number(get("HP")) || 0,
+      atk: Number(get("Attack")) || 0,
+      spd: Number(get("Speed")) || 0
+    },
+    weapons: get("Weapon") ? get("Weapon").split(",").map(w => w.trim()) : [],
+    leaderSkill: get("Leader Skill") || null
+  };
+}
 
-    if (!name || !href) return;
+async function run() {
+  const results = [];
 
-    units.push({
-      name,
-      url: `https://evertale2.fandom.com${href}`
-    });
-  });
-
-  if (units.length === 0) {
-    throw new Error("No units found — selector failed");
+  for (const unit of links) {
+    try {
+      console.log(`Scraping ${unit.name}`);
+      results.push(await scrapeUnit(unit));
+      await sleep(800); // ← prevents 429
+    } catch (err) {
+      console.warn(`Skipped ${unit.name}`);
+    }
   }
 
-  fs.writeFileSync("unit_links.json", JSON.stringify(units, n_
+  fs.writeFileSync("units.json", JSON.stringify(results, null, 2));
+  console.log(`✔ Saved ${results.length} units`);
+}
+
+run().catch(err => {
+  console.error(err);
+  process.exit(1);
+});
