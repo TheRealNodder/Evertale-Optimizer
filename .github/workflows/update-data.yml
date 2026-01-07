@@ -35,27 +35,98 @@ jobs:
         working-directory: scraper
         run: npx playwright install --with-deps chromium
 
-      # IMPORTANT: run from REPO ROOT so "data/..." resolves correctly
-      - name: Ensure data folder exists (repo root)
-        run: mkdir -p data
-
-      - name: Scrape Explorer catalog (repo root)
-        run: node scraper/scrape_toolbox_catalog.mjs
-
-      - name: Scrape Viewer characters (repo root)
-        run: node scraper/scrape_viewer_characters_playwright.mjs
-
-      # Debug: show what was created
-      - name: List generated files
+      - name: Ensure data folders exist
         run: |
-          echo "=== repo root ==="
-          ls -la
+          mkdir -p data
+          mkdir -p scraper/data
+
+      - name: Run scrapers (repo root)
+        run: |
+          node scraper/scrape_toolbox_catalog.mjs
+          node scraper/scrape_viewer_characters_playwright.mjs
+
+      - name: Debug: list outputs
+        run: |
           echo "=== data/ ==="
           ls -la data || true
-          echo "=== scraper/data/ (should be empty) ==="
+          echo "=== scraper/data/ ==="
           ls -la scraper/data || true
+          echo "=== find any json ==="
+          find . -maxdepth 3 -type f -name "*.json" -print
 
-      # Hard fail if the exact website files are missing/empty
+      # Normalize output filenames no matter what the scraper produced
+      - name: Normalize outputs to website filenames
+        run: |
+          set -e
+
+          # Helper: pick first existing non-empty file from a list
+          pick() {
+            for f in "$@"; do
+              if [ -s "$f" ]; then
+                echo "$f"
+                return 0
+              fi
+            done
+            return 1
+          }
+
+          # Try common candidates for catalog output
+          CATALOG_SRC=$(pick \
+            data/catalog.toolbox.json \
+            data/catalog.json \
+            data/catalog.toolbox.json \
+            data/catalog.toolbox.full.json \
+            data/toolbox.catalog.json \
+            data/catalog.toolbox.items.json \
+            data/items.catalog.json \
+            data/units.catalog.json \
+            data/units.toolbox.json \
+            scraper/data/catalog.toolbox.json \
+            scraper/data/catalog.json \
+            scraper/data/units.toolbox.json \
+            scraper/data/units.toolbox.full.json \
+            scraper/data/toolbox.catalog.json \
+            scraper/data/catalog.toolbox.full.json \
+          ) || true
+
+          # Try common candidates for viewer/character output
+          CHARS_SRC=$(pick \
+            data/characters.viewer.full.json \
+            data/characters.json \
+            data/units.viewer.full.json \
+            data/units.viewer.json \
+            data/viewer.characters.json \
+            data/toolbox.characters.json \
+            scraper/data/characters.viewer.full.json \
+            scraper/data/characters.json \
+            scraper/data/units.viewer.full.json \
+            scraper/data/units.viewer.json \
+            scraper/data/viewer.characters.json \
+          ) || true
+
+          echo "CATALOG_SRC=${CATALOG_SRC}"
+          echo "CHARS_SRC=${CHARS_SRC}"
+
+          # If either source wasn't found, fail with a clear message
+          if [ -z "${CATALOG_SRC}" ]; then
+            echo "ERROR: Could not locate catalog JSON output from scraper."
+            echo "Look above at Debug list outputs."
+            exit 1
+          fi
+          if [ -z "${CHARS_SRC}" ]; then
+            echo "ERROR: Could not locate characters/viewer JSON output from scraper."
+            echo "Look above at Debug list outputs."
+            exit 1
+          fi
+
+          # Copy into the exact filenames the website expects
+          cp -f "${CATALOG_SRC}" data/catalog.toolbox.json
+          cp -f "${CHARS_SRC}" data/characters.viewer.full.json
+
+          # Show sizes to confirm
+          echo "=== normalized outputs ==="
+          ls -la data/catalog.toolbox.json data/characters.viewer.full.json
+
       - name: Verify expected output files exist
         run: |
           test -s data/catalog.toolbox.json
