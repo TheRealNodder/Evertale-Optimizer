@@ -33,14 +33,14 @@ jobs:
 
       - name: Run toolbox scraper (recreates data/)
         working-directory: scraper
-        run: node scrape_toolbox_units_full.mjs
+        run: node scrape_toolbox_catalog.mjs
 
       - name: Commit generated data
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/*.json || true
-          git diff --cached --quiet || git commit -m "Update toolbox data"
+          git add data/catalog.toolbox.json || true
+          git diff --cached --quiet || git commit -m "Update toolbox catalog"
 
       - name: Push changes (rebase if needed)
         env:
