@@ -1,5 +1,4 @@
 import fs from "fs";
-import fetch from "node-fetch";
 import * as cheerio from "cheerio";
 
 const URL = "https://evertale2.fandom.com/wiki/Unit_List";
