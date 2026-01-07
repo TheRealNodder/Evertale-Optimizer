@@ -1,66 +1,43 @@
-name: Scrape Evertale Units
+<!-- Unit Detail Modal -->
+<div id="unitModal" class="modalOverlay" aria-hidden="true">
+  <div class="modalCard" role="dialog" aria-modal="true" aria-labelledby="unitModalTitle">
+    <div class="modalHeader">
+      <div class="modalTitleWrap">
+        <div id="unitModalTitle" class="modalTitle">Unit</div>
+        <div id="unitModalSubtitle" class="modalSubtitle"></div>
+      </div>
+      <button id="unitModalClose" class="iconBtn" aria-label="Close">✕</button>
+    </div>
 
-on:
-  workflow_dispatch:
-  schedule:
-    - cron: "0 6 * * 0" # Sunday 06:00 UTC
+    <div class="modalBody">
+      <div class="modalBadges" id="unitModalBadges"></div>
 
-# IMPORTANT: allow the workflow token to write (helps even if you use PAT)
-permissions:
-  contents: write
+      <div class="modalGrid">
+        <div class="modalStat"><span>Cost</span><b id="unitModalCost">-</b></div>
+        <div class="modalStat"><span>ATK</span><b id="unitModalAtk">-</b></div>
+        <div class="modalStat"><span>HP</span><b id="unitModalHp">-</b></div>
+        <div class="modalStat"><span>SPD</span><b id="unitModalSpd">-</b></div>
+      </div>
 
-jobs:
-  scrape:
-    runs-on: ubuntu-latest
+      <div class="modalSection">
+        <div class="modalSectionTitle">Leader Skill</div>
+        <div id="unitModalLeader" class="modalText muted">-</div>
+      </div>
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          # IMPORTANT: don't keep the default bot credentials
-          persist-credentials: false
-          fetch-depth: 0
+      <div class="modalSection">
+        <div class="modalSectionTitle">Active Skills</div>
+        <ul id="unitModalActive" class="modalList"></ul>
+      </div>
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
+      <div class="modalSection">
+        <div class="modalSectionTitle">Passive Skills</div>
+        <ul id="unitModalPassive" class="modalList"></ul>
+      </div>
+    </div>
 
-      - name: Clean & install dependencies
-        working-directory: scraper
-        run: |
-          rm -rf node_modules package-lock.json
-          npm install
-
-      - name: Run unit list scraper
-        working-directory: scraper
-        run: node scrape_unit_list.js
-
-      - name: Run unit page scraper
-        working-directory: scraper
-        run: node scrape_unit_pages.js
-
-      - name: Move generated units.json
-        run: |
-          mkdir -p data
-          mv scraper/units.json data/units.json
-
-      - name: Commit updated units.json
-        run: |
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-          git add data/units.json
-          git diff --cached --quiet || git commit -m "Update units.json"
-
-      - name: Push changes using PAT
-        env:
-          GH_PAT: ${{ secrets.GH_PAT }}
-        run: |
-          if [ -z "$GH_PAT" ]; then
-            echo "GH_PAT secret is missing or empty"
-            exit 1
-          fi
-
-          # Force origin to use PAT (this is the key)
-          git remote set-url origin "https://x-access-token:${GH_PAT}@github.com/TheRealNodder/Evertale-Optimizer.git"
-          git push origin HEAD:main
+    <div class="modalFooter">
+      <button id="unitModalAddStory" class="btn primary">Add to Story Team</button>
+      <button id="unitModalClose2" class="btn">Close</button>
+    </div>
+  </div>
+</div>
