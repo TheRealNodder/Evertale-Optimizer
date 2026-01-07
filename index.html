@@ -8,46 +8,135 @@
 </head>
 
 <body>
-  <!-- Top Bar -->
   <header class="topbar">
     <div class="brand">
       <div class="brand-title">Evertale Optimizer</div>
-      <div class="brand-sub">Viewer Roster • Search • Details</div>
+      <div class="brand-sub">Catalog • Team Builder • Optimizer</div>
     </div>
+
+    <nav class="tabs" id="tabs">
+      <button class="tab active" data-tab="tabCatalog">Catalog</button>
+      <button class="tab" data-tab="tabTeam">Team Builder</button>
+      <button class="tab" data-tab="tabOptimizer">Optimizer</button>
+    </nav>
   </header>
 
-  <!-- Status + Errors -->
   <section class="system">
     <div id="status" class="status">Loading…</div>
     <div id="error" class="error" style="display:none; white-space:pre-wrap;"></div>
   </section>
 
-  <!-- Main -->
   <main class="main">
-    <section class="panel active">
+    <!-- CATALOG -->
+    <section id="tabCatalog" class="panel active">
       <div class="panel-head">
-        <h2>Roster</h2>
-
+        <h2>Catalog</h2>
         <div class="panel-tools">
           <select id="categorySelect" class="select" aria-label="Category"></select>
-
-          <input
-            id="searchInput"
-            type="search"
-            placeholder="Search by name, title, or id…"
-            autocomplete="off"
-          />
-
+          <input id="searchInput" type="search" placeholder="Search…" autocomplete="off" />
           <span id="countBadge" class="badge">0</span>
         </div>
       </div>
 
-      <!-- Cards render here -->
       <div id="grid" class="grid"></div>
+    </section>
+
+    <!-- TEAM BUILDER -->
+    <section id="tabTeam" class="panel">
+      <div class="panel-head">
+        <h2>Team Builder</h2>
+        <div class="panel-tools">
+          <select id="teamMode" class="select" aria-label="Team mode">
+            <option value="story">Story Team (8)</option>
+            <option value="platoon">Platoon (5) × 20</option>
+          </select>
+
+          <select id="platoonSelect" class="select" aria-label="Platoon number" style="display:none;"></select>
+
+          <button id="btnClearTeam" class="btn">Clear Team</button>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="col">
+          <div class="section-title">Drop units into slots</div>
+
+          <div id="storyLayout" class="team-layout">
+            <div class="team-row">
+              <div class="slot" data-slot="story-main-1"><div class="slot-label">Main 1</div></div>
+              <div class="slot" data-slot="story-main-2"><div class="slot-label">Main 2</div></div>
+              <div class="slot" data-slot="story-main-3"><div class="slot-label">Main 3</div></div>
+              <div class="slot" data-slot="story-main-4"><div class="slot-label">Main 4</div></div>
+              <div class="slot" data-slot="story-main-5"><div class="slot-label">Main 5</div></div>
+            </div>
+            <div class="team-row">
+              <div class="slot" data-slot="story-backup-1"><div class="slot-label">Backup 1</div></div>
+              <div class="slot" data-slot="story-backup-2"><div class="slot-label">Backup 2</div></div>
+              <div class="slot" data-slot="story-backup-3"><div class="slot-label">Backup 3</div></div>
+            </div>
+          </div>
+
+          <div id="platoonLayout" class="team-layout" style="display:none;">
+            <div class="team-row">
+              <div class="slot" data-slot="platoon-1"><div class="slot-label">Slot 1</div></div>
+              <div class="slot" data-slot="platoon-2"><div class="slot-label">Slot 2</div></div>
+              <div class="slot" data-slot="platoon-3"><div class="slot-label">Slot 3</div></div>
+              <div class="slot" data-slot="platoon-4"><div class="slot-label">Slot 4</div></div>
+              <div class="slot" data-slot="platoon-5"><div class="slot-label">Slot 5</div></div>
+            </div>
+          </div>
+
+          <div class="hint">
+            Tip: drag a card from <b>Catalog → Characters</b> into a slot. Click a slot’s ✕ to remove.
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="section-title">Current Team Summary</div>
+          <div id="teamSummary" class="summary"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- OPTIMIZER -->
+    <section id="tabOptimizer" class="panel">
+      <div class="panel-head">
+        <h2>Optimizer</h2>
+        <div class="panel-tools">
+          <button id="btnAutofill" class="btn primary">Auto-fill current team</button>
+        </div>
+      </div>
+
+      <div class="optimizer">
+        <div class="opt-row">
+          <label>ATK weight</label>
+          <input id="wAtk" type="number" step="0.1" value="1.0" />
+        </div>
+        <div class="opt-row">
+          <label>HP weight</label>
+          <input id="wHp" type="number" step="0.1" value="0.08" />
+        </div>
+        <div class="opt-row">
+          <label>SPD weight</label>
+          <input id="wSpd" type="number" step="0.1" value="2.0" />
+        </div>
+        <div class="opt-row">
+          <label>Cost penalty</label>
+          <input id="wCost" type="number" step="0.1" value="0.8" />
+        </div>
+
+        <div class="hint">
+          This optimizer uses Viewer stats: <b>score = atk*wAtk + hp*wHp + spd*wSpd - cost*wCost</b>.
+          We can later add leader-skill logic, element filters, role filters, etc.
+        </div>
+
+        <div class="section-title">Top Picks (preview)</div>
+        <div id="topPicks" class="list"></div>
+      </div>
     </section>
   </main>
 
-  <!-- Modal -->
+  <!-- MODAL -->
   <div id="itemModal" class="modal" style="display:none;">
     <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="itemModalTitle">
       <div class="modal-head">
@@ -57,6 +146,19 @@
       <div id="itemModalBody" class="modal-body"></div>
     </div>
   </div>
+
+  <script>
+    // tabs
+    (function () {
+      const tabs = document.querySelectorAll(".tab");
+      const panels = document.querySelectorAll(".panel");
+      function setActive(id) {
+        panels.forEach(p => p.classList.toggle("active", p.id === id));
+        tabs.forEach(t => t.classList.toggle("active", t.dataset.tab === id));
+      }
+      tabs.forEach(t => t.addEventListener("click", () => setActive(t.dataset.tab)));
+    })();
+  </script>
 
   <script src="app.js"></script>
 </body>
