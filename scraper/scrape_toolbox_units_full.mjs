@@ -110,7 +110,7 @@ function parseUnitsFromHtml(html) {
     let cost = null, atk = null, hp = null, spd = null;
 
     const searchFrom = i + 2;
-    const searchTo = Math.min(slice.length - 4, i + 18); // tight window prevents drift into later blocks
+    const searchTo = Math.min(slice.length - 4, i + 18); // tight window prevents drift
     for (let j = searchFrom; j <= searchTo; j++) {
       const c = asIntMaybe(slice[j]);
       const a = asIntMaybe(slice[j + 1]);
@@ -186,15 +186,10 @@ function parseUnitsFromHtml(html) {
 
 function getTotalPagesFromHtml(html) {
   // Normalize HTML so "Page&nbsp;1&nbsp;of&nbsp;40" matches too
-  const normalized = decodeHtmlEntities(html)
-    .replace(/\s+/g, " ")
-    .trim();
-
+  const normalized = decodeHtmlEntities(html).replace(/\s+/g, " ").trim();
   const m = normalized.match(/Page\s+(\d+)\s+of\s+(\d+)/i);
   if (!m) return null;
-
   return { page: Number(m[1]), total: Number(m[2]) };
-}
 }
 
 async function fetchHtml(url) {
@@ -209,8 +204,8 @@ async function fetchHtml(url) {
 }
 
 /**
- * Auto-discover the paging query param by trying common patterns until the HTML contains "Page 2 of".
- * Returns a function buildUrl(pageNumber) -> url.
+ * Auto-discover a GET pagination parameter by trying common patterns.
+ * If this throws, the site is likely using a JS/XHR POST for paging.
  */
 async function discoverPager(totalPages) {
   if (totalPages < 2) return (p) => VIEWER_URL;
@@ -229,18 +224,20 @@ async function discoverPager(totalPages) {
   for (const build of candidates) {
     try {
       const html2 = await fetchHtml(build(2));
-      if (/Page\s+2\s+of\s+\d+/i.test(html2)) {
+      // Normalize before matching
+      const normalized = decodeHtmlEntities(html2).replace(/\s+/g, " ").trim();
+      if (new RegExp(`Page\\s+2\\s+of\\s+\\d+`, "i").test(normalized)) {
         return build;
       }
     } catch {
-      // ignore and try next
+      // try next
     }
   }
 
   throw new Error(
-    "Could not auto-discover Viewer pagination URL. " +
-    "This usually means paging is handled by a JS POST request. " +
-    "Open Viewer in your browser, click Next, and copy the request URL from DevTools → Network."
+    "Could not auto-discover GET pagination URL. " +
+    "Paging is likely handled by a JS request (XHR/POST). " +
+    "If this happens, we’ll switch to scraping the Explorer API instead."
   );
 }
 
@@ -266,20 +263,16 @@ async function run() {
 
   const allUnits = [];
 
-  // Page 1
   const units1 = parseUnitsFromHtml(html1);
   console.log(`Parsed page 1: ${units1.length}`);
   allUnits.push(...units1);
 
-  // Pages 2..N
   for (let p = 2; p <= pageInfo.total; p++) {
     const url = buildUrl(p);
     const html = await fetchHtml(url);
     const units = parseUnitsFromHtml(html);
     console.log(`Parsed page ${p}: ${units.length}`);
     allUnits.push(...units);
-
-    // small delay for politeness
     await new Promise((r) => setTimeout(r, 150));
   }
 
