@@ -1,1 +1,64 @@
+name: Update toolbox data (Playwright)
 
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 9 * * *" # daily 09:00 UTC
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-toolbox-data
+  cancel-in-progress: true
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install scraper dependencies
+        working-directory: scraper
+        run: npm install
+
+      - name: Install Playwright browsers (Chromium)
+        working-directory: scraper
+        run: npx playwright install --with-deps chromium
+
+      - name: Scrape Explorer catalog (Playwright)
+        working-directory: scraper
+        run: node scrape_toolbox_catalog.mjs
+
+      - name: Scrape Viewer characters (Playwright)
+        working-directory: scraper
+        run: node scrape_viewer_characters_playwright.mjs
+
+      - name: Commit generated data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/catalog.toolbox.json data/characters.viewer.full.json data/_debug_explorer_rendered.html || true
+          git diff --cached --quiet || git commit -m "Update toolbox data (Playwright)"
+
+      - name: Push changes (rebase if needed)
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: |
+          if [ -z "$GH_PAT" ]; then
+            echo "GH_PAT secret is missing"
+            exit 1
+          fi
+          git remote set-url origin "https://x-access-token:${GH_PAT}@github.com/TheRealNodder/Evertale-Optimizer.git"
+          git fetch origin main
+          git rebase origin/main || (git rebase --abort && exit 1)
+          git push origin HEAD:main
