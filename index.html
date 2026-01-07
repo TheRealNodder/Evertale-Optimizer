@@ -1,59 +1,66 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Evertale Optimizer</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
+name: Scrape Evertale Units
 
-<header>
-  <h1>Evertale Optimizer</h1>
-  <nav>
-    <button class="tab active" data-tab="optimizer">Optimizer</button>
-    <button class="tab" data-tab="roster">Roster</button>
-  </nav>
-</header>
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 6 * * 0" # Sunday 06:00 UTC
 
-<main>
-  <!-- OPTIMIZER TAB -->
-  <section id="optimizer" class="tab-content active">
-    <div class="controls">
-      <select id="mode">
-        <option value="PVE">PVE</option>
-        <option value="PVP">PVP</option>
-        <option value="BOSS">BOSS</option>
-        <option value="STORY">STORY</option>
-      </select>
+# IMPORTANT: allow the workflow token to write (helps even if you use PAT)
+permissions:
+  contents: write
 
-      <select id="teamSize">
-        <option value="5">5 Units</option>
-        <option value="8">8 Units</option>
-      </select>
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
 
-      <button class="primary" onclick="optimize()">Optimize</button>
-    </div>
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          # IMPORTANT: don't keep the default bot credentials
+          persist-credentials: false
+          fetch-depth: 0
 
-    <div class="layout">
-      <div>
-        <h2>Unit Pool</h2>
-        <div id="unitPool" class="grid"></div>
-      </div>
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
 
-      <div>
-        <h2>Results</h2>
-        <div id="results" class="results"></div>
-      </div>
-    </div>
-  </section>
+      - name: Clean & install dependencies
+        working-directory: scraper
+        run: |
+          rm -rf node_modules package-lock.json
+          npm install
 
-  <!-- ROSTER TAB -->
-  <section id="roster" class="tab-content">
-    <h2>Full Character Roster</h2>
-    <div id="rosterGrid" class="grid"></div>
-  </section>
-</main>
+      - name: Run unit list scraper
+        working-directory: scraper
+        run: node scrape_unit_list.js
 
-<script type="module" src="app.js"></script>
-</body>
-</html>
+      - name: Run unit page scraper
+        working-directory: scraper
+        run: node scrape_unit_pages.js
+
+      - name: Move generated units.json
+        run: |
+          mkdir -p data
+          mv scraper/units.json data/units.json
+
+      - name: Commit updated units.json
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add data/units.json
+          git diff --cached --quiet || git commit -m "Update units.json"
+
+      - name: Push changes using PAT
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: |
+          if [ -z "$GH_PAT" ]; then
+            echo "GH_PAT secret is missing or empty"
+            exit 1
+          fi
+
+          # Force origin to use PAT (this is the key)
+          git remote set-url origin "https://x-access-token:${GH_PAT}@github.com/TheRealNodder/Evertale-Optimizer.git"
+          git push origin HEAD:main
