@@ -1,17 +1,60 @@
-- name: Checkout repository
-  uses: actions/checkout@v4
+name: Update units.json (Toolbox)
 
-- name: Setup Node.js
-  uses: actions/setup-node@v4
-  with:
-    node-version: 18
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 9 * * *" # daily 09:00 UTC
 
-- name: Install scraper dependencies
-  working-directory: scraper
-  run: |
-    rm -rf node_modules package-lock.json
-    npm install
+permissions:
+  contents: write
 
-- name: Run toolbox scraper
-  working-directory: scraper
-  run: node scrape_toolbox_units.mjs
+concurrency:
+  group: update-units
+  cancel-in-progress: true
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          # keep this if you previously needed PAT; otherwise it's harmless
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install scraper dependencies
+        working-directory: scraper
+        run: |
+          rm -rf node_modules package-lock.json
+          npm install
+
+      - name: Run toolbox scraper
+        working-directory: scraper
+        run: node scrape_toolbox_units.mjs
+
+      - name: Commit updated data/units.json
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/units.json
+          git diff --cached --quiet || git commit -m "Update units.json (Toolbox)"
+
+      - name: Push changes
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: |
+          # If you have GH_PAT set (recommended), use it.
+          # Otherwise fall back to the default token (works if repo settings allow it).
+          if [ -n "$GH_PAT" ]; then
+            git remote set-url origin "https://x-access-token:${GH_PAT}@github.com/TheRealNodder/Evertale-Optimizer.git"
+          fi
+
+          # Push only if there was a commit
+          git push origin HEAD:main
