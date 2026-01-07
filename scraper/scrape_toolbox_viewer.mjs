@@ -1,6 +1,15 @@
-import fs from "fs/promises";
+// scraper/scrape_toolbox_viewer.mjs
+// Outputs:
+//   ../data/units.json  (website-ready: { updatedAt, units: [...] })
+//   ../data/weapons.json (optional, for later)
+
+import fs from "node:fs/promises";
+import path from "node:path";
 
 const VIEWER_URL = "https://evertaletoolbox2.runasp.net/Viewer";
+
+const OUT_UNITS = path.join(process.cwd(), "..", "data", "units.json");
+const OUT_WEAPONS = path.join(process.cwd(), "..", "data", "weapons.json");
 
 const ELEMENTS = new Set(["Fire", "Earth", "Storm", "Water", "Light", "Dark"]);
 const WEAPON_TYPES = new Set([
@@ -8,7 +17,7 @@ const WEAPON_TYPES = new Set([
 ]);
 
 function decodeHtmlEntities(str) {
-  return str
+  return String(str ?? "")
     .replaceAll("&nbsp;", " ")
     .replaceAll("&amp;", "&")
     .replaceAll("&quot;", '"')
@@ -18,7 +27,6 @@ function decodeHtmlEntities(str) {
 }
 
 function htmlToLines(html) {
-  // Preserve <br> as newlines, remove tags, decode common entities, normalize whitespace.
   const withBreaks = html.replace(/<br\s*\/?>/gi, "\n");
   const noTags = withBreaks.replace(/<[^>]*>/g, "\n");
   const decoded = decodeHtmlEntities(noTags);
@@ -26,26 +34,51 @@ function htmlToLines(html) {
   return decoded
     .split("\n")
     .map((l) => l.trim())
-    .filter((l) => l && l !== "Image" && l !== "filter_alt" && l !== "Filter" && l !== "Clear" && l !== "Apply");
+    .filter(Boolean);
 }
 
 function asIntMaybe(s) {
-  // "1,719" -> 1719
-  const t = s.replaceAll(",", "");
+  const t = String(s ?? "").replaceAll(",", "");
   if (!/^\d+$/.test(t)) return null;
   return Number(t);
 }
 
+function isLinkImageToken(s) {
+  return /^【\d+†Image】$/.test(s) || s === "Image";
+}
+
+function isHeaderWord(s) {
+  return (
+    s === "Name" ||
+    s === "Rarity" ||
+    s === "Element" ||
+    s === "Cost" ||
+    s === "ATK" ||
+    s === "HP" ||
+    s === "SPD" ||
+    s === "Weapon" ||
+    s === "Leader Skill" ||
+    s === "Active Skills" ||
+    s === "Passive Skills" ||
+    s === "Card View" ||
+    s === "Column:" ||
+    s === "Character" ||
+    s === "Weapon:" ||
+    s === "Elements:" ||
+    s === "Rarity:" ||
+    s === "ALL"
+  );
+}
+
 function isLikelyName(s) {
-  // Names here are usually words, not numeric, not "ALL", not headers.
   if (!s) return false;
-  if (s.length < 2) return false;
+  if (isHeaderWord(s)) return false;
+  if (isLinkImageToken(s)) return false;
   if (s === "ALL") return false;
+  if (/^\d+\s+items$/.test(s)) return false;
+  if (s.startsWith("Page ")) return false;
   if (/^\d+$/.test(s.replaceAll(",", ""))) return false;
-  // avoid obvious headers
-  const bad = new Set(["Home", "Viewer", "Explorer", "Calculator", "Simulator", "Tools", "Sign In", "en"]);
-  if (bad.has(s)) return false;
-  return true;
+  return s.length >= 2;
 }
 
 function takeWhile(lines, startIdx, stopPred) {
@@ -53,7 +86,8 @@ function takeWhile(lines, startIdx, stopPred) {
   let i = startIdx;
   for (; i < lines.length; i++) {
     if (stopPred(lines[i], i)) break;
-    out.push(lines[i]);
+    const v = lines[i];
+    if (!isHeaderWord(v) && !isLinkImageToken(v)) out.push(v);
   }
   return { out, next: i };
 }
@@ -61,183 +95,155 @@ function takeWhile(lines, startIdx, stopPred) {
 function parseCharacters(lines) {
   const units = [];
 
-  // Find the first occurrence of the column header area (Name / Rarity / Element / Cost / ATK / HP / SPD...)
-  const start = lines.findIndex((l) => l === "Name");
-  if (start === -1) throw new Error("Could not find 'Name' header. Viewer layout may have changed.");
+  const weaponStart = lines.findIndex((l) => l === "Weapon:");
+  const trimmed = weaponStart !== -1 ? lines.slice(0, weaponStart) : lines;
 
-  // After headers, character cards/rows start. We’ll scan until we hit the summary like “397 items”.
-  let i = start;
-  while (i < lines.length && lines[i] !== "Rizette") i++; // first known entry on page 1 often is Rizette
-  // If not found, just move forward a bit
-  if (i >= lines.length) i = start + 1;
+  const start = trimmed.findIndex((l) => l === "Name");
+  if (start === -1) throw new Error("Could not find 'Name' header (Viewer layout changed).");
 
-  while (i < lines.length) {
-    // Stop when we reach the “items” summary or the Weapon section label.
-    if (/^\d+\s+items$/.test(lines[i])) break;
-    if (lines[i] === "Weapon:" || lines[i] === "Weapon") break;
+  const slice = trimmed.slice(start);
 
-    // A unit block in this Viewer tends to look like:
-    // Name
-    // Title/Epithet
-    // Cost
-    // ATK
-    // HP
-    // SPD
-    // (Element + leader skill short label is in one line, eg "Light HP Up" OR "Fire ATK & HP Up")
-    // Leader skill description
-    // Active skills (names only in this view)
-    // Passive skills (names only in this view)
-    //
-    // We’ll detect by: name + title + 4 integers (cost/atk/hp/spd)
-    const name = lines[i];
-    const title = lines[i + 1];
+  for (let i = 0; i < slice.length - 12; i++) {
+    const name = slice[i];
+    const title = slice[i + 1];
 
-    if (!isLikelyName(name) || !title || !isLikelyName(title)) {
-      i++;
-      continue;
+    if (!isLikelyName(name) || !isLikelyName(title)) continue;
+
+    // Find the stat block: cost, atk, hp, spd (4 consecutive integers) within next 40 lines
+    let j = i + 2;
+    let statsPos = -1;
+    let cost = null, atk = null, hp = null, spd = null;
+
+    const limit = Math.min(slice.length, i + 45);
+    while (j < limit) {
+      const c = asIntMaybe(slice[j]);
+      const a = asIntMaybe(slice[j + 1]);
+      const h = asIntMaybe(slice[j + 2]);
+      const s = asIntMaybe(slice[j + 3]);
+      if (c != null && a != null && h != null && s != null) {
+        cost = c; atk = a; hp = h; spd = s;
+        statsPos = j;
+        break;
+      }
+      j++;
     }
+    if (statsPos === -1) continue;
 
-    const cost = asIntMaybe(lines[i + 2]);
-    const atk = asIntMaybe(lines[i + 3]);
-    const hp = asIntMaybe(lines[i + 4]);
-    const spd = asIntMaybe(lines[i + 5]);
+    let k = statsPos + 4;
 
-    if (cost == null || atk == null || hp == null || spd == null) {
-      i++;
-      continue;
-    }
+    // skip noise
+    while (k < slice.length && (slice[k] === "ALL" || isLinkImageToken(slice[k]) || isHeaderWord(slice[k]))) k++;
 
-    let j = i + 6;
-
-    // Next useful line often contains element + leader skill short name.
-    // Example: "Light HP Up" / "Storm ATK & HP Up"
+    // leader short name may include element at start
     let element = null;
     let leaderSkillName = null;
+    let leaderSkillText = null;
 
-    if (j < lines.length) {
-      const parts = lines[j].split(/\s+/);
+    if (k < slice.length) {
+      const parts = slice[k].split(/\s+/);
       if (parts.length >= 2 && ELEMENTS.has(parts[0])) {
         element = parts[0];
-        leaderSkillName = lines[j].slice(element.length).trim();
-        j++;
+        leaderSkillName = slice[k].slice(element.length).trim();
+        k++;
       }
     }
 
-    // Leader skill description (one line in this view)
-    let leaderSkillDesc = null;
-    if (j < lines.length && lines[j].startsWith("Allied ")) {
-      leaderSkillDesc = lines[j];
-      j++;
+    if (k < slice.length && (slice[k].startsWith("Allied ") || slice[k].includes("increased by"))) {
+      leaderSkillText = slice[k];
+      k++;
     }
 
-    // Active skills: consume until we hit passives that usually include "Up Lv" or "Resist" or "Mastery" etc.
-    const activeStop = (l) =>
-      l.includes("Up Lv") ||
-      l.includes("Resist") ||
-      l.includes("Mastery") ||
-      l === name || // next entry sometimes
-      /^\d+\s+items$/.test(l) ||
-      l === "Weapon:";
+    // active skills until passives likely start
+    const { out: activeSkills, next: afterActives } = takeWhile(slice, k, (l) =>
+      l.includes("Up Lv") || l.includes("Resist") || l.includes("Mastery") || l === "Weapon:" || /^\d+\s+items$/.test(l)
+    );
+    k = afterActives;
 
-    const { out: actives, next: afterActives } = takeWhile(lines, j, (l) => activeStop(l));
-    j = afterActives;
+    // passives until next unit pattern or end
+    const { out: passiveSkills, next: afterPassives } = takeWhile(slice, k, (l, idx) => {
+      if (l === "Weapon:" || /^\d+\s+items$/.test(l) || l.startsWith("Page ")) return true;
 
-    // Passive skills: consume until next unit begins (heuristic: next looks like a name + title + integers)
-    const { out: passives, next: afterPassives } = takeWhile(lines, j, (l, idx) => {
-      if (/^\d+\s+items$/.test(l) || l === "Weapon:" || l === "Weapon") return true;
-
-      // Lookahead for next unit pattern
       const n = l;
-      const t = lines[idx + 1];
-      const c = asIntMaybe(lines[idx + 2] ?? "");
-      const a = asIntMaybe(lines[idx + 3] ?? "");
-      const h2 = asIntMaybe(lines[idx + 4] ?? "");
-      const s2 = asIntMaybe(lines[idx + 5] ?? "");
-      if (isLikelyName(n) && t && isLikelyName(t) && c != null && a != null && h2 != null && s2 != null) return true;
+      const t = slice[idx + 1];
+      const c = asIntMaybe(slice[idx + 2] ?? "");
+      const a = asIntMaybe(slice[idx + 3] ?? "");
+      const h = asIntMaybe(slice[idx + 4] ?? "");
+      const s = asIntMaybe(slice[idx + 5] ?? "");
 
-      return false;
+      return isLikelyName(n) && isLikelyName(t) && c != null && a != null && h != null && s != null;
     });
+
+    const id = `${name}__${title}`.toLowerCase().replace(/[^a-z0-9]+/g, "_");
 
     units.push({
+      id,
       name,
       title,
+      element,         // might be null if the Viewer block doesn't include it in the text
+      rarity: null,    // Viewer text often doesn’t include rarity cleanly; keep null for now
       cost,
       stats: { atk, hp, spd },
-      element,
-      weaponPreferredOrEquipped: null, // this view shows weapon category icons; if you want exact weapon IDs, we can link later
-      leaderSkill: leaderSkillName
-        ? { name: leaderSkillName, description: leaderSkillDesc }
-        : null,
-      skills: {
-        active: actives,
-        passive: passives,
-      },
-      source: VIEWER_URL,
+      weaponType: null, // can be enriched later if we parse it reliably
+      leaderSkillName,
+      leaderSkillText,
+      activeSkills,
+      passiveSkills,
+      source: { viewer: VIEWER_URL }
     });
 
-    i = afterPassives;
+    i = Math.max(i, statsPos);
   }
 
-  return units;
+  // de-dupe
+  const seen = new Set();
+  const unique = [];
+  for (const u of units) {
+    if (seen.has(u.id)) continue;
+    seen.add(u.id);
+    unique.push(u);
+  }
+  return unique;
 }
 
 function parseWeapons(lines) {
-  // Weapons appear after the "Weapon:" label.
   let i = lines.findIndex((l) => l === "Weapon:");
   if (i === -1) i = lines.findIndex((l) => l === "Weapon");
   if (i === -1) return [];
-
-  // Move to first weapon id (often ends with 03 etc)
   i++;
 
   const weapons = [];
   while (i < lines.length) {
-    const id = lines[i];
-
-    // Typical weapon row in this view:
-    // WeaponId
-    // WeaponType
-    // RarityNumber
-    // ATKNumber
-    // HPNumber (or another stat; toolbox lists 2 numbers here)
-    //
-    // Example shown on the page includes things like:
-    // BlueDragonSword03 / Sword / 6 / 656 / 3720  [oai_citation:3‡evertaletoolbox2.runasp.net](https://evertaletoolbox2.runasp.net/Viewer)
-    if (!id || id.length < 4) {
-      i++;
-      continue;
-    }
-
+    const wid = lines[i];
     const type = lines[i + 1];
     const rarity = asIntMaybe(lines[i + 2]);
     const stat1 = asIntMaybe(lines[i + 3]);
     const stat2 = asIntMaybe(lines[i + 4]);
 
-    if (!WEAPON_TYPES.has(type) || rarity == null || stat1 == null || stat2 == null) {
+    if (!wid || !WEAPON_TYPES.has(type) || rarity == null || stat1 == null || stat2 == null) {
       i++;
       continue;
     }
 
     weapons.push({
-      id,
+      id: wid,
       type,
       rarity,
-      stats: { atk: stat1, hp: stat2 }, // toolbox shows two numbers; label them how you prefer
-      source: VIEWER_URL,
+      stats: { atk: stat1, hp: stat2 },
+      source: { viewer: VIEWER_URL }
     });
 
     i += 5;
   }
-
   return weapons;
 }
 
 async function run() {
+  console.log(`Fetching Viewer: ${VIEWER_URL}`);
   const res = await fetch(VIEWER_URL, {
     headers: {
-      "user-agent": "Evertale-Optimizer/1.0 (+https://github.com/TheRealNodder/Evertale-Optimizer)",
-      "accept": "text/html,*/*",
-    },
+      "user-agent": "Evertale-Optimizer-Scraper/Viewer",
+      "accept": "text/html,*/*"
+    }
   });
   if (!res.ok) throw new Error(`Fetch failed: ${res.status} ${res.statusText}`);
 
@@ -247,12 +253,21 @@ async function run() {
   const units = parseCharacters(lines);
   const weapons = parseWeapons(lines);
 
-  if (!units.length) throw new Error("Parsed 0 units. Viewer layout likely changed.");
-  if (!weapons.length) console.warn("Parsed 0 weapons (units still extracted).");
+  if (!units.length) throw new Error("Parsed 0 units (Viewer layout changed or blocked).");
 
-  await fs.mkdir("data", { recursive: true });
-  await fs.writeFile("data/units.toolbox.json", JSON.stringify(units, null, 2), "utf8");
-  await fs.writeFile("data/weapons.toolbox.json", JSON.stringify(weapons, null, 2), "utf8");
+  await fs.mkdir(path.dirname(OUT_UNITS), { recursive: true });
+
+  await fs.writeFile(
+    OUT_UNITS,
+    JSON.stringify({ updatedAt: new Date().toISOString(), units }, null, 2),
+    "utf8"
+  );
+
+  await fs.writeFile(
+    OUT_WEAPONS,
+    JSON.stringify({ updatedAt: new Date().toISOString(), weapons }, null, 2),
+    "utf8"
+  );
 
   console.log(`OK: units=${units.length}, weapons=${weapons.length}`);
 }
