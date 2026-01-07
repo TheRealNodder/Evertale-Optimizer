@@ -1,5 +1,4 @@
 import fs from "fs";
-import fetch from "node-fetch";
 import * as cheerio from "cheerio";
 
 const links = JSON.parse(fs.readFileSync("unit_links.json"));
