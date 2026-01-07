@@ -1,4 +1,4 @@
-name: Update toolbox data (Viewer Playwright)
+name: Update toolbox data (Playwright)
 
 on:
   workflow_dispatch:
@@ -35,6 +35,12 @@ jobs:
         working-directory: scraper
         run: npx playwright install --with-deps chromium
 
+      # 1) Explorer catalog (categories + images)
+      - name: Scrape Explorer catalog (Playwright)
+        working-directory: scraper
+        run: node scrape_toolbox_catalog.mjs
+
+      # 2) Viewer characters (stats/skills/leader skills)
       - name: Scrape Viewer characters (Playwright)
         working-directory: scraper
         run: node scrape_viewer_characters_playwright.mjs
@@ -43,8 +49,8 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/characters.viewer.full.json || true
-          git diff --cached --quiet || git commit -m "Update Viewer characters (Playwright)"
+          git add data/catalog.toolbox.json data/characters.viewer.full.json data/_debug_explorer_rendered.html || true
+          git diff --cached --quiet || git commit -m "Update toolbox data (Playwright)"
 
       - name: Push changes (rebase if needed)
         env:
