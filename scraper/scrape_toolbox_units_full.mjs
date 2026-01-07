@@ -1,6 +1,6 @@
 // scraper/scrape_toolbox_units_full.mjs
-// Fixes: "passive names becoming unit names"
-// Output: ../data/units.toolbox.json
+// Multi-page Toolbox Viewer scraper (Characters)
+// Output: ../data/units.toolbox.json  => { updatedAt, units: [...] }
 
 import fs from "node:fs/promises";
 import path from "node:path";
@@ -8,7 +8,7 @@ import path from "node:path";
 const VIEWER_URL = "https://evertaletoolbox2.runasp.net/Viewer";
 const OUT_UNITS = path.join(process.cwd(), "..", "data", "units.toolbox.json");
 
-// Any of these strongly indicates it's NOT a unit name/title
+// Strong indicator that a line is NOT a unit name/title
 const PASSIVE_LIKE = /(Up Lv\d+|Resist Lv\d+|Mastery\b)/i;
 
 const UI_JUNK = new Set([
@@ -55,7 +55,7 @@ function isJunk(line) {
   if (UI_JUNK.has(line)) return true;
   if (line.startsWith("Page ")) return true;
   if (line.endsWith(" items")) return true;
-  if (PASSIVE_LIKE.test(line)) return false; // passives are not "junk", just not unit names
+  if (/^【\d+†Image】$/.test(line)) return true;
   return false;
 }
 
@@ -64,13 +64,10 @@ function isValidUnitNameOrTitle(line) {
   if (UI_JUNK.has(line)) return false;
   if (line.startsWith("Page ")) return false;
   if (line.endsWith(" items")) return false;
-  // Key rule: NEVER allow passives to be name/title
-  if (PASSIVE_LIKE.test(line)) return false;
-  // Stats aren’t names
+  if (/^【\d+†Image】$/.test(line)) return false;
+  if (PASSIVE_LIKE.test(line)) return false; // critical fix
   if (asIntMaybe(line) != null) return false;
-  // Very short strings are usually noise
-  if (line.length < 2) return false;
-  return true;
+  return line.length >= 2;
 }
 
 function nextNonJunk(lines, startIdx) {
@@ -79,26 +76,24 @@ function nextNonJunk(lines, startIdx) {
   return i;
 }
 
-function parseUnits(lines) {
-  // Start at the unit table header
+/**
+ * Parse only the Character section (stops before "Weapon:")
+ * Returns unit objects for ONE page.
+ */
+function parseUnitsFromHtml(html) {
+  const lines = htmlToLines(html);
+
   const start = lines.findIndex((l) => l === "Name");
   if (start === -1) throw new Error("Couldn't find 'Name' header (Viewer layout changed).");
 
-  // Stop before weapons section
   const weaponIdx = lines.findIndex((l) => l === "Weapon:");
   const slice = weaponIdx !== -1 ? lines.slice(start, weaponIdx) : lines.slice(start);
 
   const units = [];
   const seen = new Set();
 
-  // Move index to the first actual unit entry (after header rows)
-  let i = start;
-  i = slice.findIndex((l) => l === "Rizette") >= 0 ? slice.findIndex((l) => l === "Rizette") - 1 : 0; // best-effort
-  if (i < 0) i = 0;
-
-  // Sequential parse: name -> title -> stats -> leader -> 6 actives -> 4 passives
-  // This prevents "passives becoming names".
-  for (let p = 0; p < 10000; p++) {
+  let i = 0;
+  for (let guard = 0; guard < 20000; guard++) {
     i = nextNonJunk(slice, i);
     if (i >= slice.length) break;
 
@@ -110,13 +105,12 @@ function parseUnits(lines) {
       continue;
     }
 
-    // Find 4 consecutive ints very close to name/title.
-    // On the Viewer output, these appear shortly after title.
+    // Find cost/atk/hp/spd very close after title
     let statsPos = -1;
     let cost = null, atk = null, hp = null, spd = null;
 
     const searchFrom = i + 2;
-    const searchTo = Math.min(slice.length - 4, i + 18); // <-- tight window is the fix
+    const searchTo = Math.min(slice.length - 4, i + 18); // tight window prevents drift into later blocks
     for (let j = searchFrom; j <= searchTo; j++) {
       const c = asIntMaybe(slice[j]);
       const a = asIntMaybe(slice[j + 1]);
@@ -128,17 +122,14 @@ function parseUnits(lines) {
         break;
       }
     }
-
     if (statsPos === -1) {
-      // Not actually a unit block
       i++;
       continue;
     }
 
-    let k = statsPos + 4;
-    k = nextNonJunk(slice, k);
+    let k = nextNonJunk(slice, statsPos + 4);
 
-    // Leader skill name (may be missing sometimes, but usually exists)
+    // leader skill name + text
     let leaderSkillName = null;
     let leaderSkillText = null;
 
@@ -148,7 +139,6 @@ function parseUnits(lines) {
     }
     k = nextNonJunk(slice, k);
 
-    // Leader skill text usually begins with "Allied ..."
     if (k < slice.length && slice[k].startsWith("Allied ")) {
       leaderSkillText = slice[k];
       k++;
@@ -188,38 +178,115 @@ function parseUnits(lines) {
       });
     }
 
-    // Continue scanning from where we ended
     i = k;
   }
 
   return units;
 }
 
-async function run() {
-  console.log(`Fetching: ${VIEWER_URL}`);
-  const res = await fetch(VIEWER_URL, {
+function getTotalPagesFromHtml(html) {
+  const m = html.match(/Page\s+(\d+)\s+of\s+(\d+)/i);
+  if (!m) return null;
+  return { page: Number(m[1]), total: Number(m[2]) };
+}
+
+async function fetchHtml(url) {
+  const res = await fetch(url, {
     headers: {
-      "user-agent": "Evertale-Optimizer-Scraper/FixedNames",
+      "user-agent": "Evertale-Optimizer-Scraper/MultiPage",
       "accept": "text/html,*/*"
     }
   });
-  if (!res.ok) throw new Error(`Fetch failed: ${res.status} ${res.statusText}`);
+  if (!res.ok) throw new Error(`Fetch failed: ${res.status} ${res.statusText} (${url})`);
+  return await res.text();
+}
 
-  const html = await res.text();
-  const lines = htmlToLines(html);
+/**
+ * Auto-discover the paging query param by trying common patterns until the HTML contains "Page 2 of".
+ * Returns a function buildUrl(pageNumber) -> url.
+ */
+async function discoverPager(totalPages) {
+  if (totalPages < 2) return (p) => VIEWER_URL;
 
-  const units = parseUnits(lines);
-  if (!units.length) throw new Error("Parsed 0 units. Viewer layout may have changed.");
+  const candidates = [
+    (p) => `${VIEWER_URL}?page=${p}`,
+    (p) => `${VIEWER_URL}?Page=${p}`,
+    (p) => `${VIEWER_URL}?p=${p}`,
+    (p) => `${VIEWER_URL}?pg=${p}`,
+    (p) => `${VIEWER_URL}?pageIndex=${p}`,
+    (p) => `${VIEWER_URL}?PageIndex=${p}`,
+    (p) => `${VIEWER_URL}?currentPage=${p}`,
+    (p) => `${VIEWER_URL}?CurrentPage=${p}`
+  ];
+
+  for (const build of candidates) {
+    try {
+      const html2 = await fetchHtml(build(2));
+      if (/Page\s+2\s+of\s+\d+/i.test(html2)) {
+        return build;
+      }
+    } catch {
+      // ignore and try next
+    }
+  }
+
+  throw new Error(
+    "Could not auto-discover Viewer pagination URL. " +
+    "This usually means paging is handled by a JS POST request. " +
+    "Open Viewer in your browser, click Next, and copy the request URL from DevTools → Network."
+  );
+}
+
+function mergeDedupe(units) {
+  const map = new Map();
+  for (const u of units) {
+    if (!u?.id) continue;
+    if (!map.has(u.id)) map.set(u.id, u);
+  }
+  return [...map.values()];
+}
+
+async function run() {
+  console.log(`Fetching page 1: ${VIEWER_URL}`);
+  const html1 = await fetchHtml(VIEWER_URL);
+
+  const pageInfo = getTotalPagesFromHtml(html1);
+  if (!pageInfo) throw new Error("Could not read 'Page X of Y' from Viewer HTML.");
+  console.log(`Viewer pages: ${pageInfo.total}`);
+
+  const buildUrl = await discoverPager(pageInfo.total);
+  console.log("Pagination: OK");
+
+  const allUnits = [];
+
+  // Page 1
+  const units1 = parseUnitsFromHtml(html1);
+  console.log(`Parsed page 1: ${units1.length}`);
+  allUnits.push(...units1);
+
+  // Pages 2..N
+  for (let p = 2; p <= pageInfo.total; p++) {
+    const url = buildUrl(p);
+    const html = await fetchHtml(url);
+    const units = parseUnitsFromHtml(html);
+    console.log(`Parsed page ${p}: ${units.length}`);
+    allUnits.push(...units);
+
+    // small delay for politeness
+    await new Promise((r) => setTimeout(r, 150));
+  }
+
+  const merged = mergeDedupe(allUnits);
+  console.log(`Merged unique units: ${merged.length}`);
 
   await fs.mkdir(path.dirname(OUT_UNITS), { recursive: true });
   await fs.writeFile(
     OUT_UNITS,
-    JSON.stringify({ updatedAt: new Date().toISOString(), units }, null, 2),
+    JSON.stringify({ updatedAt: new Date().toISOString(), units: merged }, null, 2),
     "utf8"
   );
 
-  console.log(`Wrote ${units.length} units -> data/units.toolbox.json`);
-  console.log(`First 5: ${units.slice(0, 5).map(u => u.name).join(", ")}`);
+  console.log(`Wrote -> data/units.toolbox.json`);
 }
 
 run().catch((e) => {
