@@ -3,101 +3,47 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Evertale Optimizer</title>
-
+  <title>Evertale Toolbox Catalog</title>
   <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
-  <!-- Top Bar -->
   <header class="topbar">
     <div class="brand">
       <div class="brand-title">Evertale Optimizer</div>
-      <div class="brand-sub">Roster • Team Builder • Optimizer</div>
+      <div class="brand-sub">Catalog • Team Builder • Optimizer</div>
     </div>
-
-    <nav class="tabs" id="tabs">
-      <button class="tab active" data-tab="rosterTab">Characters</button>
-      <button class="tab" data-tab="weaponsTab">Weapons</button>
-      <button class="tab" data-tab="enemiesTab">Enemies</button>
-    </nav>
   </header>
 
-  <!-- Status + Errors -->
   <section class="system">
     <div id="status" class="status">Loading…</div>
-    <div id="error" class="error" style="display:none;"></div>
+    <div id="error" class="error" style="display:none; white-space:pre-wrap;"></div>
   </section>
 
-  <!-- Main -->
   <main class="main">
-    <!-- Characters -->
-    <section id="rosterTab" class="panel active">
+    <section class="panel active">
       <div class="panel-head">
-        <h2>Characters</h2>
+        <h2>Catalog</h2>
         <div class="panel-tools">
-          <input id="searchInput" type="search" placeholder="Search characters…" autocomplete="off" />
+          <select id="categorySelect" class="select"></select>
+          <input id="searchInput" type="search" placeholder="Search…" autocomplete="off" />
           <span id="countBadge" class="badge">0</span>
         </div>
       </div>
 
-      <div id="roster" class="grid"></div>
-    </section>
-
-    <!-- Weapons -->
-    <section id="weaponsTab" class="panel">
-      <div class="panel-head">
-        <h2>Weapons</h2>
-        <div class="panel-tools">
-          <input id="weaponSearchInput" type="search" placeholder="Search weapons…" autocomplete="off" />
-          <span id="weaponCountBadge" class="badge">0</span>
-        </div>
-      </div>
-
-      <div id="weaponsList" class="list"></div>
-    </section>
-
-    <!-- Enemies -->
-    <section id="enemiesTab" class="panel">
-      <div class="panel-head">
-        <h2>Enemies</h2>
-        <div class="panel-tools">
-          <input id="enemySearchInput" type="search" placeholder="Search enemies…" autocomplete="off" />
-          <span id="enemyCountBadge" class="badge">0</span>
-        </div>
-      </div>
-
-      <div id="enemiesList" class="list"></div>
+      <div id="grid" class="grid"></div>
     </section>
   </main>
 
-  <!-- Unit Modal -->
-  <div id="unitModal" class="modal" style="display:none;">
-    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="unitModalTitle">
+  <!-- Modal -->
+  <div id="itemModal" class="modal" style="display:none;">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="itemModalTitle">
       <div class="modal-head">
-        <div id="unitModalTitle" class="modal-title">Unit</div>
-        <button id="unitModalClose" class="icon-btn" aria-label="Close">✕</button>
+        <div id="itemModalTitle" class="modal-title">Item</div>
+        <button id="itemModalClose" class="icon-btn" aria-label="Close">✕</button>
       </div>
-      <div id="unitModalBody" class="modal-body"></div>
+      <div id="itemModalBody" class="modal-body"></div>
     </div>
   </div>
-
-  <script>
-    // Simple tabs (no framework)
-    (function () {
-      const tabs = document.querySelectorAll(".tab");
-      const panels = document.querySelectorAll(".panel");
-
-      function setActive(tabId) {
-        panels.forEach(p => p.classList.toggle("active", p.id === tabId));
-        tabs.forEach(t => t.classList.toggle("active", t.dataset.tab === tabId));
-      }
-
-      tabs.forEach(t => {
-        t.addEventListener("click", () => setActive(t.dataset.tab));
-      });
-    })();
-  </script>
 
   <script src="app.js"></script>
 </body>
