@@ -1,132 +1,240 @@
-/* ---------- Unit Modal ---------- */
-.modalOverlay{
+/* ---------- Base ---------- */
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  background: #0b0e1a;
+  color: #e8ebff;
+}
+
+h2 { margin-top: 0; }
+
+.muted { opacity: .7; font-size: 13px; }
+
+.btn {
+  appearance: none;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.06);
+  color: inherit;
+  border-radius: 12px;
+  padding: 10px 14px;
+  cursor: pointer;
+}
+.btn.primary {
+  background: linear-gradient(135deg, #5b6cff, #7f8cff);
+  border: none;
+  color: #fff;
+}
+
+/* ---------- Topbar ---------- */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  background: #12162a;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+.logo { font-weight: 900; }
+
+.tabs { display: flex; gap: 8px; }
+.tab {
+  border: none;
+  background: transparent;
+  color: inherit;
+  padding: 8px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  opacity: .75;
+}
+.tab.active {
+  background: rgba(255,255,255,.08);
+  opacity: 1;
+}
+
+/* ---------- Layout ---------- */
+main { padding: 16px; }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.filters input, .filters select {
+  background: #12162a;
+  border: 1px solid rgba(255,255,255,.1);
+  color: inherit;
+  padding: 10px;
+  border-radius: 12px;
+}
+
+/* ---------- Grid & Cards ---------- */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
+}
+
+.card {
+  background: #12162a;
+  border-radius: 16px;
+  padding: 14px;
+  border: 1px solid rgba(255,255,255,.08);
+  cursor: pointer;
+}
+.card:hover { border-color: #5b6cff; }
+
+.cardTop .name {
+  font-weight: 800;
+}
+
+.badges { display: flex; gap: 6px; flex-wrap: wrap; }
+.badge {
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.08);
+}
+.badge.accent { background: #5b6cff; }
+.badge.green { background: #35c26b; }
+
+.stats {
+  margin-top: 10px;
+  font-size: 13px;
+}
+.statRow {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+}
+
+.miniAdd {
+  margin-left: auto;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.12);
+  color: inherit;
+  border-radius: 10px;
+  padding: 6px 8px;
+}
+
+/* ---------- Teams ---------- */
+.teamGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
+}
+
+.slot {
+  background: #12162a;
+  border-radius: 16px;
+  padding: 14px;
+  border: 1px dashed rgba(255,255,255,.12);
+}
+.slot.leader { border-color: #f5c542; }
+.slot.backup { opacity: .75; }
+
+.slotTitle {
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+/* ---------- Platoons ---------- */
+.platoon {
+  margin-bottom: 24px;
+}
+.platoon .name {
+  font-weight: 900;
+  margin-bottom: 8px;
+}
+
+/* ---------- Optimizer ---------- */
+.optimizerControls {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.optimizerControls label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* ---------- Modal ---------- */
+.modalOverlay {
   position: fixed;
   inset: 0;
   display: none;
   align-items: center;
   justify-content: center;
-  padding: 18px;
+  padding: 16px;
   background: rgba(0,0,0,.55);
   backdrop-filter: blur(6px);
   z-index: 9999;
 }
+.modalOverlay.open { display: flex; }
 
-.modalOverlay.open{ display: flex; }
-
-.modalCard{
+.modalCard {
   width: min(900px, 100%);
   max-height: 85vh;
   overflow: auto;
-  border-radius: 18px;
-  background: #0f1320;
+  background: #12162a;
+  border-radius: 20px;
   border: 1px solid rgba(255,255,255,.08);
-  box-shadow: 0 24px 60px rgba(0,0,0,.45);
 }
 
-.modalHeader{
+.modalHeader {
   display: flex;
-  align-items: flex-start;
   justify-content: space-between;
-  gap: 12px;
-  padding: 16px 18px;
+  padding: 14px 16px;
   border-bottom: 1px solid rgba(255,255,255,.08);
 }
 
-.modalTitle{
-  font-size: 18px;
-  font-weight: 800;
-  line-height: 1.2;
-}
+.modalTitle { font-weight: 900; font-size: 18px; }
+.modalSubtitle { font-size: 13px; opacity: .7; }
 
-.modalSubtitle{
-  margin-top: 4px;
-  font-size: 13px;
-  opacity: .75;
-}
-
-.iconBtn{
-  appearance: none;
-  border: 1px solid rgba(255,255,255,.10);
-  background: rgba(255,255,255,.06);
+.iconBtn {
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.12);
   color: inherit;
-  border-radius: 12px;
-  padding: 8px 10px;
-  cursor: pointer;
+  border-radius: 10px;
+  padding: 6px 10px;
 }
 
-.modalBody{
-  padding: 16px 18px 6px;
-}
+.modalBody { padding: 16px; }
 
-.modalBadges{
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 14px;
-}
+.modalBadges { display: flex; gap: 8px; margin-bottom: 12px; }
 
-.modalGrid{
+.modalGrid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 10px;
-  margin-bottom: 14px;
+}
+@media (max-width: 720px) {
+  .modalGrid { grid-template-columns: repeat(2, 1fr); }
 }
 
-@media (max-width: 720px){
-  .modalGrid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
-
-.modalStat{
-  padding: 12px;
-  border-radius: 14px;
-  background: rgba(255,255,255,.04);
-  border: 1px solid rgba(255,255,255,.06);
+.modalStat {
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.08);
+  padding: 10px;
+  border-radius: 12px;
   display: flex;
-  align-items: center;
   justify-content: space-between;
 }
 
-.modalSection{
-  margin-top: 14px;
-  padding-top: 12px;
-  border-top: 1px solid rgba(255,255,255,.08);
-}
+.modalSection { margin-top: 14px; }
+.modalSectionTitle { font-weight: 800; margin-bottom: 6px; }
 
-.modalSectionTitle{
-  font-weight: 800;
-  margin-bottom: 8px;
-}
+.modalList { padding-left: 18px; }
 
-.modalText{
-  white-space: pre-wrap;
-  line-height: 1.4;
-}
-
-.modalList{
-  margin: 0;
-  padding-left: 18px;
-}
-
-.modalList li{
-  margin: 6px 0;
-  line-height: 1.35;
-}
-
-.modalFooter{
+.modalFooter {
   display: flex;
-  gap: 10px;
   justify-content: flex-end;
-  padding: 14px 18px 16px;
+  gap: 10px;
+  padding: 14px 16px;
   border-top: 1px solid rgba(255,255,255,.08);
-}
-
-/* Small "Add" button on cards */
-.card .miniAdd{
-  margin-left: auto;
-  border: 1px solid rgba(255,255,255,.10);
-  background: rgba(255,255,255,.06);
-  color: inherit;
-  border-radius: 10px;
-  padding: 6px 8px;
-  cursor: pointer;
 }
