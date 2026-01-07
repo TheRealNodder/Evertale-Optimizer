@@ -35,18 +35,37 @@ jobs:
         working-directory: scraper
         run: npx playwright install --with-deps chromium
 
-      - name: Scrape Explorer catalog (Playwright)
-        working-directory: scraper
-        run: node scrape_toolbox_catalog.mjs
+      # IMPORTANT: run from REPO ROOT so "data/..." resolves correctly
+      - name: Ensure data folder exists (repo root)
+        run: mkdir -p data
 
-      - name: Scrape Viewer characters (Playwright)
-        working-directory: scraper
-        run: node scrape_viewer_characters_playwright.mjs
+      - name: Scrape Explorer catalog (repo root)
+        run: node scraper/scrape_toolbox_catalog.mjs
+
+      - name: Scrape Viewer characters (repo root)
+        run: node scraper/scrape_viewer_characters_playwright.mjs
+
+      # Debug: show what was created
+      - name: List generated files
+        run: |
+          echo "=== repo root ==="
+          ls -la
+          echo "=== data/ ==="
+          ls -la data || true
+          echo "=== scraper/data/ (should be empty) ==="
+          ls -la scraper/data || true
+
+      # Hard fail if the exact website files are missing/empty
+      - name: Verify expected output files exist
+        run: |
+          test -s data/catalog.toolbox.json
+          test -s data/characters.viewer.full.json
 
       - name: Commit generated data
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+
           git add data/catalog.toolbox.json data/characters.viewer.full.json data/_debug_explorer_rendered.html || true
           git diff --cached --quiet || git commit -m "Update toolbox data (Playwright)"
 
@@ -58,6 +77,7 @@ jobs:
             echo "GH_PAT secret is missing"
             exit 1
           fi
+
           git remote set-url origin "https://x-access-token:${GH_PAT}@github.com/TheRealNodder/Evertale-Optimizer.git"
           git fetch origin main
           git rebase origin/main || (git rebase --abort && exit 1)
