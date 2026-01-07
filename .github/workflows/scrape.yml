@@ -37,10 +37,10 @@ jobs:
           mkdir -p data
           mv scraper/units.json data/units.json
 
-      - name: Commit updated units.json
-        run: |
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-          git add data/units.json
-          git diff --cached --quiet || git commit -m "Update units.json"
-          git push
+     - name: Commit updated units.json
+       run: |
+         git config user.name "github-actions"
+         git config user.email "actions@github.com"
+         git add data/units.json
+         git diff --cached --quiet || git commit -m "Update units.json"
+         git push https://x-access-token:${{ secrets.GH_PAT }}@github.com/TheRealNodder/Evertale-Optimizer.git HEAD:main
