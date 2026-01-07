@@ -1,6 +1,6 @@
 // scraper/scrape_toolbox_units_full.mjs
-// Robust extraction: pulls every Character block from the Toolbox Viewer HTML.
-// Outputs: ../data/units.toolbox.json
+// Fixes: "passive names becoming unit names"
+// Output: ../data/units.toolbox.json
 
 import fs from "node:fs/promises";
 import path from "node:path";
@@ -8,7 +8,17 @@ import path from "node:path";
 const VIEWER_URL = "https://evertaletoolbox2.runasp.net/Viewer";
 const OUT_UNITS = path.join(process.cwd(), "..", "data", "units.toolbox.json");
 
-const ELEMENTS = new Set(["Fire", "Earth", "Storm", "Water", "Light", "Dark"]);
+// Any of these strongly indicates it's NOT a unit name/title
+const PASSIVE_LIKE = /(Up Lv\d+|Resist Lv\d+|Mastery\b)/i;
+
+const UI_JUNK = new Set([
+  "Home", "Viewer", "Explorer", "Calculator", "Simulator", "Story Scripts", "Tools",
+  "Character", "Weapon", "Accessory", "Boss",
+  "Rarity:", "Elements:", "Card View", "Column:",
+  "Rarity", "Element", "Cost", "Stats", "Leader Skill",
+  "Active Skills", "Passive Skills", "Name", "ATK", "HP", "SPD",
+  "ALL", "Image"
+]);
 
 function decodeHtmlEntities(str) {
   return String(str ?? "")
@@ -40,55 +50,74 @@ function normalizeId(name, title) {
   return `${name}__${title}`.toLowerCase().replace(/[^a-z0-9]+/g, "_");
 }
 
-// Viewer repeats a lot of UI labels. Filter them out when collecting skills.
-const UI_JUNK = new Set([
-  "Home", "Viewer", "Explorer", "Calculator", "Simulator",
-  "Character", "Weapon", "Accessory", "Boss",
-  "Rarity:", "Elements:", "Card View", "Column:",
-  "Rarity", "Element", "Cost", "Stats", "Leader Skill",
-  "Active Skills", "Passive Skills", "Name", "ATK", "HP", "SPD",
-  "ALL"
-]);
-
 function isJunk(line) {
   if (!line) return true;
   if (UI_JUNK.has(line)) return true;
   if (line.startsWith("Page ")) return true;
   if (line.endsWith(" items")) return true;
-  if (line === "Image") return true;
-  // The web tool shows "" tokens; in plain text runs it can show "Image" only.
-  if (/^【\d+†Image】$/.test(line)) return true;
+  if (PASSIVE_LIKE.test(line)) return false; // passives are not "junk", just not unit names
   return false;
 }
 
-function parseUnits(lines) {
-  // Find where the character table header begins
-  const start = lines.findIndex((l) => l === "Name");
-  if (start === -1) throw new Error("Couldn't find unit table header 'Name'.");
+function isValidUnitNameOrTitle(line) {
+  if (!line) return false;
+  if (UI_JUNK.has(line)) return false;
+  if (line.startsWith("Page ")) return false;
+  if (line.endsWith(" items")) return false;
+  // Key rule: NEVER allow passives to be name/title
+  if (PASSIVE_LIKE.test(line)) return false;
+  // Stats aren’t names
+  if (asIntMaybe(line) != null) return false;
+  // Very short strings are usually noise
+  if (line.length < 2) return false;
+  return true;
+}
 
-  // Cut off before weapons begin
+function nextNonJunk(lines, startIdx) {
+  let i = startIdx;
+  while (i < lines.length && isJunk(lines[i])) i++;
+  return i;
+}
+
+function parseUnits(lines) {
+  // Start at the unit table header
+  const start = lines.findIndex((l) => l === "Name");
+  if (start === -1) throw new Error("Couldn't find 'Name' header (Viewer layout changed).");
+
+  // Stop before weapons section
   const weaponIdx = lines.findIndex((l) => l === "Weapon:");
   const slice = weaponIdx !== -1 ? lines.slice(start, weaponIdx) : lines.slice(start);
 
   const units = [];
   const seen = new Set();
 
-  // Strategy:
-  // Scan for patterns: [Name][Title] then find next 4 ints = cost/atk/hp/spd,
-  // then leader skill name + description, then collect 6 actives + 4 passives (best-effort).
-  for (let i = 0; i < slice.length - 10; i++) {
+  // Move index to the first actual unit entry (after header rows)
+  let i = start;
+  i = slice.findIndex((l) => l === "Rizette") >= 0 ? slice.findIndex((l) => l === "Rizette") - 1 : 0; // best-effort
+  if (i < 0) i = 0;
+
+  // Sequential parse: name -> title -> stats -> leader -> 6 actives -> 4 passives
+  // This prevents "passives becoming names".
+  for (let p = 0; p < 10000; p++) {
+    i = nextNonJunk(slice, i);
+    if (i >= slice.length) break;
+
     const name = slice[i];
     const title = slice[i + 1];
 
-    if (isJunk(name) || isJunk(title)) continue;
-    if (asIntMaybe(name) != null || asIntMaybe(title) != null) continue;
-    if (name.length < 2 || title.length < 2) continue;
+    if (!isValidUnitNameOrTitle(name) || !isValidUnitNameOrTitle(title)) {
+      i++;
+      continue;
+    }
 
-    // find stats in next ~60 lines: cost, atk, hp, spd
+    // Find 4 consecutive ints very close to name/title.
+    // On the Viewer output, these appear shortly after title.
     let statsPos = -1;
-    let cost, atk, hp, spd;
+    let cost = null, atk = null, hp = null, spd = null;
 
-    for (let j = i + 2; j < Math.min(slice.length - 4, i + 60); j++) {
+    const searchFrom = i + 2;
+    const searchTo = Math.min(slice.length - 4, i + 18); // <-- tight window is the fix
+    for (let j = searchFrom; j <= searchTo; j++) {
       const c = asIntMaybe(slice[j]);
       const a = asIntMaybe(slice[j + 1]);
       const h = asIntMaybe(slice[j + 2]);
@@ -99,97 +128,68 @@ function parseUnits(lines) {
         break;
       }
     }
-    if (statsPos === -1) continue;
+
+    if (statsPos === -1) {
+      // Not actually a unit block
+      i++;
+      continue;
+    }
 
     let k = statsPos + 4;
+    k = nextNonJunk(slice, k);
 
-    // Move forward to leader skill name (skip junk/images)
-    while (k < slice.length && isJunk(slice[k])) k++;
-
-    // Sometimes element icon text is stripped; sometimes leader skill name follows immediately.
+    // Leader skill name (may be missing sometimes, but usually exists)
     let leaderSkillName = null;
     let leaderSkillText = null;
 
-    // If current line looks like "Light HP Up" etc, accept it.
-    if (k < slice.length && !isJunk(slice[k]) && slice[k].length <= 40) {
+    if (k < slice.length && isValidUnitNameOrTitle(slice[k])) {
       leaderSkillName = slice[k];
       k++;
     }
+    k = nextNonJunk(slice, k);
 
-    // Next non-junk line often is leader description ("Allied X element units ...")
-    while (k < slice.length && isJunk(slice[k])) k++;
+    // Leader skill text usually begins with "Allied ..."
     if (k < slice.length && slice[k].startsWith("Allied ")) {
       leaderSkillText = slice[k];
       k++;
     }
+    k = nextNonJunk(slice, k);
 
-    // Collect skills: we’ll collect a bunch then split best-effort
-    const skillBucket = [];
-    while (k < slice.length) {
-      const line = slice[k];
-
-      // Stop if next unit is starting (name/title + stats pattern ahead)
-      // Heuristic: if line is non-junk and the following line is non-junk and within next 30 we see 4 ints
-      if (!isJunk(line) && !isJunk(slice[k + 1] ?? "")) {
-        let foundStatsAhead = false;
-        for (let j = k + 2; j < Math.min(slice.length - 4, k + 35); j++) {
-          const c = asIntMaybe(slice[j]);
-          const a = asIntMaybe(slice[j + 1]);
-          const h = asIntMaybe(slice[j + 2]);
-          const s = asIntMaybe(slice[j + 3]);
-          if (c != null && a != null && h != null && s != null) { foundStatsAhead = true; break; }
-        }
-        if (foundStatsAhead) break;
-      }
-
-      if (!isJunk(line)) skillBucket.push(line);
+    // 6 actives
+    const activeSkills = [];
+    while (k < slice.length && activeSkills.length < 6) {
+      if (!isJunk(slice[k])) activeSkills.push(slice[k]);
       k++;
     }
 
-    // Determine element (best-effort): infer from leader text if possible
-    let element = null;
-    if (leaderSkillText) {
-      for (const el of ELEMENTS) {
-        if (leaderSkillText.includes(` ${el} `) || leaderSkillText.includes(`${el} element`)) {
-          element = el;
-          break;
-        }
-      }
-    }
-
-    // Toolbox viewer tends to show 6 actives then 4 passives. We’ll split by known passive markers.
-    const passiveStart = skillBucket.findIndex((x) => x.includes("Up Lv") || x.includes("Resist Lv") || x.includes("Mastery"));
-    let activeSkills = [];
-    let passiveSkills = [];
-
-    if (passiveStart === -1) {
-      activeSkills = skillBucket.slice(0, 6);
-      passiveSkills = skillBucket.slice(6, 10);
-    } else {
-      activeSkills = skillBucket.slice(0, passiveStart).slice(0, 6);
-      passiveSkills = skillBucket.slice(passiveStart).slice(0, 10);
+    // 4 passives
+    const passiveSkills = [];
+    while (k < slice.length && passiveSkills.length < 4) {
+      if (!isJunk(slice[k])) passiveSkills.push(slice[k]);
+      k++;
     }
 
     const id = normalizeId(name, title);
-    if (seen.has(id)) continue;
-    seen.add(id);
+    if (!seen.has(id)) {
+      seen.add(id);
+      units.push({
+        id,
+        name,
+        title,
+        element: null,
+        rarity: null,
+        cost,
+        stats: { atk, hp, spd },
+        leaderSkillName,
+        leaderSkillText,
+        activeSkills,
+        passiveSkills,
+        source: { viewer: VIEWER_URL }
+      });
+    }
 
-    units.push({
-      id,
-      name,
-      title,
-      element,
-      rarity: null,
-      cost,
-      stats: { atk, hp, spd },
-      leaderSkillName,
-      leaderSkillText,
-      activeSkills,
-      passiveSkills,
-      source: { viewer: VIEWER_URL }
-    });
-
-    i = statsPos; // jump forward a bit
+    // Continue scanning from where we ended
+    i = k;
   }
 
   return units;
@@ -199,7 +199,7 @@ async function run() {
   console.log(`Fetching: ${VIEWER_URL}`);
   const res = await fetch(VIEWER_URL, {
     headers: {
-      "user-agent": "Evertale-Optimizer-Scraper/Full",
+      "user-agent": "Evertale-Optimizer-Scraper/FixedNames",
       "accept": "text/html,*/*"
     }
   });
@@ -209,7 +209,7 @@ async function run() {
   const lines = htmlToLines(html);
 
   const units = parseUnits(lines);
-  if (!units.length) throw new Error("Parsed 0 units (layout changed or blocked).");
+  if (!units.length) throw new Error("Parsed 0 units. Viewer layout may have changed.");
 
   await fs.mkdir(path.dirname(OUT_UNITS), { recursive: true });
   await fs.writeFile(
@@ -219,6 +219,7 @@ async function run() {
   );
 
   console.log(`Wrote ${units.length} units -> data/units.toolbox.json`);
+  console.log(`First 5: ${units.slice(0, 5).map(u => u.name).join(", ")}`);
 }
 
 run().catch((e) => {
