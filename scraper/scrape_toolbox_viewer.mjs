@@ -1,15 +1,15 @@
 // scraper/scrape_toolbox_viewer.mjs
-// Outputs:
-//   ../data/units.json  (website-ready: { updatedAt, units: [...] })
-//   ../data/weapons.json (optional, for later)
+// Output files (repo root):
+//   data/units.toolbox.json    -> { updatedAt, units: [...] }
+//   data/weapons.toolbox.json  -> { updatedAt, weapons: [...] }
 
 import fs from "node:fs/promises";
 import path from "node:path";
 
 const VIEWER_URL = "https://evertaletoolbox2.runasp.net/Viewer";
 
-const OUT_UNITS = path.join(process.cwd(), "..", "data", "units.json");
-const OUT_WEAPONS = path.join(process.cwd(), "..", "data", "weapons.json");
+const OUT_UNITS = path.join(process.cwd(), "..", "data", "units.toolbox.json");
+const OUT_WEAPONS = path.join(process.cwd(), "..", "data", "weapons.toolbox.json");
 
 const ELEMENTS = new Set(["Fire", "Earth", "Storm", "Water", "Light", "Dark"]);
 const WEAPON_TYPES = new Set([
@@ -33,7 +33,7 @@ function htmlToLines(html) {
 
   return decoded
     .split("\n")
-    .map((l) => l.trim())
+    .map((l) => l.replace(/\s+/g, " ").trim())
     .filter(Boolean);
 }
 
@@ -95,9 +95,11 @@ function takeWhile(lines, startIdx, stopPred) {
 function parseCharacters(lines) {
   const units = [];
 
+  // stop before weapon section
   const weaponStart = lines.findIndex((l) => l === "Weapon:");
   const trimmed = weaponStart !== -1 ? lines.slice(0, weaponStart) : lines;
 
+  // find start header
   const start = trimmed.findIndex((l) => l === "Name");
   if (start === -1) throw new Error("Could not find 'Name' header (Viewer layout changed).");
 
@@ -109,7 +111,7 @@ function parseCharacters(lines) {
 
     if (!isLikelyName(name) || !isLikelyName(title)) continue;
 
-    // Find the stat block: cost, atk, hp, spd (4 consecutive integers) within next 40 lines
+    // Find 4 consecutive ints within next ~45 lines: cost, atk, hp, spd
     let j = i + 2;
     let statsPos = -1;
     let cost = null, atk = null, hp = null, spd = null;
@@ -132,9 +134,12 @@ function parseCharacters(lines) {
     let k = statsPos + 4;
 
     // skip noise
-    while (k < slice.length && (slice[k] === "ALL" || isLinkImageToken(slice[k]) || isHeaderWord(slice[k]))) k++;
+    while (
+      k < slice.length &&
+      (slice[k] === "ALL" || isLinkImageToken(slice[k]) || isHeaderWord(slice[k]))
+    ) k++;
 
-    // leader short name may include element at start
+    // element + leader short label (best effort)
     let element = null;
     let leaderSkillName = null;
     let leaderSkillText = null;
@@ -148,18 +153,27 @@ function parseCharacters(lines) {
       }
     }
 
-    if (k < slice.length && (slice[k].startsWith("Allied ") || slice[k].includes("increased by"))) {
+    // leader skill desc line (best effort)
+    if (
+      k < slice.length &&
+      (slice[k].startsWith("Allied ") || slice[k].includes("increased by"))
+    ) {
       leaderSkillText = slice[k];
       k++;
     }
 
-    // active skills until passives likely start
+    // active skills until passives start (heuristic)
     const { out: activeSkills, next: afterActives } = takeWhile(slice, k, (l) =>
-      l.includes("Up Lv") || l.includes("Resist") || l.includes("Mastery") || l === "Weapon:" || /^\d+\s+items$/.test(l)
+      l.includes("Up Lv") ||
+      l.includes("Resist") ||
+      l.includes("Mastery") ||
+      l === "Weapon:" ||
+      /^\d+\s+items$/.test(l) ||
+      l.startsWith("Page ")
     );
     k = afterActives;
 
-    // passives until next unit pattern or end
+    // passive skills until next unit block
     const { out: passiveSkills, next: afterPassives } = takeWhile(slice, k, (l, idx) => {
       if (l === "Weapon:" || /^\d+\s+items$/.test(l) || l.startsWith("Page ")) return true;
 
@@ -179,16 +193,15 @@ function parseCharacters(lines) {
       id,
       name,
       title,
-      element,         // might be null if the Viewer block doesn't include it in the text
-      rarity: null,    // Viewer text often doesn’t include rarity cleanly; keep null for now
+      element,     // may be null depending on parsing
+      rarity: null, // Viewer text often doesn't provide rarity cleanly
       cost,
       stats: { atk, hp, spd },
-      weaponType: null, // can be enriched later if we parse it reliably
       leaderSkillName,
       leaderSkillText,
       activeSkills,
       passiveSkills,
-      source: { viewer: VIEWER_URL }
+      source: { viewer: VIEWER_URL },
     });
 
     i = Math.max(i, statsPos);
@@ -229,7 +242,7 @@ function parseWeapons(lines) {
       type,
       rarity,
       stats: { atk: stat1, hp: stat2 },
-      source: { viewer: VIEWER_URL }
+      source: { viewer: VIEWER_URL },
     });
 
     i += 5;
@@ -242,8 +255,8 @@ async function run() {
   const res = await fetch(VIEWER_URL, {
     headers: {
       "user-agent": "Evertale-Optimizer-Scraper/Viewer",
-      "accept": "text/html,*/*"
-    }
+      "accept": "text/html,*/*",
+    },
   });
   if (!res.ok) throw new Error(`Fetch failed: ${res.status} ${res.statusText}`);
 
