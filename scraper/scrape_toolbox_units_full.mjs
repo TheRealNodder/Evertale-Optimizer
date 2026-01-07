@@ -1,6 +1,9 @@
 // scraper/scrape_toolbox_units_full.mjs
-// Pulls ALL unit IDs from Toolbox Explorer (no paging, no JS rendering).
-// Writes: ../data/units.toolbox.json
+// Scrape Toolbox Explorer and split into Characters / Weapons / Enemies.
+// Writes:
+//   ../data/characters.toolbox.json
+//   ../data/weapons.toolbox.json
+//   ../data/enemies.toolbox.json
 
 import fs from "node:fs/promises";
 import path from "node:path";
@@ -9,7 +12,10 @@ import cheerio from "cheerio";
 const BASE = "https://evertaletoolbox2.runasp.net";
 const EXPLORER_URL = `${BASE}/Explorer`;
 
-const OUT_PATH = path.join(process.cwd(), "..", "data", "units.toolbox.json");
+const OUT_DIR = path.join(process.cwd(), "..", "data");
+const OUT_CHAR = path.join(OUT_DIR, "characters.toolbox.json");
+const OUT_WEAP = path.join(OUT_DIR, "weapons.toolbox.json");
+const OUT_ENEM = path.join(OUT_DIR, "enemies.toolbox.json");
 
 async function fetchText(url) {
   const res = await fetch(url, {
@@ -19,66 +25,119 @@ async function fetchText(url) {
       accept: "text/html,application/xhtml+xml"
     }
   });
-
   if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText} for ${url}`);
   return await res.text();
 }
 
+// Normalize heading text
+function norm(s) {
+  return String(s ?? "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase();
+}
+
+function extractIdFromLine(t) {
+  // "RizetteBrave (Rizette)" -> RizetteBrave
+  const m = t.match(/^([A-Za-z0-9_]+)\s*\(/);
+  return m ? m[1] : null;
+}
+
 /**
- * Explorer contains list items like:
- *   RizetteBrave (Rizette)
- * We want the stable internal key: RizetteBrave
+ * We walk the DOM in order:
+ * - when we hit a heading like "Character", set currentSection
+ * - collect <li> text under that heading until next heading
  */
-function extractUnitIdsFromExplorer(html) {
+function extractBySections(html) {
   const $ = cheerio.load(html);
-  const ids = new Set();
 
-  // Primary: parse <li> elements
-  const liTexts = $("li")
-    .map((_, el) => $(el).text().replace(/\s+/g, " ").trim())
-    .get()
-    .filter(Boolean);
+  // These are the section names the Toolbox uses in its nav/content.
+  // We map them to output keys.
+  const sectionMap = new Map([
+    ["character", "characters"],
+    ["characters", "characters"],
+    ["weapon", "weapons"],
+    ["weapons", "weapons"],
+    ["boss", "enemies"],
+    ["bosses", "enemies"],
+    ["enemy", "enemies"],
+    ["enemies", "enemies"],
+    ["accessory", "accessories"],
+    ["accessories", "accessories"]
+  ]);
 
-  for (const t of liTexts) {
-    const m = t.match(/^([A-Za-z0-9_]+)\s*\(/);
-    if (m) ids.add(m[1]);
-  }
+  const buckets = {
+    characters: new Set(),
+    weapons: new Set(),
+    enemies: new Set(),
+    accessories: new Set()
+  };
 
-  // Fallback: parse raw text if <li> structure changes
-  if (ids.size === 0) {
-    const text = $.root().text();
-    const lines = text.split("\n").map((l) => l.trim()).filter(Boolean);
+  // We attempt two strategies:
+  // (A) Heading-based DOM walk using h1/h2/h3/h4 text
+  // (B) Fallback: look for "Character" / "Weapon" / "Boss" labels near lists
 
-    for (const line of lines) {
-      // Handles lines like: "* RizetteBrave (Rizette)"
-      let m = line.match(/^\*\s*([A-Za-z0-9_]+)\s*\(/);
-      if (m) ids.add(m[1]);
+  // Strategy A: DOM walk
+  let current = null;
 
-      // Handles lines like: "RizetteBrave (Rizette)"
-      m = line.match(/^([A-Za-z0-9_]+)\s*\(/);
-      if (m) ids.add(m[1]);
+  // Select a broad set of possible heading containers
+  const nodes = $("body").find("*").toArray();
+
+  for (const el of nodes) {
+    const tag = (el.tagName || "").toLowerCase();
+
+    // Detect headings
+    if (["h1", "h2", "h3", "h4", "h5", "strong", "b"].includes(tag)) {
+      const label = norm($(el).text());
+      if (sectionMap.has(label)) {
+        current = sectionMap.get(label);
+      }
+    }
+
+    // Collect list items if we’re inside a known section
+    if (tag === "li" && current) {
+      const text = $(el).text().replace(/\s+/g, " ").trim();
+      const id = extractIdFromLine(text);
+      if (id) buckets[current].add(id);
     }
   }
 
-  return [...ids];
+  // Strategy B: If A fails (no headings), collect all <li> and then classify by nearby label
+  const totalCollected =
+    buckets.characters.size + buckets.weapons.size + buckets.enemies.size + buckets.accessories.size;
+
+  if (totalCollected === 0) {
+    // fallback: just collect all li
+    const li = $("li")
+      .map((_, el) => $(el).text().replace(/\s+/g, " ").trim())
+      .get()
+      .filter(Boolean);
+
+    for (const t of li) {
+      const id = extractIdFromLine(t);
+      if (!id) continue;
+
+      // Very rough classification fallback:
+      // Weapon IDs often end with numbers or include weapon-like words; enemies often include Boss-like names.
+      // If we can’t tell, dump into characters.
+      if (/(Sword|Axe|Staff|Spear|Katana|Hammer|Mace)/i.test(id)) buckets.weapons.add(id);
+      else buckets.characters.add(id);
+    }
+  }
+
+  return {
+    characters: [...buckets.characters].sort((a, b) => a.localeCompare(b)),
+    weapons: [...buckets.weapons].sort((a, b) => a.localeCompare(b)),
+    enemies: [...buckets.enemies].sort((a, b) => a.localeCompare(b)),
+    accessories: [...buckets.accessories].sort((a, b) => a.localeCompare(b))
+  };
 }
 
-function buildMinimalUnitRecord(id) {
-  // Minimal schema that won't break your app load.
-  // Later we can enrich with stats/skills once we discover the JSON/API endpoints.
+function wrapList(list, source) {
   return {
-    id,
-    name: id,
-    title: "",
-    element: null,
-    rarity: null,
-    cost: null,
-    stats: { atk: null, hp: null, spd: null },
-    leaderSkillName: null,
-    leaderSkillText: null,
-    activeSkills: [],
-    passiveSkills: [],
-    source: { explorer: EXPLORER_URL }
+    updatedAt: new Date().toISOString(),
+    source,
+    ids: list
   };
 }
 
@@ -86,27 +145,28 @@ async function run() {
   console.log(`Fetching Explorer: ${EXPLORER_URL}`);
   const html = await fetchText(EXPLORER_URL);
 
-  const ids = extractUnitIdsFromExplorer(html);
+  const { characters, weapons, enemies, accessories } = extractBySections(html);
 
-  if (!ids.length) {
-    throw new Error("No unit IDs found in Explorer HTML. The site structure may have changed.");
+  if (!characters.length && !weapons.length && !enemies.length) {
+    throw new Error("No IDs extracted. Explorer HTML structure may have changed.");
   }
 
-  ids.sort((a, b) => a.localeCompare(b));
+  await fs.mkdir(OUT_DIR, { recursive: true });
 
-  console.log(`Found ${ids.length} unit IDs.`);
-  console.log(`First 25: ${ids.slice(0, 25).join(", ")}`);
+  await fs.writeFile(OUT_CHAR, JSON.stringify(wrapList(characters, EXPLORER_URL), null, 2), "utf8");
+  await fs.writeFile(OUT_WEAP, JSON.stringify(wrapList(weapons, EXPLORER_URL), null, 2), "utf8");
+  await fs.writeFile(OUT_ENEM, JSON.stringify(wrapList(enemies, EXPLORER_URL), null, 2), "utf8");
 
-  const units = ids.map(buildMinimalUnitRecord);
+  // accessories is optional; write only if non-empty
+  if (accessories.length) {
+    const outAcc = path.join(OUT_DIR, "accessories.toolbox.json");
+    await fs.writeFile(outAcc, JSON.stringify(wrapList(accessories, EXPLORER_URL), null, 2), "utf8");
+    console.log(`Accessories: ${accessories.length} -> data/accessories.toolbox.json`);
+  }
 
-  await fs.mkdir(path.dirname(OUT_PATH), { recursive: true });
-  await fs.writeFile(
-    OUT_PATH,
-    JSON.stringify({ updatedAt: new Date().toISOString(), units }, null, 2),
-    "utf8"
-  );
-
-  console.log(`Wrote ${units.length} units -> ${OUT_PATH}`);
+  console.log(`Characters: ${characters.length} -> data/characters.toolbox.json`);
+  console.log(`Weapons:    ${weapons.length} -> data/weapons.toolbox.json`);
+  console.log(`Enemies:    ${enemies.length} -> data/enemies.toolbox.json`);
 }
 
 run().catch((e) => {
