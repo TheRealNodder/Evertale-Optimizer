@@ -3,7 +3,7 @@ name: Scrape Evertale Units
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 6 * * 0" # Runs every Sunday at 06:00 UTC
+    - cron: "0 6 * * 0" # every Sunday at 06:00 UTC
 
 jobs:
   scrape:
@@ -37,10 +37,12 @@ jobs:
           mkdir -p data
           mv scraper/units.json data/units.json
 
-     - name: Commit updated units.json
-       run: |
-         git config user.name "github-actions"
-         git config user.email "actions@github.com"
-         git add data/units.json
-         git diff --cached --quiet || git commit -m "Update units.json"
-         git push https://x-access-token:${{ secrets.GH_PAT }}@github.com/TheRealNodder/Evertale-Optimizer.git HEAD:main
+      - name: Commit updated units.json
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}   # <-- Make sure this secret exists
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add data/units.json
+          git diff --cached --quiet || git commit -m "Update units.json"
+          git push https://x-access-token:${GH_PAT}@github.com/TheRealNodder/Evertale-Optimizer.git HEAD:main
