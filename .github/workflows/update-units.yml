@@ -1,0 +1,41 @@
+name: Update units.json from Evertale Toolbox
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 9 * * *" # daily 09:00 UTC
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-units
+  cancel-in-progress: true
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Run scraper
+        working-directory: scraper
+        run: node scrape_toolbox_units.mjs
+
+      - name: Commit changes (if any)
+        run: |
+          if git diff --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/units.json
+          git commit -m "Update units.json"
+          git push
