@@ -1,4 +1,4 @@
-name: Update toolbox data
+name: Update toolbox data (Viewer Playwright)
 
 on:
   workflow_dispatch:
@@ -31,16 +31,20 @@ jobs:
         working-directory: scraper
         run: npm install
 
-      - name: Run toolbox scraper (recreates data/)
+      - name: Install Playwright browsers (Chromium)
         working-directory: scraper
-        run: node scrape_toolbox_catalog.mjs
+        run: npx playwright install --with-deps chromium
+
+      - name: Scrape Viewer characters (Playwright)
+        working-directory: scraper
+        run: node scrape_viewer_characters_playwright.mjs
 
       - name: Commit generated data
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/catalog.toolbox.json || true
-          git diff --cached --quiet || git commit -m "Update toolbox catalog"
+          git add data/characters.viewer.full.json || true
+          git diff --cached --quiet || git commit -m "Update Viewer characters (Playwright)"
 
       - name: Push changes (rebase if needed)
         env:
@@ -50,7 +54,6 @@ jobs:
             echo "GH_PAT secret is missing"
             exit 1
           fi
-
           git remote set-url origin "https://x-access-token:${GH_PAT}@github.com/TheRealNodder/Evertale-Optimizer.git"
           git fetch origin main
           git rebase origin/main || (git rebase --abort && exit 1)
