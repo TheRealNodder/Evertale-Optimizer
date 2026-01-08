@@ -1,44 +1,61 @@
 // scraper/build_catalog_from_viewer.mjs
+// Builds data/catalog.toolbox.json from data/characters.viewer.full.json
+// This replaces Explorer scraping.
+
 import fs from "fs/promises";
 import path from "path";
 
-const VIEWER_FILE = "data/characters.viewer.full.json";
-const OUT_FILE = "data/catalog.toolbox.json";
+const IN_FILE = path.resolve(process.cwd(), "data/characters.viewer.full.json");
+const OUT_FILE = path.resolve(process.cwd(), "data/catalog.toolbox.json");
 
+function normText(s) {
+  return (s ?? "").toString().replace(/\s+/g, " ").trim();
+}
+
+// Heuristic category inference (you can improve later once we have explicit type fields)
 function inferCategory(u) {
-  const name = (u.name || "").toLowerCase();
-  const text = JSON.stringify(u).toLowerCase();
+  const name = normText(u.name).toLowerCase();
+  const element = normText(u.element).toLowerCase();
 
-  if (text.includes("weapon")) return "weapon";
-  if (text.includes("accessory")) return "accessory";
-  if (text.includes("boss")) return "boss";
-  if (text.includes("enemy") || text.includes("monster")) return "enemy";
+  // If later you add a `type` field into Viewer scraper, prefer it:
+  if (u.type) return u.type;
+
+  // Toolbox viewer list we scraped is primarily characters; so default to character.
+  // Keep hooks for future expansion.
+  if (name.includes("weapon")) return "weapon";
+  if (name.includes("accessory")) return "accessory";
+  if (name.includes("boss")) return "boss";
+  if (name.includes("enemy") || name.includes("monster")) return "enemy";
+
+  // If element exists, it's almost certainly a character
+  if (element) return "character";
 
   return "character";
 }
 
 async function run() {
-  const viewerRaw = await fs.readFile(VIEWER_FILE, "utf8");
-  const viewer = JSON.parse(viewerRaw);
+  const raw = await fs.readFile(IN_FILE, "utf8");
+  const viewer = JSON.parse(raw);
 
-  if (!viewer.characters || viewer.characters.length < 50) {
-    throw new Error("Viewer data too small; refusing to build catalog.");
+  const list = viewer.characters || [];
+  if (list.length < 50) {
+    throw new Error(`Viewer input too small (${list.length}). Refusing to build catalog.`);
   }
 
-  const items = viewer.characters.map(u => ({
+  const items = list.map(u => ({
     id: u.id || u.name,
     name: u.name,
     category: inferCategory(u),
     element: u.element || null,
-    image: null, // can be filled later if needed
-    source: "viewer"
+    image: null,  // images can be mapped later once we discover stable image URLs
+    url: u.url || null
   }));
 
   await fs.writeFile(
     OUT_FILE,
     JSON.stringify(
       {
-        generatedFrom: VIEWER_FILE,
+        generatedFrom: "data/characters.viewer.full.json",
         generatedAt: new Date().toISOString(),
         items
       },
@@ -48,7 +65,7 @@ async function run() {
     "utf8"
   );
 
-  console.log(`Built catalog with ${items.length} items`);
+  console.log(`Built catalog with ${items.length} items -> ${OUT_FILE}`);
 }
 
 run().catch(err => {
