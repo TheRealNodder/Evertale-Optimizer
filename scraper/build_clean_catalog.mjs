@@ -1,68 +1,72 @@
 // scraper/build_clean_catalog.mjs
 import fs from "fs/promises";
 
-const OUT_FILE = "data/catalog.json";
+const DATA_DIR = "data";
+const OUT_FILE = "data/catalog.clean.json";
 
-// Try ALL common inputs we’ve been generating in this repo:
-const INPUTS = [
+const CANDIDATES = [
   "data/catalog.toolbox.json",
   "data/catalog.json",
   "data/catalog.toolbox.full.json",
-  "data/catalog.toolbox.mixed.json",
 ];
 
-function isObject(x) {
-  return x && typeof x === "object" && !Array.isArray(x);
-}
-
-function isAlreadyClean(json) {
-  return (
-    isObject(json) &&
-    (Array.isArray(json.characters) ||
-      Array.isArray(json.weapons) ||
-      Array.isArray(json.accessories) ||
-      Array.isArray(json.enemies) ||
-      Array.isArray(json.bosses))
-  );
-}
-
-async function fileExistsNonEmpty(path) {
+async function safeReadJSON(path) {
   try {
-    const st = await fs.stat(path);
-    return st.size > 2;
-  } catch {
-    return false;
+    const txt = await fs.readFile(path, "utf8");
+    const json = JSON.parse(txt);
+    return json;
+  } catch (e) {
+    console.warn(`⚠️ Skipping invalid JSON: ${path}`);
+    return null;
   }
 }
 
-async function tryReadJson(path) {
-  const txt = await fs.readFile(path, "utf8");
-  return JSON.parse(txt);
+function normCat(v) {
+  const x = (v || "").toLowerCase();
+  if (["character","unit","units"].includes(x)) return "character";
+  if (["weapon","weapons"].includes(x)) return "weapon";
+  if (["accessory","accessories"].includes(x)) return "accessory";
+  if (["enemy","enemies","monster","monsters"].includes(x)) return "enemy";
+  if (["boss","bosses"].includes(x)) return "boss";
+  return "unknown";
 }
 
-function normCat(x) {
-  const v = (x || "").toString().toLowerCase().trim();
-  if (["character", "characters", "unit", "units"].includes(v)) return "character";
-  if (["weapon", "weapons"].includes(v)) return "weapon";
-  if (["accessory", "accessories"].includes(v)) return "accessory";
-  if (["enemy", "enemies", "monster", "monsters"].includes(v)) return "enemy";
-  if (["boss", "bosses"].includes(v)) return "boss";
-  return v || "unknown";
-}
-
-// Extract items[] from various possible shapes
-function getItems(raw) {
-  if (Array.isArray(raw)) return raw;
-  if (Array.isArray(raw.items)) return raw.items;
-  if (raw.catalog && Array.isArray(raw.catalog.items)) return raw.catalog.items;
+function extractItems(json) {
+  if (!json) return null;
+  if (Array.isArray(json)) return json;
+  if (Array.isArray(json.items)) return json.items;
+  if (json.catalog && Array.isArray(json.catalog.items)) return json.catalog.items;
   return null;
 }
 
-function cleanFromItems(items, generatedFrom) {
+async function main() {
+  console.log("📂 data/ contains:");
+  const files = await fs.readdir(DATA_DIR);
+  console.log(files.join(", "));
+
+  let sourceFile = null;
+  let items = null;
+
+  for (const file of CANDIDATES) {
+    try {
+      const json = await safeReadJSON(file);
+      const extracted = extractItems(json);
+      if (extracted && extracted.length > 5) {
+        sourceFile = file;
+        items = extracted;
+        break;
+      }
+    } catch {}
+  }
+
+  if (!items) {
+    throw new Error("No valid catalog source found (all inputs invalid or empty)");
+  }
+
   const out = {
     meta: {
       generatedAt: new Date().toISOString(),
-      generatedFrom,
+      source: sourceFile,
     },
     characters: [],
     weapons: [],
@@ -72,93 +76,27 @@ function cleanFromItems(items, generatedFrom) {
     unknown: [],
   };
 
-  const pushByCat = (cat, obj) => {
-    if (cat === "character") out.characters.push(obj);
-    else if (cat === "weapon") out.weapons.push(obj);
-    else if (cat === "accessory") out.accessories.push(obj);
-    else if (cat === "enemy") out.enemies.push(obj);
-    else if (cat === "boss") out.bosses.push(obj);
-    else out.unknown.push(obj);
-  };
-
   for (const it of items) {
-    const id = (it.id ?? it.key ?? it.name ?? "").toString().trim();
-    const name = (it.name ?? it.id ?? "").toString().trim();
+    const name = (it.name || it.id || "").toString().trim();
     if (!name) continue;
 
-    const category = normCat(it.category ?? it.type);
     const entry = {
-      id: id || name,
+      id: (it.id || name).toString(),
       name,
-      category,
-      element: it.element ?? null,
-      image: it.image ?? it.imageUrl ?? it.img ?? null,
-      url: it.url ?? "https://evertaletoolbox2.runasp.net/Explorer",
+      category: normCat(it.category || it.type),
+      element: it.element || null,
+      image: it.image || it.imageUrl || null,
+      url: it.url || null,
     };
-    pushByCat(category, entry);
+
+    out[entry.category + "s"]?.push(entry) || out.unknown.push(entry);
   }
 
-  return out;
-}
-
-async function main() {
-  // Helpful debug: show what’s in data/ before we even start
-  try {
-    const listing = await fs.readdir("data");
-    console.log("data/ contains:", listing.join(", "));
-  } catch {
-    console.log("data/ folder not readable (does it exist?)");
-  }
-
-  // Find first usable input
-  let chosen = null;
-  for (const p of INPUTS) {
-    if (await fileExistsNonEmpty(p)) {
-      chosen = p;
-      break;
-    }
-  }
-
-  if (!chosen) {
-    throw new Error(
-      `No input catalog found. Expected one of: ${INPUTS.join(", ")}`
-    );
-  }
-
-  const raw = await tryReadJson(chosen);
-
-  // If already clean, just normalize and write
-  if (isAlreadyClean(raw)) {
-    console.log("Catalog already clean — passing through:", chosen);
-    const out = {
-      meta: {
-        generatedAt: new Date().toISOString(),
-        generatedFrom: chosen,
-      },
-      characters: raw.characters ?? [],
-      weapons: raw.weapons ?? [],
-      accessories: raw.accessories ?? [],
-      enemies: raw.enemies ?? [],
-      bosses: raw.bosses ?? [],
-      unknown: raw.unknown ?? [],
-    };
-    await fs.writeFile(OUT_FILE, JSON.stringify(out, null, 2), "utf8");
-    console.log("Wrote:", OUT_FILE);
-    return;
-  }
-
-  // Otherwise, must have items[]
-  const items = getItems(raw);
-  if (!items || !items.length) {
-    throw new Error(`Input exists but has no items[]: ${chosen}`);
-  }
-
-  const out = cleanFromItems(items, chosen);
   await fs.writeFile(OUT_FILE, JSON.stringify(out, null, 2), "utf8");
-  console.log("Wrote:", OUT_FILE);
+  console.log(`✅ Wrote clean catalog -> ${OUT_FILE}`);
 }
 
-main().catch((err) => {
-  console.error("build_clean_catalog failed:", err.message);
+main().catch(err => {
+  console.error("❌ build_clean_catalog failed:", err.message);
   process.exit(1);
 });
