@@ -1,16 +1,23 @@
-// app.js — CLEAN OPTION A
-// Single source of truth: data/catalog.toolbox.json
+// app.js — Option A (clean): single stable file: ./data/catalog.json
 
-const DATA_URL = "./data/catalog.toolbox.json";
+const DATA_URL = "./data/catalog.json";
+
+const $ = (s) => document.querySelector(s);
 
 let state = {
   items: [],
   byId: new Map(),
-  team: [],
+  team: Array(8).fill(null),
 };
 
-// ----------------- Utils -----------------
-const $ = (s) => document.querySelector(s);
+// ---------- UI helpers ----------
+function showStatus(msg) {
+  $("#status").classList.remove("hidden");
+  $("#statusText").textContent = msg;
+}
+function hideStatus() {
+  $("#status").classList.add("hidden");
+}
 
 function safeNum(v) {
   const n = Number(v);
@@ -23,142 +30,161 @@ function esc(s = "") {
   );
 }
 
-// ----------------- Load -----------------
+function toAbs(u) {
+  if (!u) return null;
+  const s = String(u);
+  if (s.startsWith("http://") || s.startsWith("https://")) return s;
+  return s; // allow relative paths too
+}
+
+// ---------- Load ----------
 async function loadCatalog() {
   const res = await fetch(DATA_URL, { cache: "no-store" });
-  if (!res.ok) throw new Error("Failed to load catalog.toolbox.json");
-
+  if (!res.ok) {
+    throw new Error(`Missing catalog file: ${DATA_URL} (HTTP ${res.status})`);
+  }
   const json = await res.json();
-  if (!Array.isArray(json.items)) {
-    throw new Error("catalog.toolbox.json has no items[]");
+  if (!json || !json.items || !Array.isArray(json.items)) {
+    throw new Error("catalog.json must have { items: [] }");
   }
 
-  state.items = json.items;
-  state.byId = new Map(json.items.map(i => [i.id, i]));
+  // Normalize & filter broken entries
+  const items = json.items
+    .map((x) => ({
+      id: String(x.id ?? ""),
+      name: String(x.name ?? ""),
+      category: String(x.category ?? "unknown").toLowerCase(),
+      element: x.element ?? null,
+      cost: x.cost ?? null,
+      atk: x.atk ?? null,
+      hp: x.hp ?? null,
+      spd: x.spd ?? null,
+      image: toAbs(x.image),
+      url: x.url ?? null,
+    }))
+    .filter((x) => x.id && x.name);
+
+  state.items = items;
+  state.byId = new Map(items.map(i => [i.id, i]));
 }
 
-// ----------------- Catalog -----------------
-function renderCatalog() {
-  const cat = $("#category").value;
-  const q = $("#search").value.toLowerCase();
+// ---------- Render catalog ----------
+function cardHtml(item) {
+  const img = item.image
+    ? `<img src="${esc(item.image)}" alt="${esc(item.name)}" loading="lazy" />`
+    : `<div class="ph">${esc(item.name.slice(0, 1).toUpperCase())}</div>`;
 
-  const list = state.items.filter(i => {
-    if (cat !== "all" && i.category !== cat) return false;
-    if (q && !i.name.toLowerCase().includes(q)) return false;
-    return true;
-  });
-
-  $("#catalog").innerHTML = list.map(renderCard).join("");
-}
-
-function renderCard(item) {
   return `
-    <div class="card" draggable="${item.category === "character"}"
-         data-id="${esc(item.id)}">
-      <div class="thumb">
-        ${item.image ? `<img src="${item.image}" />` : `<div class="ph"></div>`}
+    <div class="card" draggable="${item.category === "character"}" data-id="${esc(item.id)}">
+      <div class="thumb">${img}</div>
+      <div>
+        <div class="name">${esc(item.name)}</div>
+        <div class="meta">${esc(item.category)}${item.element ? " • " + esc(item.element) : ""}</div>
       </div>
-      <div class="name">${esc(item.name)}</div>
-      <div class="meta">${esc(item.category)} ${item.element ?? ""}</div>
     </div>
   `;
 }
 
-// ----------------- Team -----------------
-function initTeam() {
-  state.team = Array(8).fill(null);
-  renderTeam();
+function renderCatalog() {
+  const cat = $("#category").value;
+  const q = $("#search").value.trim().toLowerCase();
+
+  let list = state.items;
+
+  if (cat !== "all") list = list.filter(x => x.category === cat);
+  if (q) list = list.filter(x => x.name.toLowerCase().includes(q));
+
+  $("#catalog").innerHTML = list.map(cardHtml).join("");
 }
 
+// ---------- Team ----------
 function renderTeam() {
-  $("#team").innerHTML = state.team.map((id, i) => {
+  $("#team").innerHTML = state.team.map((id, idx) => {
     const u = id ? state.byId.get(id) : null;
-    return `
-      <div class="slot" data-slot="${i}">
-        ${u ? esc(u.name) : "Drop character"}
-      </div>
-    `;
+    return `<div class="slot" data-slot="${idx}">${u ? esc(u.name) : "Drop character"}</div>`;
   }).join("");
 
   document.querySelectorAll(".slot").forEach(slot => {
-    slot.ondragover = e => e.preventDefault();
-    slot.ondrop = e => {
+    slot.ondragover = (e) => e.preventDefault();
+    slot.ondrop = (e) => {
+      e.preventDefault();
       const id = e.dataTransfer.getData("text/plain");
       const unit = state.byId.get(id);
       if (!unit || unit.category !== "character") return;
 
-      state.team[slot.dataset.slot] = id;
+      const idx = Number(slot.dataset.slot);
+      state.team[idx] = id;
       renderTeam();
       renderSummary();
     };
   });
 }
 
-// ----------------- Summary -----------------
 function renderSummary() {
   const units = state.team.map(id => state.byId.get(id)).filter(Boolean);
 
-  const sum = k => units.reduce((a,u)=>a+safeNum(u[k]),0);
-  const avg = k => units.length ? Math.round(sum(k)/units.length) : 0;
+  const sum = (k) => units.reduce((a, u) => a + safeNum(u[k]), 0);
+  const avg = (k) => units.length ? Math.round(sum(k) / units.length) : 0;
 
-  $("#sumCost").textContent = sum("cost");
-  $("#sumAtk").textContent = avg("atk");
-  $("#sumHp").textContent  = avg("hp");
-  $("#sumSpd").textContent = avg("spd");
+  $("#sumCost").textContent = String(sum("cost"));
+  $("#sumAtk").textContent  = String(avg("atk"));
+  $("#sumHp").textContent   = String(avg("hp"));
+  $("#sumSpd").textContent  = String(avg("spd"));
 }
 
-// ----------------- Optimizer -----------------
+// ---------- Optimizer ----------
 function score(u) {
-  return (
-    safeNum(u.atk) * 1 +
-    safeNum(u.hp)  * 0.08 +
-    safeNum(u.spd) * 2 -
-    safeNum(u.cost) * 0.8
-  );
+  // same weights as before (tweak later)
+  return (safeNum(u.atk) * 1) + (safeNum(u.hp) * 0.08) + (safeNum(u.spd) * 2) - (safeNum(u.cost) * 0.8);
 }
 
 function runOptimizer() {
   const ranked = state.items
     .filter(i => i.category === "character")
     .map(u => ({ ...u, score: score(u) }))
-    .sort((a,b)=>b.score-a.score)
+    .sort((a, b) => b.score - a.score)
     .slice(0, 20);
 
-  $("#optimizer").innerHTML = ranked.map((u,i)=>`
+  $("#optimizer").innerHTML = ranked.map((u, i) => `
     <tr>
-      <td>${i+1}</td>
+      <td>${i + 1}</td>
       <td>${esc(u.name)}</td>
-      <td>${u.atk}</td>
-      <td>${u.hp}</td>
-      <td>${u.spd}</td>
-      <td>${u.cost}</td>
+      <td>${safeNum(u.atk)}</td>
+      <td>${safeNum(u.hp)}</td>
+      <td>${safeNum(u.spd)}</td>
+      <td>${safeNum(u.cost)}</td>
       <td>${Math.round(u.score)}</td>
     </tr>
   `).join("");
 }
 
-// ----------------- Drag -----------------
-document.addEventListener("dragstart", e => {
+// Drag support
+document.addEventListener("dragstart", (e) => {
   const card = e.target.closest(".card");
   if (!card) return;
   e.dataTransfer.setData("text/plain", card.dataset.id);
 });
 
-// ----------------- Main -----------------
+// ---------- Main ----------
 async function main() {
   try {
+    showStatus("Loading catalog…");
+
     await loadCatalog();
 
-    $("#category").onchange = renderCatalog;
-    $("#search").oninput = renderCatalog;
-    $("#optimize").onclick = runOptimizer;
+    $("#category").addEventListener("change", renderCatalog);
+    $("#search").addEventListener("input", renderCatalog);
+    $("#optimize").addEventListener("click", runOptimizer);
 
-    initTeam();
     renderCatalog();
+    renderTeam();
+    renderSummary();
     runOptimizer();
-  } catch (e) {
-    console.error(e);
-    alert(e.message);
+
+    hideStatus();
+  } catch (err) {
+    console.error(err);
+    showStatus(`ERROR: ${err.message}`);
   }
 }
 
