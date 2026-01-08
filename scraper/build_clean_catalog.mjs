@@ -1,141 +1,68 @@
 // scraper/build_clean_catalog.mjs
-// Smart cleaner:
-// - If input is already CLEAN (has characters/weapons/etc), pass through
-// - If input is MESSY (has items[]), clean it
-// - Never fail just because items[] is missing
-
 import fs from "fs/promises";
-import crypto from "crypto";
 
 const OUT_FILE = "data/catalog.json";
 
-// Priority: toolbox → existing catalog
+// Try ALL common inputs we’ve been generating in this repo:
 const INPUTS = [
   "data/catalog.toolbox.json",
   "data/catalog.json",
+  "data/catalog.toolbox.full.json",
+  "data/catalog.toolbox.mixed.json",
 ];
 
-const ELEMENTS = ["Fire", "Water", "Storm", "Earth", "Light", "Dark"];
-
-function norm(s) {
-  return (s ?? "").toString().replace(/\s+/g, " ").trim();
-}
-
-function makeId(name) {
-  return (
-    norm(name)
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "_")
-      .replace(/^_+|_+$/g, "")
-      .slice(0, 80) ||
-    crypto.randomBytes(6).toString("hex")
-  );
-}
-
-function detectElement(text) {
-  const s = norm(text);
-  for (const el of ELEMENTS) {
-    if (s.includes(el)) return el;
-  }
-  return null;
-}
-
-function safeNum(v) {
-  const n = Number(v);
-  return Number.isFinite(n) ? n : null;
-}
-
-function guessCategory(item) {
-  const c = (item.category ?? item.type ?? "").toLowerCase();
-  if (c.includes("char")) return "character";
-  if (c.includes("weapon")) return "weapon";
-  if (c.includes("access")) return "accessory";
-  if (c.includes("boss")) return "boss";
-  if (c.includes("enemy") || c.includes("monster")) return "enemy";
-
-  const img = (item.image ?? item.imageUrl ?? "").toLowerCase();
-  if (img.includes("/weapons/")) return "weapon";
-  if (img.includes("/accessories/")) return "accessory";
-  if (img.includes("/monsters/")) return "character";
-
-  return "unknown";
-}
-
-function parseMixedRow(text) {
-  const s = norm(text);
-  if (!s) return null;
-
-  const element = detectElement(s);
-  const head = element ? s.split(element)[0] : s;
-
-  const nameMatch = head.match(/^(.+?)(\d)/);
-  const name = nameMatch ? norm(nameMatch[1]) : s;
-
-  const nums = s.match(/\d+/g)?.map(Number) ?? [];
-
-  return {
-    name,
-    element,
-    cost: nums[0] ?? null,
-    atk: nums[1] ?? null,
-    hp: nums[2] ?? null,
-    spd: nums[3] ?? null,
-  };
+function isObject(x) {
+  return x && typeof x === "object" && !Array.isArray(x);
 }
 
 function isAlreadyClean(json) {
   return (
-    json &&
-    typeof json === "object" &&
-    Array.isArray(json.characters)
+    isObject(json) &&
+    (Array.isArray(json.characters) ||
+      Array.isArray(json.weapons) ||
+      Array.isArray(json.accessories) ||
+      Array.isArray(json.enemies) ||
+      Array.isArray(json.bosses))
   );
 }
 
-async function main() {
-  let inputPath = null;
-  let raw = null;
-
-  for (const p of INPUTS) {
-    try {
-      raw = JSON.parse(await fs.readFile(p, "utf8"));
-      inputPath = p;
-      break;
-    } catch {}
+async function fileExistsNonEmpty(path) {
+  try {
+    const st = await fs.stat(path);
+    return st.size > 2;
+  } catch {
+    return false;
   }
+}
 
-  if (!raw) {
-    throw new Error("No input catalog found.");
-  }
+async function tryReadJson(path) {
+  const txt = await fs.readFile(path, "utf8");
+  return JSON.parse(txt);
+}
 
-  // -----------------------------
-  // CASE 1: ALREADY CLEAN → PASS
-  // -----------------------------
-  if (isAlreadyClean(raw)) {
-    console.log("ℹ️ Catalog already clean — passing through");
-    await fs.writeFile(
-      OUT_FILE,
-      JSON.stringify(raw, null, 2),
-      "utf8"
-    );
-    return;
-  }
+function normCat(x) {
+  const v = (x || "").toString().toLowerCase().trim();
+  if (["character", "characters", "unit", "units"].includes(v)) return "character";
+  if (["weapon", "weapons"].includes(v)) return "weapon";
+  if (["accessory", "accessories"].includes(v)) return "accessory";
+  if (["enemy", "enemies", "monster", "monsters"].includes(v)) return "enemy";
+  if (["boss", "bosses"].includes(v)) return "boss";
+  return v || "unknown";
+}
 
-  // -----------------------------
-  // CASE 2: MESSY → CLEAN IT
-  // -----------------------------
-  const items =
-    raw.items ??
-    raw.catalog?.items ??
-    [];
+// Extract items[] from various possible shapes
+function getItems(raw) {
+  if (Array.isArray(raw)) return raw;
+  if (Array.isArray(raw.items)) return raw.items;
+  if (raw.catalog && Array.isArray(raw.catalog.items)) return raw.catalog.items;
+  return null;
+}
 
-  if (!Array.isArray(items) || !items.length) {
-    throw new Error(`No items array found in ${inputPath}`);
-  }
-
+function cleanFromItems(items, generatedFrom) {
   const out = {
     meta: {
       generatedAt: new Date().toISOString(),
-      generatedFrom: inputPath,
+      generatedFrom,
     },
     characters: [],
     weapons: [],
@@ -145,57 +72,93 @@ async function main() {
     unknown: [],
   };
 
-  const seen = new Set();
+  const pushByCat = (cat, obj) => {
+    if (cat === "character") out.characters.push(obj);
+    else if (cat === "weapon") out.weapons.push(obj);
+    else if (cat === "accessory") out.accessories.push(obj);
+    else if (cat === "enemy") out.enemies.push(obj);
+    else if (cat === "boss") out.bosses.push(obj);
+    else out.unknown.push(obj);
+  };
 
   for (const it of items) {
-    let name = norm(it.name ?? it.id ?? "");
+    const id = (it.id ?? it.key ?? it.name ?? "").toString().trim();
+    const name = (it.name ?? it.id ?? "").toString().trim();
     if (!name) continue;
 
-    let element = it.element ?? null;
-    let cost = safeNum(it.cost);
-    let atk = safeNum(it.atk);
-    let hp = safeNum(it.hp);
-    let spd = safeNum(it.spd);
-
-    if (name.split(" ").length > 6 && /\d/.test(name)) {
-      const p = parseMixedRow(name);
-      if (p) {
-        name = p.name ?? name;
-        element ??= p.element;
-        cost ??= p.cost;
-        atk ??= p.atk;
-        hp ??= p.hp;
-        spd ??= p.spd;
-      }
-    }
-
-    const id = makeId(name);
-    if (seen.has(id)) continue;
-    seen.add(id);
-
-    const category = guessCategory(it);
-
+    const category = normCat(it.category ?? it.type);
     const entry = {
-      id,
+      id: id || name,
       name,
       category,
-      element,
-      cost,
-      atk,
-      hp,
-      spd,
-      image: it.image ?? it.imageUrl ?? null,
+      element: it.element ?? null,
+      image: it.image ?? it.imageUrl ?? it.img ?? null,
       url: it.url ?? "https://evertaletoolbox2.runasp.net/Explorer",
     };
-
-    out[`${category}s`]?.push(entry) ?? out.unknown.push(entry);
+    pushByCat(category, entry);
   }
 
+  return out;
+}
+
+async function main() {
+  // Helpful debug: show what’s in data/ before we even start
+  try {
+    const listing = await fs.readdir("data");
+    console.log("data/ contains:", listing.join(", "));
+  } catch {
+    console.log("data/ folder not readable (does it exist?)");
+  }
+
+  // Find first usable input
+  let chosen = null;
+  for (const p of INPUTS) {
+    if (await fileExistsNonEmpty(p)) {
+      chosen = p;
+      break;
+    }
+  }
+
+  if (!chosen) {
+    throw new Error(
+      `No input catalog found. Expected one of: ${INPUTS.join(", ")}`
+    );
+  }
+
+  const raw = await tryReadJson(chosen);
+
+  // If already clean, just normalize and write
+  if (isAlreadyClean(raw)) {
+    console.log("Catalog already clean — passing through:", chosen);
+    const out = {
+      meta: {
+        generatedAt: new Date().toISOString(),
+        generatedFrom: chosen,
+      },
+      characters: raw.characters ?? [],
+      weapons: raw.weapons ?? [],
+      accessories: raw.accessories ?? [],
+      enemies: raw.enemies ?? [],
+      bosses: raw.bosses ?? [],
+      unknown: raw.unknown ?? [],
+    };
+    await fs.writeFile(OUT_FILE, JSON.stringify(out, null, 2), "utf8");
+    console.log("Wrote:", OUT_FILE);
+    return;
+  }
+
+  // Otherwise, must have items[]
+  const items = getItems(raw);
+  if (!items || !items.length) {
+    throw new Error(`Input exists but has no items[]: ${chosen}`);
+  }
+
+  const out = cleanFromItems(items, chosen);
   await fs.writeFile(OUT_FILE, JSON.stringify(out, null, 2), "utf8");
-  console.log("✅ Clean catalog built:", OUT_FILE);
+  console.log("Wrote:", OUT_FILE);
 }
 
 main().catch((err) => {
-  console.error("❌ build_clean_catalog failed:", err.message);
+  console.error("build_clean_catalog failed:", err.message);
   process.exit(1);
 });
