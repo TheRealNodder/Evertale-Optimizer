@@ -1,13 +1,15 @@
 // scraper/scrape_viewer_characters_playwright.mjs
-// Extract items from Blazor Server (_blazor) websocket frames (JSON or MessagePack).
+// Blazor Server (_blazor) websocket extraction for EvertaleToolbox Viewer.
 //
-// Outputs (repo root /data):
-//   toolbox.items.json          (flat list; categorized; includes image paths)
-//   catalog.toolbox.json        (dropdown-ready catalog)
-// Debug:
-//   _debug_ws_largest_frames.json   (stores largest WS payloads, base64 if binary)
-//   _debug_viewer_rendered.html
-//   _debug_viewer_screenshot.png
+// Writes (repo root /data):
+//   data/toolbox.items.json
+//   data/catalog.toolbox.json
+//   data/_debug_ws_largest_frames.json
+//   data/_debug_viewer_rendered.html
+//   data/_debug_viewer_screenshot.png
+//
+// Important:
+// - We DO NOT hard-fail the workflow. If extraction fails, we still write debug files and exit 0.
 
 import fs from "fs/promises";
 import path from "path";
@@ -23,6 +25,33 @@ const OUT_WS_DEBUG = "data/_debug_ws_largest_frames.json";
 
 function norm(s) {
   return (s ?? "").toString().replace(/\s+/g, " ").trim();
+}
+
+// Fix #1: clean names if they accidentally include stats
+function cleanName(maybeName) {
+  let s = norm(maybeName);
+
+  const STOP_TOKENS = [
+    "HP", "ATK", "DEF", "SPD", "AGI", "TU",
+    "LUK", "COST", "LEVEL", "RARITY"
+  ];
+
+  const upper = s.toUpperCase();
+
+  // Cut at first " <TOKEN> "
+  let cutAt = -1;
+  for (const t of STOP_TOKENS) {
+    const idx = upper.indexOf(` ${t} `);
+    if (idx !== -1) cutAt = (cutAt === -1 ? idx : Math.min(cutAt, idx));
+  }
+  if (cutAt !== -1) s = s.slice(0, cutAt).trim();
+
+  // Also cut on "HP:" / "ATK:" / etc
+  s = s.split(/\b(HP|ATK|DEF|SPD|AGI|TU|LUK|COST|LEVEL|RARITY)\s*[:=]/i)[0].trim();
+
+  // cleanup
+  s = s.replace(/\s{2,}/g, " ").trim();
+  return s;
 }
 
 async function ensureDir(dir) {
@@ -48,7 +77,7 @@ async function saveDebug(page) {
   } catch {}
 }
 
-// --- SignalR JSON protocol messages are delimited by ASCII 0x1E ---
+// SignalR JSON protocol: messages separated by ASCII 0x1E
 function splitSignalRJson(text) {
   return text
     .split("\u001e")
@@ -64,14 +93,12 @@ function tryJsonParse(s) {
   }
 }
 
-// --- SignalR MessagePack protocol uses length-prefixed frames (varint length) ---
-// This splits a Buffer into message chunks, each chunk is msgpack payload.
+// SignalR MessagePack: length-prefixed frames (varint length)
 function splitVarintLengthPrefixed(buffer) {
   const chunks = [];
   let offset = 0;
 
   while (offset < buffer.length) {
-    // read varint length
     let length = 0;
     let shift = 0;
     let b = 0;
@@ -93,12 +120,12 @@ function splitVarintLengthPrefixed(buffer) {
   return chunks;
 }
 
-// Recursively find large arrays of objects that look like “items”
+// Find arrays of objects that could be a dataset
 function findCandidateArrays(obj, minLen = 50) {
   const out = [];
   const seen = new Set();
 
-  function walk(x, pathKey) {
+  function walk(x, p) {
     if (!x) return;
     if (typeof x !== "object") return;
     if (seen.has(x)) return;
@@ -106,16 +133,17 @@ function findCandidateArrays(obj, minLen = 50) {
 
     if (Array.isArray(x)) {
       if (x.length >= minLen && x.some((e) => e && typeof e === "object")) {
-        out.push({ path: pathKey, arr: x });
+        out.push({ path: p, arr: x });
       }
-      for (let i = 0; i < Math.min(x.length, 50); i++) {
-        walk(x[i], `${pathKey}[${i}]`);
+      // only walk some elements for speed
+      for (let i = 0; i < Math.min(x.length, 60); i++) {
+        walk(x[i], `${p}[${i}]`);
       }
       return;
     }
 
     for (const [k, v] of Object.entries(x)) {
-      walk(v, pathKey ? `${pathKey}.${k}` : k);
+      walk(v, p ? `${p}.${k}` : k);
     }
   }
 
@@ -123,7 +151,6 @@ function findCandidateArrays(obj, minLen = 50) {
   return out;
 }
 
-// Normalize a record into our item shape (best-effort, survives unknown schema)
 function normalizeRecord(r) {
   if (!r || typeof r !== "object") return null;
 
@@ -143,7 +170,6 @@ function normalizeRecord(r) {
 
   const id = lower.id ?? lower.unitid ?? lower.uid ?? name;
 
-  // Try to find an image field
   const image =
     lower.image ??
     lower.imagepath ??
@@ -153,18 +179,16 @@ function normalizeRecord(r) {
     lower.portraitpath ??
     null;
 
-  // Some payloads may include a file name instead of a full path
   const imageStr = image ? String(image) : null;
 
   return {
     id: String(id),
-    name: String(name),
+    name: cleanName(name),          // ✅ FIX: clean stat-mixed names
     image: imageStr,
     raw: r,
   };
 }
 
-// Categorize by image path or obvious fields
 function categorizeItem(item) {
   const img = (item.image || "").toLowerCase();
 
@@ -174,20 +198,52 @@ function categorizeItem(item) {
   if (img.includes("/boss")) return "bosses";
   if (img.includes("/characters/") || img.includes("/units/")) return "characters";
 
-  // fallback heuristics by name patterns or raw keys
-  const rawKeys = item.raw && typeof item.raw === "object" ? Object.keys(item.raw).map(k => k.toLowerCase()) : [];
-  if (rawKeys.includes("weapon") || rawKeys.includes("weapontype")) return "weapons";
-  if (rawKeys.includes("accessory")) return "accessories";
+  // fallback based on keys
+  const keys = item.raw && typeof item.raw === "object"
+    ? Object.keys(item.raw).map(k => k.toLowerCase())
+    : [];
 
-  return "characters"; // default if unknown
+  if (keys.some(k => k.includes("weapon"))) return "weapons";
+  if (keys.some(k => k.includes("accessory"))) return "accessories";
+  if (keys.some(k => k.includes("monster") || k.includes("enemy"))) return "enemies";
+
+  return "characters";
 }
 
 function toAbsoluteImageUrl(image) {
   if (!image) return null;
   if (image.startsWith("http://") || image.startsWith("https://")) return image;
   if (image.startsWith("/")) return `https://${DOMAIN_HINT}${image}`;
-  // if it’s just a filename, don’t guess too hard
   return image;
+}
+
+// Fix #2: better selection of the correct dataset array
+function looksLikeRealItem(obj) {
+  if (!obj || typeof obj !== "object") return false;
+
+  const keys = Object.keys(obj).map((k) => k.toLowerCase());
+
+  const hasName =
+    keys.includes("name") ||
+    keys.includes("unitname") ||
+    keys.includes("displayname") ||
+    keys.includes("title") ||
+    keys.includes("charactername");
+
+  const hasId =
+    keys.includes("id") ||
+    keys.includes("unitid") ||
+    keys.includes("uid");
+
+  const hasImage =
+    keys.includes("image") ||
+    keys.includes("imagepath") ||
+    keys.includes("icon") ||
+    keys.includes("iconpath") ||
+    keys.includes("portrait") ||
+    keys.includes("portraitpath");
+
+  return hasName && (hasId || hasImage);
 }
 
 async function run() {
@@ -206,54 +262,57 @@ async function run() {
 
   page.setDefaultTimeout(120000);
 
-  // Store biggest WS frames for debugging + parsing
-  const wsFrames = [];
-  const MAX_STORE = 12; // keep only biggest few to avoid huge repo
+  // Keep only a handful of the biggest WS frames for debug
+  const wsLargest = [];
+  const MAX_STORE = 10;
 
-  function storeLargest(frame) {
-    wsFrames.push(frame);
-    wsFrames.sort((a, b) => (b.length || 0) - (a.length || 0));
-    if (wsFrames.length > MAX_STORE) wsFrames.length = MAX_STORE;
+  function storeLargestFrame(frame) {
+    wsLargest.push(frame);
+    wsLargest.sort((a, b) => (b.length || 0) - (a.length || 0));
+    if (wsLargest.length > MAX_STORE) wsLargest.length = MAX_STORE;
   }
 
-  // Extracted candidate arrays across all messages
   const candidateArrays = [];
 
   page.on("websocket", (ws) => {
     ws.on("framereceived", (evt) => {
-      const payload = evt.payload;
+      try {
+        const payload = evt.payload;
+        const isBuffer = Buffer.isBuffer(payload);
 
-      // Playwright may provide payload as string; sometimes it’s Buffer-like
-      const isBuffer = Buffer.isBuffer(payload);
-      const text = typeof payload === "string" ? payload : isBuffer ? payload.toString("utf8") : String(payload);
-      const length = text.length;
+        const text =
+          typeof payload === "string"
+            ? payload
+            : isBuffer
+            ? payload.toString("utf8")
+            : String(payload);
 
-      // Store the biggest frames for later inspection
-      storeLargest({
-        wsUrl: ws.url(),
-        direction: "recv",
-        length,
-        sampleHead: text.slice(0, 1200),
-        // if it *is* binary, keep base64
-        base64: isBuffer ? Buffer.from(payload).toString("base64") : null,
-      });
+        const length = text.length;
 
-      // ---- Try JSON protocol parse (delimiter 0x1E) ----
-      const parts = splitSignalRJson(text);
-      for (const part of parts) {
-        const p = tryJsonParse(part);
-        if (!p.ok) continue;
+        storeLargestFrame({
+          wsUrl: ws.url(),
+          direction: "recv",
+          length,
+          sampleHead: text.slice(0, 1400),
+          base64: isBuffer ? Buffer.from(payload).toString("base64") : null,
+        });
 
-        // Many SignalR messages are like:
-        // { type:1, target:"...", arguments:[ ... ] }
-        const cands = findCandidateArrays(p.value, 50);
-        candidateArrays.push(...cands);
+        // Try JSON protocol first
+        const parts = splitSignalRJson(text);
+        for (const part of parts) {
+          const p = tryJsonParse(part);
+          if (!p.ok) continue;
 
-        if (p.value && typeof p.value === "object" && Array.isArray(p.value.arguments)) {
-          for (const arg of p.value.arguments) {
-            candidateArrays.push(...findCandidateArrays(arg, 50));
+          candidateArrays.push(...findCandidateArrays(p.value, 50));
+
+          if (p.value && typeof p.value === "object" && Array.isArray(p.value.arguments)) {
+            for (const arg of p.value.arguments) {
+              candidateArrays.push(...findCandidateArrays(arg, 50));
+            }
           }
         }
+      } catch {
+        // ignore frame
       }
     });
   });
@@ -261,12 +320,12 @@ async function run() {
   console.log(`Fetching Viewer: ${VIEWER_URL}`);
   await page.goto(VIEWER_URL, { waitUntil: "domcontentloaded", timeout: 120000 });
 
-  // Let Blazor connect + stream initial data
+  // Let Blazor connect
   await page.waitForTimeout(12000);
 
-  // Encourage additional frames
-  for (let i = 0; i < 14; i++) {
-    await page.evaluate(() => window.scrollBy(0, 1600));
+  // Encourage more traffic (virtualized grids often load on scroll)
+  for (let i = 0; i < 16; i++) {
+    await page.evaluate(() => window.scrollBy(0, 1700));
     await page.waitForTimeout(650);
   }
 
@@ -275,19 +334,23 @@ async function run() {
   await saveDebug(page);
   await browser.close();
 
-  // Save WS debug (largest frames)
+  // Save WS debug
   await fs.writeFile(
     path.resolve(process.cwd(), OUT_WS_DEBUG),
-    JSON.stringify({ scrapedAt: new Date().toISOString(), largestFrames: wsFrames }, null, 2),
+    JSON.stringify(
+      { scrapedAt: new Date().toISOString(), largestFrames: wsLargest },
+      null,
+      2
+    ),
     "utf8"
   );
   console.log(`Wrote WS debug -> ${OUT_WS_DEBUG}`);
 
-  // If JSON-protocol candidates weren’t found, try MessagePack on any stored binary frames
-  // (This only works if Playwright actually gives Buffer; often it's already string.)
-  if (candidateArrays.length < 1) {
-    for (const f of wsFrames) {
+  // If we didn't find candidate arrays through JSON protocol, attempt MessagePack decode
+  if (candidateArrays.length === 0) {
+    for (const f of wsLargest) {
       if (!f.base64) continue;
+
       const buf = Buffer.from(f.base64, "base64");
       const chunks = splitVarintLengthPrefixed(buf);
 
@@ -308,14 +371,24 @@ async function run() {
     }
   }
 
-  // Pick the best candidate array: biggest length where elements normalize well
+  // -------- Choose best dataset array (FIXED scoring) --------
   let best = null;
   let bestScore = 0;
 
   for (const c of candidateArrays) {
     const arr = c.arr;
-    const sample = arr.slice(0, 80).map(normalizeRecord).filter(Boolean);
-    const score = arr.length * (sample.length / Math.max(1, Math.min(arr.length, 80)));
+    if (!Array.isArray(arr) || arr.length < 20) continue;
+
+    const sample = arr.slice(0, 120);
+
+    const good = sample.filter(looksLikeRealItem).length;
+    const goodRatio = good / Math.max(1, sample.length);
+
+    const strings = sample.filter((x) => typeof x === "string").length;
+    const stringRatio = strings / Math.max(1, sample.length);
+
+    // prefer big arrays of real objects; penalize string-heavy arrays
+    const score = (arr.length * goodRatio) - (arr.length * 0.5 * stringRatio);
 
     if (score > bestScore) {
       bestScore = score;
@@ -324,34 +397,30 @@ async function run() {
   }
 
   if (!best) {
-    console.log("No candidate item arrays found yet. Use data/_debug_ws_largest_frames.json to tune selectors/decoding.");
-    // Do not fail—keep debug for inspection.
+    console.log("No usable dataset array found yet. Debug frames saved. (Not failing.)");
     return;
   }
 
-  // Normalize entire array
-  const items = best.arr.map(normalizeRecord).filter(Boolean);
+  // Normalize all records
+  const normalized = best.arr.map(normalizeRecord).filter(Boolean);
 
-  // Categorize + finalize
-  const finalItems = items.map((it) => {
-    const category = categorizeItem(it);
-    return {
-      id: it.id,
-      name: it.name,
-      category,
-      image: toAbsoluteImageUrl(it.image),
-    };
-  });
+  // Categorize + absolute image urls
+  const items = normalized.map((it) => ({
+    id: it.id,
+    name: it.name,
+    category: categorizeItem(it),
+    image: toAbsoluteImageUrl(it.image),
+  }));
 
-  // Deduplicate by (category + name)
+  // Deduplicate by category+name
   const dedup = new Map();
-  for (const it of finalItems) {
+  for (const it of items) {
     const key = `${it.category}::${it.name}`;
     if (!dedup.has(key)) dedup.set(key, it);
   }
   const dedupItems = Array.from(dedup.values());
 
-  // Write items file
+  // Write flat items
   await fs.writeFile(
     path.resolve(process.cwd(), OUT_ITEMS),
     JSON.stringify(
@@ -370,7 +439,7 @@ async function run() {
   );
   console.log(`Wrote ${OUT_ITEMS} items=${dedupItems.length}`);
 
-  // Build catalog (simple dropdown-ready)
+  // Build catalog
   const counts = dedupItems.reduce((acc, it) => {
     acc[it.category] = (acc[it.category] || 0) + 1;
     return acc;
@@ -397,7 +466,7 @@ async function run() {
   console.log(`Wrote ${OUT_CATALOG}`);
 }
 
-// Never hard-fail; we want debug committed every time.
+// Never hard-fail. Always keep debug output.
 run().catch((err) => {
   console.error("SCRAPER ERROR (non-fatal):", err);
   process.exit(0);
