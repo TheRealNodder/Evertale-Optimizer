@@ -1,4 +1,4 @@
-name: Update Toolbox Data (Clean Catalog)
+name: Update Toolbox Data (WS)
 
 on:
   workflow_dispatch:
@@ -9,34 +9,18 @@ permissions:
   contents: write
 
 concurrency:
-  group: update-toolbox-data
+  group: update-toolbox-ws
   cancel-in-progress: true
 
 jobs:
   scrape:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           persist-credentials: false
           fetch-depth: 0
-
-      # Pull latest BEFORE making changes (prevents "cannot rebase: unstaged changes")
-      - name: Sync with main (pre-scrape)
-        env:
-          GH_PAT: ${{ secrets.GH_PAT }}
-        run: |
-          set -e
-          if [ -z "$GH_PAT" ]; then
-            echo "GH_PAT secret is missing"
-            exit 1
-          fi
-          git remote set-url origin "https://x-access-token:${GH_PAT}@github.com/${{ github.repository }}.git"
-          git fetch origin main
-          git checkout main
-          git reset --hard origin/main
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -54,60 +38,45 @@ jobs:
       - name: Ensure data folder exists
         run: mkdir -p data
 
-      # Run your capture scripts if they exist; do not fail the whole job if site changes.
-      - name: Scrape Explorer (best effort)
-        run: node scraper/scrape_explorer_capture_json.mjs || true
+      - name: Scrape Toolbox items from WS
+        run: node scraper/scrape_toolbox_items_from_ws.mjs
 
-      - name: Scrape Viewer (best effort)
-        run: node scraper/scrape_viewer_characters_playwright.mjs || true
+      - name: Normalize into catalog.clean.json
+        run: node scraper/normalize_toolbox_items.mjs
 
-      - name: Scrape Viewer DOM items (best effort)
-        run: node scraper/scrape_viewer_dom_items.mjs || true
-
-      # Build clean catalog (THIS is the required step)
-      - name: Build Clean Catalog
-        run: node scraper/build_clean_catalog.mjs
-
-      - name: Show data folder contents
+      - name: Show outputs
         if: always()
         run: |
           echo "=== data/ ==="
           ls -la data || true
           echo "=== sizes ==="
           wc -c data/*.json 2>/dev/null || true
+          echo "=== counts ==="
+          node -e "const j=require('fs').existsSync('data/catalog.clean.json')?JSON.parse(require('fs').readFileSync('data/catalog.clean.json','utf8')):null; console.log(j?j.counts:'no catalog.clean.json');"
 
       - name: Upload debug artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: toolbox-debug
+          name: toolbox-ws-debug
           path: |
-            data/*.json
-            data/*.html
-            data/*.png
-            data/*.txt
+            data/toolbox.items.json
+            data/catalog.clean.json
+            data/_debug_ws_frames.json
+            data/_debug_ws_decoded.json
+            data/_debug_viewer_rendered.html
+            data/_debug_viewer_screenshot.png
           if-no-files-found: ignore
           retention-days: 7
-
-      - name: Verify clean catalog exists
-        run: |
-          test -s data/catalog.clean.json
-          node -e "JSON.parse(require('fs').readFileSync('data/catalog.clean.json','utf8')); console.log('catalog.clean.json OK')"
 
       - name: Commit generated data
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/toolbox.items.json data/catalog.clean.json data/_debug_ws_frames.json data/_debug_ws_decoded.json data/_debug_viewer_rendered.html data/_debug_viewer_screenshot.png || true
+          git diff --cached --quiet || git commit -m "Update toolbox dataset (WS)"
 
-          # Commit ONLY the clean catalog + any optional raw files you want to keep
-          git add data/catalog.clean.json || true
-
-          # (Optional) keep captures for debugging:
-          git add data/*captures*.json data/*raw*.json data/_debug_* || true
-
-          git diff --cached --quiet || git commit -m "Update toolbox data (clean catalog)"
-
-      - name: Push changes
+      - name: Push changes (safe)
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
         run: |
@@ -116,5 +85,7 @@ jobs:
             echo "GH_PAT secret is missing"
             exit 1
           fi
-          git remote set-url origin "https://x-access-token:${GH_PAT}@github.com/${{ github.repository }}.git"
+          git remote set-url origin "https://x-access-token:${GH_PAT}@github.com/TheRealNodder/Evertale-Optimizer.git"
+          git fetch origin main
+          git pull --rebase origin main
           git push origin HEAD:main
