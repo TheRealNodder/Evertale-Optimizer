@@ -1,67 +1,70 @@
 // scraper/scrape_viewer_characters_playwright.mjs
-// Blazor Server (_blazor) websocket extraction for EvertaleToolbox Viewer.
+// Scrape the rendered Viewer HTML table (DOM) using Playwright.
+// This avoids SignalR decoding and fixes "name mixed with stats" by reading each TD separately.
 //
-// Writes (repo root /data):
+// Outputs (repo root /data):
 //   data/toolbox.items.json
-//   data/catalog.toolbox.json
-//   data/_debug_ws_largest_frames.json
+// Debug:
 //   data/_debug_viewer_rendered.html
 //   data/_debug_viewer_screenshot.png
 //
-// Important:
-// - We DO NOT hard-fail the workflow. If extraction fails, we still write debug files and exit 0.
+// NOTE: This scraper writes toolbox.items.json ALWAYS (if table exists).
+// It fails only if it cannot find any real rows.
 
 import fs from "fs/promises";
 import path from "path";
 import { chromium } from "playwright";
-import { decode as msgpackDecode } from "@msgpack/msgpack";
 
 const VIEWER_URL = "https://evertaletoolbox2.runasp.net/Viewer";
 const DOMAIN_HINT = "evertaletoolbox2.runasp.net";
 
 const OUT_ITEMS = "data/toolbox.items.json";
-const OUT_CATALOG = "data/catalog.toolbox.json";
-const OUT_WS_DEBUG = "data/_debug_ws_largest_frames.json";
 
 function norm(s) {
   return (s ?? "").toString().replace(/\s+/g, " ").trim();
 }
 
-// Fix #1: clean names if they accidentally include stats
-function cleanName(maybeName) {
-  let s = norm(maybeName);
+function isHeaderRow(name) {
+  const n = (name || "").toLowerCase();
+  return (
+    n === "name" ||
+    n.includes("rarity element cost atk hp spd") ||
+    n.includes("leader skill") ||
+    n.includes("active skills")
+  );
+}
 
-  const STOP_TOKENS = [
-    "HP", "ATK", "DEF", "SPD", "AGI", "TU",
-    "LUK", "COST", "LEVEL", "RARITY"
-  ];
-
-  const upper = s.toUpperCase();
-
-  // Cut at first " <TOKEN> "
-  let cutAt = -1;
-  for (const t of STOP_TOKENS) {
-    const idx = upper.indexOf(` ${t} `);
-    if (idx !== -1) cutAt = (cutAt === -1 ? idx : Math.min(cutAt, idx));
-  }
-  if (cutAt !== -1) s = s.slice(0, cutAt).trim();
-
-  // Also cut on "HP:" / "ATK:" / etc
-  s = s.split(/\b(HP|ATK|DEF|SPD|AGI|TU|LUK|COST|LEVEL|RARITY)\s*[:=]/i)[0].trim();
-
-  // cleanup
-  s = s.replace(/\s{2,}/g, " ").trim();
+function toAbsUrl(src) {
+  if (!src) return null;
+  const s = String(src);
+  if (s.startsWith("http://") || s.startsWith("https://")) return s;
+  if (s.startsWith("/")) return `https://${DOMAIN_HINT}${s}`;
   return s;
 }
 
-async function ensureDir(dir) {
-  await fs.mkdir(dir, { recursive: true });
+function categorizeFromWeaponCell(weaponText, imageUrl) {
+  const img = (imageUrl || "").toLowerCase();
+  if (img.includes("/weapons/")) return "weapons";
+  if (img.includes("/accessories/")) return "accessories";
+  if (img.includes("/monsters/")) return "enemies";
+  if (img.includes("boss")) return "bosses";
+
+  // Viewer table you showed is units; default characters
+  // If later you run a weapons view, weaponText might be the name itself
+  const wt = (weaponText || "").toLowerCase();
+  if (wt.includes("sword") || wt.includes("axe") || wt.includes("hammer") || wt.includes("staff") || wt.includes("spear") || wt.includes("bow")) {
+    return "characters";
+  }
+
+  return "characters";
+}
+
+async function ensureDataDir() {
+  await fs.mkdir(path.resolve(process.cwd(), "data"), { recursive: true });
 }
 
 async function saveDebug(page) {
   const outDir = path.resolve(process.cwd(), "data");
-  await ensureDir(outDir);
-
   const htmlPath = path.join(outDir, "_debug_viewer_rendered.html");
   const pngPath = path.join(outDir, "_debug_viewer_screenshot.png");
 
@@ -77,177 +80,8 @@ async function saveDebug(page) {
   } catch {}
 }
 
-// SignalR JSON protocol: messages separated by ASCII 0x1E
-function splitSignalRJson(text) {
-  return text
-    .split("\u001e")
-    .map((s) => s.trim())
-    .filter(Boolean);
-}
-
-function tryJsonParse(s) {
-  try {
-    return { ok: true, value: JSON.parse(s) };
-  } catch (e) {
-    return { ok: false, err: e?.message || String(e) };
-  }
-}
-
-// SignalR MessagePack: length-prefixed frames (varint length)
-function splitVarintLengthPrefixed(buffer) {
-  const chunks = [];
-  let offset = 0;
-
-  while (offset < buffer.length) {
-    let length = 0;
-    let shift = 0;
-    let b = 0;
-
-    do {
-      if (offset >= buffer.length) return chunks;
-      b = buffer[offset++];
-      length |= (b & 0x7f) << shift;
-      shift += 7;
-    } while (b & 0x80);
-
-    if (length <= 0) continue;
-    if (offset + length > buffer.length) break;
-
-    chunks.push(buffer.subarray(offset, offset + length));
-    offset += length;
-  }
-
-  return chunks;
-}
-
-// Find arrays of objects that could be a dataset
-function findCandidateArrays(obj, minLen = 50) {
-  const out = [];
-  const seen = new Set();
-
-  function walk(x, p) {
-    if (!x) return;
-    if (typeof x !== "object") return;
-    if (seen.has(x)) return;
-    seen.add(x);
-
-    if (Array.isArray(x)) {
-      if (x.length >= minLen && x.some((e) => e && typeof e === "object")) {
-        out.push({ path: p, arr: x });
-      }
-      // only walk some elements for speed
-      for (let i = 0; i < Math.min(x.length, 60); i++) {
-        walk(x[i], `${p}[${i}]`);
-      }
-      return;
-    }
-
-    for (const [k, v] of Object.entries(x)) {
-      walk(v, p ? `${p}.${k}` : k);
-    }
-  }
-
-  walk(obj, "");
-  return out;
-}
-
-function normalizeRecord(r) {
-  if (!r || typeof r !== "object") return null;
-
-  const lower = Object.fromEntries(
-    Object.entries(r).map(([k, v]) => [k.toLowerCase(), v])
-  );
-
-  const name =
-    lower.name ??
-    lower.unitname ??
-    lower.displayname ??
-    lower.title ??
-    lower.charactername ??
-    null;
-
-  if (!name) return null;
-
-  const id = lower.id ?? lower.unitid ?? lower.uid ?? name;
-
-  const image =
-    lower.image ??
-    lower.imagepath ??
-    lower.icon ??
-    lower.iconpath ??
-    lower.portrait ??
-    lower.portraitpath ??
-    null;
-
-  const imageStr = image ? String(image) : null;
-
-  return {
-    id: String(id),
-    name: cleanName(name),          // ✅ FIX: clean stat-mixed names
-    image: imageStr,
-    raw: r,
-  };
-}
-
-function categorizeItem(item) {
-  const img = (item.image || "").toLowerCase();
-
-  if (img.includes("/weapons/")) return "weapons";
-  if (img.includes("/accessories/")) return "accessories";
-  if (img.includes("/monsters/")) return "enemies";
-  if (img.includes("/boss")) return "bosses";
-  if (img.includes("/characters/") || img.includes("/units/")) return "characters";
-
-  // fallback based on keys
-  const keys = item.raw && typeof item.raw === "object"
-    ? Object.keys(item.raw).map(k => k.toLowerCase())
-    : [];
-
-  if (keys.some(k => k.includes("weapon"))) return "weapons";
-  if (keys.some(k => k.includes("accessory"))) return "accessories";
-  if (keys.some(k => k.includes("monster") || k.includes("enemy"))) return "enemies";
-
-  return "characters";
-}
-
-function toAbsoluteImageUrl(image) {
-  if (!image) return null;
-  if (image.startsWith("http://") || image.startsWith("https://")) return image;
-  if (image.startsWith("/")) return `https://${DOMAIN_HINT}${image}`;
-  return image;
-}
-
-// Fix #2: better selection of the correct dataset array
-function looksLikeRealItem(obj) {
-  if (!obj || typeof obj !== "object") return false;
-
-  const keys = Object.keys(obj).map((k) => k.toLowerCase());
-
-  const hasName =
-    keys.includes("name") ||
-    keys.includes("unitname") ||
-    keys.includes("displayname") ||
-    keys.includes("title") ||
-    keys.includes("charactername");
-
-  const hasId =
-    keys.includes("id") ||
-    keys.includes("unitid") ||
-    keys.includes("uid");
-
-  const hasImage =
-    keys.includes("image") ||
-    keys.includes("imagepath") ||
-    keys.includes("icon") ||
-    keys.includes("iconpath") ||
-    keys.includes("portrait") ||
-    keys.includes("portraitpath");
-
-  return hasName && (hasId || hasImage);
-}
-
 async function run() {
-  await ensureDir(path.resolve(process.cwd(), "data"));
+  await ensureDataDir();
 
   const browser = await chromium.launch({
     headless: true,
@@ -262,212 +96,152 @@ async function run() {
 
   page.setDefaultTimeout(120000);
 
-  // Keep only a handful of the biggest WS frames for debug
-  const wsLargest = [];
-  const MAX_STORE = 10;
-
-  function storeLargestFrame(frame) {
-    wsLargest.push(frame);
-    wsLargest.sort((a, b) => (b.length || 0) - (a.length || 0));
-    if (wsLargest.length > MAX_STORE) wsLargest.length = MAX_STORE;
-  }
-
-  const candidateArrays = [];
-
-  page.on("websocket", (ws) => {
-    ws.on("framereceived", (evt) => {
-      try {
-        const payload = evt.payload;
-        const isBuffer = Buffer.isBuffer(payload);
-
-        const text =
-          typeof payload === "string"
-            ? payload
-            : isBuffer
-            ? payload.toString("utf8")
-            : String(payload);
-
-        const length = text.length;
-
-        storeLargestFrame({
-          wsUrl: ws.url(),
-          direction: "recv",
-          length,
-          sampleHead: text.slice(0, 1400),
-          base64: isBuffer ? Buffer.from(payload).toString("base64") : null,
-        });
-
-        // Try JSON protocol first
-        const parts = splitSignalRJson(text);
-        for (const part of parts) {
-          const p = tryJsonParse(part);
-          if (!p.ok) continue;
-
-          candidateArrays.push(...findCandidateArrays(p.value, 50));
-
-          if (p.value && typeof p.value === "object" && Array.isArray(p.value.arguments)) {
-            for (const arg of p.value.arguments) {
-              candidateArrays.push(...findCandidateArrays(arg, 50));
-            }
-          }
-        }
-      } catch {
-        // ignore frame
-      }
-    });
-  });
-
   console.log(`Fetching Viewer: ${VIEWER_URL}`);
   await page.goto(VIEWER_URL, { waitUntil: "domcontentloaded", timeout: 120000 });
 
-  // Let Blazor connect
-  await page.waitForTimeout(12000);
+  // Wait for any table to appear
+  await page.waitForSelector("table", { timeout: 120000 });
 
-  // Encourage more traffic (virtualized grids often load on scroll)
-  for (let i = 0; i < 16; i++) {
-    await page.evaluate(() => window.scrollBy(0, 1700));
-    await page.waitForTimeout(650);
+  // Some Blazor tables take time to populate
+  await page.waitForTimeout(4000);
+
+  // Keep scraping as we scroll, since the table may be virtualized
+  // We collect rows by a stable key (Name + Rarity + Element)
+  const seen = new Set();
+  const items = [];
+
+  let stableRounds = 0;
+  let lastCount = 0;
+
+  for (let round = 0; round < 60; round++) {
+    // Extract current rows
+    const rows = await page.evaluate(() => {
+      // Find the first visible table with rows
+      const tables = Array.from(document.querySelectorAll("table"));
+      let table = null;
+
+      for (const t of tables) {
+        const trs = t.querySelectorAll("tbody tr");
+        if (trs && trs.length > 0) {
+          table = t;
+          break;
+        }
+      }
+      if (!table) return [];
+
+      const trs = Array.from(table.querySelectorAll("tbody tr"));
+
+      return trs.map((tr) => {
+        const tds = Array.from(tr.querySelectorAll("td"));
+        const cols = tds.map((td) => (td.textContent || "").replace(/\s+/g, " ").trim());
+
+        // Try to find an image in the row (often in the first cell)
+        const imgEl = tr.querySelector("img");
+        const imgSrc = imgEl ? imgEl.getAttribute("src") : null;
+
+        return { cols, imgSrc };
+      });
+    });
+
+    for (const r of rows) {
+      const cols = r.cols || [];
+      const name = cols[0] || "";
+      if (!name || isHeaderRow(name)) continue;
+
+      // Map columns based on the header you posted:
+      // 0 Name
+      // 1 Rarity
+      // 2 Element
+      // 3 Cost
+      // 4 ATK
+      // 5 HP
+      // 6 SPD
+      // 7 Weapon
+      // 8 Leader Skill
+      // 9 Active Skills
+      // 10 Passive Skills
+      const rarity = cols[1] || null;
+      const element = cols[2] || null;
+      const cost = cols[3] || null;
+      const atk = cols[4] || null;
+      const hp = cols[5] || null;
+      const spd = cols[6] || null;
+      const weapon = cols[7] || null;
+      const leaderSkill = cols[8] || null;
+      const activeSkills = cols[9] || null;
+      const passiveSkills = cols[10] || null;
+
+      const image = toAbsUrl(r.imgSrc);
+
+      const key = `${name}||${rarity}||${element}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+
+      const category = categorizeFromWeaponCell(weapon, image);
+
+      items.push({
+        id: norm(name),
+        name: norm(name),
+        category,               // characters for this Viewer
+        rarity: norm(rarity),
+        element: norm(element),
+        cost: norm(cost),
+        atk: norm(atk),
+        hp: norm(hp),
+        spd: norm(spd),
+        weapon: norm(weapon),
+        leaderSkill: norm(leaderSkill),
+        activeSkills: norm(activeSkills),
+        passiveSkills: norm(passiveSkills),
+        image,
+        url: VIEWER_URL,
+      });
+    }
+
+    // Check if we’re still discovering new rows
+    if (items.length === lastCount) stableRounds++;
+    else stableRounds = 0;
+
+    lastCount = items.length;
+
+    // If count hasn't changed for a few rounds, assume we've loaded everything available
+    if (stableRounds >= 6) break;
+
+    // Scroll down to trigger virtualized loading
+    await page.evaluate(() => window.scrollBy(0, 1800));
+    await page.waitForTimeout(700);
   }
-
-  await page.waitForTimeout(3500);
 
   await saveDebug(page);
   await browser.close();
 
-  // Save WS debug
+  if (items.length < 5) {
+    throw new Error(
+      `Viewer table scrape produced too few rows (${items.length}). The page might not be rendering table rows for the runner.`
+    );
+  }
+
+  // Write toolbox.items.json
+  const outPath = path.resolve(process.cwd(), OUT_ITEMS);
   await fs.writeFile(
-    path.resolve(process.cwd(), OUT_WS_DEBUG),
-    JSON.stringify(
-      { scrapedAt: new Date().toISOString(), largestFrames: wsLargest },
-      null,
-      2
-    ),
-    "utf8"
-  );
-  console.log(`Wrote WS debug -> ${OUT_WS_DEBUG}`);
-
-  // If we didn't find candidate arrays through JSON protocol, attempt MessagePack decode
-  if (candidateArrays.length === 0) {
-    for (const f of wsLargest) {
-      if (!f.base64) continue;
-
-      const buf = Buffer.from(f.base64, "base64");
-      const chunks = splitVarintLengthPrefixed(buf);
-
-      for (const chunk of chunks) {
-        try {
-          const decoded = msgpackDecode(chunk);
-          candidateArrays.push(...findCandidateArrays(decoded, 50));
-
-          if (decoded && typeof decoded === "object" && Array.isArray(decoded.arguments)) {
-            for (const arg of decoded.arguments) {
-              candidateArrays.push(...findCandidateArrays(arg, 50));
-            }
-          }
-        } catch {
-          // ignore
-        }
-      }
-    }
-  }
-
-  // -------- Choose best dataset array (FIXED scoring) --------
-  let best = null;
-  let bestScore = 0;
-
-  for (const c of candidateArrays) {
-    const arr = c.arr;
-    if (!Array.isArray(arr) || arr.length < 20) continue;
-
-    const sample = arr.slice(0, 120);
-
-    const good = sample.filter(looksLikeRealItem).length;
-    const goodRatio = good / Math.max(1, sample.length);
-
-    const strings = sample.filter((x) => typeof x === "string").length;
-    const stringRatio = strings / Math.max(1, sample.length);
-
-    // prefer big arrays of real objects; penalize string-heavy arrays
-    const score = (arr.length * goodRatio) - (arr.length * 0.5 * stringRatio);
-
-    if (score > bestScore) {
-      bestScore = score;
-      best = c;
-    }
-  }
-
-  if (!best) {
-    console.log("No usable dataset array found yet. Debug frames saved. (Not failing.)");
-    return;
-  }
-
-  // Normalize all records
-  const normalized = best.arr.map(normalizeRecord).filter(Boolean);
-
-  // Categorize + absolute image urls
-  const items = normalized.map((it) => ({
-    id: it.id,
-    name: it.name,
-    category: categorizeItem(it),
-    image: toAbsoluteImageUrl(it.image),
-  }));
-
-  // Deduplicate by category+name
-  const dedup = new Map();
-  for (const it of items) {
-    const key = `${it.category}::${it.name}`;
-    if (!dedup.has(key)) dedup.set(key, it);
-  }
-  const dedupItems = Array.from(dedup.values());
-
-  // Write flat items
-  await fs.writeFile(
-    path.resolve(process.cwd(), OUT_ITEMS),
+    outPath,
     JSON.stringify(
       {
         source: VIEWER_URL,
-        extractedFrom: best.path,
-        extractedCount: best.arr.length,
-        normalizedCount: dedupItems.length,
         scrapedAt: new Date().toISOString(),
-        items: dedupItems,
+        count: items.length,
+        items,
       },
       null,
       2
     ),
     "utf8"
   );
-  console.log(`Wrote ${OUT_ITEMS} items=${dedupItems.length}`);
 
-  // Build catalog
-  const counts = dedupItems.reduce((acc, it) => {
-    acc[it.category] = (acc[it.category] || 0) + 1;
-    return acc;
-  }, {});
-
-  await fs.writeFile(
-    path.resolve(process.cwd(), OUT_CATALOG),
-    JSON.stringify(
-      {
-        generatedAt: new Date().toISOString(),
-        counts,
-        items: dedupItems.map((it) => ({
-          id: it.id,
-          name: it.name,
-          category: it.category,
-          image: it.image,
-        })),
-      },
-      null,
-      2
-    ),
-    "utf8"
-  );
-  console.log(`Wrote ${OUT_CATALOG}`);
+  console.log(`Wrote ${OUT_ITEMS} items=${items.length}`);
 }
 
-// Never hard-fail. Always keep debug output.
 run().catch((err) => {
-  console.error("SCRAPER ERROR (non-fatal):", err);
-  process.exit(0);
+  console.error(err);
+  process.exit(1); // this one SHOULD fail if it can't produce items
 });
