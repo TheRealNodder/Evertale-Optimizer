@@ -1,4 +1,4 @@
-name: Update Toolbox Data (WS Extract + Build Catalog)
+name: Update Toolbox Data (WS Extract -> Catalog)
 
 on:
   workflow_dispatch:
@@ -64,10 +64,29 @@ jobs:
       - name: Run WS extractor scraper
         run: node scraper/scrape_viewer_characters_playwright.mjs
 
+      # Upload debug artifacts even if extraction fails
+      - name: Upload debug artifacts (always)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: toolbox-debug
+          path: |
+            data/_debug_ws_largest_frames.json
+            data/_debug_viewer_rendered.html
+            data/_debug_viewer_screenshot.png
+          if-no-files-found: ignore
+          retention-days: 7
+
+      # HARD CHECK: toolbox.items.json must exist before building catalog
+      - name: Verify toolbox.items.json exists and is valid
+        run: |
+          test -s data/toolbox.items.json
+          node -e "JSON.parse(require('fs').readFileSync('data/toolbox.items.json','utf8')); console.log('toolbox.items.json OK')"
+
       - name: Build catalog from toolbox.items.json
         run: node scraper/build_catalog_from_items.mjs
 
-      - name: Upload outputs + debug (always)
+      - name: Upload generated outputs (always)
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -75,9 +94,6 @@ jobs:
           path: |
             data/toolbox.items.json
             data/catalog.toolbox.json
-            data/_debug_ws_largest_frames.json
-            data/_debug_viewer_rendered.html
-            data/_debug_viewer_screenshot.png
           if-no-files-found: ignore
           retention-days: 7
 
