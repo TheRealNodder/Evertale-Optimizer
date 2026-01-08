@@ -28,8 +28,6 @@ jobs:
         with:
           node-version: 20
 
-      # IMPORTANT: npm ci FAILS if you don't have a package-lock.json.
-      # So we use npm install.
       - name: Install deps (scraper)
         working-directory: scraper
         run: npm install
@@ -41,16 +39,26 @@ jobs:
       - name: Ensure data folder exists
         run: mkdir -p data
 
-      # --- Run your scrapers/builders (adjust only if your filenames differ) ---
+      # --- CAPTURE (Explorer) ---
       - name: Scrape Explorer (captures)
         run: node scraper/scrape_explorer_capture_json.mjs
 
-      - name: Scrape Viewer (network/ws capture)
-        run: node scraper/scrape_viewer_characters_playwright.mjs
+      # --- EXTRACT REAL ITEMS FROM WS FRAMES ---
+      - name: Extract items from WS frames
+        run: node scraper/extract_items_from_ws_frames.mjs
 
-      # Build catalog from the item file if your pipeline uses toolbox.items.json
+      # --- BUILD CATALOG FROM ITEMS ---
       - name: Build Catalog from Items
         run: node scraper/build_catalog_from_items.mjs
+
+      # --- Ensure output is inside /data for GitHub Pages ---
+      - name: Ensure catalog is in data/
+        run: |
+          mkdir -p data
+          if [ -s catalog.toolbox.json ] && [ ! -s data/catalog.toolbox.json ]; then
+            mv catalog.toolbox.json data/catalog.toolbox.json
+          fi
+          test -s data/catalog.toolbox.json
 
       # --- Debug / visibility ---
       - name: Show data folder contents
@@ -61,7 +69,7 @@ jobs:
           echo "=== sizes ==="
           wc -c data/*.json 2>/dev/null || true
 
-      # Upload artifacts even on failure so you can inspect on phone
+      # Upload artifacts even on failure (phone-friendly)
       - name: Upload debug artifacts
         if: always()
         uses: actions/upload-artifact@v4
@@ -79,11 +87,9 @@ jobs:
       - name: Verify outputs exist
         run: |
           test -s data/catalog.toolbox.json
-          # keep this check only if you actually produce it:
-          test -s data/characters.viewer.full.json || true
-          test -s data/toolbox.items.json || true
+          test -s data/toolbox.items.json
 
-      # --- Commit + push safely (avoids your "cannot rebase: unstaged changes" issue) ---
+      # --- Commit + push ---
       - name: Commit generated data
         run: |
           git config user.name "github-actions[bot]"
@@ -103,12 +109,6 @@ jobs:
           fi
 
           git remote set-url origin "https://x-access-token:${GH_PAT}@github.com/TheRealNodder/Evertale-Optimizer.git"
-          git fetch origin main
 
-          # If remote moved forward, rebase our commit cleanly
-          if ! git pull --rebase origin main; then
-            echo "Rebase failed"
-            exit 1
-          fi
-
+          git pull --rebase origin main
           git push origin HEAD:main
