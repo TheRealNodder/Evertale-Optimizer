@@ -1,5 +1,5 @@
 // app.js (module) — clean catalog loader + UI
-const DATA_URL = "./data/catalog.json";
+const DATA_URL = "./data/catalog.clean.json";
 
 const $ = (sel) => document.querySelector(sel);
 
