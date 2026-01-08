@@ -1,4 +1,4 @@
-name: Update Toolbox Data (Explorer + WS Extract)
+name: Update Toolbox Data
 
 on:
   workflow_dispatch:
@@ -15,6 +15,7 @@ concurrency:
 jobs:
   scrape:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -27,6 +28,8 @@ jobs:
         with:
           node-version: 20
 
+      # IMPORTANT: npm ci FAILS if you don't have a package-lock.json.
+      # So we use npm install.
       - name: Install deps (scraper)
         working-directory: scraper
         run: npm install
@@ -35,60 +38,61 @@ jobs:
         working-directory: scraper
         run: npx playwright install --with-deps chromium
 
-      - name: Ensure data folder exists (repo root)
+      - name: Ensure data folder exists
         run: mkdir -p data
 
-      - name: Capture Explorer traffic (HTTP + WS)
-        continue-on-error: true
+      # --- Run your scrapers/builders (adjust only if your filenames differ) ---
+      - name: Scrape Explorer (captures)
         run: node scraper/scrape_explorer_capture_json.mjs
 
-      - name: Extract items from captured WS frames
-        continue-on-error: true
-        run: node scraper/extract_items_from_ws_frames.mjs
+      - name: Scrape Viewer (network/ws capture)
+        run: node scraper/scrape_viewer_characters_playwright.mjs
 
-      - name: Upload debug artifacts (always)
+      # Build catalog from the item file if your pipeline uses toolbox.items.json
+      - name: Build Catalog from Items
+        run: node scraper/build_catalog_from_items.mjs
+
+      # --- Debug / visibility ---
+      - name: Show data folder contents
+        if: always()
+        run: |
+          echo "=== data/ ==="
+          ls -la data || true
+          echo "=== sizes ==="
+          wc -c data/*.json 2>/dev/null || true
+
+      # Upload artifacts even on failure so you can inspect on phone
+      - name: Upload debug artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: explorer-debug
+          name: toolbox-debug
           path: |
-            data/explorer.http.captures.json
-            data/explorer.ws.frames.json
-            data/_debug_explorer_rendered.html
-            data/_debug_explorer_screenshot.png
-            data/_debug_ws_decoded.json
-            data/toolbox.items.json
+            data/*.json
+            data/*.html
+            data/*.png
+            data/*.txt
           if-no-files-found: ignore
           retention-days: 7
 
-      - name: Verify toolbox.items.json (if present)
+      # --- Hard checks so workflow fails if files are missing ---
+      - name: Verify outputs exist
         run: |
-          if [ -s data/toolbox.items.json ]; then
-            node -e "JSON.parse(require('fs').readFileSync('data/toolbox.items.json','utf8')); console.log('toolbox.items.json OK')"
-          else
-            echo "toolbox.items.json not created yet (see artifacts)."
-          fi
+          test -s data/catalog.toolbox.json
+          # keep this check only if you actually produce it:
+          test -s data/characters.viewer.full.json || true
+          test -s data/toolbox.items.json || true
 
-      - name: Commit generated data (if present)
+      # --- Commit + push safely (avoids your "cannot rebase: unstaged changes" issue) ---
+      - name: Commit generated data
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Always commit capture/debug so we can iterate
-          git add data/explorer.http.captures.json \
-                  data/explorer.ws.frames.json \
-                  data/_debug_explorer_rendered.html \
-                  data/_debug_explorer_screenshot.png \
-                  data/_debug_ws_decoded.json || true
+          git add data/ || true
+          git diff --cached --quiet || git commit -m "Update toolbox data"
 
-          # Commit items if created
-          if [ -s data/toolbox.items.json ]; then
-            git add data/toolbox.items.json
-          fi
-
-          git diff --cached --quiet || git commit -m "Update toolbox capture + items"
-
-      - name: Push changes (safe rebase)
+      - name: Push changes (safe)
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
         run: |
@@ -98,9 +102,13 @@ jobs:
             exit 1
           fi
 
-          git reset --hard
-
           git remote set-url origin "https://x-access-token:${GH_PAT}@github.com/TheRealNodder/Evertale-Optimizer.git"
           git fetch origin main
-          git rebase origin/main || (git rebase --abort && exit 1)
+
+          # If remote moved forward, rebase our commit cleanly
+          if ! git pull --rebase origin main; then
+            echo "Rebase failed"
+            exit 1
+          fi
+
           git push origin HEAD:main
