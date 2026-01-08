@@ -12,30 +12,22 @@ async function run() {
   console.log("Loading Viewer:", URL);
   await page.goto(URL, { waitUntil: "networkidle" });
 
-  // Wait for something meaningful to appear
-  await page.waitForSelector("img", { timeout: 60000 });
+  // Wait for images inside rows (real content)
+  await page.waitForSelector("img[src*='/files/']", { timeout: 60000 });
 
-  // Extract DOM-visible cards / rows
   const items = await page.evaluate(() => {
-    const results = [];
+    const rows = [];
+    document.querySelectorAll("tr").forEach(tr => {
+      const img = tr.querySelector("img");
+      const text = tr.innerText?.trim();
+      if (!img || !text) return;
 
-    // This is intentionally generic — survives layout changes
-    const cards = document.querySelectorAll("tr, .card, .item, .row");
-
-    cards.forEach(el => {
-      const text = el.innerText?.trim();
-      if (!text || text.length < 10) return;
-
-      const img =
-        el.querySelector("img")?.getAttribute("src") ?? null;
-
-      results.push({
+      rows.push({
         text,
-        image: img
+        image: img.src
       });
     });
-
-    return results;
+    return rows;
   });
 
   await browser.close();
