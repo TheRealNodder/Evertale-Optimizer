@@ -1,4 +1,4 @@
-name: Update Toolbox Data (WS Extract)
+name: Update Toolbox Data (WS Extract + Build Catalog)
 
 on:
   workflow_dispatch:
@@ -61,8 +61,11 @@ jobs:
       - name: Ensure data folder exists (repo root)
         run: mkdir -p data
 
-      - name: Scrape Viewer + Extract Catalog
+      - name: Run WS extractor scraper
         run: node scraper/scrape_viewer_characters_playwright.mjs
+
+      - name: Build catalog from toolbox.items.json
+        run: node scraper/build_catalog_from_items.mjs
 
       - name: Upload outputs + debug (always)
         if: always()
@@ -70,9 +73,9 @@ jobs:
         with:
           name: toolbox-data
           path: |
-            data/_debug_ws_largest_frames.json
             data/toolbox.items.json
             data/catalog.toolbox.json
+            data/_debug_ws_largest_frames.json
             data/_debug_viewer_rendered.html
             data/_debug_viewer_screenshot.png
           if-no-files-found: ignore
@@ -90,24 +93,19 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          git add data/_debug_ws_largest_frames.json \
-                  data/toolbox.items.json \
+          git add data/toolbox.items.json \
                   data/catalog.toolbox.json \
+                  data/_debug_ws_largest_frames.json \
                   data/_debug_viewer_rendered.html \
                   data/_debug_viewer_screenshot.png || true
 
           if git diff --cached --quiet; then
             echo "No changes to commit."
           else
-            git commit -m "Update toolbox catalog (ws extract)"
+            git commit -m "Update toolbox items + catalog"
           fi
 
       - name: Push changes
         run: |
           set -e
-          # Only push if we actually created a commit in this run
-          if git diff --quiet origin/main..HEAD; then
-            echo "No new commits to push."
-          else
-            git push origin HEAD:main
-          fi
+          git push origin HEAD:main
