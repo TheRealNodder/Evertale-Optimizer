@@ -1,11 +1,7 @@
-name: Normalize Catalog (clean site data)
+name: Normalize Toolbox Catalog
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - "data/catalog.toolbox.json"
-      - "scraper/normalize_catalog_from_mixed.mjs"
 
 permissions:
   contents: write
@@ -17,6 +13,7 @@ concurrency:
 jobs:
   normalize:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -36,25 +33,43 @@ jobs:
       - name: Ensure data folder exists
         run: mkdir -p data
 
-      - name: Build clean catalog.json from mixed toolbox file
+      # --- Safety check ---
+      - name: Verify mixed catalog exists
+        run: |
+          if [ ! -s data/catalog.toolbox.json ]; then
+            echo "❌ Missing data/catalog.toolbox.json"
+            exit 1
+          fi
+          node -e "JSON.parse(require('fs').readFileSync('data/catalog.toolbox.json','utf8')); console.log('mixed catalog JSON OK')"
+
+      # --- Normalize ---
+      - name: Normalize mixed catalog → clean catalog
         run: node scraper/normalize_catalog_from_mixed.mjs
 
+      # --- Verify output ---
+      - name: Verify clean catalog exists
+        run: |
+          test -s data/catalog.toolbox.clean.json
+          node -e "JSON.parse(require('fs').readFileSync('data/catalog.toolbox.clean.json','utf8')); console.log('clean catalog JSON OK')"
+
+      # --- Show results (phone-friendly) ---
       - name: Show outputs
         run: |
-          ls -la data || true
-          wc -c data/*.json || true
+          echo "=== data/ ==="
+          ls -la data
+          echo "=== sizes ==="
+          wc -c data/*.json
 
-      - name: Verify clean catalog exists
-        run: test -s data/catalog.json
-
+      # --- Commit ---
       - name: Commit clean catalog
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          git add data/catalog.json
-          git diff --cached --quiet || git commit -m "Update clean catalog.json"
+          git add data/catalog.toolbox.clean.json
+          git diff --cached --quiet || git commit -m "Normalize toolbox catalog"
 
+      # --- Push ---
       - name: Push changes
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
