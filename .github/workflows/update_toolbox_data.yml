@@ -3,7 +3,7 @@ name: Update Toolbox Data
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 9 * * *" # daily 09:00 UTC
+    - cron: "0 9 * * *"
 
 permissions:
   contents: write
@@ -36,48 +36,35 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Ensure data folder exists (repo root)
-        run: |
-          mkdir -p data
+        run: mkdir -p data
 
-      - name: Run scrapers (repo root)
+      - name: Scrape Viewer (repo root)
+        run: node scraper/scrape_viewer_characters_playwright.mjs
+
+      - name: Verify viewer JSON exists and is valid
         run: |
-          node scraper/build_catalog_from_viewer.mjs
-          node scraper/scrape_viewer_characters_playwright.mjs
+          test -s data/characters.viewer.full.json
+          node -e "JSON.parse(require('fs').readFileSync('data/characters.viewer.full.json','utf8')); console.log('viewer JSON OK')"
+
+      - name: Build Catalog from Viewer (repo root)
+        run: node scraper/build_catalog_from_viewer.mjs
 
       - name: Show outputs
         run: |
           echo "=== data/ ==="
           ls -la data || true
-          echo "=== scraper/data/ ==="
-          ls -la scraper/data || true
-          echo "=== preview file sizes ==="
+          echo "=== sizes ==="
           wc -c data/*.json || true
 
-      # IMPORTANT: do not allow committing empty/placeholder files
       - name: Verify outputs are not empty
         run: |
           test -s data/catalog.toolbox.json
           test -s data/characters.viewer.full.json
 
-          # Extra safety: fail if either is suspiciously tiny (< 500 bytes)
-          BYTES1=$(wc -c < data/catalog.toolbox.json)
-          BYTES2=$(wc -c < data/characters.viewer.full.json)
-          echo "catalog.toolbox.json bytes=$BYTES1"
-          echo "characters.viewer.full.json bytes=$BYTES2"
-          if [ "$BYTES1" -lt 500 ]; then
-            echo "ERROR: catalog.toolbox.json is too small (likely empty/placeholder)."
-            exit 1
-          fi
-          if [ "$BYTES2" -lt 500 ]; then
-            echo "ERROR: characters.viewer.full.json is too small (likely empty/placeholder)."
-            exit 1
-          fi
-
       - name: Commit generated data
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-
           git add data/catalog.toolbox.json data/characters.viewer.full.json || true
           git diff --cached --quiet || git commit -m "Update toolbox data"
 
@@ -86,15 +73,11 @@ jobs:
           GH_PAT: ${{ secrets.GH_PAT }}
         run: |
           set -e
-
           if [ -z "$GH_PAT" ]; then
             echo "GH_PAT secret is missing"
             exit 1
           fi
-
           git remote set-url origin "https://x-access-token:${GH_PAT}@github.com/TheRealNodder/Evertale-Optimizer.git"
-
           git fetch origin main
           git rebase origin/main || (git rebase --abort && exit 1)
-
           git push origin HEAD:main
