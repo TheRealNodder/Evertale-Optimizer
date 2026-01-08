@@ -1,19 +1,18 @@
 // scraper/build_clean_catalog.mjs
-// Build data/catalog.clean.json from whatever inputs exist.
-// This script is intentionally tolerant: it tries multiple sources and keeps going.
-
 import fs from "node:fs";
 import path from "node:path";
 
 const DATA_DIR = path.resolve("data");
 const OUT_FILE = path.join(DATA_DIR, "catalog.clean.json");
 
-// Inputs we may have in your repo based on your screenshots/logs:
+// Toolbox host for images (critical: GH Pages can't serve /files/images/*)
+const TOOLBOX_ORIGIN = "https://evertaletoolbox2.runasp.net";
+
 const INPUTS = [
-  path.join(DATA_DIR, "catalog.toolbox.json"),     // old name (often missing)
-  path.join(DATA_DIR, "catalog.json"),             // sometimes exists (may be broken)
-  path.join(DATA_DIR, "catalog.dom.raw.json"),     // dom scrape fallback
-  path.join(DATA_DIR, "catalog.clean.json"),       // if already built, we can re-save normalized
+  path.join(DATA_DIR, "catalog.dom.raw.json"),
+  path.join(DATA_DIR, "catalog.toolbox.json"),
+  path.join(DATA_DIR, "catalog.json"),
+  path.join(DATA_DIR, "catalog.clean.json"),
 ];
 
 function normCat(x) {
@@ -38,28 +37,20 @@ function safeReadJson(file) {
 }
 
 function extractItems(json) {
-  // Accept lots of shapes:
-  // - array
-  // - { items: [...] }
-  // - { catalog: { items: [...] } }
-  // - clean split lists: { characters, weapons, ... }
   if (!json) return [];
-
   if (Array.isArray(json)) return json;
-
   if (Array.isArray(json.items)) return json.items;
-
   if (json.catalog && Array.isArray(json.catalog.items)) return json.catalog.items;
 
-  // split clean catalog shape
+  // clean split format
   const blocks = [
     ["character", json.characters],
     ["weapon", json.weapons],
     ["accessory", json.accessories],
     ["enemy", json.enemies],
     ["boss", json.bosses],
+    ["unknown", json.unknown],
   ];
-
   const out = [];
   for (const [cat, arr] of blocks) {
     if (!Array.isArray(arr)) continue;
@@ -68,30 +59,16 @@ function extractItems(json) {
   return out;
 }
 
-function inferCategory(it) {
-  const cat = normCat(it.category ?? it.type);
-  if (cat !== "unknown") return cat;
-
-  const img = (it.image ?? it.imageUrl ?? it.img ?? it.icon ?? "").toString();
-  const url = (it.url ?? "").toString();
-
-  const s = (img + " " + url).toLowerCase();
-
-  if (s.includes("/files/images/weapons/")) return "weapon";
-  if (s.includes("/files/images/accessories/")) return "accessory";
-  if (s.includes("/files/images/monsters/")) return "enemy";
-  if (s.includes("/files/images/boss")) return "boss";
-  if (s.includes("/files/images/units/") || s.includes("/files/images/characters/")) return "character";
-
-  return "unknown";
+function isGarbageRow(name) {
+  const n = (name || "").toString().trim().toLowerCase();
+  if (!n) return true;
+  if (n.includes("name rarity element cost atk hp spd")) return true;
+  return false;
 }
 
-function isGarbageRow(name) {
-  const n = (name || "").toString().trim();
-  if (!n) return true;
-  // Your “header row” problem:
-  if (n.toLowerCase().includes("name rarity element cost atk hp spd")) return true;
-  return false;
+function toNum(x) {
+  const n = Number(String(x ?? "").replace(/,/g, "").trim());
+  return Number.isFinite(n) ? n : null;
 }
 
 function makeId(it) {
@@ -102,28 +79,59 @@ function makeId(it) {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 }
 
+function fixImageUrl(img) {
+  if (!img) return null;
+  const s = img.toString();
+  if (s.startsWith("http://") || s.startsWith("https://")) return s;
+  if (s.startsWith("/files/")) return TOOLBOX_ORIGIN + s;
+  return s;
+}
+
+function inferCategory(it) {
+  const cat = normCat(it.category ?? it.type);
+  if (cat !== "unknown") return cat;
+
+  const img = (it.image ?? it.imageUrl ?? it.img ?? it.icon ?? "").toString().toLowerCase();
+  if (img.includes("/files/images/weapons/")) return "weapon";
+  if (img.includes("/files/images/accessories/")) return "accessory";
+  if (img.includes("/files/images/monsters/")) return "enemy";
+  if (img.includes("/files/images/units/") || img.includes("/files/images/characters/")) return "character";
+
+  return "unknown";
+}
+
 function normalizeItem(it) {
   const name = (it.name ?? it.title ?? it.label ?? "").toString().trim();
   const id = makeId(it);
   const category = inferCategory(it);
-  const element = (it.element ?? "").toString() || null;
+  const element = (it.element ?? "").toString().trim() || null;
 
-  const image =
-    it.image ??
-    it.imageUrl ??
-    it.img ??
-    it.icon ??
-    null;
+  const image = fixImageUrl(it.image ?? it.imageUrl ?? it.img ?? it.icon ?? null);
 
-  const url = it.url ?? null;
+  return {
+    id,
+    name,
+    category,
+    element,
+    image,
+    url: it.url ?? null,
+    cost: toNum(it.cost),
+    atk: toNum(it.atk),
+    hp: toNum(it.hp),
+    spd: toNum(it.spd),
+  };
+}
 
-  // keep numeric fields if they exist
-  const cost = Number.isFinite(Number(it.cost)) ? Number(it.cost) : null;
-  const atk = Number.isFinite(Number(it.atk)) ? Number(it.atk) : null;
-  const hp  = Number.isFinite(Number(it.hp))  ? Number(it.hp)  : null;
-  const spd = Number.isFinite(Number(it.spd)) ? Number(it.spd) : null;
-
-  return { id, name, category, element, image, url, cost, atk, hp, spd };
+function uniqById(items) {
+  const seen = new Set();
+  const out = [];
+  for (const it of items) {
+    if (!it.id) continue;
+    if (seen.has(it.id)) continue;
+    seen.add(it.id);
+    out.push(it);
+  }
+  return out;
 }
 
 function splitByCategory(items) {
@@ -148,18 +156,6 @@ function splitByCategory(items) {
   return out;
 }
 
-function uniqById(items) {
-  const seen = new Set();
-  const out = [];
-  for (const it of items) {
-    if (!it.id) continue;
-    if (seen.has(it.id)) continue;
-    seen.add(it.id);
-    out.push(it);
-  }
-  return out;
-}
-
 function run() {
   if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 
@@ -169,6 +165,7 @@ function run() {
   for (const f of INPUTS) {
     const json = safeReadJson(f);
     if (!json) continue;
+
     const items = extractItems(json);
     if (items.length) {
       sourceFiles.push(path.relative(process.cwd(), f));
@@ -176,7 +173,6 @@ function run() {
     }
   }
 
-  // Normalize
   const normalized = rawItems
     .map(normalizeItem)
     .filter((x) => x.id && !isGarbageRow(x.name));
@@ -205,13 +201,11 @@ function run() {
   };
 
   fs.writeFileSync(OUT_FILE, JSON.stringify(result, null, 2), "utf8");
+  console.log(`Wrote ${path.relative(process.cwd(), OUT_FILE)} counts=${JSON.stringify(result.counts)}`);
 
-  console.log(`Wrote ${path.relative(process.cwd(), OUT_FILE)}`);
-  console.log("counts:", result.counts);
-
+  // If characters are 0, it's not a "filter" problem—your input sources don't include them.
   if (result.counts.total < 10) {
-    // hard fail if output is obviously useless
-    throw new Error(`Clean catalog too small (total=${result.counts.total}). Inputs may be empty/broken.`);
+    throw new Error(`Clean catalog too small (total=${result.counts.total}). Inputs likely empty/broken.`);
   }
 }
 
