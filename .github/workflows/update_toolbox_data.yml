@@ -66,13 +66,14 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-    # Add main outputs + debug artifacts if they exist
+          # Add main outputs + debug artifacts if they exist
           git add data/catalog.toolbox.json \
                   data/characters.viewer.full.json \
                   data/_debug_viewer_rendered.html \
                   data/_debug_viewer_screenshot.png || true
 
-    git diff --cached --quiet || git commit -m "Update toolbox data"
+          git diff --cached --quiet || git commit -m "Update toolbox data"
+
       - name: Push changes (rebase if needed)
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
