@@ -71,4 +71,125 @@ async function run() {
     // ignore
   }
 
- 
+  // Extract rows from current table page
+  async function extractPageRows() {
+    return await page.evaluate(() => {
+      const norm = (s) => (s ?? "").toString().replace(/\s+/g, " ").trim();
+      const table = document.querySelector("table");
+      if (!table) return [];
+
+      const headers = Array.from(table.querySelectorAll("thead th, thead td"))
+        .map(x => norm(x.textContent).toLowerCase());
+
+      const rows = Array.from(table.querySelectorAll("tbody tr"))
+        .map(tr => Array.from(tr.querySelectorAll("td, th")).map(td => norm(td.textContent)))
+        .filter(cells => cells.length > 0);
+
+      return { headers, rows };
+    });
+  }
+
+  // Pagination: try to click a "Next" control if present
+  async function clickNextIfPossible() {
+    const candidates = [
+      page.getByRole("button", { name: /next/i }),
+      page.locator('button[aria-label*="next" i]'),
+      page.locator('button:has-text("Next")'),
+      page.locator('button:has-text("»")'),
+      page.locator('a:has-text("Next")'),
+      page.locator('a:has-text("»")'),
+    ];
+
+    for (const loc of candidates) {
+      try {
+        const el = loc.first();
+        if (await el.count() === 0) continue;
+        if (!(await el.isVisible({ timeout: 500 }))) continue;
+        const disabled = await el.isDisabled().catch(() => false);
+        if (disabled) continue;
+
+        await el.click({ timeout: 3000 });
+        await page.waitForTimeout(2500);
+        return true;
+      } catch {
+        // try next candidate
+      }
+    }
+    return false;
+  }
+
+  const all = [];
+  const seen = new Set();
+
+  const MAX_PAGES = 300;
+  for (let p = 1; p <= MAX_PAGES; p++) {
+    const { headers, rows } = await extractPageRows();
+
+    if (!rows || rows.length === 0) {
+      console.log(`No rows on page ${p}. Stopping.`);
+      break;
+    }
+
+    const headerIndex = (key) => headers.findIndex(h => h.includes(key));
+
+    const idxName = 0;
+    const idxCost = headerIndex("cost");
+    const idxAtk  = headerIndex("atk");
+    const idxHp   = headerIndex("hp");
+    const idxSpd  = headerIndex("spd");
+    const idxElem = headerIndex("element");
+
+    for (const cells of rows) {
+      const name = normText(cells[idxName] ?? "");
+      if (!name) continue;
+      if (seen.has(name)) continue;
+      seen.add(name);
+
+      const cost = parseNumberish(idxCost >= 0 ? cells[idxCost] : cells[1]);
+      const atk  = parseNumberish(idxAtk  >= 0 ? cells[idxAtk]  : cells[2]);
+      const hp   = parseNumberish(idxHp   >= 0 ? cells[idxHp]   : cells[3]);
+      const spd  = parseNumberish(idxSpd  >= 0 ? cells[idxSpd]  : cells[4]);
+      const element = normText(idxElem >= 0 ? cells[idxElem] : (cells[5] ?? ""));
+
+      all.push({
+        id: name,     // stable fallback ID
+        name,
+        element,
+        cost,
+        atk,
+        hp,
+        spd,
+        url: VIEWER_URL
+      });
+    }
+
+    console.log(`Parsed page ${p}: +${rows.length} rows, total unique=${all.length}`);
+
+    const moved = await clickNextIfPossible();
+    if (!moved) {
+      console.log("No Next button found. Stopping pagination.");
+      break;
+    }
+  }
+
+  await browser.close();
+
+  // Refuse to overwrite with junk
+  if (all.length < 50) {
+    throw new Error(`Viewer extraction too small (${all.length}). Refusing to write output.`);
+  }
+
+  const outPath = path.join(outDir, "characters.viewer.full.json");
+  await writeJson(outPath, {
+    source: VIEWER_URL,
+    scrapedAt: new Date().toISOString(),
+    characters: all,
+  });
+
+  console.log(`Wrote ${all.length} characters -> ${outPath}`);
+}
+
+run().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});
