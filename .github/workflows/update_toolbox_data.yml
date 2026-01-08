@@ -1,4 +1,4 @@
-name: Update Toolbox Data (Capture Logs)
+name: Update Toolbox Data (WS Extract)
 
 on:
   workflow_dispatch:
@@ -38,29 +38,23 @@ jobs:
       - name: Ensure data folder exists (repo root)
         run: mkdir -p data
 
-      - name: Capture Viewer traffic (HTTP + WS)
+      - name: Scrape Viewer + Extract Catalog (repo root)
         run: node scraper/scrape_viewer_characters_playwright.mjs
 
-      # Always upload artifacts so you can inspect them even if something breaks
-      - name: Upload capture + debug artifacts (always)
+      # Always upload artifacts so you can inspect outputs even if extraction is partial
+      - name: Upload outputs + debug (always)
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: viewer-capture
+          name: toolbox-data
           path: |
-            data/viewer.raw.responses.json
-            data/viewer.raw.ws.json
+            data/_debug_ws_largest_frames.json
+            data/toolbox.items.json
+            data/catalog.toolbox.json
             data/_debug_viewer_rendered.html
             data/_debug_viewer_screenshot.png
           if-no-files-found: ignore
           retention-days: 7
-
-      - name: Verify capture outputs exist and are valid JSON
-        run: |
-          test -s data/viewer.raw.responses.json
-          test -s data/viewer.raw.ws.json
-          node -e "JSON.parse(require('fs').readFileSync('data/viewer.raw.responses.json','utf8')); console.log('http capture JSON OK')"
-          node -e "JSON.parse(require('fs').readFileSync('data/viewer.raw.ws.json','utf8')); console.log('ws capture JSON OK')"
 
       - name: Show outputs
         run: |
@@ -69,17 +63,18 @@ jobs:
           echo "=== sizes ==="
           wc -c data/*.json || true
 
-      - name: Commit capture logs + debug files
+      - name: Commit generated files (if changed)
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          git add data/viewer.raw.responses.json \
-                  data/viewer.raw.ws.json \
+          git add data/_debug_ws_largest_frames.json \
+                  data/toolbox.items.json \
+                  data/catalog.toolbox.json \
                   data/_debug_viewer_rendered.html \
                   data/_debug_viewer_screenshot.png || true
 
-          git diff --cached --quiet || git commit -m "Capture Viewer traffic logs"
+          git diff --cached --quiet || git commit -m "Update toolbox catalog (ws extract)"
 
       - name: Push changes (rebase if needed)
         env:
