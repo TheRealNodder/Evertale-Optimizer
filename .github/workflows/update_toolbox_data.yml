@@ -1,4 +1,4 @@
-name: Update Toolbox Data
+name: Update Toolbox Data (Clean Catalog)
 
 on:
   workflow_dispatch:
@@ -17,14 +17,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # -------------------------
-      # Setup
-      # -------------------------
       - name: Checkout
         uses: actions/checkout@v4
         with:
           persist-credentials: false
           fetch-depth: 0
+
+      # Pull latest BEFORE making changes (prevents "cannot rebase: unstaged changes")
+      - name: Sync with main (pre-scrape)
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: |
+          set -e
+          if [ -z "$GH_PAT" ]; then
+            echo "GH_PAT secret is missing"
+            exit 1
+          fi
+          git remote set-url origin "https://x-access-token:${GH_PAT}@github.com/${{ github.repository }}.git"
+          git fetch origin main
+          git checkout main
+          git reset --hard origin/main
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -42,37 +54,20 @@ jobs:
       - name: Ensure data folder exists
         run: mkdir -p data
 
-      # -------------------------
-      # Scraping (best effort)
-      # -------------------------
-      - name: Scrape Explorer (captures only, non-blocking)
+      # Run your capture scripts if they exist; do not fail the whole job if site changes.
+      - name: Scrape Explorer (best effort)
         run: node scraper/scrape_explorer_capture_json.mjs || true
 
-      - name: Scrape Viewer (DOM extraction)
-        run: node scraper/scrape_viewer_dom_items.mjs
+      - name: Scrape Viewer (best effort)
+        run: node scraper/scrape_viewer_characters_playwright.mjs || true
 
-      # -------------------------
-      # Safety: remove poisoned JSON
-      # -------------------------
-      - name: Remove invalid catalog.json if broken
-        run: |
-          if [ -f data/catalog.json ]; then
-            node -e "try{JSON.parse(require('fs').readFileSync('data/catalog.json','utf8'))}catch(e){process.exit(1)}" \
-              || (echo 'Removing invalid data/catalog.json' && rm -f data/catalog.json)
-          fi
+      - name: Scrape Viewer DOM items (best effort)
+        run: node scraper/scrape_viewer_dom_items.mjs || true
 
-      # -------------------------
-      # Build CLEAN catalog
-      # -------------------------
+      # Build clean catalog (THIS is the required step)
       - name: Build Clean Catalog
         run: node scraper/build_clean_catalog.mjs
 
-      - name: Verify clean catalog exists
-        run: test -s data/catalog.clean.json
-
-      # -------------------------
-      # Debug visibility (phone-friendly)
-      # -------------------------
       - name: Show data folder contents
         if: always()
         run: |
@@ -94,28 +89,32 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
-      # -------------------------
-      # Commit + Push (SAFE)
-      # -------------------------
+      - name: Verify clean catalog exists
+        run: |
+          test -s data/catalog.clean.json
+          node -e "JSON.parse(require('fs').readFileSync('data/catalog.clean.json','utf8')); console.log('catalog.clean.json OK')"
+
       - name: Commit generated data
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          git add data/ || true
+          # Commit ONLY the clean catalog + any optional raw files you want to keep
+          git add data/catalog.clean.json || true
+
+          # (Optional) keep captures for debugging:
+          git add data/*captures*.json data/*raw*.json data/_debug_* || true
+
           git diff --cached --quiet || git commit -m "Update toolbox data (clean catalog)"
 
-      - name: Push changes (safe rebase)
+      - name: Push changes
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
         run: |
           set -e
           if [ -z "$GH_PAT" ]; then
-            echo "GH_PAT secret missing"
+            echo "GH_PAT secret is missing"
             exit 1
           fi
-
-          git remote set-url origin "https://x-access-token:${GH_PAT}@github.com/TheRealNodder/Evertale-Optimizer.git"
-          git fetch origin main
-          git pull --rebase origin main
+          git remote set-url origin "https://x-access-token:${GH_PAT}@github.com/${{ github.repository }}.git"
           git push origin HEAD:main
