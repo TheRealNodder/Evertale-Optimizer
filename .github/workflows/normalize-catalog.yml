@@ -6,10 +6,6 @@ on:
 permissions:
   contents: write
 
-concurrency:
-  group: normalize-catalog
-  cancel-in-progress: true
-
 jobs:
   normalize:
     runs-on: ubuntu-latest
@@ -17,24 +13,23 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          persist-credentials: false
-          fetch-depth: 0
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: Install deps (scraper)
-        working-directory: scraper
-        run: npm install
-
       - name: Ensure data folder exists
         run: mkdir -p data
 
-      # --- Detect mixed catalog source ---
-      - name: Detect mixed catalog file
+      - name: Skip if clean catalog already exists
+        run: |
+          if [ -s data/catalog.clean.json ]; then
+            echo "✅ catalog.clean.json already exists — skipping normalize"
+            exit 0
+          fi
+
+      - name: Detect mixed catalog
         id: detect
         run: |
           if [ -s data/catalog.toolbox.json ]; then
@@ -42,57 +37,32 @@ jobs:
           elif [ -s data/catalog.json ]; then
             echo "src=data/catalog.json" >> $GITHUB_OUTPUT
           else
-            echo "❌ No mixed catalog found"
-            ls -la data
+            echo "❌ No mixed catalog found and no clean catalog exists"
             exit 1
           fi
 
-      - name: Verify mixed catalog JSON
-        run: |
-          echo "Using ${{ steps.detect.outputs.src }}"
-          node -e "JSON.parse(require('fs').readFileSync('${{ steps.detect.outputs.src }}','utf8')); console.log('mixed catalog JSON OK')"
-
-      # --- Normalize ---
-      - name: Normalize mixed catalog → clean catalog
+      - name: Normalize mixed catalog
         run: |
           node scraper/normalize_catalog_from_mixed.mjs \
             "${{ steps.detect.outputs.src }}" \
-            "data/catalog.toolbox.clean.json"
+            "data/catalog.clean.json"
 
-      # --- Verify output ---
-      - name: Verify clean catalog exists
+      - name: Verify clean catalog
         run: |
-          test -s data/catalog.toolbox.clean.json
-          node -e "JSON.parse(require('fs').readFileSync('data/catalog.toolbox.clean.json','utf8')); console.log('clean catalog JSON OK')"
+          test -s data/catalog.clean.json
+          node -e "JSON.parse(require('fs').readFileSync('data/catalog.clean.json','utf8')); console.log('clean catalog OK')"
 
-      # --- Show outputs (phone-friendly) ---
-      - name: Show outputs
-        run: |
-          echo "=== data/ ==="
-          ls -la data
-          echo "=== sizes ==="
-          wc -c data/*.json
-
-      # --- Commit ---
       - name: Commit clean catalog
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          git add data/catalog.toolbox.clean.json
+          git add data/catalog.clean.json
           git diff --cached --quiet || git commit -m "Normalize toolbox catalog"
 
-      # --- Push ---
       - name: Push changes
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
         run: |
-          set -e
-          if [ -z "$GH_PAT" ]; then
-            echo "GH_PAT secret is missing"
-            exit 1
-          fi
-
           git remote set-url origin "https://x-access-token:${GH_PAT}@github.com/TheRealNodder/Evertale-Optimizer.git"
           git pull --rebase origin main
           git push origin HEAD:main
