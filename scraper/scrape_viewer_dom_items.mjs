@@ -1,169 +1,207 @@
 // scraper/scrape_viewer_dom_items.mjs
-import fs from "fs";
+// DOM table extractor: pulls headers + table rows into structured objects
+// Output: data/catalog.dom.raw.json  { url, generatedAt, headers, items }
+
+import fs from "node:fs";
+import path from "node:path";
 import { chromium } from "playwright";
 
-const URL = "https://evertaletoolbox2.runasp.net/Viewer";
-const OUT = "data/catalog.dom.raw.json";
+const VIEWER_URL = "https://evertaletoolbox2.runasp.net/Viewer";
+const DATA_DIR = path.resolve("data");
+const OUT_FILE = path.join(DATA_DIR, "catalog.dom.raw.json");
 
-const DEBUG_HTML = "data/_debug_viewer_dom_rendered.html";
-const DEBUG_PNG  = "data/_debug_viewer_dom_screenshot.png";
-const DEBUG_TXT  = "data/_debug_viewer_dom_counts.txt";
+const DEBUG_HTML = path.join(DATA_DIR, "_debug_viewer_rendered.html");
+const DEBUG_PNG = path.join(DATA_DIR, "_debug_viewer_screenshot.png");
 
-function ensureDataDir() {
-  fs.mkdirSync("data", { recursive: true });
+function ensureDir(p) {
+  if (!fs.existsSync(p)) fs.mkdirSync(p, { recursive: true });
 }
 
-async function saveDebug(page, note = "") {
-  try {
-    const html = await page.content();
-    fs.writeFileSync(DEBUG_HTML, html, "utf8");
-  } catch {}
-  try {
-    await page.screenshot({ path: DEBUG_PNG, fullPage: true });
-  } catch {}
-  try {
-    const counts = await page.evaluate(() => {
-      const imgs = [...document.querySelectorAll("img")];
-      const fileImgs = imgs.filter(i => (i.src || "").includes("/files/"));
-      const tables = document.querySelectorAll("table").length;
-      const rows = document.querySelectorAll("tr").length;
-      const bodyText = (document.body?.innerText || "").slice(0, 2000);
-      return {
-        imgs: imgs.length,
-        fileImgs: fileImgs.length,
-        tables,
-        rows,
-        bodyTextSample: bodyText
-      };
-    });
-    fs.writeFileSync(
-      DEBUG_TXT,
-      `${note}\n\n` + JSON.stringify(counts, null, 2),
-      "utf8"
-    );
-  } catch {}
+function norm(s) {
+  return (s ?? "").toString().replace(/\s+/g, " ").trim();
 }
 
-// scroll helper (triggers lazy loads)
-async function autoScroll(page, maxRounds = 12) {
-  for (let i = 0; i < maxRounds; i++) {
-    await page.evaluate(() => window.scrollBy(0, Math.max(800, window.innerHeight)));
-    await page.waitForTimeout(800);
-  }
-  await page.evaluate(() => window.scrollTo(0, 0));
-  await page.waitForTimeout(500);
+function normCat(x) {
+  const v = (x || "").toString().toLowerCase().trim();
+  if (["character", "characters", "unit", "units"].includes(v)) return "character";
+  if (["weapon", "weapons"].includes(v)) return "weapon";
+  if (["accessory", "accessories"].includes(v)) return "accessory";
+  if (["enemy", "enemies", "monster", "monsters"].includes(v)) return "enemy";
+  if (["boss", "bosses"].includes(v)) return "boss";
+  return v || "unknown";
+}
+
+function pickCategoryFromRow(row) {
+  const img = (row.image ?? "").toLowerCase();
+  if (img.includes("/files/images/weapons/")) return "weapon";
+  if (img.includes("/files/images/accessories/")) return "accessory";
+  if (img.includes("/files/images/monsters/")) return "enemy";
+  if (img.includes("/files/images/units/") || img.includes("/files/images/characters/")) return "character";
+  return "unknown";
+}
+
+function toNum(x) {
+  const n = Number(String(x ?? "").replace(/,/g, "").trim());
+  return Number.isFinite(n) ? n : null;
 }
 
 async function run() {
-  ensureDataDir();
+  ensureDir(DATA_DIR);
 
   const browser = await chromium.launch({
     headless: true,
+    args: ["--no-sandbox", "--disable-dev-shm-usage"],
   });
 
-  const context = await browser.newContext({
-    viewport: { width: 1400, height: 900 },
-    userAgent:
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36",
-  });
+  const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
 
-  const page = await context.newPage();
+  console.log(`Loading Viewer: ${VIEWER_URL}`);
+  await page.goto(VIEWER_URL, { waitUntil: "domcontentloaded", timeout: 120_000 });
 
-  console.log("Loading Viewer:", URL);
+  // Give Blazor a chance to hydrate
+  await page.waitForTimeout(4000);
 
-  // IMPORTANT: do NOT use networkidle on Blazor Server pages
-  await page.goto(URL, { waitUntil: "domcontentloaded", timeout: 90000 });
+  // Try to wait for *any* table OR grid-like row container.
+  // If table never appears, we still save debug.
+  const tableAppeared = await page
+    .waitForSelector("table", { timeout: 45_000 })
+    .then(() => true)
+    .catch(() => false);
 
-  // Give Blazor time to connect/render
-  await page.waitForTimeout(3000);
-
-  // Wait for *something* indicating real render:
-  // - images from /files/
-  // - table rows
-  // - or /files/images/ appearing anywhere in HTML
-  const ok = await Promise.race([
-    page.waitForSelector("img[src*='/files/']", { timeout: 45000 }).then(() => true).catch(() => false),
-    page.waitForSelector("tr", { timeout: 45000 }).then(() => true).catch(() => false),
-    page.waitForFunction(
-      () => (document.documentElement?.innerHTML || "").includes("/files/images/"),
-      { timeout: 45000 }
-    ).then(() => true).catch(() => false),
-  ]);
-
-  // trigger lazy-loading by scrolling
-  await autoScroll(page, 14);
-
-  // try extraction in multiple ways
-  const items = await page.evaluate(() => {
-    const results = [];
-
-    // Prefer rows that contain an image from /files/
-    const rows = [...document.querySelectorAll("tr")];
-
-    for (const tr of rows) {
-      const img = tr.querySelector("img");
-      const src = img?.getAttribute("src") || img?.src || "";
-      const text = (tr.innerText || "").replace(/\s+/g, " ").trim();
-
-      if (!text) continue;
-
-      // Ignore obvious header row
-      if (text.toLowerCase().startsWith("name rarity element")) continue;
-
-      if (src.includes("/files/")) {
-        results.push({ text, image: src });
-        continue;
-      }
-
-      // Fallback: sometimes images are background-image or inside other tags
-      const anyFileLink = tr.querySelector("a[href*='/files/']")?.getAttribute("href") || "";
-      if (anyFileLink) {
-        results.push({ text, image: anyFileLink });
-      }
-    }
-
-    // If still empty, try grabbing any images on page + nearby text blocks
-    if (results.length === 0) {
-      const imgs = [...document.querySelectorAll("img")]
-        .map(i => i.getAttribute("src") || i.src || "")
-        .filter(s => s.includes("/files/"));
-      for (const src of imgs.slice(0, 4000)) {
-        results.push({ text: src.split("/").pop() || src, image: src });
-      }
-    }
-
-    return results;
-  });
-
-  if (!items.length) {
-    console.log("No DOM items extracted — saving debug artifacts…");
-    await saveDebug(page, "DOM extraction returned 0 items");
-    await browser.close();
-    throw new Error("No DOM items extracted");
+  // Scroll to force lazy rendering
+  for (let i = 0; i < 8; i++) {
+    await page.mouse.wheel(0, 1200);
+    await page.waitForTimeout(500);
   }
+  await page.waitForTimeout(1500);
 
-  // Write output
-  fs.writeFileSync(
-    OUT,
-    JSON.stringify(
-      {
-        generatedAt: new Date().toISOString(),
-        source: URL,
-        count: items.length,
-        items,
-      },
-      null,
-      2
-    ),
-    "utf8"
-  );
+  // Save debug always (helps you inspect on phone)
+  await page.content().then((html) => fs.writeFileSync(DEBUG_HTML, html, "utf8")).catch(() => {});
+  await page.screenshot({ path: DEBUG_PNG, fullPage: true }).catch(() => {});
 
-  console.log(`Wrote ${items.length} DOM items -> ${OUT}`);
+  const extracted = await page.evaluate(() => {
+    const norm = (s) => (s ?? "").toString().replace(/\s+/g, " ").trim();
+
+    // If there is a table, parse it.
+    const table = document.querySelector("table");
+    if (table) {
+      const headers = Array.from(table.querySelectorAll("thead th")).map((th) => norm(th.textContent));
+      const rows = [];
+
+      const trs = Array.from(table.querySelectorAll("tbody tr"));
+      for (const tr of trs) {
+        const tds = Array.from(tr.querySelectorAll("td"));
+        const cells = tds.map((td) => norm(td.textContent));
+
+        // image (if present in row)
+        const img = tr.querySelector("img");
+        const image = img?.getAttribute("src") || null;
+
+        rows.push({ cells, image });
+      }
+
+      return { mode: "table", headers, rows };
+    }
+
+    // Fallback: attempt grid cards (if site uses cards, not table)
+    const cards = Array.from(document.querySelectorAll("img"))
+      .map((img) => img.getAttribute("src"))
+      .filter((src) => src && src.includes("/files/images/"))
+      .slice(0, 5000);
+
+    return { mode: "images", headers: [], rows: cards.map((src) => ({ cells: [], image: src })) };
+  });
 
   await browser.close();
+
+  let items = [];
+  let headers = extracted.headers ?? [];
+
+  if (extracted.mode === "table") {
+    // Build objects by header names
+    const idx = (name) => headers.findIndex((h) => h.toLowerCase() === name.toLowerCase());
+
+    const iName = idx("Name");
+    const iElement = idx("Element");
+    const iCost = idx("Cost");
+    const iAtk = idx("ATK");
+    const iHp = idx("HP");
+    const iSpd = idx("SPD");
+    const iWeapon = idx("Weapon");
+    const iRarity = idx("Rarity");
+    const iType = idx("Type");
+
+    for (const r of extracted.rows) {
+      const cells = r.cells || [];
+      const name = norm(cells[iName] ?? "");
+      if (!name) continue;
+
+      // Skip the header row that sometimes gets scraped as data
+      if (name.toLowerCase().includes("name rarity element cost atk hp spd")) continue;
+
+      const element = norm(cells[iElement] ?? "") || null;
+      const cost = toNum(cells[iCost]);
+      const atk = toNum(cells[iAtk]);
+      const hp = toNum(cells[iHp]);
+      const spd = toNum(cells[iSpd]);
+
+      const typeCell = norm(cells[iType] ?? "");
+      let category = normCat(typeCell);
+      if (category === "unknown") category = pickCategoryFromRow({ image: r.image });
+
+      items.push({
+        id: name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""),
+        name,
+        category,
+        element,
+        cost,
+        atk,
+        hp,
+        spd,
+        rarity: norm(cells[iRarity] ?? "") || null,
+        weaponType: norm(cells[iWeapon] ?? "") || null,
+        image: r.image || null,
+        url: VIEWER_URL,
+      });
+    }
+  } else {
+    // image-only fallback (no stats)
+    for (const r of extracted.rows) {
+      const src = r.image;
+      if (!src) continue;
+      items.push({
+        id: src.toLowerCase().split("/").pop().replace(/[^a-z0-9]+/g, "-"),
+        name: src.split("/").pop(),
+        category: pickCategoryFromRow({ image: src }),
+        element: null,
+        cost: null,
+        atk: null,
+        hp: null,
+        spd: null,
+        image: src,
+        url: VIEWER_URL,
+      });
+    }
+  }
+
+  const payload = {
+    url: VIEWER_URL,
+    generatedAt: new Date().toISOString(),
+    mode: extracted.mode,
+    headers,
+    items,
+  };
+
+  fs.writeFileSync(OUT_FILE, JSON.stringify(payload, null, 2), "utf8");
+  console.log(`Wrote ${path.relative(process.cwd(), OUT_FILE)} items=${items.length} mode=${extracted.mode}`);
+
+  // Fail if we didn’t get any rows at all
+  if (!items.length) {
+    throw new Error("No DOM items extracted (0). Check data/_debug_viewer_rendered.html and screenshot.");
+  }
 }
 
-run().catch((err) => {
-  console.error(err);
+run().catch((e) => {
+  console.error("scrape_viewer_dom_items failed:", e.message);
   process.exit(1);
 });
