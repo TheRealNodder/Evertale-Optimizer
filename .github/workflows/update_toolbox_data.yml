@@ -1,9 +1,8 @@
-name: Update Toolbox Data (Explorer JSON)
+name: Update Toolbox Data (Explorer Capture)
 
 on:
   workflow_dispatch:
   schedule:
-    # 9:00 UTC daily
     - cron: "0 9 * * *"
 
 permissions:
@@ -16,7 +15,6 @@ concurrency:
 jobs:
   scrape:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -40,60 +38,67 @@ jobs:
       - name: Ensure data folder exists (repo root)
         run: mkdir -p data
 
-      - name: Scrape Explorer JSON (repo root)
+      # Don’t fail the whole job yet — we want artifacts even if no dataset found
+      - name: Scrape Explorer (HTTP + WS capture)
+        continue-on-error: true
         run: node scraper/scrape_explorer_capture_json.mjs
 
-      - name: Verify toolbox.items.json exists and is valid
-        run: |
-          test -s data/toolbox.items.json
-          node -e "JSON.parse(require('fs').readFileSync('data/toolbox.items.json','utf8')); console.log('toolbox.items.json OK')"
-
-      # Upload debug artifacts even if scraping fails
       - name: Upload debug artifacts (always)
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: explorer-debug
           path: |
-            data/explorer.captured.json
+            data/explorer.http.captures.json
+            data/explorer.ws.frames.json
             data/_debug_explorer_rendered.html
             data/_debug_explorer_screenshot.png
             data/toolbox.items.json
           if-no-files-found: ignore
           retention-days: 7
 
-      - name: Commit generated data
+      # If toolbox.items.json exists, validate it
+      - name: Verify toolbox.items.json (if present)
+        run: |
+          if [ -s data/toolbox.items.json ]; then
+            node -e "JSON.parse(require('fs').readFileSync('data/toolbox.items.json','utf8')); console.log('toolbox.items.json OK')"
+          else
+            echo "toolbox.items.json not created yet (see artifacts)."
+          fi
+
+      - name: Commit generated data (if present)
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Stage outputs + debug (debug is useful when things change)
-          git add data/toolbox.items.json \
-                  data/explorer.captured.json \
+          # Always commit captures (they are small and help debugging)
+          git add data/explorer.http.captures.json \
+                  data/explorer.ws.frames.json \
                   data/_debug_explorer_rendered.html \
                   data/_debug_explorer_screenshot.png || true
 
-          # Commit only if there are changes
-          git diff --cached --quiet || git commit -m "Update toolbox items (Explorer JSON)"
+          # Commit items if created
+          if [ -s data/toolbox.items.json ]; then
+            git add data/toolbox.items.json
+          fi
+
+          git diff --cached --quiet || git commit -m "Update toolbox capture (Explorer)"
 
       - name: Push changes (safe rebase)
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
         run: |
           set -e
-
           if [ -z "$GH_PAT" ]; then
             echo "GH_PAT secret is missing"
             exit 1
           fi
 
-          # Ensure a clean working tree before rebase
+          # Clean tree before rebase
           git reset --hard
 
           git remote set-url origin "https://x-access-token:${GH_PAT}@github.com/TheRealNodder/Evertale-Optimizer.git"
           git fetch origin main
 
-          # Rebase local commits (if any) on top of latest main
           git rebase origin/main || (git rebase --abort && exit 1)
-
           git push origin HEAD:main
