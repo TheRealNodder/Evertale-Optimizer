@@ -22,13 +22,19 @@ jobs:
       - name: Ensure data folder exists
         run: mkdir -p data
 
+      # --------------------------------------------------
+      # 1️⃣ Exit early if clean catalog already exists
+      # --------------------------------------------------
       - name: Skip if clean catalog already exists
         run: |
           if [ -s data/catalog.clean.json ]; then
-            echo "✅ catalog.clean.json already exists — skipping normalize"
+            echo "✅ catalog.clean.json already exists — normalize not needed"
             exit 0
           fi
 
+      # --------------------------------------------------
+      # 2️⃣ Detect mixed catalog safely
+      # --------------------------------------------------
       - name: Detect mixed catalog
         id: detect
         run: |
@@ -41,17 +47,26 @@ jobs:
             exit 1
           fi
 
+      # --------------------------------------------------
+      # 3️⃣ Normalize mixed → clean
+      # --------------------------------------------------
       - name: Normalize mixed catalog
         run: |
           node scraper/normalize_catalog_from_mixed.mjs \
             "${{ steps.detect.outputs.src }}" \
             "data/catalog.clean.json"
 
+      # --------------------------------------------------
+      # 4️⃣ Verify output
+      # --------------------------------------------------
       - name: Verify clean catalog
         run: |
           test -s data/catalog.clean.json
           node -e "JSON.parse(require('fs').readFileSync('data/catalog.clean.json','utf8')); console.log('clean catalog OK')"
 
+      # --------------------------------------------------
+      # 5️⃣ Commit + push
+      # --------------------------------------------------
       - name: Commit clean catalog
         run: |
           git config user.name "github-actions[bot]"
