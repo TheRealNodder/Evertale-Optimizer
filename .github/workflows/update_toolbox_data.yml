@@ -39,30 +39,45 @@ jobs:
       - name: Ensure data folder exists
         run: mkdir -p data
 
+      # Best effort capture (doesn't always produce a dataset)
       - name: Scrape Explorer (captures) - best effort
         run: node scraper/scrape_explorer_capture_json.mjs || true
 
-      - name: Build Clean Catalog
-        run: node scraper/build_clean_catalog.mjs
-
-      - name: Show data folder contents
+      # IMPORTANT: show what's actually created
+      - name: Show data folder contents (pre-clean)
         if: always()
         run: |
           echo "=== data/ ==="
           ls -la data || true
           echo "=== sizes ==="
-          wc -c data/*.json 2>/dev/null || true
+          wc -c data/* 2>/dev/null || true
+
+      # Build/clean catalog.json from whatever input exists
+      - name: Build Clean Catalog
+        run: node scraper/build_clean_catalog.mjs
 
       - name: Verify catalog exists
         run: test -s data/catalog.json
+
+      - name: Upload debug artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: toolbox-debug
+          path: |
+            data/*.json
+            data/*.html
+            data/*.png
+            data/*.txt
+          if-no-files-found: ignore
+          retention-days: 7
 
       - name: Commit generated data
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          git add data/catalog.json
-          git diff --cached --quiet || git commit -m "Update clean catalog"
+          git add data/catalog.json || true
+          git diff --cached --quiet || git commit -m "Update catalog"
 
       - name: Push changes
         env:
