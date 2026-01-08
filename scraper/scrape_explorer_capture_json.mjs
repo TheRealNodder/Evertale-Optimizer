@@ -1,14 +1,19 @@
 // scraper/scrape_explorer_capture_json.mjs
-// Robust approach: open /Explorer and capture ANY JSON responses.
-// Many Blazor apps fetch their datasets via normal HTTP (not WS), even if UI is Blazor.
-// We store the biggest JSON responses and try to identify items inside.
+// Explorer capture (HTTP + WS) for Blazor/SignalR apps.
+// Writes debug files even when we can't find a clean dataset yet.
 //
-// Outputs:
-//   data/explorer.captured.json (list of captured JSON responses metadata + small sample)
-//   data/toolbox.items.json     (best-effort normalized items if we find a big dataset)
-// Debug:
+// Outputs (always):
+//   data/explorer.http.captures.json
+//   data/explorer.ws.frames.json
 //   data/_debug_explorer_rendered.html
 //   data/_debug_explorer_screenshot.png
+//
+// Output (only if we find a dataset):
+//   data/toolbox.items.json
+//
+// Control:
+//   STRICT=1  -> exit 1 if no dataset found
+//   STRICT=0  -> exit 0 (default) so workflow can upload artifacts
 
 import fs from "fs/promises";
 import path from "path";
@@ -17,19 +22,11 @@ import { chromium } from "playwright";
 const BASE = "https://evertaletoolbox2.runasp.net";
 const EXPLORER_URL = `${BASE}/Explorer`;
 
-const OUT_CAPTURE = "data/explorer.captured.json";
+const OUT_HTTP = "data/explorer.http.captures.json";
+const OUT_WS = "data/explorer.ws.frames.json";
 const OUT_ITEMS = "data/toolbox.items.json";
 
-function norm(s) {
-  return (s ?? "").toString().replace(/\s+/g, " ").trim();
-}
-function toAbsUrl(u) {
-  if (!u) return null;
-  const s = String(u);
-  if (s.startsWith("http://") || s.startsWith("https://")) return s;
-  if (s.startsWith("/")) return BASE + s;
-  return s;
-}
+function nowIso() { return new Date().toISOString(); }
 
 async function ensureDataDir() {
   await fs.mkdir(path.resolve(process.cwd(), "data"), { recursive: true });
@@ -45,14 +42,26 @@ async function saveDebug(page) {
   } catch {}
 }
 
+function norm(s) {
+  return (s ?? "").toString().replace(/\s+/g, " ").trim();
+}
+
+function toAbsUrl(u) {
+  if (!u) return null;
+  const s = String(u);
+  if (s.startsWith("http://") || s.startsWith("https://")) return s;
+  if (s.startsWith("/")) return BASE + s;
+  return s;
+}
+
 function isProbablyItem(obj) {
   if (!obj || typeof obj !== "object") return false;
   const keys = Object.keys(obj).map(k => k.toLowerCase());
   const hasName = keys.includes("name") || keys.includes("title") || keys.includes("displayname");
-  const hasImage = keys.some(k => k.includes("image") || k.includes("icon") || k.includes("portrait"));
   const hasType = keys.includes("type") || keys.includes("category") || keys.includes("kind");
+  const hasImg = keys.some(k => k.includes("image") || k.includes("icon") || k.includes("portrait"));
   const hasStats = keys.includes("atk") || keys.includes("hp") || keys.includes("spd") || keys.includes("cost") || keys.includes("element");
-  return hasName && (hasType || hasImage || hasStats);
+  return hasName && (hasType || hasImg || hasStats);
 }
 
 function findBigArrays(x, minLen = 50) {
@@ -139,37 +148,87 @@ async function run() {
   const page = await context.newPage();
   page.setDefaultTimeout(120000);
 
-  const captures = [];
+  // --- Capture WS frames too (Explorer may still use SignalR)
+  const wsFrames = [];
+  page.on("websocket", (ws) => {
+    ws.on("framereceived", (evt) => {
+      const payload = evt.payload;
+      if (typeof payload === "string") {
+        wsFrames.push({ dir: "recv", ws: ws.url(), type: "text", len: payload.length, head: payload.slice(0, 1600) });
+      } else if (Buffer.isBuffer(payload)) {
+        wsFrames.push({ dir: "recv", ws: ws.url(), type: "binary", len: payload.length, base64: payload.toString("base64") });
+      }
+    });
+    ws.on("framesent", (evt) => {
+      const payload = evt.payload;
+      if (typeof payload === "string") {
+        wsFrames.push({ dir: "sent", ws: ws.url(), type: "text", len: payload.length, head: payload.slice(0, 1600) });
+      } else if (Buffer.isBuffer(payload)) {
+        wsFrames.push({ dir: "sent", ws: ws.url(), type: "binary", len: payload.length, base64: payload.toString("base64") });
+      }
+    });
+  });
+
+  // --- Capture HTTP responses (NOT only JSON)
+  const httpCaps = [];
+  const inMemoryBodies = []; // keep parsed bodies for picking best array
 
   page.on("response", async (resp) => {
     try {
       const url = resp.url();
-      const ct = (resp.headers()["content-type"] || "").toLowerCase();
-
-      if (!ct.includes("application/json")) return;
       if (!url.startsWith(BASE)) return;
 
-      const text = await resp.text();
-      const size = text.length;
+      const headers = resp.headers();
+      const ct = (headers["content-type"] || "").toLowerCase();
+      const status = resp.status();
 
-      // Avoid storing gigantic full bodies in capture file; keep sample
-      let parsed = null;
-      try { parsed = JSON.parse(text); } catch { return; }
+      // Only store “interesting” types (but broader than JSON)
+      const interesting =
+        ct.includes("application/json") ||
+        ct.includes("text/plain") ||
+        ct.includes("application/octet-stream") ||
+        ct.includes("application/x-msgpack") ||
+        ct.includes("application/msgpack");
 
-      captures.push({
+      if (!interesting) return;
+
+      const buf = await resp.body();
+      const size = buf?.length ?? 0;
+
+      // create a light preview
+      let previewText = null;
+      let parsedJson = null;
+
+      // Try UTF-8 decode; if it looks like JSON, parse it
+      try {
+        const txt = buf.toString("utf8");
+        previewText = txt.slice(0, 3000);
+
+        const t = txt.trim();
+        if ((t.startsWith("{") && t.endsWith("}")) || (t.startsWith("[") && t.endsWith("]"))) {
+          try { parsedJson = JSON.parse(t); } catch {}
+        }
+      } catch {}
+
+      // Store capture
+      httpCaps.push({
         url,
-        status: resp.status(),
+        status,
         contentType: ct,
         size,
-        // lightweight sample:
-        topKeys: parsed && typeof parsed === "object" && !Array.isArray(parsed) ? Object.keys(parsed).slice(0, 40) : null,
-        isArray: Array.isArray(parsed),
-        arrayLen: Array.isArray(parsed) ? parsed.length : null,
+        previewText,
+        isJsonParsed: !!parsedJson,
+        topKeys: parsedJson && typeof parsedJson === "object" && !Array.isArray(parsedJson)
+          ? Object.keys(parsedJson).slice(0, 50)
+          : null,
+        arrayLen: Array.isArray(parsedJson) ? parsedJson.length : null,
+        // store binary base64 only for medium-small (avoid giant artifacts)
+        base64: (!previewText && size > 0 && size <= 2_000_000) ? buf.toString("base64") : null,
       });
 
-      // Also stash parsed for later selection (in memory only)
-      captures[captures.length - 1]._parsed = parsed;
-
+      if (parsedJson) {
+        inMemoryBodies.push({ url, size, parsed: parsedJson });
+      }
     } catch {
       // ignore
     }
@@ -178,82 +237,103 @@ async function run() {
   console.log(`Fetching Explorer: ${EXPLORER_URL}`);
   await page.goto(EXPLORER_URL, { waitUntil: "domcontentloaded", timeout: 120000 });
 
-  // Let it load requests
-  await page.waitForTimeout(25000);
+  // Let scripts connect/load
+  await page.waitForTimeout(20000);
 
-  // Interact/scroll to trigger loads
-  for (let i = 0; i < 10; i++) {
-    await page.evaluate(() => window.scrollBy(0, 1800));
-    await page.waitForTimeout(800);
+  // Try basic interactions that often trigger data loads
+  // (safe: all wrapped in try/catch so it won't crash if selectors don't exist)
+  const tryClicks = [
+    /units?/i,
+    /characters?/i,
+    /weapons?/i,
+    /accessories?/i,
+    /enemies?/i,
+    /boss/i,
+    /monster/i,
+  ];
+
+  for (const re of tryClicks) {
+    try {
+      const loc = page.getByRole("button", { name: re });
+      if (await loc.count()) {
+        await loc.first().click({ timeout: 3000 });
+        await page.waitForTimeout(1500);
+      }
+    } catch {}
+    try {
+      const loc = page.getByRole("link", { name: re });
+      if (await loc.count()) {
+        await loc.first().click({ timeout: 3000 });
+        await page.waitForTimeout(1500);
+      }
+    } catch {}
   }
 
+  // Scroll to trigger lazy loads
+  for (let i = 0; i < 12; i++) {
+    await page.evaluate(() => window.scrollBy(0, 1800));
+    await page.waitForTimeout(900);
+  }
   await page.waitForTimeout(5000);
 
   await saveDebug(page);
   await browser.close();
 
-  // Write capture meta (without full parsed bodies)
-  const captureMeta = captures
-    .map(({ _parsed, ...rest }) => rest)
-    .sort((a, b) => (b.size - a.size));
+  // Sort & write HTTP captures (top by size)
+  httpCaps.sort((a, b) => (b.size - a.size));
 
-  await fs.writeFile(path.resolve(process.cwd(), OUT_CAPTURE), JSON.stringify({
-    scrapedAt: new Date().toISOString(),
-    count: captureMeta.length,
-    captures: captureMeta,
-  }, null, 2), "utf8");
+  await fs.writeFile(
+    path.resolve(process.cwd(), OUT_HTTP),
+    JSON.stringify({ scrapedAt: nowIso(), count: httpCaps.length, captures: httpCaps }, null, 2),
+    "utf8"
+  );
 
-  console.log(`Wrote capture list -> ${OUT_CAPTURE} (${captureMeta.length} json responses)`);
+  // Sort & write WS frames (top by len)
+  wsFrames.sort((a, b) => (b.len - a.len));
+  await fs.writeFile(
+    path.resolve(process.cwd(), OUT_WS),
+    JSON.stringify({ scrapedAt: nowIso(), count: wsFrames.length, frames: wsFrames.slice(0, 200) }, null, 2),
+    "utf8"
+  );
 
-  // Try to pick best dataset
+  console.log(`Wrote HTTP captures -> ${OUT_HTTP} (${httpCaps.length})`);
+  console.log(`Wrote WS frames     -> ${OUT_WS} (${wsFrames.length})`);
+
+  // Try to pick dataset from any parsed JSON bodies
   let best = null;
-
-  for (const c of captures) {
-    const parsed = c._parsed;
-    if (!parsed) continue;
-
-    // Find best big array inside this JSON
-    const arrays = findBigArrays(parsed, 50);
+  for (const b of inMemoryBodies) {
+    const arrays = findBigArrays(b.parsed, 50);
     if (!arrays.length) continue;
-
     const top = arrays[0];
-    // prefer higher "score" then length then response size
-    const candidate = {
-      url: c.url,
-      size: c.size,
-      path: top.path,
-      length: top.length,
-      score: top.score,
-      arr: top.arr,
-    };
-
+    const cand = { url: b.url, size: b.size, path: top.path, length: top.length, score: top.score, arr: top.arr };
     if (!best ||
-        candidate.score > best.score ||
-        (candidate.score === best.score && candidate.length > best.length) ||
-        (candidate.score === best.score && candidate.length === best.length && candidate.size > best.size)) {
-      best = candidate;
+        cand.score > best.score ||
+        (cand.score === best.score && cand.length > best.length) ||
+        (cand.score === best.score && cand.length === best.length && cand.size > best.size)) {
+      best = cand;
     }
   }
 
   if (!best) {
-    throw new Error(
-      `No usable JSON dataset found on Explorer. Open data/explorer.captured.json to see what endpoints returned JSON.`
-    );
+    const strict = process.env.STRICT === "1";
+    console.log("No usable JSON dataset found yet (likely data is coming via WS or binary).");
+    if (strict) throw new Error("No usable JSON dataset found on Explorer. See debug outputs.");
+    return;
   }
 
   const normalized = best.arr.map(normalizeItem).filter(Boolean);
-
   if (normalized.length < 20) {
-    throw new Error(
-      `Found a candidate array but normalized too small (${normalized.length}). Best was path=${best.path} len=${best.length} score=${best.score}.`
-    );
+    const strict = process.env.STRICT === "1";
+    console.log(`Candidate found but normalized too small (${normalized.length}).`);
+    if (strict) throw new Error("Found dataset but could not normalize enough items.");
+    return;
   }
 
   await fs.writeFile(
     path.resolve(process.cwd(), OUT_ITEMS),
     JSON.stringify({
       source: EXPLORER_URL,
-      scrapedAt: new Date().toISOString(),
+      scrapedAt: nowIso(),
       picked: { url: best.url, path: best.path, length: best.length, score: best.score, size: best.size },
       count: normalized.length,
       items: normalized,
