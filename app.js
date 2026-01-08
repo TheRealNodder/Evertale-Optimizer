@@ -1,190 +1,111 @@
-// app.js — Option A (clean): single stable file: ./data/catalog.json
-
+// app.js (module) — clean catalog loader + UI
 const DATA_URL = "./data/catalog.json";
 
-const $ = (s) => document.querySelector(s);
+const $ = (sel) => document.querySelector(sel);
 
 let state = {
-  items: [],
-  byId: new Map(),
-  team: Array(8).fill(null),
+  catalog: null,
+  flat: [],
 };
 
-// ---------- UI helpers ----------
 function showStatus(msg) {
   $("#status").classList.remove("hidden");
-  $("#statusText").textContent = msg;
+  $("#statusMsg").textContent = msg;
 }
 function hideStatus() {
   $("#status").classList.add("hidden");
 }
+function escapeHtml(s){return (s??"").toString().replace(/[&<>"']/g,(c)=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]))}
+function escapeAttr(s){return escapeHtml(s).replace(/"/g,"&quot;")}
 
-function safeNum(v) {
-  const n = Number(v);
-  return Number.isFinite(n) ? n : 0;
+async function fetchJson(url) {
+  const res = await fetch(url, { cache: "no-store" });
+  if (!res.ok) throw new Error(`${url} -> HTTP ${res.status}`);
+  return await res.json();
 }
 
-function esc(s = "") {
-  return s.toString().replace(/[&<>"']/g, c =>
-    ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c])
-  );
-}
+function flattenCatalog(cat) {
+  const blocks = [
+    ["character", cat.characters ?? []],
+    ["weapon", cat.weapons ?? []],
+    ["accessory", cat.accessories ?? []],
+    ["enemy", cat.enemies ?? []],
+    ["boss", cat.bosses ?? []],
+    ["unknown", cat.unknown ?? []],
+  ];
 
-function toAbs(u) {
-  if (!u) return null;
-  const s = String(u);
-  if (s.startsWith("http://") || s.startsWith("https://")) return s;
-  return s; // allow relative paths too
-}
-
-// ---------- Load ----------
-async function loadCatalog() {
-  const res = await fetch(DATA_URL, { cache: "no-store" });
-  if (!res.ok) {
-    throw new Error(`Missing catalog file: ${DATA_URL} (HTTP ${res.status})`);
+  const flat = [];
+  for (const [type, arr] of blocks) {
+    for (const it of arr) {
+      flat.push({
+        ...it,
+        category: it.category || type,
+      });
+    }
   }
-  const json = await res.json();
-  if (!json || !json.items || !Array.isArray(json.items)) {
-    throw new Error("catalog.json must have { items: [] }");
-  }
-
-  // Normalize & filter broken entries
-  const items = json.items
-    .map((x) => ({
-      id: String(x.id ?? ""),
-      name: String(x.name ?? ""),
-      category: String(x.category ?? "unknown").toLowerCase(),
-      element: x.element ?? null,
-      cost: x.cost ?? null,
-      atk: x.atk ?? null,
-      hp: x.hp ?? null,
-      spd: x.spd ?? null,
-      image: toAbs(x.image),
-      url: x.url ?? null,
-    }))
-    .filter((x) => x.id && x.name);
-
-  state.items = items;
-  state.byId = new Map(items.map(i => [i.id, i]));
+  return flat;
 }
 
-// ---------- Render catalog ----------
 function cardHtml(item) {
   const img = item.image
-    ? `<img src="${esc(item.image)}" alt="${esc(item.name)}" loading="lazy" />`
-    : `<div class="ph">${esc(item.name.slice(0, 1).toUpperCase())}</div>`;
+    ? `<img src="${escapeAttr(item.image)}" alt="${escapeHtml(item.name)}" loading="lazy" />`
+    : `<div class="ph">${escapeHtml(item.name.slice(0,1).toUpperCase())}</div>`;
+
+  const tags = [];
+  if (item.element) tags.push(`elem: ${item.element}`);
+  if (item.cost != null) tags.push(`cost: ${item.cost}`);
+  if (item.atk != null && item.atk !== 0) tags.push(`atk: ${item.atk}`);
+  if (item.hp != null && item.hp !== 0) tags.push(`hp: ${item.hp}`);
+  if (item.spd != null && item.spd !== 0) tags.push(`spd: ${item.spd}`);
 
   return `
-    <div class="card" draggable="${item.category === "character"}" data-id="${esc(item.id)}">
+    <div class="card" data-id="${escapeAttr(item.id)}">
       <div class="thumb">${img}</div>
-      <div>
-        <div class="name">${esc(item.name)}</div>
-        <div class="meta">${esc(item.category)}${item.element ? " • " + esc(item.element) : ""}</div>
+      <div class="meta">
+        <div class="name">${escapeHtml(item.name)}</div>
+        <div class="sub">${escapeHtml(item.category)}${item.element ? " • " + escapeHtml(item.element) : ""}</div>
+        <div class="tags">${tags.map(t=>`<span class="tag">${escapeHtml(t)}</span>`).join("")}</div>
       </div>
     </div>
   `;
 }
 
-function renderCatalog() {
-  const cat = $("#category").value;
-  const q = $("#search").value.trim().toLowerCase();
-
-  let list = state.items;
-
-  if (cat !== "all") list = list.filter(x => x.category === cat);
-  if (q) list = list.filter(x => x.name.toLowerCase().includes(q));
-
-  $("#catalog").innerHTML = list.map(cardHtml).join("");
+function renderCounts(flat) {
+  const count = (cat) => flat.filter(x => x.category === cat).length;
+  $("#countAll").textContent = flat.length;
+  $("#countChars").textContent = count("character");
+  $("#countWeapons").textContent = count("weapon");
+  $("#countEnemies").textContent = count("enemy") + count("boss");
 }
 
-// ---------- Team ----------
-function renderTeam() {
-  $("#team").innerHTML = state.team.map((id, idx) => {
-    const u = id ? state.byId.get(id) : null;
-    return `<div class="slot" data-slot="${idx}">${u ? esc(u.name) : "Drop character"}</div>`;
-  }).join("");
+function renderGrid() {
+  const cat = $("#categorySelect").value;
+  const q = $("#searchInput").value.trim().toLowerCase();
 
-  document.querySelectorAll(".slot").forEach(slot => {
-    slot.ondragover = (e) => e.preventDefault();
-    slot.ondrop = (e) => {
-      e.preventDefault();
-      const id = e.dataTransfer.getData("text/plain");
-      const unit = state.byId.get(id);
-      if (!unit || unit.category !== "character") return;
+  let items = state.flat;
 
-      const idx = Number(slot.dataset.slot);
-      state.team[idx] = id;
-      renderTeam();
-      renderSummary();
-    };
-  });
+  if (cat !== "all") items = items.filter(x => x.category === cat);
+  if (q) items = items.filter(x => (x.name || "").toLowerCase().includes(q));
+
+  $("#catalogGrid").innerHTML = items.map(cardHtml).join("");
 }
 
-function renderSummary() {
-  const units = state.team.map(id => state.byId.get(id)).filter(Boolean);
-
-  const sum = (k) => units.reduce((a, u) => a + safeNum(u[k]), 0);
-  const avg = (k) => units.length ? Math.round(sum(k) / units.length) : 0;
-
-  $("#sumCost").textContent = String(sum("cost"));
-  $("#sumAtk").textContent  = String(avg("atk"));
-  $("#sumHp").textContent   = String(avg("hp"));
-  $("#sumSpd").textContent  = String(avg("spd"));
-}
-
-// ---------- Optimizer ----------
-function score(u) {
-  // same weights as before (tweak later)
-  return (safeNum(u.atk) * 1) + (safeNum(u.hp) * 0.08) + (safeNum(u.spd) * 2) - (safeNum(u.cost) * 0.8);
-}
-
-function runOptimizer() {
-  const ranked = state.items
-    .filter(i => i.category === "character")
-    .map(u => ({ ...u, score: score(u) }))
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 20);
-
-  $("#optimizer").innerHTML = ranked.map((u, i) => `
-    <tr>
-      <td>${i + 1}</td>
-      <td>${esc(u.name)}</td>
-      <td>${safeNum(u.atk)}</td>
-      <td>${safeNum(u.hp)}</td>
-      <td>${safeNum(u.spd)}</td>
-      <td>${safeNum(u.cost)}</td>
-      <td>${Math.round(u.score)}</td>
-    </tr>
-  `).join("");
-}
-
-// Drag support
-document.addEventListener("dragstart", (e) => {
-  const card = e.target.closest(".card");
-  if (!card) return;
-  e.dataTransfer.setData("text/plain", card.dataset.id);
-});
-
-// ---------- Main ----------
 async function main() {
+  $("#categorySelect").addEventListener("change", renderGrid);
+  $("#searchInput").addEventListener("input", renderGrid);
+
   try {
     showStatus("Loading catalog…");
+    const catalog = await fetchJson(DATA_URL);
+    state.catalog = catalog;
+    state.flat = flattenCatalog(catalog);
 
-    await loadCatalog();
-
-    $("#category").addEventListener("change", renderCatalog);
-    $("#search").addEventListener("input", renderCatalog);
-    $("#optimize").addEventListener("click", runOptimizer);
-
-    renderCatalog();
-    renderTeam();
-    renderSummary();
-    runOptimizer();
-
+    renderCounts(state.flat);
+    renderGrid();
     hideStatus();
-  } catch (err) {
-    console.error(err);
-    showStatus(`ERROR: ${err.message}`);
+  } catch (e) {
+    console.error(e);
+    showStatus(`ERROR loading ${DATA_URL}: ${e.message}`);
   }
 }
 
