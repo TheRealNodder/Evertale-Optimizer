@@ -1,7 +1,7 @@
 // scraper/scrape_viewer_characters_playwright.mjs
-// Robust Blazor Server scraper for Viewer page in GitHub Actions.
+// Robust Blazor Viewer scraper (table OR MudBlazor grid/div layout).
 // Writes: data/characters.viewer.full.json
-// On failure, writes debug artifacts:
+// On failure writes:
 //   data/_debug_viewer_rendered.html
 //   data/_debug_viewer_screenshot.png
 
@@ -24,7 +24,6 @@ async function ensureDir(dir) {
 async function writeJson(filepath, obj) {
   await fs.writeFile(filepath, JSON.stringify(obj, null, 2), "utf8");
 }
-
 async function saveDebug(page) {
   const outDir = path.resolve(process.cwd(), "data");
   await ensureDir(outDir);
@@ -73,36 +72,25 @@ async function run() {
   console.log(`Fetching Viewer: ${VIEWER_URL}`);
   await page.goto(VIEWER_URL, { waitUntil: "domcontentloaded", timeout: 120000 });
 
-  // Give Blazor Server time to connect + render
+  // Blazor hydration time
   await page.waitForTimeout(8000);
 
-  // Wait for ANY of these "Viewer rendered" signals:
-  // - table with rows
-  // - a lot of <tr> anywhere
-  // - "Page X of Y" text
-  // - a lot of links/buttons (post-hydration)
-  // - large body text length (virtualized renders can still show big text)
-  const READY_TIMEOUT = 120000;
-
+  // Wait for “something rendered”
   try {
     await page.waitForFunction(() => {
-      const table = document.querySelector("table");
-      if (table && table.querySelectorAll("tbody tr").length >= 3) return true;
-
-      const trs = document.querySelectorAll("tr");
-      if (trs.length > 15) return true;
-
       const bodyText = document.body?.innerText || "";
+      const tables = document.querySelectorAll("table");
+      const trs = document.querySelectorAll("tr");
+      const mudRows =
+        document.querySelectorAll(".mud-table-row, .mud-virtualize, .mud-data-grid, [role='row']").length;
+
+      if (tables.length) return true;
+      if (trs.length > 10) return true;
+      if (mudRows > 10) return true;
       if (/page\s+\d+\s+of\s+\d+/i.test(bodyText)) return true;
-
-      const anchors = document.querySelectorAll("a");
-      const buttons = document.querySelectorAll("button");
-      if (anchors.length + buttons.length > 80) return true;
-
       if (bodyText.length > 4000) return true;
-
       return false;
-    }, { timeout: READY_TIMEOUT });
+    }, { timeout: 120000 });
   } catch (e) {
     console.log("Viewer did not render in time. Capturing debug artifacts...");
     await saveDebug(page);
@@ -110,34 +98,72 @@ async function run() {
     throw new Error(`Viewer hydration timeout: ${e?.message || e}`);
   }
 
-  // At this point, something rendered. Try to extract from a table if present.
-  async function extractTablePage() {
+  // Extract visible rows (table OR MudBlazor-like div rows)
+  async function extractVisibleRows() {
     return await page.evaluate(() => {
       const norm = (s) => (s ?? "").toString().replace(/\s+/g, " ").trim();
+
+      // 1) TABLE PATH
       const table = document.querySelector("table");
-      if (!table) return null;
+      if (table) {
+        const headers = Array.from(table.querySelectorAll("thead th, thead td"))
+          .map(x => norm(x.textContent).toLowerCase());
 
-      const headers = Array.from(table.querySelectorAll("thead th, thead td"))
-        .map(x => norm(x.textContent).toLowerCase());
+        const rows = Array.from(table.querySelectorAll("tbody tr"))
+          .map(tr => Array.from(tr.querySelectorAll("td, th")).map(td => norm(td.textContent)))
+          .filter(cells => cells.length > 0);
 
-      const rows = Array.from(table.querySelectorAll("tbody tr"))
-        .map(tr => Array.from(tr.querySelectorAll("td, th")).map(td => norm(td.textContent)))
-        .filter(cells => cells.length > 0);
+        return { mode: "table", headers, rows };
+      }
 
-      return { headers, rows };
+      // 2) MUDBLAZOR / GRID / DIV ROW PATHS
+      // Try common row/cell patterns.
+      const rowSelectors = [
+        ".mud-table-body .mud-table-row",
+        ".mud-table-row",
+        ".mud-data-grid-row",
+        "[role='row']",
+      ];
+
+      const cellSelectors = [
+        ".mud-table-cell",
+        ".mud-td",
+        "[role='cell']",
+        ".mud-data-grid-cell",
+      ];
+
+      let rowsEls = [];
+      for (const sel of rowSelectors) {
+        const found = Array.from(document.querySelectorAll(sel));
+        if (found.length > rowsEls.length) rowsEls = found;
+      }
+
+      // Filter out header-ish rows where possible
+      rowsEls = rowsEls.filter(r => !r.querySelector("th") && norm(r.textContent).length > 0);
+
+      const rows = rowsEls.map(r => {
+        // If row has clear cell nodes, use them; else fallback to splitting text
+        let cells = [];
+        for (const csel of cellSelectors) {
+          const cs = Array.from(r.querySelectorAll(csel)).map(c => norm(c.textContent)).filter(Boolean);
+          if (cs.length > cells.length) cells = cs;
+        }
+        if (!cells.length) {
+          // fallback: split row text on big spaces
+          const t = norm(r.textContent);
+          cells = t ? t.split("  ").map(x => norm(x)).filter(Boolean) : [];
+          // If split fails, return single cell
+          if (!cells.length && t) cells = [t];
+        }
+        return cells;
+      }).filter(cells => cells.length > 0);
+
+      // We may not have headers in grid mode
+      return { mode: "grid", headers: [], rows };
     });
   }
 
-  // If table isn’t present, fall back to dumping visible text into debug and fail clearly.
-  const firstPage = await extractTablePage();
-  if (!firstPage || !firstPage.rows || firstPage.rows.length === 0) {
-    console.log("No table rows found even though Viewer rendered. Saving debug artifacts...");
-    await saveDebug(page);
-    await browser.close();
-    throw new Error("Viewer rendered, but table rows were not found. Likely layout changed or needs different selectors.");
-  }
-
-  // Pagination helpers
+  // Click “Next” in many possible paging UIs
   async function clickNextIfPossible() {
     const candidates = [
       page.getByRole("button", { name: /next/i }),
@@ -147,6 +173,7 @@ async function run() {
       page.locator('a:has-text("Next")'),
       page.locator('a:has-text("»")'),
       page.locator('button:has-text(">")'),
+      page.locator('button:has-text("›")'),
     ];
 
     for (const loc of candidates) {
@@ -161,7 +188,7 @@ async function run() {
         await page.waitForTimeout(2500);
         return true;
       } catch {
-        // try next
+        // keep trying
       }
     }
     return false;
@@ -170,32 +197,30 @@ async function run() {
   const all = [];
   const seen = new Set();
 
-  const MAX_PAGES = 300;
+  const MAX_PAGES = 350;
 
   for (let p = 1; p <= MAX_PAGES; p++) {
-    const { headers, rows } = (await extractTablePage()) || { headers: [], rows: [] };
-    if (!rows.length) break;
+    const { rows } = await extractVisibleRows();
 
-    const headerIndex = (key) => (headers || []).findIndex(h => h.includes(key));
+    if (!rows || rows.length === 0) {
+      console.log(`No rows found on page ${p}. Stopping.`);
+      break;
+    }
 
-    const idxName = 0;
-    const idxCost = headerIndex("cost");
-    const idxAtk  = headerIndex("atk");
-    const idxHp   = headerIndex("hp");
-    const idxSpd  = headerIndex("spd");
-    const idxElem = headerIndex("element");
-
+    // We assume first cell is name; others are stats-ish.
+    // This is best-effort and will be refined once we see the debug HTML.
     for (const cells of rows) {
-      const name = normText(cells[idxName] ?? "");
+      const name = normText(cells[0] ?? "");
       if (!name) continue;
       if (seen.has(name)) continue;
       seen.add(name);
 
-      const cost = parseNumberish(idxCost >= 0 ? cells[idxCost] : cells[1]);
-      const atk  = parseNumberish(idxAtk  >= 0 ? cells[idxAtk]  : cells[2]);
-      const hp   = parseNumberish(idxHp   >= 0 ? cells[idxHp]   : cells[3]);
-      const spd  = parseNumberish(idxSpd  >= 0 ? cells[idxSpd]  : cells[4]);
-      const element = normText(idxElem >= 0 ? cells[idxElem] : (cells[5] ?? ""));
+      // Try to interpret common columns if present
+      const cost = parseNumberish(cells[1]);
+      const atk  = parseNumberish(cells[2]);
+      const hp   = parseNumberish(cells[3]);
+      const spd  = parseNumberish(cells[4]);
+      const element = normText(cells[5] ?? "");
 
       all.push({
         id: name,
@@ -205,7 +230,8 @@ async function run() {
         atk,
         hp,
         spd,
-        url: VIEWER_URL
+        url: VIEWER_URL,
+        _raw: cells, // keep raw row to debug mapping later
       });
     }
 
@@ -218,11 +244,15 @@ async function run() {
     }
   }
 
-  await browser.close();
-
+  // If we got almost nothing, save debug and fail
   if (all.length < 50) {
+    console.log("Extraction too small; saving debug artifacts...");
+    await saveDebug(page);
+    await browser.close();
     throw new Error(`Viewer extraction too small (${all.length}). Refusing to write output.`);
   }
+
+  await browser.close();
 
   const outPath = path.join(outDir, "characters.viewer.full.json");
   await writeJson(outPath, {
@@ -231,7 +261,7 @@ async function run() {
     characters: all,
   });
 
-  console.log(`Wrote ${all.length} characters -> ${outPath}`);
+  console.log(`Wrote ${all.length} items -> ${outPath}`);
 }
 
 run().catch((err) => {
