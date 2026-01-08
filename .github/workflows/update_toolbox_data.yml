@@ -38,10 +38,10 @@ jobs:
       - name: Ensure data folder exists (repo root)
         run: mkdir -p data
 
-      - name: Scrape Viewer (repo root)
+      - name: Scrape Viewer by type (repo root)
         run: node scraper/scrape_viewer_characters_playwright.mjs
 
-      # ALWAYS run, even if scraping fails, so we can grab debug html/png
+      # Always run (even if scraping fails) so you can download debug HTML/PNG
       - name: Upload debug artifacts (always)
         if: always()
         uses: actions/upload-artifact@v4
@@ -55,10 +55,10 @@ jobs:
 
       - name: Verify viewer JSON exists and is valid
         run: |
-          test -s data/characters.viewer.full.json
-          node -e "JSON.parse(require('fs').readFileSync('data/characters.viewer.full.json','utf8')); console.log('viewer JSON OK')"
+          test -s data/viewer.toolbox.full.json
+          node -e "JSON.parse(require('fs').readFileSync('data/viewer.toolbox.full.json','utf8')); console.log('viewer JSON OK')"
 
-      - name: Build Catalog from Viewer (repo root)
+      - name: Build Catalog from Viewer
         run: node scraper/build_catalog_from_viewer.mjs
 
       - name: Show outputs
@@ -70,16 +70,16 @@ jobs:
 
       - name: Verify outputs are not empty
         run: |
+          test -s data/viewer.toolbox.full.json
           test -s data/catalog.toolbox.json
-          test -s data/characters.viewer.full.json
 
       - name: Commit generated data
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          git add data/catalog.toolbox.json \
-                  data/characters.viewer.full.json || true
+          git add data/viewer.toolbox.full.json \
+                  data/catalog.toolbox.json || true
 
           git diff --cached --quiet || git commit -m "Update toolbox data"
 
@@ -92,6 +92,7 @@ jobs:
             echo "GH_PAT secret is missing"
             exit 1
           fi
+
           git remote set-url origin "https://x-access-token:${GH_PAT}@github.com/TheRealNodder/Evertale-Optimizer.git"
           git fetch origin main
           git rebase origin/main || (git rebase --abort && exit 1)
