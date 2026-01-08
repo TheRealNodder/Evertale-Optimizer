@@ -33,18 +33,31 @@ jobs:
       - name: Ensure data folder exists
         run: mkdir -p data
 
-      # --- Safety check ---
-      - name: Verify mixed catalog exists
+      # --- Detect mixed catalog source ---
+      - name: Detect mixed catalog file
+        id: detect
         run: |
-          if [ ! -s data/catalog.toolbox.json ]; then
-            echo "❌ Missing data/catalog.toolbox.json"
+          if [ -s data/catalog.toolbox.json ]; then
+            echo "src=data/catalog.toolbox.json" >> $GITHUB_OUTPUT
+          elif [ -s data/catalog.json ]; then
+            echo "src=data/catalog.json" >> $GITHUB_OUTPUT
+          else
+            echo "❌ No mixed catalog found"
+            ls -la data
             exit 1
           fi
-          node -e "JSON.parse(require('fs').readFileSync('data/catalog.toolbox.json','utf8')); console.log('mixed catalog JSON OK')"
+
+      - name: Verify mixed catalog JSON
+        run: |
+          echo "Using ${{ steps.detect.outputs.src }}"
+          node -e "JSON.parse(require('fs').readFileSync('${{ steps.detect.outputs.src }}','utf8')); console.log('mixed catalog JSON OK')"
 
       # --- Normalize ---
       - name: Normalize mixed catalog → clean catalog
-        run: node scraper/normalize_catalog_from_mixed.mjs
+        run: |
+          node scraper/normalize_catalog_from_mixed.mjs \
+            "${{ steps.detect.outputs.src }}" \
+            "data/catalog.toolbox.clean.json"
 
       # --- Verify output ---
       - name: Verify clean catalog exists
@@ -52,7 +65,7 @@ jobs:
           test -s data/catalog.toolbox.clean.json
           node -e "JSON.parse(require('fs').readFileSync('data/catalog.toolbox.clean.json','utf8')); console.log('clean catalog JSON OK')"
 
-      # --- Show results (phone-friendly) ---
+      # --- Show outputs (phone-friendly) ---
       - name: Show outputs
         run: |
           echo "=== data/ ==="
