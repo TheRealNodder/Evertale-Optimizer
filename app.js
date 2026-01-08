@@ -1,15 +1,14 @@
-// app.js (module) — full site logic: Catalog + Team + Optimizer (constraints)
+// app.js (module) — Catalog + Team + Optimizer (single-source, no viewer merge)
 
 const DATA = {
   catalog: "./data/catalog.toolbox.json",
-  characters: "./data/characters.viewer.full.json",
 };
 
 let state = {
-  items: [],        // combined catalog items (characters + others)
-  byId: new Map(),  // id -> item
-  teamMode: "story", // story | platoon
-  teamSlots: [],     // array of {label, id}
+  items: [],
+  byId: new Map(),
+  teamMode: "story",
+  teamSlots: [],
 };
 
 const $ = (sel) => document.querySelector(sel);
@@ -24,16 +23,22 @@ function hideStatus() {
 
 function normCat(x) {
   const v = (x || "").toString().toLowerCase().trim();
+
+  // Accept both singular and plural
   if (["character", "characters", "unit", "units"].includes(v)) return "character";
   if (["weapon", "weapons"].includes(v)) return "weapon";
   if (["enemy", "enemies", "monster", "monsters"].includes(v)) return "enemy";
   if (["boss", "bosses"].includes(v)) return "boss";
   if (["accessory", "accessories"].includes(v)) return "accessory";
+
   return v || "unknown";
 }
 
 function safeNum(v) {
-  const n = Number(v);
+  if (v == null) return 0;
+  // support "1,234"
+  const s = String(v).replace(/,/g, "");
+  const n = Number(s);
   return Number.isFinite(n) ? n : 0;
 }
 
@@ -43,96 +48,74 @@ async function fetchJson(url) {
   return await res.json();
 }
 
-// Basic normalizers for your scraped formats
-function getCatalogItems(catalogJson) {
-  if (Array.isArray(catalogJson)) return catalogJson;
-  if (Array.isArray(catalogJson.items)) return catalogJson.items;
-  if (catalogJson.catalog && Array.isArray(catalogJson.catalog.items)) return catalogJson.catalog.items;
-  if (catalogJson.catalog && Array.isArray(catalogJson.catalog.characters)) {
-    // if you ever switch to catalog split lists
-    return [
-      ...(catalogJson.catalog.characters ?? []),
-      ...(catalogJson.catalog.weapons ?? []),
-      ...(catalogJson.catalog.accessories ?? []),
-      ...(catalogJson.catalog.enemies ?? []),
-      ...(catalogJson.catalog.bosses ?? [])
-    ];
-  }
-  return [];
+function isHeaderItem(name) {
+  const n = (name || "").toLowerCase();
+  return (
+    n === "name" ||
+    n.includes("rarity element cost atk hp spd") ||
+    n.includes("leader skill active skills") ||
+    n.includes("passive skills")
+  );
 }
 
-function getViewerCharacters(charsJson) {
-  if (Array.isArray(charsJson)) return charsJson;
-  if (Array.isArray(charsJson.characters)) return charsJson.characters;
-  if (Array.isArray(charsJson.items)) return charsJson.items;
-  return [];
-}
+function normalizeCatalogItems(catalogJson) {
+  // supported shapes:
+  // { items: [...] } or { catalog: { items: [...] } } or array directly
+  const items =
+    Array.isArray(catalogJson) ? catalogJson
+    : Array.isArray(catalogJson.items) ? catalogJson.items
+    : catalogJson.catalog && Array.isArray(catalogJson.catalog.items) ? catalogJson.catalog.items
+    : [];
 
-// Merge: Catalog provides category + image; Viewer provides stats for characters
-function mergeData(catalogJson, charactersJson) {
-  const catalogItems = getCatalogItems(catalogJson);
-  const chars = getViewerCharacters(charactersJson);
+  const out = [];
 
-  const charById = new Map();
-  const charByName = new Map();
+  for (const it of items) {
+    const id = (it.id ?? it.key ?? it.name ?? "").toString().trim();
+    const name = (it.name ?? "").toString().trim();
+    if (!id || !name) continue;
+    if (isHeaderItem(name)) continue;
 
-  for (const c of chars) {
-    const id = (c.id ?? c.unitId ?? c.key ?? "").toString();
-    const name = (c.name ?? "").toString();
-    if (id) charById.set(id, c);
-    if (name) charByName.set(name.toLowerCase(), c);
-  }
-
-  const merged = catalogItems.map((it) => {
-    const id = (it.id ?? it.key ?? it.name ?? "").toString();
-    const name = (it.name ?? "").toString();
     const category = normCat(it.category ?? it.type);
 
-    const img = it.imageUrl || it.image || it.img || it.icon || null;
+    const image =
+      it.imageUrl || it.image || it.img || it.icon || it.iconUrl || null;
 
-    let stats = null;
-    if (category === "character") {
-      stats = charById.get(id) || charByName.get(name.toLowerCase()) || null;
-    }
-
-    // Viewer formats vary; support both {stats:{atk,hp,spd},cost} and flat {atk,hp,spd,cost}
-    const atk = safeNum(stats?.stats?.atk ?? stats?.atk ?? it.atk);
-    const hp  = safeNum(stats?.stats?.hp  ?? stats?.hp  ?? it.hp);
-    const spd = safeNum(stats?.stats?.spd ?? stats?.spd ?? it.spd);
-    const cost = safeNum(stats?.cost ?? it.cost);
-
-    const element = stats?.element ?? it.element ?? "";
-
-    return {
+    out.push({
       id,
       name,
       category,
-      element,
-      cost,
-      atk,
-      hp,
-      spd,
-      image: img || stats?.imageUrl || stats?.image || stats?.img || null,
-      url: it.url || stats?.url || null,
+      element: it.element ?? null,
+      cost: safeNum(it.cost),
+      atk: safeNum(it.atk),
+      hp: safeNum(it.hp),
+      spd: safeNum(it.spd),
+      weapon: it.weapon ?? null,
+      leaderSkill: it.leaderSkill ?? null,
+      activeSkills: it.activeSkills ?? null,
+      passiveSkills: it.passiveSkills ?? null,
+      image: image ? String(image) : null,
+      url: it.url ?? null,
       raw: it,
-      statsRaw: stats,
-    };
-  });
+    });
+  }
 
-  // Remove garbage
-  return merged.filter((x) => x.name && x.id);
+  return out;
 }
 
 function setCounts(items) {
   const byCat = (cat) => items.filter((x) => x.category === cat).length;
   $("#countAll").textContent = items.length;
   $("#countChars").textContent = byCat("character");
-  $("#countWeapons").textContent = byCat("weapon");
+  $("#countWeapons").textContent = byCat("weapon") + byCat("accessory");
   $("#countEnemies").textContent = byCat("enemy") + byCat("boss");
 }
 
-function escapeHtml(s){return (s??"").toString().replace(/[&<>"']/g,(c)=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]))}
-function escapeAttr(s){return escapeHtml(s).replace(/"/g,"&quot;")}
+function escapeHtml(s) {
+  return (s ?? "").toString().replace(/[&<>"']/g, (c) => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[c]));
+}
+function escapeAttr(s) { return escapeHtml(s).replace(/"/g,"&quot;"); }
 
 function cardHtml(item) {
   const img = item.image
@@ -167,12 +150,8 @@ function renderCatalog() {
 
   let filtered = state.items;
 
-  if (cat !== "all") {
-    filtered = filtered.filter((x) => x.category === cat);
-  }
-  if (q) {
-    filtered = filtered.filter((x) => x.name.toLowerCase().includes(q));
-  }
+  if (cat !== "all") filtered = filtered.filter((x) => x.category === cat);
+  if (q) filtered = filtered.filter((x) => x.name.toLowerCase().includes(q));
 
   $("#catalogGrid").innerHTML = filtered.map(cardHtml).join("");
 
@@ -193,10 +172,7 @@ function renderCatalog() {
 function buildSlots(count, labels) {
   const slots = [];
   for (let i = 0; i < count; i++) {
-    slots.push({
-      label: labels?.[i] ?? `Slot ${i + 1}`,
-      id: null,
-    });
+    slots.push({ label: labels?.[i] ?? `Slot ${i + 1}`, id: null });
   }
   return slots;
 }
@@ -228,7 +204,6 @@ function renderTeam() {
     `;
   }).join("");
 
-  // drop targets
   for (const slotEl of wrap.querySelectorAll(".slot")) {
     slotEl.addEventListener("dragover", (e) => e.preventDefault());
     slotEl.addEventListener("drop", (e) => {
@@ -244,7 +219,6 @@ function renderTeam() {
     });
   }
 
-  // remove buttons
   for (const btn of wrap.querySelectorAll("[data-remove]")) {
     btn.addEventListener("click", () => {
       const idx = Number(btn.dataset.remove);
@@ -270,7 +244,7 @@ function renderSummary() {
   $("#teamSpd").textContent = avg("spd").toString();
 }
 
-// ---------- Optimizer (constraints + preview) ----------
+// ---------- Optimizer ----------
 function getWeights() {
   return {
     wAtk: safeNum($("#wAtk")?.value ?? 1),
@@ -279,22 +253,9 @@ function getWeights() {
     wCost: safeNum($("#wCost")?.value ?? 0.8),
   };
 }
-
 function scoreUnit(u, W) {
   return (u.atk * W.wAtk) + (u.hp * W.wHp) + (u.spd * W.wSpd) - (u.cost * W.wCost);
 }
-
-function currentTeamIds() {
-  return state.teamSlots.map(s => s.id).filter(Boolean);
-}
-
-function currentTeamCost() {
-  return currentTeamIds()
-    .map(id => state.byId.get(id))
-    .filter(Boolean)
-    .reduce((a, u) => a + safeNum(u.cost), 0);
-}
-
 function optimizePreview() {
   const W = getWeights();
   const candidates = state.items
@@ -315,7 +276,13 @@ function optimizePreview() {
     </tr>
   `).join("");
 }
-
+function currentTeamIds() { return state.teamSlots.map(s => s.id).filter(Boolean); }
+function currentTeamCost() {
+  return currentTeamIds()
+    .map(id => state.byId.get(id))
+    .filter(Boolean)
+    .reduce((a, u) => a + safeNum(u.cost), 0);
+}
 function autofillTeam() {
   const W = getWeights();
   const maxCost = safeNum($("#maxCost")?.value ?? 999);
@@ -329,7 +296,6 @@ function autofillTeam() {
     if (fillMode === "replaceAll") locked.delete(i);
   }
 
-  // clear unlocked slots first if we are replacing all or filling empty only (we keep locked)
   for (let i = 0; i < state.teamSlots.length; i++) {
     if (!locked.has(i)) {
       if (fillMode === "replaceAll") state.teamSlots[i].id = null;
@@ -352,10 +318,7 @@ function autofillTeam() {
     for (const cand of ranked) {
       if (used.has(cand.id)) continue;
       const nextCost = cost + safeNum(cand.cost);
-      if (nextCost <= maxCost) {
-        pick = cand;
-        break;
-      }
+      if (nextCost <= maxCost) { pick = cand; break; }
     }
     if (!pick) break;
 
@@ -408,7 +371,6 @@ async function main() {
     optimizePreview();
   });
 
-  // Auto refresh preview when weights change
   ["#wAtk","#wHp","#wSpd","#wCost","#maxCost","#fillMode","#lockMode"].forEach(id => {
     const el = $(id);
     if (el) el.addEventListener("input", optimizePreview);
@@ -416,18 +378,15 @@ async function main() {
   });
 
   try {
-    showStatus("Loading catalog + character stats…");
+    showStatus("Loading catalog…");
 
-    const [catalogJson, charsJson] = await Promise.all([
-      fetchJson(DATA.catalog),
-      fetchJson(DATA.characters),
-    ]);
+    const catalogJson = await fetchJson(DATA.catalog);
+    const items = normalizeCatalogItems(catalogJson);
 
-    const merged = mergeData(catalogJson, charsJson);
-    state.items = merged;
-    state.byId = new Map(merged.map(x => [x.id, x]));
+    state.items = items;
+    state.byId = new Map(items.map(x => [x.id, x]));
 
-    setCounts(merged);
+    setCounts(items);
     initTeam("story");
     renderCatalog();
     optimizePreview();
