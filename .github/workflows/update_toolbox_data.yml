@@ -1,4 +1,4 @@
-name: Update Toolbox Data (Explorer Capture)
+name: Update Toolbox Data (Explorer + WS Extract)
 
 on:
   workflow_dispatch:
@@ -38,10 +38,13 @@ jobs:
       - name: Ensure data folder exists (repo root)
         run: mkdir -p data
 
-      # Don’t fail the whole job yet — we want artifacts even if no dataset found
-      - name: Scrape Explorer (HTTP + WS capture)
+      - name: Capture Explorer traffic (HTTP + WS)
         continue-on-error: true
         run: node scraper/scrape_explorer_capture_json.mjs
+
+      - name: Extract items from captured WS frames
+        continue-on-error: true
+        run: node scraper/extract_items_from_ws_frames.mjs
 
       - name: Upload debug artifacts (always)
         if: always()
@@ -53,11 +56,11 @@ jobs:
             data/explorer.ws.frames.json
             data/_debug_explorer_rendered.html
             data/_debug_explorer_screenshot.png
+            data/_debug_ws_decoded.json
             data/toolbox.items.json
           if-no-files-found: ignore
           retention-days: 7
 
-      # If toolbox.items.json exists, validate it
       - name: Verify toolbox.items.json (if present)
         run: |
           if [ -s data/toolbox.items.json ]; then
@@ -71,18 +74,19 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Always commit captures (they are small and help debugging)
+          # Always commit capture/debug so we can iterate
           git add data/explorer.http.captures.json \
                   data/explorer.ws.frames.json \
                   data/_debug_explorer_rendered.html \
-                  data/_debug_explorer_screenshot.png || true
+                  data/_debug_explorer_screenshot.png \
+                  data/_debug_ws_decoded.json || true
 
           # Commit items if created
           if [ -s data/toolbox.items.json ]; then
             git add data/toolbox.items.json
           fi
 
-          git diff --cached --quiet || git commit -m "Update toolbox capture (Explorer)"
+          git diff --cached --quiet || git commit -m "Update toolbox capture + items"
 
       - name: Push changes (safe rebase)
         env:
@@ -94,11 +98,9 @@ jobs:
             exit 1
           fi
 
-          # Clean tree before rebase
           git reset --hard
 
           git remote set-url origin "https://x-access-token:${GH_PAT}@github.com/TheRealNodder/Evertale-Optimizer.git"
           git fetch origin main
-
           git rebase origin/main || (git rebase --abort && exit 1)
           git push origin HEAD:main
