@@ -1,14 +1,13 @@
 // scraper/extract_items_from_ws_frames.mjs
-// Read WS frames captured by scrape_explorer_capture_json.mjs and attempt to extract
-// real datasets from SignalR MessagePack payloads.
+// Robust extractor for Blazor Server / SignalR WS captures.
+// Supports:
+//   - SignalR JSON protocol (text frames, 0x1e separated)
+//   - SignalR MessagePack protocol (binary frames, varint-length-prefixed)
+// Also searches invocation messages (arguments) for item-like arrays.
 //
-// Inputs:
-//   data/explorer.ws.frames.json
-//
-// Outputs:
-//   data/toolbox.items.json
-// Debug:
-//   data/_debug_ws_decoded.json
+// Input:  data/explorer.ws.frames.json
+// Output: data/toolbox.items.json
+// Debug:  data/_debug_ws_decoded.json, data/_debug_ws_messages.sample.json
 
 import fs from "fs/promises";
 import path from "path";
@@ -17,9 +16,12 @@ import { decode as msgpackDecode } from "@msgpack/msgpack";
 const IN_WS = "data/explorer.ws.frames.json";
 const OUT_ITEMS = "data/toolbox.items.json";
 const OUT_DEBUG = "data/_debug_ws_decoded.json";
+const OUT_SAMPLE = "data/_debug_ws_messages.sample.json";
 
 const BASE = "https://evertaletoolbox2.runasp.net";
 const SOURCE_URL = `${BASE}/Explorer`;
+
+const RS = String.fromCharCode(0x1e);
 
 function norm(s) {
   return (s ?? "").toString().replace(/\s+/g, " ").trim();
@@ -33,7 +35,10 @@ function toAbsUrl(u) {
   return s;
 }
 
-// SignalR MessagePack frames are length-prefixed with a VarInt length
+// ---------- SignalR helpers ----------
+
+// SignalR MessagePack frames are varint-length-prefixed chunks.
+// Each chunk is a message.
 function splitVarintLengthPrefixed(buffer) {
   const chunks = [];
   let offset = 0;
@@ -59,18 +64,46 @@ function splitVarintLengthPrefixed(buffer) {
   return chunks;
 }
 
-function isProbablyItem(obj) {
-  if (!obj || typeof obj !== "object") return false;
+// Text protocol messages are separated by 0x1e record separator.
+function splitTextMessages(text) {
+  const parts = text.split(RS).map(p => p.trim()).filter(Boolean);
+  return parts;
+}
+
+// Try JSON parse safely
+function tryJsonParse(s) {
+  try { return JSON.parse(s); } catch { return null; }
+}
+
+// ---------- Item detection + extraction ----------
+
+function looksItemish(obj) {
+  if (!obj || typeof obj !== "object" || Array.isArray(obj)) return false;
+
   const keys = Object.keys(obj).map(k => k.toLowerCase());
-  const hasName = keys.includes("name") || keys.includes("title") || keys.includes("displayname");
-  const hasType = keys.includes("type") || keys.includes("category") || keys.includes("kind");
-  const hasImg = keys.some(k => k.includes("image") || k.includes("icon") || k.includes("portrait"));
-  const hasStats = keys.includes("atk") || keys.includes("hp") || keys.includes("spd") || keys.includes("cost") || keys.includes("element");
+  const hasName =
+    keys.includes("name") || keys.includes("title") || keys.includes("displayname");
+  const hasType =
+    keys.includes("type") || keys.includes("category") || keys.includes("kind");
+  const hasImg =
+    keys.some(k => k.includes("image") || k.includes("icon") || k.includes("portrait"));
+  const hasStats =
+    keys.includes("atk") || keys.includes("hp") || keys.includes("spd") || keys.includes("cost") || keys.includes("element");
+
   return hasName && (hasType || hasImg || hasStats);
 }
 
-function findBigArrays(x, minLen = 50) {
-  const res = [];
+function scoreArray(arr) {
+  if (!Array.isArray(arr) || arr.length === 0) return 0;
+  const sample = arr.slice(0, Math.min(250, arr.length));
+  const good = sample.filter(looksItemish).length;
+  return good / sample.length;
+}
+
+// Search deep for arrays that contain item-like objects.
+// Lower minLen because some payloads are chunked.
+function findCandidateArrays(root, minLen = 10) {
+  const out = [];
   const seen = new Set();
 
   function walk(v, p) {
@@ -80,12 +113,15 @@ function findBigArrays(x, minLen = 50) {
 
     if (Array.isArray(v)) {
       if (v.length >= minLen) {
-        const sample = v.slice(0, 200);
-        const good = sample.filter(isProbablyItem).length;
-        const score = good / Math.max(1, sample.length);
-        res.push({ path: p, length: v.length, score, arr: v });
+        const s = scoreArray(v);
+        if (s >= 0.15) {
+          out.push({ path: p, length: v.length, score: s, arr: v });
+        }
       }
-      for (let i = 0; i < Math.min(20, v.length); i++) walk(v[i], `${p}[${i}]`);
+      // Walk a little inside
+      for (let i = 0; i < Math.min(15, v.length); i++) {
+        walk(v[i], `${p}[${i}]`);
+      }
       return;
     }
 
@@ -94,9 +130,9 @@ function findBigArrays(x, minLen = 50) {
     }
   }
 
-  walk(x, "");
-  res.sort((a, b) => (b.score - a.score) || (b.length - a.length));
-  return res;
+  walk(root, "");
+  out.sort((a, b) => (b.score - a.score) || (b.length - a.length));
+  return out;
 }
 
 function normalizeItem(obj) {
@@ -131,54 +167,129 @@ function normalizeItem(obj) {
   };
 }
 
+// SignalR Invocation messages often store actual payload in "arguments"
+function unwrapSignalRMessage(msg) {
+  // JSON protocol message examples contain:
+  // {type:1,target:"...",arguments:[...]}
+  // or {type:6} ping, etc.
+  if (!msg || typeof msg !== "object") return [msg];
+
+  const out = [msg];
+
+  if (Array.isArray(msg.arguments)) {
+    for (let i = 0; i < msg.arguments.length; i++) {
+      out.push(msg.arguments[i]);
+    }
+  }
+  return out;
+}
+
 async function run() {
-  const wsJson = JSON.parse(await fs.readFile(path.resolve(process.cwd(), IN_WS), "utf8"));
-  const frames = wsJson.frames || wsJson.wsFrames || wsJson.data || [];
+  const raw = JSON.parse(await fs.readFile(path.resolve(process.cwd(), IN_WS), "utf8"));
+  const frames = raw.frames || raw.wsFrames || raw.data || [];
   if (!Array.isArray(frames) || frames.length === 0) {
     throw new Error(`No frames found in ${IN_WS}`);
   }
 
-  const decoded = [];
-  let totalChunks = 0;
-  let decodedOk = 0;
+  const decodedMessages = [];
+  const debug = {
+    scrapedAt: new Date().toISOString(),
+    framesCount: frames.length,
+    counts: {
+      textFrames: 0,
+      binaryFrames: 0,
+      jsonMessages: 0,
+      msgpackMessages: 0,
+      msgpackDecodeFailures: 0,
+    },
+    bestCandidate: null,
+    notes: [],
+  };
 
+  // 1) Decode text frames (SignalR JSON protocol)
   for (const f of frames) {
-    if (f.type !== "binary" || !f.base64) continue;
-    const buf = Buffer.from(f.base64, "base64");
+    if (f.type !== "text" && f.opcode !== 1 && !f.text) continue;
 
+    debug.counts.textFrames++;
+    const text = f.text ?? f.data ?? f.payload ?? "";
+    if (!text) continue;
+
+    for (const part of splitTextMessages(String(text))) {
+      const obj = tryJsonParse(part);
+      if (obj) {
+        debug.counts.jsonMessages++;
+        decodedMessages.push(obj);
+      }
+    }
+  }
+
+  // 2) Decode binary frames (SignalR MessagePack protocol)
+  for (const f of frames) {
+    if (f.type !== "binary" && f.opcode !== 2 && !f.base64) continue;
+
+    debug.counts.binaryFrames++;
+    const b64 = f.base64 ?? f.dataBase64 ?? f.payloadBase64 ?? null;
+    if (!b64) continue;
+
+    const buf = Buffer.from(b64, "base64");
     const chunks = splitVarintLengthPrefixed(buf);
-    totalChunks += chunks.length;
 
     for (const c of chunks) {
+      // Try MessagePack decode
       try {
         const obj = msgpackDecode(c);
-        decodedOk++;
-        decoded.push(obj);
+        debug.counts.msgpackMessages++;
+        decodedMessages.push(obj);
+        continue;
+      } catch {
+        debug.counts.msgpackDecodeFailures++;
+      }
+
+      // Fallback: sometimes binary contains UTF-8 JSON protocol fragments
+      try {
+        const asText = c.toString("utf8");
+        for (const part of splitTextMessages(asText)) {
+          const obj = tryJsonParse(part);
+          if (obj) {
+            debug.counts.jsonMessages++;
+            decodedMessages.push(obj);
+          }
+        }
       } catch {
         // ignore
       }
     }
   }
 
-  // Try to find candidate arrays in decoded objects (often under Invocation.arguments)
+  // Save a sample of decoded messages for inspection
+  await fs.writeFile(
+    path.resolve(process.cwd(), OUT_SAMPLE),
+    JSON.stringify(decodedMessages.slice(0, 80), null, 2),
+    "utf8"
+  );
+
+  // Build a list of "search roots": messages + unwrapped arguments
+  const searchRoots = [];
+  for (const m of decodedMessages) {
+    for (const u of unwrapSignalRMessage(m)) searchRoots.push(u);
+  }
+
+  // Find best candidate array across all roots
   let best = null;
 
-  for (let i = 0; i < decoded.length; i++) {
-    const obj = decoded[i];
+  for (let i = 0; i < searchRoots.length; i++) {
+    const root = searchRoots[i];
+    const cands = findCandidateArrays(root, 10);
+    if (!cands.length) continue;
 
-    // Search whole object
-    const arrays = findBigArrays(obj, 50);
-    if (!arrays.length) continue;
-
-    const top = arrays[0];
+    const top = cands[0];
     const cand = {
       index: i,
       path: top.path,
       length: top.length,
       score: top.score,
+      // keep only for selection; don’t write to debug huge
       arr: top.arr,
-      // helpful for debugging:
-      topKeys: obj && typeof obj === "object" && !Array.isArray(obj) ? Object.keys(obj).slice(0, 30) : null,
     };
 
     if (!best ||
@@ -188,28 +299,28 @@ async function run() {
     }
   }
 
-  // Write debug no matter what
+  debug.bestCandidate = best
+    ? { index: best.index, path: best.path, length: best.length, score: best.score }
+    : null;
+
   await fs.writeFile(
     path.resolve(process.cwd(), OUT_DEBUG),
-    JSON.stringify({
-      scrapedAt: new Date().toISOString(),
-      framesCount: frames.length,
-      decodedObjects: decoded.length,
-      totalChunks,
-      decodedOk,
-      bestCandidate: best ? { index: best.index, path: best.path, length: best.length, score: best.score, topKeys: best.topKeys } : null,
-    }, null, 2),
+    JSON.stringify(debug, null, 2),
     "utf8"
   );
 
   if (!best) {
-    throw new Error(`No usable dataset array found in decoded WS payloads. Check ${OUT_DEBUG}.`);
+    throw new Error(
+      `No usable dataset array found in decoded WS payloads. Check ${OUT_DEBUG} and ${OUT_SAMPLE}.`
+    );
   }
 
   const normalized = best.arr.map(normalizeItem).filter(Boolean);
 
-  if (normalized.length < 20) {
-    throw new Error(`Found candidate array but normalized too small (${normalized.length}). Check ${OUT_DEBUG}.`);
+  if (normalized.length < 25) {
+    throw new Error(
+      `Found a candidate array but normalized too small (${normalized.length}). Check ${OUT_SAMPLE}.`
+    );
   }
 
   // Dedup by id
@@ -223,7 +334,7 @@ async function run() {
     JSON.stringify({
       source: SOURCE_URL,
       generatedAt: new Date().toISOString(),
-      picked: { decodedIndex: best.index, path: best.path, length: best.length, score: best.score },
+      picked: debug.bestCandidate,
       count: items.length,
       items,
     }, null, 2),
@@ -232,6 +343,7 @@ async function run() {
 
   console.log(`Wrote ${OUT_ITEMS} items=${items.length}`);
   console.log(`Debug: ${OUT_DEBUG}`);
+  console.log(`Sample: ${OUT_SAMPLE}`);
 }
 
 run().catch((err) => {
