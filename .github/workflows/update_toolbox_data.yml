@@ -1,8 +1,9 @@
-name: Update Toolbox Data (WS Extract -> Catalog)
+name: Update Toolbox Data (Explorer JSON)
 
 on:
   workflow_dispatch:
   schedule:
+    # 9:00 UTC daily
     - cron: "0 9 * * *"
 
 permissions:
@@ -15,35 +16,13 @@ concurrency:
 jobs:
   scrape:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           persist-credentials: false
           fetch-depth: 0
-
-      - name: Ensure clean working tree
-        run: |
-          git reset --hard
-          git clean -fd
-
-      - name: Set authenticated remote
-        env:
-          GH_PAT: ${{ secrets.GH_PAT }}
-        run: |
-          set -e
-          if [ -z "$GH_PAT" ]; then
-            echo "GH_PAT secret is missing"
-            exit 1
-          fi
-          git remote set-url origin "https://x-access-token:${GH_PAT}@github.com/TheRealNodder/Evertale-Optimizer.git"
-
-      - name: Pull latest main (rebase)
-        run: |
-          set -e
-          git fetch origin main
-          git checkout main
-          git pull --rebase origin main
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -61,67 +40,60 @@ jobs:
       - name: Ensure data folder exists (repo root)
         run: mkdir -p data
 
-      - name: Run WS extractor scraper
-        run: node scraper/scrape_viewer_characters_playwright.mjs
+      - name: Scrape Explorer JSON (repo root)
+        run: node scraper/scrape_explorer_capture_json.mjs
 
-      # Upload debug artifacts even if extraction fails
-      - name: Upload debug artifacts (always)
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: toolbox-debug
-          path: |
-            data/_debug_ws_largest_frames.json
-            data/_debug_viewer_rendered.html
-            data/_debug_viewer_screenshot.png
-          if-no-files-found: ignore
-          retention-days: 7
-
-      # HARD CHECK: toolbox.items.json must exist before building catalog
       - name: Verify toolbox.items.json exists and is valid
         run: |
           test -s data/toolbox.items.json
           node -e "JSON.parse(require('fs').readFileSync('data/toolbox.items.json','utf8')); console.log('toolbox.items.json OK')"
 
-      - name: Build catalog from toolbox.items.json
-        run: node scraper/build_catalog_from_items.mjs
-
-      - name: Upload generated outputs (always)
+      # Upload debug artifacts even if scraping fails
+      - name: Upload debug artifacts (always)
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: toolbox-data
+          name: explorer-debug
           path: |
+            data/explorer.captured.json
+            data/_debug_explorer_rendered.html
+            data/_debug_explorer_screenshot.png
             data/toolbox.items.json
-            data/catalog.toolbox.json
           if-no-files-found: ignore
           retention-days: 7
 
-      - name: Show outputs
-        run: |
-          echo "=== data/ ==="
-          ls -la data || true
-          echo "=== sizes ==="
-          wc -c data/*.json || true
-
-      - name: Commit generated files (if changed)
+      - name: Commit generated data
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
+          # Stage outputs + debug (debug is useful when things change)
           git add data/toolbox.items.json \
-                  data/catalog.toolbox.json \
-                  data/_debug_ws_largest_frames.json \
-                  data/_debug_viewer_rendered.html \
-                  data/_debug_viewer_screenshot.png || true
+                  data/explorer.captured.json \
+                  data/_debug_explorer_rendered.html \
+                  data/_debug_explorer_screenshot.png || true
 
-          if git diff --cached --quiet; then
-            echo "No changes to commit."
-          else
-            git commit -m "Update toolbox items + catalog"
-          fi
+          # Commit only if there are changes
+          git diff --cached --quiet || git commit -m "Update toolbox items (Explorer JSON)"
 
-      - name: Push changes
+      - name: Push changes (safe rebase)
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
         run: |
           set -e
+
+          if [ -z "$GH_PAT" ]; then
+            echo "GH_PAT secret is missing"
+            exit 1
+          fi
+
+          # Ensure a clean working tree before rebase
+          git reset --hard
+
+          git remote set-url origin "https://x-access-token:${GH_PAT}@github.com/TheRealNodder/Evertale-Optimizer.git"
+          git fetch origin main
+
+          # Rebase local commits (if any) on top of latest main
+          git rebase origin/main || (git rebase --abort && exit 1)
+
           git push origin HEAD:main
