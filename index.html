@@ -16,156 +16,60 @@
       </div>
     </div>
 
-    <nav class="tabs" id="tabs">
-      <button class="tab active" data-tab="catalog">Catalog</button>
-      <button class="tab" data-tab="team">Team Builder</button>
-      <button class="tab" data-tab="optimizer">Optimizer</button>
-    </nav>
+    <div class="controls">
+      <select id="category" class="control">
+        <option value="all">All</option>
+        <option value="character">Characters</option>
+        <option value="weapon">Weapons</option>
+        <option value="accessory">Accessories</option>
+        <option value="enemy">Enemies</option>
+        <option value="boss">Bosses</option>
+      </select>
+
+      <input id="search" class="control" type="search" placeholder="Search…" />
+      <button id="optimize" class="btn">Run Optimizer</button>
+    </div>
   </header>
 
-  <main class="container">
-    <section class="panel" id="status">
-      <div class="status">
+  <main class="layout">
+    <section class="panel">
+      <h2>Catalog</h2>
+      <div id="status" class="status hidden">
         <div class="spinner"></div>
-        <div>
-          <div class="statusTitle">Loading…</div>
-          <div class="statusMsg" id="statusMsg">Fetching data files from /data</div>
-        </div>
+        <div id="statusText">Loading…</div>
       </div>
+      <div id="catalog" class="grid"></div>
     </section>
 
-    <!-- CATALOG -->
-    <section class="panel" id="tab-catalog">
-      <div class="panelHeader">
-        <h2>Catalog</h2>
-        <div class="counts">
-          <div class="pill"><span id="countAll">0</span> items</div>
-          <div class="pill"><span id="countChars">0</span> characters</div>
-          <div class="pill"><span id="countWeapons">0</span> weapons</div>
-          <div class="pill"><span id="countEnemies">0</span> enemies</div>
+    <aside class="side">
+      <section class="panel">
+        <h2>Story Team (8 slots)</h2>
+        <p class="hint">Drag a character card from the catalog and drop it into a slot.</p>
+        <div id="team" class="team"></div>
+
+        <div class="summary">
+          <div class="sumrow"><span>Total Cost</span><b id="sumCost">0</b></div>
+          <div class="sumrow"><span>Avg ATK</span><b id="sumAtk">0</b></div>
+          <div class="sumrow"><span>Avg HP</span><b id="sumHp">0</b></div>
+          <div class="sumrow"><span>Avg SPD</span><b id="sumSpd">0</b></div>
         </div>
-      </div>
+      </section>
 
-      <div class="toolbar">
-        <label class="field">
-          <span>Category</span>
-          <select id="categorySelect">
-            <option value="all">All</option>
-            <option value="character">Characters</option>
-            <option value="weapon">Weapons</option>
-            <option value="enemy">Enemies</option>
-            <option value="boss">Bosses</option>
-            <option value="accessory">Accessories</option>
-          </select>
-        </label>
-
-        <label class="field grow">
-          <span>Search</span>
-          <input id="searchInput" placeholder="Type a name… (Rizette, Bahamut, etc)" />
-        </label>
-      </div>
-
-      <div class="grid" id="catalogGrid"></div>
-    </section>
-
-    <!-- TEAM BUILDER -->
-    <section class="panel hidden" id="tab-team">
-      <div class="panelHeader">
-        <h2>Team Builder</h2>
-        <div class="seg">
-          <button class="segBtn active" id="modeStory">Story Team (8)</button>
-          <button class="segBtn" id="modePlatoon">Platoon (5) × 20</button>
-          <button class="segBtn danger" id="clearTeam">Clear Team</button>
+      <section class="panel">
+        <h2>Optimizer Top 20</h2>
+        <div class="tableWrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th><th>Name</th><th>ATK</th><th>HP</th><th>SPD</th><th>Cost</th><th>Score</th>
+              </tr>
+            </thead>
+            <tbody id="optimizer"></tbody>
+          </table>
         </div>
-      </div>
-
-      <div class="hint">Tip: drag a character card from Catalog into a slot. Click ✕ to remove.</div>
-
-      <div class="teamWrap">
-        <div class="team" id="teamSlots"></div>
-
-        <aside class="summary">
-          <h3>Current Team Summary</h3>
-          <div class="kv"><span>Units</span><span id="teamCount">0</span></div>
-          <div class="kv"><span>Total Cost</span><span id="teamCost">0</span></div>
-          <div class="kv"><span>Avg ATK</span><span id="teamAtk">0</span></div>
-          <div class="kv"><span>Avg HP</span><span id="teamHp">0</span></div>
-          <div class="kv"><span>Avg SPD</span><span id="teamSpd">0</span></div>
-        </aside>
-      </div>
-    </section>
-
-    <!-- OPTIMIZER -->
-    <section class="panel hidden" id="tab-optimizer">
-      <div class="panelHeader">
-        <h2>Optimizer</h2>
-        <div style="display:flex; gap:10px; flex-wrap:wrap;">
-          <button class="btn" id="autoFill">Auto-fill current team</button>
-          <button class="btn primary" id="runOptimize">Optimize (preview)</button>
-        </div>
-      </div>
-
-      <div class="toolbar">
-        <label class="field">
-          <span>Max Team Cost</span>
-          <input type="number" id="maxCost" value="999" step="1" />
-        </label>
-
-        <label class="field">
-          <span>Fill behavior</span>
-          <select id="fillMode">
-            <option value="emptyOnly" selected>Fill empty slots only</option>
-            <option value="replaceAll">Replace all slots</option>
-          </select>
-        </label>
-
-        <label class="field">
-          <span>Locked slots</span>
-          <select id="lockMode">
-            <option value="keepPlaced" selected>Keep placed units</option>
-            <option value="none">No locks</option>
-          </select>
-        </label>
-
-        <label class="field">
-          <span>ATK weight</span>
-          <input type="number" id="wAtk" value="1.0" step="0.1"/>
-        </label>
-        <label class="field">
-          <span>HP weight</span>
-          <input type="number" id="wHp" value="0.08" step="0.01"/>
-        </label>
-        <label class="field">
-          <span>SPD weight</span>
-          <input type="number" id="wSpd" value="2.0" step="0.1"/>
-        </label>
-        <label class="field">
-          <span>Cost penalty</span>
-          <input type="number" id="wCost" value="0.8" step="0.1"/>
-        </label>
-      </div>
-
-      <div class="hint">
-        Score = atk*wAtk + hp*wHp + spd*wSpd − cost*wCost. Optimizer fills the current team mode (Story 8 or Platoon 5),
-        respects Max Cost, avoids duplicates, and can lock placed units.
-      </div>
-
-      <div class="tableWrap">
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Rank</th><th>Unit</th><th>ATK</th><th>HP</th><th>SPD</th><th>Cost</th><th>Score</th>
-            </tr>
-          </thead>
-          <tbody id="optResults"></tbody>
-        </table>
-      </div>
-    </section>
+      </section>
+    </aside>
   </main>
-
-  <footer class="footer">
-    Data source: Evertale Toolbox Viewer/Explorer (scraped into /data). Images shown when available.
-  </footer>
 
   <script type="module" src="./app.js"></script>
 </body>
