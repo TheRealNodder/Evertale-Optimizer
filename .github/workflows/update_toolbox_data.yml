@@ -1,4 +1,4 @@
-name: Update Toolbox Data (WS + HTTP Capture)
+name: Update Toolbox Data (Capture Logs)
 
 on:
   workflow_dispatch:
@@ -38,34 +38,29 @@ jobs:
       - name: Ensure data folder exists (repo root)
         run: mkdir -p data
 
-      - name: Scrape Viewer (WS + HTTP capture)
+      - name: Capture Viewer traffic (HTTP + WS)
         run: node scraper/scrape_viewer_characters_playwright.mjs
 
-      # Always upload debug HTML/PNG even if the job fails
-      - name: Upload debug artifacts (always)
+      # Always upload artifacts so you can inspect them even if something breaks
+      - name: Upload capture + debug artifacts (always)
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: viewer-debug
+          name: viewer-capture
           path: |
-            data/_debug_viewer_rendered.html
-            data/_debug_viewer_screenshot.png
             data/viewer.raw.responses.json
             data/viewer.raw.ws.json
+            data/_debug_viewer_rendered.html
+            data/_debug_viewer_screenshot.png
           if-no-files-found: ignore
           retention-days: 7
 
-      - name: Verify viewer outputs exist and are valid
+      - name: Verify capture outputs exist and are valid JSON
         run: |
           test -s data/viewer.raw.responses.json
           test -s data/viewer.raw.ws.json
           node -e "JSON.parse(require('fs').readFileSync('data/viewer.raw.responses.json','utf8')); console.log('http capture JSON OK')"
           node -e "JSON.parse(require('fs').readFileSync('data/viewer.raw.ws.json','utf8')); console.log('ws capture JSON OK')"
-
-      # Only run this once viewer.toolbox.full.json is a REAL dataset (not placeholder)
-      # Keep it commented for now so workflow doesn't fail here.
-      # - name: Build Catalog from Viewer
-      #   run: node scraper/build_catalog_from_viewer.mjs
 
       - name: Show outputs
         run: |
@@ -74,7 +69,7 @@ jobs:
           echo "=== sizes ==="
           wc -c data/*.json || true
 
-      - name: Commit captured data + debug
+      - name: Commit capture logs + debug files
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -84,7 +79,7 @@ jobs:
                   data/_debug_viewer_rendered.html \
                   data/_debug_viewer_screenshot.png || true
 
-          git diff --cached --quiet || git commit -m "Capture toolbox Viewer traffic"
+          git diff --cached --quiet || git commit -m "Capture Viewer traffic logs"
 
       - name: Push changes (rebase if needed)
         env:
