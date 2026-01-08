@@ -2,9 +2,15 @@ name: Update Toolbox Data
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: "0 9 * * *" # daily 09:00 UTC
 
 permissions:
   contents: write
+
+concurrency:
+  group: update-toolbox-data
+  cancel-in-progress: true
 
 jobs:
   scrape:
@@ -29,10 +35,9 @@ jobs:
         working-directory: scraper
         run: npx playwright install --with-deps chromium
 
-      - name: Ensure data folder exists
+      - name: Ensure data folder exists (repo root)
         run: |
           mkdir -p data
-          mkdir -p scraper/data
 
       - name: Run scrapers (repo root)
         run: |
@@ -45,10 +50,38 @@ jobs:
           ls -la data || true
           echo "=== scraper/data/ ==="
           ls -la scraper/data || true
-          echo "=== json files ==="
-          find . -maxdepth 3 -type f -name "*.json" -print
+          echo "=== preview file sizes ==="
+          wc -c data/*.json || true
 
-      - name: Commit & Push
+      # IMPORTANT: do not allow committing empty/placeholder files
+      - name: Verify outputs are not empty
+        run: |
+          test -s data/catalog.toolbox.json
+          test -s data/characters.viewer.full.json
+
+          # Extra safety: fail if either is suspiciously tiny (< 500 bytes)
+          BYTES1=$(wc -c < data/catalog.toolbox.json)
+          BYTES2=$(wc -c < data/characters.viewer.full.json)
+          echo "catalog.toolbox.json bytes=$BYTES1"
+          echo "characters.viewer.full.json bytes=$BYTES2"
+          if [ "$BYTES1" -lt 500 ]; then
+            echo "ERROR: catalog.toolbox.json is too small (likely empty/placeholder)."
+            exit 1
+          fi
+          if [ "$BYTES2" -lt 500 ]; then
+            echo "ERROR: characters.viewer.full.json is too small (likely empty/placeholder)."
+            exit 1
+          fi
+
+      - name: Commit generated data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add data/catalog.toolbox.json data/characters.viewer.full.json || true
+          git diff --cached --quiet || git commit -m "Update toolbox data"
+
+      - name: Push changes (rebase if needed)
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
         run: |
@@ -59,14 +92,9 @@ jobs:
             exit 1
           fi
 
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          # Commit ANY json created under data/ (and debug html if present)
-          git add data/*.json data/_debug*.html || true
-          git diff --cached --quiet || git commit -m "Update toolbox data"
-
           git remote set-url origin "https://x-access-token:${GH_PAT}@github.com/TheRealNodder/Evertale-Optimizer.git"
+
           git fetch origin main
           git rebase origin/main || (git rebase --abort && exit 1)
+
           git push origin HEAD:main
