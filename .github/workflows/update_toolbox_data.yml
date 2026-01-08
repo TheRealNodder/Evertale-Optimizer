@@ -17,6 +17,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # -------------------------
+      # Setup
+      # -------------------------
       - name: Checkout
         uses: actions/checkout@v4
         with:
@@ -39,25 +42,44 @@ jobs:
       - name: Ensure data folder exists
         run: mkdir -p data
 
-      # Best effort capture (doesn't always produce a dataset)
-      - name: Scrape Explorer (captures) - best effort
+      # -------------------------
+      # Scraping (best effort)
+      # -------------------------
+      - name: Scrape Explorer (captures only, non-blocking)
         run: node scraper/scrape_explorer_capture_json.mjs || true
 
-      # IMPORTANT: show what's actually created
-      - name: Show data folder contents (pre-clean)
+      - name: Scrape Viewer (captures only, non-blocking)
+        run: node scraper/scrape_viewer_characters_playwright.mjs || true
+
+      # -------------------------
+      # Safety: remove poisoned JSON
+      # -------------------------
+      - name: Remove invalid catalog.json if broken
+        run: |
+          if [ -f data/catalog.json ]; then
+            node -e "try{JSON.parse(require('fs').readFileSync('data/catalog.json','utf8'))}catch(e){process.exit(1)}" \
+              || (echo 'Removing invalid data/catalog.json' && rm -f data/catalog.json)
+          fi
+
+      # -------------------------
+      # Build CLEAN catalog
+      # -------------------------
+      - name: Build Clean Catalog
+        run: node scraper/build_clean_catalog.mjs
+
+      - name: Verify clean catalog exists
+        run: test -s data/catalog.clean.json
+
+      # -------------------------
+      # Debug visibility (phone-friendly)
+      # -------------------------
+      - name: Show data folder contents
         if: always()
         run: |
           echo "=== data/ ==="
           ls -la data || true
           echo "=== sizes ==="
-          wc -c data/* 2>/dev/null || true
-
-      # Build/clean catalog.json from whatever input exists
-      - name: Build Clean Catalog
-        run: node scraper/build_clean_catalog.mjs
-
-      - name: Verify catalog exists
-        run: test -s data/catalog.json
+          wc -c data/*.json 2>/dev/null || true
 
       - name: Upload debug artifacts
         if: always()
@@ -72,22 +94,28 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
+      # -------------------------
+      # Commit + Push (SAFE)
+      # -------------------------
       - name: Commit generated data
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/catalog.json || true
-          git diff --cached --quiet || git commit -m "Update catalog"
 
-      - name: Push changes
+          git add data/ || true
+          git diff --cached --quiet || git commit -m "Update toolbox data (clean catalog)"
+
+      - name: Push changes (safe rebase)
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
         run: |
           set -e
           if [ -z "$GH_PAT" ]; then
-            echo "GH_PAT secret is missing"
+            echo "GH_PAT secret missing"
             exit 1
           fi
+
           git remote set-url origin "https://x-access-token:${GH_PAT}@github.com/TheRealNodder/Evertale-Optimizer.git"
+          git fetch origin main
           git pull --rebase origin main
           git push origin HEAD:main
