@@ -39,23 +39,20 @@ jobs:
       - name: Ensure data folder exists
         run: mkdir -p data
 
-      # ✅ Capture Explorer (for images / references)
-      - name: Scrape Explorer (captures)
+      - name: Scrape Explorer (captures) - best effort
         run: node scraper/scrape_explorer_capture_json.mjs || true
 
-      # ✅ Build / normalize catalog (THIS produces catalog.json)
       - name: Build Clean Catalog
         run: node scraper/build_clean_catalog.mjs
 
-      # 🔍 Debug visibility (phone friendly)
       - name: Show data folder contents
+        if: always()
         run: |
           echo "=== data/ ==="
-          ls -la data
+          ls -la data || true
           echo "=== sizes ==="
-          wc -c data/*.json || true
+          wc -c data/*.json 2>/dev/null || true
 
-      # ❗ HARD REQUIREMENT: catalog.json must exist
       - name: Verify catalog exists
         run: test -s data/catalog.json
 
@@ -63,6 +60,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+
           git add data/catalog.json
           git diff --cached --quiet || git commit -m "Update clean catalog"
 
@@ -70,6 +68,11 @@ jobs:
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
         run: |
+          set -e
+          if [ -z "$GH_PAT" ]; then
+            echo "GH_PAT secret is missing"
+            exit 1
+          fi
           git remote set-url origin "https://x-access-token:${GH_PAT}@github.com/TheRealNodder/Evertale-Optimizer.git"
           git pull --rebase origin main
           git push origin HEAD:main
