@@ -1,4 +1,4 @@
-name: Update Toolbox Data
+name: Update Toolbox Data (Network Capture)
 
 on:
   workflow_dispatch:
@@ -38,10 +38,10 @@ jobs:
       - name: Ensure data folder exists (repo root)
         run: mkdir -p data
 
-      - name: Scrape Viewer by type (repo root)
+      - name: Scrape Viewer via network capture (repo root)
         run: node scraper/scrape_viewer_characters_playwright.mjs
 
-      # Always run (even if scraping fails) so you can download debug HTML/PNG
+      # Always upload debug HTML/PNG even if the job fails
       - name: Upload debug artifacts (always)
         if: always()
         uses: actions/upload-artifact@v4
@@ -53,10 +53,12 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
-      - name: Verify viewer JSON exists and is valid
+      - name: Verify viewer outputs exist and are valid
         run: |
+          test -s data/viewer.raw.network.json
           test -s data/viewer.toolbox.full.json
-          node -e "JSON.parse(require('fs').readFileSync('data/viewer.toolbox.full.json','utf8')); console.log('viewer JSON OK')"
+          node -e "JSON.parse(require('fs').readFileSync('data/viewer.raw.network.json','utf8')); console.log('network JSON OK')"
+          node -e "JSON.parse(require('fs').readFileSync('data/viewer.toolbox.full.json','utf8')); console.log('viewer dataset JSON OK')"
 
       - name: Build Catalog from Viewer
         run: node scraper/build_catalog_from_viewer.mjs
@@ -68,9 +70,8 @@ jobs:
           echo "=== sizes ==="
           wc -c data/*.json || true
 
-      - name: Verify outputs are not empty
+      - name: Verify catalog exists
         run: |
-          test -s data/viewer.toolbox.full.json
           test -s data/catalog.toolbox.json
 
       - name: Commit generated data
@@ -78,10 +79,11 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          git add data/viewer.toolbox.full.json \
+          git add data/viewer.raw.network.json \
+                  data/viewer.toolbox.full.json \
                   data/catalog.toolbox.json || true
 
-          git diff --cached --quiet || git commit -m "Update toolbox data"
+          git diff --cached --quiet || git commit -m "Update toolbox data (network capture)"
 
       - name: Push changes (rebase if needed)
         env:
