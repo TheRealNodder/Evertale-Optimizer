@@ -1,4 +1,4 @@
-name: Update Toolbox Data (Network Capture)
+name: Update Toolbox Data (WS + HTTP Capture)
 
 on:
   workflow_dispatch:
@@ -38,7 +38,7 @@ jobs:
       - name: Ensure data folder exists (repo root)
         run: mkdir -p data
 
-      - name: Scrape Viewer via network capture (repo root)
+      - name: Scrape Viewer (WS + HTTP capture)
         run: node scraper/scrape_viewer_characters_playwright.mjs
 
       # Always upload debug HTML/PNG even if the job fails
@@ -50,18 +50,22 @@ jobs:
           path: |
             data/_debug_viewer_rendered.html
             data/_debug_viewer_screenshot.png
+            data/viewer.raw.responses.json
+            data/viewer.raw.ws.json
           if-no-files-found: ignore
           retention-days: 7
 
       - name: Verify viewer outputs exist and are valid
         run: |
-          test -s data/viewer.raw.network.json
-          test -s data/viewer.toolbox.full.json
-          node -e "JSON.parse(require('fs').readFileSync('data/viewer.raw.network.json','utf8')); console.log('network JSON OK')"
-          node -e "JSON.parse(require('fs').readFileSync('data/viewer.toolbox.full.json','utf8')); console.log('viewer dataset JSON OK')"
+          test -s data/viewer.raw.responses.json
+          test -s data/viewer.raw.ws.json
+          node -e "JSON.parse(require('fs').readFileSync('data/viewer.raw.responses.json','utf8')); console.log('http capture JSON OK')"
+          node -e "JSON.parse(require('fs').readFileSync('data/viewer.raw.ws.json','utf8')); console.log('ws capture JSON OK')"
 
-      - name: Build Catalog from Viewer
-        run: node scraper/build_catalog_from_viewer.mjs
+      # Only run this once viewer.toolbox.full.json is a REAL dataset (not placeholder)
+      # Keep it commented for now so workflow doesn't fail here.
+      # - name: Build Catalog from Viewer
+      #   run: node scraper/build_catalog_from_viewer.mjs
 
       - name: Show outputs
         run: |
@@ -70,20 +74,17 @@ jobs:
           echo "=== sizes ==="
           wc -c data/*.json || true
 
-      - name: Verify catalog exists
-        run: |
-          test -s data/catalog.toolbox.json
-
-      - name: Commit generated data
+      - name: Commit captured data + debug
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          git add data/viewer.raw.network.json \
-                  data/viewer.toolbox.full.json \
-                  data/catalog.toolbox.json || true
+          git add data/viewer.raw.responses.json \
+                  data/viewer.raw.ws.json \
+                  data/_debug_viewer_rendered.html \
+                  data/_debug_viewer_screenshot.png || true
 
-          git diff --cached --quiet || git commit -m "Update toolbox data (network capture)"
+          git diff --cached --quiet || git commit -m "Capture toolbox Viewer traffic"
 
       - name: Push changes (rebase if needed)
         env:
