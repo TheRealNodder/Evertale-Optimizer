@@ -39,72 +39,37 @@ jobs:
       - name: Ensure data folder exists
         run: mkdir -p data
 
-      # --- CAPTURE (Explorer) ---
+      # ✅ Capture Explorer (for images / references)
       - name: Scrape Explorer (captures)
-        run: node scraper/scrape_explorer_capture_json.mjs
+        run: node scraper/scrape_explorer_capture_json.mjs || true
 
-      # --- BUILD CATALOG FROM ITEMS ---
-      - name: Build Catalog from Items
-        run: node scraper/build_catalog_from_items.mjs
+      # ✅ Build / normalize catalog (THIS produces catalog.json)
+      - name: Build Clean Catalog
+        run: node scraper/build_clean_catalog.mjs
 
-      # --- Ensure output is inside /data for GitHub Pages ---
-      - name: Ensure catalog is in data/
-        run: |
-          mkdir -p data
-          if [ -s catalog.toolbox.json ] && [ ! -s data/catalog.toolbox.json ]; then
-            mv catalog.toolbox.json data/catalog.toolbox.json
-          fi
-          test -s data/catalog.toolbox.json
-
-      # --- Debug / visibility ---
+      # 🔍 Debug visibility (phone friendly)
       - name: Show data folder contents
-        if: always()
         run: |
           echo "=== data/ ==="
-          ls -la data || true
+          ls -la data
           echo "=== sizes ==="
-          wc -c data/*.json 2>/dev/null || true
+          wc -c data/*.json || true
 
-      # Upload artifacts even on failure (phone-friendly)
-      - name: Upload debug artifacts
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: toolbox-debug
-          path: |
-            data/*.json
-            data/*.html
-            data/*.png
-            data/*.txt
-          if-no-files-found: ignore
-          retention-days: 7
+      # ❗ HARD REQUIREMENT: catalog.json must exist
+      - name: Verify catalog exists
+        run: test -s data/catalog.json
 
-      # --- Hard checks so workflow fails if files are missing ---
-      - name: Verify outputs exist
-        run: |
-          test -s data/catalog.toolbox.json
-          test -s data/toolbox.items.json
-
-      # --- Commit + push ---
       - name: Commit generated data
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/catalog.json
+          git diff --cached --quiet || git commit -m "Update clean catalog"
 
-          git add data/ || true
-          git diff --cached --quiet || git commit -m "Update toolbox data"
-
-      - name: Push changes (safe)
+      - name: Push changes
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
         run: |
-          set -e
-          if [ -z "$GH_PAT" ]; then
-            echo "GH_PAT secret is missing"
-            exit 1
-          fi
-
           git remote set-url origin "https://x-access-token:${GH_PAT}@github.com/TheRealNodder/Evertale-Optimizer.git"
-
           git pull --rebase origin main
           git push origin HEAD:main
