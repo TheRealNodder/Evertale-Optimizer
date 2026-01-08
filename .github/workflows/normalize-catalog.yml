@@ -1,0 +1,70 @@
+name: Normalize Catalog (clean site data)
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "data/catalog.toolbox.json"
+      - "scraper/normalize_catalog_from_mixed.mjs"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: normalize-catalog
+  cancel-in-progress: true
+
+jobs:
+  normalize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install deps (scraper)
+        working-directory: scraper
+        run: npm install
+
+      - name: Ensure data folder exists
+        run: mkdir -p data
+
+      - name: Build clean catalog.json from mixed toolbox file
+        run: node scraper/normalize_catalog_from_mixed.mjs
+
+      - name: Show outputs
+        run: |
+          ls -la data || true
+          wc -c data/*.json || true
+
+      - name: Verify clean catalog exists
+        run: test -s data/catalog.json
+
+      - name: Commit clean catalog
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add data/catalog.json
+          git diff --cached --quiet || git commit -m "Update clean catalog.json"
+
+      - name: Push changes
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: |
+          set -e
+          if [ -z "$GH_PAT" ]; then
+            echo "GH_PAT secret is missing"
+            exit 1
+          fi
+
+          git remote set-url origin "https://x-access-token:${GH_PAT}@github.com/TheRealNodder/Evertale-Optimizer.git"
+          git pull --rebase origin main
+          git push origin HEAD:main
