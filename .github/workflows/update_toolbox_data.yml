@@ -1,4 +1,4 @@
-name: Update Toolbox Data (WS)
+name: Update Toolbox Data (Toolbox-only)
 
 on:
   workflow_dispatch:
@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: update-toolbox-ws
+  group: update-toolbox-data
   cancel-in-progress: true
 
 jobs:
@@ -19,8 +19,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          persist-credentials: false
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -38,33 +38,42 @@ jobs:
       - name: Ensure data folder exists
         run: mkdir -p data
 
-      - name: Debug: list scraper files
+      # ----------------------------
+      # TOOLBOX-ONLY PIPELINE
+      # ----------------------------
+
+      # 1) Pull toolbox units/items (your repo already has this script)
+      - name: Scrape Toolbox Units (best effort)
+        run: node scraper/scrape_toolbox_units_full.mjs || true
+
+      # 2) If you have the WS scraper, run it too (but don't block build)
+      - name: Scrape Toolbox Items from WS (best effort)
         run: |
-          echo "=== scraper ==="
-          ls -la scraper || true
-          echo "=== data (before) ==="
-          ls -la data || true
+          if [ -f scraper/scrape_toolbox_items_from_ws.mjs ]; then
+            node scraper/scrape_toolbox_items_from_ws.mjs || true
+          else
+            echo "scraper/scrape_toolbox_items_from_ws.mjs not found (check filename)."
+            ls -la scraper | sed -n '1,120p'
+          fi
 
-      # 1) Capture WS frames / viewer traffic
-      - name: Capture WS frames from Viewer
-        run: node scraper/scrape_toolbox_items_from_ws.mjs
+      # 3) Normalize toolbox items (if it produces an items file)
+      - name: Normalize Toolbox Items (best effort)
+        run: |
+          if [ -f scraper/normalize_toolbox_items.mjs ]; then
+            node scraper/normalize_toolbox_items.mjs || true
+          fi
 
-      # 2) Extract items dataset from captured frames
-      - name: Extract items from WS frames
-        run: node scraper/extract_items_from_ws_frames.mjs
-
-      # 3) Normalize items into categorized clean catalog
-      - name: Normalize toolbox items
-        run: node scraper/normalize_toolbox_items.mjs
-
-      # 4) Build final clean catalog file the website should load
-      - name: Build clean catalog
+      # 4) Build a clean catalog from whatever inputs exist
+      - name: Build Clean Catalog
         run: node scraper/build_clean_catalog.mjs
 
-      - name: Show outputs
+      # ----------------------------
+      # Debug / visibility (always)
+      # ----------------------------
+      - name: Show data folder contents
         if: always()
         run: |
-          echo "=== data (after) ==="
+          echo "=== data/ ==="
           ls -la data || true
           echo "=== sizes ==="
           wc -c data/*.json 2>/dev/null || true
@@ -73,7 +82,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: toolbox-ws-debug
+          name: toolbox-debug
           path: |
             data/*.json
             data/*.html
@@ -82,14 +91,26 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
+      # ----------------------------
+      # Hard checks (fail if missing)
+      # ----------------------------
+      - name: Verify clean catalog exists
+        run: |
+          test -s data/catalog.clean.json
+          node -e "JSON.parse(require('fs').readFileSync('data/catalog.clean.json','utf8')); console.log('catalog.clean.json OK')"
+
+      # ----------------------------
+      # Commit + push (safe)
+      # ----------------------------
       - name: Commit generated data
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/ || true
-          git diff --cached --quiet || git commit -m "Update toolbox data (WS)"
 
-      - name: Push changes (safe)
+          git add data/ || true
+          git diff --cached --quiet || git commit -m "Update toolbox data (toolbox-only)"
+
+      - name: Push changes (safe, rebase w/ autostash)
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
         run: |
@@ -98,7 +119,11 @@ jobs:
             echo "GH_PAT secret is missing"
             exit 1
           fi
-          git remote set-url origin "https://x-access-token:${GH_PAT}@github.com/TheRealNodder/Evertale-Optimizer.git"
+
+          git remote set-url origin "https://x-access-token:${GH_PAT}@github.com/${{ github.repository }}.git"
           git fetch origin main
-          git pull --rebase origin main
+
+          # This avoids: "cannot rebase: You have unstaged changes."
+          git pull --rebase --autostash origin main
+
           git push origin HEAD:main
