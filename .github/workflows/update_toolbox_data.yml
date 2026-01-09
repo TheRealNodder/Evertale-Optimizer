@@ -1,26 +1,14 @@
-name: Update Toolbox Data (WS) + Debug
+name: SMOKE TEST
 
 on:
   workflow_dispatch:
 
-permissions:
-  contents: write
-
 jobs:
-  scrape:
+  test:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          persist-credentials: false
-          fetch-depth: 0
-
-      - name: Debug: show workflow + scraper files
+      - name: Hello
         run: |
-          echo "=== .github/workflows ==="
-          ls -la .github/workflows || true
-          echo "=== scraper dir ==="
-          ls -la scraper || true
-          echo "=== find .mjs ==="
-          find scraper -maxdepth 4 -type f -name "*.mjs" -print || true
+          echo "Workflow is running"
+          pwd
+          ls -la
