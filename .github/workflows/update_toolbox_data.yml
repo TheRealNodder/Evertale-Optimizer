@@ -37,7 +37,7 @@ jobs:
           ls -la scraper || true
           echo "=== find .mjs in scraper (maxdepth 4) ==="
           find scraper -maxdepth 4 -type f -name "*.mjs" -print || true
-          echo "=== find package.json ==="
+          echo "=== find package.json (maxdepth 4) ==="
           find . -maxdepth 4 -type f -name "package.json" -print || true
 
       - name: Install deps (scraper)
@@ -57,14 +57,9 @@ jobs:
           echo "=== data/ (before) ==="
           ls -la data || true
 
-      # ---- IMPORTANT ----
-      # This will still fail until the file exists in your repo at:
-      #   scraper/scrape_toolbox_items_from_ws.mjs
-      # The debug steps above will show you what files exist and where.
       - name: Scrape Toolbox items from WS
         run: node scraper/scrape_toolbox_items_from_ws.mjs
 
-      # If you haven’t created this yet, either create it or comment this step out for now
       - name: Normalize into catalog.clean.json
         run: node scraper/normalize_toolbox_items.mjs
 
