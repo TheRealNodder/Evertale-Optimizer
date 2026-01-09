@@ -3,7 +3,7 @@ name: Update Toolbox Data (Toolbox-only)
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 9 * * *" # daily 9:00 UTC
+    - cron: "0 9 * * *"
 
 permissions:
   contents: write
@@ -15,8 +15,6 @@ concurrency:
 jobs:
   scrape:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -33,8 +31,6 @@ jobs:
         working-directory: scraper
         run: npm install
 
-      # Only needed if scrape_toolbox_units_full.mjs uses Playwright.
-      # Keeping it because your repo already used Playwright in other scripts.
       - name: Install Playwright Chromium
         working-directory: scraper
         run: npx playwright install --with-deps chromium
@@ -42,96 +38,65 @@ jobs:
       - name: Ensure data folder exists
         run: mkdir -p data
 
-      - name: Preflight - show scraper files
+      - name: Show scraper folder (debug)
         run: |
-          echo "=== scraper/ listing ==="
+          echo "=== scraper/ ==="
           ls -la scraper || true
-          echo "=== NOTE: if you see scrape_toolbox_items_from_ws.mj (missing 's'), that's a typo file name ==="
-          ls -la scraper/scrape_toolbox_items_from_ws.mj 2>/dev/null || true
-          ls -la scraper/scrape_toolbox_items_from_ws.mjs 2>/dev/null || true
+          echo "=== scraper/*.mjs ==="
+          find scraper -maxdepth 2 -type f -name "*.mjs" -print || true
 
-      # ---------------------------
-      # TOOLBOX-ONLY SCRAPE
-      # ---------------------------
-      - name: Scrape Toolbox units (primary)
+      # --- TOOLBOX scrape (this is the one that currently crashes due to cheerio import) ---
+      - name: Scrape Toolbox Units (full)
         run: node scraper/scrape_toolbox_units_full.mjs
 
-      # If your scraper emits toolbox.items.json, normalize it (optional but recommended)
-      - name: Normalize Toolbox items (if present)
-        run: |
-          if [ -s data/toolbox.items.json ]; then
-            node scraper/normalize_toolbox_items.mjs
-          else
-            echo "No data/toolbox.items.json produced (skipping normalize_toolbox_items.mjs)"
-          fi
+      # --- Normalize (optional but recommended if your script writes normalized output) ---
+      - name: Normalize Toolbox Items
+        run: node scraper/normalize_toolbox_items.mjs
 
-      # Build/refresh catalog.toolbox.json from toolbox items if present
-      - name: Build catalog.toolbox.json (from toolbox items, if present)
-        run: |
-          if [ -s data/toolbox.items.json ]; then
-            node scraper/build_catalog_from_items.mjs
-          else
-            echo "No toolbox.items.json -> skipping build_catalog_from_items.mjs"
-          fi
-
-      # Build clean catalog from whatever sources exist in /data
-      - name: Build clean catalog (catalog.clean.json)
+      # --- Build clean catalog (your repo has build_clean_catalog.mjs) ---
+      - name: Build Clean Catalog
         run: node scraper/build_clean_catalog.mjs
 
-      # ---------------------------
-      # DEBUG / INSPECTION
-      # ---------------------------
-      - name: Show data folder contents + sizes
+      - name: Show outputs
         if: always()
         run: |
           echo "=== data/ ==="
           ls -la data || true
           echo "=== sizes ==="
           wc -c data/* 2>/dev/null || true
-          echo "=== quick JSON validity checks (best effort) ==="
-          for f in data/*.json; do
-            echo "--- $f ---"
-            node -e "JSON.parse(require('fs').readFileSync('$f','utf8')); console.log('OK')" || echo "INVALID JSON: $f"
+          echo "=== head of catalog files (if present) ==="
+          for f in data/catalog.clean.json data/catalog.toolbox.json data/toolbox.items.json; do
+            if [ -s "$f" ]; then
+              echo "--- $f ---"
+              head -c 400 "$f" || true
+              echo
+            fi
           done
 
-      - name: Upload debug artifacts
+      - name: Upload debug artifacts (always)
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: toolbox-debug
           path: |
-            data/**
-            scraper/**
+            data/*
           if-no-files-found: ignore
           retention-days: 7
 
-      # ---------------------------
-      # HARD VERIFY (FAIL IF MISSING)
-      # ---------------------------
-      - name: Verify required outputs exist
+      # --- Fail hard if the clean catalog didn't get produced ---
+      - name: Verify clean catalog exists
         run: |
           test -s data/catalog.clean.json
-          # optional but expected:
-          test -s data/catalog.toolbox.json || echo "WARN: data/catalog.toolbox.json missing"
 
-      # ---------------------------
-      # COMMIT + PUSH
-      # ---------------------------
       - name: Commit generated data
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Only commit stable outputs; keep debug files out of git.
-          # If you want to commit debug files, remove the path filtering below.
-          git add data/catalog.clean.json || true
-          git add data/catalog.toolbox.json || true
-          git add data/toolbox.items.json || true
-          git add data/toolbox.items.normalized.json || true
+          git add data/ || true
+          git diff --cached --quiet || git commit -m "Update toolbox data (toolbox-only)"
 
-          git diff --cached --quiet || git commit -m "Update toolbox data"
-
-      - name: Push changes
+      - name: Push changes (safe)
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
         run: |
@@ -143,5 +108,7 @@ jobs:
 
           git remote set-url origin "https://x-access-token:${GH_PAT}@github.com/TheRealNodder/Evertale-Optimizer.git"
           git fetch origin main
-          git pull --rebase origin main
+
+          # autostash prevents: "cannot rebase: You have unstaged changes."
+          git pull --rebase --autostash origin main
           git push origin HEAD:main
