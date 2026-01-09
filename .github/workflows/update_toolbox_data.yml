@@ -3,7 +3,7 @@ name: Update Toolbox Data (Toolbox-only)
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 9 * * *"
+    - cron: "0 9 * * *" # daily 9:00 UTC
 
 permissions:
   contents: write
@@ -15,12 +15,14 @@ concurrency:
 jobs:
   scrape:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
           persist-credentials: false
+          fetch-depth: 0
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -31,6 +33,8 @@ jobs:
         working-directory: scraper
         run: npm install
 
+      # Only needed if scrape_toolbox_units_full.mjs uses Playwright.
+      # Keeping it because your repo already used Playwright in other scripts.
       - name: Install Playwright Chromium
         working-directory: scraper
         run: npx playwright install --with-deps chromium
@@ -38,45 +42,57 @@ jobs:
       - name: Ensure data folder exists
         run: mkdir -p data
 
-      # ----------------------------
-      # TOOLBOX-ONLY PIPELINE
-      # ----------------------------
-
-      # 1) Pull toolbox units/items (your repo already has this script)
-      - name: Scrape Toolbox Units (best effort)
-        run: node scraper/scrape_toolbox_units_full.mjs || true
-
-      # 2) If you have the WS scraper, run it too (but don't block build)
-      - name: Scrape Toolbox Items from WS (best effort)
+      - name: Preflight - show scraper files
         run: |
-          if [ -f scraper/scrape_toolbox_items_from_ws.mjs ]; then
-            node scraper/scrape_toolbox_items_from_ws.mjs || true
+          echo "=== scraper/ listing ==="
+          ls -la scraper || true
+          echo "=== NOTE: if you see scrape_toolbox_items_from_ws.mj (missing 's'), that's a typo file name ==="
+          ls -la scraper/scrape_toolbox_items_from_ws.mj 2>/dev/null || true
+          ls -la scraper/scrape_toolbox_items_from_ws.mjs 2>/dev/null || true
+
+      # ---------------------------
+      # TOOLBOX-ONLY SCRAPE
+      # ---------------------------
+      - name: Scrape Toolbox units (primary)
+        run: node scraper/scrape_toolbox_units_full.mjs
+
+      # If your scraper emits toolbox.items.json, normalize it (optional but recommended)
+      - name: Normalize Toolbox items (if present)
+        run: |
+          if [ -s data/toolbox.items.json ]; then
+            node scraper/normalize_toolbox_items.mjs
           else
-            echo "scraper/scrape_toolbox_items_from_ws.mjs not found (check filename)."
-            ls -la scraper | sed -n '1,120p'
+            echo "No data/toolbox.items.json produced (skipping normalize_toolbox_items.mjs)"
           fi
 
-      # 3) Normalize toolbox items (if it produces an items file)
-      - name: Normalize Toolbox Items (best effort)
+      # Build/refresh catalog.toolbox.json from toolbox items if present
+      - name: Build catalog.toolbox.json (from toolbox items, if present)
         run: |
-          if [ -f scraper/normalize_toolbox_items.mjs ]; then
-            node scraper/normalize_toolbox_items.mjs || true
+          if [ -s data/toolbox.items.json ]; then
+            node scraper/build_catalog_from_items.mjs
+          else
+            echo "No toolbox.items.json -> skipping build_catalog_from_items.mjs"
           fi
 
-      # 4) Build a clean catalog from whatever inputs exist
-      - name: Build Clean Catalog
+      # Build clean catalog from whatever sources exist in /data
+      - name: Build clean catalog (catalog.clean.json)
         run: node scraper/build_clean_catalog.mjs
 
-      # ----------------------------
-      # Debug / visibility (always)
-      # ----------------------------
-      - name: Show data folder contents
+      # ---------------------------
+      # DEBUG / INSPECTION
+      # ---------------------------
+      - name: Show data folder contents + sizes
         if: always()
         run: |
           echo "=== data/ ==="
           ls -la data || true
           echo "=== sizes ==="
-          wc -c data/*.json 2>/dev/null || true
+          wc -c data/* 2>/dev/null || true
+          echo "=== quick JSON validity checks (best effort) ==="
+          for f in data/*.json; do
+            echo "--- $f ---"
+            node -e "JSON.parse(require('fs').readFileSync('$f','utf8')); console.log('OK')" || echo "INVALID JSON: $f"
+          done
 
       - name: Upload debug artifacts
         if: always()
@@ -84,33 +100,38 @@ jobs:
         with:
           name: toolbox-debug
           path: |
-            data/*.json
-            data/*.html
-            data/*.png
-            data/*.txt
+            data/**
+            scraper/**
           if-no-files-found: ignore
           retention-days: 7
 
-      # ----------------------------
-      # Hard checks (fail if missing)
-      # ----------------------------
-      - name: Verify clean catalog exists
+      # ---------------------------
+      # HARD VERIFY (FAIL IF MISSING)
+      # ---------------------------
+      - name: Verify required outputs exist
         run: |
           test -s data/catalog.clean.json
-          node -e "JSON.parse(require('fs').readFileSync('data/catalog.clean.json','utf8')); console.log('catalog.clean.json OK')"
+          # optional but expected:
+          test -s data/catalog.toolbox.json || echo "WARN: data/catalog.toolbox.json missing"
 
-      # ----------------------------
-      # Commit + push (safe)
-      # ----------------------------
+      # ---------------------------
+      # COMMIT + PUSH
+      # ---------------------------
       - name: Commit generated data
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          git add data/ || true
-          git diff --cached --quiet || git commit -m "Update toolbox data (toolbox-only)"
+          # Only commit stable outputs; keep debug files out of git.
+          # If you want to commit debug files, remove the path filtering below.
+          git add data/catalog.clean.json || true
+          git add data/catalog.toolbox.json || true
+          git add data/toolbox.items.json || true
+          git add data/toolbox.items.normalized.json || true
 
-      - name: Push changes (safe, rebase w/ autostash)
+          git diff --cached --quiet || git commit -m "Update toolbox data"
+
+      - name: Push changes
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
         run: |
@@ -120,10 +141,7 @@ jobs:
             exit 1
           fi
 
-          git remote set-url origin "https://x-access-token:${GH_PAT}@github.com/${{ github.repository }}.git"
+          git remote set-url origin "https://x-access-token:${GH_PAT}@github.com/TheRealNodder/Evertale-Optimizer.git"
           git fetch origin main
-
-          # This avoids: "cannot rebase: You have unstaged changes."
-          git pull --rebase --autostash origin main
-
+          git pull --rebase origin main
           git push origin HEAD:main
