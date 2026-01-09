@@ -2,13 +2,20 @@ name: Update Toolbox Data (WS) + Debug
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: "0 9 * * *"
 
 permissions:
   contents: write
 
+concurrency:
+  group: update-toolbox-ws
+  cancel-in-progress: true
+
 jobs:
   scrape:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -16,11 +23,91 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
 
-      - name: Debug: show workflow + scraper files
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Debug: show repo tree
         run: |
-          echo "=== .github/workflows ==="
-          ls -la .github/workflows || true
+          echo "=== repo root ==="
+          pwd
+          ls -la
           echo "=== scraper dir ==="
           ls -la scraper || true
-          echo "=== find .mjs ==="
+          echo "=== find .mjs in scraper (maxdepth 4) ==="
           find scraper -maxdepth 4 -type f -name "*.mjs" -print || true
+          echo "=== find package.json ==="
+          find . -maxdepth 4 -type f -name "package.json" -print || true
+
+      - name: Install deps (scraper)
+        working-directory: scraper
+        run: npm install
+
+      - name: Install Playwright Chromium
+        working-directory: scraper
+        run: npx playwright install --with-deps chromium
+
+      - name: Ensure data folder exists
+        run: mkdir -p data
+
+      - name: Debug: show data folder before
+        if: always()
+        run: |
+          echo "=== data/ (before) ==="
+          ls -la data || true
+
+      # ---- IMPORTANT ----
+      # This will still fail until the file exists in your repo at:
+      #   scraper/scrape_toolbox_items_from_ws.mjs
+      # The debug steps above will show you what files exist and where.
+      - name: Scrape Toolbox items from WS
+        run: node scraper/scrape_toolbox_items_from_ws.mjs
+
+      # If you haven’t created this yet, either create it or comment this step out for now
+      - name: Normalize into catalog.clean.json
+        run: node scraper/normalize_toolbox_items.mjs
+
+      - name: Show outputs
+        if: always()
+        run: |
+          echo "=== data/ (after) ==="
+          ls -la data || true
+          echo "=== sizes ==="
+          wc -c data/*.json 2>/dev/null || true
+          echo "=== counts (if catalog.clean.json exists) ==="
+          node -e "const fs=require('fs'); if(fs.existsSync('data/catalog.clean.json')){const j=JSON.parse(fs.readFileSync('data/catalog.clean.json','utf8')); console.log(j.counts);} else {console.log('no data/catalog.clean.json');}"
+
+      - name: Upload debug artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: toolbox-ws-debug
+          path: |
+            data/*.json
+            data/*.html
+            data/*.png
+            data/*.txt
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Commit generated data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/ || true
+          git diff --cached --quiet || git commit -m "Update toolbox dataset (WS)"
+
+      - name: Push changes (safe)
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: |
+          set -e
+          if [ -z "$GH_PAT" ]; then
+            echo "GH_PAT secret is missing"
+            exit 1
+          fi
+          git remote set-url origin "https://x-access-token:${GH_PAT}@github.com/TheRealNodder/Evertale-Optimizer.git"
+          git fetch origin main
+          git pull --rebase origin main
+          git push origin HEAD:main
