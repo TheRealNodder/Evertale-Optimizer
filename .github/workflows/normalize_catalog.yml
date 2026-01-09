@@ -1,1 +1,80 @@
+name: Normalize Catalog (clean)
 
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: normalize-catalog
+  cancel-in-progress: true
+
+jobs:
+  normalize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install deps (scraper)
+        working-directory: scraper
+        run: npm install
+
+      - name: Ensure data folder exists
+        run: mkdir -p data
+
+      # If clean already exists, just stop early (optional)
+      - name: Skip if clean catalog already exists
+        run: |
+          if [ -s data/catalog.clean.json ]; then
+            echo "catalog.clean.json already exists; nothing to do."
+            exit 0
+          fi
+
+      # Build clean catalog from whatever mixed inputs exist in /data
+      - name: Build Clean Catalog
+        run: node scraper/build_clean_catalog.mjs
+
+      - name: Show outputs
+        if: always()
+        run: |
+          echo "=== data/ ==="
+          ls -la data || true
+          wc -c data/*.json 2>/dev/null || true
+
+      - name: Verify clean catalog exists
+        run: |
+          test -s data/catalog.clean.json
+          node -e "JSON.parse(require('fs').readFileSync('data/catalog.clean.json','utf8')); console.log('catalog.clean.json OK')"
+
+      - name: Commit clean catalog
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add data/catalog.clean.json || true
+          git diff --cached --quiet || git commit -m "Normalize catalog.clean.json"
+
+      - name: Push changes (safe, rebase w/ autostash)
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: |
+          set -e
+          if [ -z "$GH_PAT" ]; then
+            echo "GH_PAT secret is missing"
+            exit 1
+          fi
+
+          git remote set-url origin "https://x-access-token:${GH_PAT}@github.com/${{ github.repository }}.git"
+          git fetch origin main
+          git pull --rebase --autostash origin main
+          git push origin HEAD:main
