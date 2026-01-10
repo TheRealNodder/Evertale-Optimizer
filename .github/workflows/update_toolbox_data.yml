@@ -1,108 +1,51 @@
-name: Update Toolbox Data (Toolbox-only)
+name: Update Toolbox Data
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "0 9 * * *"
-
-permissions:
-  contents: write
-
-concurrency:
-  group: update-toolbox-data
-  cancel-in-progress: true
 
 jobs:
-  scrape:
+  update:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          persist-credentials: false
-          fetch-depth: 0
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: Install deps (scraper)
+      - name: Install deps
         working-directory: scraper
         run: npm install
-
-      - name: Install Playwright Chromium
-        working-directory: scraper
-        run: npx playwright install --with-deps chromium
 
       - name: Ensure data folder exists
         run: mkdir -p data
 
-      - name: Debug: list scraper + data before
-        run: |
-          echo "=== scraper/ ==="
-          ls -la scraper || true
-          echo "=== data/ (before) ==="
-          ls -la data || true
-
-      # 1) MUST produce data/toolbox.items.json (or whatever your scraper writes)
-      - name: Scrape Toolbox items (WS)
+      - name: Scrape toolbox items (WS)
         run: node scraper/scrape_toolbox_items_from_ws.mjs
 
-      - name: Verify toolbox.items.json exists and is valid JSON
-        run: |
-          test -s data/toolbox.items.json
-          node -e "JSON.parse(require('fs').readFileSync('data/toolbox.items.json','utf8')); console.log('toolbox.items.json OK')"
+      - name: Debug data folder after scrape
+        run: ls -la data
 
-      # 2) Normalize
-      - name: Normalize Toolbox items
+      - name: Normalize toolbox items
         run: node scraper/normalize_toolbox_items.mjs
 
-      # 3) Build final catalog for the site
       - name: Build clean catalog
         run: node scraper/build_clean_catalog.mjs
 
-      - name: Debug: list data after
-        if: always()
-        run: |
-          echo "=== data/ (after) ==="
-          ls -la data || true
-          echo "=== sizes ==="
-          wc -c data/* 2>/dev/null || true
-
-      - name: Upload debug artifacts
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: toolbox-debug
-          path: |
-            data/*
-          if-no-files-found: ignore
-          retention-days: 7
-
-      - name: Verify required outputs exist
+      - name: Verify clean catalog
         run: |
           test -s data/catalog.clean.json
+          echo "catalog.clean.json exists"
 
-      - name: Commit generated data
+      - name: Commit data
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/ || true
-          git diff --cached --quiet || git commit -m "Update toolbox data"
+          git add data/
+          git commit -m "Update toolbox data (clean catalog)" || echo "No changes"
 
-      - name: Push changes (safe)
-        env:
-          GH_PAT: ${{ secrets.GH_PAT }}
-        run: |
-          set -e
-          if [ -z "$GH_PAT" ]; then
-            echo "GH_PAT secret is missing"
-            exit 1
-          fi
-          git remote set-url origin "https://x-access-token:${GH_PAT}@github.com/TheRealNodder/Evertale-Optimizer.git"
-          git fetch origin main
-          git pull --rebase --autostash origin main
-          git push origin HEAD:main
+      - name: Push changes
+        run: git push
