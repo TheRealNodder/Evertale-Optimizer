@@ -15,6 +15,8 @@ concurrency:
 jobs:
   scrape:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -45,21 +47,21 @@ jobs:
           echo "=== data/ (before) ==="
           ls -la data || true
 
-      # 1) MUST produce data/toolbox.items.json
-      - name: Scrape Toolbox items from WS (required)
+      # 1) MUST produce data/toolbox.items.json (or whatever your scraper writes)
+      - name: Scrape Toolbox items (WS)
         run: node scraper/scrape_toolbox_items_from_ws.mjs
 
-      - name: Verify toolbox.items.json exists
+      - name: Verify toolbox.items.json exists and is valid JSON
         run: |
           test -s data/toolbox.items.json
           node -e "JSON.parse(require('fs').readFileSync('data/toolbox.items.json','utf8')); console.log('toolbox.items.json OK')"
 
-      # 2) Normalize items
+      # 2) Normalize
       - name: Normalize Toolbox items
         run: node scraper/normalize_toolbox_items.mjs
 
-      # 3) Build clean catalog
-      - name: Build Clean Catalog
+      # 3) Build final catalog for the site
+      - name: Build clean catalog
         run: node scraper/build_clean_catalog.mjs
 
       - name: Debug: list data after
@@ -70,7 +72,7 @@ jobs:
           echo "=== sizes ==="
           wc -c data/* 2>/dev/null || true
 
-      - name: Upload debug artifacts (always)
+      - name: Upload debug artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -80,7 +82,7 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
-      - name: Verify clean catalog exists
+      - name: Verify required outputs exist
         run: |
           test -s data/catalog.clean.json
 
@@ -88,8 +90,8 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/ scraper/scrape_toolbox_items_from_ws.mjs || true
-          git diff --cached --quiet || git commit -m "Update toolbox data (toolbox-only)"
+          git add data/ || true
+          git diff --cached --quiet || git commit -m "Update toolbox data"
 
       - name: Push changes (safe)
         env:
