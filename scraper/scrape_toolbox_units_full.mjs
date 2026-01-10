@@ -3,7 +3,7 @@
 
 import fs from "node:fs/promises";
 import path from "node:path";
-import { load } from "cheerio";
+import * as cheerio from "cheerio";
 
 const BASE = "https://evertaletoolbox2.runasp.net";
 const EXPLORER_URL = `${BASE}/Explorer`;
