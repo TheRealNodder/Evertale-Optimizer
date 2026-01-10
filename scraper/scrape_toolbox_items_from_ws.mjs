@@ -1,6 +1,13 @@
 // scraper/scrape_toolbox_items_from_ws.mjs
-// Captures Blazor/SignalR WS frames and tries to extract a large items dataset.
-// Outputs: data/toolbox.items.json + debug files.
+// Captures Blazor/SignalR WS frames and extracts the largest dataset array.
+// Supports BOTH SignalR JSON protocol and SignalR MessagePack protocol.
+// Output:
+//   data/toolbox.items.json
+// Debug:
+//   data/_debug_toolbox_ws_frames.json
+//   data/_debug_toolbox_ws_payload_samples.json
+//   data/_debug_toolbox_ws_decoded.json
+//   data/_debug_toolbox_ws_hits.json
 
 import fs from "fs";
 import path from "path";
@@ -12,12 +19,12 @@ const OUT_DIR = path.resolve("data");
 const OUT_ITEMS = path.join(OUT_DIR, "toolbox.items.json");
 
 const DBG_FRAMES = path.join(OUT_DIR, "_debug_toolbox_ws_frames.json");
+const DBG_SAMPLES = path.join(OUT_DIR, "_debug_toolbox_ws_payload_samples.json");
 const DBG_DECODED = path.join(OUT_DIR, "_debug_toolbox_ws_decoded.json");
 const DBG_HITS = path.join(OUT_DIR, "_debug_toolbox_ws_hits.json");
 
 const TOOLBOX_URL =
-  process.env.TOOLBOX_URL ||
-  "https://evertaletoolbox2.runasp.net/Viewer"; // if Toolbox has a different route, set env TOOLBOX_URL in workflow
+  process.env.TOOLBOX_URL || "https://evertaletoolbox2.runasp.net/Viewer";
 
 function ensureDir(p) {
   fs.mkdirSync(p, { recursive: true });
@@ -25,25 +32,32 @@ function ensureDir(p) {
 
 function looksLikeBase64(s) {
   if (typeof s !== "string") return false;
-  if (s.length < 40) return false;
+  if (s.length < 16) return false;
   if (s.length % 4 !== 0) return false;
   return /^[A-Za-z0-9+/=]+$/.test(s);
 }
 
 function toBytes(payload) {
-  // Playwright websocket payloads are strings; binary frames commonly arrive base64-encoded.
   if (Buffer.isBuffer(payload)) return new Uint8Array(payload);
   if (payload instanceof Uint8Array) return payload;
   if (typeof payload === "string") {
+    // Playwright often provides binary frames as base64 strings.
     if (looksLikeBase64(payload)) {
       try {
         return new Uint8Array(Buffer.from(payload, "base64"));
       } catch {}
     }
-    // best effort: treat as utf8
     return new Uint8Array(Buffer.from(payload, "utf8"));
   }
   return null;
+}
+
+function bytesToUtf8(bytes) {
+  try {
+    return Buffer.from(bytes).toString("utf8");
+  } catch {
+    return null;
+  }
 }
 
 function safeJson(x) {
@@ -54,8 +68,25 @@ function safeJson(x) {
   }
 }
 
+function itemLike(o) {
+  if (!o || typeof o !== "object") return false;
+  if (Array.isArray(o)) return false;
+  const s = JSON.stringify(o);
+  return (
+    s.includes("/files/images/") ||
+    "Name" in o ||
+    "name" in o ||
+    "Id" in o ||
+    "id" in o ||
+    "Element" in o ||
+    "element" in o ||
+    "ATK" in o ||
+    "HP" in o ||
+    "SPD" in o
+  );
+}
+
 function walkFindLargestArray(node, wantPredicate) {
-  // returns {arr, path, score}
   const seen = new Set();
   let best = { arr: null, path: "", score: 0 };
 
@@ -66,16 +97,13 @@ function walkFindLargestArray(node, wantPredicate) {
 
     if (Array.isArray(v)) {
       let score = v.length;
-
       if (v.length > 0 && wantPredicate) {
-        // boost if many elements match
         let hit = 0;
-        for (let i = 0; i < Math.min(v.length, 50); i++) {
+        for (let i = 0; i < Math.min(v.length, 80); i++) {
           if (wantPredicate(v[i])) hit++;
         }
-        score += hit * 5;
+        score += hit * 10;
       }
-
       if (score > best.score) best = { arr: v, path: p, score };
 
       for (let i = 0; i < Math.min(v.length, 200); i++) {
@@ -93,23 +121,7 @@ function walkFindLargestArray(node, wantPredicate) {
   return best;
 }
 
-function itemLike(o) {
-  if (!o || typeof o !== "object") return false;
-  const s = JSON.stringify(o);
-  // toolbox image paths or known fields often appear in these objects
-  return (
-    s.includes("/files/images/") ||
-    "Name" in o ||
-    "name" in o ||
-    "Id" in o ||
-    "id" in o ||
-    "Element" in o ||
-    "element" in o
-  );
-}
-
 function normalizeRawItem(o) {
-  // Very tolerant mapping (Toolbox/Blazor properties may be PascalCase)
   const get = (...keys) => {
     for (const k of keys) {
       if (o && Object.prototype.hasOwnProperty.call(o, k)) return o[k];
@@ -119,16 +131,16 @@ function normalizeRawItem(o) {
 
   const name = get("name", "Name", "UnitName", "Title");
   const id = get("id", "Id", "ID", "Key", "key") || name;
+
+  const categoryRaw = get("category", "Category", "type", "Type");
+  const category = categoryRaw ? String(categoryRaw).toLowerCase() : null;
+
   const image =
     get("image", "Image", "imageUrl", "ImageUrl", "Icon", "icon") || null;
 
-  const category =
-    (get("category", "Category", "type", "Type") || "").toString().toLowerCase() ||
-    null;
-
   const element = get("element", "Element") ?? null;
-  const cost = get("cost", "Cost") ?? null;
 
+  const cost = get("cost", "Cost") ?? null;
   const atk = get("atk", "ATK", "Attack") ?? null;
   const hp = get("hp", "HP") ?? null;
   const spd = get("spd", "SPD", "Speed") ?? null;
@@ -147,15 +159,81 @@ function normalizeRawItem(o) {
   };
 }
 
+// ---- SignalR JSON protocol decode ----
+// SignalR JSON protocol uses record separator 0x1e between messages.
+// Each message is JSON.
+function decodeSignalrJsonFromUtf8(text) {
+  if (!text) return [];
+  const RS = "\u001e";
+  if (!text.includes(RS) && !text.trim().startsWith("{")) return [];
+
+  const parts = text.split(RS).map((s) => s.trim()).filter(Boolean);
+  const msgs = [];
+  for (const p of parts) {
+    try {
+      msgs.push(JSON.parse(p));
+    } catch {
+      // ignore
+    }
+  }
+  return msgs;
+}
+
+// ---- SignalR MessagePack decode ----
+function decodeSignalrMsgpack(bytes) {
+  const protocol = new MessagePackHubProtocol();
+  const logger = { log: () => {} };
+  try {
+    return protocol.parseMessages(bytes, logger) || [];
+  } catch {
+    return [];
+  }
+}
+
+// Try to force the app to load “units/characters” data
+async function pokeUi(page) {
+  // Scroll some
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+  await page.waitForTimeout(1000);
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.waitForTimeout(1000);
+
+  // Click anything that looks like a tab/button to load units
+  const keywords = ["units", "characters", "all", "viewer", "catalog"];
+  await page.evaluate((keys) => {
+    function clickIfMatch(el) {
+      const t = (el.innerText || el.textContent || "").toLowerCase().trim();
+      if (!t) return false;
+      if (keys.some((k) => t === k || t.includes(k))) {
+        el.click();
+        return true;
+      }
+      return false;
+    }
+
+    const candidates = [
+      ...document.querySelectorAll("button"),
+      ...document.querySelectorAll("[role='button']"),
+      ...document.querySelectorAll("a"),
+      ...document.querySelectorAll("li")
+    ];
+
+    for (const el of candidates) {
+      try {
+        if (clickIfMatch(el)) break;
+      } catch {}
+    }
+  }, keywords);
+
+  await page.waitForTimeout(4000);
+}
+
 async function run() {
   ensureDir(OUT_DIR);
 
   const frames = [];
-  const decodedMessages = [];
-  const hits = [];
-
-  const protocol = new MessagePackHubProtocol();
-  const logger = { log: () => {} };
+  const payloadSamples = [];
+  const decoded = [];
 
   const browser = await chromium.launch({ headless: true });
   const page = await browser.newPage();
@@ -165,7 +243,7 @@ async function run() {
       frames.push({
         t: Date.now(),
         dir: "in",
-        opcode: frame.opcode, // 'text' or 'binary' (Playwright sets this)
+        opcode: frame.opcode,
         len: frame.payload?.length ?? 0,
         payload: frame.payload
       });
@@ -184,68 +262,87 @@ async function run() {
   console.log(`Loading Toolbox page: ${TOOLBOX_URL}`);
   await page.goto(TOOLBOX_URL, { waitUntil: "domcontentloaded", timeout: 120000 });
 
-  // Give Blazor time to connect and stream
-  await page.waitForTimeout(20000);
+  // Let Blazor connect
+  await page.waitForTimeout(12000);
+  await pokeUi(page);
+  await page.waitForTimeout(18000);
 
-  // Save raw frames first
   fs.writeFileSync(DBG_FRAMES, JSON.stringify(frames, null, 2), "utf8");
 
-  // Decode frames -> SignalR hub messages
+  // Sample first ~20 incoming frames payloads (trim for readability)
+  for (const f of frames.filter((x) => x.dir === "in").slice(0, 25)) {
+    const bytes = toBytes(f.payload);
+    const text = bytes ? bytesToUtf8(bytes) : null;
+
+    payloadSamples.push({
+      opcode: f.opcode,
+      len: f.len,
+      asTextPreview: text ? text.slice(0, 400) : null,
+      looksBase64: typeof f.payload === "string" ? looksLikeBase64(f.payload) : false
+    });
+  }
+  fs.writeFileSync(DBG_SAMPLES, JSON.stringify(payloadSamples, null, 2), "utf8");
+
+  // Decode all incoming frames using BOTH decoders
   for (const f of frames) {
-    // Only try decoding incoming frames (server -> client)
     if (f.dir !== "in") continue;
 
     const bytes = toBytes(f.payload);
-    if (!bytes || bytes.length < 8) continue;
+    if (!bytes || bytes.length < 2) continue;
 
-    try {
-      const msgs = protocol.parseMessages(bytes, logger);
-      for (const m of msgs) decodedMessages.push(m);
-    } catch {
-      // ignore non-signalr frames
+    // 1) Try JSON protocol via UTF-8 + RS splitting
+    const text = bytesToUtf8(bytes);
+    const jsonMsgs = decodeSignalrJsonFromUtf8(text);
+    for (const m of jsonMsgs) {
+      decoded.push({ protocol: "json", msg: m });
+    }
+
+    // 2) Try MessagePack protocol
+    const mpMsgs = decodeSignalrMsgpack(bytes);
+    for (const m of mpMsgs) {
+      decoded.push({ protocol: "msgpack", msg: m });
     }
   }
 
-  fs.writeFileSync(DBG_DECODED, JSON.stringify(safeJson(decodedMessages) ?? [], null, 2), "utf8");
+  fs.writeFileSync(DBG_DECODED, JSON.stringify(safeJson(decoded) ?? [], null, 2), "utf8");
 
-  // Find best candidate dataset: usually inside Invocation arguments
-  let best = { arr: null, path: "", score: 0, msgIndex: -1 };
+  // Find largest dataset array in decoded messages
+  let best = { arr: null, path: "", score: 0, index: -1, protocol: null };
 
-  for (let i = 0; i < decodedMessages.length; i++) {
-    const m = decodedMessages[i];
-    const cand = walkFindLargestArray(m, itemLike);
+  for (let i = 0; i < decoded.length; i++) {
+    const entry = decoded[i];
+    const cand = walkFindLargestArray(entry.msg, itemLike);
     if (cand.arr && cand.score > best.score) {
-      best = { ...cand, msgIndex: i };
+      best = { ...cand, index: i, protocol: entry.protocol };
     }
   }
 
   if (!best.arr || best.arr.length < 20) {
-    // also try: search for any single string stream that contains /files/images/
-    const jsonText = JSON.stringify(decodedMessages);
-    const hasImages = jsonText.includes("/files/images/");
     fs.writeFileSync(
       DBG_HITS,
       JSON.stringify(
         {
-          messageCount: decodedMessages.length,
+          frameCount: frames.length,
+          incomingFrames: frames.filter((x) => x.dir === "in").length,
+          decodedCount: decoded.length,
           bestScore: best.score,
-          bestMsgIndex: best.msgIndex,
+          bestProtocol: best.protocol,
+          bestIndex: best.index,
           bestPath: best.path,
-          bestLength: best.arr ? best.arr.length : 0,
-          sawFilesImages: hasImages
+          bestLength: best.arr ? best.arr.length : 0
         },
         null,
         2
       ),
       "utf8"
     );
+
     throw new Error(
       `No large dataset found in WS frames (best count=${best.arr ? best.arr.length : 0}). ` +
-        `Check ${DBG_DECODED} and ${DBG_FRAMES}`
+        `Check ${DBG_SAMPLES}, ${DBG_DECODED}, ${DBG_FRAMES}`
     );
   }
 
-  // Normalize extracted array
   const normalized = best.arr
     .map((x) => normalizeRawItem(x))
     .filter((x) => x && x.id && x.name);
@@ -254,12 +351,12 @@ async function run() {
     DBG_HITS,
     JSON.stringify(
       {
-        messageCount: decodedMessages.length,
-        bestMsgIndex: best.msgIndex,
+        bestProtocol: best.protocol,
+        bestIndex: best.index,
         bestPath: best.path,
         extractedCount: best.arr.length,
         normalizedCount: normalized.length,
-        sample: normalized.slice(0, 5)
+        sample: normalized.slice(0, 8)
       },
       null,
       2
