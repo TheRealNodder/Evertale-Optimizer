@@ -15,8 +15,6 @@ concurrency:
 jobs:
   scrape:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -33,56 +31,30 @@ jobs:
         working-directory: scraper
         run: npm install
 
-      - name: Install Playwright Chromium
+      - name: Install Playwright browsers
         working-directory: scraper
         run: npx playwright install --with-deps chromium
 
       - name: Ensure data folder exists
         run: mkdir -p data
 
-      - name: Debug: list scraper folder
-        run: |
-          echo "=== scraper/ ==="
-          ls -la scraper || true
-          echo "=== data/ (before) ==="
-          ls -la data || true
-
-      # Auto-fix the common typo: .mj instead of .mjs
-      - name: Fix scraper filename typo if needed
+      - name: Fix .mj typo if present
         run: |
           if [ -f "scraper/scrape_toolbox_items_from_ws.mj" ] && [ ! -f "scraper/scrape_toolbox_items_from_ws.mjs" ]; then
-            echo "Renaming scraper/scrape_toolbox_items_from_ws.mj -> .mjs"
             mv scraper/scrape_toolbox_items_from_ws.mj scraper/scrape_toolbox_items_from_ws.mjs
           fi
 
-      - name: Verify scraper script exists
+      - name: Verify scripts exist
         run: |
           test -f scraper/scrape_toolbox_items_from_ws.mjs
           test -f scraper/normalize_toolbox_items.mjs
 
-      # ---- SCRAPE (best effort; do not fail the job) ----
-      - name: Scrape Toolbox items from WS (best effort)
+      - name: Scrape Toolbox items (best effort)
         run: node scraper/scrape_toolbox_items_from_ws.mjs || true
 
-      - name: Debug: show toolbox.items.json status
-        if: always()
-        run: |
-          echo "=== data/ after scrape ==="
-          ls -la data || true
-          if [ -f data/toolbox.items.json ]; then
-            echo "toolbox.items.json bytes:"
-            wc -c data/toolbox.items.json || true
-            echo "toolbox.items.json head (600 chars):"
-            head -c 600 data/toolbox.items.json; echo
-          else
-            echo "data/toolbox.items.json not found"
-          fi
-
-      # ---- NORMALIZE (your updated normalize script should exit 0 if too small) ----
       - name: Normalize Toolbox items (safe)
         run: node scraper/normalize_toolbox_items.mjs || true
 
-      # ---- Always upload debug artifacts so you can inspect on phone ----
       - name: Upload debug artifacts (always)
         if: always()
         uses: actions/upload-artifact@v4
@@ -96,30 +68,13 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
-      - name: Debug: list data outputs
-        if: always()
-        run: |
-          echo "=== data/ (after) ==="
-          ls -la data || true
-          echo "=== sizes ==="
-          wc -c data/*.json 2>/dev/null || true
-
-      # Commit only if something changed
       - name: Commit generated data (if changed)
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/ || true
+          git diff --cached --quiet || git commit -m "Update toolbox data"
 
-          git add data/ scraper/scrape_toolbox_items_from_ws.mjs || true
-
-          if git diff --cached --quiet; then
-            echo "No changes to commit."
-            exit 0
-          fi
-
-          git commit -m "Update toolbox data"
-
-      # Push using your PAT (avoids 403 + handles remote updates safely)
       - name: Push changes (safe)
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
@@ -129,7 +84,6 @@ jobs:
             echo "GH_PAT secret is missing"
             exit 1
           fi
-
           git remote set-url origin "https://x-access-token:${GH_PAT}@github.com/TheRealNodder/Evertale-Optimizer.git"
           git fetch origin main
           git pull --rebase --autostash origin main
