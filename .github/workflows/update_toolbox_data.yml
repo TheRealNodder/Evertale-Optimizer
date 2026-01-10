@@ -15,6 +15,7 @@ concurrency:
 jobs:
   scrape:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     steps:
       - name: Checkout
@@ -39,25 +40,47 @@ jobs:
       - name: Ensure data folder exists
         run: mkdir -p data
 
-      # --- TOOLBOX SOURCE OF TRUTH ---
-      - name: Scrape Toolbox items via WS (SignalR msgpack)
+      - name: Debug: list scraper + data before
+        run: |
+          echo "=== scraper/ ==="
+          ls -la scraper || true
+          echo "=== data/ (before) ==="
+          ls -la data || true
+
+      # ---- WS FIRST (SAFE MODE SCRAPER SHOULD NOT FAIL HARD) ----
+      - name: Scrape toolbox items via WS (may produce empty)
         run: node scraper/scrape_toolbox_items_from_ws.mjs
 
-      - name: Normalize toolbox items -> clean catalog files
-        run: node scraper/normalize_toolbox_items.mjs
+      - name: Debug: show WS outputs
+        if: always()
+        run: |
+          echo "=== data after WS scrape ==="
+          ls -la data || true
+          echo "=== toolbox.items.json size ==="
+          wc -c data/toolbox.items.json 2>/dev/null || true
 
-      # Optional: if you want a single file that your app uses, keep this
+      # ---- FALLBACK: if WS is empty, scrape DOM + normalize DOM catalog ----
+      - name: If WS empty, fallback to DOM scrape + normalize
+        run: |
+          node -e "const fs=require('fs'); const p='data/toolbox.items.json'; if(!fs.existsSync(p)) process.exit(1); const a=JSON.parse(fs.readFileSync(p,'utf8')); process.exit(Array.isArray(a)&&a.length>0?0:1)" \
+          && echo "WS items present (skip DOM fallback)" \
+          || (echo "WS empty -> DOM fallback" && node scraper/scrape_viewer_dom_items.mjs && node scraper/normalize_dom_catalog.mjs)
+
+      # ---- Normalize WS items (only succeeds if toolbox.items.json has content) ----
+      - name: Normalize toolbox items (WS) -> catalog
+        run: node scraper/normalize_toolbox_items.mjs || true
+
+      # ---- Build final clean catalog (should pick best available inputs) ----
       - name: Build clean catalog
         run: node scraper/build_clean_catalog.mjs
 
-      # --- Debug visibility ---
-      - name: Show data folder contents
+      - name: Show data folder contents (after)
         if: always()
         run: |
-          echo "=== data/ ==="
+          echo "=== data/ (after) ==="
           ls -la data || true
           echo "=== sizes ==="
-          wc -c data/*.json 2>/dev/null || true
+          wc -c data/* 2>/dev/null || true
 
       - name: Upload debug artifacts
         if: always()
@@ -72,23 +95,32 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
-      # --- Hard checks ---
-      - name: Verify required outputs exist
+      # Hard check: ensure at least ONE usable catalog exists
+      - name: Verify catalog exists
         run: |
-          test -s data/toolbox.items.json
-          # at least one of these should exist based on your pipeline
-          test -s data/catalog.clean.json || test -s data/catalog.toolbox.json
+          if [ -s data/catalog.clean.json ]; then
+            echo "OK: data/catalog.clean.json"
+            exit 0
+          fi
+          if [ -s data/catalog.toolbox.json ]; then
+            echo "OK: data/catalog.toolbox.json"
+            exit 0
+          fi
+          if [ -s data/catalog.dom.raw.json ]; then
+            echo "OK: data/catalog.dom.raw.json (raw fallback)"
+            exit 0
+          fi
+          echo "ERROR: No catalog output was produced."
+          exit 1
 
-      # --- Commit + push safely ---
       - name: Commit generated data
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-
           git add data/ || true
           git diff --cached --quiet || git commit -m "Update toolbox data"
 
-      - name: Push changes
+      - name: Push changes (safe)
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
         run: |
@@ -97,8 +129,7 @@ jobs:
             echo "GH_PAT secret is missing"
             exit 1
           fi
-
           git remote set-url origin "https://x-access-token:${GH_PAT}@github.com/${GITHUB_REPOSITORY}.git"
           git fetch origin main
-          git pull --rebase origin main
+          git pull --rebase --autostash origin main
           git push origin HEAD:main
