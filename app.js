@@ -1,19 +1,18 @@
-// app.js — loads split data files with graceful fallback
+// app.js (module) — Catalog + Team Builder + Optimizer using separated data/*.toolbox.json files
 
 const DATA = {
-  characters: "./data/characters.json",
-  weapons: "./data/weapons.json",
-  accessories: "./data/accessories.json",
-  enemies: "./data/enemies.json",
-  bosses: "./data/bosses.json",
-  leaderSkills: "./data/leaderSkills.todo.json", // optional
+  characters: "./data/characters.toolbox.json",
+  weapons: "./data/weapons.toolbox.json",
+  accessories: "./data/accessories.toolbox.json",
+  enemies: "./data/enemies.toolbox.json",
+  bosses: "./data/bosses.toolbox.json",
 };
 
 let state = {
-  items: [],
-  byId: new Map(),
-  teamMode: "story",
-  teamSlots: [],
+  items: [],        // combined catalog items
+  byId: new Map(),  // id -> item
+  teamMode: "story", // story | platoon
+  teamSlots: [],     // array of {label, id}
 };
 
 const $ = (sel) => document.querySelector(sel);
@@ -22,8 +21,8 @@ function showStatus(msg) {
   const box = $("#status");
   if (!box) return;
   box.classList.remove("hidden");
-  const msgEl = $("#statusMsg");
-  if (msgEl) msgEl.textContent = msg;
+  const el = $("#statusMsg");
+  if (el) el.textContent = msg;
 }
 function hideStatus() {
   const box = $("#status");
@@ -31,13 +30,6 @@ function hideStatus() {
   box.classList.add("hidden");
 }
 
-function safeNum(v) {
-  const n = Number(v);
-  return Number.isFinite(n) ? n : 0;
-}
-function cleanText(s) {
-  return (s ?? "").toString().trim();
-}
 function normCat(x) {
   const v = (x || "").toString().toLowerCase().trim();
   if (["character", "characters", "unit", "units"].includes(v)) return "character";
@@ -48,31 +40,111 @@ function normCat(x) {
   return v || "unknown";
 }
 
-async function fetchJsonOptional(url) {
-  try {
-    const res = await fetch(url, { cache: "no-store" });
-    if (!res.ok) return { ok: false, url, status: res.status, data: null };
-    const data = await res.json();
-    return { ok: true, url, status: res.status, data };
-  } catch (e) {
-    return { ok: false, url, status: 0, data: null, error: e?.message || String(e) };
-  }
+function safeNum(v) {
+  const n = Number(v);
+  return Number.isFinite(n) ? n : 0;
 }
 
-function unwrapItems(json) {
-  if (!json) return [];
+async function fetchJson(url) {
+  const res = await fetch(url, { cache: "no-store" });
+  if (!res.ok) throw new Error(`${url} -> HTTP ${res.status}`);
+  return await res.json();
+}
+
+function unwrapArray(json) {
   if (Array.isArray(json)) return json;
-  if (Array.isArray(json.items)) return json.items;
-  if (Array.isArray(json.characters)) return json.characters;
-  if (Array.isArray(json.weapons)) return json.weapons;
-  if (Array.isArray(json.accessories)) return json.accessories;
-  if (Array.isArray(json.enemies)) return json.enemies;
-  if (Array.isArray(json.bosses)) return json.bosses;
+  if (json && Array.isArray(json.items)) return json.items;
+  if (json && json.data && Array.isArray(json.data.items)) return json.data.items;
   return [];
 }
 
-function escapeHtml(s){return (s??"").toString().replace(/[&<>"']/g,(c)=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]))}
-function escapeAttr(s){return escapeHtml(s).replace(/"/g,"&quot;")}
+function normalizeItem(raw, forcedCategory) {
+  const category = normCat(forcedCategory ?? raw.category ?? raw.type);
+  const id =
+    (raw.id ?? raw.key ?? raw.unitId ?? raw.name ?? raw.title ?? "").toString().trim();
+
+  const name = (raw.name ?? raw.title ?? raw.displayName ?? "").toString().trim();
+
+  // image might be absolute or /files/...
+  let image =
+    raw.image ??
+    raw.imageUrl ??
+    raw.img ??
+    raw.icon ??
+    raw.portrait ??
+    null;
+
+  if (image && typeof image === "string" && image.startsWith("/")) {
+    // toolbox paths are root-based; on GH Pages we still want absolute toolbox host? (No)
+    // If your JSON already contains full URLs, keep them. If it contains /files/..., keep as-is.
+    // The browser will try to load it from your GH pages domain, not toolbox.
+    // If you want toolbox images, store full URLs in JSON during your build step.
+    image = image;
+  }
+
+  const element = (raw.element ?? raw.elem ?? "").toString().trim() || null;
+
+  const cost = raw.cost != null ? safeNum(raw.cost) : null;
+  const atk = raw.atk != null ? safeNum(raw.atk) : null;
+  const hp = raw.hp != null ? safeNum(raw.hp) : null;
+  const spd = raw.spd != null ? safeNum(raw.spd) : null;
+
+  const url = raw.url ?? raw.link ?? null;
+
+  return {
+    id,
+    name,
+    category,
+    element,
+    image,
+    url,
+    cost,
+    atk,
+    hp,
+    spd,
+    raw,
+  };
+}
+
+function buildCatalog({ characters, weapons, accessories, enemies, bosses }) {
+  const items = [];
+
+  for (const c of characters) items.push(normalizeItem(c, "character"));
+  for (const w of weapons) items.push(normalizeItem(w, "weapon"));
+  for (const a of accessories) items.push(normalizeItem(a, "accessory"));
+  for (const e of enemies) items.push(normalizeItem(e, "enemy"));
+  for (const b of bosses) items.push(normalizeItem(b, "boss"));
+
+  // filter broken rows
+  return items.filter((x) => x.id && x.name);
+}
+
+function setCounts(items) {
+  const count = (cat) => items.filter((x) => x.category === cat).length;
+
+  const all = $("#countAll");
+  const chars = $("#countChars");
+  const weapons = $("#countWeapons");
+  const enemies = $("#countEnemies");
+
+  if (all) all.textContent = String(items.length);
+  if (chars) chars.textContent = String(count("character"));
+  if (weapons) weapons.textContent = String(count("weapon") + count("accessory"));
+  if (enemies) enemies.textContent = String(count("enemy") + count("boss"));
+}
+
+function escapeHtml(s) {
+  return (s ?? "").toString().replace(/[&<>"']/g, (c) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  }[c]));
+}
+function escapeAttr(s) {
+  return escapeHtml(s).replace(/"/g, "&quot;");
+}
 
 function cardHtml(item) {
   const img = item.image
@@ -81,41 +153,27 @@ function cardHtml(item) {
 
   const tags = [
     item.element ? `elem: ${item.element}` : "",
-    item.cost ? `cost: ${item.cost}` : "",
+    item.cost != null ? `cost: ${item.cost}` : "",
   ].filter(Boolean);
 
+  // only characters draggable into team
+  const draggable = item.category === "character" ? "true" : "false";
+
   return `
-    <div class="card" draggable="${item.category === "character" ? "true" : "false"}" data-id="${escapeAttr(item.id)}">
+    <div class="card" draggable="${draggable}" data-id="${escapeAttr(item.id)}">
       <div class="thumb">${img}</div>
       <div class="meta">
         <div class="name">${escapeHtml(item.name)}</div>
-        <div class="sub">
-          ${escapeHtml(item.category)}${item.element ? " • " + escapeHtml(item.element) : ""}
-        </div>
-        <div class="tags">
-          ${tags.map(t => `<span class="tag">${escapeHtml(t)}</span>`).join("")}
-        </div>
+        <div class="sub">${escapeHtml(item.category)}${item.element ? " • " + escapeHtml(item.element) : ""}</div>
+        <div class="tags">${tags.map(t => `<span class="tag">${escapeHtml(t)}</span>`).join("")}</div>
       </div>
     </div>
   `;
 }
 
-function setCounts(items) {
-  const byCat = (cat) => items.filter((x) => x.category === cat).length;
-  const set = (id, val) => { const el = $(id); if (el) el.textContent = String(val); };
-  set("#countAll", items.length);
-  set("#countChars", byCat("character"));
-  set("#countWeapons", byCat("weapon"));
-  set("#countEnemies", byCat("enemy") + byCat("boss"));
-}
-
-// ---------- Catalog render ----------
 function renderCatalog() {
-  const catSel = $("#categorySelect");
-  const qSel = $("#searchInput");
-
-  const cat = catSel ? catSel.value : "all";
-  const q = qSel ? qSel.value.trim().toLowerCase() : "";
+  const cat = $("#categorySelect")?.value ?? "all";
+  const q = ($("#searchInput")?.value ?? "").trim().toLowerCase();
 
   let filtered = state.items;
 
@@ -124,6 +182,7 @@ function renderCatalog() {
 
   const grid = $("#catalogGrid");
   if (!grid) return;
+
   grid.innerHTML = filtered.map(cardHtml).join("");
 
   for (const el of document.querySelectorAll(".card")) {
@@ -139,20 +198,26 @@ function renderCatalog() {
   }
 }
 
-// ---------- Team builder ----------
 function buildSlots(count, labels) {
   const slots = [];
-  for (let i = 0; i < count; i++) slots.push({ label: labels?.[i] ?? `Slot ${i+1}`, id: null });
+  for (let i = 0; i < count; i++) {
+    slots.push({ label: labels?.[i] ?? `Slot ${i + 1}`, id: null });
+  }
   return slots;
 }
 
 function initTeam(mode) {
   state.teamMode = mode;
+
   if (mode === "story") {
-    state.teamSlots = buildSlots(8, ["Main 1","Main 2","Main 3","Main 4","Main 5","Backup 1","Backup 2","Backup 3"]);
+    state.teamSlots = buildSlots(8, [
+      "Main 1", "Main 2", "Main 3", "Main 4", "Main 5",
+      "Backup 1", "Backup 2", "Backup 3",
+    ]);
   } else {
-    state.teamSlots = buildSlots(5, ["Slot 1","Slot 2","Slot 3","Slot 4","Slot 5"]);
+    state.teamSlots = buildSlots(5, ["Slot 1", "Slot 2", "Slot 3", "Slot 4", "Slot 5"]);
   }
+
   renderTeam();
   renderSummary();
 }
@@ -201,18 +266,27 @@ function renderSummary() {
   const ids = state.teamSlots.map(s => s.id).filter(Boolean);
   const items = ids.map(id => state.byId.get(id)).filter(Boolean);
 
-  const set = (id, val) => { const el = $(id); if (el) el.textContent = String(val); };
+  const teamCount = $("#teamCount");
+  const teamCost = $("#teamCost");
+  const teamAtk = $("#teamAtk");
+  const teamHp = $("#teamHp");
+  const teamSpd = $("#teamSpd");
 
-  set("#teamCount", items.length);
-  set("#teamCost", items.reduce((a,x)=>a+safeNum(x.cost),0));
+  if (teamCount) teamCount.textContent = String(items.length);
 
-  const avg = (k) => items.length ? Math.round(items.reduce((a,x)=>a+safeNum(x[k]),0)/items.length) : 0;
-  set("#teamAtk", avg("atk"));
-  set("#teamHp",  avg("hp"));
-  set("#teamSpd", avg("spd"));
+  const cost = items.reduce((a, x) => a + safeNum(x.cost), 0);
+  if (teamCost) teamCost.textContent = String(cost);
+
+  const avg = (k) => items.length
+    ? Math.round(items.reduce((a, x) => a + safeNum(x[k]), 0) / items.length)
+    : 0;
+
+  if (teamAtk) teamAtk.textContent = String(avg("atk"));
+  if (teamHp) teamHp.textContent = String(avg("hp"));
+  if (teamSpd) teamSpd.textContent = String(avg("spd"));
 }
 
-// ---------- Optimizer ----------
+// ----- Optimizer -----
 function getWeights() {
   return {
     wAtk: safeNum($("#wAtk")?.value ?? 1),
@@ -223,91 +297,35 @@ function getWeights() {
 }
 
 function scoreUnit(u, W) {
-  return (u.atk * W.wAtk) + (u.hp * W.wHp) + (u.spd * W.wSpd) - (u.cost * W.wCost);
+  return (safeNum(u.atk) * W.wAtk) + (safeNum(u.hp) * W.wHp) + (safeNum(u.spd) * W.wSpd) - (safeNum(u.cost) * W.wCost);
 }
 
 function optimizePreview() {
   const W = getWeights();
-  const candidates = state.items
+
+  const ranked = state.items
     .filter(x => x.category === "character")
     .map(x => ({ ...x, score: scoreUnit(x, W) }))
-    .sort((a,b) => b.score - a.score)
-    .slice(0, 50);
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 20);
 
-  const body = $("#optResults");
-  if (!body) return;
-  body.innerHTML = candidates.map((x,i)=>`
+  const tbody = $("#optimizer");
+  if (!tbody) return;
+
+  tbody.innerHTML = ranked.map((x, i) => `
     <tr>
-      <td>${i+1}</td>
+      <td>${i + 1}</td>
       <td>${escapeHtml(x.name)}</td>
-      <td>${x.atk}</td>
-      <td>${x.hp}</td>
-      <td>${x.spd}</td>
-      <td>${x.cost}</td>
+      <td>${x.atk ?? ""}</td>
+      <td>${x.hp ?? ""}</td>
+      <td>${x.spd ?? ""}</td>
+      <td>${x.cost ?? ""}</td>
       <td>${Math.round(x.score)}</td>
     </tr>
   `).join("");
 }
 
-function currentTeamIds() {
-  return state.teamSlots.map(s => s.id).filter(Boolean);
-}
-function currentTeamCost() {
-  return currentTeamIds()
-    .map(id => state.byId.get(id))
-    .filter(Boolean)
-    .reduce((a,u)=>a+safeNum(u.cost),0);
-}
-
-function autofillTeam() {
-  const W = getWeights();
-  const maxCost = safeNum($("#maxCost")?.value ?? 999);
-  const fillMode = $("#fillMode")?.value ?? "emptyOnly";
-  const lockMode = $("#lockMode")?.value ?? "keepPlaced";
-
-  const locked = new Set();
-  for (let i = 0; i < state.teamSlots.length; i++) {
-    if (lockMode === "keepPlaced" && state.teamSlots[i].id) locked.add(i);
-    if (fillMode === "replaceAll") locked.delete(i);
-  }
-
-  if (fillMode === "replaceAll") {
-    for (let i = 0; i < state.teamSlots.length; i++) {
-      if (!locked.has(i)) state.teamSlots[i].id = null;
-    }
-  }
-
-  const used = new Set(currentTeamIds());
-  let cost = currentTeamCost();
-
-  const ranked = state.items
-    .filter(x => x.category === "character")
-    .map(x => ({ ...x, score: scoreUnit(x, W) }))
-    .sort((a,b)=>b.score-a.score);
-
-  for (let i = 0; i < state.teamSlots.length; i++) {
-    if (locked.has(i)) continue;
-    if (fillMode === "emptyOnly" && state.teamSlots[i].id) continue;
-
-    let pick = null;
-    for (const cand of ranked) {
-      if (used.has(cand.id)) continue;
-      const nextCost = cost + safeNum(cand.cost);
-      if (nextCost <= maxCost) { pick = cand; break; }
-    }
-    if (!pick) break;
-
-    state.teamSlots[i].id = pick.id;
-    used.add(pick.id);
-    cost += safeNum(pick.cost);
-  }
-
-  renderTeam();
-  renderSummary();
-  optimizePreview();
-}
-
-// ---------- Tabs ----------
+// ----- Tabs -----
 function wireTabs() {
   const tabs = $("#tabs");
   if (!tabs) return;
@@ -316,7 +334,7 @@ function wireTabs() {
     const btn = e.target.closest(".tab");
     if (!btn) return;
 
-    document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+    document.querySelectorAll(".tab").forEach(x => x.classList.remove("active"));
     btn.classList.add("active");
 
     const tab = btn.dataset.tab;
@@ -324,84 +342,6 @@ function wireTabs() {
     $("#tab-team")?.classList.toggle("hidden", tab !== "team");
     $("#tab-optimizer")?.classList.toggle("hidden", tab !== "optimizer");
   });
-}
-
-// ---------- Load split data ----------
-function normalizeItem(raw, forcedCategory) {
-  const category = normCat(forcedCategory ?? raw.category ?? raw.type);
-
-  const id = cleanText(raw.id || raw.key || raw.slug || raw.name);
-  const name = cleanText(raw.name || raw.title || raw.displayName || raw.id);
-
-  return {
-    id,
-    name,
-    category,
-    rarity: raw.rarity ?? null,
-    element: raw.element ?? null,
-    cost: raw.cost ?? null,
-    atk: safeNum(raw.atk ?? raw.attack ?? raw.stats?.atk),
-    hp: safeNum(raw.hp ?? raw.health ?? raw.stats?.hp),
-    spd: safeNum(raw.spd ?? raw.speed ?? raw.stats?.spd),
-    weaponType: raw.weaponType ?? raw.weapon ?? null,
-    leaderSkill: raw.leaderSkill ?? null,
-    activeSkills: raw.activeSkills ?? raw.skills?.active ?? null,
-    passiveSkills: raw.passiveSkills ?? raw.skills?.passive ?? null,
-    image: raw.image ?? raw.imageUrl ?? raw.icon ?? null,
-    url: raw.url ?? null,
-    raw,
-  };
-}
-
-async function loadAllData() {
-  const results = await Promise.all([
-    fetchJsonOptional(DATA.characters),
-    fetchJsonOptional(DATA.weapons),
-    fetchJsonOptional(DATA.accessories),
-    fetchJsonOptional(DATA.enemies),
-    fetchJsonOptional(DATA.bosses),
-    fetchJsonOptional(DATA.leaderSkills),
-  ]);
-
-  const [charsR, weapR, accR, eneR, bossR, lsR] = results;
-
-  const errs = results.filter(r => !r.ok);
-  if (errs.length) {
-    console.warn("Some data files failed to load:", errs);
-    const msg = errs.map(e => `${e.url} (${e.status || "ERR"})`).join(" | ");
-    showStatus(`Some files missing, loading partial data: ${msg}`);
-  }
-
-  const chars = unwrapItems(charsR.data).map(x => normalizeItem(x, "character"));
-  const weapons = unwrapItems(weapR.data).map(x => normalizeItem(x, "weapon"));
-  const accessories = unwrapItems(accR.data).map(x => normalizeItem(x, "accessory"));
-  const enemies = unwrapItems(eneR.data).map(x => normalizeItem(x, "enemy"));
-  const bosses = unwrapItems(bossR.data).map(x => normalizeItem(x, "boss"));
-
-  let items = [...chars, ...weapons, ...accessories, ...enemies, ...bosses];
-
-  // Apply leader skills mapping if available
-  // supports:
-  // { skills: { [id]: {name, description} } } OR { [id]: {name, description} }
-  if (lsR.ok && lsR.data) {
-    const map = lsR.data.skills || lsR.data;
-    if (map && typeof map === "object") {
-      items = items.map(it => {
-        if (it.category !== "character") return it;
-        const ls = map[it.id];
-        return ls ? { ...it, leaderSkill: ls } : it;
-      });
-    }
-  }
-
-  // De-dupe by id
-  const byId = new Map();
-  for (const it of items) {
-    if (!it.id || !it.name) continue;
-    if (!byId.has(it.id)) byId.set(it.id, it);
-  }
-
-  return Array.from(byId.values());
 }
 
 async function main() {
@@ -415,6 +355,7 @@ async function main() {
     $("#modePlatoon")?.classList.remove("active");
     initTeam("story");
   });
+
   $("#modePlatoon")?.addEventListener("click", () => {
     $("#modePlatoon")?.classList.add("active");
     $("#modeStory")?.classList.remove("active");
@@ -422,20 +363,37 @@ async function main() {
   });
 
   $("#clearTeam")?.addEventListener("click", () => initTeam(state.teamMode));
-  $("#runOptimize")?.addEventListener("click", optimizePreview);
-  $("#autoFill")?.addEventListener("click", autofillTeam);
 
-  ["#wAtk","#wHp","#wSpd","#wCost","#maxCost","#fillMode","#lockMode"].forEach(id => {
+  $("#runOptimize")?.addEventListener("click", optimizePreview);
+
+  ["#wAtk", "#wHp", "#wSpd", "#wCost"].forEach(id => {
     const el = $(id);
-    if (!el) return;
-    el.addEventListener("input", optimizePreview);
-    el.addEventListener("change", optimizePreview);
+    if (el) {
+      el.addEventListener("input", optimizePreview);
+      el.addEventListener("change", optimizePreview);
+    }
   });
 
   try {
-    showStatus("Loading split data files…");
+    showStatus("Loading toolbox data…");
 
-    const items = await loadAllData();
+    const [charactersJson, weaponsJson, accessoriesJson, enemiesJson, bossesJson] =
+      await Promise.all([
+        fetchJson(DATA.characters),
+        fetchJson(DATA.weapons),
+        fetchJson(DATA.accessories),
+        fetchJson(DATA.enemies),
+        fetchJson(DATA.bosses).catch(() => []), // allow missing bosses file
+      ]);
+
+    const characters = unwrapArray(charactersJson);
+    const weapons = unwrapArray(weaponsJson);
+    const accessories = unwrapArray(accessoriesJson);
+    const enemies = unwrapArray(enemiesJson);
+    const bosses = unwrapArray(bossesJson);
+
+    const items = buildCatalog({ characters, weapons, accessories, enemies, bosses });
+
     state.items = items;
     state.byId = new Map(items.map(x => [x.id, x]));
 
