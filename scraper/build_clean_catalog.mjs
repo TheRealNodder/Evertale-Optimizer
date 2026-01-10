@@ -1,29 +1,24 @@
 // scraper/build_clean_catalog.mjs
-// Build a "clean" catalog for the site from whatever partial/mixed sources exist.
-// - Works even if you only have image-path items (no stats).
-// - Detects categories by image path (weapons/units/characters/accessories/monsters/enemies/bosses).
-// - Does NOT require Viewer stats to exist (stats remain null).
+// Build the ONE file the website should load: data/catalog.clean.json
+// Merges Toolbox sources (characters + weapons + accessories + enemies/bosses) if present.
 
 import fs from "node:fs";
 import path from "node:path";
 
 const DATA_DIR = path.resolve("data");
+const OUT_FILE = path.join(DATA_DIR, "catalog.clean.json");
 
-const INPUT_CANDIDATES = [
-  "data/catalog.toolbox.json",
-  "data/catalog.json",
-  "data/catalog.clean.json",
-  "data/catalog.dom.raw.json",
-  "data/catalog.dom.raw.json",
-  "data/catalog.dom.raw.json",
-  "data/catalog.dom.raw.json",
-  "data/catalog.dom.raw.json",
-  "data/catalog.dom.raw.json",
-  "data/catalog.dom.raw.json",
-  "data/catalog.dom.raw.json",
-  "data/catalog.dom.raw.json",
-  // add more if you generate them:
-  "data/catalog.dom.raw.json",
+// Priority inputs (all optional; we merge whatever exists)
+const INPUTS = [
+  "data/characters.toolbox.json",     // from scrape_toolbox_characters_dom.mjs (has stats)
+  "data/characters.toolbox.json",     // duplicate-safe
+  "data/weapons.toolbox.json",        // if produced by scrape_toolbox_units_full.mjs
+  "data/accessories.toolbox.json",    // if produced by scrape_toolbox_units_full.mjs
+  "data/enemies.toolbox.json",        // if produced by scrape_toolbox_units_full.mjs
+  "data/bosses.toolbox.json",         // if you ever add this
+  "data/catalog.toolbox.json",        // legacy/mixed (optional)
+  "data/catalog.dom.raw.json",        // legacy/mixed (optional)
+  "data/catalog.json"                 // legacy (optional)
 ];
 
 function existsNonEmpty(p) {
@@ -34,160 +29,105 @@ function existsNonEmpty(p) {
   }
 }
 
-function tryReadJson(p) {
-  try {
-    const txt = fs.readFileSync(p, "utf8");
-    return JSON.parse(txt);
-  } catch {
-    return null;
+function safeJsonRead(p) {
+  const raw = JSON.parse(fs.readFileSync(p, "utf8"));
+  // supports [] or {items: []} or {characters: []} etc.
+  if (Array.isArray(raw)) return raw;
+  if (raw && Array.isArray(raw.items)) return raw.items;
+
+  // common split shapes
+  const merged = [];
+  for (const k of ["characters", "weapons", "accessories", "enemies", "bosses", "unknown"]) {
+    if (Array.isArray(raw?.[k])) merged.push(...raw[k]);
   }
-}
-
-function toArray(json) {
-  if (!json) return [];
-  if (Array.isArray(json)) return json;
-  if (Array.isArray(json.items)) return json.items;
-  if (Array.isArray(json.catalog)) return json.catalog;
-  if (json.catalog && Array.isArray(json.catalog.items)) return json.catalog.items;
-
-  // split-style catalog
-  if (json.catalog && typeof json.catalog === "object") {
-    const out = [];
-    for (const k of ["characters", "weapons", "accessories", "enemies", "bosses"]) {
-      if (Array.isArray(json.catalog[k])) out.push(...json.catalog[k]);
-    }
-    return out;
-  }
-
-  return [];
-}
-
-function normCat(x) {
-  const v = (x || "").toString().toLowerCase().trim();
-  if (["character", "characters", "unit", "units"].includes(v)) return "character";
-  if (["weapon", "weapons"].includes(v)) return "weapon";
-  if (["accessory", "accessories"].includes(v)) return "accessory";
-  if (["enemy", "enemies", "monster", "monsters"].includes(v)) return "enemy";
-  if (["boss", "bosses"].includes(v)) return "boss";
-  return v || "unknown";
-}
-
-function catFromImage(img) {
-  const s = (img || "").toString().toLowerCase();
-
-  // weapon
-  if (s.includes("/weapons/")) return "weapon";
-
-  // accessory
-  if (s.includes("/accessories/") || s.includes("/acc/")) return "accessory";
-
-  // characters/units (toolbox uses different folder names depending on page)
-  if (
-    s.includes("/units/") ||
-    s.includes("/unit/") ||
-    s.includes("/characters/") ||
-    s.includes("/character/") ||
-    s.includes("/heroes/") ||
-    s.includes("/hero/")
-  ) return "character";
-
-  // enemies/monsters
-  if (s.includes("/monsters/") || s.includes("/enemies/")) return "enemy";
-
-  // bosses (if they have their own folder)
-  if (s.includes("/boss/") || s.includes("/bosses/")) return "boss";
-
-  return "unknown";
+  return merged.length ? merged : [];
 }
 
 function slugifyId(s) {
-  return (s || "")
+  return (s ?? "")
     .toString()
     .trim()
     .toLowerCase()
-    .replace(/^https?:\/\//, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
+    .replace(/\s+/g, "-")
+    .replace(/[^a-z0-9\-]/g, "");
 }
 
-// Turns "VenusSeaShellMace01.png" into "Venus Sea Shell Mace 01"
-function prettyNameFromFilename(filename) {
-  const base = filename.replace(/\.(png|jpg|jpeg|webp)$/i, "");
-  const spaced = base
-    .replace(/([a-z])([A-Z])/g, "$1 $2")
-    .replace(/([A-Za-z])(\d+)/g, "$1 $2")
-    .replace(/(\d+)([A-Za-z])/g, "$1 $2")
-    .replace(/\s+/g, " ")
-    .trim();
-  return spaced || base;
+function catFromImage(img) {
+  const x = (img || "").toLowerCase();
+  if (x.includes("/weapons/")) return "weapon";
+  if (x.includes("/accessories/")) return "accessory";
+  if (x.includes("/monsters/") || x.includes("/enemies/")) return "enemy";
+  if (x.includes("/boss")) return "boss";
+  // Toolbox uses monsters/ for many enemies; characters usually appear as monsters too,
+  // so we avoid using image-only to decide character.
+  return "unknown";
 }
 
-// Accepts either:
-// - {id,name,image,url,category,type,...}
-// - raw strings like "/files/images/weapons/small/X.png"
-// - DOM scraped objects {image: "..."} etc
+function normCat(v) {
+  const s = (v || "").toString().toLowerCase().trim();
+  if (["character", "characters", "unit", "units"].includes(s)) return "character";
+  if (["weapon", "weapons"].includes(s)) return "weapon";
+  if (["accessory", "accessories"].includes(s)) return "accessory";
+  if (["enemy", "enemies", "monster", "monsters"].includes(s)) return "enemy";
+  if (["boss", "bosses"].includes(s)) return "boss";
+  return s || "unknown";
+}
+
+function num(v) {
+  if (v == null) return null;
+  const n = Number(String(v).replace(/,/g, "").trim());
+  return Number.isFinite(n) ? n : null;
+}
+
 function normalizeItem(raw) {
-  // If it’s a plain string, treat it as image/path/name
+  // raw can be a string image path
   if (typeof raw === "string") {
-    const img = raw;
-    const file = path.posix.basename(img);
-    const name = prettyNameFromFilename(file);
-    const category = catFromImage(img);
-    const id = slugifyId(file || img);
+    const image = raw;
+    const name = path.posix.basename(image);
+    const id = slugifyId(name);
     return {
       id,
       name,
-      category,
+      category: catFromImage(image),
       element: null,
-      image: img,
+      image,
       url: null,
       cost: null,
       atk: null,
       hp: null,
-      spd: null,
+      spd: null
     };
   }
 
-  const img = raw.imageUrl || raw.image || raw.img || raw.icon || null;
+  const name = (raw.name ?? raw.title ?? raw.id ?? "").toString().trim();
+  const id = (raw.id ?? raw.key ?? raw.unitId ?? slugifyId(name)).toString().trim() || slugifyId(name);
 
-  // Sometimes your broken mixed rows look like:
-  // "Name Rarity Element Cost ATK HP ..."
-  // Treat those as invalid headers
-  const rawName = (raw.name ?? raw.id ?? "").toString();
-  const lower = rawName.toLowerCase();
-  if (
-    lower.includes("name rarity element cost") ||
-    lower === "name" ||
-    lower.startsWith("name rarity")
-  ) {
-    return null;
-  }
-
-  const category = normCat(raw.category ?? raw.type) || catFromImage(img);
-  const name =
-    (raw.name && raw.name.toString().trim()) ||
-    (img ? prettyNameFromFilename(path.posix.basename(img)) : rawName.trim()) ||
+  const image =
+    raw.imageUrl ||
+    raw.image ||
+    raw.img ||
+    raw.icon ||
     null;
 
-  const id =
-    (raw.id && raw.id.toString().trim()) ||
-    (raw.key && raw.key.toString().trim()) ||
-    (img ? slugifyId(path.posix.basename(img)) : slugifyId(name)) ||
-    null;
-
-  if (!id || !name) return null;
+  const category =
+    normCat(raw.category ?? raw.type) ||
+    (image ? catFromImage(image) : "unknown");
 
   return {
     id,
-    name,
-    category: category === "unknown" ? catFromImage(img) : category,
+    name: name || id,
+    category,
     element: raw.element ?? null,
-    image: img,
+    image: image ?? null,
     url: raw.url ?? null,
-    cost: raw.cost ?? null,
-    atk: raw.atk ?? null,
-    hp: raw.hp ?? null,
-    spd: raw.spd ?? null,
+    cost: num(raw.cost),
+    atk: num(raw.atk),
+    hp: num(raw.hp),
+    spd: num(raw.spd),
+    leaderSkill: raw.leaderSkill ?? raw.leader ?? null,
+    activeSkills: raw.activeSkills ?? raw.actives ?? null,
+    passiveSkills: raw.passiveSkills ?? raw.passives ?? null,
+    raw
   };
 }
 
@@ -198,16 +138,15 @@ function splitByCategory(items) {
     accessories: [],
     enemies: [],
     bosses: [],
-    unknown: [],
+    unknown: []
   };
 
   for (const it of items) {
-    const cat = normCat(it.category);
-    if (cat === "character") out.characters.push(it);
-    else if (cat === "weapon") out.weapons.push(it);
-    else if (cat === "accessory") out.accessories.push(it);
-    else if (cat === "enemy") out.enemies.push(it);
-    else if (cat === "boss") out.bosses.push(it);
+    if (it.category === "character") out.characters.push(it);
+    else if (it.category === "weapon") out.weapons.push(it);
+    else if (it.category === "accessory") out.accessories.push(it);
+    else if (it.category === "enemy") out.enemies.push(it);
+    else if (it.category === "boss") out.bosses.push(it);
     else out.unknown.push(it);
   }
   return out;
@@ -218,8 +157,7 @@ function dedupe(items) {
   const out = [];
   for (const it of items) {
     const k = it.id || it.name;
-    if (!k) continue;
-    if (seen.has(k)) continue;
+    if (!k || seen.has(k)) continue;
     seen.add(k);
     out.push(it);
   }
@@ -229,61 +167,35 @@ function dedupe(items) {
 function main() {
   if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 
-  // Load the first valid JSON source that contains items
-  const sourcesTried = [];
-  let inputFile = null;
-  let inputJson = null;
+  const present = INPUTS.filter(existsNonEmpty);
+  console.log(`[build_clean_catalog] inputs present: ${present.length}`);
+  for (const p of present) console.log(` - ${p}`);
 
-  // auto-detect: any json in data that looks like catalog
-  const dataFiles = fs
-    .readdirSync(DATA_DIR)
-    .filter((f) => f.toLowerCase().endsWith(".json"))
-    .map((f) => path.join("data", f));
-
-  const candidates = [
-    ...INPUT_CANDIDATES,
-    ...dataFiles, // fallback to ANY json present
-  ];
-
-  for (const file of candidates) {
-    if (!existsNonEmpty(file)) continue;
-    sourcesTried.push(file);
-    const json = tryReadJson(file);
-    if (!json) continue;
-
-    const arr = toArray(json);
-    if (arr.length >= 1) {
-      inputFile = file;
-      inputJson = json;
-      break;
+  const mergedRaw = [];
+  for (const p of present) {
+    try {
+      mergedRaw.push(...safeJsonRead(p));
+    } catch (e) {
+      console.warn(`[build_clean_catalog] failed reading ${p}: ${e.message}`);
     }
   }
 
-  if (!inputJson) {
-    console.error("build_clean_catalog failed: No readable catalog source JSON found.");
-    console.error("Tried:", sourcesTried);
-    process.exit(1);
+  const normalized = dedupe(mergedRaw.map(normalizeItem)).filter(x => x.name);
+
+  // Promote anything from characters.toolbox.json to category=character (it contains stats)
+  // If the source includes atk/hp/spd/cost, it’s definitely a character row from Viewer DOM scrape.
+  for (const it of normalized) {
+    if (it.category !== "character") {
+      const hasStats = it.atk != null || it.hp != null || it.spd != null || it.cost != null;
+      if (hasStats) it.category = "character";
+    }
   }
-
-  const rawArr = toArray(inputJson);
-
-  // Normalize items
-  const normalized = dedupe(
-    rawArr
-      .map(normalizeItem)
-      .filter(Boolean)
-      .map((x) => ({
-        ...x,
-        // if category still unknown but we have an image, infer it
-        category: x.category === "unknown" ? catFromImage(x.image) : x.category,
-      }))
-  );
 
   const split = splitByCategory(normalized);
 
   const out = {
     generatedAt: new Date().toISOString(),
-    sourceFiles: [inputFile],
+    sourceFiles: present,
     counts: {
       total: normalized.length,
       characters: split.characters.length,
@@ -291,21 +203,19 @@ function main() {
       accessories: split.accessories.length,
       enemies: split.enemies.length,
       bosses: split.bosses.length,
-      unknown: split.unknown.length,
+      unknown: split.unknown.length
     },
     characters: split.characters,
     weapons: split.weapons,
     accessories: split.accessories,
     enemies: split.enemies,
     bosses: split.bosses,
-    unknown: split.unknown,
+    unknown: split.unknown
   };
 
-  const outPath = path.join(DATA_DIR, "catalog.clean.json");
-  fs.writeFileSync(outPath, JSON.stringify(out, null, 2), "utf8");
-
-  console.log(`Wrote clean catalog -> ${outPath}`);
-  console.log("Counts:", out.counts);
+  fs.writeFileSync(OUT_FILE, JSON.stringify(out, null, 2), "utf8");
+  console.log(`[build_clean_catalog] wrote ${OUT_FILE}`);
+  console.log(`[build_clean_catalog] counts:`, out.counts);
 }
 
 main();
