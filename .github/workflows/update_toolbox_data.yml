@@ -1,4 +1,4 @@
-name: Update Toolbox Data
+name: Update Toolbox Data (toolbox-only)
 
 on:
   workflow_dispatch:
@@ -21,7 +21,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          persist-credentials: false
           fetch-depth: 0
 
       - name: Setup Node
@@ -33,103 +32,79 @@ jobs:
         working-directory: scraper
         run: npm install
 
-      - name: Install Playwright Chromium
+      # Fixes: "Executable doesn't exist..." after Playwright updates
+      - name: Install Playwright browsers
         working-directory: scraper
         run: npx playwright install --with-deps chromium
 
       - name: Ensure data folder exists
         run: mkdir -p data
 
-      - name: Debug: list scraper + data before
+      # --- TOOLBOX SCRAPE (best effort) ---
+      # If the WS dataset isn't found, we still want debug files uploaded,
+      # and we do NOT want to delete the last known-good catalog.clean.json
+      - name: Scrape Toolbox items from WS (best effort)
+        run: node scraper/scrape_toolbox_items_from_ws.mjs || true
+
+      # --- NORMALIZE (only if toolbox.items.json exists) ---
+      - name: Normalize toolbox.items.json -> clean catalog (only if items exist)
         run: |
-          echo "=== scraper/ ==="
-          ls -la scraper || true
-          echo "=== data/ (before) ==="
-          ls -la data || true
+          if [ -s data/toolbox.items.json ]; then
+            node scraper/normalize_toolbox_items.mjs
+          else
+            echo "Skipping normalize: data/toolbox.items.json missing or empty"
+          fi
 
-      # ---- WS FIRST (SAFE MODE SCRAPER SHOULD NOT FAIL HARD) ----
-      - name: Scrape toolbox items via WS (may produce empty)
-        run: node scraper/scrape_toolbox_items_from_ws.mjs
+      # --- VERIFY OUTPUTS (soft) ---
+      # We do not fail the job if scrape failed; we only fail if we have NO clean catalog at all.
+      - name: Verify we have a clean catalog (required)
+        run: |
+          if [ -s data/catalog.clean.json ]; then
+            echo "OK: data/catalog.clean.json exists"
+          else
+            echo "ERROR: data/catalog.clean.json missing. Nothing to publish."
+            exit 1
+          fi
 
-      - name: Debug: show WS outputs
+      # --- DEBUG VISIBILITY ---
+      - name: Show data folder contents
         if: always()
         run: |
-          echo "=== data after WS scrape ==="
-          ls -la data || true
-          echo "=== toolbox.items.json size ==="
-          wc -c data/toolbox.items.json 2>/dev/null || true
-
-      # ---- FALLBACK: if WS is empty, scrape DOM + normalize DOM catalog ----
-      - name: If WS empty, fallback to DOM scrape + normalize
-        run: |
-          node -e "const fs=require('fs'); const p='data/toolbox.items.json'; if(!fs.existsSync(p)) process.exit(1); const a=JSON.parse(fs.readFileSync(p,'utf8')); process.exit(Array.isArray(a)&&a.length>0?0:1)" \
-          && echo "WS items present (skip DOM fallback)" \
-          || (echo "WS empty -> DOM fallback" && node scraper/scrape_viewer_dom_items.mjs && node scraper/normalize_dom_catalog.mjs)
-
-      # ---- Normalize WS items (only succeeds if toolbox.items.json has content) ----
-      - name: Normalize toolbox items (WS) -> catalog
-        run: node scraper/normalize_toolbox_items.mjs || true
-
-      # ---- Build final clean catalog (should pick best available inputs) ----
-      - name: Build clean catalog
-        run: node scraper/build_clean_catalog.mjs
-
-      - name: Show data folder contents (after)
-        if: always()
-        run: |
-          echo "=== data/ (after) ==="
+          echo "=== data/ ==="
           ls -la data || true
           echo "=== sizes ==="
-          wc -c data/* 2>/dev/null || true
+          (wc -c data/*.json 2>/dev/null || true) | sort -n || true
 
-      - name: Upload debug artifacts
+      - name: Upload debug artifacts (always)
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: toolbox-debug
           path: |
             data/*.json
+            data/*.txt
             data/*.html
             data/*.png
-            data/*.txt
           if-no-files-found: ignore
           retention-days: 7
 
-      # Hard check: ensure at least ONE usable catalog exists
-      - name: Verify catalog exists
-        run: |
-          if [ -s data/catalog.clean.json ]; then
-            echo "OK: data/catalog.clean.json"
-            exit 0
-          fi
-          if [ -s data/catalog.toolbox.json ]; then
-            echo "OK: data/catalog.toolbox.json"
-            exit 0
-          fi
-          if [ -s data/catalog.dom.raw.json ]; then
-            echo "OK: data/catalog.dom.raw.json (raw fallback)"
-            exit 0
-          fi
-          echo "ERROR: No catalog output was produced."
-          exit 1
-
+      # --- COMMIT ONLY IF CHANGED ---
       - name: Commit generated data
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/ || true
-          git diff --cached --quiet || git commit -m "Update toolbox data"
 
-      - name: Push changes (safe)
-        env:
-          GH_PAT: ${{ secrets.GH_PAT }}
-        run: |
-          set -e
-          if [ -z "$GH_PAT" ]; then
-            echo "GH_PAT secret is missing"
-            exit 1
+          git add data/ || true
+          if git diff --cached --quiet; then
+            echo "No data changes to commit."
+            exit 0
           fi
-          git remote set-url origin "https://x-access-token:${GH_PAT}@github.com/${GITHUB_REPOSITORY}.git"
-          git fetch origin main
-          git pull --rebase --autostash origin main
+
+          git commit -m "Update toolbox data (clean catalog)"
+
+      - name: Push changes
+        run: |
+          # Avoid your earlier "cannot rebase: You have unstaged changes"
+          # by using autostash.
+          git pull --rebase --autostash origin main || true
           git push origin HEAD:main
