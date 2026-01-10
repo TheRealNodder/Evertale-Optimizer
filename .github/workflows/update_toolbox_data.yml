@@ -1,4 +1,4 @@
-name: Update Toolbox Data (Toolbox WS)
+name: Update Toolbox Data
 
 on:
   workflow_dispatch:
@@ -13,12 +13,15 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  update:
+  scrape:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -29,43 +32,32 @@ jobs:
         working-directory: scraper
         run: npm install
 
-      - name: Install Playwright Chromium (with deps)
+      - name: Install Playwright Chromium
         working-directory: scraper
         run: npx playwright install --with-deps chromium
-
-      - name: Debug Playwright install
-        working-directory: scraper
-        run: |
-          node -v
-          npm -v
-          npx playwright --version
-          ls -la ~/.cache/ms-playwright || true
-          npx playwright install --dry-run || true
 
       - name: Ensure data folder exists
         run: mkdir -p data
 
-      - name: Scrape toolbox items (WS)
+      # --- TOOLBOX SOURCE OF TRUTH ---
+      - name: Scrape Toolbox items via WS (SignalR msgpack)
         run: node scraper/scrape_toolbox_items_from_ws.mjs
 
-      - name: List data outputs (after scrape)
+      - name: Normalize toolbox items -> clean catalog files
+        run: node scraper/normalize_toolbox_items.mjs
+
+      # Optional: if you want a single file that your app uses, keep this
+      - name: Build clean catalog
+        run: node scraper/build_clean_catalog.mjs
+
+      # --- Debug visibility ---
+      - name: Show data folder contents
         if: always()
         run: |
           echo "=== data/ ==="
           ls -la data || true
           echo "=== sizes ==="
           wc -c data/*.json 2>/dev/null || true
-
-      - name: Normalize toolbox items
-        run: node scraper/normalize_toolbox_items.mjs
-
-      - name: Build clean catalog
-        run: node scraper/build_clean_catalog.mjs
-
-      - name: Verify outputs exist
-        run: |
-          test -s data/toolbox.items.json
-          test -s data/catalog.clean.json
 
       - name: Upload debug artifacts
         if: always()
@@ -80,12 +72,33 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
+      # --- Hard checks ---
+      - name: Verify required outputs exist
+        run: |
+          test -s data/toolbox.items.json
+          # at least one of these should exist based on your pipeline
+          test -s data/catalog.clean.json || test -s data/catalog.toolbox.json
+
+      # --- Commit + push safely ---
       - name: Commit generated data
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/ scraper/package.json || true
-          git diff --cached --quiet || git commit -m "Update toolbox data (Toolbox WS)"
+
+          git add data/ || true
+          git diff --cached --quiet || git commit -m "Update toolbox data"
 
       - name: Push changes
-        run: git push
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: |
+          set -e
+          if [ -z "$GH_PAT" ]; then
+            echo "GH_PAT secret is missing"
+            exit 1
+          fi
+
+          git remote set-url origin "https://x-access-token:${GH_PAT}@github.com/${GITHUB_REPOSITORY}.git"
+          git fetch origin main
+          git pull --rebase origin main
+          git push origin HEAD:main
