@@ -38,40 +38,37 @@ jobs:
       - name: Ensure data folder exists
         run: mkdir -p data
 
-      - name: Show scraper folder (debug)
+      - name: Debug: list scraper + data before
         run: |
           echo "=== scraper/ ==="
           ls -la scraper || true
-          echo "=== scraper/*.mjs ==="
-          find scraper -maxdepth 2 -type f -name "*.mjs" -print || true
+          echo "=== data/ (before) ==="
+          ls -la data || true
 
-      # --- TOOLBOX scrape (this is the one that currently crashes due to cheerio import) ---
-      - name: Scrape Toolbox Units (full)
-        run: node scraper/scrape_toolbox_units_full.mjs
+      # 1) MUST produce data/toolbox.items.json
+      - name: Scrape Toolbox items from WS (required)
+        run: node scraper/scrape_toolbox_items_from_ws.mjs
 
-      # --- Normalize (optional but recommended if your script writes normalized output) ---
-      - name: Normalize Toolbox Items
+      - name: Verify toolbox.items.json exists
+        run: |
+          test -s data/toolbox.items.json
+          node -e "JSON.parse(require('fs').readFileSync('data/toolbox.items.json','utf8')); console.log('toolbox.items.json OK')"
+
+      # 2) Normalize items
+      - name: Normalize Toolbox items
         run: node scraper/normalize_toolbox_items.mjs
 
-      # --- Build clean catalog (your repo has build_clean_catalog.mjs) ---
+      # 3) Build clean catalog
       - name: Build Clean Catalog
         run: node scraper/build_clean_catalog.mjs
 
-      - name: Show outputs
+      - name: Debug: list data after
         if: always()
         run: |
-          echo "=== data/ ==="
+          echo "=== data/ (after) ==="
           ls -la data || true
           echo "=== sizes ==="
           wc -c data/* 2>/dev/null || true
-          echo "=== head of catalog files (if present) ==="
-          for f in data/catalog.clean.json data/catalog.toolbox.json data/toolbox.items.json; do
-            if [ -s "$f" ]; then
-              echo "--- $f ---"
-              head -c 400 "$f" || true
-              echo
-            fi
-          done
 
       - name: Upload debug artifacts (always)
         if: always()
@@ -83,7 +80,6 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
-      # --- Fail hard if the clean catalog didn't get produced ---
       - name: Verify clean catalog exists
         run: |
           test -s data/catalog.clean.json
@@ -92,8 +88,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          git add data/ || true
+          git add data/ scraper/scrape_toolbox_items_from_ws.mjs || true
           git diff --cached --quiet || git commit -m "Update toolbox data (toolbox-only)"
 
       - name: Push changes (safe)
@@ -105,10 +100,7 @@ jobs:
             echo "GH_PAT secret is missing"
             exit 1
           fi
-
           git remote set-url origin "https://x-access-token:${GH_PAT}@github.com/TheRealNodder/Evertale-Optimizer.git"
           git fetch origin main
-
-          # autostash prevents: "cannot rebase: You have unstaged changes."
           git pull --rebase --autostash origin main
           git push origin HEAD:main
