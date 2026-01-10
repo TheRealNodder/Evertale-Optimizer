@@ -1,192 +1,276 @@
 // scraper/scrape_toolbox_items_from_ws.mjs
-import fs from "node:fs";
-import path from "node:path";
+// Captures Blazor/SignalR WS frames and tries to extract a large items dataset.
+// Outputs: data/toolbox.items.json + debug files.
+
+import fs from "fs";
+import path from "path";
+import process from "process";
 import { chromium } from "playwright";
 import { MessagePackHubProtocol } from "@microsoft/signalr-protocol-msgpack";
 
-const VIEWER_URL = "https://evertaletoolbox2.runasp.net/Viewer";
+const OUT_DIR = path.resolve("data");
+const OUT_ITEMS = path.join(OUT_DIR, "toolbox.items.json");
 
-const DATA_DIR = path.resolve("data");
-const OUT_ITEMS = path.join(DATA_DIR, "toolbox.items.json");
+const DBG_FRAMES = path.join(OUT_DIR, "_debug_toolbox_ws_frames.json");
+const DBG_DECODED = path.join(OUT_DIR, "_debug_toolbox_ws_decoded.json");
+const DBG_HITS = path.join(OUT_DIR, "_debug_toolbox_ws_hits.json");
 
-// Debug outputs
-const DEBUG_WS = path.join(DATA_DIR, "_debug_ws_frames.json");
-const DEBUG_DECODE = path.join(DATA_DIR, "_debug_ws_decoded.json");
-const DEBUG_HTML = path.join(DATA_DIR, "_debug_viewer_rendered.html");
-const DEBUG_PNG = path.join(DATA_DIR, "_debug_viewer_screenshot.png");
+const TOOLBOX_URL =
+  process.env.TOOLBOX_URL ||
+  "https://evertaletoolbox2.runasp.net/Viewer"; // if Toolbox has a different route, set env TOOLBOX_URL in workflow
 
 function ensureDir(p) {
-  if (!fs.existsSync(p)) fs.mkdirSync(p, { recursive: true });
+  fs.mkdirSync(p, { recursive: true });
 }
 
-// SignalR binary messages are framed with VarInt length prefix.
-// Parse varint (7-bit) length.
-function readVarInt(buf, offset) {
-  let result = 0;
-  let shift = 0;
-  let i = offset;
+function looksLikeBase64(s) {
+  if (typeof s !== "string") return false;
+  if (s.length < 40) return false;
+  if (s.length % 4 !== 0) return false;
+  return /^[A-Za-z0-9+/=]+$/.test(s);
+}
 
-  while (i < buf.length) {
-    const byte = buf[i];
-    result |= (byte & 0x7f) << shift;
-    i++;
-    if ((byte & 0x80) === 0) return { value: result, next: i };
-    shift += 7;
-    if (shift > 35) break;
+function toBytes(payload) {
+  // Playwright websocket payloads are strings; binary frames commonly arrive base64-encoded.
+  if (Buffer.isBuffer(payload)) return new Uint8Array(payload);
+  if (payload instanceof Uint8Array) return payload;
+  if (typeof payload === "string") {
+    if (looksLikeBase64(payload)) {
+      try {
+        return new Uint8Array(Buffer.from(payload, "base64"));
+      } catch {}
+    }
+    // best effort: treat as utf8
+    return new Uint8Array(Buffer.from(payload, "utf8"));
   }
   return null;
 }
 
-// Split a buffer stream into SignalR binary messages (length-prefixed)
-function splitSignalRBinaryMessages(buffer) {
-  const messages = [];
-  let offset = 0;
-
-  while (offset < buffer.length) {
-    const lenInfo = readVarInt(buffer, offset);
-    if (!lenInfo) break;
-    const msgLen = lenInfo.value;
-    const start = lenInfo.next;
-    const end = start + msgLen;
-    if (end > buffer.length) break;
-
-    messages.push(buffer.subarray(start, end));
-    offset = end;
+function safeJson(x) {
+  try {
+    return JSON.parse(JSON.stringify(x));
+  } catch {
+    return null;
   }
-
-  return messages;
 }
 
-// Deep search: find the biggest array of objects/strings/numbers
-function findLargestArray(root) {
-  let best = { path: "", count: 0, value: null };
+function walkFindLargestArray(node, wantPredicate) {
+  // returns {arr, path, score}
+  const seen = new Set();
+  let best = { arr: null, path: "", score: 0 };
 
-  function walk(v, p) {
-    if (!v) return;
+  function rec(v, p) {
+    if (!v || typeof v !== "object") return;
+    if (seen.has(v)) return;
+    seen.add(v);
+
     if (Array.isArray(v)) {
-      if (v.length > best.count) best = { path: p, count: v.length, value: v };
-      // walk children a bit
-      for (let i = 0; i < Math.min(50, v.length); i++) walk(v[i], `${p}[${i}]`);
+      let score = v.length;
+
+      if (v.length > 0 && wantPredicate) {
+        // boost if many elements match
+        let hit = 0;
+        for (let i = 0; i < Math.min(v.length, 50); i++) {
+          if (wantPredicate(v[i])) hit++;
+        }
+        score += hit * 5;
+      }
+
+      if (score > best.score) best = { arr: v, path: p, score };
+
+      for (let i = 0; i < Math.min(v.length, 200); i++) {
+        rec(v[i], `${p}[${i}]`);
+      }
       return;
     }
-    if (typeof v === "object") {
-      for (const k of Object.keys(v)) walk(v[k], p ? `${p}.${k}` : k);
+
+    for (const [k, vv] of Object.entries(v)) {
+      rec(vv, p ? `${p}.${k}` : k);
     }
   }
 
-  walk(root, "");
+  rec(node, "");
   return best;
 }
 
+function itemLike(o) {
+  if (!o || typeof o !== "object") return false;
+  const s = JSON.stringify(o);
+  // toolbox image paths or known fields often appear in these objects
+  return (
+    s.includes("/files/images/") ||
+    "Name" in o ||
+    "name" in o ||
+    "Id" in o ||
+    "id" in o ||
+    "Element" in o ||
+    "element" in o
+  );
+}
+
+function normalizeRawItem(o) {
+  // Very tolerant mapping (Toolbox/Blazor properties may be PascalCase)
+  const get = (...keys) => {
+    for (const k of keys) {
+      if (o && Object.prototype.hasOwnProperty.call(o, k)) return o[k];
+    }
+    return null;
+  };
+
+  const name = get("name", "Name", "UnitName", "Title");
+  const id = get("id", "Id", "ID", "Key", "key") || name;
+  const image =
+    get("image", "Image", "imageUrl", "ImageUrl", "Icon", "icon") || null;
+
+  const category =
+    (get("category", "Category", "type", "Type") || "").toString().toLowerCase() ||
+    null;
+
+  const element = get("element", "Element") ?? null;
+  const cost = get("cost", "Cost") ?? null;
+
+  const atk = get("atk", "ATK", "Attack") ?? null;
+  const hp = get("hp", "HP") ?? null;
+  const spd = get("spd", "SPD", "Speed") ?? null;
+
+  return {
+    id: id ? String(id) : null,
+    name: name ? String(name) : null,
+    category,
+    element,
+    image,
+    cost,
+    atk,
+    hp,
+    spd,
+    raw: o
+  };
+}
+
 async function run() {
-  ensureDir(DATA_DIR);
-
-  const browser = await chromium.launch({
-    headless: true,
-    args: ["--no-sandbox", "--disable-dev-shm-usage"]
-  });
-
-  const page = await browser.newPage({ viewport: { width: 1400, height: 800 } });
-
-  // CDP session for WS frames
-  const cdp = await page.context().newCDPSession(page);
-  await cdp.send("Network.enable");
+  ensureDir(OUT_DIR);
 
   const frames = [];
-  const wsBuffersById = new Map(); // requestId -> Buffer chunks concatenated
+  const decodedMessages = [];
+  const hits = [];
 
-  cdp.on("Network.webSocketFrameReceived", (ev) => {
-    const { requestId, timestamp, response } = ev;
-    const payloadData = response.payloadData;
-    const opcode = response.opcode; // 2 = binary
-    frames.push({ dir: "recv", requestId, timestamp, opcode, length: payloadData?.length ?? 0 });
-
-    if (opcode === 2 && payloadData) {
-      // CDP sends binary payload as base64 string
-      const chunk = Buffer.from(payloadData, "base64");
-      const prev = wsBuffersById.get(requestId);
-      wsBuffersById.set(requestId, prev ? Buffer.concat([prev, chunk]) : chunk);
-    }
-  });
-
-  cdp.on("Network.webSocketFrameSent", (ev) => {
-    const { requestId, timestamp, response } = ev;
-    frames.push({ dir: "sent", requestId, timestamp, opcode: response.opcode, length: response.payloadData?.length ?? 0 });
-  });
-
-  console.log(`Loading Viewer: ${VIEWER_URL}`);
-  await page.goto(VIEWER_URL, { waitUntil: "domcontentloaded", timeout: 120_000 });
-  await page.waitForTimeout(5000);
-
-  // Scroll a bit to trigger more data rendering/loading
-  for (let i = 0; i < 10; i++) {
-    await page.mouse.wheel(0, 1400);
-    await page.waitForTimeout(700);
-  }
-  await page.waitForTimeout(4000);
-
-  // Save debug HTML/screenshot
-  try {
-    const html = await page.content();
-    fs.writeFileSync(DEBUG_HTML, html, "utf8");
-  } catch {}
-  try {
-    await page.screenshot({ path: DEBUG_PNG, fullPage: true });
-  } catch {}
-
-  await browser.close();
-
-  fs.writeFileSync(DEBUG_WS, JSON.stringify(frames, null, 2), "utf8");
-
-  // Decode SignalR binary messages using MessagePackHubProtocol
   const protocol = new MessagePackHubProtocol();
-  const decoded = [];
-  let bestDataset = { count: 0, path: "", value: null, requestId: null };
+  const logger = { log: () => {} };
 
-  for (const [requestId, buf] of wsBuffersById.entries()) {
-    // Split into messages
-    const messages = splitSignalRBinaryMessages(buf);
-    if (!messages.length) continue;
+  const browser = await chromium.launch({ headless: true });
+  const page = await browser.newPage();
 
-    for (const msgBuf of messages) {
-      try {
-        // parseMessages returns hub messages from a single binary payload
-        const hubMsgs = protocol.parseMessages(msgBuf, null);
-        for (const hm of hubMsgs) {
-          decoded.push({ requestId, type: hm.type, target: hm.target ?? null });
+  page.on("websocket", (ws) => {
+    ws.on("framereceived", (frame) => {
+      frames.push({
+        t: Date.now(),
+        dir: "in",
+        opcode: frame.opcode, // 'text' or 'binary' (Playwright sets this)
+        len: frame.payload?.length ?? 0,
+        payload: frame.payload
+      });
+    });
+    ws.on("framesent", (frame) => {
+      frames.push({
+        t: Date.now(),
+        dir: "out",
+        opcode: frame.opcode,
+        len: frame.payload?.length ?? 0,
+        payload: frame.payload
+      });
+    });
+  });
 
-          // Search within for largest array
-          const largest = findLargestArray(hm);
-          if (largest.count > bestDataset.count) {
-            bestDataset = { count: largest.count, path: largest.path, value: largest.value, requestId };
-          }
-        }
-      } catch {
-        // Ignore decode failures (some frames are handshake/keepalive/etc)
-      }
+  console.log(`Loading Toolbox page: ${TOOLBOX_URL}`);
+  await page.goto(TOOLBOX_URL, { waitUntil: "domcontentloaded", timeout: 120000 });
+
+  // Give Blazor time to connect and stream
+  await page.waitForTimeout(20000);
+
+  // Save raw frames first
+  fs.writeFileSync(DBG_FRAMES, JSON.stringify(frames, null, 2), "utf8");
+
+  // Decode frames -> SignalR hub messages
+  for (const f of frames) {
+    // Only try decoding incoming frames (server -> client)
+    if (f.dir !== "in") continue;
+
+    const bytes = toBytes(f.payload);
+    if (!bytes || bytes.length < 8) continue;
+
+    try {
+      const msgs = protocol.parseMessages(bytes, logger);
+      for (const m of msgs) decodedMessages.push(m);
+    } catch {
+      // ignore non-signalr frames
     }
   }
 
-  fs.writeFileSync(DEBUG_DECODE, JSON.stringify({ decodedCount: decoded.length, bestDataset }, null, 2), "utf8");
+  fs.writeFileSync(DBG_DECODED, JSON.stringify(safeJson(decodedMessages) ?? [], null, 2), "utf8");
 
-  if (!bestDataset.value || bestDataset.count < 50) {
+  // Find best candidate dataset: usually inside Invocation arguments
+  let best = { arr: null, path: "", score: 0, msgIndex: -1 };
+
+  for (let i = 0; i < decodedMessages.length; i++) {
+    const m = decodedMessages[i];
+    const cand = walkFindLargestArray(m, itemLike);
+    if (cand.arr && cand.score > best.score) {
+      best = { ...cand, msgIndex: i };
+    }
+  }
+
+  if (!best.arr || best.arr.length < 20) {
+    // also try: search for any single string stream that contains /files/images/
+    const jsonText = JSON.stringify(decodedMessages);
+    const hasImages = jsonText.includes("/files/images/");
+    fs.writeFileSync(
+      DBG_HITS,
+      JSON.stringify(
+        {
+          messageCount: decodedMessages.length,
+          bestScore: best.score,
+          bestMsgIndex: best.msgIndex,
+          bestPath: best.path,
+          bestLength: best.arr ? best.arr.length : 0,
+          sawFilesImages: hasImages
+        },
+        null,
+        2
+      ),
+      "utf8"
+    );
     throw new Error(
-      `No large dataset found in WS frames (best count=${bestDataset.count}). Check data/_debug_ws_decoded.json and data/_debug_ws_frames.json`
+      `No large dataset found in WS frames (best count=${best.arr ? best.arr.length : 0}). ` +
+        `Check ${DBG_DECODED} and ${DBG_FRAMES}`
     );
   }
 
-  // Write the extracted dataset as toolbox.items.json
-  const out = {
-    generatedAt: new Date().toISOString(),
-    source: VIEWER_URL,
-    requestId: bestDataset.requestId,
-    extractedPath: bestDataset.path,
-    count: bestDataset.count,
-    items: bestDataset.value
-  };
+  // Normalize extracted array
+  const normalized = best.arr
+    .map((x) => normalizeRawItem(x))
+    .filter((x) => x && x.id && x.name);
 
-  fs.writeFileSync(OUT_ITEMS, JSON.stringify(out, null, 2), "utf8");
-  console.log(`Wrote items -> ${OUT_ITEMS} (count=${bestDataset.count})`);
+  fs.writeFileSync(
+    DBG_HITS,
+    JSON.stringify(
+      {
+        messageCount: decodedMessages.length,
+        bestMsgIndex: best.msgIndex,
+        bestPath: best.path,
+        extractedCount: best.arr.length,
+        normalizedCount: normalized.length,
+        sample: normalized.slice(0, 5)
+      },
+      null,
+      2
+    ),
+    "utf8"
+  );
+
+  fs.writeFileSync(OUT_ITEMS, JSON.stringify(normalized, null, 2), "utf8");
+  console.log(`Wrote toolbox items -> ${OUT_ITEMS} (${normalized.length})`);
+
+  await browser.close();
 }
 
 run().catch((e) => {
