@@ -1,4 +1,4 @@
-name: Update Toolbox Data (toolbox-only)
+name: Update Toolbox Data
 
 on:
   workflow_dispatch:
@@ -15,12 +15,12 @@ concurrency:
 jobs:
   scrape:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
+          persist-credentials: false
           fetch-depth: 0
 
       - name: Setup Node
@@ -28,83 +28,100 @@ jobs:
         with:
           node-version: 20
 
+      # If you don't have a package-lock.json, npm ci will fail.
       - name: Install deps (scraper)
         working-directory: scraper
         run: npm install
 
-      # Fixes: "Executable doesn't exist..." after Playwright updates
-      - name: Install Playwright browsers
+      - name: Install Playwright Chromium
         working-directory: scraper
         run: npx playwright install --with-deps chromium
 
       - name: Ensure data folder exists
         run: mkdir -p data
 
-      # --- TOOLBOX SCRAPE (best effort) ---
-      # If the WS dataset isn't found, we still want debug files uploaded,
-      # and we do NOT want to delete the last known-good catalog.clean.json
-      - name: Scrape Toolbox items from WS (best effort)
+      # --- SCRAPE (best effort; do NOT fail the whole workflow if Toolbox changes) ---
+      - name: Scrape Toolbox items (WS) - best effort
         run: node scraper/scrape_toolbox_items_from_ws.mjs || true
 
-      # --- NORMALIZE (only if toolbox.items.json exists) ---
-      - name: Normalize toolbox.items.json -> clean catalog (only if items exist)
-        run: |
-          if [ -s data/toolbox.items.json ]; then
-            node scraper/normalize_toolbox_items.mjs
-          else
-            echo "Skipping normalize: data/toolbox.items.json missing or empty"
-          fi
-
-      # --- VERIFY OUTPUTS (soft) ---
-      # We do not fail the job if scrape failed; we only fail if we have NO clean catalog at all.
-      - name: Verify we have a clean catalog (required)
-        run: |
-          if [ -s data/catalog.clean.json ]; then
-            echo "OK: data/catalog.clean.json exists"
-          else
-            echo "ERROR: data/catalog.clean.json missing. Nothing to publish."
-            exit 1
-          fi
-
-      # --- DEBUG VISIBILITY ---
-      - name: Show data folder contents
+      # --- DEBUG: list + quick peek ---
+      - name: Debug: show data folder contents
         if: always()
         run: |
-          echo "=== data/ ==="
+          echo "=== data/ (ls) ==="
           ls -la data || true
-          echo "=== sizes ==="
-          (wc -c data/*.json 2>/dev/null || true) | sort -n || true
+          echo "=== data/ sizes ==="
+          wc -c data/*.json 2>/dev/null || true
+          echo "=== toolbox.items.json head ==="
+          if [ -f data/toolbox.items.json ]; then
+            head -c 600 data/toolbox.items.json; echo
+          else
+            echo "data/toolbox.items.json not found"
+          fi
 
-      - name: Upload debug artifacts (always)
+      # --- NORMALIZE ONLY IF toolbox.items.json has >= 50 items ---
+      - name: Normalize toolbox.items.json -> catalog (only if items >= 50)
+        run: |
+          if [ ! -s data/toolbox.items.json ]; then
+            echo "Skipping normalize: data/toolbox.items.json missing or empty"
+            exit 0
+          fi
+
+          COUNT=$(node -e "const fs=require('fs'); const j=JSON.parse(fs.readFileSync('data/toolbox.items.json','utf8')); const arr=Array.isArray(j)?j:(Array.isArray(j.items)?j.items:[]); console.log(arr.length);")
+          echo "toolbox.items.json item count = $COUNT"
+
+          if [ "$COUNT" -lt 50 ]; then
+            echo "Skipping normalize: too few items ($COUNT). Keeping existing outputs."
+            exit 0
+          fi
+
+          node scraper/normalize_toolbox_items.mjs
+
+      # Optional: if you use this builder, only run if inputs exist
+      - name: Build clean catalog (only if needed inputs exist)
+        run: |
+          if [ -s data/catalog.toolbox.json ] || [ -s data/catalog.clean.json ]; then
+            node scraper/build_clean_catalog.mjs || true
+          else
+            echo "Skipping build_clean_catalog: no catalog inputs found"
+          fi
+
+      # --- Upload artifacts even if scraping fails so you can inspect on phone ---
+      - name: Upload debug artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: toolbox-debug
           path: |
             data/*.json
-            data/*.txt
             data/*.html
             data/*.png
+            data/*.txt
           if-no-files-found: ignore
           retention-days: 7
 
-      # --- COMMIT ONLY IF CHANGED ---
-      - name: Commit generated data
+      # --- Commit only if something changed ---
+      - name: Commit generated data (if changed)
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
           git add data/ || true
-          if git diff --cached --quiet; then
-            echo "No data changes to commit."
-            exit 0
+          git diff --cached --quiet || git commit -m "Update toolbox data"
+
+      # --- Push (safe) ---
+      - name: Push changes (safe)
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: |
+          set -e
+          if [ -z "$GH_PAT" ]; then
+            echo "GH_PAT secret is missing"
+            exit 1
           fi
 
-          git commit -m "Update toolbox data (clean catalog)"
+          git remote set-url origin "https://x-access-token:${GH_PAT}@github.com/TheRealNodder/Evertale-Optimizer.git"
+          git fetch origin main
 
-      - name: Push changes
-        run: |
-          # Avoid your earlier "cannot rebase: You have unstaged changes"
-          # by using autostash.
-          git pull --rebase --autostash origin main || true
+          git pull --rebase origin main
           git push origin HEAD:main
