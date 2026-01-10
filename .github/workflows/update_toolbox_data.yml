@@ -1,7 +1,9 @@
-name: Update Toolbox Data
+name: Update Toolbox Data (Toolbox WS)
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: "0 9 * * *"
 
 permissions:
   contents: write
@@ -27,14 +29,18 @@ jobs:
         working-directory: scraper
         run: npm install
 
-      - name: Debug scraper node_modules
+      - name: Install Playwright Chromium (with deps)
+        working-directory: scraper
+        run: npx playwright install --with-deps chromium
+
+      - name: Debug Playwright install
         working-directory: scraper
         run: |
           node -v
           npm -v
-          ls -la
-          ls -la node_modules/@microsoft || true
-          node -e "console.log('signalr msgpack exists:', !!require('fs').existsSync('node_modules/@microsoft/signalr-protocol-msgpack/package.json'))"
+          npx playwright --version
+          ls -la ~/.cache/ms-playwright || true
+          npx playwright install --dry-run || true
 
       - name: Ensure data folder exists
         run: mkdir -p data
@@ -44,7 +50,11 @@ jobs:
 
       - name: List data outputs (after scrape)
         if: always()
-        run: ls -la data || true
+        run: |
+          echo "=== data/ ==="
+          ls -la data || true
+          echo "=== sizes ==="
+          wc -c data/*.json 2>/dev/null || true
 
       - name: Normalize toolbox items
         run: node scraper/normalize_toolbox_items.mjs
@@ -52,8 +62,10 @@ jobs:
       - name: Build clean catalog
         run: node scraper/build_clean_catalog.mjs
 
-      - name: Verify clean catalog exists
-        run: test -s data/catalog.clean.json
+      - name: Verify outputs exist
+        run: |
+          test -s data/toolbox.items.json
+          test -s data/catalog.clean.json
 
       - name: Upload debug artifacts
         if: always()
@@ -73,7 +85,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data/ scraper/package.json || true
-          git diff --cached --quiet || git commit -m "Update toolbox data (WS + clean catalog)"
+          git diff --cached --quiet || git commit -m "Update toolbox data (Toolbox WS)"
 
       - name: Push changes
         run: git push
