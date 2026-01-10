@@ -3,6 +3,13 @@ name: Update Toolbox Data
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
+concurrency:
+  group: update-toolbox-data
+  cancel-in-progress: true
+
 jobs:
   update:
     runs-on: ubuntu-latest
@@ -16,9 +23,18 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install deps
+      - name: Install deps (scraper)
         working-directory: scraper
         run: npm install
+
+      - name: Debug scraper node_modules
+        working-directory: scraper
+        run: |
+          node -v
+          npm -v
+          ls -la
+          ls -la node_modules/@microsoft || true
+          node -e "console.log('signalr msgpack exists:', !!require('fs').existsSync('node_modules/@microsoft/signalr-protocol-msgpack/package.json'))"
 
       - name: Ensure data folder exists
         run: mkdir -p data
@@ -26,8 +42,9 @@ jobs:
       - name: Scrape toolbox items (WS)
         run: node scraper/scrape_toolbox_items_from_ws.mjs
 
-      - name: Debug data folder after scrape
-        run: ls -la data
+      - name: List data outputs (after scrape)
+        if: always()
+        run: ls -la data || true
 
       - name: Normalize toolbox items
         run: node scraper/normalize_toolbox_items.mjs
@@ -35,17 +52,28 @@ jobs:
       - name: Build clean catalog
         run: node scraper/build_clean_catalog.mjs
 
-      - name: Verify clean catalog
-        run: |
-          test -s data/catalog.clean.json
-          echo "catalog.clean.json exists"
+      - name: Verify clean catalog exists
+        run: test -s data/catalog.clean.json
 
-      - name: Commit data
+      - name: Upload debug artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: toolbox-debug
+          path: |
+            data/*.json
+            data/*.html
+            data/*.png
+            data/*.txt
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Commit generated data
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/
-          git commit -m "Update toolbox data (clean catalog)" || echo "No changes"
+          git add data/ scraper/package.json || true
+          git diff --cached --quiet || git commit -m "Update toolbox data (WS + clean catalog)"
 
       - name: Push changes
         run: git push
