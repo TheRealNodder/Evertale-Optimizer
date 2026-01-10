@@ -27,54 +27,58 @@ jobs:
         with:
           node-version: 20
 
-      # If you DO have package-lock.json, npm ci is best.
-      # If you DON'T, fallback to npm install.
       - name: Install deps (scraper)
         working-directory: scraper
-        run: |
-          if [ -f package-lock.json ]; then
-            npm ci
-          else
-            npm install
-          fi
+        run: npm install
 
-      - name: Install Playwright browsers
+      - name: Install Playwright Chromium
         working-directory: scraper
         run: npx playwright install --with-deps chromium
 
       - name: Ensure data folder exists
         run: mkdir -p data
 
-      # Make sure workspace is current BEFORE generating files
-      - name: Sync with origin/main (pre-run)
-        run: |
-          git fetch origin main
-          git reset --hard origin/main
+      # ---- SCRAPE (best-effort; do not fail run) ----
+      - name: Scrape Explorer (captures) - best effort
+        run: node scraper/scrape_explorer_capture_json.mjs || true
 
-      # -----------------------------
-      # TOOLBOX-ONLY PIPELINE
-      # -----------------------------
+      - name: Scrape Viewer (captures) - best effort
+        run: node scraper/scrape_viewer_characters_playwright.mjs || true
 
-      - name: Scrape Toolbox items (WS) - best effort
-        run: node scraper/scrape_toolbox_items_from_ws.mjs || true
-
-      - name: Normalize toolbox items -> catalog.toolbox.json (safe skip if empty)
-        run: node scraper/normalize_toolbox_items.mjs || true
-
-      # Optional: units (characters) fallback (does NOT block the run)
-      - name: Scrape Toolbox units full - best effort
+      # Your “full units” scraper (this is where your error was)
+      - name: Scrape Toolbox Units Full (HTML) - best effort
         run: node scraper/scrape_toolbox_units_full.mjs || true
 
-      # Build any downstream catalogs (best effort)
-      - name: Build catalog from items - best effort
-        run: node scraper/build_catalog_from_items.mjs || true
+      # If you have toolbox WS item scraper, run it best-effort
+      - name: Scrape Toolbox Items from WS - best effort
+        run: |
+          if [ -f scraper/scrape_toolbox_items_from_ws.mjs ]; then
+            node scraper/scrape_toolbox_items_from_ws.mjs || true
+          else
+            echo "skip: scraper/scrape_toolbox_items_from_ws.mjs not found"
+          fi
 
-      - name: Build clean catalog - best effort
-        run: node scraper/build_clean_catalog.mjs || true
+      # ---- NORMALIZE / BUILD (should not fail if inputs missing) ----
+      - name: Normalize Toolbox Items - best effort
+        run: |
+          if [ -f scraper/normalize_toolbox_items.mjs ]; then
+            node scraper/normalize_toolbox_items.mjs || true
+          else
+            echo "skip: scraper/normalize_toolbox_items.mjs not found"
+          fi
 
-      # -----------------------------
-      # Debug visibility
-      # -----------------------------
+      - name: Normalize DOM Catalog - best effort
+        run: |
+          if [ -f scraper/normalize_dom_catalog.mjs ]; then
+            node scraper/normalize_dom_catalog.mjs || true
+          else
+            echo "skip: scraper/normalize_dom_catalog.mjs not found"
+          fi
+
+      - name: Build Clean Catalog - required
+        run: node scraper/build_clean_catalog.mjs
+
+      # ---- DEBUG VISIBILITY ----
       - name: Show data folder contents
         if: always()
         run: |
@@ -82,12 +86,9 @@ jobs:
           ls -la data || true
           echo "=== sizes ==="
           wc -c data/*.json 2>/dev/null || true
-          echo "=== head ==="
-          for f in data/*.json; do
-            echo "--- $f ---"
-            head -c 400 "$f" || true
-            echo
-          done
+
+      - name: Validate clean catalog JSON
+        run: node -e "JSON.parse(require('fs').readFileSync('data/catalog.clean.json','utf8')); console.log('catalog.clean.json OK');"
 
       - name: Upload debug artifacts
         if: always()
@@ -96,31 +97,25 @@ jobs:
           name: toolbox-debug
           path: |
             data/*.json
-            data/*.txt
             data/*.html
             data/*.png
+            data/*.txt
           if-no-files-found: ignore
           retention-days: 7
 
-      # -----------------------------
-      # Commit + push (NO rebase step)
-      # -----------------------------
-      - name: Commit generated data (if changed)
+      # ---- COMMIT ONLY WHAT THE WEBSITE NEEDS ----
+      - name: Remove noisy debug files before commit
+        run: |
+          rm -f data/_debug* || true
+          rm -f data/*.png data/*.html data/*.txt || true
+
+      - name: Commit clean catalog only
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Only commit data outputs (not workflows)
-          git add data/ || true
-
-          if git diff --cached --quiet; then
-            echo "No data changes to commit."
-            exit 0
-          fi
-
-          git commit -m "Update toolbox data"
+          git add data/catalog.clean.json || true
+          git diff --cached --quiet || git commit -m "Update toolbox catalog"
 
       - name: Push changes
-        run: |
-          # If there was no commit, this is a no-op
-          git push origin HEAD:main || true
+        run: git push
