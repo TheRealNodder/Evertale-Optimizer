@@ -36,6 +36,7 @@ function extractIdFromLine(t) {
 
 function extractBySections(html) {
   // FIX: use cheerio.load, not load()
+  import * as cheerio from "cheerio";
   const $ = cheerio.load(html);
 
   // map a section heading -> output bucket key
