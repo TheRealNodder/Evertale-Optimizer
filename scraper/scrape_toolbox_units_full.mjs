@@ -1,5 +1,5 @@
 // scraper/scrape_toolbox_units_full.mjs
-// Recreates ../data/ and writes categorized ID lists from Toolbox Explorer.
+// Writes categorized ID lists from Toolbox Explorer into repo-root /data
 
 import fs from "node:fs/promises";
 import path from "node:path";
@@ -8,26 +8,24 @@ import * as cheerio from "cheerio";
 const BASE = "https://evertaletoolbox2.runasp.net";
 const EXPLORER_URL = `${BASE}/Explorer`;
 
-const OUT_DIR = path.join(process.cwd(), "..", "data");
+// IMPORTANT: workflow runs from repo root, so output must be ./data (NOT ../data)
+const OUT_DIR  = path.join(process.cwd(), "data");
 const OUT_CHAR = path.join(OUT_DIR, "characters.toolbox.json");
 const OUT_WEAP = path.join(OUT_DIR, "weapons.toolbox.json");
 const OUT_ENEM = path.join(OUT_DIR, "enemies.toolbox.json");
 const OUT_ACC  = path.join(OUT_DIR, "accessories.toolbox.json");
 
 async function fetchText(url) {
-  const res = await fetch(url, {
-    headers: {
-      "user-agent":
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36",
-      accept: "text/html,application/xhtml+xml"
-    }
-  });
-  if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText} for ${url}`);
+  const res = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0" } });
+  if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
   return await res.text();
 }
 
-function norm(s) {
-  return String(s ?? "").replace(/\s+/g, " ").trim().toLowerCase();
+function normalizeHeading(t) {
+  return String(t ?? "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase();
 }
 
 function extractIdFromLine(t) {
@@ -37,53 +35,71 @@ function extractIdFromLine(t) {
 }
 
 function extractBySections(html) {
-  const $ = load(html);
+  // FIX: use cheerio.load, not load()
+  const $ = cheerio.load(html);
 
+  // map a section heading -> output bucket key
   const sectionMap = new Map([
     ["character", "characters"],
     ["characters", "characters"],
+    ["unit", "characters"],
+    ["units", "characters"],
+
     ["weapon", "weapons"],
     ["weapons", "weapons"],
-    ["boss", "enemies"],
-    ["bosses", "enemies"],
+
+    ["accessory", "accessories"],
+    ["accessories", "accessories"],
+
     ["enemy", "enemies"],
     ["enemies", "enemies"],
-    ["accessory", "accessories"],
-    ["accessories", "accessories"]
+    ["monster", "enemies"],
+    ["monsters", "enemies"],
+    ["boss", "enemies"],
+    ["bosses", "enemies"],
   ]);
 
   const buckets = {
     characters: new Set(),
     weapons: new Set(),
     enemies: new Set(),
-    accessories: new Set()
+    accessories: new Set(),
   };
 
-  let current = null;
+  // Toolbox Explorer tends to use headings + UL lists.
+  // Strategy:
+  // - find headings (h1/h2/h3/h4) and read the next UL/OL
+  // - parse list items as "Id (Name)" format
+  const headings = $("h1,h2,h3,h4").toArray();
 
-  const nodes = $("body").find("*").toArray();
-  for (const el of nodes) {
-    const tag = (el.tagName || "").toLowerCase();
+  for (const h of headings) {
+    const headText = normalizeHeading($(h).text());
+    const bucketKey = sectionMap.get(headText);
+    if (!bucketKey) continue;
 
-    // detect headings
-    if (["h1", "h2", "h3", "h4", "h5", "strong", "b"].includes(tag)) {
-      const label = norm($(el).text());
-      if (sectionMap.has(label)) current = sectionMap.get(label);
+    // try to find the next list near the heading
+    let list = $(h).nextAll("ul,ol").first();
+    if (!list || !list.length) {
+      // sometimes there is a div wrapper
+      list = $(h).parent().find("ul,ol").first();
     }
+    if (!list || !list.length) continue;
 
-    // collect items
-    if (tag === "li" && current) {
+    list.find("li").each((_, el) => {
       const text = $(el).text().replace(/\s+/g, " ").trim();
       const id = extractIdFromLine(text);
-      if (id) buckets[current].add(id);
-    }
+      if (id) buckets[bucketKey].add(id);
+    });
   }
 
+  // Fallback: if headings parsing failed, grab all LI and dump into characters
   const total =
-    buckets.characters.size + buckets.weapons.size + buckets.enemies.size + buckets.accessories.size;
+    buckets.characters.size +
+    buckets.weapons.size +
+    buckets.enemies.size +
+    buckets.accessories.size;
 
   if (total === 0) {
-    // fallback: collect all <li> items and dump into characters
     $("li").each((_, el) => {
       const text = $(el).text().replace(/\s+/g, " ").trim();
       const id = extractIdFromLine(text);
@@ -112,7 +128,6 @@ async function run() {
     throw new Error("No IDs extracted. Explorer HTML may have changed.");
   }
 
-  // ✅ This recreates the folder every run
   await fs.mkdir(OUT_DIR, { recursive: true });
 
   await fs.writeFile(OUT_CHAR, JSON.stringify(wrap(characters, EXPLORER_URL), null, 2), "utf8");
