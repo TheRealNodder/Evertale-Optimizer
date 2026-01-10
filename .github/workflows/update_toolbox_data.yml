@@ -15,6 +15,7 @@ concurrency:
 jobs:
   scrape:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -31,51 +32,64 @@ jobs:
         working-directory: scraper
         run: npm install
 
-      - name: Install Playwright browsers
+      - name: Install Playwright Chromium
         working-directory: scraper
         run: npx playwright install --with-deps chromium
 
       - name: Ensure data folder exists
         run: mkdir -p data
 
-      - name: Fix .mj typo if present
-        run: |
-          if [ -f "scraper/scrape_toolbox_items_from_ws.mj" ] && [ ! -f "scraper/scrape_toolbox_items_from_ws.mjs" ]; then
-            mv scraper/scrape_toolbox_items_from_ws.mj scraper/scrape_toolbox_items_from_ws.mjs
-          fi
-
-      - name: Verify scripts exist
-        run: |
-          test -f scraper/scrape_toolbox_items_from_ws.mjs
-          test -f scraper/normalize_toolbox_items.mjs
-
-      - name: Scrape Toolbox items (best effort)
+      # 1) Capture from toolbox (may fail sometimes). Do NOT stop the workflow.
+      - name: Scrape Toolbox items (WS capture)
         run: node scraper/scrape_toolbox_items_from_ws.mjs || true
 
-      - name: Normalize Toolbox items (safe)
-        run: node scraper/normalize_toolbox_items.mjs || true
+      # 2) Normalize only if toolbox.items.json exists AND is non-empty.
+      - name: Normalize toolbox.items.json -> normalized outputs
+        run: |
+          if [ -s data/toolbox.items.json ]; then
+            node scraper/normalize_toolbox_items.mjs
+          else
+            echo "Skipping normalize: data/toolbox.items.json missing or empty"
+          fi
 
-      - name: Upload debug artifacts (always)
+      # 3) Build final clean catalog (this should succeed even if normalize skipped,
+      # because it can reuse last committed clean files).
+      - name: Build clean catalog
+        run: node scraper/build_clean_catalog.mjs || true
+
+      # Debug visibility (always)
+      - name: Show data folder contents
+        if: always()
+        run: |
+          echo "=== data/ ==="
+          ls -la data || true
+          echo "=== sizes ==="
+          wc -c data/* 2>/dev/null || true
+
+      # Upload debug artifacts for phone inspection
+      - name: Upload debug artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: toolbox-debug
           path: |
             data/*.json
-            data/*.txt
             data/*.html
             data/*.png
+            data/*.txt
           if-no-files-found: ignore
           retention-days: 7
 
-      - name: Commit generated data (if changed)
+      # Commit only if there are changes
+      - name: Commit generated data
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data/ || true
           git diff --cached --quiet || git commit -m "Update toolbox data"
 
-      - name: Push changes (safe)
+      # Push safely (no rebase error due to unstaged changes)
+      - name: Push changes
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
         run: |
@@ -84,7 +98,8 @@ jobs:
             echo "GH_PAT secret is missing"
             exit 1
           fi
+
           git remote set-url origin "https://x-access-token:${GH_PAT}@github.com/TheRealNodder/Evertale-Optimizer.git"
           git fetch origin main
-          git pull --rebase --autostash origin main
+          git pull --rebase origin main
           git push origin HEAD:main
