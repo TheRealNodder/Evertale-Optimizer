@@ -1,4 +1,4 @@
-name: Update Toolbox Data
+name: Update Toolbox Data (with Leader Skills)
 
 on:
   workflow_dispatch:
@@ -27,6 +27,7 @@ jobs:
         with:
           node-version: 20
 
+      # NOTE: npm ci will fail without package-lock.json, so we use npm install.
       - name: Install deps (scraper)
         working-directory: scraper
         run: npm install
@@ -38,84 +39,96 @@ jobs:
       - name: Ensure data folder exists
         run: mkdir -p data
 
-      # ---- SCRAPE (best-effort; do not fail run) ----
-      - name: Scrape Explorer (captures) - best effort
-        run: node scraper/scrape_explorer_capture_json.mjs || true
+      # --------------------------------------------------------------------
+      # 1) Pull categorized lists from Toolbox Explorer
+      #    Outputs (expected):
+      #      data/characters.toolbox.json
+      #      data/weapons.toolbox.json
+      #      data/enemies.toolbox.json
+      #      data/accessories.toolbox.json
+      # --------------------------------------------------------------------
+      - name: Scrape Toolbox Explorer lists
+        run: node scraper/scrape_toolbox_units_full.mjs
 
-      - name: Scrape Viewer (captures) - best effort
-        run: node scraper/scrape_viewer_characters_playwright.mjs || true
-
-      # Your “full units” scraper (this is where your error was)
-      - name: Scrape Toolbox Units Full (HTML) - best effort
-        run: node scraper/scrape_toolbox_units_full.mjs || true
-
-      # If you have toolbox WS item scraper, run it best-effort
-      - name: Scrape Toolbox Items from WS - best effort
-        run: |
-          if [ -f scraper/scrape_toolbox_items_from_ws.mjs ]; then
-            node scraper/scrape_toolbox_items_from_ws.mjs || true
-          else
-            echo "skip: scraper/scrape_toolbox_items_from_ws.mjs not found"
-          fi
-
-      # ---- NORMALIZE / BUILD (should not fail if inputs missing) ----
-      - name: Normalize Toolbox Items - best effort
-        run: |
-          if [ -f scraper/normalize_toolbox_items.mjs ]; then
-            node scraper/normalize_toolbox_items.mjs || true
-          else
-            echo "skip: scraper/normalize_toolbox_items.mjs not found"
-          fi
-
-      - name: Normalize DOM Catalog - best effort
-        run: |
-          if [ -f scraper/normalize_dom_catalog.mjs ]; then
-            node scraper/normalize_dom_catalog.mjs || true
-          else
-            echo "skip: scraper/normalize_dom_catalog.mjs not found"
-          fi
-
-      - name: Build Clean Catalog - required
+      # --------------------------------------------------------------------
+      # 2) Build your refined catalog/items from your existing builder pipeline
+      #    This should produce:
+      #      data/catalog.items.json   (or create it via your builder)
+      # --------------------------------------------------------------------
+      - name: Build clean catalog
         run: node scraper/build_clean_catalog.mjs
 
-      # ---- DEBUG VISIBILITY ----
-      - name: Show data folder contents
+      # Ensure the site’s primary file exists (website loads this)
+      - name: Verify catalog.items.json exists
+        run: |
+          test -s data/catalog.items.json
+          node -e "JSON.parse(require('fs').readFileSync('data/catalog.items.json','utf8')); console.log('catalog.items.json OK')"
+
+      # --------------------------------------------------------------------
+      # 3) Scrape Leader Skills from Toolbox Viewer and merge into catalog
+      #    Outputs:
+      #      data/leaderSkills.toolbox.json
+      #      data/catalog.items.withleaders.json (and overwrites catalog.items.json)
+      # --------------------------------------------------------------------
+      - name: Scrape leader skills (Toolbox Viewer)
+        run: node scraper/scrape_leader_skills_playwright.mjs
+
+      - name: Merge leader skills into catalog.items.json
+        run: node scraper/merge_leader_skills_into_items.mjs
+
+      # --------------------------------------------------------------------
+      # Debug visibility (helpful on phone)
+      # --------------------------------------------------------------------
+      - name: Show data outputs
         if: always()
         run: |
           echo "=== data/ ==="
           ls -la data || true
           echo "=== sizes ==="
           wc -c data/*.json 2>/dev/null || true
-
-      - name: Validate clean catalog JSON
-        run: node -e "JSON.parse(require('fs').readFileSync('data/catalog.clean.json','utf8')); console.log('catalog.clean.json OK');"
+          echo "=== catalog preview ==="
+          head -c 800 data/catalog.items.json 2>/dev/null || true
+          echo ""
 
       - name: Upload debug artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: toolbox-debug
-          path: |
-            data/*.json
-            data/*.html
-            data/*.png
-            data/*.txt
+          name: toolbox-data-debug
+          path: data/*
           if-no-files-found: ignore
           retention-days: 7
 
-      # ---- COMMIT ONLY WHAT THE WEBSITE NEEDS ----
-      - name: Remove noisy debug files before commit
+      # Optional hard check: fail if catalog is too small
+      - name: Verify catalog has enough items
         run: |
-          rm -f data/_debug* || true
-          rm -f data/*.png data/*.html data/*.txt || true
+          node -e "const fs=require('fs'); const j=JSON.parse(fs.readFileSync('data/catalog.items.json','utf8')); const items=Array.isArray(j)?j:(j.items||[]); console.log('items=',items.length); if(items.length<200) process.exit(1);"
 
-      - name: Commit clean catalog only
+      # --------------------------------------------------------------------
+      # Commit + push
+      # --------------------------------------------------------------------
+      - name: Commit generated data
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          git add data/catalog.clean.json || true
-          git diff --cached --quiet || git commit -m "Update toolbox catalog"
+          git add data/ || true
+          if git diff --cached --quiet; then
+            echo "No data changes to commit."
+            exit 0
+          fi
+          git commit -m "Update toolbox data + leader skills"
 
-      - name: Push changes
-        run: git push
+      - name: Push
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: |
+          set -e
+          if [ -z "$GH_PAT" ]; then
+            echo "GH_PAT secret missing"
+            exit 1
+          fi
+
+          git remote set-url origin "https://x-access-token:${GH_PAT}@github.com/${GITHUB_REPOSITORY}.git"
+          git pull --rebase origin main
+          git push origin HEAD:main
