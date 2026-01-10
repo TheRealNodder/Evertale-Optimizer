@@ -39,57 +39,53 @@ jobs:
       - name: Ensure data folder exists
         run: mkdir -p data
 
-      # 1) Capture from toolbox (may fail sometimes). Do NOT stop the workflow.
-      - name: Scrape Toolbox items (WS capture)
-        run: node scraper/scrape_toolbox_items_from_ws.mjs || true
+      # 1) Explorer-based lists (weapons/enemies/accessories/etc)
+      - name: Scrape Toolbox Explorer lists
+        run: node scraper/scrape_toolbox_units_full.mjs
 
-      # 2) Normalize only if toolbox.items.json exists AND is non-empty.
-      - name: Normalize toolbox.items.json -> normalized outputs
-        run: |
-          if [ -s data/toolbox.items.json ]; then
-            node scraper/normalize_toolbox_items.mjs
-          else
-            echo "Skipping normalize: data/toolbox.items.json missing or empty"
-          fi
+      # 2) Viewer DOM characters (stats)
+      - name: Scrape Toolbox Viewer characters (DOM)
+        run: node scraper/scrape_toolbox_characters_dom.mjs || true
 
-      # 3) Build final clean catalog (this should succeed even if normalize skipped,
-      # because it can reuse last committed clean files).
+      # 3) Build one clean catalog file for the website
       - name: Build clean catalog
-        run: node scraper/build_clean_catalog.mjs || true
+        run: node scraper/build_clean_catalog.mjs
 
-      # Debug visibility (always)
-      - name: Show data folder contents
+      - name: Show outputs
         if: always()
         run: |
           echo "=== data/ ==="
           ls -la data || true
           echo "=== sizes ==="
-          wc -c data/* 2>/dev/null || true
+          wc -c data/*.json 2>/dev/null || true
 
-      # Upload debug artifacts for phone inspection
       - name: Upload debug artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: toolbox-debug
           path: |
-            data/*.json
-            data/*.html
+            data/_debug*
             data/*.png
+            data/*.html
             data/*.txt
+            data/*.json
           if-no-files-found: ignore
           retention-days: 7
 
-      # Commit only if there are changes
-      - name: Commit generated data
+      - name: Verify catalog.clean.json exists
+        run: |
+          test -s data/catalog.clean.json
+          node -e "JSON.parse(require('fs').readFileSync('data/catalog.clean.json','utf8')); console.log('catalog.clean.json OK')"
+
+      - name: Commit generated catalog only
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/ || true
-          git diff --cached --quiet || git commit -m "Update toolbox data"
+          git add data/catalog.clean.json
+          git diff --cached --quiet || git commit -m "Update toolbox catalog"
 
-      # Push safely (no rebase error due to unstaged changes)
-      - name: Push changes
+      - name: Push changes (rebase-safe)
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
         run: |
@@ -98,7 +94,6 @@ jobs:
             echo "GH_PAT secret is missing"
             exit 1
           fi
-
           git remote set-url origin "https://x-access-token:${GH_PAT}@github.com/TheRealNodder/Evertale-Optimizer.git"
           git fetch origin main
           git pull --rebase origin main
