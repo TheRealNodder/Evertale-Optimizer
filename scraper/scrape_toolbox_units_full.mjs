@@ -1,5 +1,5 @@
 // scraper/scrape_toolbox_units_full.mjs
-// Writes categorized ID lists from Toolbox Explorer into repo-root /data
+// Toolbox-only: parse Explorer HTML into categorized ID lists.
 
 import fs from "node:fs/promises";
 import path from "node:path";
@@ -8,141 +8,182 @@ import * as cheerio from "cheerio";
 const BASE = "https://evertaletoolbox2.runasp.net";
 const EXPLORER_URL = `${BASE}/Explorer`;
 
-// IMPORTANT: workflow runs from repo root, so output must be ./data (NOT ../data)
-const OUT_DIR  = path.join(process.cwd(), "data");
+const OUT_DIR = path.join(process.cwd(), "data");
 const OUT_CHAR = path.join(OUT_DIR, "characters.toolbox.json");
 const OUT_WEAP = path.join(OUT_DIR, "weapons.toolbox.json");
 const OUT_ENEM = path.join(OUT_DIR, "enemies.toolbox.json");
 const OUT_ACC  = path.join(OUT_DIR, "accessories.toolbox.json");
 
+function normSpace(s) {
+  return (s ?? "").toString().replace(/\s+/g, " ").trim();
+}
+
+function pickCategoryFromText(text) {
+  const t = text.toLowerCase();
+  if (t.includes("character")) return "characters";
+  if (t.includes("weapon")) return "weapons";
+  if (t.includes("enemy")) return "enemies";
+  if (t.includes("accessor")) return "accessories";
+  return null;
+}
+
+function extractIdFromHref(href) {
+  // Common patterns on toolbox: /Viewer?id=XXX or /Viewer/XXX etc.
+  if (!href) return null;
+  try {
+    const u = new URL(href, BASE);
+    const idQ = u.searchParams.get("id") || u.searchParams.get("Id");
+    if (idQ) return idQ;
+
+    const parts = u.pathname.split("/").filter(Boolean);
+    // last path segment often is ID
+    if (parts.length) {
+      const last = parts[parts.length - 1];
+      if (last && !last.toLowerCase().includes("viewer") && !last.toLowerCase().includes("explorer")) {
+        return last;
+      }
+    }
+  } catch {
+    // If href is relative without leading slash
+    if (href.includes("id=")) {
+      const m = href.match(/[?&]id=([^&]+)/i);
+      if (m) return m[1];
+    }
+    const parts = href.split("/").filter(Boolean);
+    const last = parts[parts.length - 1];
+    if (last && !last.includes("?")) return last;
+  }
+  return null;
+}
+
 async function fetchText(url) {
-  const res = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0" } });
+  const res = await fetch(url, {
+    headers: {
+      "user-agent": "Mozilla/5.0 (compatible; Evertale-Optimizer/1.0; +https://github.com/)",
+      "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    },
+  });
   if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
   return await res.text();
 }
 
-function normalizeHeading(t) {
-  return String(t ?? "")
-    .replace(/\s+/g, " ")
-    .trim()
-    .toLowerCase();
-}
-
-function extractIdFromLine(t) {
-  // "RizetteBrave (Rizette)" -> "RizetteBrave"
-  const m = String(t ?? "").match(/^([A-Za-z0-9_]+)\s*\(/);
-  return m ? m[1] : null;
-}
-
-function extractBySections(html) {
-  // FIX: use cheerio.load, not load()
-  import * as cheerio from "cheerio";
-  const $ = cheerio.load(html);
-
-  // map a section heading -> output bucket key
-  const sectionMap = new Map([
-    ["character", "characters"],
-    ["characters", "characters"],
-    ["unit", "characters"],
-    ["units", "characters"],
-
-    ["weapon", "weapons"],
-    ["weapons", "weapons"],
-
-    ["accessory", "accessories"],
-    ["accessories", "accessories"],
-
-    ["enemy", "enemies"],
-    ["enemies", "enemies"],
-    ["monster", "enemies"],
-    ["monsters", "enemies"],
-    ["boss", "enemies"],
-    ["bosses", "enemies"],
-  ]);
-
-  const buckets = {
-    characters: new Set(),
-    weapons: new Set(),
-    enemies: new Set(),
-    accessories: new Set(),
+function extractByHeadings($) {
+  // Strategy:
+  // - Walk headings (h1/h2/h3/h4)
+  // - For each heading that looks like a category, scan until next heading for links
+  // - Collect items from <a> tags with IDs
+  const sections = {
+    characters: [],
+    weapons: [],
+    enemies: [],
+    accessories: [],
   };
 
-  // Toolbox Explorer tends to use headings + UL lists.
-  // Strategy:
-  // - find headings (h1/h2/h3/h4) and read the next UL/OL
-  // - parse list items as "Id (Name)" format
   const headings = $("h1,h2,h3,h4").toArray();
+  for (let i = 0; i < headings.length; i++) {
+    const h = headings[i];
+    const title = normSpace($(h).text());
+    const cat = pickCategoryFromText(title);
+    if (!cat) continue;
 
-  for (const h of headings) {
-    const headText = normalizeHeading($(h).text());
-    const bucketKey = sectionMap.get(headText);
-    if (!bucketKey) continue;
+    // Scan siblings until next heading
+    let node = h.nextSibling;
+    const collected = [];
+    while (node) {
+      const $node = $(node);
+      if ($node.is("h1,h2,h3,h4")) break;
 
-    // try to find the next list near the heading
-    let list = $(h).nextAll("ul,ol").first();
-    if (!list || !list.length) {
-      // sometimes there is a div wrapper
-      list = $(h).parent().find("ul,ol").first();
+      $node.find("a[href]").each((_, a) => {
+        const href = $(a).attr("href");
+        const id = extractIdFromHref(href);
+        const name = normSpace($(a).text());
+        if (!id) return;
+        collected.push({ id, name: name || id, href });
+      });
+
+      node = node.nextSibling;
     }
-    if (!list || !list.length) continue;
 
-    list.find("li").each((_, el) => {
-      const text = $(el).text().replace(/\s+/g, " ").trim();
-      const id = extractIdFromLine(text);
-      if (id) buckets[bucketKey].add(id);
-    });
+    // Dedup
+    const seen = new Set(sections[cat].map(x => x.id));
+    for (const it of collected) {
+      if (!seen.has(it.id)) {
+        sections[cat].push(it);
+        seen.add(it.id);
+      }
+    }
   }
 
-  // Fallback: if headings parsing failed, grab all LI and dump into characters
-  const total =
-    buckets.characters.size +
-    buckets.weapons.size +
-    buckets.enemies.size +
-    buckets.accessories.size;
-
-  if (total === 0) {
-    $("li").each((_, el) => {
-      const text = $(el).text().replace(/\s+/g, " ").trim();
-      const id = extractIdFromLine(text);
-      if (id) buckets.characters.add(id);
-    });
-  }
-
-  const out = {};
-  for (const [k, set] of Object.entries(buckets)) {
-    out[k] = [...set].sort((a, b) => a.localeCompare(b));
-  }
-  return out;
+  return sections;
 }
 
-function wrap(ids, source) {
-  return { updatedAt: new Date().toISOString(), source, ids };
+function extractByLinkHeuristics($) {
+  // Fallback if headings parsing fails:
+  // scrape ALL links and bucket by text around them
+  const all = $("a[href]").toArray().map(a => {
+    const href = $(a).attr("href");
+    const id = extractIdFromHref(href);
+    const name = normSpace($(a).text());
+    return { href, id, name: name || id || "" };
+  }).filter(x => x.id);
+
+  // If Explorer uses obvious prefixes in href, try that:
+  const sections = { characters: [], weapons: [], enemies: [], accessories: [] };
+
+  for (const it of all) {
+    const hrefL = (it.href || "").toLowerCase();
+    const nameL = (it.name || "").toLowerCase();
+
+    let cat = null;
+    if (hrefL.includes("weapon") || nameL.includes("weapon")) cat = "weapons";
+    else if (hrefL.includes("enemy") || nameL.includes("enemy")) cat = "enemies";
+    else if (hrefL.includes("accessor") || nameL.includes("accessor")) cat = "accessories";
+    else cat = "characters";
+
+    sections[cat].push({ id: it.id, name: it.name, href: it.href });
+  }
+
+  // Dedup each
+  for (const k of Object.keys(sections)) {
+    const seen = new Set();
+    sections[k] = sections[k].filter(x => (seen.has(x.id) ? false : (seen.add(x.id), true)));
+  }
+
+  return sections;
 }
 
 async function run() {
+  await fs.mkdir(OUT_DIR, { recursive: true });
+
   console.log(`Fetching Explorer: ${EXPLORER_URL}`);
   const html = await fetchText(EXPLORER_URL);
 
-  const { characters, weapons, enemies, accessories } = extractBySections(html);
+  const $ = cheerio.load(html);
 
-  if (!characters.length && !weapons.length && !enemies.length && !accessories.length) {
-    throw new Error("No IDs extracted. Explorer HTML may have changed.");
+  let sections = extractByHeadings($);
+
+  const totalA =
+    sections.characters.length +
+    sections.weapons.length +
+    sections.enemies.length +
+    sections.accessories.length;
+
+  if (totalA < 50) {
+    console.warn(`[scrape_toolbox_units_full] heading-scan found only ${totalA} items, using heuristic fallback`);
+    sections = extractByLinkHeuristics($);
   }
 
-  await fs.mkdir(OUT_DIR, { recursive: true });
+  // Write outputs
+  await fs.writeFile(OUT_CHAR, JSON.stringify(sections.characters, null, 2), "utf8");
+  await fs.writeFile(OUT_WEAP, JSON.stringify(sections.weapons, null, 2), "utf8");
+  await fs.writeFile(OUT_ENEM, JSON.stringify(sections.enemies, null, 2), "utf8");
+  await fs.writeFile(OUT_ACC,  JSON.stringify(sections.accessories, null, 2), "utf8");
 
-  await fs.writeFile(OUT_CHAR, JSON.stringify(wrap(characters, EXPLORER_URL), null, 2), "utf8");
-  await fs.writeFile(OUT_WEAP, JSON.stringify(wrap(weapons, EXPLORER_URL), null, 2), "utf8");
-  await fs.writeFile(OUT_ENEM, JSON.stringify(wrap(enemies, EXPLORER_URL), null, 2), "utf8");
-
-  if (accessories.length) {
-    await fs.writeFile(OUT_ACC, JSON.stringify(wrap(accessories, EXPLORER_URL), null, 2), "utf8");
-    console.log(`Accessories: ${accessories.length} -> data/accessories.toolbox.json`);
-  }
-
-  console.log(`Characters: ${characters.length} -> data/characters.toolbox.json`);
-  console.log(`Weapons:    ${weapons.length} -> data/weapons.toolbox.json`);
-  console.log(`Enemies:    ${enemies.length} -> data/enemies.toolbox.json`);
+  console.log(`[scrape_toolbox_units_full] wrote:
+  characters:   ${sections.characters.length} -> ${OUT_CHAR}
+  weapons:      ${sections.weapons.length} -> ${OUT_WEAP}
+  enemies:      ${sections.enemies.length} -> ${OUT_ENEM}
+  accessories:  ${sections.accessories.length} -> ${OUT_ACC}`);
 }
 
 run().catch((e) => {
