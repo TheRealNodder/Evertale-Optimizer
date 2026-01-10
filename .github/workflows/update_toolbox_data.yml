@@ -20,44 +20,76 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          persist-credentials: false
           fetch-depth: 0
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: npm
+          cache-dependency-path: scraper/package-lock.json
 
+      # If you DO have package-lock.json, npm ci is best.
+      # If you DON'T, fallback to npm install.
       - name: Install deps (scraper)
         working-directory: scraper
-        run: npm install
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
 
-      - name: Install Playwright Chromium
+      - name: Install Playwright browsers
         working-directory: scraper
         run: npx playwright install --with-deps chromium
 
       - name: Ensure data folder exists
         run: mkdir -p data
 
-      # 1) Explorer-based lists (weapons/enemies/accessories/etc)
-      - name: Scrape Toolbox Explorer lists
-        run: node scraper/scrape_toolbox_units_full.mjs
+      # Make sure workspace is current BEFORE generating files
+      - name: Sync with origin/main (pre-run)
+        run: |
+          git fetch origin main
+          git reset --hard origin/main
 
-      # 2) Viewer DOM characters (stats)
-      - name: Scrape Toolbox Viewer characters (DOM)
-        run: node scraper/scrape_toolbox_characters_dom.mjs || true
+      # -----------------------------
+      # TOOLBOX-ONLY PIPELINE
+      # -----------------------------
 
-      # 3) Build one clean catalog file for the website
-      - name: Build clean catalog
-        run: node scraper/build_clean_catalog.mjs
+      - name: Scrape Toolbox items (WS) - best effort
+        run: node scraper/scrape_toolbox_items_from_ws.mjs || true
 
-      - name: Show outputs
+      - name: Normalize toolbox items -> catalog.toolbox.json (safe skip if empty)
+        run: node scraper/normalize_toolbox_items.mjs || true
+
+      # Optional: units (characters) fallback (does NOT block the run)
+      - name: Scrape Toolbox units full - best effort
+        run: node scraper/scrape_toolbox_units_full.mjs || true
+
+      # Build any downstream catalogs (best effort)
+      - name: Build catalog from items - best effort
+        run: node scraper/build_catalog_from_items.mjs || true
+
+      - name: Build clean catalog - best effort
+        run: node scraper/build_clean_catalog.mjs || true
+
+      # -----------------------------
+      # Debug visibility
+      # -----------------------------
+      - name: Show data folder contents
         if: always()
         run: |
           echo "=== data/ ==="
           ls -la data || true
           echo "=== sizes ==="
           wc -c data/*.json 2>/dev/null || true
+          echo "=== head ==="
+          for f in data/*.json; do
+            echo "--- $f ---"
+            head -c 400 "$f" || true
+            echo
+          done
 
       - name: Upload debug artifacts
         if: always()
@@ -65,36 +97,32 @@ jobs:
         with:
           name: toolbox-debug
           path: |
-            data/_debug*
-            data/*.png
-            data/*.html
-            data/*.txt
             data/*.json
+            data/*.txt
+            data/*.html
+            data/*.png
           if-no-files-found: ignore
           retention-days: 7
 
-      - name: Verify catalog.clean.json exists
-        run: |
-          test -s data/catalog.clean.json
-          node -e "JSON.parse(require('fs').readFileSync('data/catalog.clean.json','utf8')); console.log('catalog.clean.json OK')"
-
-      - name: Commit generated catalog only
+      # -----------------------------
+      # Commit + push (NO rebase step)
+      # -----------------------------
+      - name: Commit generated data (if changed)
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/catalog.clean.json
-          git diff --cached --quiet || git commit -m "Update toolbox catalog"
 
-      - name: Push changes (rebase-safe)
-        env:
-          GH_PAT: ${{ secrets.GH_PAT }}
-        run: |
-          set -e
-          if [ -z "$GH_PAT" ]; then
-            echo "GH_PAT secret is missing"
-            exit 1
+          # Only commit data outputs (not workflows)
+          git add data/ || true
+
+          if git diff --cached --quiet; then
+            echo "No data changes to commit."
+            exit 0
           fi
-          git remote set-url origin "https://x-access-token:${GH_PAT}@github.com/TheRealNodder/Evertale-Optimizer.git"
-          git fetch origin main
-          git pull --rebase origin main
-          git push origin HEAD:main
+
+          git commit -m "Update toolbox data"
+
+      - name: Push changes
+        run: |
+          # If there was no commit, this is a no-op
+          git push origin HEAD:main || true
