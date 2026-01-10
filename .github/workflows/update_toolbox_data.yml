@@ -15,6 +15,7 @@ concurrency:
 jobs:
   scrape:
     runs-on: ubuntu-latest
+    timeout-minutes: 25
 
     steps:
       - name: Checkout
@@ -28,7 +29,6 @@ jobs:
         with:
           node-version: 20
 
-      # If you don't have a package-lock.json, npm ci will fail.
       - name: Install deps (scraper)
         working-directory: scraper
         run: npm install
@@ -40,76 +40,86 @@ jobs:
       - name: Ensure data folder exists
         run: mkdir -p data
 
-      # --- SCRAPE (best effort; do NOT fail the whole workflow if Toolbox changes) ---
-      - name: Scrape Toolbox items (WS) - best effort
+      - name: Debug: list scraper folder
+        run: |
+          echo "=== scraper/ ==="
+          ls -la scraper || true
+          echo "=== data/ (before) ==="
+          ls -la data || true
+
+      # Auto-fix the common typo: .mj instead of .mjs
+      - name: Fix scraper filename typo if needed
+        run: |
+          if [ -f "scraper/scrape_toolbox_items_from_ws.mj" ] && [ ! -f "scraper/scrape_toolbox_items_from_ws.mjs" ]; then
+            echo "Renaming scraper/scrape_toolbox_items_from_ws.mj -> .mjs"
+            mv scraper/scrape_toolbox_items_from_ws.mj scraper/scrape_toolbox_items_from_ws.mjs
+          fi
+
+      - name: Verify scraper script exists
+        run: |
+          test -f scraper/scrape_toolbox_items_from_ws.mjs
+          test -f scraper/normalize_toolbox_items.mjs
+
+      # ---- SCRAPE (best effort; do not fail the job) ----
+      - name: Scrape Toolbox items from WS (best effort)
         run: node scraper/scrape_toolbox_items_from_ws.mjs || true
 
-      # --- DEBUG: list + quick peek ---
-      - name: Debug: show data folder contents
+      - name: Debug: show toolbox.items.json status
         if: always()
         run: |
-          echo "=== data/ (ls) ==="
+          echo "=== data/ after scrape ==="
           ls -la data || true
-          echo "=== data/ sizes ==="
-          wc -c data/*.json 2>/dev/null || true
-          echo "=== toolbox.items.json head ==="
           if [ -f data/toolbox.items.json ]; then
+            echo "toolbox.items.json bytes:"
+            wc -c data/toolbox.items.json || true
+            echo "toolbox.items.json head (600 chars):"
             head -c 600 data/toolbox.items.json; echo
           else
             echo "data/toolbox.items.json not found"
           fi
 
-      # --- NORMALIZE ONLY IF toolbox.items.json has >= 50 items ---
-      - name: Normalize toolbox.items.json -> catalog (only if items >= 50)
-        run: |
-          if [ ! -s data/toolbox.items.json ]; then
-            echo "Skipping normalize: data/toolbox.items.json missing or empty"
-            exit 0
-          fi
+      # ---- NORMALIZE (your updated normalize script should exit 0 if too small) ----
+      - name: Normalize Toolbox items (safe)
+        run: node scraper/normalize_toolbox_items.mjs || true
 
-          COUNT=$(node -e "const fs=require('fs'); const j=JSON.parse(fs.readFileSync('data/toolbox.items.json','utf8')); const arr=Array.isArray(j)?j:(Array.isArray(j.items)?j.items:[]); console.log(arr.length);")
-          echo "toolbox.items.json item count = $COUNT"
-
-          if [ "$COUNT" -lt 50 ]; then
-            echo "Skipping normalize: too few items ($COUNT). Keeping existing outputs."
-            exit 0
-          fi
-
-          node scraper/normalize_toolbox_items.mjs
-
-      # Optional: if you use this builder, only run if inputs exist
-      - name: Build clean catalog (only if needed inputs exist)
-        run: |
-          if [ -s data/catalog.toolbox.json ] || [ -s data/catalog.clean.json ]; then
-            node scraper/build_clean_catalog.mjs || true
-          else
-            echo "Skipping build_clean_catalog: no catalog inputs found"
-          fi
-
-      # --- Upload artifacts even if scraping fails so you can inspect on phone ---
-      - name: Upload debug artifacts
+      # ---- Always upload debug artifacts so you can inspect on phone ----
+      - name: Upload debug artifacts (always)
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: toolbox-debug
           path: |
             data/*.json
+            data/*.txt
             data/*.html
             data/*.png
-            data/*.txt
           if-no-files-found: ignore
           retention-days: 7
 
-      # --- Commit only if something changed ---
+      - name: Debug: list data outputs
+        if: always()
+        run: |
+          echo "=== data/ (after) ==="
+          ls -la data || true
+          echo "=== sizes ==="
+          wc -c data/*.json 2>/dev/null || true
+
+      # Commit only if something changed
       - name: Commit generated data (if changed)
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          git add data/ || true
-          git diff --cached --quiet || git commit -m "Update toolbox data"
+          git add data/ scraper/scrape_toolbox_items_from_ws.mjs || true
 
-      # --- Push (safe) ---
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+
+          git commit -m "Update toolbox data"
+
+      # Push using your PAT (avoids 403 + handles remote updates safely)
       - name: Push changes (safe)
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
@@ -122,6 +132,5 @@ jobs:
 
           git remote set-url origin "https://x-access-token:${GH_PAT}@github.com/TheRealNodder/Evertale-Optimizer.git"
           git fetch origin main
-
-          git pull --rebase origin main
+          git pull --rebase --autostash origin main
           git push origin HEAD:main
