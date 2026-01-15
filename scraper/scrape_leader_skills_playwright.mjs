@@ -1,235 +1,355 @@
 // scraper/scrape_leader_skills_playwright.mjs
-// Scrapes Leader Skill name + tooltip/description from Toolbox Viewer using Playwright.
-// Input:  data/catalog.items.json  (must contain character items with name + id)
-// Output: data/leaderSkills.toolbox.json  ({ generatedAt, count, skills: { [id]: {name, description} } })
-
 import fs from "fs";
 import path from "path";
 import { chromium } from "playwright";
 
-const ROOT = process.cwd();
-const IN_ITEMS = path.join(ROOT, "data", "catalog.items.json");
-const OUT = path.join(ROOT, "data", "leaderSkills.toolbox.json");
+const OUT = "data/leader_skills.json";
+const DEBUG_HTML = "data/_debug_leaderskills_rendered.html";
+const DEBUG_PNG = "data/_debug_leaderskills.png";
 
 const VIEWER_URL = "https://evertaletoolbox2.runasp.net/Viewer";
 
-// Adjust if your file uses a different structure
-function loadItems() {
-  const raw = JSON.parse(fs.readFileSync(IN_ITEMS, "utf8"));
-  if (Array.isArray(raw)) return raw;
-  if (Array.isArray(raw.items)) return raw.items;
-  return [];
+// Tuning
+const NAV_TIMEOUT_MS = 180000;
+const ACTION_TIMEOUT_MS = 30000;
+const PAGE_WAIT_MS = 250; // small settle delay between actions
+const MAX_PAGES = 300; // safety cap
+
+function ensureDir(p) {
+  fs.mkdirSync(p, { recursive: true });
 }
 
-function sleep(ms) {
-  return new Promise((r) => setTimeout(r, ms));
+function writeDebug(page, html) {
+  ensureDir("data");
+  fs.writeFileSync(DEBUG_HTML, html ?? "", "utf8");
 }
 
-function cleanText(s) {
-  return (s || "").toString().replace(/\s+/g, " ").trim();
+async function screenshotDebug(page) {
+  ensureDir("data");
+  await page.screenshot({ path: DEBUG_PNG, fullPage: true });
 }
 
-async function run() {
-  if (!fs.existsSync(IN_ITEMS)) {
-    throw new Error(`Missing ${IN_ITEMS}. Put your refined items file there first.`);
+function normalizeWhitespace(s) {
+  return (s ?? "").replace(/\s+/g, " ").trim();
+}
+
+async function main() {
+  ensureDir("data");
+
+  // Seed file so workflow can always find it
+  if (!fs.existsSync(OUT)) {
+    fs.writeFileSync(
+      OUT,
+      JSON.stringify(
+        {
+          generatedAt: new Date().toISOString(),
+          source: VIEWER_URL,
+          leaderSkills: [],
+        },
+        null,
+        2
+      ),
+      "utf8"
+    );
   }
 
-  const items = loadItems().filter((x) => (x.category || "").toLowerCase() === "character");
-  if (items.length < 50) {
-    throw new Error(`Too few characters in ${IN_ITEMS}: ${items.length}`);
-  }
-
-  console.log(`[leaderSkills] characters to process: ${items.length}`);
-
-  const browser = await chromium.launch({ headless: true });
-  const page = await browser.newPage({ viewport: { width: 1400, height: 900 } });
-
-  const skills = {};
-  let ok = 0;
-  let miss = 0;
-
-  // Try to reduce resource load
-  await page.route("**/*", (route) => {
-    const url = route.request().url();
-    const type = route.request().resourceType();
-    if (type === "image" || url.endsWith(".png") || url.endsWith(".jpg") || url.endsWith(".webp")) {
-      return route.abort();
-    }
-    return route.continue();
+  const browser = await chromium.launch({
+    headless: true,
+    // If you want to see it locally set headless:false
   });
 
-  await page.goto(VIEWER_URL, { waitUntil: "domcontentloaded" });
+  const context = await browser.newContext({
+    viewport: { width: 1400, height: 900 },
+  });
+
+  const page = await context.newPage();
+  page.setDefaultTimeout(ACTION_TIMEOUT_MS);
+
+  console.log(`[leader_skills] Loading: ${VIEWER_URL}`);
+  await page.goto(VIEWER_URL, { waitUntil: "domcontentloaded", timeout: NAV_TIMEOUT_MS });
+
+  // Blazor often needs a moment after DOMContentLoaded
   await page.waitForTimeout(1500);
 
-  // Heuristics: find a search box (Viewer has one). If not found, we still attempt table reading.
-  const searchSelCandidates = [
-    'input[placeholder*="Search" i]',
-    'input[aria-label*="Search" i]',
-    'input[type="search"]',
-    "input.rz-textbox",
-    "input"
-  ];
+  // Dump rendered HTML for debugging regardless (useful when it fails on Actions)
+  const initialHtml = await page.content();
+  writeDebug(page, initialHtml);
+  await screenshotDebug(page);
 
-  async function getSearchBox() {
-    for (const sel of searchSelCandidates) {
-      const el = await page.$(sel);
-      if (!el) continue;
-      const box = page.locator(sel).first();
-      const isVisible = await box.isVisible().catch(() => false);
-      if (isVisible) return box;
+  // ---- Find a "grid-like" area by looking for lots of repeated rows/images ----
+  // The character list has many portrait images. We’ll target images that sit inside the listing.
+  //
+  // This selector strategy:
+  //  - find all images on page
+  //  - then filter to those with reasonably-sized bounding boxes (portraits)
+  //  - and that are inside a repeated-row container (heuristic: closest table/div grid)
+  //
+  // We’ll re-locate per page to handle virtualization/pagination.
+  async function getClickablePortraitHandles() {
+    // Try a few common structures first (works if page uses <table> or role=grid)
+    const candidates = [
+      // Most likely: images inside a table/grid
+      "table img",
+      "[role='grid'] img",
+      ".table img",
+      ".grid img",
+      ".k-grid img",
+      // Fallback: any img (we'll filter by size)
+      "img",
+    ];
+
+    for (const sel of candidates) {
+      const handles = await page.$$(sel);
+      if (handles.length === 0) continue;
+
+      // Filter by visible + portrait-ish size
+      const filtered = [];
+      for (const h of handles) {
+        const box = await h.boundingBox();
+        if (!box) continue;
+        if (box.width < 35 || box.height < 35) continue;
+        if (box.width > 140 || box.height > 140) continue;
+        filtered.push(h);
+      }
+      if (filtered.length >= 10) return filtered;
     }
+    return [];
+  }
+
+  // Extract row “name” from the row containing the clicked portrait
+  async function extractNameFromContext(portraitHandle) {
+    try {
+      const row = await portraitHandle.evaluateHandle((img) => {
+        // walk up a few levels - rows are usually <tr> or some container div
+        let n = img;
+        for (let i = 0; i < 6 && n; i++) {
+          if (n.tagName?.toLowerCase() === "tr") return n;
+          n = n.parentElement;
+        }
+        return img.closest("tr") || img.closest("div");
+      });
+
+      const text = await row.evaluate((el) => (el?.innerText ? el.innerText : ""));
+      // Typically first line is name; keep it conservative
+      const lines = (text || "").split("\n").map((x) => x.trim()).filter(Boolean);
+      if (lines.length === 0) return null;
+
+      // Heuristic: character name usually appears early and is not "SSR", not numbers-only
+      for (const line of lines.slice(0, 8)) {
+        if (!line) continue;
+        if (/^(SSR|SR|R|UR)$/i.test(line)) continue;
+        if (/^\d[\d,]*$/.test(line)) continue;
+        if (line.length >= 2 && line.length <= 40) return line;
+      }
+      return lines[0] ?? null;
+    } catch {
+      return null;
+    }
+  }
+
+  async function openModalFromPortrait(portraitHandle) {
+    // click the portrait; sometimes needs force due to overlays
+    await portraitHandle.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(50);
+    await portraitHandle.click({ force: true });
+  }
+
+  async function readLeaderSkillFromModal() {
+    // Modal/dialog patterns vary. We’ll look for any visible overlay containing “Leader Skill”
+    const modalCandidates = [
+      "[role='dialog']",
+      ".modal",
+      ".modal-dialog",
+      ".blazored-modal",
+      ".k-window",
+      "div:has-text('Leader Skill')",
+    ];
+
+    // Wait for something that contains "Leader Skill"
+    const leaderLabel = page.locator("text=/Leader\\s*Skill/i").first();
+    await leaderLabel.waitFor({ state: "visible", timeout: 15000 });
+
+    // From the label, capture nearby text
+    const skillText = await leaderLabel.evaluate((el) => {
+      // Attempt: get the nearest container and its text
+      const container =
+        el.closest("div") ||
+        el.closest("section") ||
+        el.closest("article") ||
+        el.parentElement;
+
+      const txt = container ? container.innerText : el.innerText;
+      return txt || "";
+    });
+
+    // skillText likely includes "Leader Skill:" label; extract the sentence after it
+    const flat = (skillText || "").replace(/\r/g, "\n");
+    const lines = flat.split("\n").map((x) => x.trim()).filter(Boolean);
+
+    // Find the line that contains "Leader Skill" then return the next meaningful line
+    for (let i = 0; i < lines.length; i++) {
+      if (/leader\s*skill/i.test(lines[i])) {
+        // Sometimes "Leader Skill:" and the text are on same line
+        const sameLine = lines[i].replace(/.*leader\s*skill\s*:?\s*/i, "").trim();
+        if (sameLine) return normalizeWhitespace(sameLine);
+
+        // Otherwise next line is the description
+        for (let j = i + 1; j < Math.min(i + 6, lines.length); j++) {
+          if (lines[j] && !/^(stats|power|hp|atk|attack|speed|level)\b/i.test(lines[j])) {
+            return normalizeWhitespace(lines[j]);
+          }
+        }
+      }
+    }
+
     return null;
   }
 
-  // Find the table
-  const table = page.locator("table").first();
-  await table.waitFor({ state: "visible", timeout: 120000 });
+  async function closeModal() {
+    // Try ESC first (fast)
+    await page.keyboard.press("Escape").catch(() => {});
+    await page.waitForTimeout(100);
 
-  // Determine column indexes by header text
-  const headerCells = table.locator("thead tr th");
-  const headerCount = await headerCells.count();
-
-  let colName = -1;
-  let colLeader = -1;
-
-  for (let i = 0; i < headerCount; i++) {
-    const text = cleanText(await headerCells.nth(i).innerText().catch(() => ""));
-    const t = text.toLowerCase();
-    if (t === "name" || t.includes("name")) colName = i;
-    if (t.includes("leader")) colLeader = i;
-  }
-
-  if (colName === -1) {
-    console.warn("[leaderSkills] Could not detect Name column; continuing with fallback matching by row text.");
-  }
-  if (colLeader === -1) {
-    console.warn("[leaderSkills] Could not detect Leader Skill column. It may be hidden in column toggles.");
-  }
-
-  const searchBox = await getSearchBox();
-  if (!searchBox) console.warn("[leaderSkills] Search box not found; this will be slower/less reliable.");
-
-  // Tooltip locator candidates
-  const tooltipCandidates = [
-    ".rz-tooltip",                 // Radzen tooltip
-    ".rz-tooltip-content",
-    ".tooltip-inner",
-    '[role="tooltip"]'
-  ];
-
-  async function readTooltipText() {
-    for (const sel of tooltipCandidates) {
-      const loc = page.locator(sel).first();
-      const visible = await loc.isVisible().catch(() => false);
-      if (visible) {
-        const tx = cleanText(await loc.innerText().catch(() => ""));
-        if (tx) return tx;
+    // If still present, try common close buttons
+    const closeButtons = [
+      "button:has-text('Close')",
+      "button[aria-label='Close']",
+      ".modal button.close",
+      ".modal .btn-close",
+      ".k-window-actions .k-window-action",
+      "button:has-text('×')",
+      "button:has-text('X')",
+      "text=×",
+    ];
+    for (const sel of closeButtons) {
+      const btn = page.locator(sel).first();
+      if (await btn.isVisible().catch(() => false)) {
+        await btn.click({ force: true }).catch(() => {});
+        await page.waitForTimeout(120);
+        break;
       }
     }
-    return "";
   }
 
-  // Main loop
-  for (let idx = 0; idx < items.length; idx++) {
-    const ch = items[idx];
-    const name = ch.name;
-    const id = ch.id;
+  async function goToNextPage() {
+    // Based on your screenshot: there is a pager with a ">" button
+    // We’ll try a few selectors for next:
+    const nextSelectors = [
+      "button:has-text('>')",
+      "a:has-text('>')",
+      "button[aria-label*='Next']",
+      "a[aria-label*='Next']",
+      ".pagination button:has-text('>')",
+      ".pagination a:has-text('>')",
+    ];
 
-    // Search/filter
-    if (searchBox) {
-      await searchBox.fill("");
-      await searchBox.type(name, { delay: 10 });
-      await page.waitForTimeout(300);
+    for (const sel of nextSelectors) {
+      const next = page.locator(sel).first();
+      if (!(await next.isVisible().catch(() => false))) continue;
+
+      // If disabled, stop
+      const disabled =
+        (await next.getAttribute("disabled").catch(() => null)) !== null ||
+        (await next.getAttribute("aria-disabled").catch(() => null)) === "true" ||
+        (await next.evaluate((el) => el.classList.contains("disabled")).catch(() => false));
+
+      if (disabled) return false;
+
+      await next.click({ force: true });
+      await page.waitForTimeout(1200); // allow Blazor rerender
+      return true;
     }
 
-    // Get first matching row
-    const rows = table.locator("tbody tr");
-    const rowCount = await rows.count();
+    // If we can’t find next, assume single page
+    return false;
+  }
 
-    if (rowCount === 0) {
-      miss++;
-      continue;
+  // Collect results
+  const results = [];
+  const seenKey = new Set();
+
+  for (let pageIdx = 1; pageIdx <= MAX_PAGES; pageIdx++) {
+    await page.waitForTimeout(PAGE_WAIT_MS);
+
+    // Refresh debug each page (helps diagnose later)
+    const html = await page.content();
+    writeDebug(page, html);
+    await screenshotDebug(page);
+
+    const portraits = await getClickablePortraitHandles();
+    if (portraits.length < 5) {
+      console.log(`[leader_skills] Page ${pageIdx}: not enough portraits found (${portraits.length}). Stopping.`);
+      break;
     }
 
-    let row = rows.nth(0);
+    console.log(`[leader_skills] Page ${pageIdx}: found ${portraits.length} portrait candidates`);
 
-    // If we have a Name column, try to find an exact-ish match among first few rows
-    if (colName !== -1) {
-      const scan = Math.min(rowCount, 10);
-      let bestRow = null;
-      for (let r = 0; r < scan; r++) {
-        const cell = rows.nth(r).locator("td").nth(colName);
-        const cellText = cleanText(await cell.innerText().catch(() => ""));
-        if (!cellText) continue;
-        // exact or starts-with match
-        if (cellText.toLowerCase() === name.toLowerCase() || cellText.toLowerCase().includes(name.toLowerCase())) {
-          bestRow = rows.nth(r);
-          break;
+    for (let i = 0; i < portraits.length; i++) {
+      const h = portraits[i];
+
+      // Key off row name if possible; otherwise skip duplicates by index+page
+      const name = await extractNameFromContext(h);
+      const key = `${pageIdx}:${name ?? "unknown"}:${i}`;
+      if (seenKey.has(key)) continue;
+      seenKey.add(key);
+
+      try {
+        await openModalFromPortrait(h);
+
+        const leaderSkill = await readLeaderSkillFromModal();
+        await closeModal();
+
+        if (name && leaderSkill) {
+          results.push({
+            name,
+            leaderSkill,
+          });
+          console.log(`  ✓ ${name}: ${leaderSkill}`);
+        } else {
+          // still close modal attempt already done
+          if (name) console.log(`  - ${name}: (no leader skill found)`);
         }
-      }
-      if (bestRow) row = bestRow;
-    }
 
-    // Read leader skill cell
-    let leaderName = "";
-    let leaderDesc = "";
-
-    if (colLeader !== -1) {
-      const leaderCell = row.locator("td").nth(colLeader);
-
-      leaderName = cleanText(await leaderCell.innerText().catch(() => ""));
-
-      // If tooltip provides description, hover cell and read tooltip
-      await leaderCell.hover({ timeout: 2000 }).catch(() => {});
-      await page.waitForTimeout(100);
-      leaderDesc = cleanText(await readTooltipText());
-    } else {
-      // Fallback: try to find a cell that contains "Up" etc. (very weak fallback)
-      const tds = row.locator("td");
-      const tdCount = await tds.count();
-      for (let t = 0; t < tdCount; t++) {
-        const tx = cleanText(await tds.nth(t).innerText().catch(() => ""));
-        if (!tx) continue;
-        if (tx.toLowerCase().includes("up") && tx.length < 40) {
-          leaderName = tx;
-          await tds.nth(t).hover().catch(() => {});
-          await page.waitForTimeout(100);
-          leaderDesc = cleanText(await readTooltipText());
-          break;
-        }
+        // keep actions quick but stable
+        await page.waitForTimeout(80);
+      } catch (e) {
+        console.warn(`[leader_skills] Failed entry on page ${pageIdx} idx ${i}: ${e?.message ?? e}`);
+        await closeModal().catch(() => {});
+        await page.waitForTimeout(150);
       }
     }
 
-    // Save if we got something useful
-    if (leaderName) {
-      skills[id] = { name: leaderName, description: leaderDesc || null };
-      ok++;
-    } else {
-      miss++;
-    }
-
-    // Be gentle
-    if (idx % 25 === 0) {
-      console.log(`[leaderSkills] ${idx}/${items.length} ok=${ok} miss=${miss}`);
-      await sleep(150);
+    const hasNext = await goToNextPage();
+    if (!hasNext) {
+      console.log("[leader_skills] No next page detected. Done.");
+      break;
     }
   }
 
-  await browser.close();
+  // De-dup by name (last wins)
+  const byName = new Map();
+  for (const r of results) {
+    if (!r?.name || !r?.leaderSkill) continue;
+    byName.set(r.name, r.leaderSkill);
+  }
 
   const out = {
     generatedAt: new Date().toISOString(),
     source: VIEWER_URL,
-    count: Object.keys(skills).length,
-    skills
+    count: byName.size,
+    leaderSkills: Array.from(byName.entries()).map(([name, leaderSkill]) => ({
+      name,
+      leaderSkill,
+    })),
   };
 
-  fs.mkdirSync(path.join(ROOT, "data"), { recursive: true });
-  fs.writeFileSync(OUT, JSON.stringify(out, null, 2));
-  console.log(`[leaderSkills] wrote ${OUT} count=${out.count} (ok=${ok}, miss=${miss})`);
+  fs.writeFileSync(OUT, JSON.stringify(out, null, 2), "utf8");
+  console.log(`[leader_skills] Wrote ${OUT} (${out.count} skills)`);
+
+  await browser.close();
 }
 
-run().catch((e) => {
+main().catch((e) => {
   console.error(e);
   process.exit(1);
 });

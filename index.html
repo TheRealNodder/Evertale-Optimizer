@@ -2,75 +2,72 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Evertale Optimizer</title>
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  />
+  <title>Evertale Optimizer – Roster</title>
   <link rel="stylesheet" href="./style.css" />
 </head>
+
 <body>
+  <!-- ================= HEADER ================= -->
   <header class="topbar">
-    <div class="brand">
-      <div class="logo">E</div>
-      <div>
-        <div class="title">Evertale Optimizer</div>
-        <div class="subtitle">Catalog • Team Builder • Optimizer</div>
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="brand-title">Evertale Optimizer</div>
+        <div class="brand-sub">Roster</div>
       </div>
-    </div>
 
-    <div class="controls">
-      <select id="category" class="control">
-        <option value="all">All</option>
-        <option value="character">Characters</option>
-        <option value="weapon">Weapons</option>
-        <option value="accessory">Accessories</option>
-        <option value="enemy">Enemies</option>
-        <option value="boss">Bosses</option>
-      </select>
+      <div class="controls">
+        <label class="search">
+          <span class="sr-only">Search</span>
+          <input
+            id="searchInput"
+            type="search"
+            placeholder="Search units…"
+            autocomplete="off"
+          />
+        </label>
 
-      <input id="search" class="control" type="search" placeholder="Search…" />
-      <button id="optimize" class="btn">Run Optimizer</button>
+        <label class="toggle">
+          <input id="leadersOnly" type="checkbox" />
+          <span>Leaders only</span>
+        </label>
+      </div>
     </div>
   </header>
 
-  <main class="layout">
-    <section class="panel">
-      <h2>Catalog</h2>
-      <div id="status" class="status hidden">
-        <div class="spinner"></div>
-        <div id="statusText">Loading…</div>
-      </div>
-      <div id="catalog" class="grid"></div>
+  <!-- ================= MAIN ================= -->
+  <main class="main">
+
+    <!-- ===== STATUS / LOADING ===== -->
+    <section id="status" class="status hidden">
+      <div class="spinner" aria-hidden="true"></div>
+      <div class="statusMessage">Loading data…</div>
     </section>
 
-    <aside class="side">
-      <section class="panel">
-        <h2>Story Team (8 slots)</h2>
-        <p class="hint">Drag a character card from the catalog and drop it into a slot.</p>
-        <div id="team" class="team"></div>
+    <!-- ===== LEADER UNITS SECTION ===== -->
+    <section id="leader-units" class="leader-section">
+      <h2 class="section-title">Leader Units</h2>
 
-        <div class="summary">
-          <div class="sumrow"><span>Total Cost</span><b id="sumCost">0</b></div>
-          <div class="sumrow"><span>Avg ATK</span><b id="sumAtk">0</b></div>
-          <div class="sumrow"><span>Avg HP</span><b id="sumHp">0</b></div>
-          <div class="sumrow"><span>Avg SPD</span><b id="sumSpd">0</b></div>
-        </div>
-      </section>
+      <div id="leaderList" class="leader-list">
+        <!-- injected by JS -->
+      </div>
+    </section>
 
-      <section class="panel">
-        <h2>Optimizer Top 20</h2>
-        <div class="tableWrap">
-          <table>
-            <thead>
-              <tr>
-                <th>#</th><th>Name</th><th>ATK</th><th>HP</th><th>SPD</th><th>Cost</th><th>Score</th>
-              </tr>
-            </thead>
-            <tbody id="optimizer"></tbody>
-          </table>
-        </div>
-      </section>
-    </aside>
+    <!-- ===== ALL UNITS (FUTURE EXPANSION) ===== -->
+    <section id="all-units" class="all-units">
+      <h2 class="section-title">All Units</h2>
+
+      <div id="unitGrid" class="unit-grid">
+        <!-- injected by JS -->
+      </div>
+    </section>
+
   </main>
 
-  <script type="module" src="./app.js"></script>
+  <!-- ================= SCRIPT ================= -->
+  <script src="./app.js"></script>
 </body>
 </html>

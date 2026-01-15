@@ -1,165 +1,259 @@
+/* style.css — Mobile-first layout + rarity bubble */
+
+/* ---------- Base ---------- */
 :root{
-  --bg:#0b0f19;
-  --panel:#121a2b;
-  --muted:#7f8aa5;
-  --text:#e7ecff;
-  --border:#22304f;
-  --accent:#6aa6ff;
+  --bg: #0b0f19;
+  --panel: rgba(255,255,255,0.06);
+  --panel-2: rgba(255,255,255,0.08);
+  --border: rgba(255,255,255,0.12);
+  --text: rgba(255,255,255,0.92);
+  --muted: rgba(255,255,255,0.72);
+  --muted2: rgba(255,255,255,0.55);
+  --accent: rgba(120,180,255,0.95);
+  --danger: rgba(255,100,100,0.95);
+  --ok: rgba(120,255,180,0.95);
 }
 
-*{box-sizing:border-box}
+*{ box-sizing:border-box; }
+html,body{ height:100%; }
 body{
   margin:0;
-  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-  background:var(--bg);
-  color:var(--text);
+  font-family: system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+  background: radial-gradient(1200px 600px at 20% -10%, rgba(120,180,255,0.18), transparent 60%),
+              radial-gradient(900px 500px at 100% 0%, rgba(255,120,200,0.12), transparent 55%),
+              var(--bg);
+  color: var(--text);
 }
 
+/* ---------- Topbar ---------- */
 .topbar{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:16px;
-  padding:14px 16px;
-  border-bottom:1px solid var(--border);
-  background:rgba(18,26,43,.85);
-  position:sticky;
-  top:0;
+  position: sticky;
+  top: 0;
+  z-index: 50;
   backdrop-filter: blur(10px);
-  z-index:10;
+  background: rgba(8,10,16,0.75);
+  border-bottom: 1px solid var(--border);
 }
-
-.brand{display:flex;align-items:center;gap:12px}
-.logo{
-  width:38px;height:38px;border-radius:12px;
-  background:linear-gradient(135deg,#2b5bff,#6aa6ff);
-  display:grid;place-items:center;
-  font-weight:800;
-}
-
-.title{font-weight:800;letter-spacing:.2px}
-.subtitle{font-size:12px;color:var(--muted)}
-
-.controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.control{
-  background:var(--panel);
-  border:1px solid var(--border);
-  color:var(--text);
-  border-radius:12px;
-  padding:10px 12px;
-  outline:none;
-}
-.control::placeholder{color:var(--muted)}
-
-.btn{
-  background:var(--accent);
-  border:none;
-  color:#061027;
-  font-weight:800;
-  padding:10px 14px;
-  border-radius:12px;
-  cursor:pointer;
-}
-.btn:active{transform:translateY(1px)}
-
-.layout{
-  display:grid;
-  grid-template-columns: 1.3fr .9fr;
-  gap:14px;
-  padding:14px;
-}
-
-@media (max-width: 980px){
-  .layout{grid-template-columns:1fr}
-}
-
-.panel{
-  background:var(--panel);
-  border:1px solid var(--border);
-  border-radius:16px;
-  padding:14px;
-}
-
-.hint{color:var(--muted);font-size:12px;margin-top:-6px}
-
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
-  gap:10px;
-  margin-top:10px;
-}
-
-.card{
-  border:1px solid var(--border);
-  border-radius:16px;
-  background:rgba(255,255,255,.02);
-  padding:10px;
+.topbar-inner{
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 12px 14px;
   display:flex;
-  gap:10px;
-  align-items:center;
-  cursor:grab;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
 }
-.card:active{cursor:grabbing}
-
-.thumb{
-  width:54px;height:54px;border-radius:14px;
-  background:rgba(255,255,255,.04);
-  border:1px solid var(--border);
-  display:grid;place-items:center;
-  overflow:hidden;
-  flex:0 0 auto;
+.brand{ min-width: 140px; }
+.brand-title{
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  line-height: 1.1;
 }
-.thumb img{width:100%;height:100%;object-fit:cover}
-.ph{color:var(--muted);font-weight:800}
-
-.name{font-weight:800;line-height:1.2}
-.meta{color:var(--muted);font-size:12px;margin-top:2px}
-
-.team{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-  margin-top:10px;
+.brand-sub{
+  margin-top: 2px;
+  opacity: 0.7;
+  font-size: 0.9em;
 }
-.slot{
-  border:1px dashed var(--border);
-  border-radius:16px;
-  padding:12px;
-  min-height:58px;
+
+/* ---------- Controls ---------- */
+.controls{
   display:flex;
   align-items:center;
-  color:var(--muted);
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
-.summary{
-  margin-top:12px;
-  border-top:1px solid var(--border);
-  padding-top:12px;
+label.search{
+  display:flex;
+  align-items:center;
+  gap: 8px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 6px 10px;
 }
-.sumrow{display:flex;justify-content:space-between;padding:6px 0;color:var(--muted)}
-.sumrow b{color:var(--text)}
 
-.tableWrap{overflow:auto;border-radius:12px;border:1px solid var(--border);margin-top:10px}
-table{width:100%;border-collapse:collapse;font-size:12px}
-th,td{padding:8px 10px;border-bottom:1px solid var(--border);text-align:left}
-thead th{position:sticky;top:0;background:rgba(18,26,43,.95)}
+#searchInput{
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--text);
+  width: min(280px, 55vw);
+  font-size: 14px;
+}
 
+label.toggle{
+  display:inline-flex;
+  align-items:center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  font-size: 13px;
+  user-select: none;
+}
+
+select{
+  background: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 8px 10px;
+  border-radius: 999px;
+  outline: none;
+  font-size: 13px;
+}
+select option{
+  color: #111; /* for native select dropdowns */
+}
+
+.sr-only{
+  position:absolute !important;
+  width:1px; height:1px;
+  padding:0; margin:-1px;
+  overflow:hidden; clip:rect(0,0,0,0);
+  white-space:nowrap; border:0;
+}
+
+/* ---------- Main layout ---------- */
+.main{
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 14px;
+}
+
+.section-title{
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  margin: 14px 0 10px 0;
+}
+.section-sub{
+  margin-top: -6px;
+  margin-bottom: 10px;
+  opacity: 0.7;
+  font-size: 0.95em;
+}
+
+/* ---------- Status ---------- */
 .status{
   display:flex;
   align-items:center;
-  gap:10px;
-  padding:10px 12px;
-  border:1px solid var(--border);
-  border-radius:14px;
-  margin-top:10px;
-  color:var(--muted);
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  margin: 14px 0;
 }
-.hidden{display:none}
-
+.hidden{ display:none !important; }
 .spinner{
-  width:16px;height:16px;border-radius:50%;
-  border:2px solid rgba(255,255,255,.2);
-  border-top-color: var(--accent);
-  animation: spin .8s linear infinite;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.25);
+  border-top-color: rgba(255,255,255,0.9);
+  animation: spin 0.9s linear infinite;
 }
-@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes spin{
+  to{ transform: rotate(360deg); }
+}
+
+/* ---------- Leader list cards (mobile friendly stacked) ---------- */
+#leaderList{
+  display:block;
+}
+
+/* App.js sets inline styles; these are defaults/overrides */
+.leader-card{
+  background: var(--panel);
+}
+
+/* ---------- Unit grid ---------- */
+#unitGrid{
+  display:grid;
+  gap: 10px;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+@media (min-width: 520px){
+  #unitGrid{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (min-width: 920px){
+  #unitGrid{
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* ---------- Unit tile ---------- */
+.unit-tile{
+  background: var(--panel);
+  transition: transform 0.08s ease, background 0.08s ease;
+}
+.unit-tile:hover{
+  transform: translateY(-1px);
+  background: var(--panel-2);
+}
+
+/* ---------- Rarity bubble (pin if you don't want it yet) ---------- */
+/*
+To show rarity as a separate bubble, app.js must output an element with class:
+  .rarity-pill  AND a modifier class:
+  .rarity-n / .rarity-r / .rarity-sr / .rarity-ssr
+
+If app.js is not emitting these yet, this CSS will do nothing (safe to keep).
+*/
+.rarity-pill{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width: 40px;
+  height: 22px;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 0.3px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.06);
+  color: var(--text);
+}
+
+/* N, R, SR, SSR colors */
+.rarity-n { background: rgba(200,200,200,0.14); border-color: rgba(200,200,200,0.22); }
+.rarity-r { background: rgba(120,200,255,0.16); border-color: rgba(120,200,255,0.25); }
+.rarity-sr{ background: rgba(170,120,255,0.16); border-color: rgba(170,120,255,0.25); }
+.rarity-ssr{ background: rgba(255,210,120,0.18); border-color: rgba(255,210,120,0.28); }
+
+/* Optional: small meta chips */
+.chip{
+  display:inline-flex;
+  align-items:center;
+  gap: 6px;
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--border);
+  color: var(--muted);
+}
+
+/* ---------- Inputs (checkbox look) ---------- */
+input[type="checkbox"]{
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+}
+
+/* ---------- Links ---------- */
+a{ color: var(--accent); }
+a:visited{ color: var(--accent); }
+
+/* ---------- Small screen tweaks ---------- */
+@media (max-width: 420px){
+  .brand{ min-width: 0; }
+  .brand-sub{ display:none; }
+  #searchInput{ width: 52vw; }
+}
