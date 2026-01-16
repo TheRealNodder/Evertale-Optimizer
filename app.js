@@ -1,303 +1,409 @@
-// app.js (module) — Roster UI + Owned selection persistence + Leader Units section
-const DATA_URL = "./data/characters.json";
-const OWNED_KEY = "ownedUnitIds";
+/* app.js — FULL FILE (ROSTER + FILTERS + OWNED + OPTIMIZER TAB)
+   - Loads ./data/characters.json (array OR {characters:[...]})
+   - Always renders leader skill block (never "hidden")
+   - Handles invalid JSON with a clear on-page error
+   - Encodes image URLs safely (fixes “string did not match expected pattern”)
+   - Builds Element + Rarity dropdowns from data
+   - Persists Owned checkboxes in localStorage
+*/
 
-const $ = (sel) => document.querySelector(sel);
+(() => {
+  "use strict";
 
-let state = {
-  all: [],
-  owned: new Set(),
-};
+  /* =======================
+     CONFIG (paths + storage)
+  ======================= */
+  const DATA_CHARACTERS = "./data/characters.json";
+  const LS_OWNED_KEY = "evertale_owned_units_v1";
 
-function showStatus(msg) {
-  $("#status").classList.remove("hidden");
-  $("#statusMsg").textContent = msg;
-}
-function hideStatus() {
-  $("#status").classList.add("hidden");
-}
+  /* =======================
+     STATE
+  ======================= */
+  const state = {
+    units: [],
+    owned: new Set(),
+    filters: {
+      q: "",
+      element: "all",
+      rarity: "all",
+      ownedOnly: false,
+    },
+  };
 
-function loadOwnedSet() {
-  try {
-    const raw = localStorage.getItem(OWNED_KEY);
-    const arr = raw ? JSON.parse(raw) : [];
-    return new Set(Array.isArray(arr) ? arr : []);
-  } catch {
-    return new Set();
-  }
-}
-function saveOwnedSet() {
-  const arr = Array.from(state.owned);
-  localStorage.setItem(OWNED_KEY, JSON.stringify(arr));
-}
+  /* =======================
+     DOM helpers
+  ======================= */
+  const $ = (sel) => document.querySelector(sel);
 
-function getLeaderText(u) {
-  if (typeof u.leaderSkill === "string") return u.leaderSkill;
-  if (u.leaderSkill && typeof u.leaderSkill.text === "string") return u.leaderSkill.text;
-  if (u.leaderSkill && typeof u.leaderSkill.description === "string") return u.leaderSkill.description;
-  if (typeof u.leaderSkillText === "string") return u.leaderSkillText;
-  return "";
-}
-
-function rarityClass(r) {
-  const x = String(r || "").toUpperCase();
-  if (x === "SSR") return "rarity-ssr";
-  if (x === "SR") return "rarity-sr";
-  if (x === "R") return "rarity-r";
-  return "rarity-n";
-}
-
-async function fetchJson(url) {
-  const res = await fetch(url, { cache: "no-store" });
-  if (!res.ok) throw new Error(`${url} → HTTP ${res.status}`);
-  return await res.json();
-}
-
-function normalizeCatalog(raw) {
-  if (Array.isArray(raw)) return raw;
-  if (raw && Array.isArray(raw.characters)) return raw.characters;
-  if (raw && Array.isArray(raw.items)) return raw.items;
-  return [];
-}
-
-function unitTile(u) {
-  const wrap = document.createElement("div");
-  wrap.className = "unit-tile";
-  wrap.style.cssText = "display:flex;gap:12px;align-items:flex-start;padding:12px;border:1px solid rgba(255,255,255,0.12);border-radius:12px;";
-
-  const img = document.createElement("img");
-  img.src = u.image || "";
-  img.alt = u.name || u.id || "unit";
-  img.loading = "lazy";
-  img.style.cssText = "width:64px;height:64px;border-radius:12px;object-fit:cover;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.06);";
-  wrap.appendChild(img);
-
-  const right = document.createElement("div");
-  right.style.cssText = "flex:1;min-width:0;";
-
-  const top = document.createElement("div");
-  top.style.cssText = "display:flex;gap:8px;align-items:center;justify-content:space-between;";
-
-  const title = document.createElement("div");
-  title.style.cssText = "font-weight:800;line-height:1.15;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;";
-  title.textContent = u.name || u.id || "Unknown";
-  top.appendChild(title);
-
-  const rarity = document.createElement("span");
-  rarity.className = `rarity-pill ${rarityClass(u.rarity)}`;
-  rarity.textContent = (u.rarity || "N").toUpperCase();
-  top.appendChild(rarity);
-
-  right.appendChild(top);
-
-  const meta = document.createElement("div");
-  meta.style.cssText = "margin-top:6px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;color:rgba(255,255,255,0.72);font-size:12px;";
-  const e = document.createElement("span");
-  e.className = "chip";
-  e.textContent = `Element: ${u.element || "?"}`;
-  meta.appendChild(e);
-
-  const stats = document.createElement("span");
-  stats.className = "chip";
-  stats.textContent = `ATK ${u.atk ?? "?"} • HP ${u.hp ?? "?"} • SPD ${u.spd ?? "?"}`;
-  meta.appendChild(stats);
-
-  right.appendChild(meta);
-
-  const leader = getLeaderText(u);
-  if (leader) {
-    const ls = document.createElement("div");
-    ls.style.cssText = "margin-top:8px;color:rgba(255,255,255,0.75);font-size:12.5px;line-height:1.35;";
-    ls.innerHTML = `<span style="font-weight:800;">Leader:</span> <span></span>`;
-    ls.querySelector("span:last-child").textContent = leader;
-    right.appendChild(ls);
+  function safeText(v, fallback = "") {
+    return v == null ? fallback : String(v);
   }
 
-  // Owned checkbox
-  const ownedWrap = document.createElement("label");
-  ownedWrap.style.cssText = "margin-top:10px;display:flex;gap:8px;align-items:center;user-select:none;";
-  ownedWrap.className = "toggle";
-
-  const cb = document.createElement("input");
-  cb.type = "checkbox";
-  cb.checked = state.owned.has(u.id);
-  cb.addEventListener("change", () => {
-    if (cb.checked) state.owned.add(u.id);
-    else state.owned.delete(u.id);
-    saveOwnedSet();
-    // keep leader section accurate
-    renderLeaderSection();
-  });
-
-  const txt = document.createElement("span");
-  txt.textContent = "Owned";
-
-  ownedWrap.innerHTML = "";
-  ownedWrap.appendChild(cb);
-  ownedWrap.appendChild(txt);
-  right.appendChild(ownedWrap);
-
-  wrap.appendChild(right);
-  return wrap;
-}
-
-function leaderCard(u) {
-  // same as tile, but emphasizes leader skill block
-  const wrap = document.createElement("div");
-  wrap.className = "leader-card";
-  wrap.style.cssText = "display:flex;gap:12px;align-items:flex-start;padding:12px;border:1px solid rgba(255,255,255,0.12);border-radius:12px;background:rgba(255,255,255,0.06);margin:10px 0;";
-
-  const img = document.createElement("img");
-  img.src = u.image || "";
-  img.alt = u.name || u.id || "unit";
-  img.loading = "lazy";
-  img.style.cssText = "width:64px;height:64px;border-radius:12px;object-fit:cover;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.06);";
-  wrap.appendChild(img);
-
-  const right = document.createElement("div");
-  right.style.cssText = "flex:1;min-width:0;";
-
-  const top = document.createElement("div");
-  top.style.cssText = "display:flex;gap:8px;align-items:center;justify-content:space-between;";
-
-  const title = document.createElement("div");
-  title.style.cssText = "font-weight:800;line-height:1.15;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;";
-  title.textContent = u.name || u.id || "Unknown";
-  top.appendChild(title);
-
-  const rarity = document.createElement("span");
-  rarity.className = `rarity-pill ${rarityClass(u.rarity)}`;
-  rarity.textContent = (u.rarity || "N").toUpperCase();
-  top.appendChild(rarity);
-
-  right.appendChild(top);
-
-  const meta = document.createElement("div");
-  meta.style.cssText = "margin-top:6px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;color:rgba(255,255,255,0.72);font-size:12px;";
-  const e = document.createElement("span");
-  e.className = "chip";
-  e.textContent = `Element: ${u.element || "?"}`;
-  meta.appendChild(e);
-
-  const stats = document.createElement("span");
-  stats.className = "chip";
-  stats.textContent = `ATK ${u.atk ?? "?"} • HP ${u.hp ?? "?"} • SPD ${u.spd ?? "?"}`;
-  meta.appendChild(stats);
-
-  right.appendChild(meta);
-
-  const leader = getLeaderText(u);
-  const ls = document.createElement("div");
-  ls.style.cssText = "margin-top:8px;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(0,0,0,0.15);";
-  ls.innerHTML = `<div style="font-weight:800;margin-bottom:4px;">Leader Skill</div><div style="color:rgba(255,255,255,0.78);font-size:13px;line-height:1.35;"></div>`;
-  ls.querySelector("div:last-child").textContent = leader || "(none)";
-  right.appendChild(ls);
-
-  // Owned checkbox
-  const ownedWrap = document.createElement("label");
-  ownedWrap.className = "toggle";
-  ownedWrap.style.cssText = "margin-top:10px;display:inline-flex;gap:8px;align-items:center;user-select:none;";
-
-  const cb = document.createElement("input");
-  cb.type = "checkbox";
-  cb.checked = state.owned.has(u.id);
-  cb.addEventListener("change", () => {
-    if (cb.checked) state.owned.add(u.id);
-    else state.owned.delete(u.id);
-    saveOwnedSet();
-    // keep roster tiles consistent (re-render visible list)
-    renderRoster();
-  });
-
-  const txt = document.createElement("span");
-  txt.textContent = "Owned";
-
-  ownedWrap.innerHTML = "";
-  ownedWrap.appendChild(cb);
-  ownedWrap.appendChild(txt);
-  right.appendChild(ownedWrap);
-
-  wrap.appendChild(right);
-  return wrap;
-}
-
-function matchesFilters(u) {
-  const q = ($("#searchInput")?.value || "").trim().toLowerCase();
-  const leadersOnly = $("#leadersOnly")?.checked || false;
-  const element = $("#elementFilter")?.value || "";
-  const rarity = $("#rarityFilter")?.value || "";
-
-  if (q) {
-    const hay = `${u.name || ""} ${u.id || ""} ${u.element || ""} ${(u.rarity || "")}`.toLowerCase();
-    if (!hay.includes(q)) return false;
+  function normLower(s) {
+    return safeText(s, "").toLowerCase();
   }
 
-  if (element) {
-    if ((u.element || "").toLowerCase() !== element.toLowerCase()) return false;
+  // Fixes: “The string did not match the expected pattern.”
+  // Some image URLs contain spaces or characters that must be encoded.
+  function safeUrl(u) {
+    const raw = safeText(u, "").trim();
+    if (!raw) return "";
+    try {
+      return encodeURI(raw);
+    } catch {
+      return raw;
+    }
   }
 
-  if (rarity) {
-    if ((u.rarity || "").toUpperCase() !== rarity.toUpperCase()) return false;
+  function splitPrimarySecondary(name, secondaryName) {
+    const sec = safeText(secondaryName, "").trim();
+    if (sec) return { primary: safeText(name, ""), secondary: sec };
+
+    const n = safeText(name, "").trim();
+    const parts = n.split(" ").filter(Boolean);
+    if (parts.length >= 3) {
+      return { primary: parts[0], secondary: parts.slice(1).join(" ") };
+    }
+    return { primary: n, secondary: "" };
   }
 
-  if (leadersOnly) {
-    if (!getLeaderText(u)) return false;
+  /* =======================
+     LocalStorage (Owned)
+  ======================= */
+  function loadOwned() {
+    try {
+      const arr = JSON.parse(localStorage.getItem(LS_OWNED_KEY) || "[]");
+      return new Set(Array.isArray(arr) ? arr : []);
+    } catch {
+      return new Set();
+    }
   }
 
-  return true;
-}
-
-function renderRoster() {
-  const grid = $("#unitGrid");
-  if (!grid) return;
-
-  const filtered = state.all.filter(matchesFilters);
-
-  grid.innerHTML = "";
-  filtered.forEach(u => grid.appendChild(unitTile(u)));
-
-  // title counts if you have one (optional)
-  const count = $("#countMsg");
-  if (count) count.textContent = `${filtered.length} shown`;
-}
-
-function renderLeaderSection() {
-  const box = $("#leaderList");
-  if (!box) return;
-
-  // Leader section should show leader units (not "all units"),
-  // but render full leader card including stats, leader skill, rarity, owned.
-  const leaders = state.all.filter(u => !!getLeaderText(u));
-
-  box.innerHTML = "";
-  if (!leaders.length) {
-    box.textContent = "No leader units found.";
-    return;
+  function saveOwned() {
+    try {
+      localStorage.setItem(LS_OWNED_KEY, JSON.stringify([...state.owned]));
+    } catch {
+      // ignore
+    }
   }
-  leaders.forEach(u => box.appendChild(leaderCard(u)));
-}
 
-function wireUI() {
-  $("#searchInput")?.addEventListener("input", renderRoster);
-  $("#leadersOnly")?.addEventListener("change", renderRoster);
-  $("#elementFilter")?.addEventListener("change", renderRoster);
-  $("#rarityFilter")?.addEventListener("change", renderRoster);
-}
+  /* =======================
+     Data loading
+  ======================= */
+  async function fetchJsonRobust(url) {
+    const res = await fetch(url, { cache: "no-store" });
+    if (!res.ok) throw new Error(`HTTP ${res.status} while fetching ${url}`);
+    const txt = await res.text();
+    try {
+      return JSON.parse(txt);
+    } catch (e) {
+      const msg = e && e.message ? e.message : String(e);
+      throw new Error(`JSON.parse failed for ${url}: ${msg}`);
+    }
+  }
 
-async function main() {
-  state.owned = loadOwnedSet();
+  function coerceCharacterArray(json) {
+    if (Array.isArray(json)) return json;
+    if (json && Array.isArray(json.characters)) return json.characters;
+    throw new Error("characters.json is not an array (expected [] or {characters: []}).");
+  }
 
-  showStatus("Loading characters…");
-  const raw = await fetchJson(DATA_URL);
-  state.all = normalizeCatalog(raw);
+  function normalizeUnit(u) {
+    const id = safeText(u.id, u.handle || u.slug || u.name || "");
+    const { primary, secondary } = splitPrimarySecondary(u.name, u.secondaryName || u.title);
 
-  hideStatus();
-  wireUI();
-  renderLeaderSection();
-  renderRoster();
-}
+    const leaderObj = u.leaderSkill || {};
+    const leaderName =
+      leaderObj && leaderObj.name != null ? safeText(leaderObj.name) : safeText(u.leaderSkillName);
+    const leaderDesc =
+      leaderObj && leaderObj.description != null
+        ? safeText(leaderObj.description)
+        : safeText(u.leaderSkillDescription);
 
-main().catch(err => {
-  console.error(err);
-  showStatus(String(err?.message || err));
-});
+    return {
+      id,
+      name: primary,
+      secondaryName: secondary,
+
+      rarity: safeText(u.rarity, ""),
+      element: safeText(u.element, ""),
+
+      atk: u.atk ?? u.attack ?? u.baseAttack ?? u.BaseAttack ?? u.BaseAtk ?? null,
+      hp: u.hp ?? u.health ?? u.baseHP ?? u.BaseHP ?? null,
+      spd: u.spd ?? u.speed ?? u.Speed ?? null,
+      cost: u.cost ?? u.Cost ?? null,
+
+      image: safeUrl(u.image || u.icon || u.imageUrl || u.portrait || ""),
+
+      leaderSkill: {
+        name: leaderName,
+        description: leaderDesc,
+      },
+    };
+  }
+
+  async function loadCharacters() {
+    const raw = await fetchJsonRobust(DATA_CHARACTERS);
+    const arr = coerceCharacterArray(raw);
+    return arr.map(normalizeUnit);
+  }
+
+  /* =======================
+     Rendering: Unit Card (LOCKED)
+  ======================= */
+  function renderUnitCard(unit) {
+    const leaderName =
+      unit.leaderSkill?.name && unit.leaderSkill.name !== "None"
+        ? unit.leaderSkill.name
+        : "No Leader Skill";
+
+    const leaderDesc =
+      unit.leaderSkill?.description && unit.leaderSkill.description !== "None"
+        ? unit.leaderSkill.description
+        : "This unit does not provide a leader skill.";
+
+    const imgHtml = unit.image
+      ? `<img src="${unit.image}" alt="${unit.name}" loading="lazy">`
+      : `<div class="ph">?</div>`;
+
+    const atk = unit.atk ?? "-";
+    const hp = unit.hp ?? "-";
+    const spd = unit.spd ?? "-";
+    const cost = unit.cost ?? "-";
+
+    return `
+      <article class="unitCard">
+        <div class="unitThumb">
+          ${imgHtml}
+        </div>
+
+        <div class="meta">
+          <div class="topRow">
+            <div>
+              <div class="unitName">${safeText(unit.name)}</div>
+              <div class="unitTitle">${safeText(unit.secondaryName)}</div>
+            </div>
+            <div class="tags">
+              <span class="tag rarity">${safeText(unit.rarity)}</span>
+              <span class="tag element">${safeText(unit.element)}</span>
+            </div>
+          </div>
+
+          <div class="statLine">
+            <span class="stat"><strong>ATK</strong> ${atk}</span>
+            <span class="stat"><strong>HP</strong> ${hp}</span>
+            <span class="stat"><strong>SPD</strong> ${spd}</span>
+            <span class="stat"><strong>COST</strong> ${cost}</span>
+          </div>
+
+          <!-- LEADER SKILL (ALWAYS VISIBLE) -->
+          <div class="leaderBlock">
+            <div class="leaderName">Leader skill: ${leaderName}</div>
+            <div class="leaderText">${leaderDesc}</div>
+          </div>
+
+          <label class="ownedRow">
+            <input type="checkbox" class="ownedCheck" data-unit-id="${safeText(unit.id)}">
+            <span class="ownedLabel">Owned</span>
+          </label>
+        </div>
+      </article>
+    `;
+  }
+
+  /* =======================
+     Filters + Roster render
+  ======================= */
+  function applyFilters(list) {
+    const q = normLower(state.filters.q);
+    const elem = state.filters.element;
+    const rar = state.filters.rarity;
+    const ownedOnly = !!state.filters.ownedOnly;
+
+    return list.filter((u) => {
+      const id = safeText(u.id);
+
+      if (ownedOnly && !state.owned.has(id)) return false;
+      if (elem !== "all" && safeText(u.element) !== elem) return false;
+      if (rar !== "all" && safeText(u.rarity) !== rar) return false;
+
+      if (q) {
+        const hay = normLower(
+          `${u.name} ${u.secondaryName} ${u.element} ${u.rarity} ${u.leaderSkill?.name}`
+        );
+        if (!hay.includes(q)) return false;
+      }
+      return true;
+    });
+  }
+
+  function renderRoster() {
+    const grid = $("#unitGrid");
+    if (!grid) return;
+
+    const filtered = applyFilters(state.units);
+
+    grid.innerHTML = filtered.map(renderUnitCard).join("");
+
+    // Wire Owned checkboxes after render
+    grid.querySelectorAll('input.ownedCheck[data-unit-id]').forEach((cb) => {
+      const id = cb.getAttribute("data-unit-id") || "";
+      cb.checked = state.owned.has(id);
+
+      cb.addEventListener("change", () => {
+        if (cb.checked) state.owned.add(id);
+        else state.owned.delete(id);
+
+        saveOwned();
+
+        // If Owned-only is enabled, re-render so unchecked cards disappear immediately
+        if (state.filters.ownedOnly) renderRoster();
+      });
+    });
+
+    const status = $("#statusText");
+    if (status) {
+      status.textContent = `${filtered.length} shown • ${state.units.length} total • ${state.owned.size} owned`;
+    }
+  }
+
+  /* =======================
+     Dropdown population
+  ======================= */
+  function fillSelect(selectEl, values, allLabel) {
+    if (!selectEl) return;
+    const current = selectEl.value || "all";
+    selectEl.innerHTML = "";
+
+    const optAll = document.createElement("option");
+    optAll.value = "all";
+    optAll.textContent = allLabel;
+    selectEl.appendChild(optAll);
+
+    values.forEach((v) => {
+      const opt = document.createElement("option");
+      opt.value = v;
+      opt.textContent = v;
+      selectEl.appendChild(opt);
+    });
+
+    selectEl.value = values.includes(current) ? current : "all";
+  }
+
+  function rebuildFilterOptions() {
+    const elements = [...new Set(state.units.map((u) => safeText(u.element)).filter(Boolean))].sort();
+
+    const rarities = [...new Set(state.units.map((u) => safeText(u.rarity)).filter(Boolean))].sort(
+      (a, b) => {
+        const order = { N: 0, R: 1, SR: 2, SSR: 3 };
+        return (order[a] ?? 99) - (order[b] ?? 99);
+      }
+    );
+
+    fillSelect($("#elementSelect"), elements, "All elements");
+    fillSelect($("#raritySelect"), rarities, "All rarities");
+  }
+
+  /* =======================
+     Controls wiring
+  ======================= */
+  function wireControls() {
+    const search = $("#searchInput");
+    if (search) {
+      search.addEventListener("input", (e) => {
+        state.filters.q = e.target.value || "";
+        renderRoster();
+      });
+    }
+
+    const elSel = $("#elementSelect");
+    if (elSel) {
+      elSel.addEventListener("change", (e) => {
+        state.filters.element = e.target.value || "all";
+        renderRoster();
+      });
+    }
+
+    const rSel = $("#raritySelect");
+    if (rSel) {
+      rSel.addEventListener("change", (e) => {
+        state.filters.rarity = e.target.value || "all";
+        renderRoster();
+      });
+    }
+
+    const ownedOnly = $("#ownedOnly");
+    if (ownedOnly) {
+      ownedOnly.addEventListener("change", (e) => {
+        state.filters.ownedOnly = !!e.target.checked;
+        renderRoster();
+      });
+    }
+  }
+
+  /* =======================
+     Tabs (Roster / Optimizer)
+  ======================= */
+  function showTab(which) {
+    const pageRoster = $("#pageRoster") || $("#tab-roster");
+    const pageOptimizer = $("#pageOptimizer") || $("#tab-optimizer");
+
+    const btnRoster = $("#btnRoster") || $("#tabRoster");
+    const btnOptim = $("#btnOptimizer") || $("#tabOptimizer");
+
+    if (pageRoster && pageOptimizer) {
+      if (which === "optimizer") {
+        pageRoster.classList.add("hidden");
+        pageOptimizer.classList.remove("hidden");
+      } else {
+        pageOptimizer.classList.add("hidden");
+        pageRoster.classList.remove("hidden");
+      }
+    }
+
+    if (btnRoster && btnOptim) {
+      if (which === "optimizer") {
+        btnRoster.classList.remove("active");
+        btnOptim.classList.add("active");
+      } else {
+        btnOptim.classList.remove("active");
+        btnRoster.classList.add("active");
+      }
+    }
+  }
+
+  function wireTabs() {
+    const btnRoster = $("#btnRoster") || $("#tabRoster");
+    const btnOptim = $("#btnOptimizer") || $("#tabOptimizer");
+
+    if (btnRoster) btnRoster.addEventListener("click", () => showTab("roster"));
+    if (btnOptim) btnOptim.addEventListener("click", () => showTab("optimizer"));
+  }
+
+  /* =======================
+     Init
+  ======================= */
+  async function init() {
+    state.owned = loadOwned();
+
+    wireControls();
+    wireTabs();
+
+    try {
+      state.units = await loadCharacters();
+      rebuildFilterOptions();
+      renderRoster();
+      showTab("roster");
+    } catch (err) {
+      console.error(err);
+      const grid = $("#unitGrid");
+      if (grid) {
+        grid.innerHTML = "";
+        const msg = err && err.message ? err.message : String(err);
+        grid.textContent = `ERROR: ${msg}`;
+      }
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", init);
+})();
