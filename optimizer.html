@@ -1,52 +1,101 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Evertale Optimizer</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Evertale Optimizer — Optimizer</title>
+  <link rel="stylesheet" href="./style.css" />
 </head>
-<body>
 
-<div class="topbar">
-  <div>
-    <div class="brandTitle">Evertale Optimizer</div>
-    <div class="brandSub">Build the best team from your units</div>
-  </div>
-  <a href="index.html" class="tab">← Back to Roster</a>
-</div>
+<body data-page="optimizer">
+  <div class="topbar">
+    <div>
+      <div class="brandTitle">Evertale Optimizer</div>
+      <div class="brandSub">Build teams from owned units</div>
+    </div>
 
-<div class="page">
-
-  <div class="controls">
-    <select id="teamMode" class="input">
-      <option value="story">Story Team (5 + 2)</option>
-      <option value="platoon">Platoon (5)</option>
-    </select>
-
-    <select id="strategy" class="input">
-      <option value="rainbow">Rainbow (Mixed Elements)</option>
-      <option value="mono">Mono Element</option>
-    </select>
-
-    <select id="elementFocus" class="input">
-      <option value="any">Any Element</option>
-      <option value="Fire">Fire</option>
-      <option value="Water">Water</option>
-      <option value="Earth">Earth</option>
-      <option value="Light">Light</option>
-      <option value="Dark">Dark</option>
-    </select>
-
-    <button id="runOptimize" class="btn">Build Best Team</button>
+    <div class="tabs">
+      <a class="tab" href="index.html">Roster</a>
+      <a class="tab active" href="optimizer.html">Optimizer</a>
+    </div>
   </div>
 
-  <div class="panel">
-    <div class="panelTitle">Recommended Team</div>
-    <div id="teamGrid" class="slotGrid"></div>
+  <div class="page">
+    <div class="panel">
+      <div class="optHeader">
+        <div>
+          <div class="panelTitle">Optimizer</div>
+          <div class="muted">Uses your owned units (from the Roster page).</div>
+        </div>
+
+        <button id="refreshOwned" class="btn">Refresh Owned</button>
+      </div>
+
+      <div class="panelRow">
+        <div class="panelTitle">Team Type</div>
+        <select id="teamType" class="input">
+          <option value="story">Story (Main 5 + Backup 2)</option>
+          <option value="platoon">Platoon (5 slots)</option>
+        </select>
+      </div>
+
+      <div class="panelRow">
+        <div class="panelTitle">Strategy</div>
+        <select id="strategy" class="input">
+          <option value="rainbow">Rainbow (best overall)</option>
+          <option value="mono">Mono (same element)</option>
+        </select>
+      </div>
+
+      <div class="panelRow" id="monoElementRow">
+        <div class="panelTitle">Mono Element</div>
+        <select id="monoElement" class="input">
+          <option value="Fire">Fire</option>
+          <option value="Water">Water</option>
+          <option value="Earth">Earth</option>
+          <option value="Storm">Storm</option>
+          <option value="Light">Light</option>
+          <option value="Dark">Dark</option>
+        </select>
+      </div>
+
+      <div class="panelRow">
+        <div class="panelTitle">Synergy Preference</div>
+        <select id="synergyMode" class="input">
+          <option value="leader">Prefer best leader skill</option>
+          <option value="raw">Prefer raw stats</option>
+        </select>
+      </div>
+
+      <div class="panelRow">
+        <div class="panelTitle">Max Cost (optional)</div>
+        <input id="maxCost" class="input" type="number" min="0" placeholder="e.g. 400" />
+      </div>
+
+      <div class="panelRow">
+        <button id="buildTeam" class="btn">Build Best Team</button>
+        <div class="muted" id="ownedCountText"></div>
+      </div>
+    </div>
+
+    <div class="panel teamBlock">
+      <div class="teamSubTitle">Recommended Team</div>
+      <div id="teamSlots" class="slotGrid"></div>
+
+      <div class="summaryRow">
+        <div class="summaryItem"><strong>Units:</strong> <span id="sumUnits">0</span></div>
+        <div class="summaryItem"><strong>Total Cost:</strong> <span id="sumCost">0</span></div>
+        <div class="summaryItem"><strong>Avg ATK:</strong> <span id="sumAtk">0</span></div>
+        <div class="summaryItem"><strong>Avg HP:</strong> <span id="sumHp">0</span></div>
+        <div class="summaryItem"><strong>Avg SPD:</strong> <span id="sumSpd">0</span></div>
+      </div>
+    </div>
+
+    <div class="footerHint">
+      If your owned list is empty, go back to Roster and check “Owned” on units.
+    </div>
   </div>
 
-</div>
-
-<script src="optimizer.js"></script>
+  <script type="module" src="./app.js"></script>
 </body>
 </html>
