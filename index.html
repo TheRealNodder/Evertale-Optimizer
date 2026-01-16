@@ -2,72 +2,61 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1, viewport-fit=cover"
-  />
-  <title>Evertale Optimizer – Roster</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Evertale Optimizer — Roster</title>
   <link rel="stylesheet" href="./style.css" />
 </head>
 
-<body>
-  <!-- ================= HEADER ================= -->
-  <header class="topbar">
-    <div class="topbar-inner">
-      <div class="brand">
-        <div class="brand-title">Evertale Optimizer</div>
-        <div class="brand-sub">Roster</div>
-      </div>
-
-      <div class="controls">
-        <label class="search">
-          <span class="sr-only">Search</span>
-          <input
-            id="searchInput"
-            type="search"
-            placeholder="Search units…"
-            autocomplete="off"
-          />
-        </label>
-
-        <label class="toggle">
-          <input id="leadersOnly" type="checkbox" />
-          <span>Leaders only</span>
-        </label>
-      </div>
+<body data-page="roster">
+  <div class="topbar">
+    <div>
+      <div class="brandTitle">Evertale Optimizer</div>
+      <div class="brandSub">Roster</div>
     </div>
-  </header>
 
-  <!-- ================= MAIN ================= -->
-  <main class="main">
+    <div class="tabs">
+      <a class="tab active" href="index.html">Roster</a>
+      <a class="tab" href="optimizer.html">Optimizer</a>
+    </div>
+  </div>
 
-    <!-- ===== STATUS / LOADING ===== -->
-    <section id="status" class="status hidden">
-      <div class="spinner" aria-hidden="true"></div>
-      <div class="statusMessage">Loading data…</div>
-    </section>
+  <main class="page">
+    <div class="controls">
+      <input id="searchInput" class="input" type="search" placeholder="Search unit name / element / rarity…" />
 
-    <!-- ===== LEADER UNITS SECTION ===== -->
-    <section id="leader-units" class="leader-section">
-      <h2 class="section-title">Leader Units</h2>
+      <select id="elementSelect" class="input">
+        <option value="all">All Elements</option>
+        <option value="Fire">Fire</option>
+        <option value="Water">Water</option>
+        <option value="Earth">Earth</option>
+        <option value="Storm">Storm</option>
+        <option value="Light">Light</option>
+        <option value="Dark">Dark</option>
+      </select>
 
-      <div id="leaderList" class="leader-list">
-        <!-- injected by JS -->
-      </div>
-    </section>
+      <select id="raritySelect" class="input">
+        <option value="all">All Rarities</option>
+        <option value="N">N</option>
+        <option value="R">R</option>
+        <option value="SR">SR</option>
+        <option value="SSR">SSR</option>
+      </select>
 
-    <!-- ===== ALL UNITS (FUTURE EXPANSION) ===== -->
-    <section id="all-units" class="all-units">
-      <h2 class="section-title">All Units</h2>
+      <label class="check">
+        <input id="ownedOnly" type="checkbox" />
+        Owned only
+      </label>
+    </div>
 
-      <div id="unitGrid" class="unit-grid">
-        <!-- injected by JS -->
-      </div>
-    </section>
+    <div id="statusText" class="muted"></div>
 
+    <div id="unitGrid"></div>
+
+    <div class="footerHint">
+      Tip: check “Owned” on units you have. The Optimizer page will use only those.
+    </div>
   </main>
 
-  <!-- ================= SCRIPT ================= -->
-  <script src="./app.js"></script>
+  <script type="module" src="./app.js"></script>
 </body>
 </html>
