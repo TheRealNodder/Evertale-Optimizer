@@ -1,409 +1,317 @@
-/* app.js — FULL FILE (ROSTER + FILTERS + OWNED + OPTIMIZER TAB)
-   - Loads ./data/characters.json (array OR {characters:[...]})
-   - Always renders leader skill block (never "hidden")
-   - Handles invalid JSON with a clear on-page error
-   - Encodes image URLs safely (fixes “string did not match expected pattern”)
-   - Builds Element + Rarity dropdowns from data
-   - Persists Owned checkboxes in localStorage
-*/
+/* app.js — Roster + Optimizer (owned sync via localStorage) */
 
-(() => {
-  "use strict";
+const DATA_CHARACTERS = "./data/characters.json";
+const LS_OWNED_KEY = "evertale_owned_units_v1";
 
-  /* =======================
-     CONFIG (paths + storage)
-  ======================= */
-  const DATA_CHARACTERS = "./data/characters.json";
-  const LS_OWNED_KEY = "evertale_owned_units_v1";
+const state = {
+  units: [],
+  owned: new Set(),
+  filters: { q: "", element: "all", rarity: "all", ownedOnly: false },
+};
 
-  /* =======================
-     STATE
-  ======================= */
-  const state = {
-    units: [],
-    owned: new Set(),
-    filters: {
-      q: "",
-      element: "all",
-      rarity: "all",
-      ownedOnly: false,
-    },
+const $ = (s) => document.querySelector(s);
+
+function safeNum(v) {
+  const n = Number(v);
+  return Number.isFinite(n) ? n : 0;
+}
+
+function loadOwned() {
+  try {
+    return new Set(JSON.parse(localStorage.getItem(LS_OWNED_KEY) || "[]"));
+  } catch {
+    return new Set();
+  }
+}
+function saveOwned() {
+  localStorage.setItem(LS_OWNED_KEY, JSON.stringify([...state.owned]));
+}
+
+async function loadCharacters() {
+  const res = await fetch(DATA_CHARACTERS, { cache: "no-store" });
+  if (!res.ok) throw new Error(`Failed to load ${DATA_CHARACTERS} (${res.status})`);
+  const json = await res.json();
+  if (Array.isArray(json)) return json;
+  if (Array.isArray(json.characters)) return json.characters;
+  throw new Error("ERROR LOADING characters.json is not an array");
+}
+
+/* ---------------- Card HTML (LOCKED leader block always visible) ---------------- */
+function renderUnitCardHTML(unit) {
+  const imgHtml = unit.image
+    ? `<img src="${unit.image}" alt="${unit.name}" loading="lazy">`
+    : `<div class="ph">${(unit.name || "?").slice(0, 1).toUpperCase()}</div>`;
+
+  const leaderName =
+    unit.leaderSkill?.name && unit.leaderSkill.name !== "None"
+      ? unit.leaderSkill.name
+      : "No Leader Skill";
+
+  const leaderDesc =
+    unit.leaderSkill?.description && unit.leaderSkill.description !== "None"
+      ? unit.leaderSkill.description
+      : "This unit does not provide a leader skill.";
+
+  const atk = safeNum(unit.atk);
+  const hp  = safeNum(unit.hp);
+  const spd = safeNum(unit.spd);
+  const cost = safeNum(unit.cost);
+
+  const checked = state.owned.has(unit.id) ? "checked" : "";
+
+  return `
+    <div class="unitCard" data-unit-id="${unit.id}">
+      <div class="unitThumb">${imgHtml}</div>
+
+      <div class="meta">
+        <div class="nameRow">
+          <div>
+            <div class="unitName">${unit.name ?? ""}</div>
+            <div class="unitSub">${unit.secondaryName ?? unit.title ?? ""}</div>
+          </div>
+
+          <div class="tags">
+            <span class="tag rarity">${unit.rarity ?? ""}</span>
+            <span class="tag element">${unit.element ?? ""}</span>
+          </div>
+        </div>
+
+        <div class="statLine">
+          <div class="stat"><strong>ATK:</strong> ${atk}</div>
+          <div class="stat"><strong>HP:</strong> ${hp}</div>
+          <div class="stat"><strong>SPD:</strong> ${spd}</div>
+          <div class="stat"><strong>COST:</strong> ${cost}</div>
+        </div>
+
+        <div class="leaderBlock">
+          <div class="leaderName">${leaderName}</div>
+          <div class="leaderDesc">${leaderDesc}</div>
+        </div>
+
+        <label class="ownedRow">
+          <input class="ownedCheck" type="checkbox" data-owned-id="${unit.id}" ${checked}>
+          <span class="ownedLabel">Owned</span>
+        </label>
+      </div>
+    </div>
+  `;
+}
+
+/* ---------------- Roster page ---------------- */
+function applyRosterFilters(units) {
+  const q = (state.filters.q || "").trim().toLowerCase();
+  const el = state.filters.element;
+  const r = state.filters.rarity;
+  const ownedOnly = !!state.filters.ownedOnly;
+
+  return units.filter((u) => {
+    if (ownedOnly && !state.owned.has(u.id)) return false;
+    if (el !== "all" && (u.element || "") !== el) return false;
+    if (r !== "all" && (u.rarity || "") !== r) return false;
+
+    if (!q) return true;
+    const hay = `${u.name ?? ""} ${u.secondaryName ?? ""} ${u.title ?? ""} ${u.element ?? ""} ${u.rarity ?? ""} ${u.leaderSkill?.name ?? ""} ${u.leaderSkill?.description ?? ""}`.toLowerCase();
+    return hay.includes(q);
+  });
+}
+
+function renderRoster() {
+  const grid = $("#unitGrid");
+  if (!grid) return;
+
+  const filtered = applyRosterFilters(state.units);
+
+  $("#statusText").textContent = `Showing ${filtered.length} / ${state.units.length}`;
+
+  grid.innerHTML = filtered.map(renderUnitCardHTML).join("");
+
+  // wire owned checkboxes
+  grid.querySelectorAll("input[data-owned-id]").forEach((cb) => {
+    cb.addEventListener("change", () => {
+      const id = cb.getAttribute("data-owned-id");
+      if (!id) return;
+      if (cb.checked) state.owned.add(id);
+      else state.owned.delete(id);
+      saveOwned();
+    });
+  });
+}
+
+function initRosterPage() {
+  $("#searchInput")?.addEventListener("input", (e) => {
+    state.filters.q = e.target.value || "";
+    renderRoster();
+  });
+
+  $("#elementSelect")?.addEventListener("change", (e) => {
+    state.filters.element = e.target.value;
+    renderRoster();
+  });
+
+  $("#raritySelect")?.addEventListener("change", (e) => {
+    state.filters.rarity = e.target.value;
+    renderRoster();
+  });
+
+  $("#ownedOnly")?.addEventListener("change", (e) => {
+    state.filters.ownedOnly = !!e.target.checked;
+    renderRoster();
+  });
+
+  renderRoster();
+}
+
+/* ---------------- Optimizer page ---------------- */
+function scoreUnit(u) {
+  // baseline score
+  const atk = safeNum(u.atk);
+  const hp  = safeNum(u.hp);
+  const spd = safeNum(u.spd);
+  const cost = safeNum(u.cost);
+  return atk * 1 + hp * 0.08 + spd * 2 - cost * 0.8;
+}
+
+function leaderBoostScore(u, strategy, monoElement) {
+  // very lightweight: prefer units that have a leader skill that mentions the chosen element or “Attack”
+  if (strategy !== "leader") return 0;
+
+  const name = (u.leaderSkill?.name || "").toLowerCase();
+  const desc = (u.leaderSkill?.description || "").toLowerCase();
+  let bonus = 0;
+
+  if (monoElement) {
+    const el = monoElement.toLowerCase();
+    if (name.includes(el) || desc.includes(el)) bonus += 50;
+  }
+  if (name.includes("atk") || desc.includes("attack")) bonus += 25;
+  if (desc.includes("max hp") || desc.includes("hp")) bonus += 10;
+
+  return bonus;
+}
+
+function pickBestTeam(ownedUnits, opts) {
+  const {
+    teamType,            // story | platoon
+    strategy,            // rainbow | mono
+    monoElement,         // element string
+    synergyMode,         // leader | raw
+    maxCost,             // number or 0
+  } = opts;
+
+  const slots = teamType === "story" ? 7 : 5;
+
+  let pool = ownedUnits.slice();
+
+  if (strategy === "mono") {
+    pool = pool.filter(u => (u.element || "") === monoElement);
+  }
+
+  // rank by composite score
+  const ranked = pool
+    .map(u => ({
+      u,
+      s: scoreUnit(u) + leaderBoostScore(u, synergyMode, strategy === "mono" ? monoElement : null),
+    }))
+    .sort((a, b) => b.s - a.s);
+
+  const picked = [];
+  const used = new Set();
+  let totalCost = 0;
+
+  for (const { u } of ranked) {
+    if (picked.length >= slots) break;
+    if (used.has(u.id)) continue;
+
+    const c = safeNum(u.cost);
+    if (maxCost > 0 && totalCost + c > maxCost) continue;
+
+    picked.push(u);
+    used.add(u.id);
+    totalCost += c;
+  }
+
+  return picked;
+}
+
+function renderTeam(team) {
+  const wrap = $("#teamSlots");
+  if (!wrap) return;
+
+  wrap.innerHTML = team.map((u, idx) => {
+    return `
+      <div class="slot">
+        <div class="slotTitle">Slot ${idx + 1}</div>
+        ${renderUnitCardHTML(u)}
+      </div>
+    `;
+  }).join("");
+
+  // remove “Owned” checkbox interactions inside optimizer slots (display only)
+  wrap.querySelectorAll("input[data-owned-id]").forEach((cb) => {
+    cb.disabled = true;
+  });
+
+  const avg = (k) => team.length ? Math.round(team.reduce((a,x)=>a+safeNum(x[k]),0)/team.length) : 0;
+
+  $("#sumUnits").textContent = String(team.length);
+  $("#sumCost").textContent  = String(team.reduce((a,x)=>a+safeNum(x.cost),0));
+  $("#sumAtk").textContent   = String(avg("atk"));
+  $("#sumHp").textContent    = String(avg("hp"));
+  $("#sumSpd").textContent   = String(avg("spd"));
+}
+
+function initOptimizerPage() {
+  const monoRow = $("#monoElementRow");
+  const strategySel = $("#strategy");
+  const updateMonoRow = () => {
+    const v = strategySel?.value || "rainbow";
+    if (!monoRow) return;
+    monoRow.classList.toggle("hidden", v !== "mono");
+  };
+  strategySel?.addEventListener("change", updateMonoRow);
+  updateMonoRow();
+
+  const refreshOwned = () => {
+    state.owned = loadOwned();
+    const ownedCount = state.owned.size;
+    $("#ownedCountText").textContent = `Owned units: ${ownedCount}`;
   };
 
-  /* =======================
-     DOM helpers
-  ======================= */
-  const $ = (sel) => document.querySelector(sel);
+  $("#refreshOwned")?.addEventListener("click", refreshOwned);
 
-  function safeText(v, fallback = "") {
-    return v == null ? fallback : String(v);
+  $("#buildTeam")?.addEventListener("click", () => {
+    refreshOwned();
+
+    const ownedUnits = state.units.filter(u => state.owned.has(u.id));
+    const teamType = $("#teamType")?.value || "story";
+    const strategy = $("#strategy")?.value || "rainbow";
+    const monoElement = $("#monoElement")?.value || "Fire";
+    const synergyMode = $("#synergyMode")?.value || "leader";
+    const maxCost = safeNum($("#maxCost")?.value || 0);
+
+    const team = pickBestTeam(ownedUnits, { teamType, strategy, monoElement, synergyMode, maxCost });
+    renderTeam(team);
+  });
+
+  refreshOwned();
+  renderTeam([]);
+}
+
+/* ---------------- Boot ---------------- */
+async function boot() {
+  state.owned = loadOwned();
+
+  try {
+    state.units = await loadCharacters();
+  } catch (e) {
+    console.error(e);
+    $("#statusText") && ($("#statusText").textContent = e.message);
+    return;
   }
 
-  function normLower(s) {
-    return safeText(s, "").toLowerCase();
-  }
+  const page = document.body.getAttribute("data-page");
+  if (page === "optimizer") initOptimizerPage();
+  else initRosterPage();
+}
 
-  // Fixes: “The string did not match the expected pattern.”
-  // Some image URLs contain spaces or characters that must be encoded.
-  function safeUrl(u) {
-    const raw = safeText(u, "").trim();
-    if (!raw) return "";
-    try {
-      return encodeURI(raw);
-    } catch {
-      return raw;
-    }
-  }
-
-  function splitPrimarySecondary(name, secondaryName) {
-    const sec = safeText(secondaryName, "").trim();
-    if (sec) return { primary: safeText(name, ""), secondary: sec };
-
-    const n = safeText(name, "").trim();
-    const parts = n.split(" ").filter(Boolean);
-    if (parts.length >= 3) {
-      return { primary: parts[0], secondary: parts.slice(1).join(" ") };
-    }
-    return { primary: n, secondary: "" };
-  }
-
-  /* =======================
-     LocalStorage (Owned)
-  ======================= */
-  function loadOwned() {
-    try {
-      const arr = JSON.parse(localStorage.getItem(LS_OWNED_KEY) || "[]");
-      return new Set(Array.isArray(arr) ? arr : []);
-    } catch {
-      return new Set();
-    }
-  }
-
-  function saveOwned() {
-    try {
-      localStorage.setItem(LS_OWNED_KEY, JSON.stringify([...state.owned]));
-    } catch {
-      // ignore
-    }
-  }
-
-  /* =======================
-     Data loading
-  ======================= */
-  async function fetchJsonRobust(url) {
-    const res = await fetch(url, { cache: "no-store" });
-    if (!res.ok) throw new Error(`HTTP ${res.status} while fetching ${url}`);
-    const txt = await res.text();
-    try {
-      return JSON.parse(txt);
-    } catch (e) {
-      const msg = e && e.message ? e.message : String(e);
-      throw new Error(`JSON.parse failed for ${url}: ${msg}`);
-    }
-  }
-
-  function coerceCharacterArray(json) {
-    if (Array.isArray(json)) return json;
-    if (json && Array.isArray(json.characters)) return json.characters;
-    throw new Error("characters.json is not an array (expected [] or {characters: []}).");
-  }
-
-  function normalizeUnit(u) {
-    const id = safeText(u.id, u.handle || u.slug || u.name || "");
-    const { primary, secondary } = splitPrimarySecondary(u.name, u.secondaryName || u.title);
-
-    const leaderObj = u.leaderSkill || {};
-    const leaderName =
-      leaderObj && leaderObj.name != null ? safeText(leaderObj.name) : safeText(u.leaderSkillName);
-    const leaderDesc =
-      leaderObj && leaderObj.description != null
-        ? safeText(leaderObj.description)
-        : safeText(u.leaderSkillDescription);
-
-    return {
-      id,
-      name: primary,
-      secondaryName: secondary,
-
-      rarity: safeText(u.rarity, ""),
-      element: safeText(u.element, ""),
-
-      atk: u.atk ?? u.attack ?? u.baseAttack ?? u.BaseAttack ?? u.BaseAtk ?? null,
-      hp: u.hp ?? u.health ?? u.baseHP ?? u.BaseHP ?? null,
-      spd: u.spd ?? u.speed ?? u.Speed ?? null,
-      cost: u.cost ?? u.Cost ?? null,
-
-      image: safeUrl(u.image || u.icon || u.imageUrl || u.portrait || ""),
-
-      leaderSkill: {
-        name: leaderName,
-        description: leaderDesc,
-      },
-    };
-  }
-
-  async function loadCharacters() {
-    const raw = await fetchJsonRobust(DATA_CHARACTERS);
-    const arr = coerceCharacterArray(raw);
-    return arr.map(normalizeUnit);
-  }
-
-  /* =======================
-     Rendering: Unit Card (LOCKED)
-  ======================= */
-  function renderUnitCard(unit) {
-    const leaderName =
-      unit.leaderSkill?.name && unit.leaderSkill.name !== "None"
-        ? unit.leaderSkill.name
-        : "No Leader Skill";
-
-    const leaderDesc =
-      unit.leaderSkill?.description && unit.leaderSkill.description !== "None"
-        ? unit.leaderSkill.description
-        : "This unit does not provide a leader skill.";
-
-    const imgHtml = unit.image
-      ? `<img src="${unit.image}" alt="${unit.name}" loading="lazy">`
-      : `<div class="ph">?</div>`;
-
-    const atk = unit.atk ?? "-";
-    const hp = unit.hp ?? "-";
-    const spd = unit.spd ?? "-";
-    const cost = unit.cost ?? "-";
-
-    return `
-      <article class="unitCard">
-        <div class="unitThumb">
-          ${imgHtml}
-        </div>
-
-        <div class="meta">
-          <div class="topRow">
-            <div>
-              <div class="unitName">${safeText(unit.name)}</div>
-              <div class="unitTitle">${safeText(unit.secondaryName)}</div>
-            </div>
-            <div class="tags">
-              <span class="tag rarity">${safeText(unit.rarity)}</span>
-              <span class="tag element">${safeText(unit.element)}</span>
-            </div>
-          </div>
-
-          <div class="statLine">
-            <span class="stat"><strong>ATK</strong> ${atk}</span>
-            <span class="stat"><strong>HP</strong> ${hp}</span>
-            <span class="stat"><strong>SPD</strong> ${spd}</span>
-            <span class="stat"><strong>COST</strong> ${cost}</span>
-          </div>
-
-          <!-- LEADER SKILL (ALWAYS VISIBLE) -->
-          <div class="leaderBlock">
-            <div class="leaderName">Leader skill: ${leaderName}</div>
-            <div class="leaderText">${leaderDesc}</div>
-          </div>
-
-          <label class="ownedRow">
-            <input type="checkbox" class="ownedCheck" data-unit-id="${safeText(unit.id)}">
-            <span class="ownedLabel">Owned</span>
-          </label>
-        </div>
-      </article>
-    `;
-  }
-
-  /* =======================
-     Filters + Roster render
-  ======================= */
-  function applyFilters(list) {
-    const q = normLower(state.filters.q);
-    const elem = state.filters.element;
-    const rar = state.filters.rarity;
-    const ownedOnly = !!state.filters.ownedOnly;
-
-    return list.filter((u) => {
-      const id = safeText(u.id);
-
-      if (ownedOnly && !state.owned.has(id)) return false;
-      if (elem !== "all" && safeText(u.element) !== elem) return false;
-      if (rar !== "all" && safeText(u.rarity) !== rar) return false;
-
-      if (q) {
-        const hay = normLower(
-          `${u.name} ${u.secondaryName} ${u.element} ${u.rarity} ${u.leaderSkill?.name}`
-        );
-        if (!hay.includes(q)) return false;
-      }
-      return true;
-    });
-  }
-
-  function renderRoster() {
-    const grid = $("#unitGrid");
-    if (!grid) return;
-
-    const filtered = applyFilters(state.units);
-
-    grid.innerHTML = filtered.map(renderUnitCard).join("");
-
-    // Wire Owned checkboxes after render
-    grid.querySelectorAll('input.ownedCheck[data-unit-id]').forEach((cb) => {
-      const id = cb.getAttribute("data-unit-id") || "";
-      cb.checked = state.owned.has(id);
-
-      cb.addEventListener("change", () => {
-        if (cb.checked) state.owned.add(id);
-        else state.owned.delete(id);
-
-        saveOwned();
-
-        // If Owned-only is enabled, re-render so unchecked cards disappear immediately
-        if (state.filters.ownedOnly) renderRoster();
-      });
-    });
-
-    const status = $("#statusText");
-    if (status) {
-      status.textContent = `${filtered.length} shown • ${state.units.length} total • ${state.owned.size} owned`;
-    }
-  }
-
-  /* =======================
-     Dropdown population
-  ======================= */
-  function fillSelect(selectEl, values, allLabel) {
-    if (!selectEl) return;
-    const current = selectEl.value || "all";
-    selectEl.innerHTML = "";
-
-    const optAll = document.createElement("option");
-    optAll.value = "all";
-    optAll.textContent = allLabel;
-    selectEl.appendChild(optAll);
-
-    values.forEach((v) => {
-      const opt = document.createElement("option");
-      opt.value = v;
-      opt.textContent = v;
-      selectEl.appendChild(opt);
-    });
-
-    selectEl.value = values.includes(current) ? current : "all";
-  }
-
-  function rebuildFilterOptions() {
-    const elements = [...new Set(state.units.map((u) => safeText(u.element)).filter(Boolean))].sort();
-
-    const rarities = [...new Set(state.units.map((u) => safeText(u.rarity)).filter(Boolean))].sort(
-      (a, b) => {
-        const order = { N: 0, R: 1, SR: 2, SSR: 3 };
-        return (order[a] ?? 99) - (order[b] ?? 99);
-      }
-    );
-
-    fillSelect($("#elementSelect"), elements, "All elements");
-    fillSelect($("#raritySelect"), rarities, "All rarities");
-  }
-
-  /* =======================
-     Controls wiring
-  ======================= */
-  function wireControls() {
-    const search = $("#searchInput");
-    if (search) {
-      search.addEventListener("input", (e) => {
-        state.filters.q = e.target.value || "";
-        renderRoster();
-      });
-    }
-
-    const elSel = $("#elementSelect");
-    if (elSel) {
-      elSel.addEventListener("change", (e) => {
-        state.filters.element = e.target.value || "all";
-        renderRoster();
-      });
-    }
-
-    const rSel = $("#raritySelect");
-    if (rSel) {
-      rSel.addEventListener("change", (e) => {
-        state.filters.rarity = e.target.value || "all";
-        renderRoster();
-      });
-    }
-
-    const ownedOnly = $("#ownedOnly");
-    if (ownedOnly) {
-      ownedOnly.addEventListener("change", (e) => {
-        state.filters.ownedOnly = !!e.target.checked;
-        renderRoster();
-      });
-    }
-  }
-
-  /* =======================
-     Tabs (Roster / Optimizer)
-  ======================= */
-  function showTab(which) {
-    const pageRoster = $("#pageRoster") || $("#tab-roster");
-    const pageOptimizer = $("#pageOptimizer") || $("#tab-optimizer");
-
-    const btnRoster = $("#btnRoster") || $("#tabRoster");
-    const btnOptim = $("#btnOptimizer") || $("#tabOptimizer");
-
-    if (pageRoster && pageOptimizer) {
-      if (which === "optimizer") {
-        pageRoster.classList.add("hidden");
-        pageOptimizer.classList.remove("hidden");
-      } else {
-        pageOptimizer.classList.add("hidden");
-        pageRoster.classList.remove("hidden");
-      }
-    }
-
-    if (btnRoster && btnOptim) {
-      if (which === "optimizer") {
-        btnRoster.classList.remove("active");
-        btnOptim.classList.add("active");
-      } else {
-        btnOptim.classList.remove("active");
-        btnRoster.classList.add("active");
-      }
-    }
-  }
-
-  function wireTabs() {
-    const btnRoster = $("#btnRoster") || $("#tabRoster");
-    const btnOptim = $("#btnOptimizer") || $("#tabOptimizer");
-
-    if (btnRoster) btnRoster.addEventListener("click", () => showTab("roster"));
-    if (btnOptim) btnOptim.addEventListener("click", () => showTab("optimizer"));
-  }
-
-  /* =======================
-     Init
-  ======================= */
-  async function init() {
-    state.owned = loadOwned();
-
-    wireControls();
-    wireTabs();
-
-    try {
-      state.units = await loadCharacters();
-      rebuildFilterOptions();
-      renderRoster();
-      showTab("roster");
-    } catch (err) {
-      console.error(err);
-      const grid = $("#unitGrid");
-      if (grid) {
-        grid.innerHTML = "";
-        const msg = err && err.message ? err.message : String(err);
-        grid.textContent = `ERROR: ${msg}`;
-      }
-    }
-  }
-
-  document.addEventListener("DOMContentLoaded", init);
-})();
+document.addEventListener("DOMContentLoaded", boot);
