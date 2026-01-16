@@ -1,61 +1,52 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Evertale Optimizer — Optimizer</title>
-  <link rel="stylesheet" href="./style.css" />
+  <meta charset="UTF-8" />
+  <title>Evertale Optimizer</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <header class="topbar">
-    <div class="topbar-inner">
-      <div class="brand">
-        <div class="brand-title">Evertale Optimizer</div>
-        <div class="brand-sub">Optimizer</div>
-      </div>
 
-      <div class="controls">
-        <a class="chip" href="./index.html" style="text-decoration:none;">← Back to Roster</a>
+<div class="topbar">
+  <div>
+    <div class="brandTitle">Evertale Optimizer</div>
+    <div class="brandSub">Build the best team from your units</div>
+  </div>
+  <a href="index.html" class="tab">← Back to Roster</a>
+</div>
 
-        <label class="toggle">
-          <input id="monoOnly" type="checkbox" />
-          <span>Mono suggestion</span>
-        </label>
+<div class="page">
 
-        <select id="monoElement">
-          <option value="">Any element</option>
-          <option value="Fire">Fire</option>
-          <option value="Water">Water</option>
-          <option value="Earth">Earth</option>
-          <option value="Wind">Wind</option>
-          <option value="Light">Light</option>
-          <option value="Dark">Dark</option>
-        </select>
+  <div class="controls">
+    <select id="teamMode" class="input">
+      <option value="story">Story Team (5 + 2)</option>
+      <option value="platoon">Platoon (5)</option>
+    </select>
 
-        <input id="keyword" type="search" placeholder="Synergy keyword (burn/poison/sleep...)" style="padding:8px 10px;border-radius:999px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.92);outline:none;" />
-      </div>
-    </div>
-  </header>
+    <select id="strategy" class="input">
+      <option value="rainbow">Rainbow (Mixed Elements)</option>
+      <option value="mono">Mono Element</option>
+    </select>
 
-  <main class="main">
-    <section id="status" class="status hidden">
-      <div class="spinner" aria-hidden="true"></div>
-      <div id="statusMsg">Loading…</div>
-    </section>
+    <select id="elementFocus" class="input">
+      <option value="any">Any Element</option>
+      <option value="Fire">Fire</option>
+      <option value="Water">Water</option>
+      <option value="Earth">Earth</option>
+      <option value="Light">Light</option>
+      <option value="Dark">Dark</option>
+    </select>
 
-    <section>
-      <div class="section-title">Your Owned Roster</div>
-      <div class="section-sub">This list is pulled from what you checked as Owned on the Roster page.</div>
-      <div id="ownedGrid"></div>
-    </section>
+    <button id="runOptimize" class="btn">Build Best Team</button>
+  </div>
 
-    <section style="margin-top:18px;">
-      <div class="section-title">Leader Candidates (from your owned units)</div>
-      <div class="section-sub">These are owned units that have leader skills, ranked by simple matching rules.</div>
-      <div id="leaderCandidates"></div>
-    </section>
-  </main>
+  <div class="panel">
+    <div class="panelTitle">Recommended Team</div>
+    <div id="teamGrid" class="slotGrid"></div>
+  </div>
 
-  <script type="module" src="./optimizer.js"></script>
+</div>
+
+<script src="optimizer.js"></script>
 </body>
 </html>
