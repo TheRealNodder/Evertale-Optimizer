@@ -2,49 +2,76 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Evertale Optimizer</title>
-  <link rel="stylesheet" href="style.css"/>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="./style.css" />
+
+  <!-- Preload fonts/icons if needed later -->
 </head>
 <body>
 
-  <!-- TOP BAR -->
+  <!-- ===================== TOP BAR ===================== -->
   <header class="topbar">
-  <div>
-    <div class="brandTitle">Evertale Optimizer</div>
-    <div class="brandSub">Roster • Leader Skills • Optimization</div>
-  </div>
-
-  <nav class="tabs">
-    <a class="tab active" href="./index.html">Roster</a>
-    <a class="tab" href="./optimizer.html">Optimizer</a>
-  </nav>
-</header>
-
-  <!-- PAGE -->
-  <main class="page">
-
-    <!-- CONTROLS -->
-    <div class="controls">
-      <input id="searchInput" class="input" type="text" placeholder="Search units…"/>
+    <div>
+      <div class="brandTitle">Evertale Optimizer</div>
+      <div class="brandSub">Roster · Leader Skills · Team Builder</div>
     </div>
 
-    <!-- ROSTER GRID -->
-    <section>
-      <div id="unitGrid"></div>
+    <nav class="tabs">
+      <a href="index.html" class="tab active">Roster</a>
+      <a href="optimizer.html" class="tab">Optimizer</a>
+    </nav>
+  </header>
+
+  <!-- ===================== PAGE ===================== -->
+  <main class="page">
+
+    <!-- ===== Controls ===== -->
+    <section class="controls">
+      <input
+        id="searchInput"
+        class="input"
+        type="text"
+        placeholder="Search by name, title, element, rarity…"
+      />
+
+      <select id="elementFilter" class="input">
+        <option value="all">All Elements</option>
+        <option value="Fire">Fire</option>
+        <option value="Water">Water</option>
+        <option value="Storm">Storm</option>
+        <option value="Earth">Earth</option>
+        <option value="Light">Light</option>
+        <option value="Dark">Dark</option>
+      </select>
+
+      <select id="rarityFilter" class="input">
+        <option value="all">All Rarities</option>
+        <option value="N">N</option>
+        <option value="R">R</option>
+        <option value="SR">SR</option>
+        <option value="SSR">SSR</option>
+      </select>
     </section>
 
-    <!-- OPTIMIZER (placeholder logic panel for now) -->
-    <section class="panel">
-      <div class="panelTitle">Optimizer (Coming Online)</div>
-      <p class="muted">
-        Owned units are stored and ready. Optimization logic will build mono / rainbow teams
-        using leader skills, stats, and synergy.
-      </p>
+    <!-- ===== Status ===== -->
+    <div id="statusText" class="muted"></div>
+
+    <!-- ===================== ROSTER GRID ===================== -->
+    <section id="unitGrid" class="grid">
+      <!-- Cards injected by app.js -->
     </section>
+
+    <!-- ===== Footer Hint ===== -->
+    <div class="footerHint muted">
+      ✔ Check the units you own to use them in the Optimizer
+    </div>
 
   </main>
 
-  <script src="app.js"></script>
+  <!-- ===================== SCRIPTS ===================== -->
+  <script src="./app.js"></script>
 </body>
 </html>
