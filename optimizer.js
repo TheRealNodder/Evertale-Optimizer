@@ -1,383 +1,230 @@
-/* optimizer.js — FULL (Story=8, Platoons=20x5), Stats + Theme + LeaderSkills */
+/* optimizer.js — basic optimizer scaffold (uses characters.json + saved owned set) */
 
 const DATA_CHARACTERS = "./data/characters.json";
-const LS_OWNED_KEY = "evertale_owned_units_v2"; // MUST match roster app.js key
+const LS_OWNED_KEY = "evertale_owned_units_v1";
 
-const $ = (s) => document.querySelector(s);
-const safeStr = (v, fb = "") => (v == null ? fb : String(v));
-const safeNum = (v, fb = 0) => {
-  const n = Number(v);
-  return Number.isFinite(n) ? n : fb;
+const state = {
+  allUnits: [],
+  ownedIds: new Set(),
+  ownedUnits: [],
+  mode: "story",        // story | platoons
+  style: "mono",        // mono | rainbow
+  monoElement: "Light", // for mono
 };
 
-function rarityScore(r) {
-  const x = safeStr(r, "").toUpperCase();
-  if (x === "SSR") return 40;
-  if (x === "SR") return 25;
-  if (x === "R") return 10;
-  if (x === "N") return 3;
-  return 0;
-}
+const $ = (s) => document.querySelector(s);
 
-async function loadCharacters() {
-  const res = await fetch(DATA_CHARACTERS, { cache: "no-store" });
-  if (!res.ok) throw new Error(`characters.json HTTP ${res.status}`);
-  const json = await res.json();
-  const arr = Array.isArray(json) ? json : (Array.isArray(json.characters) ? json.characters : null);
-  if (!Array.isArray(arr)) throw new Error("ERROR LOADING characters.json is not an array");
-  return arr;
-}
-
-function loadOwnedIds() {
+function loadOwned() {
   try {
-    const raw = JSON.parse(localStorage.getItem(LS_OWNED_KEY) || "[]");
-    return new Set(Array.isArray(raw) ? raw : []);
+    return new Set(JSON.parse(localStorage.getItem(LS_OWNED_KEY) || "[]"));
   } catch {
     return new Set();
   }
 }
 
-/** Normalize unit shape (keeps original fields too) */
-function normalizeUnit(raw, i) {
-  const id = safeStr(raw.id, raw.unitId ?? raw.key ?? `unit_${i}`);
-  const name = safeStr(raw.name, "");
-  const secondaryName = safeStr(raw.secondaryName ?? raw.title ?? raw.handle ?? raw.subName ?? "", "");
-  const element = safeStr(raw.element ?? raw.elem ?? "Unknown", "Unknown");
-  const rarity = safeStr(raw.rarity ?? raw.rank ?? raw.tier ?? "SSR", "SSR");
-  const image = safeStr(raw.image ?? raw.imageUrl ?? raw.img ?? raw.icon ?? "", "");
-
-  // Stats (support many formats)
-  const atk = safeNum(raw.atk ?? raw.stats?.atk ?? raw.ATK ?? raw.attack ?? 0);
-  const hp = safeNum(raw.hp ?? raw.stats?.hp ?? raw.HP ?? 0);
-  const spd = safeNum(raw.spd ?? raw.stats?.spd ?? raw.SPD ?? raw.speed ?? 0);
-  const cost = safeNum(raw.cost ?? raw.stats?.cost ?? raw.COST ?? 0);
-
-  return { ...raw, id, name, secondaryName, element, rarity, image, atk, hp, spd, cost };
+async function loadCharacters() {
+  const res = await fetch(DATA_CHARACTERS, { cache: "no-store" });
+  const json = await res.json();
+  if (Array.isArray(json)) return json;
+  if (Array.isArray(json.characters)) return json.characters;
+  throw new Error("characters.json is not an array");
 }
 
-/** Robust leader skill getter */
-function getLeaderSkill(u) {
-  const obj = u.leaderSkill ?? u.leader_skill ?? u.leader ?? u.leaderSkillRaw ?? null;
-  if (obj && typeof obj === "object") {
-    const name = safeStr(obj.name ?? obj.title ?? "", "").trim();
-    const description = safeStr(obj.description ?? obj.desc ?? obj.text ?? "", "").trim();
-    if (name || description) return { name: name || "None", description: description || "None" };
-  }
-  const nameFlat = safeStr(u.leaderSkillName ?? u.leader_name ?? u.leaderName ?? "", "").trim();
-  const descFlat = safeStr(u.leaderSkillDescription ?? u.leader_desc ?? u.leaderDescription ?? "", "").trim();
-  if (nameFlat || descFlat) return { name: nameFlat || "None", description: descFlat || "None" };
-  return { name: "None", description: "None" };
+function normalizeText(s) {
+  return String(s || "").toLowerCase();
 }
 
-/**
- * Extract “skill text” for theme matching (sleep/burn/etc.)
- * This tries common structures:
- * - u.skills: [{name, description}, ...]
- * - u.attacks: [{name, description}, ...]
- * - u.moves / u.abilities / u.passives
- * - u.rawText / u.description
- */
-function getAllSkillText(u) {
-  const parts = [];
-
-  const pushObjList = (list) => {
-    if (!Array.isArray(list)) return;
-    for (const x of list) {
-      if (!x || typeof x !== "object") continue;
-      parts.push(safeStr(x.name, ""));
-      parts.push(safeStr(x.title, ""));
-      parts.push(safeStr(x.description, ""));
-      parts.push(safeStr(x.desc, ""));
-      parts.push(safeStr(x.text, ""));
-    }
-  };
-
-  pushObjList(u.skills);
-  pushObjList(u.attacks);
-  pushObjList(u.moves);
-  pushObjList(u.abilities);
-  pushObjList(u.passives);
-
-  // Sometimes the unit has a blob string
-  parts.push(safeStr(u.description, ""));
-  parts.push(safeStr(u.rawText, ""));
-
-  // Always include leader skill too (so theme can come from LS)
-  const ls = getLeaderSkill(u);
-  parts.push(ls.name);
-  parts.push(ls.description);
-
-  return parts.filter(Boolean).join(" ").toLowerCase();
-}
-
-/** Theme keyword map (expand later as needed) */
-const THEME_KEYWORDS = {
-  burn: ["burn", "ignite", "blaze", "scorch"],
-  sleep: ["sleep", "slumber", "dream"],
-  poison: ["poison", "toxin", "venom"],
-  stun: ["stun", "paralyze", "paralysis"],
-  freeze: ["freeze", "frozen", "icebound", "chill"],
-  bleed: ["bleed", "bleeding"],
-  blind: ["blind", "blinded"],
-  rage: ["rage", "berserk"],
+// Keyword scoring (based on your importance notes)
+const KEY_WEIGHTS = {
+  sleep: 4,
+  burn: 5,
+  poison: 5,
+  stun: 4,
+  heal: 4,
+  "atk": 3,       // ATK Buff (loose match)
+  "attack": 3,    // ATK Buff
+  "hp": 3,        // HP Buff
+  "max hp": 3,    // HP Buff
+  "tu": 5,        // Turn manipulation (TU)
+  "turn": 5,      // Turn manipulation
 };
 
-/** Return true if unit text matches a theme */
-function unitHasTheme(u, theme) {
-  if (!theme || theme === "none") return false;
-  const t = getAllSkillText(u);
-  const keys = THEME_KEYWORDS[theme] || [theme];
-  return keys.some(k => t.includes(k));
-}
+function unitTextBlob(u) {
+  const parts = [];
+  if (u.leaderSkill?.name) parts.push(u.leaderSkill.name);
+  if (u.leaderSkill?.description) parts.push(u.leaderSkill.description);
 
-/** Simple “leader boost” heuristic (you can tune weights later) */
-function leaderBoostScore(u) {
-  const t = `${getLeaderSkill(u).name} ${getLeaderSkill(u).description}`.toLowerCase();
+  // activeSkillDetails / passiveSkillDetails exist in your structure
+  const act = Array.isArray(u.activeSkillDetails) ? u.activeSkillDetails : [];
+  const pas = Array.isArray(u.passiveSkillDetails) ? u.passiveSkillDetails : [];
 
-  let s = 0;
-  if (t.includes("attack increased")) s += 18;
-  if (t.includes("max hp increased") || t.includes("maximum health")) s += 10;
-  if (t.includes("speed increased")) s += 8;
-  if (t.includes("by 10%")) s += 6;
-  if (t.includes("by 15%")) s += 10;
-  if (t.includes("by 20%")) s += 14;
-
-  return s;
-}
-
-/**
- * Score unit:
- * - rarity baseline
- * - leader boost bonus
- * - theme match bonus (sleep/burn/etc.)
- * - mono element bonus + ATK priority
- * - stats
- */
-function computeScore(u, cfg) {
-  let score = 0;
-
-  // Baseline
-  score += rarityScore(u.rarity);
-
-  // Stats (tune later; ATK matters more for mono build)
-  const atk = safeNum(u.atk);
-  const hp = safeNum(u.hp);
-  const spd = safeNum(u.spd);
-  const cost = safeNum(u.cost);
-
-  const atkW = cfg.buildType === "mono" ? 0.020 : 0.012;
-  const hpW = 0.004;
-  const spdW = 0.020;
-  const costW = 0.080; // penalty
-
-  score += atk * atkW;
-  score += hp * hpW;
-  score += spd * spdW;
-  score -= cost * costW;
-
-  // Leader boost
-  score += leaderBoostScore(u);
-
-  // Theme synergy bonus (leader + attack descriptions)
-  if (cfg.theme !== "none") {
-    if (unitHasTheme(u, cfg.theme)) score += 60;
+  for (const a of act) {
+    parts.push(a?.name || "");
+    parts.push(a?.description || "");
+  }
+  for (const p of pas) {
+    parts.push(p?.name || "");
+    parts.push(p?.description || "");
   }
 
-  // Mono element synergy bonus
-  if (cfg.buildType === "mono") {
-    const el = safeStr(u.element, "").toLowerCase();
-    const want = safeStr(cfg.monoElement, "").toLowerCase();
-    if (want && want !== "all" && el === want) score += 35;
+  return normalizeText(parts.join(" "));
+}
 
-    // Bonus if leader skill/skills mention the element
-    const text = getAllSkillText(u);
-    if (want && want !== "all" && text.includes(want)) score += 12;
+function scoreUnit(u, context) {
+  // Base score from ATK (primary) + leader skill presence
+  const atk = Number(u.atk || 0);
+  let score = atk / 10; // scale down
+  if (u.leaderSkill?.name && u.leaderSkill.name !== "None") score += 50;
+
+  // Keyword synergy score
+  const blob = unitTextBlob(u);
+  for (const [k, w] of Object.entries(KEY_WEIGHTS)) {
+    if (blob.includes(k)) score += w * 8;
   }
+
+  // Mono preference
+  if (context.style === "mono") {
+    if (String(u.element || "") === context.monoElement) score += 80;
+    else score -= 40;
+  }
+
+  // Rarity small bump
+  const r = String(u.rarity || "");
+  if (r === "SSR") score += 30;
+  else if (r === "SR") score += 15;
+  else if (r === "R") score += 5;
 
   return score;
 }
 
-/** Build a single team (story=8, platoon=5) */
-function buildTeam(pool, cfg) {
-  const teamSize = cfg.teamMode === "platoon" ? 5 : 8;
+function renderSmallCard(u) {
+  const leaderName =
+    u.leaderSkill?.name && u.leaderSkill.name !== "None"
+      ? u.leaderSkill.name
+      : "No Leader Skill";
 
-  const ranked = pool
-    .map(u => ({ ...u, _score: computeScore(u, cfg) }))
-    .sort((a, b) => b._score - a._score);
+  const leaderDesc =
+    u.leaderSkill?.description && u.leaderSkill.description !== "None"
+      ? u.leaderSkill.description
+      : "";
 
-  // Optional: if mono, prefer at least 4–6 matching element before fillers (simple heuristic)
-  if (cfg.buildType === "mono" && cfg.monoElement && cfg.monoElement !== "all") {
-    const want = cfg.monoElement.toLowerCase();
-    const inEl = ranked.filter(u => safeStr(u.element, "").toLowerCase() === want);
-    const outEl = ranked.filter(u => safeStr(u.element, "").toLowerCase() !== want);
-    const merged = [...inEl, ...outEl];
-    return merged.slice(0, teamSize);
-  }
-
-  return ranked.slice(0, teamSize);
-}
-
-/** Build 20 platoons (each size 5), no repeats unless you allow it */
-function buildPlatoons(pool, cfg) {
-  const PLATOONS = 20;
-  const SIZE = 5;
-
-  // Rank once
-  const ranked = pool
-    .map(u => ({ ...u, _score: computeScore(u, cfg) }))
-    .sort((a, b) => b._score - a._score);
-
-  const used = new Set();
-  const platoons = [];
-
-  for (let p = 0; p < PLATOONS; p++) {
-    const team = [];
-    for (const u of ranked) {
-      if (team.length >= SIZE) break;
-      if (used.has(u.id)) continue;
-      team.push(u);
-      used.add(u.id);
-    }
-    platoons.push(team);
-  }
-
-  return platoons;
-}
-
-/* ---------------- Rendering ---------------- */
-
-function unitCardHtml(u, compact = false) {
-  const img = u.image
-    ? `<img src="${u.image}" alt="${u.name}" loading="lazy">`
-    : `<div class="ph">${(u.name || "?").slice(0, 1).toUpperCase()}</div>`;
-
-  const ls = getLeaderSkill(u);
-  const hasLeader = ls.name && ls.name !== "None" && ls.name !== "No Leader Skill";
-  const leaderName = hasLeader ? ls.name : "No Leader Skill";
-  const leaderDesc = hasLeader
-    ? (ls.description && ls.description !== "None" ? ls.description : "")
-    : "This unit does not provide a leader skill.";
-
-  if (compact) {
-    // resource-saving: image + name only
-    return `
-      <div class="unitCompact">
-        <div class="unitThumb">${img}</div>
-        <div class="unitCompactName">${u.name}</div>
-      </div>
-    `;
-  }
+  const img = u.image || "";
 
   return `
     <div class="unitCard">
-      <div class="unitThumb">${img}</div>
+      <div class="unitThumb">
+        ${img ? `<img src="${img}" alt="${u.name}">` : `<div class="ph">?</div>`}
+      </div>
       <div class="meta">
-        <div class="unitName">${u.name}</div>
-        <div class="unitTitle">${u.secondaryName || ""}</div>
-
-        <div class="tags">
-          <span class="tag rarity">${safeStr(u.rarity, "")}</span>
-          <span class="tag element">${safeStr(u.element, "")}</span>
+        <div class="topRow">
+          <div>
+            <div class="unitName">${u.name || ""}</div>
+            <div class="unitTitle">${u.title || ""}</div>
+          </div>
+          <div class="tags">
+            <span class="tag rarity">${u.rarity || ""}</span>
+            <span class="tag element">${u.element || ""}</span>
+          </div>
         </div>
 
         <div class="statLine">
-          <div class="stat"><strong>ATK</strong> ${safeNum(u.atk)}</div>
-          <div class="stat"><strong>HP</strong> ${safeNum(u.hp)}</div>
-          <div class="stat"><strong>SPD</strong> ${safeNum(u.spd)}</div>
-          <div class="stat"><strong>COST</strong> ${safeNum(u.cost)}</div>
+          <span class="stat"><strong>ATK</strong> ${u.atk ?? "-"}</span>
+          <span class="stat"><strong>HP</strong> ${u.hp ?? "-"}</span>
+          <span class="stat"><strong>SPD</strong> ${u.spd ?? "-"}</span>
+          <span class="stat"><strong>COST</strong> ${u.cost ?? "-"}</span>
         </div>
 
         <div class="leaderBlock">
-          <div class="leaderName">${leaderName}</div>
-          <div class="leaderDesc">${leaderDesc || "—"}</div>
+          <div class="leaderText"><strong>${leaderName}</strong></div>
+          <div class="leaderText">${leaderDesc}</div>
         </div>
       </div>
     </div>
   `;
 }
 
-function renderOwned(gridEl, owned) {
-  gridEl.innerHTML = owned.length
-    ? owned.map(u => unitCardHtml(u, false)).join("")
-    : `<div class="muted">No owned units found. Go to Roster and check “Owned”.</div>`;
+function renderOwnedGrid() {
+  const grid = $("#ownedGrid");
+  if (!grid) return;
+  grid.innerHTML = state.ownedUnits.map(renderSmallCard).join("");
+  $("#ownedCount").textContent = `Owned: ${state.ownedUnits.length}`;
 }
 
-function renderStoryTeam(gridEl, team) {
-  gridEl.innerHTML = team.map(u => unitCardHtml(u, false)).join("");
+function setMode(mode) {
+  state.mode = mode;
+  $("#modeStory").classList.toggle("active", mode === "story");
+  $("#modePlatoons").classList.toggle("active", mode === "platoons");
+
+  const status = $("#optimizerStatus");
+  if (mode === "story") {
+    status.textContent = "Story mode: selecting 8 units (5 main + 3 backup).";
+  } else {
+    status.textContent = "Platoons mode: scaffold only (20×5). Team fill logic can be added next.";
+  }
 }
 
-function renderPlatoons(gridEl, platoons) {
-  // Each platoon: compact row to save resources
-  gridEl.innerHTML = platoons
-    .map((team, idx) => `
-      <div class="platoonBlock">
-        <div class="platoonTitle">Platoon ${idx + 1}</div>
-        <div class="platoonRow">
-          ${team.map(u => unitCardHtml(u, true)).join("")}
-        </div>
-      </div>
-    `)
-    .join("");
+function setStyle(style) {
+  state.style = style;
+  $("#monoElement").disabled = style !== "mono";
 }
 
-/* ---------------- Main ---------------- */
+function buildBestTeam() {
+  const context = { style: state.style, monoElement: state.monoElement };
 
-async function main() {
-  const raw = await loadCharacters();
-  const all = raw.map(normalizeUnit);
-
-  const ownedIds = loadOwnedIds();
-  const owned = all.filter(u => ownedIds.has(u.id));
-
-  $("#ownedCount") && ($("#ownedCount").textContent =
-    `Owned IDs saved: ${ownedIds.size} • Owned matched: ${owned.length} • Total: ${all.length}`);
-
-  const ownedGrid = $("#ownedGrid");
-  ownedGrid && renderOwned(ownedGrid, owned);
-
-  function run() {
-    const cfg = {
-      teamMode: $("#teamMode").value,      // "story" or "platoon"
-      buildType: $("#buildType").value,    // "rainbow" or "mono"
-      monoElement: $("#monoElement").value,// element string
-      theme: $("#theme").value,            // "none" / "sleep" / "burn" etc.
-    };
-
-    const pool = owned.length ? owned : [];
-    const teamGrid = $("#teamGrid");
-    if (!pool.length) {
-      teamGrid.innerHTML = `<div class="muted">No owned units available. Go to Roster → check Owned → come back.</div>`;
-      return;
-    }
-
-    if (cfg.teamMode === "platoon") {
-      const platoons = buildPlatoons(pool, cfg);
-      renderPlatoons(teamGrid, platoons);
-    } else {
-      const team = buildTeam(pool, cfg); // story=8
-      renderStoryTeam(teamGrid, team);
-    }
+  const owned = [...state.ownedUnits];
+  if (owned.length === 0) {
+    $("#teamView").innerHTML = `<div class="muted">No owned units selected yet. Go to Roster page and check units.</div>`;
+    return;
   }
 
-  $("#runOpt")?.addEventListener("click", run);
+  const scored = owned
+    .map(u => ({ u, s: scoreUnit(u, context) }))
+    .sort((a, b) => b.s - a.s);
 
-  $("#teamMode")?.addEventListener("change", () => {
-    // Optional UI adjustments for compact display
-    run();
-  });
-
-  $("#buildType")?.addEventListener("change", () => {
-    const isMono = $("#buildType").value === "mono";
-    const el = $("#monoElement");
-    if (el) el.style.display = isMono ? "" : "none";
-  });
-
-  $("#buildType")?.dispatchEvent(new Event("change"));
-  run();
+  if (state.mode === "story") {
+    const picked = scored.slice(0, 8).map(x => x.u);
+    $("#teamView").innerHTML = `
+      <div class="muted" style="margin-bottom:10px;">Top 8 by score (basic heuristic):</div>
+      <div class="grid">${picked.map(renderSmallCard).join("")}</div>
+    `;
+  } else {
+    // Platoons scaffold: show top 20 as a starting point
+    const picked = scored.slice(0, 20).map(x => x.u);
+    $("#teamView").innerHTML = `
+      <div class="muted" style="margin-bottom:10px;">Platoons scaffold: top 20 shown (next step is distributing into 20×5 slots).</div>
+      <div class="grid">${picked.map(renderSmallCard).join("")}</div>
+    `;
+  }
 }
 
-main().catch(err => {
-  console.error(err);
-  const tg = $("#teamGrid");
-  if (tg) tg.textContent = `ERROR: ${err.message}`;
+async function init() {
+  state.ownedIds = loadOwned();
+
+  $("#teamStyle").addEventListener("change", (e) => {
+    setStyle(e.target.value);
+  });
+  $("#monoElement").addEventListener("change", (e) => {
+    state.monoElement = e.target.value;
+  });
+
+  $("#modeStory").addEventListener("click", () => setMode("story"));
+  $("#modePlatoons").addEventListener("click", () => setMode("platoons"));
+  $("#buildBtn").addEventListener("click", buildBestTeam);
+
+  setMode("story");
+  setStyle($("#teamStyle").value);
+
+  state.allUnits = await loadCharacters();
+
+  // ownedUnits determined by id match
+  state.ownedUnits = state.allUnits.filter(u => state.ownedIds.has(u.id));
+  renderOwnedGrid();
+  buildBestTeam();
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  init().catch((err) => {
+    console.error(err);
+    $("#optimizerStatus").textContent = "Failed to load optimizer data.";
+  });
 });
