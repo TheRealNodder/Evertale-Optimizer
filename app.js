@@ -96,6 +96,7 @@ function buildLeaderSkillIndex(lsArr) {
   for (const raw of lsArr) {
     // try multiple possible field names
     const unitName =
+      raw.character ??
       raw.unitName ??
       raw.characterName ??
       raw.nameOfUnit ??
