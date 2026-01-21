@@ -1,42 +1,331 @@
+/* style.css — REPLACE ENTIRE FILE WITH THIS (REFINED) */
+
+:root {
+  --bg: #0b0d12;
+  --panel: #121522;
+  --panel2: #0f1220;
+  --text: #e9ecff;
+  --muted: #aab1d6;
+  --line: rgba(255,255,255,0.08);
+  --chip: rgba(255,255,255,0.10);
+  --chip2: rgba(255,255,255,0.16);
+}
+
+* { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+
+.hidden { display: none !important; }
+
+/* Top bar */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(11,13,18,0.92);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+  padding: 10px 12px;
+}
+.topbar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  max-width: 1150px;
+  margin: 0 auto;
+}
+
+.brandTitle { font-weight: 900; letter-spacing: 0.2px; }
+.brandSub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+.tabs { display:flex; gap: 8px; }
+.tab {
+  border: 1px solid var(--line);
+  background: var(--panel2);
+  color: var(--text);
+  padding: 8px 10px;
+  border-radius: 10px;
+  font-weight: 900;
+}
+.tab.active {
+  background: var(--panel);
+  border-color: rgba(255,255,255,0.18);
+}
+
+.page { padding: 14px 12px 40px; max-width: 1150px; margin: 0 auto; }
+
+/* Controls */
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  border-radius: 12px;
+  margin-bottom: 14px;
+}
+.input {
+  background: var(--panel2);
+  border: 1px solid var(--line);
+  color: var(--text);
+  border-radius: 10px;
+  padding: 10px 12px;
+  min-height: 40px;
+  outline: none;
+}
+.btn {
+  border: 1px solid var(--line);
+  background: var(--panel2);
+  color: var(--text);
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-weight: 900;
+}
+.btn:active { transform: translateY(1px); }
+
+#statusText { color: var(--muted); font-size: 13px; margin: 6px 0 10px; }
+
 /* =========================================================
-   style.css — COMPACT/DETAILED TOGGLE WORKS ON DESKTOP TOO
-   =========================================================
-   If your compact/detailed rules are currently wrapped in a
-   @media(max-width:...) block, move them OUT so they apply
-   on desktop as well.
-
-If you want compact/detailed strictly mobile-only, DO NOT apply
-this change. But you said desktop is stuck detailed, so this makes
-the toggle affect desktop too.
---------------------------------------------------------- */
-
-/* Apply the details show/hide globally */
-body.mobile-compact .unitDetails { display: none; }
-body.mobile-detailed .unitDetails { display: block; }
-
-/* Grid behavior based on mode */
-.rosterGrid { display: grid; gap: 12px; }
-
-/* “Compact” means multiple per row */
-body.mobile-compact .rosterGrid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+   ROSTER GRID DEFAULTS
+   (Base layout when no mode class is present or before JS sets it)
+   ========================================================= */
+#unitGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+@media (min-width: 700px) {
+  #unitGrid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (min-width: 1000px) {
+  #unitGrid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 
-/* “Detailed” means 1 per row */
-body.mobile-detailed .rosterGrid {
-  grid-template-columns: repeat(1, minmax(0, 1fr));
+/* =========================================================
+   UNIFIED CARD
+   ========================================================= */
+.unitCard {
+  border: 1px solid var(--line);
+  background: var(--panel);
+  border-radius: 14px;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: 88px 1fr;
+  gap: 12px;
+  align-items: start;
 }
 
-/* Optional: on wide desktop, compact can be more than 3 per row */
-@media (min-width: 1024px) {
-  body.mobile-compact .rosterGrid {
-    grid-template-columns: repeat(6, minmax(0, 1fr));
+/* Thumbnail */
+.unitThumb {
+  width: 88px;
+  height: 88px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(255,255,255,0.06);
+  display: grid;
+  place-items: center;
+}
+.unitThumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.unitThumb .ph {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  font-size: 28px;
+}
+
+.meta { display:flex; flex-direction: column; gap: 8px; }
+.topRow { display:flex; align-items:flex-start; justify-content: space-between; gap: 10px; }
+
+.unitName { font-weight: 900; line-height: 1.15; font-size: 16px; }
+.unitTitle, .unitSub { font-size: 13px; color: var(--muted); margin-top: 2px; line-height: 1.2; }
+
+.tags { display:flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.tag {
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: var(--chip);
+  border: 1px solid var(--line);
+  color: var(--text);
+  white-space: nowrap;
+}
+.tag.rarity { background: var(--chip2); font-weight: 900; }
+.tag.element { color: var(--muted); }
+
+/* Details area (skills/stats/leader) — ALWAYS IN DOM */
+.unitDetails { display: block; }
+
+.statLine {
+  display:flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+}
+.stat { color: var(--text); font-size: 13px; }
+.stat strong { font-weight: 900; }
+
+/* Leader block — NEVER HIDE */
+.leaderBlock {
+  border-top: 1px solid var(--line);
+  padding-top: 8px;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+.leaderName { font-weight: 900; font-size: 13px; }
+.leaderDesc {
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 2px;
+  line-height: 1.25;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+/* Owned row */
+.ownedRow {
+  display:flex;
+  align-items:center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: var(--text);
+  font-weight: 900;
+}
+.ownedCheck { width: 18px; height: 18px; }
+
+/* Panels (optimizer + skill blocks) */
+.panel {
+  border: 1px solid var(--line);
+  background: var(--panel);
+  border-radius: 14px;
+  padding: 12px;
+  margin-top: 10px;
+}
+.panelTitle { font-weight: 900; margin-bottom: 6px; }
+.muted { color: var(--muted); font-size: 13px; }
+
+/* Optimizer pills */
+.optHeader { display:flex; align-items:flex-start; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+.panelRow { display:flex; align-items:center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+.optMode { display:flex; gap: 8px; }
+.pill {
+  border: 1px solid var(--line);
+  background: var(--panel2);
+  color: var(--text);
+  padding: 8px 10px;
+  border-radius: 999px;
+  font-weight: 900;
+}
+.pill.active { background: var(--chip2); }
+
+/* Footer hint */
+.footerHint { color: var(--muted); font-size: 13px; margin-top: 14px; }
+
+/* =========================================================
+   VIEW MODES (GLOBAL)
+   - These now apply on ALL screen sizes, fixing desktop toggle.
+   - Mobile-specific sizing is handled below via media queries.
+   ========================================================= */
+
+/* DETAILED MODE: always expanded */
+body.mobile-detailed .unitDetails { display: block !important; }
+
+/* COMPACT MODE:
+   - Details hidden by default
+   - Shown only when card has .expanded (tap behavior) */
+body.mobile-compact .unitDetails { display: none !important; }
+body.mobile-compact .unitCard.expanded .unitDetails {
+  display: block !important;
+  border-top: 1px solid var(--line) !important;
+  padding-top: 8px !important;
+  margin-top: 6px !important;
+}
+
+/* =========================================================
+   GRID BEHAVIOR BY MODE
+   - Desktop now responds to mode too (previously it could not).
+   ========================================================= */
+
+/* Detailed = 1 per row everywhere */
+body.mobile-detailed #unitGrid {
+  grid-template-columns: 1fr !important;
+  gap: 12px !important;
+}
+
+/* Compact = multiple per row; tune by breakpoint */
+body.mobile-compact #unitGrid {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+}
+
+/* On wider screens, compact can show more columns */
+@media (min-width: 700px) {
+  body.mobile-compact #unitGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+}
+@media (min-width: 1000px) {
+  body.mobile-compact #unitGrid {
+    grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
   }
 }
 
-/* Ensure the toggle button is visible on desktop if you hid it */
-#mobileViewToggle,
-.mobileViewToggle,
-[data-mobile-view-toggle] {
-  display: inline-flex;
+/* =========================================================
+   MOBILE CARD SIZING (ONLY sizing/spacing is mobile-specific)
+   This preserves the intended compact mobile appearance.
+   ========================================================= */
+@media (max-width: 620px) {
+
+  /* COMPACT MODE: 3 per row + compact card layout */
+  body.mobile-compact .unitCard {
+    grid-template-columns: 1fr !important;
+    padding: 8px !important;
+    gap: 8px !important;
+    border-radius: 12px !important;
+  }
+
+  body.mobile-compact .unitThumb {
+    width: 100% !important;
+    height: 92px !important;
+    border-radius: 10px !important;
+  }
+
+  body.mobile-compact .unitName { font-size: 13px !important; }
+  body.mobile-compact .unitTitle { font-size: 11px !important; }
+
+  body.mobile-compact .tag {
+    font-size: 10px !important;
+    padding: 2px 6px !important;
+  }
+
+  /* DETAILED MODE: still 1 per row but tighter card sizing */
+  body.mobile-detailed .unitCard {
+    grid-template-columns: 72px 1fr !important;
+    gap: 10px !important;
+    padding: 12px !important;
+  }
+
+  body.mobile-detailed .unitThumb {
+    width: 72px !important;
+    height: 72px !important;
+    border-radius: 10px !important;
+  }
 }
