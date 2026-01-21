@@ -1,14 +1,4 @@
-/* =========================================================
-   optimizer.js — UI + storage + owned sync (engine-ready)
-   =========================================================
-   This file:
-   - Loads characters.json (canonical)
-   - Reads owned IDs from localStorage["evertale_owned_units_v1"]
-   - Renders Story (5+3), Platoons (20x5), and Storage grids
-   - Persists layout to localStorage["evertale_team_layout_v1"]
-   - Exposes refreshOptimizerFromOwned() for optimizer-hook.js
-   - Accepts engine payloads via renderStory(payload) / renderPlatoons(payload)
-   ========================================================= */
+/* optimizer.js — FULL UI RENDERER + ENGINE APPLY (WHOLE FILE) */
 
 const DATA_CHARACTERS = "./data/characters.json";
 const OWNED_KEY = "evertale_owned_units_v1";
@@ -24,101 +14,76 @@ const state = {
   ownedIds: new Set(),
   ownedUnits: [],
   layout: null,
-  mode: "story", // "story" | "platoons"
+  mode: "story",
 };
 
-/* ---------- utils ---------- */
-function safeJsonParse(raw, fallback) {
-  try { return JSON.parse(raw); } catch { return fallback; }
-}
-function el(id) { return document.getElementById(id); }
+function el(id){ return document.getElementById(id); }
+function safeJsonParse(raw, fallback){ try { return JSON.parse(raw); } catch { return fallback; } }
+function normId(v){ return (v == null || v === "") ? "" : String(v); }
 
 function getOwnedIds() {
   const arr = safeJsonParse(localStorage.getItem(OWNED_KEY) || "[]", []);
-  return new Set(Array.isArray(arr) ? arr : []);
+  const ids = Array.isArray(arr) ? arr : [];
+  return new Set(ids.map(normId).filter(Boolean));
 }
 
-function defaultLayout() {
-  return {
+function loadLayout() {
+  const empty = {
     storyMain: Array(STORY_MAIN).fill(""),
     storyBack: Array(STORY_BACK).fill(""),
     platoons: Array.from({ length: PLATOON_COUNT }, () => Array(PLATOON_SIZE).fill("")),
   };
-}
-
-function loadLayout() {
   const obj = safeJsonParse(localStorage.getItem(LAYOUT_KEY) || "null", null);
-  const base = defaultLayout();
-  if (!obj) return base;
+  if (!obj) return empty;
 
-  const out = { ...base, ...obj };
+  obj.storyMain = Array.isArray(obj.storyMain) ? obj.storyMain.map(normId) : empty.storyMain;
+  obj.storyBack = Array.isArray(obj.storyBack) ? obj.storyBack.map(normId) : empty.storyBack;
+  obj.platoons  = Array.isArray(obj.platoons) ? obj.platoons : empty.platoons;
 
-  if (!Array.isArray(out.storyMain)) out.storyMain = base.storyMain;
-  if (!Array.isArray(out.storyBack)) out.storyBack = base.storyBack;
-  if (!Array.isArray(out.platoons)) out.platoons = base.platoons;
+  obj.storyMain = obj.storyMain.slice(0, STORY_MAIN).concat(Array(STORY_MAIN).fill("")).slice(0, STORY_MAIN);
+  obj.storyBack = obj.storyBack.slice(0, STORY_BACK).concat(Array(STORY_BACK).fill("")).slice(0, STORY_BACK);
 
-  out.storyMain = out.storyMain.slice(0, STORY_MAIN).concat(Array(STORY_MAIN).fill("")).slice(0, STORY_MAIN);
-  out.storyBack = out.storyBack.slice(0, STORY_BACK).concat(Array(STORY_BACK).fill("")).slice(0, STORY_BACK);
+  obj.platoons = obj.platoons.slice(0, PLATOON_COUNT);
+  while (obj.platoons.length < PLATOON_COUNT) obj.platoons.push(Array(PLATOON_SIZE).fill(""));
 
-  out.platoons = out.platoons.slice(0, PLATOON_COUNT);
-  while (out.platoons.length < PLATOON_COUNT) out.platoons.push(Array(PLATOON_SIZE).fill(""));
-  out.platoons = out.platoons.map(row => {
-    const r = Array.isArray(row) ? row : [];
+  obj.platoons = obj.platoons.map(row => {
+    const r = Array.isArray(row) ? row.map(normId) : [];
     return r.slice(0, PLATOON_SIZE).concat(Array(PLATOON_SIZE).fill("")).slice(0, PLATOON_SIZE);
   });
 
-  return out;
+  return obj;
 }
 
-function saveLayout() {
+function saveLayout(){
   localStorage.setItem(LAYOUT_KEY, JSON.stringify(state.layout));
 }
 
 async function loadCharacters() {
   const res = await fetch(DATA_CHARACTERS, { cache: "no-store" });
-  if (!res.ok) throw new Error(`Failed to load characters.json (${res.status})`);
+  if (!res.ok) throw new Error(`Failed to fetch ${DATA_CHARACTERS}: ${res.status}`);
   const json = await res.json();
   const chars = Array.isArray(json) ? json : (json && Array.isArray(json.characters) ? json.characters : []);
   return chars;
 }
 
-/* ---------- rendering helpers ---------- */
 function optionList(units) {
   const opts = [`<option value="">(empty)</option>`];
   for (const u of units) {
-    opts.push(`<option value="${u.id}">${escapeHtml(u.name)} (${escapeHtml(u.element || "")} ${escapeHtml(u.rarity || "")})</option>`);
+    opts.push(`<option value="${normId(u.id)}">${u.name} (${u.element} ${u.rarity})</option>`);
   }
   return opts.join("");
 }
 
-function escapeHtml(s) {
-  return String(s ?? "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;");
-}
+function slotCardHTML(slotKey, idx, currentId, units) {
+  const cid = normId(currentId);
+  const u = units.find(x => normId(x.id) === cid);
 
-function unitById(id) {
-  return state.ownedUnits.find(u => u.id === id) || null;
-}
-
-function renderSlotCard(slotKey, idx, currentId) {
-  const u = currentId ? unitById(currentId) : null;
-  const img = u?.image ? `<img src="${escapeHtml(u.image)}" alt="">` : `<div class="ph">?</div>`;
-  const title = u ? escapeHtml(u.name) : "Empty";
-  const sub = u ? escapeHtml(u.title || "") : "Select a unit";
-
-  const chips = u ? `
-    <div class="slotMetaRow">
-      <span class="slotChip">${escapeHtml(u.rarity || "")}</span>
-      <span class="slotChip">${escapeHtml(u.element || "")}</span>
-    </div>
-  ` : "";
+  const img = u?.image ? `<img src="${u.image}" alt="">` : `<div class="ph">?</div>`;
+  const title = u ? u.name : "Empty";
+  const sub = u ? (u.title || "") : "Select a unit";
 
   return `
-    <div class="slotCard">
+    <div class="slotCard ${u ? "" : "empty"}">
       <div class="slotTop">
         <div class="slotImg">${img}</div>
         <div>
@@ -126,39 +91,94 @@ function renderSlotCard(slotKey, idx, currentId) {
           <div class="slotSub">${sub}</div>
         </div>
       </div>
-      ${chips}
+
+      ${u ? `
+        <div class="slotMetaRow">
+          <span class="slotChip">${u.rarity || ""}</span>
+          <span class="slotChip">${u.element || ""}</span>
+        </div>
+      ` : ""}
+
       <select class="slotSelect" data-slot="${slotKey}" data-idx="${idx}">
-        ${optionList(state.ownedUnits)}
+        ${optionList(units)}
       </select>
     </div>
   `;
 }
 
-function renderStoryUI() {
-  const storyMain = el("storyMain");
-  const storyBack = el("storyBack");
-  if (!storyMain || !storyBack) return;
+function wireSelects(units) {
+  document.querySelectorAll("select.slotSelect").forEach(sel => {
+    const slot = sel.getAttribute("data-slot");
+    const idx = parseInt(sel.getAttribute("data-idx"), 10);
 
-  storyMain.innerHTML = state.layout.storyMain.map((id, i) => renderSlotCard("storyMain", i, id)).join("");
-  storyBack.innerHTML = state.layout.storyBack.map((id, i) => renderSlotCard("storyBack", i, id)).join("");
+    let current = "";
+    if (slot === "storyMain") current = state.layout.storyMain[idx] || "";
+    else if (slot === "storyBack") current = state.layout.storyBack[idx] || "";
+    else if (slot.startsWith("platoon_")) {
+      const p = parseInt(slot.split("_")[1], 10);
+      current = state.layout.platoons[p][idx] || "";
+    }
+
+    sel.value = normId(current);
+
+    sel.addEventListener("change", () => {
+      const v = normId(sel.value);
+
+      if (slot === "storyMain") state.layout.storyMain[idx] = v;
+      else if (slot === "storyBack") state.layout.storyBack[idx] = v;
+      else if (slot.startsWith("platoon_")) {
+        const p = parseInt(slot.split("_")[1], 10);
+        state.layout.platoons[p][idx] = v;
+      }
+
+      saveLayout();
+      renderAll();
+    });
+  });
 }
 
-function renderPlatoonsUI() {
+function renderStory(payload) {
+  // payload support (engine-hook may call renderStory(result.story))
+  if (payload && payload.main && payload.back) {
+    state.layout.storyMain = payload.main.map(normId).slice(0, STORY_MAIN).concat(Array(STORY_MAIN).fill("")).slice(0, STORY_MAIN);
+    state.layout.storyBack = payload.back.map(normId).slice(0, STORY_BACK).concat(Array(STORY_BACK).fill("")).slice(0, STORY_BACK);
+    saveLayout();
+  }
+
+  const mainEl = el("storyMain");
+  const backEl = el("storyBack");
+  if (!mainEl || !backEl) return;
+
+  mainEl.innerHTML = state.layout.storyMain.map((id,i) => slotCardHTML("storyMain", i, id, state.ownedUnits)).join("");
+  backEl.innerHTML = state.layout.storyBack.map((id,i) => slotCardHTML("storyBack", i, id, state.ownedUnits)).join("");
+}
+
+function renderPlatoons(payload) {
+  // payload support (engine-hook may call renderPlatoons(result.platoons))
+  if (Array.isArray(payload)) {
+    state.layout.platoons = payload.slice(0, PLATOON_COUNT).map(p => {
+      const units = Array.isArray(p.units) ? p.units.map(normId) : [];
+      return units.slice(0, PLATOON_SIZE).concat(Array(PLATOON_SIZE).fill("")).slice(0, PLATOON_SIZE);
+    });
+    while (state.layout.platoons.length < PLATOON_COUNT) state.layout.platoons.push(Array(PLATOON_SIZE).fill(""));
+    saveLayout();
+  }
+
   const grid = el("platoonsGrid");
   if (!grid) return;
 
-  grid.innerHTML = state.layout.platoons.map((row, p) => {
-    const slots = row.map((id, i) => renderSlotCard(`platoon_${p}`, i, id)).join("");
+  grid.innerHTML = state.layout.platoons.map((row,p) => {
+    const slots = row.map((id,i) => slotCardHTML(`platoon_${p}`, i, id, state.ownedUnits)).join("");
     return `
-      <section class="panel platoonPanel">
-        <div class="panelTitle">Platoon ${p + 1}</div>
+      <div class="panel platoonPanel">
+        <div class="panelTitle">Platoon ${p+1}</div>
         <div class="slotGrid platoonSlots">${slots}</div>
-      </section>
+      </div>
     `;
   }).join("");
 }
 
-function renderStorageUI() {
+function renderStorage() {
   const grid = el("storageGrid");
   if (!grid) return;
 
@@ -166,64 +186,36 @@ function renderStorageUI() {
     ...state.layout.storyMain.filter(Boolean),
     ...state.layout.storyBack.filter(Boolean),
     ...state.layout.platoons.flat().filter(Boolean),
-  ]);
+  ].map(normId));
 
-  const remaining = state.ownedUnits.filter(u => !used.has(u.id));
+  const remaining = state.ownedUnits.filter(u => !used.has(normId(u.id)));
 
   grid.innerHTML = remaining.map(u => {
-    const img = u.image ? `<img src="${escapeHtml(u.image)}" alt="">` : `<div class="ph">?</div>`;
+    const img = u.image ? `<img src="${u.image}" alt="">` : `<div class="ph">?</div>`;
     return `
       <div class="slotCard">
         <div class="slotTop">
           <div class="slotImg">${img}</div>
           <div>
-            <div class="slotName">${escapeHtml(u.name)}</div>
-            <div class="slotSub">${escapeHtml(u.title || "")}</div>
+            <div class="slotName">${u.name}</div>
+            <div class="slotSub">${u.title || ""}</div>
           </div>
         </div>
         <div class="slotMetaRow">
-          <span class="slotChip">${escapeHtml(u.rarity || "")}</span>
-          <span class="slotChip">${escapeHtml(u.element || "")}</span>
+          <span class="slotChip">${u.rarity || ""}</span>
+          <span class="slotChip">${u.element || ""}</span>
         </div>
       </div>
     `;
   }).join("");
 }
 
-function wireSelects() {
-  document.querySelectorAll("select.slotSelect").forEach(sel => {
-    const slot = sel.getAttribute("data-slot");
-    const idx = parseInt(sel.getAttribute("data-idx") || "0", 10);
+function renderAll() {
+  el("ownedCount").textContent = `${state.ownedUnits.length} selected`;
+  const poolText = el("ownedPoolText");
+  if (poolText) poolText.textContent = `${state.ownedUnits.length} owned units available`;
 
-    let current = "";
-    if (slot === "storyMain") current = state.layout.storyMain[idx] || "";
-    else if (slot === "storyBack") current = state.layout.storyBack[idx] || "";
-    else if (slot && slot.startsWith("platoon_")) {
-      const p = parseInt(slot.split("_")[1], 10);
-      current = state.layout.platoons[p]?.[idx] || "";
-    }
-
-    sel.value = current;
-
-    sel.addEventListener("change", () => {
-      const v = sel.value || "";
-      if (slot === "storyMain") state.layout.storyMain[idx] = v;
-      else if (slot === "storyBack") state.layout.storyBack[idx] = v;
-      else if (slot && slot.startsWith("platoon_")) {
-        const p = parseInt(slot.split("_")[1], 10);
-        if (!state.layout.platoons[p]) state.layout.platoons[p] = Array(PLATOON_SIZE).fill("");
-        state.layout.platoons[p][idx] = v;
-      }
-      saveLayout();
-      renderAll();
-    });
-  });
-}
-
-function renderModeVisibility() {
-  const modeSel = el("modeSelect");
-  if (modeSel) state.mode = modeSel.value;
-
+  // mode
   const storySection = el("storySection");
   const platoonsSection = el("platoonsSection");
   if (storySection && platoonsSection) {
@@ -235,122 +227,112 @@ function renderModeVisibility() {
       platoonsSection.classList.remove("hidden");
     }
   }
+
+  renderStory();
+  renderPlatoons();
+  renderStorage();
+  wireSelects(state.ownedUnits);
+
+  // expose functions for hook
+  window.renderStory = renderStory;
+  window.renderPlatoons = renderPlatoons;
 }
 
-function renderAll() {
-  // Owned count
-  const ownedCountEl = el("ownedCount");
-  if (ownedCountEl) ownedCountEl.textContent = `${state.ownedUnits.length} selected`;
-
-  renderModeVisibility();
-  renderStoryUI();
-  renderPlatoonsUI();
-  renderStorageUI();
-  wireSelects();
+function clearTeams() {
+  state.layout = {
+    storyMain: Array(STORY_MAIN).fill(""),
+    storyBack: Array(STORY_BACK).fill(""),
+    platoons: Array.from({ length: PLATOON_COUNT }, () => Array(PLATOON_SIZE).fill("")),
+  };
+  saveLayout();
+  renderAll();
 }
 
-/* =========================================================
-   Engine payload application
-   ========================================================= */
 function applyEngineResult(result) {
   if (!result || !result.story) return;
 
-  // Story
-  const main = Array.isArray(result.story.main) ? result.story.main : [];
-  const back = Array.isArray(result.story.back) ? result.story.back : [];
+  const main = Array.isArray(result.story.main) ? result.story.main.map(normId).filter(Boolean) : [];
+  const back = Array.isArray(result.story.back) ? result.story.back.map(normId).filter(Boolean) : [];
 
   state.layout.storyMain = main.slice(0, STORY_MAIN).concat(Array(STORY_MAIN).fill("")).slice(0, STORY_MAIN);
   state.layout.storyBack = back.slice(0, STORY_BACK).concat(Array(STORY_BACK).fill("")).slice(0, STORY_BACK);
 
-  // Platoons
   if (Array.isArray(result.platoons)) {
     state.layout.platoons = result.platoons.slice(0, PLATOON_COUNT).map(p => {
-      const units = Array.isArray(p.units) ? p.units : [];
+      const units = Array.isArray(p.units) ? p.units.map(normId).filter(Boolean) : [];
       return units.slice(0, PLATOON_SIZE).concat(Array(PLATOON_SIZE).fill("")).slice(0, PLATOON_SIZE);
     });
-    while (state.layout.platoons.length < PLATOON_COUNT) {
-      state.layout.platoons.push(Array(PLATOON_SIZE).fill(""));
-    }
+    while (state.layout.platoons.length < PLATOON_COUNT) state.layout.platoons.push(Array(PLATOON_SIZE).fill(""));
   }
 
   saveLayout();
   renderAll();
 }
 
-/* These are called by optimizer-hook.js with payloads */
-window.renderStory = function (payload) {
-  if (payload && Array.isArray(payload.main) && Array.isArray(payload.back)) {
-    applyEngineResult({ story: payload, platoons: state.layout.platoons.map(units => ({ units })) });
+function runEngine() {
+  if (!window.OptimizerEngine || typeof window.OptimizerEngine.run !== "function") {
+    console.error("OptimizerEngine not loaded");
     return;
   }
-  renderAll();
-};
 
-window.renderPlatoons = function (payload) {
-  if (Array.isArray(payload)) {
-    applyEngineResult({ story: { main: state.layout.storyMain, back: state.layout.storyBack }, platoons: payload });
-    return;
-  }
-  renderAll();
-};
-
-/* =========================================================
-   Owned sync — required by optimizer-hook.js
-   ========================================================= */
-window.refreshOptimizerFromOwned = function refreshOptimizerFromOwned() {
-  state.ownedIds = getOwnedIds();
-  state.ownedUnits = state.all.filter(u => state.ownedIds.has(u.id));
-
-  // Expose for engine hook
+  // engine input is owned units (objects)
   window.__optimizerOwnedUnits = state.ownedUnits;
 
+  const result = window.OptimizerEngine.run(window.__optimizerOwnedUnits || [], window.__optimizerOptions || {});
+  window.__optimizerResult = result;
+
+  applyEngineResult(result);
+}
+
+function installModeButtons() {
+  const storyBtn = el("modeStory");
+  const platoonsBtn = el("modePlatoons");
+  if (!storyBtn || !platoonsBtn) return;
+
+  storyBtn.addEventListener("click", () => {
+    state.mode = "story";
+    storyBtn.classList.add("active");
+    platoonsBtn.classList.remove("active");
+    renderAll();
+  });
+
+  platoonsBtn.addEventListener("click", () => {
+    state.mode = "platoons";
+    platoonsBtn.classList.add("active");
+    storyBtn.classList.remove("active");
+    renderAll();
+  });
+}
+
+// Hook entrypoint: called by optimizer-hook.js if present
+window.refreshOptimizerFromOwned = function refreshOptimizerFromOwned() {
+  state.ownedIds = getOwnedIds();
+  state.ownedUnits = state.all.filter(u => state.ownedIds.has(normId(u.id)));
+  window.__optimizerOwnedUnits = state.ownedUnits;
   renderAll();
 };
 
-/* =========================================================
-   UI actions
-   ========================================================= */
-function clearTeams() {
-  state.layout = defaultLayout();
-  saveLayout();
-  renderAll();
-}
-
-function buildBestTeams() {
-  // Prefer engine hook
-  if (typeof window.runOptimizer === "function") {
-    window.runOptimizer();
-    // runOptimizer will call renderStory/renderPlatoons with payloads
-    return;
-  }
-  // Fallback: direct engine call if hook not present
-  if (window.OptimizerEngine && typeof window.OptimizerEngine.run === "function") {
-    const owned = window.__optimizerOwnedUnits || state.ownedUnits;
-    const result = window.OptimizerEngine.run(owned, window.__optimizerOptions || {});
-    window.__optimizerResult = result;
-    applyEngineResult(result);
-  }
-}
-
-/* =========================================================
-   init
-   ========================================================= */
 async function init() {
   state.all = await loadCharacters();
   state.layout = loadLayout();
 
-  // initial owned
-  window.refreshOptimizerFromOwned();
+  // owned
+  state.ownedIds = getOwnedIds();
+  state.ownedUnits = state.all.filter(u => state.ownedIds.has(normId(u.id)));
+  window.__optimizerOwnedUnits = state.ownedUnits;
 
-  el("modeSelect")?.addEventListener("change", () => renderAll());
+  // events
+  el("buildBest")?.addEventListener("click", runEngine);
   el("clearTeams")?.addEventListener("click", clearTeams);
-  el("buildBest")?.addEventListener("click", buildBestTeams);
+  installModeButtons();
+
+  renderAll();
 }
 
 document.addEventListener("DOMContentLoaded", () => {
   init().catch(err => {
-    console.error("[optimizer] init failed:", err);
-    const ownedCountEl = el("ownedCount");
-    if (ownedCountEl) ownedCountEl.textContent = `Error: ${String(err.message || err)}`;
+    console.error(err);
+    const owned = el("ownedCount");
+    if (owned) owned.textContent = `Error: ${String(err.message || err)}`;
   });
 });
