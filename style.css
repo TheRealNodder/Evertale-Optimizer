@@ -1,4 +1,4 @@
-/* style.css — REPLACE ENTIRE FILE WITH THIS (REFINED) */
+/* style.css — FULL FILE (REFINED + OPTIMIZER BOX FIX) */
 
 :root {
   --bg: #0b0d12;
@@ -52,6 +52,7 @@ html, body {
   padding: 8px 10px;
   border-radius: 10px;
   font-weight: 900;
+  cursor: pointer;
 }
 .tab.active {
   background: var(--panel);
@@ -87,6 +88,7 @@ html, body {
   padding: 10px 12px;
   border-radius: 10px;
   font-weight: 900;
+  cursor: pointer;
 }
 .btn:active { transform: translateY(1px); }
 
@@ -94,7 +96,6 @@ html, body {
 
 /* =========================================================
    ROSTER GRID DEFAULTS
-   (Base layout when no mode class is present or before JS sets it)
    ========================================================= */
 #unitGrid {
   display: grid;
@@ -109,7 +110,7 @@ html, body {
 }
 
 /* =========================================================
-   UNIFIED CARD
+   UNIFIED ROSTER CARD
    ========================================================= */
 .unitCard {
   border: 1px solid var(--line);
@@ -120,9 +121,9 @@ html, body {
   grid-template-columns: 88px 1fr;
   gap: 12px;
   align-items: start;
+  min-width: 0;
 }
 
-/* Thumbnail */
 .unitThumb {
   width: 88px;
   height: 88px;
@@ -147,7 +148,7 @@ html, body {
   font-size: 28px;
 }
 
-.meta { display:flex; flex-direction: column; gap: 8px; }
+.meta { display:flex; flex-direction: column; gap: 8px; min-width: 0; }
 .topRow { display:flex; align-items:flex-start; justify-content: space-between; gap: 10px; }
 
 .unitName { font-weight: 900; line-height: 1.15; font-size: 16px; }
@@ -166,7 +167,6 @@ html, body {
 .tag.rarity { background: var(--chip2); font-weight: 900; }
 .tag.element { color: var(--muted); }
 
-/* Details area (skills/stats/leader) — ALWAYS IN DOM */
 .unitDetails { display: block; }
 
 .statLine {
@@ -211,7 +211,7 @@ html, body {
 }
 .ownedCheck { width: 18px; height: 18px; }
 
-/* Panels (optimizer + skill blocks) */
+/* Panels */
 .panel {
   border: 1px solid var(--line);
   background: var(--panel);
@@ -225,7 +225,7 @@ html, body {
 /* Optimizer pills */
 .optHeader { display:flex; align-items:flex-start; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
 .panelRow { display:flex; align-items:center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
-.optMode { display:flex; gap: 8px; }
+.optMode { display:flex; gap: 8px; flex-wrap: wrap; }
 .pill {
   border: 1px solid var(--line);
   background: var(--panel2);
@@ -233,6 +233,7 @@ html, body {
   padding: 8px 10px;
   border-radius: 999px;
   font-weight: 900;
+  cursor: pointer;
 }
 .pill.active { background: var(--chip2); }
 
@@ -241,16 +242,9 @@ html, body {
 
 /* =========================================================
    VIEW MODES (GLOBAL)
-   - These now apply on ALL screen sizes, fixing desktop toggle.
-   - Mobile-specific sizing is handled below via media queries.
    ========================================================= */
-
-/* DETAILED MODE: always expanded */
 body.mobile-detailed .unitDetails { display: block !important; }
 
-/* COMPACT MODE:
-   - Details hidden by default
-   - Shown only when card has .expanded (tap behavior) */
 body.mobile-compact .unitDetails { display: none !important; }
 body.mobile-compact .unitCard.expanded .unitDetails {
   display: block !important;
@@ -259,24 +253,17 @@ body.mobile-compact .unitCard.expanded .unitDetails {
   margin-top: 6px !important;
 }
 
-/* =========================================================
-   GRID BEHAVIOR BY MODE
-   - Desktop now responds to mode too (previously it could not).
-   ========================================================= */
-
-/* Detailed = 1 per row everywhere */
+/* Grid behavior by mode */
 body.mobile-detailed #unitGrid {
   grid-template-columns: 1fr !important;
   gap: 12px !important;
 }
 
-/* Compact = multiple per row; tune by breakpoint */
 body.mobile-compact #unitGrid {
   grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
   gap: 10px !important;
 }
 
-/* On wider screens, compact can show more columns */
 @media (min-width: 700px) {
   body.mobile-compact #unitGrid {
     grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
@@ -289,12 +276,143 @@ body.mobile-compact #unitGrid {
 }
 
 /* =========================================================
-   MOBILE CARD SIZING (ONLY sizing/spacing is mobile-specific)
-   This preserves the intended compact mobile appearance.
+   OPTIMIZER: SLOT BOXES + GRIDS (THIS WAS MISSING)
+   ========================================================= */
+
+/* Story slots: 5 and 3 */
+.slotGrid {
+  display: grid;
+  gap: 10px;
+  margin-top: 10px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+.storyBackGrid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+/* Platoons grid: 20 blocks */
+.platoonsGrid {
+  display: grid;
+  gap: 12px;
+  margin-top: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+@media (min-width: 900px) {
+  .platoonsGrid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+/* Storage grid */
+.grid {
+  display: grid;
+  gap: 10px;
+  margin-top: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+@media (min-width: 700px) {
+  .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (min-width: 1000px) {
+  .grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+/* Slot cards (story/platoon/storage) */
+.slotCard {
+  border: 1px solid var(--line);
+  background: var(--panel2);
+  border-radius: 12px;
+  padding: 10px;
+  min-height: 96px;
+  display: grid;
+  gap: 8px;
+  align-content: start;
+  min-width: 0;
+}
+
+.slotCard.empty {
+  color: var(--muted);
+  font-weight: 900;
+  display: grid;
+  place-items: center;
+  text-align: center;
+}
+
+/* Top of slot: image + name */
+.slotTop {
+  display: grid;
+  grid-template-columns: 56px 1fr;
+  gap: 10px;
+  align-items: center;
+  min-width: 0;
+}
+.slotImg {
+  width: 56px;
+  height: 56px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: rgba(255,255,255,0.06);
+  display: grid;
+  place-items: center;
+}
+.slotImg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.slotName {
+  font-weight: 900;
+  line-height: 1.15;
+  font-size: 13px;
+  min-width: 0;
+}
+.slotSub {
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 2px;
+  line-height: 1.2;
+}
+
+/* Slot meta rows */
+.slotMetaRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+.slotChip {
+  font-size: 11px;
+  padding: 3px 7px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,0.06);
+  color: var(--text);
+  white-space: nowrap;
+}
+
+/* Leader line inside slot */
+.slotLeader {
+  border-top: 1px solid var(--line);
+  padding-top: 6px;
+}
+.slotLeader .leadName { font-weight: 900; font-size: 12px; }
+.slotLeader .leadDesc { color: var(--muted); font-size: 12px; margin-top: 2px; line-height: 1.25; }
+
+/* Slot select (dropdown) */
+.slotSelect {
+  width: 100%;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--line);
+  color: var(--text);
+  border-radius: 10px;
+  padding: 8px 10px;
+  outline: none;
+}
+
+/* =========================================================
+   MOBILE CARD SIZING (ONLY sizing is mobile-specific)
    ========================================================= */
 @media (max-width: 620px) {
-
-  /* COMPACT MODE: 3 per row + compact card layout */
   body.mobile-compact .unitCard {
     grid-template-columns: 1fr !important;
     padding: 8px !important;
@@ -316,7 +434,6 @@ body.mobile-compact #unitGrid {
     padding: 2px 6px !important;
   }
 
-  /* DETAILED MODE: still 1 per row but tighter card sizing */
   body.mobile-detailed .unitCard {
     grid-template-columns: 72px 1fr !important;
     gap: 10px !important;
@@ -328,4 +445,10 @@ body.mobile-compact #unitGrid {
     height: 72px !important;
     border-radius: 10px !important;
   }
+
+  /* Optimizer grids on mobile */
+  .slotGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .storyBackGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .platoonsGrid { grid-template-columns: 1fr; }
+  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
