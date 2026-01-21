@@ -1,4 +1,5 @@
-/* style.css — LOCKED CARD + MOBILE LAYOUTS */
+/* style.css — REPLACE ENTIRE FILE WITH THIS */
+
 :root {
   --bg: #0b0d12;
   --panel: #121522;
@@ -23,15 +24,11 @@ html, body { margin:0; padding:0; background: var(--bg); color: var(--text); fon
   background: rgba(11,13,18,0.92);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--line);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   padding: 10px 12px;
-  gap: 12px;
 }
-.topbar-inner { display:flex; align-items:center; justify-content: space-between; width: 100%; gap: 12px; }
+.topbar-inner { display:flex; align-items:center; justify-content: space-between; gap: 12px; max-width: 1150px; margin:0 auto; }
 
-.brandTitle { font-weight: 800; letter-spacing: 0.2px; }
+.brandTitle { font-weight: 900; letter-spacing: 0.2px; }
 .brandSub { font-size: 12px; color: var(--muted); margin-top: 2px; }
 
 .tabs { display:flex; gap: 8px; }
@@ -41,14 +38,16 @@ html, body { margin:0; padding:0; background: var(--bg); color: var(--text); fon
   color: var(--text);
   padding: 8px 10px;
   border-radius: 10px;
-  font-weight: 800;
-  text-decoration: none;
+  font-weight: 900;
 }
-.tab.active { background: var(--panel); border-color: rgba(255,255,255,0.18); }
+.tab.active {
+  background: var(--panel);
+  border-color: rgba(255,255,255,0.18);
+}
 
 .page { padding: 14px 12px 40px; max-width: 1150px; margin: 0 auto; }
 
-/* Controls row */
+/* Controls */
 .controls {
   display: flex;
   flex-wrap: wrap;
@@ -59,7 +58,6 @@ html, body { margin:0; padding:0; background: var(--bg); color: var(--text); fon
   border-radius: 12px;
   margin-bottom: 14px;
 }
-
 .input {
   background: var(--panel2);
   border: 1px solid var(--line);
@@ -69,16 +67,30 @@ html, body { margin:0; padding:0; background: var(--bg); color: var(--text); fon
   min-height: 40px;
   outline: none;
 }
+.btn {
+  border: 1px solid var(--line);
+  background: var(--panel2);
+  color: var(--text);
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-weight: 900;
+}
+.btn:active { transform: translateY(1px); }
 
-.check { display:flex; align-items:center; gap:8px; color: var(--muted); padding: 0 6px; }
+#statusText { color: var(--muted); font-size: 13px; margin: 6px 0 10px; }
 
-.grid {
+/* Roster grid (desktop defaults) */
+#unitGrid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
 }
-@media (min-width: 700px) { .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-@media (min-width: 1000px) { .grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (min-width: 700px) {
+  #unitGrid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (min-width: 1000px) {
+  #unitGrid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
 
 /* Unified card */
 .unitCard {
@@ -92,6 +104,7 @@ html, body { margin:0; padding:0; background: var(--bg); color: var(--text); fon
   align-items: start;
 }
 
+/* Thumbnail */
 .unitThumb {
   width: 88px;
   height: 88px;
@@ -101,14 +114,26 @@ html, body { margin:0; padding:0; background: var(--bg); color: var(--text); fon
   display: grid;
   place-items: center;
 }
-.unitThumb img { width: 100%; height: 100%; object-fit: cover; display:block; }
-.unitThumb .ph { width: 100%; height: 100%; display:grid; place-items:center; font-weight:800; font-size: 28px; }
+.unitThumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.unitThumb .ph {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  font-size: 28px;
+}
 
 .meta { display:flex; flex-direction: column; gap: 8px; }
-
 .topRow { display:flex; align-items:flex-start; justify-content: space-between; gap: 10px; }
-.unitName { font-weight: 900; line-height: 1.2; font-size: 16px; }
-.unitTitle { font-size: 13px; color: var(--muted); margin-top: 2px; line-height: 1.2; }
+
+.unitName { font-weight: 900; line-height: 1.15; font-size: 16px; }
+.unitTitle, .unitSub { font-size: 13px; color: var(--muted); margin-top: 2px; line-height: 1.2; }
 
 .tags { display:flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
 .tag {
@@ -123,216 +148,133 @@ html, body { margin:0; padding:0; background: var(--bg); color: var(--text); fon
 .tag.rarity { background: var(--chip2); font-weight: 900; }
 .tag.element { color: var(--muted); }
 
-.statLine { display:flex; flex-wrap: wrap; gap: 10px; font-weight: 800; letter-spacing: 0.2px; }
+/* Details area (skills/stats/leader) */
+.unitDetails { display:block; }
+
+.statLine {
+  display:flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+}
 .stat { color: var(--text); font-size: 13px; }
 .stat strong { font-weight: 900; }
 
-/* Leader block ALWAYS visible */
-.leaderBlock { border-top: 1px solid var(--line); padding-top: 8px; display:block !important; visibility: visible !important; opacity: 1 !important; }
+/* Leader block — NEVER HIDE */
+.leaderBlock {
+  border-top: 1px solid var(--line);
+  padding-top: 8px;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
 .leaderName { font-weight: 900; font-size: 13px; }
-.leaderDesc { color: var(--muted); font-size: 13px; margin-top: 2px; line-height: 1.25; }
+.leaderDesc { color: var(--muted); font-size: 13px; margin-top: 2px; line-height: 1.25; word-break: break-word; overflow-wrap: anywhere; }
 
 /* Owned row */
 .ownedRow {
-  display:flex; align-items:center; gap: 8px;
+  display:flex;
+  align-items:center;
+  gap: 8px;
   padding: 8px 10px;
   background: rgba(255,255,255,0.04);
   border: 1px solid var(--line);
   border-radius: 12px;
   color: var(--text);
-  font-weight: 800;
+  font-weight: 900;
 }
 .ownedCheck { width: 18px; height: 18px; }
-.ownedLabel { font-weight: 900; }
 
-.panel { border: 1px solid var(--line); background: var(--panel); border-radius: 14px; padding: 12px; margin-top: 12px; }
+/* Panels (optimizer + skill blocks) */
+.panel {
+  border: 1px solid var(--line);
+  background: var(--panel);
+  border-radius: 14px;
+  padding: 12px;
+  margin-top: 10px;
+}
 .panelTitle { font-weight: 900; margin-bottom: 6px; }
 .muted { color: var(--muted); font-size: 13px; }
 
-.btn { border: 1px solid var(--line); background: var(--panel2); color: var(--text); padding: 8px 10px; border-radius: 10px; font-weight: 900; }
+/* Optimizer pills */
 .optHeader { display:flex; align-items:flex-start; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
-.platoonTools { display:flex; gap: 10px; align-items:center; flex-wrap: wrap; }
-
-.teamBlock { margin-top: 10px; }
-.teamSubTitle { color: var(--muted); font-weight: 900; margin-bottom: 8px; }
-
-/* Slots (Optimizer) */
-.slotGrid { display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-@media (min-width: 700px) { .slotGrid { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
-.storyBackGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-@media (min-width: 700px) { .storyBackGrid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-
-.slot {
-  border: 1px dashed rgba(255,255,255,0.18);
-  background: rgba(255,255,255,0.03);
-  border-radius: 14px;
-  padding: 10px;
-  display:flex;
-  flex-direction: column;
-  gap: 8px;
+.panelRow { display:flex; align-items:center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+.optMode { display:flex; gap: 8px; }
+.pill {
+  border: 1px solid var(--line);
+  background: var(--panel2);
+  color: var(--text);
+  padding: 8px 10px;
+  border-radius: 999px;
+  font-weight: 900;
 }
-.slotTitle { font-weight: 900; font-size: 13px; color: var(--muted); }
-.slotPick { border: 1px solid var(--line); background: var(--panel2); color: var(--text); border-radius: 10px; padding: 8px; font-weight: 800; }
+.pill.active { background: var(--chip2); }
 
-.slotCard { display:grid; grid-template-columns: 56px 1fr; gap: 10px; align-items:start; }
-.slotThumb { width:56px; height:56px; border-radius: 12px; overflow:hidden; background: rgba(255,255,255,0.06); display:grid; place-items:center; }
-.slotThumb img { width:100%; height:100%; object-fit: cover; display:block; }
-.slotMeta { display:flex; flex-direction:column; gap: 6px; }
-.slotName { font-weight: 900; line-height: 1.15; }
-.slotTitle { margin:0; }
-.slotTags { display:flex; gap: 6px; flex-wrap: wrap; }
-.slotLeader { border-top: 1px solid var(--line); padding-top: 6px; }
-.slotCard.empty { color: var(--muted); }
-
-/* Platoons container */
-.platoonsGrid { display:flex; flex-direction: column; gap: 12px; }
-.platoonBlock { border: 1px solid var(--line); background: rgba(255,255,255,0.02); border-radius: 14px; padding: 10px; }
-
-/* Storage mini cards */
-.miniCard { border: 1px solid var(--line); background: rgba(255,255,255,0.03); border-radius: 14px; padding: 10px; display:grid; grid-template-columns: 56px 1fr; gap: 10px; align-items:center; }
-.miniThumb { width:56px; height:56px; border-radius: 12px; overflow:hidden; background: rgba(255,255,255,0.06); display:grid; place-items:center; }
-.miniThumb img { width:100%; height:100%; object-fit: cover; display:block; }
-.miniText .unitName { font-size: 14px; }
-.miniText .unitTitle { font-size: 12px; }
-
-/* ================= MOBILE OVERRIDES (LOCKED) ================= */
-@media (max-width: 620px) {
-  .grid { grid-template-columns: 1fr !important; gap: 12px !important; }
-
-  .unitCard {
-    grid-template-columns: 1fr !important;
-    grid-template-rows: auto auto !important;
-    gap: 10px !important;
-    padding: 12px !important;
-  }
-
-  .unitThumb {
-    width: 100% !important;
-    height: 180px !important;
-    border-radius: 14px !important;
-  }
-
-  .topRow { flex-direction: column !important; align-items: flex-start !important; gap: 6px !important; }
-  .tags { justify-content: flex-start !important; }
-  .leaderDesc, .statLine { word-break: break-word !important; overflow-wrap: anywhere !important; }
-
-  .slotGrid { grid-template-columns: 1fr !important; }
-}
-
-@media (max-width: 380px) {
-  .unitThumb { height: 150px !important; }
-  .tag { font-size: 11px !important; }
-  .unitName { font-size: 16px !important; }
-  .unitTitle { font-size: 13px !important; }
-}
+/* Footer hint */
+.footerHint { color: var(--muted); font-size: 13px; margin-top: 14px; }
 
 /* =========================================================
-   MOBILE COMPACT ROSTER (4 per row)
-   Paste at bottom of style.css
-========================================================= */
+   MOBILE VIEW MODES (COMPACT vs DETAILED)
+   - Compact: 3 per row + tap to expand inline
+   - Detailed: 1 per row + always expanded
+   ========================================================= */
 
 @media (max-width: 620px) {
-  /* 4 across (fallback to 3 on tiny screens) */
-  #unitGrid {
-    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+
+  /* COMPACT MODE: 3 per row */
+  body.mobile-compact #unitGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
     gap: 8px !important;
   }
 
-  /* very small phones */
-  @media (max-width: 380px) {
-    #unitGrid {
-      grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-    }
-  }
-
-  /* compact card */
-  .unitCard {
+  body.mobile-compact .unitCard {
     grid-template-columns: 1fr !important;
     padding: 8px !important;
-    gap: 6px !important;
+    gap: 8px !important;
     border-radius: 12px !important;
-    position: relative;
   }
 
-  /* square thumbnail */
-  .unitThumb {
+  body.mobile-compact .unitThumb {
     width: 100% !important;
-    height: auto !important;
-    aspect-ratio: 1 / 1 !important;
+    height: 92px !important;
     border-radius: 10px !important;
   }
 
-  .unitThumb img {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: cover !important;
-  }
+  body.mobile-compact .unitName { font-size: 13px !important; }
+  body.mobile-compact .unitTitle { font-size: 11px !important; }
 
-  /* remove extra spacing */
-  .meta {
-    gap: 4px !important;
-  }
-
-  /* show name + title only (short) */
-  .unitName {
-    font-size: 12px !important;
-    line-height: 1.15 !important;
-  }
-  .unitTitle,
-  .unitSub {
-    font-size: 11px !important;
-    line-height: 1.15 !important;
-    color: var(--muted) !important;
-
-    /* 1 line clamp */
-    display: -webkit-box !important;
-    -webkit-line-clamp: 1 !important;
-    -webkit-box-orient: vertical !important;
-    overflow: hidden !important;
-  }
-
-  /* hide heavy sections in roster cards */
-  .leaderBlock,
-  .statLine,
-  .leader,
-  .leaderName,
-  .leaderDesc {
-    display: none !important;
-  }
-
-  /* tags become tiny (optional: keep rarity only) */
-  .tags {
-    justify-content: flex-start !important;
-    gap: 4px !important;
-  }
-  .tag {
+  body.mobile-compact .tag {
     font-size: 10px !important;
     padding: 2px 6px !important;
   }
 
-  /* owned checkbox becomes a corner overlay */
-  .ownedRow {
-    position: absolute !important;
-    top: 6px !important;
-    right: 6px !important;
-    margin: 0 !important;
-    padding: 4px 6px !important;
-    border-radius: 999px !important;
-    background: rgba(0,0,0,0.45) !important;
-    border: 1px solid rgba(255,255,255,0.18) !important;
+  /* Hide details by default, show when expanded */
+  body.mobile-compact .unitDetails { display: none !important; }
+  body.mobile-compact .unitCard.expanded .unitDetails {
+    display: block !important;
+    border-top: 1px solid var(--line) !important;
+    padding-top: 8px !important;
+    margin-top: 6px !important;
   }
 
-  .ownedRow input[type="checkbox"] {
-    transform: scale(1.1);
+  /* DETAILED MODE: 1 per row */
+  body.mobile-detailed #unitGrid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
   }
 
-  /* hide the "Owned" text to save space */
-  .ownedRow .ownedLabel,
-  .ownedRow span,
-  .ownedRow {
-    font-size: 0 !important;
+  body.mobile-detailed .unitCard {
+    grid-template-columns: 72px 1fr !important;
+    gap: 10px !important;
+    padding: 12px !important;
   }
-  .ownedRow input[type="checkbox"] {
-    font-size: initial !important;
+
+  body.mobile-detailed .unitThumb {
+    width: 72px !important;
+    height: 72px !important;
+    border-radius: 10px !important;
   }
+
+  body.mobile-detailed .unitDetails { display: block !important; }
 }
