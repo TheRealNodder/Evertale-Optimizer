@@ -136,3 +136,68 @@ body.mobile-compact .unitThumb{width:72px;height:72px;border-radius:10px}
   .platoonsGrid{grid-template-columns:1fr}
   .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+
+/* =========================================================
+   FIX: iPhone portrait compact mode vertical-letter wrapping
+   Keep 3-per-row, but make each card layout vertical + truncate text
+   ========================================================= */
+@media (max-width: 620px) {
+
+  /* Keep 3 per row in compact (as intended) */
+  body.mobile-compact #unitGrid{
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+
+  /* Make compact cards stack vertically so narrow widths don't break text */
+  body.mobile-compact .unitCard{
+    grid-template-columns: 1fr !important;
+    padding: 8px !important;
+    gap: 8px !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+  }
+
+  body.mobile-compact .unitThumb{
+    width: 100% !important;
+    height: 84px !important;
+    border-radius: 10px !important;
+  }
+
+  /* Put name/title/tags in a narrow-friendly stack */
+  body.mobile-compact .topRow{
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    justify-content: flex-start !important;
+    gap: 6px !important;
+  }
+
+  body.mobile-compact .tags{
+    justify-content: flex-start !important;
+  }
+
+  /* Prevent per-character wrapping: truncate instead */
+  body.mobile-compact .unitName{
+    font-size: 13px !important;
+    line-height: 1.1 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 100% !important;
+  }
+
+  /* Title is what usually causes the vertical “letter column” — hide in compact */
+  body.mobile-compact .unitTitle{
+    display: none !important;
+  }
+
+  /* Make the owned row fit the narrow card */
+  body.mobile-compact .ownedRow{
+    padding: 6px 8px !important;
+    justify-content: center !important;
+  }
+
+  body.mobile-compact .ownedRow span{
+    display: none !important; /* icon-only in compact */
+  }
+}
