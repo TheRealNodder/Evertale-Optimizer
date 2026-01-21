@@ -1,3 +1,4 @@
+<!-- index.html — REPLACE ENTIRE FILE WITH THIS -->
 <!doctype html>
 <html lang="en">
 <head>
@@ -6,7 +7,7 @@
   <title>Evertale Optimizer</title>
   <link rel="stylesheet" href="./style.css" />
 </head>
-<body>
+<body class="mobile-compact">
   <header class="topbar">
     <div class="topbar-inner">
       <div>
@@ -14,14 +15,15 @@
         <div class="brandSub">Roster → Owned → Optimizer</div>
       </div>
 
-      <nav class="tabs">
-        <a class="tab active" href="./index.html">Roster</a>
-        <a class="tab" href="./optimizer.html">Optimizer</a>
-      </nav>
+      <div class="tabs">
+        <button id="tabRoster" class="tab active" type="button">Roster</button>
+        <button id="tabOptimizer" class="tab" type="button">Optimizer</button>
+      </div>
     </div>
   </header>
 
-  <main class="page">
+  <!-- ROSTER PAGE -->
+  <main id="pageRoster" class="page">
     <div class="controls">
       <input id="searchInput" class="input" type="search" placeholder="Search name/title/element/rarity..." />
 
@@ -43,16 +45,49 @@
         <option value="SSR">SSR</option>
       </select>
 
-      <button id="viewToggle" class="btn" type="button">View: Compact</button>
-      <a class="btn" href="./optimizer.html" style="text-decoration:none; display:inline-flex; align-items:center;">Go to Optimizer</a>
+      <button id="mobileViewToggle" class="btn" type="button">Mobile: Compact</button>
+
+      <button id="goOptimizer" class="btn" type="button">Go to Optimizer</button>
     </div>
 
     <div id="statusText"></div>
-    <div id="unitGrid" class="rosterGrid"></div>
+
+    <div id="unitGrid"></div>
 
     <div class="footerHint">
-      Compact: multi-column, tap card to expand.<br/>
-      Detailed: 1 per row, always expanded.
+      Mobile Compact: 3 per row. Tap a card to expand inline.<br/>
+      Mobile Detailed: 1 per row, always expanded.
+    </div>
+  </main>
+
+  <!-- OPTIMIZER PAGE (layout only; logic placeholder) -->
+  <main id="pageOptimizer" class="page hidden">
+    <div class="panel">
+      <div class="optHeader">
+        <div>
+          <div class="panelTitle">Optimizer</div>
+          <div class="muted">Uses your checked “Owned” units from the roster.</div>
+        </div>
+        <button id="backToRoster" class="btn" type="button">Back to Roster</button>
+      </div>
+
+      <div class="panelRow">
+        <div class="panelTitle">Team Mode</div>
+        <div class="optMode">
+          <button id="modeStory" class="pill active" type="button">Story (5 + 3)</button>
+          <button id="modePlatoons" class="pill" type="button">Platoons (20 × 5)</button>
+        </div>
+      </div>
+
+      <div class="panelRow">
+        <div class="panelTitle">Owned Units</div>
+        <div class="platoonTools">
+          <div class="muted"><span id="ownedCount">0</span> selected</div>
+          <button id="buildBestTeam" class="btn" type="button">Build Best Team</button>
+        </div>
+      </div>
+
+      <div id="optimizerArea"></div>
     </div>
   </main>
 
