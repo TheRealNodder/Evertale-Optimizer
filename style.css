@@ -1,54 +1,138 @@
+:root{
+  --bg:#0b0d12; --panel:#121522; --panel2:#0f1220;
+  --text:#e9ecff; --muted:#aab1d6; --line:rgba(255,255,255,.08);
+  --chip:rgba(255,255,255,.10); --chip2:rgba(255,255,255,.16);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+.hidden{display:none!important}
+
+/* Top */
+.topbar{position:sticky;top:0;z-index:10;background:rgba(11,13,18,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:10px 12px}
+.topbar-inner{display:flex;align-items:center;justify-content:space-between;gap:12px;max-width:1150px;margin:0 auto}
+.brandTitle{font-weight:900;letter-spacing:.2px}
+.brandSub{font-size:12px;color:var(--muted);margin-top:2px}
+.tabs{display:flex;gap:8px}
+.tab{border:1px solid var(--line);background:var(--panel2);color:var(--text);padding:8px 10px;border-radius:10px;font-weight:900;cursor:pointer;text-decoration:none}
+.tab.active{background:var(--panel);border-color:rgba(255,255,255,.18)}
+.page{padding:14px 12px 40px;max-width:1150px;margin:0 auto}
+
+/* Controls */
+.controls{display:flex;flex-wrap:wrap;gap:10px;padding:10px;border:1px solid var(--line);background:var(--panel);border-radius:12px;margin-bottom:14px}
+.input{background:var(--panel2);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:10px 12px;min-height:40px;outline:none}
+.btn{border:1px solid var(--line);background:var(--panel2);color:var(--text);padding:10px 12px;border-radius:10px;font-weight:900;cursor:pointer}
+.btn:active{transform:translateY(1px)}
+#statusText{color:var(--muted);font-size:13px;margin:6px 0 10px}
+.footerHint{color:var(--muted);font-size:13px;margin-top:14px}
+
+/* Panels */
+.panel{border:1px solid var(--line);background:var(--panel);border-radius:14px;padding:12px;margin-top:10px}
+.panelTitle{font-weight:900;margin-bottom:6px}
+.muted{color:var(--muted);font-size:13px}
+.skillText{white-space:normal;line-height:1.25}
+.skillLine{margin:8px 0}
+
 /* =========================================================
-   FIX: Desktop Compact overflow / “card doesn’t contain items”
-   Paste this NEAR THE END of style.css so it overrides earlier rules.
+   ROSTER GRID + VIEW MODES
    ========================================================= */
+.rosterGrid{display:grid;gap:12px}
 
-/* 1) Compact grid: prevent cards from getting too narrow */
-body.mobile-compact #unitGrid {
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)) !important;
-  gap: 12px !important;
+/* Default before JS applies a class */
+#unitGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (min-width:700px){#unitGrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (min-width:1000px){#unitGrid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+
+/* DETAILED: 1 per row */
+body.mobile-detailed #unitGrid{
+  grid-template-columns:1fr!important;
+  gap:12px!important;
+}
+body.mobile-detailed .unitDetails{display:block!important}
+
+/* COMPACT: auto-fit prevents crushing (fixes overflow on desktop) */
+body.mobile-compact #unitGrid{
+  grid-template-columns:repeat(auto-fit,minmax(240px,1fr))!important;
+  gap:12px!important;
+}
+body.mobile-compact .unitDetails{display:none!important}
+body.mobile-compact .unitCard.expanded .unitDetails{
+  display:block!important;border-top:1px solid var(--line)!important;padding-top:8px!important;margin-top:6px!important
 }
 
-/* 2) Remove the old desktop compact overrides that crush width
-      (DELETE these if they exist earlier in your file):
-
-@media (min-width: 700px) {
-  body.mobile-compact #unitGrid {
-    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-  }
+/* =========================================================
+   ROSTER CARD
+   ========================================================= */
+.unitCard{
+  border:1px solid var(--line);background:var(--panel);border-radius:14px;padding:12px;
+  display:grid;grid-template-columns:88px 1fr;gap:12px;align-items:start;
+  overflow:hidden;min-width:0;
 }
-@media (min-width: 1000px) {
-  body.mobile-compact #unitGrid {
-    grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
-  }
-}
-*/
+.unitThumb{width:88px;height:88px;border-radius:12px;overflow:hidden;background:rgba(255,255,255,.06);display:grid;place-items:center}
+.unitThumb img{width:100%;height:100%;object-fit:cover;display:block}
+.unitThumb .ph{width:100%;height:100%;display:grid;place-items:center;font-weight:900;font-size:28px}
+.meta{display:flex;flex-direction:column;gap:8px;min-width:0}
+.topRow{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.unitName{font-weight:900;line-height:1.15;font-size:16px;overflow-wrap:anywhere;word-break:break-word}
+.unitTitle,.unitSub{font-size:13px;color:var(--muted);margin-top:2px;line-height:1.2;overflow-wrap:anywhere;word-break:break-word}
+.tags{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.tag{font-size:12px;padding:4px 8px;border-radius:999px;background:var(--chip);border:1px solid var(--line);white-space:nowrap}
+.tag.rarity{background:var(--chip2);font-weight:900}
+.tag.element{color:var(--muted)}
+.unitDetails{display:block}
+.statLine{display:flex;flex-wrap:wrap;gap:10px;font-weight:800;letter-spacing:.2px}
+.stat{font-size:13px}
+.stat strong{font-weight:900}
 
-/* 3) Keep content visually contained inside the card */
-.unitCard {
-  overflow: hidden;
-  min-width: 0;
-}
+/* Leader always visible */
+.leaderBlock{border-top:1px solid var(--line);padding-top:8px;display:block!important;visibility:visible!important;opacity:1!important}
+.leaderName{font-weight:900;font-size:13px}
+.leaderDesc{color:var(--muted);font-size:13px;margin-top:2px;line-height:1.25;overflow-wrap:anywhere;word-break:break-word}
 
-/* 4) Allow text to wrap instead of pushing layout outside */
-.unitName,
-.unitTitle,
-.unitSub,
-.leaderDesc {
-  overflow-wrap: anywhere;
-  word-break: break-word;
-}
+.ownedRow{display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:12px;font-weight:900}
+.ownedCheck{width:18px;height:18px}
 
-/* 5) (Optional but recommended) tighten the compact card layout a bit
-      so it looks “compact” without breaking */
-body.mobile-compact .unitCard {
-  grid-template-columns: 72px 1fr;
-  gap: 10px;
-  padding: 10px;
-}
+/* Compact card tweak (still readable) */
+body.mobile-compact .unitCard{grid-template-columns:72px 1fr;gap:10px;padding:10px}
+body.mobile-compact .unitThumb{width:72px;height:72px;border-radius:10px}
 
-body.mobile-compact .unitThumb {
-  width: 72px;
-  height: 72px;
-  border-radius: 10px;
+/* =========================================================
+   OPTIMIZER LAYOUT (slot boxes)
+   ========================================================= */
+.optHeader{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px}
+.platoonTools{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.teamBlock{margin-top:10px}
+.teamSubTitle{font-weight:900;margin:8px 0 6px}
+
+.slotGrid{display:grid;gap:10px;margin-top:8px;grid-template-columns:repeat(5,minmax(0,1fr))}
+.storyBackGrid{grid-template-columns:repeat(3,minmax(0,1fr))}
+
+.platoonsGrid{display:grid;gap:12px;margin-top:10px;grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (min-width:900px){.platoonsGrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+.grid{display:grid;gap:10px;margin-top:10px;grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (min-width:700px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (min-width:1000px){.grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+
+.slotCard{
+  border:1px solid var(--line);background:var(--panel2);border-radius:12px;padding:10px;
+  min-height:96px;display:grid;gap:8px;align-content:start;min-width:0;
+}
+.slotTop{display:grid;grid-template-columns:56px 1fr;gap:10px;align-items:center;min-width:0}
+.slotImg{width:56px;height:56px;border-radius:10px;overflow:hidden;background:rgba(255,255,255,.06);display:grid;place-items:center}
+.slotImg img{width:100%;height:100%;object-fit:cover;display:block}
+.slotImg .ph{font-weight:900}
+.slotName{font-weight:900;line-height:1.15;font-size:13px;overflow-wrap:anywhere;word-break:break-word}
+.slotSub{color:var(--muted);font-size:12px;margin-top:2px;line-height:1.2;overflow-wrap:anywhere;word-break:break-word}
+.slotMetaRow{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.slotChip{font-size:11px;padding:3px 7px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.06);white-space:nowrap}
+.slotSelect{width:100%;background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:8px 10px;outline:none}
+
+/* Mobile */
+@media (max-width:620px){
+  #unitGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  body.mobile-compact #unitGrid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+  .slotGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .storyBackGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .platoonsGrid{grid-template-columns:1fr}
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
