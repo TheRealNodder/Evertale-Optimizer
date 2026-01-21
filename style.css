@@ -225,3 +225,113 @@ html, body { margin:0; padding:0; background: var(--bg); color: var(--text); fon
   .unitName { font-size: 16px !important; }
   .unitTitle { font-size: 13px !important; }
 }
+/* =========================================================
+   MOBILE COMPACT ROSTER (4 per row)
+   Paste at bottom of style.css
+========================================================= */
+
+@media (max-width: 620px) {
+  /* 4 across (fallback to 3 on tiny screens) */
+  #unitGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+  }
+
+  /* very small phones */
+  @media (max-width: 380px) {
+    #unitGrid {
+      grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+  }
+
+  /* compact card */
+  .unitCard {
+    grid-template-columns: 1fr !important;
+    padding: 8px !important;
+    gap: 6px !important;
+    border-radius: 12px !important;
+    position: relative;
+  }
+
+  /* square thumbnail */
+  .unitThumb {
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 1 / 1 !important;
+    border-radius: 10px !important;
+  }
+
+  .unitThumb img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+  }
+
+  /* remove extra spacing */
+  .meta {
+    gap: 4px !important;
+  }
+
+  /* show name + title only (short) */
+  .unitName {
+    font-size: 12px !important;
+    line-height: 1.15 !important;
+  }
+  .unitTitle,
+  .unitSub {
+    font-size: 11px !important;
+    line-height: 1.15 !important;
+    color: var(--muted) !important;
+
+    /* 1 line clamp */
+    display: -webkit-box !important;
+    -webkit-line-clamp: 1 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+  }
+
+  /* hide heavy sections in roster cards */
+  .leaderBlock,
+  .statLine,
+  .leader,
+  .leaderName,
+  .leaderDesc {
+    display: none !important;
+  }
+
+  /* tags become tiny (optional: keep rarity only) */
+  .tags {
+    justify-content: flex-start !important;
+    gap: 4px !important;
+  }
+  .tag {
+    font-size: 10px !important;
+    padding: 2px 6px !important;
+  }
+
+  /* owned checkbox becomes a corner overlay */
+  .ownedRow {
+    position: absolute !important;
+    top: 6px !important;
+    right: 6px !important;
+    margin: 0 !important;
+    padding: 4px 6px !important;
+    border-radius: 999px !important;
+    background: rgba(0,0,0,0.45) !important;
+    border: 1px solid rgba(255,255,255,0.18) !important;
+  }
+
+  .ownedRow input[type="checkbox"] {
+    transform: scale(1.1);
+  }
+
+  /* hide the "Owned" text to save space */
+  .ownedRow .ownedLabel,
+  .ownedRow span,
+  .ownedRow {
+    font-size: 0 !important;
+  }
+  .ownedRow input[type="checkbox"] {
+    font-size: initial !important;
+  }
+}
