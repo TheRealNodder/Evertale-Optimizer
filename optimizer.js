@@ -1,66 +1,23 @@
-/* optimizer.js — FULL UI RENDERER + ENGINE APPLY (WHOLE FILE) */
+/* optimizer.js — WHOLE FILE (engine + shared filters + full renderer)
+   Works with:
+   - optimizer_doctrine.js (window.OPTIMIZER_DOCTRINE)
+   - optimizerEngine.js (window.OptimizerEngine.run)
+   - optimizer-hook.js (optional; will call refreshOptimizerFromOwned/runOptimizer if present)
+
+   Storage keys:
+   - Owned:  evertale_owned_units_v1
+   - Layout: evertale_team_layout_v1
+   - Shared filters:
+       evertale_optimizer_teamType_v1  (auto|mono|rainbow)
+       evertale_optimizer_preset_v1    (auto|burn|poison|sleep|stun|heal|turn|atkBuff|hpBuff|cleanse)
+*/
 
 const DATA_CHARACTERS = "./data/characters.json";
 const OWNED_KEY = "evertale_owned_units_v1";
 const LAYOUT_KEY = "evertale_team_layout_v1";
 
-const LS_TEAMCOMP_KEY = "evertale_optimizer_teamcomp_v1"; // auto | force_mono | force_rainbow
-const LS_PRESET_KEY = "evertale_optimizer_preset_v1";     // auto | burn | poison | sleep | stun | heal | turn | atkBuff | hpBuff | cleanse
-
-function getSelectValue(id, fallback) {
-  const node = el(id);
-  if (!node) return fallback;
-  return (node.value == null ? fallback : String(node.value));
-}
-
-function loadOptimizerPrefs() {
-  const comp = localStorage.getItem(LS_TEAMCOMP_KEY) || "auto";
-  const preset = localStorage.getItem(LS_PRESET_KEY) || "auto";
-  const compEl = el("teamCompSelect");
-  const presetEl = el("teamPresetSelect");
-  if (compEl) compEl.value = comp;
-  if (presetEl) presetEl.value = preset;
-}
-
-function saveOptimizerPrefs() {
-  const comp = getSelectValue("teamCompSelect", "auto");
-  const preset = getSelectValue("teamPresetSelect", "auto");
-  localStorage.setItem(LS_TEAMCOMP_KEY, comp);
-  localStorage.setItem(LS_PRESET_KEY, preset);
-}
-
-function buildDoctrineOverridesFromUI() {
-  const comp = getSelectValue("teamCompSelect", "auto");
-  const preset = getSelectValue("teamPresetSelect", "auto");
-
-  const overrides = {};
-
-  // Team composition override (mono/rainbow)
-  if (comp === "force_mono" || comp === "force_rainbow") {
-    overrides.monoVsRainbow = Object.assign({}, (window.OPTIMIZER_DOCTRINE && window.OPTIMIZER_DOCTRINE.OPTIMIZER_DOCTRINE && window.OPTIMIZER_DOCTRINE.OPTIMIZER_DOCTRINE.monoVsRainbow) || null, {
-      selectionMode: comp
-    });
-  } else if (comp === "auto") {
-    // leave undefined so engine uses doctrine default
-  }
-
-  // Preset override: boost selected status weight
-  if (preset && preset !== "auto") {
-    const baseWeights = (window.OPTIMIZER_DOCTRINE && window.OPTIMIZER_DOCTRINE.OPTIMIZER_DOCTRINE && window.OPTIMIZER_DOCTRINE.OPTIMIZER_DOCTRINE.statusWeights)
-      ? window.OPTIMIZER_DOCTRINE.OPTIMIZER_DOCTRINE.statusWeights
-      : null;
-
-    const next = Object.assign({}, baseWeights || {});
-    const boost = 2; // doctrine-prescribed bias
-    if (next[preset] == null) next[preset] = boost;
-    else next[preset] = Number(next[preset]) + boost;
-
-    overrides.statusWeights = next;
-  }
-
-  return overrides;
-}
-
+const LS_TEAMTYPE_KEY = "evertale_optimizer_teamType_v1";
+const LS_PRESET_KEY = "evertale_optimizer_preset_v1";
 
 const STORY_MAIN = 5;
 const STORY_BACK = 3;
@@ -75,9 +32,32 @@ const state = {
   mode: "story",
 };
 
-function el(id){ return document.getElementById(id); }
-function safeJsonParse(raw, fallback){ try { return JSON.parse(raw); } catch { return fallback; } }
-function normId(v){ return (v == null || v === "") ? "" : String(v); }
+function el(id) { return document.getElementById(id); }
+function safeJsonParse(raw, fallback) { try { return JSON.parse(raw); } catch { return fallback; } }
+function normId(v) { return (v == null || v === "") ? "" : String(v); }
+
+function getTeamTypePref() {
+  const v = localStorage.getItem(LS_TEAMTYPE_KEY);
+  return (v === "mono" || v === "rainbow" || v === "auto") ? v : "auto";
+}
+function getPresetPref() {
+  const allowed = new Set(["auto","burn","poison","sleep","stun","heal","turn","atkBuff","hpBuff","cleanse"]);
+  const v = localStorage.getItem(LS_PRESET_KEY) || "auto";
+  return allowed.has(v) ? v : "auto";
+}
+function setTeamTypePref(v) { localStorage.setItem(LS_TEAMTYPE_KEY, v); }
+function setPresetPref(v) { localStorage.setItem(LS_PRESET_KEY, v); }
+
+function initSharedOptimizerFiltersUI() {
+  const teamSel = el("teamTypeSelect");
+  const presetSel = el("presetSelect");
+
+  if (teamSel) teamSel.value = getTeamTypePref();
+  if (presetSel) presetSel.value = getPresetPref();
+
+  teamSel?.addEventListener("change", (e) => setTeamTypePref(e.target.value || "auto"));
+  presetSel?.addEventListener("change", (e) => setPresetPref(e.target.value || "auto"));
+}
 
 function getOwnedIds() {
   const arr = safeJsonParse(localStorage.getItem(OWNED_KEY) || "[]", []);
@@ -91,6 +71,7 @@ function loadLayout() {
     storyBack: Array(STORY_BACK).fill(""),
     platoons: Array.from({ length: PLATOON_COUNT }, () => Array(PLATOON_SIZE).fill("")),
   };
+
   const obj = safeJsonParse(localStorage.getItem(LAYOUT_KEY) || "null", null);
   if (!obj) return empty;
 
@@ -112,7 +93,7 @@ function loadLayout() {
   return obj;
 }
 
-function saveLayout(){
+function saveLayout() {
   localStorage.setItem(LAYOUT_KEY, JSON.stringify(state.layout));
 }
 
@@ -190,21 +171,13 @@ function wireSelects(units) {
       }
 
       saveLayout();
-    
-  loadOptimizerPrefs();
-  el("teamCompSelect")?.addEventListener("change", () => {
-    saveOptimizerPrefs();
-  });
-  el("teamPresetSelect")?.addEventListener("change", () => {
-    saveOptimizerPrefs();
-  });
-  renderAll();
+      renderAll();
     });
   });
 }
 
 function renderStory(payload) {
-  // payload support (engine-hook may call renderStory(result.story))
+  // Engine hook may call renderStory(result.story)
   if (payload && payload.main && payload.back) {
     state.layout.storyMain = payload.main.map(normId).slice(0, STORY_MAIN).concat(Array(STORY_MAIN).fill("")).slice(0, STORY_MAIN);
     state.layout.storyBack = payload.back.map(normId).slice(0, STORY_BACK).concat(Array(STORY_BACK).fill("")).slice(0, STORY_BACK);
@@ -220,7 +193,7 @@ function renderStory(payload) {
 }
 
 function renderPlatoons(payload) {
-  // payload support (engine-hook may call renderPlatoons(result.platoons))
+  // Engine hook may call renderPlatoons(result.platoons)
   if (Array.isArray(payload)) {
     state.layout.platoons = payload.slice(0, PLATOON_COUNT).map(p => {
       const units = Array.isArray(p.units) ? p.units.map(normId) : [];
@@ -277,11 +250,9 @@ function renderStorage() {
 }
 
 function renderAll() {
-  el("ownedCount").textContent = `${state.ownedUnits.length} selected`;
-  const poolText = el("ownedPoolText");
-  if (poolText) poolText.textContent = `${state.ownedUnits.length} owned units available`;
+  el("ownedCount") && (el("ownedCount").textContent = `${state.ownedUnits.length} selected`);
+  el("ownedPoolText") && (el("ownedPoolText").textContent = `${state.ownedUnits.length} owned units available`);
 
-  // mode
   const storySection = el("storySection");
   const platoonsSection = el("platoonsSection");
   if (storySection && platoonsSection) {
@@ -299,7 +270,7 @@ function renderAll() {
   renderStorage();
   wireSelects(state.ownedUnits);
 
-  // expose functions for hook
+  // expose for hook
   window.renderStory = renderStory;
   window.renderPlatoons = renderPlatoons;
 }
@@ -335,23 +306,53 @@ function applyEngineResult(result) {
   renderAll();
 }
 
+function buildEngineOptions() {
+  // prefer select value if present, otherwise localStorage
+  const teamType = (el("teamTypeSelect")?.value || getTeamTypePref());
+  const preset   = (el("presetSelect")?.value || getPresetPref());
+
+  // persist (so roster/optimizer stay in sync)
+  setTeamTypePref(teamType);
+  setPresetPref(preset);
+
+  // ===== strongest preset enforcement =====
+  const options = {};
+
+  // Doctrine overrides
+  options.doctrineOverrides = {};
+
+  // Team type enforcement
+  if (teamType === "mono") {
+    options.doctrineOverrides.monoVsRainbow = { selectionMode: "force_mono" };
+  } else if (teamType === "rainbow") {
+    options.doctrineOverrides.monoVsRainbow = { selectionMode: "force_rainbow" };
+  } else {
+    options.doctrineOverrides.monoVsRainbow = { selectionMode: "auto" };
+  }
+
+  // Preset enforcement
+  options.presetTag = (preset === "auto") ? "" : preset;
+  options.presetMode = (preset === "auto") ? "off" : "hard";
+
+  // Minimum required matching units
+  // Adjust here if you want even stronger:
+  // - story: 8 forces all 8 match
+  // - platoon: 5 forces all 5 match
+  options.presetMinStory8 = 5;
+  options.presetMinPlatoon5 = 3;
+
+  return options;
+}
+
 function runEngine() {
   if (!window.OptimizerEngine || typeof window.OptimizerEngine.run !== "function") {
     console.error("OptimizerEngine not loaded");
     return;
   }
 
-  saveOptimizerPrefs();
-
-  // engine input is owned units (objects)
   window.__optimizerOwnedUnits = state.ownedUnits;
-
-  const doctrineOverrides = buildDoctrineOverridesFromUI();
-
-  // options for engine (including doctrine overrides)
-  const options = Object.assign({}, window.__optimizerOptions || {}, {
-    doctrineOverrides
-  });
+  const options = buildEngineOptions();
+  window.__optimizerOptions = options;
 
   const result = window.OptimizerEngine.run(window.__optimizerOwnedUnits || [], options);
   window.__optimizerResult = result;
@@ -387,20 +388,33 @@ window.refreshOptimizerFromOwned = function refreshOptimizerFromOwned() {
   renderAll();
 };
 
+// Also expose a standard run function for hook/devtools
+window.runOptimizer = function runOptimizer() {
+  runEngine();
+};
+
 async function init() {
+  initSharedOptimizerFiltersUI();
+
   state.all = await loadCharacters();
   state.layout = loadLayout();
 
-  // owned
   state.ownedIds = getOwnedIds();
   state.ownedUnits = state.all.filter(u => state.ownedIds.has(normId(u.id)));
   window.__optimizerOwnedUnits = state.ownedUnits;
 
-  // events
   el("buildBest")?.addEventListener("click", runEngine);
   el("clearTeams")?.addEventListener("click", clearTeams);
-  installModeButtons();
 
+  // If user changes filters on optimizer page, persist immediately
+  el("teamTypeSelect")?.addEventListener("change", () => {
+    setTeamTypePref(el("teamTypeSelect").value || "auto");
+  });
+  el("presetSelect")?.addEventListener("change", () => {
+    setPresetPref(el("presetSelect").value || "auto");
+  });
+
+  installModeButtons();
   renderAll();
 }
 
