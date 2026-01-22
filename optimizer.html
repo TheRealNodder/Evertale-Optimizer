@@ -44,12 +44,11 @@
           <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
             <div id="ownedCount" class="muted">0 selected</div>
             <button id="buildBest" class="btn" type="button">Build Best Team</button>
-            <button id="clearTeams" class="btn" type="button">Clear</button>
+            <button id="clearTeams" class="btn" type="button">Clear Teams</button>
           </div>
         </div>
       </div>
 
-      <!-- Shared optimizer filters -->
       <div class="panelRow" style="margin-top:10px;">
         <select id="teamTypeSelect" class="input">
           <option value="auto">Team Type: Auto</option>
@@ -71,7 +70,7 @@
         </select>
       </div>
 
-      <!-- NEW: Locked Leader (Story anchor for full optimizer run) -->
+      <!-- Leader lock (anchor) -->
       <div class="panelRow" style="margin-top:10px;">
         <select id="leaderLockSelect" class="input">
           <option value="">Locked Leader: (none)</option>
@@ -79,15 +78,20 @@
 
         <button id="clearLeaderLock" class="btn" type="button">Clear Leader Lock</button>
 
-        <div id="leaderLockHint" class="muted" style="align-self:center;">
-          Lock forces that unit into the Story 8 and biases optimization.
+        <div class="muted" style="align-self:center;">
+          Lock forces unit into Story 8 and sets Mono element if Mono is selected.
         </div>
+      </div>
+
+      <div class="panel" style="margin-top:12px;">
+        <div class="panelTitle">Messages</div>
+        <div id="optimizerMessages" class="muted">—</div>
       </div>
     </section>
 
     <section id="storySection" class="panel">
       <div class="panelTitle">Story Team</div>
-      <div class="muted">Main: 5 units • Backup: 3 units</div>
+      <div class="muted">Tap the lock icon on a slot to lock/unlock it.</div>
 
       <div class="teamBlock">
         <div class="teamSubTitle">Main 5</div>
@@ -107,7 +111,7 @@
 
     <section id="platoonsSection" class="panel hidden">
       <div class="panelTitle">Platoons</div>
-      <div class="muted">20 platoons × 5 units each</div>
+      <div class="muted">Each slot can be locked. Optimizer fills only unlocked empty slots.</div>
       <div id="platoonsGrid" class="platoonsGrid"></div>
     </section>
 
