@@ -10,9 +10,36 @@
 (function (global) {
   "use strict";
 
-  const DOCTRINE = (global.OPTIMIZER_DOCTRINE && global.OPTIMIZER_DOCTRINE.OPTIMIZER_DOCTRINE)
+  let DOCTRINE = (global.OPTIMIZER_DOCTRINE && global.OPTIMIZER_DOCTRINE.OPTIMIZER_DOCTRINE)
     ? global.OPTIMIZER_DOCTRINE.OPTIMIZER_DOCTRINE
     : global.OPTIMIZER_DOCTRINE;
+
+  function deepMerge(dst, src) {
+    if (!src || typeof src !== "object") return dst;
+    for (const k of Object.keys(src)) {
+      const sv = src[k];
+      const dv = dst[k];
+      if (Array.isArray(sv)) {
+        dst[k] = sv.slice();
+      } else if (sv && typeof sv === "object") {
+        dst[k] = deepMerge(dv && typeof dv === "object" ? Object.assign({}, dv) : {}, sv);
+      } else {
+        dst[k] = sv;
+      }
+    }
+    return dst;
+  }
+
+  function resolveDoctrine(overrides) {
+    const base = (global.OPTIMIZER_DOCTRINE && global.OPTIMIZER_DOCTRINE.OPTIMIZER_DOCTRINE)
+      ? global.OPTIMIZER_DOCTRINE.OPTIMIZER_DOCTRINE
+      : global.OPTIMIZER_DOCTRINE;
+
+    const merged = base && typeof base === "object" ? Object.assign({}, base) : {};
+    if (overrides && typeof overrides === "object") deepMerge(merged, overrides);
+    return merged;
+  }
+
 
   if (!DOCTRINE) {
     console.error("[OptimizerEngine] OPTIMIZER_DOCTRINE not found on window.");
@@ -989,6 +1016,7 @@
 
   /* ---------- main run ---------- */
   function run(unitsRaw, options) {
+    DOCTRINE = resolveDoctrine(options && options.doctrineOverrides);
     const ownedViewsAll = buildUnitViews(unitsRaw || []);
 
     const ownedSet = new Set(ownedViewsAll.map(v => v.id));
