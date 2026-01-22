@@ -4,6 +4,64 @@ const DATA_CHARACTERS = "./data/characters.json";
 const OWNED_KEY = "evertale_owned_units_v1";
 const LAYOUT_KEY = "evertale_team_layout_v1";
 
+const LS_TEAMCOMP_KEY = "evertale_optimizer_teamcomp_v1"; // auto | force_mono | force_rainbow
+const LS_PRESET_KEY = "evertale_optimizer_preset_v1";     // auto | burn | poison | sleep | stun | heal | turn | atkBuff | hpBuff | cleanse
+
+function getSelectValue(id, fallback) {
+  const node = el(id);
+  if (!node) return fallback;
+  return (node.value == null ? fallback : String(node.value));
+}
+
+function loadOptimizerPrefs() {
+  const comp = localStorage.getItem(LS_TEAMCOMP_KEY) || "auto";
+  const preset = localStorage.getItem(LS_PRESET_KEY) || "auto";
+  const compEl = el("teamCompSelect");
+  const presetEl = el("teamPresetSelect");
+  if (compEl) compEl.value = comp;
+  if (presetEl) presetEl.value = preset;
+}
+
+function saveOptimizerPrefs() {
+  const comp = getSelectValue("teamCompSelect", "auto");
+  const preset = getSelectValue("teamPresetSelect", "auto");
+  localStorage.setItem(LS_TEAMCOMP_KEY, comp);
+  localStorage.setItem(LS_PRESET_KEY, preset);
+}
+
+function buildDoctrineOverridesFromUI() {
+  const comp = getSelectValue("teamCompSelect", "auto");
+  const preset = getSelectValue("teamPresetSelect", "auto");
+
+  const overrides = {};
+
+  // Team composition override (mono/rainbow)
+  if (comp === "force_mono" || comp === "force_rainbow") {
+    overrides.monoVsRainbow = Object.assign({}, (window.OPTIMIZER_DOCTRINE && window.OPTIMIZER_DOCTRINE.OPTIMIZER_DOCTRINE && window.OPTIMIZER_DOCTRINE.OPTIMIZER_DOCTRINE.monoVsRainbow) || null, {
+      selectionMode: comp
+    });
+  } else if (comp === "auto") {
+    // leave undefined so engine uses doctrine default
+  }
+
+  // Preset override: boost selected status weight
+  if (preset && preset !== "auto") {
+    const baseWeights = (window.OPTIMIZER_DOCTRINE && window.OPTIMIZER_DOCTRINE.OPTIMIZER_DOCTRINE && window.OPTIMIZER_DOCTRINE.OPTIMIZER_DOCTRINE.statusWeights)
+      ? window.OPTIMIZER_DOCTRINE.OPTIMIZER_DOCTRINE.statusWeights
+      : null;
+
+    const next = Object.assign({}, baseWeights || {});
+    const boost = 2; // doctrine-prescribed bias
+    if (next[preset] == null) next[preset] = boost;
+    else next[preset] = Number(next[preset]) + boost;
+
+    overrides.statusWeights = next;
+  }
+
+  return overrides;
+}
+
+
 const STORY_MAIN = 5;
 const STORY_BACK = 3;
 const PLATOON_COUNT = 20;
@@ -132,7 +190,15 @@ function wireSelects(units) {
       }
 
       saveLayout();
-      renderAll();
+    
+  loadOptimizerPrefs();
+  el("teamCompSelect")?.addEventListener("change", () => {
+    saveOptimizerPrefs();
+  });
+  el("teamPresetSelect")?.addEventListener("change", () => {
+    saveOptimizerPrefs();
+  });
+  renderAll();
     });
   });
 }
@@ -275,10 +341,19 @@ function runEngine() {
     return;
   }
 
+  saveOptimizerPrefs();
+
   // engine input is owned units (objects)
   window.__optimizerOwnedUnits = state.ownedUnits;
 
-  const result = window.OptimizerEngine.run(window.__optimizerOwnedUnits || [], window.__optimizerOptions || {});
+  const doctrineOverrides = buildDoctrineOverridesFromUI();
+
+  // options for engine (including doctrine overrides)
+  const options = Object.assign({}, window.__optimizerOptions || {}, {
+    doctrineOverrides
+  });
+
+  const result = window.OptimizerEngine.run(window.__optimizerOwnedUnits || [], options);
   window.__optimizerResult = result;
 
   applyEngineResult(result);
