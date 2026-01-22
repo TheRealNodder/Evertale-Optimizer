@@ -10,7 +10,7 @@
 (function (global) {
   "use strict";
 
-  const DOCTRINE = (global.OPTIMIZER_DOCTRINE && global.OPTIMIZER_DOCTRINE.OPTIMIZER_DOCTRINE)
+  let DOCTRINE = (global.OPTIMIZER_DOCTRINE && global.OPTIMIZER_DOCTRINE.OPTIMIZER_DOCTRINE)
     ? global.OPTIMIZER_DOCTRINE.OPTIMIZER_DOCTRINE
     : global.OPTIMIZER_DOCTRINE;
 
@@ -19,6 +19,24 @@
   }
 
   const EPS = 1e-9;
+
+  // Deep clone + merge so UI can override doctrine per-run (mono/rainbow mode, preset weights, etc.)
+  function cloneObj(obj) {
+    try { return structuredClone(obj); } catch { return JSON.parse(JSON.stringify(obj || {})); }
+  }
+  function deepMerge(target, src) {
+    if (!src || typeof src !== "object") return target;
+    for (const k of Object.keys(src)) {
+      const sv = src[k];
+      if (sv && typeof sv === "object" && !Array.isArray(sv)) {
+        if (!target[k] || typeof target[k] !== "object" || Array.isArray(target[k])) target[k] = {};
+        deepMerge(target[k], sv);
+      } else {
+        target[k] = sv;
+      }
+    }
+    return target;
+  }
 
   /* ---------- helpers ---------- */
   function clamp(x, lo, hi) { return Math.max(lo, Math.min(hi, x)); }
@@ -174,12 +192,93 @@
     return out;
   }
 
+  
   function tagsFromSkills(unit) {
     const corpus = buildSkillCorpus(unit);
-    const base = tagsFromKeywords(corpus); // uses doctrine keywordsToTag
+    const s = safeLower(corpus);
+
+    // We DO NOT tag a unit as burn/poison/sleep/stun merely because the word appears.
+    // We try to detect whether the unit APPLIES the status (or is built around enabling it),
+    // versus merely referencing it as a condition (which may even be negative, e.g. "cannot be used if poisoned").
+    function has(re) { return re.test(s); }
+
     const out = new Set();
-    for (const t of base) out.add(String(t).toLowerCase());
-    for (const t of statusContextTags(corpus)) out.add(String(t).toLowerCase());
+
+    // --- APPLY/INFLICT patterns (positive tags) ---
+    const burnApply =
+      has(/\b(inflict|apply|cause|ignite|set)\b[^\n]{0,40}\bburn/i) ||
+      has(/\bburn\b[^\n]{0,40}\b(enemy|enemies|target|targets)\b/i) ||
+      has(/\b(burning)\b[^\n]{0,40}\b(enemy|enemies|target|targets)\b/i);
+
+    const poisonApply =
+      has(/\b(inflict|apply|cause|toxic|venom)\b[^\n]{0,40}\bpoison/i) ||
+      has(/\bpoison\b[^\n]{0,40}\b(enemy|enemies|target|targets)\b/i) ||
+      has(/\b(poisoned)\b[^\n]{0,40}\b(enemy|enemies|target|targets)\b/i);
+
+    const sleepApply =
+      has(/\b(put|puts|inflict|apply|cause)\b[^\n]{0,40}\bsleep/i) ||
+      has(/\bsleep\b[^\n]{0,40}\b(enemy|enemies|target|targets)\b/i);
+
+    const stunApply =
+      has(/\b(inflict|apply|cause)\b[^\n]{0,40}\bstun/i) ||
+      has(/\bstun\b[^\n]{0,40}\b(enemy|enemies|target|targets)\b/i) ||
+      has(/\bfreeze\b[^\n]{0,40}\b(enemy|enemies|target|targets)\b/i);
+
+    // --- CONDITION patterns (do NOT count as the status tag by themselves) ---
+    const burnMention = has(/\bburn(?:ing)?\b/i);
+    const poisonMention = has(/\bpoison(?:ed)?\b/i);
+    const sleepMention = has(/\bsleep\b/i);
+    const stunMention = has(/\bstun\b|\bfreeze\b/i);
+
+    const condRe = (word) => new RegExp(`\\b(if|while|when|unless|until)\\b[^\\n]{0,120}\\b${word}\\b`, "i");
+
+    const burnCond = burnMention && has(condRe("burn"));
+    const poisonCond = poisonMention && has(condRe("poison"));
+    const sleepCond = sleepMention && has(condRe("sleep"));
+    const stunCond = stunMention && (has(condRe("stun")) || has(condRe("freeze")));
+
+    // --- NEGATIVE interaction tags ---
+    const negWords = "(cannot|can't|locked|unusable|disabled|reduced|decrease|less|penalty|weaken|weaker|worse|prevent)";
+    const antiWindow = (word) => new RegExp(`(?:\\bif\\b|\\bwhile\\b|\\bwhen\\b)[^\\n]{0,120}\\b${word}\\b[^\\n]{0,120}\\b${negWords}\\b`, "i");
+
+    const antiBurn = has(/\bcannot be used[^\\n]{0,120}\bburn/i) || has(antiWindow("burn"));
+    const antiPoison = has(/\bcannot be used[^\\n]{0,120}\bpoison/i) || has(antiWindow("poison"));
+
+    if (antiBurn) out.add("anti_burn");
+    if (antiPoison) out.add("anti_poison");
+
+    // --- Canonical positive status tags ---
+    // Only add the tag if we see apply patterns OR if it's clearly a positive synergy statement.
+    // (Synergy examples: "deal more damage to burning enemies" should still count as burn synergy.)
+    const burnSynergy = burnMention && has(/\b(burning)\b[^\n]{0,80}\b(enemy|enemies|target|targets)\b/i) && !antiBurn;
+    const poisonSynergy = poisonMention && has(/\b(poisoned)\b[^\n]{0,80}\b(enemy|enemies|target|targets)\b/i) && !antiPoison;
+
+    if (burnApply || burnSynergy) out.add("burn");
+    if (poisonApply || poisonSynergy) out.add("poison");
+    if (sleepApply) out.add("sleep");
+    if (stunApply) out.add("stun");
+
+    // If the status is only mentioned as a condition (and not applied/synergy), track it as a condition tag
+    // (useful for future refinements, but does not satisfy presets)
+    if (burnCond && !out.has("burn")) out.add("cond_burn");
+    if (poisonCond && !out.has("poison")) out.add("cond_poison");
+    if (sleepCond && !out.has("sleep")) out.add("cond_sleep");
+    if (stunCond && !out.has("stun")) out.add("cond_stun");
+
+    // --- Other doctrine keyword tags (heal/turn/buffs/cleanse etc.) ---
+    // These are safe to take from raw keywords.
+    const kw = tagsFromKeywords(corpus);
+    for (const t of kw) {
+      const tl = String(t).toLowerCase();
+      out.add(tl);
+    }
+
+    // Extra explicit revive tag for front/back decisions
+    if (/\brevive\b|\bresurrect\b/i.test(s)) out.add("revive");
+
+    // Cleanse detection (helps even if keyword lists miss some variations)
+    if (/(remove|cleans|cleanse|purif)[^\n]{0,80}(debuff|burn|poison|sleep|stun)/i.test(s)) out.add("cleanse");
+
     return out;
   }
 
@@ -321,9 +420,32 @@
       const providedTags = coerceTagSet(u);
       const derivedTags = tagsFromSkills(u);
 
-      // Prefer derived tags (from skills) when available, otherwise fall back to provided tags.
-      // This prevents stale/incorrect tags in characters.json from dominating.
-      const tagSet = derivedTags.size ? derivedTags : providedTags;
+      // Tag authority rule:
+      // - Prefer tags derived from ACTIVE/PASSIVE SKILL text.
+      // - If derived tags exist, only accept PROVIDED status tags (burn/poison/sleep/etc.) if the skill text also implies them.
+      //   This prevents stale/misleading tags in characters.json (e.g., a unit tagged burn/poison but only *reacts* to them negatively).
+      // - If no derived tags exist (some units have sparse skill text), fall back to provided tags.
+      let tagSet;
+      if (derivedTags.size) {
+        tagSet = new Set(derivedTags);
+
+        const statusLike = new Set([
+          "burn","poison","sleep","stun","turn","heal","cleanse",
+          "atkbuff","hpbuff","anti_burn","anti_poison","revive"
+        ]);
+
+        for (const tRaw of providedTags) {
+          const t = String(tRaw).toLowerCase().trim();
+          if (!t) continue;
+
+          // If it's a status-like tag and skill text didn't produce it, ignore it.
+          if (statusLike.has(t) && !derivedTags.has(t)) continue;
+
+          tagSet.add(t);
+        }
+      } else {
+        tagSet = providedTags;
+      }
 
       // merge tags from leader parsing; note doctrine tags are camelCase in JSON but we store lowercase for internal
       for (const t of keywordTags) tagSet.add(String(t).toLowerCase());
@@ -498,12 +620,31 @@
     const monoThresh = DOCTRINE.monoVsRainbow.monoThreshold.story;
     const rainbowMin = DOCTRINE.monoVsRainbow.rainbowThreshold.storyDistinctElementsMin;
 
+    const mode = (DOCTRINE.monoVsRainbow.selectionMode || "auto"); // auto | force_mono | force_rainbow
+
     const leaderMatchesMajority = leaderView ? leaderMentionsElement(leaderView, dist.majorityElement) : false;
     const monoRequiresLeader = !!DOCTRINE.monoVsRainbow.monoRequiresLeader;
-    const monoEligible = (dist.majorityRatio >= monoThresh) && (!monoRequiresLeader || leaderMatchesMajority);
 
+    const hardMono =
+      (dist.distinctElements === 1) &&
+      (dist.majorityElement !== "unknown") &&
+      !(dist.counts && dist.counts.unknown) &&
+      (dist.majorityRatio >= 0.999);
+
+    const monoEligible = (dist.majorityRatio >= monoThresh) && (!monoRequiresLeader || leaderMatchesMajority);
     const rainbowTarget = dist.distinctElements >= rainbowMin;
 
+    // Hard modes: used to *enforce* selection, not just bias it.
+    if (mode === "force_mono") {
+      // Strongest interpretation: the team must be entirely one element (no unknown).
+      return hardMono ? 1 : 0;
+    }
+    if (mode === "force_rainbow") {
+      // Require broad coverage. We use doctrine's rainbowMin as the hard requirement.
+      return rainbowTarget ? 1 : 0;
+    }
+
+    // Auto mode (bias)
     if (monoEligible) return clamp(0.85 + 0.15 * dist.majorityRatio, 0, 1);
     if (rainbowTarget) return clamp(0.70 + 0.10 * (dist.distinctElements / 6), 0, 1);
     return clamp(0.45 + 0.20 * dist.majorityRatio, 0, 1);
@@ -620,7 +761,7 @@
     return { coverage, pairSyn, elemStrat, add };
   }
 
-  function storyScore(teamViews) {
+  function storyScore(teamViews, options) {
     const baseSum = sum(teamViews, v => v.unitBase);
     const leaderEval = pickBestLeader(teamViews);
     const mult = leaderMultiplier(teamViews, leaderEval);
@@ -628,7 +769,32 @@
     const additives = teamAdditives(teamViews, leaderEval.leaderView);
     const penalty = storyRolePenalty(teamViews);
 
-    const score = (baseSum * (1 - penalty) + additives.add) * mult;
+    // Hard mono/rainbow enforcement (if enabled via doctrine override from UI).
+    // This ensures "force mono" actually returns a mono-element team (and "force rainbow" returns high coverage).
+    const dist = elementDistribution(teamViews);
+    const mode = (DOCTRINE.monoVsRainbow.selectionMode || "auto");
+    const rainbowMin = DOCTRINE.monoVsRainbow.rainbowThreshold.storyDistinctElementsMin;
+
+    const hardMono =
+      (dist.distinctElements === 1) &&
+      (dist.majorityElement !== "unknown") &&
+      !(dist.counts && dist.counts.unknown) &&
+      (dist.majorityRatio >= 0.999);
+
+    let forceFactor = 1;
+    if (mode === "force_mono" && !hardMono) forceFactor = 1e-9;
+    if (mode === "force_rainbow" && dist.distinctElements < rainbowMin) forceFactor = 1e-9;
+
+    // Preset enforcement (Burn/Sleep/Poison/etc.) based on derived tags from skills.
+    const presetTag = options && options.presetTag ? String(options.presetTag).toLowerCase() : "";
+    const presetMode = options && options.presetMode ? String(options.presetMode) : "off";
+    if (presetMode === "hard" && presetTag) {
+      const need = Number.isFinite(Number(options.presetMinStory8)) ? Number(options.presetMinStory8) : 0;
+      const have = teamViews.reduce((acc, v) => acc + (v.tags && v.tags.map(t=>String(t).toLowerCase()).includes(presetTag) ? 1 : 0), 0);
+      if (need > 0 && have < need) forceFactor = 1e-9;
+    }
+
+    const score = (baseSum * (1 - penalty) + additives.add) * mult * forceFactor;
 
     return {
       score,
@@ -642,11 +808,34 @@
     };
   }
 
-  function platoonScore(teamViews) {
+  function platoonScore(teamViews, options) {
     const baseSum = sum(teamViews, v => v.unitBase);
     const additives = teamAdditives(teamViews, null);
     const penalty = platoonRolePenalty(teamViews);
-    const score = (baseSum * (1 - penalty) + additives.add);
+    // Hard mono/rainbow enforcement for platoons as well.
+    const dist = elementDistribution(teamViews);
+    const mode = (DOCTRINE.monoVsRainbow.selectionMode || "auto");
+    const rainbowMin = DOCTRINE.monoVsRainbow.rainbowThreshold.storyDistinctElementsMin;
+
+    const hardMono =
+      (dist.distinctElements === 1) &&
+      (dist.majorityElement !== "unknown") &&
+      !(dist.counts && dist.counts.unknown) &&
+      (dist.majorityRatio >= 0.999);
+
+    let forceFactor = 1;
+    if (mode === "force_mono" && !hardMono) forceFactor = 1e-9;
+    if (mode === "force_rainbow" && dist.distinctElements < rainbowMin) forceFactor = 1e-9;
+
+    const presetTag = options && options.presetTag ? String(options.presetTag).toLowerCase() : "";
+    const presetMode = options && options.presetMode ? String(options.presetMode) : "off";
+    if (presetMode === "hard" && presetTag) {
+      const need = Number.isFinite(Number(options.presetMinPlatoon5)) ? Number(options.presetMinPlatoon5) : 0;
+      const have = teamViews.reduce((acc, v) => acc + (v.tags && v.tags.map(t=>String(t).toLowerCase()).includes(presetTag) ? 1 : 0), 0);
+      if (need > 0 && have < need) forceFactor = 1e-9;
+    }
+
+    const score = (baseSum * (1 - penalty) + additives.add) * forceFactor;
     return { score, baseSum, penalty, additives };
   }
 
@@ -705,7 +894,7 @@
   }
 
   /* ---------- beam search for story ---------- */
-  function beamSearchStory(pool, lockedSet, targetSize) {
+  function beamSearchStory(pool, lockedSet, targetSize, options) {
     const beamWidth = DOCTRINE.optimizerSearch.beamWidthStory;
 
     const idToView = new Map(pool.map(v => [v.id, v]));
@@ -823,7 +1012,7 @@
     // leaf scoring
     let best = null;
     for (const st of beam) {
-      const s = storyScore(st.picked);
+      const s = storyScore(st.picked, options);
       const pickedIds = st.picked.map(v => v.id);
       const record = { picked: st.picked, pickedIds, story: s };
       if (!best) best = record;
@@ -840,7 +1029,7 @@
       }
     }
 
-    return best ? best : { picked: [], pickedIds: [], story: storyScore([]) };
+    return best ? best : { picked: [], pickedIds: [], story: storyScore([], options) };
   }
 
   /* ---------- front/back assignment (story) ---------- */
@@ -975,9 +1164,13 @@
   }
 
   /* ---------- platoon builder ---------- */
-  function buildPlatoons(remainingViews) {
+  function buildPlatoons(remainingViews, options) {
     const count = DOCTRINE.teamFormats.platoons.count;
     const size = DOCTRINE.teamFormats.platoons.size;
+
+    const presetTag = options && options.presetTag ? String(options.presetTag).toLowerCase() : "";
+    const presetMode = options && options.presetMode ? String(options.presetMode) : "off";
+    const presetNeed = Number.isFinite(Number(options && options.presetMinPlatoon5)) ? Number(options.presetMinPlatoon5) : 0;
 
     const variety = DOCTRINE.optimizerSearch.varietyPressure;
     const usage = {}; // tag -> count
@@ -1023,9 +1216,21 @@
         for (const v of candidates) {
           // evaluate marginal
           const trial = team.concat([v]);
-          const base = platoonScore(team).score;
-          const next = platoonScore(trial).score;
+          const base = platoonScore(team, options).score;
+          const next = platoonScore(trial, options).score;
           let marginal = next - base;
+
+          // Preset guidance: if hard preset is selected, push platoons to include the preset tag.
+          if (presetMode === "hard" && presetTag && presetNeed > 0) {
+            const have = team.reduce((acc, x) => acc + (x.tags && x.tags.map(t=>String(t).toLowerCase()).includes(presetTag) ? 1 : 0), 0);
+            const candHas = v.tags && v.tags.map(t=>String(t).toLowerCase()).includes(presetTag);
+            const slotsAfter = slotsLeft - 1;
+            const needAfter = Math.max(presetNeed - (have + (candHas ? 1 : 0)), 0);
+
+            // If we are running out of slots to meet the requirement, heavily prefer candidates that match.
+            if (candHas && have < presetNeed) marginal += 0.14;
+            if (!candHas && needAfter > slotsAfter) marginal -= 0.20;
+          }
 
           // need boosts if running out of slots
           if (needDps && slotsLeft <= 2 && v.roles.countsAsDps) marginal += 0.08;
@@ -1049,7 +1254,7 @@
 
       if (!team.length) break;
 
-      const scoreObj = platoonScore(team);
+      const scoreObj = platoonScore(team, options);
       updateUsageForPlatoon(team);
 
       platoons.push({
@@ -1068,6 +1273,13 @@
 
   /* ---------- main run ---------- */
   function run(unitsRaw, options) {
+    // Apply per-run doctrine overrides from UI (team type, preset weights, etc.)
+    const __savedDoctrine = DOCTRINE;
+    if (options && options.doctrineOverrides) {
+      DOCTRINE = deepMerge(cloneObj(__savedDoctrine), options.doctrineOverrides);
+    }
+
+    try {
     const ownedViewsAll = buildUnitViews(unitsRaw || []);
 
     const ownedSet = new Set(ownedViewsAll.map(v => v.id));
@@ -1088,10 +1300,90 @@
       };
     }
 
-    const pool = buildCandidatePool(ownedViews, locked);
+    let pool = buildCandidatePool(ownedViews, locked);
 
+    // Preset candidate narrowing: if hard preset is selected and enough matching units exist to fill story,
+    // restrict the story search pool to preset-matching units (while still keeping locked units).
+    const presetTag = options && options.presetTag ? String(options.presetTag).toLowerCase() : "";
+    const presetMode = options && options.presetMode ? String(options.presetMode) : "off";
+    if (presetMode === "hard" && presetTag) {
+      const matchesAll = ownedViews.filter(v => v.tags && v.tags.map(t => String(t).toLowerCase()).includes(presetTag));
+      if (matchesAll.length >= storySize) {
+        const lockedIds = new Set(locked || []);
+        pool = pool.filter(v => lockedIds.has(v.id) || (v.tags && v.tags.map(t => String(t).toLowerCase()).includes(presetTag)));
+      }
+    }
+
+
+    // --- HARD mono/rainbow enforcement for story selection ---
+    // In force_mono, we restrict the candidate pool to ONE element that has enough owned units to fill the story team,
+    // and choose the best element (by resulting story score). This prevents mixed-element "best of bad tiny scores".
+    const mode = (DOCTRINE.monoVsRainbow && DOCTRINE.monoVsRainbow.selectionMode) ? DOCTRINE.monoVsRainbow.selectionMode : "auto";
+    if (mode === "force_mono" && pool.length) {
+      const storyNeed = storySize;
+      const byEl = new Map();
+      for (const v of ownedViews) {
+        const e = (v.element || "unknown");
+        if (!byEl.has(e)) byEl.set(e, []);
+        byEl.get(e).push(v);
+      }
+
+      // candidate elements: those with >= storyNeed, excluding unknown
+      const candidates = [];
+      for (const [e, arr] of byEl.entries()) {
+        if (e !== "unknown" && arr.length >= storyNeed) candidates.push(e);
+      }
+
+      // If none can fill fully, fall back to the element with the largest count (still restrict as much as possible).
+      if (!candidates.length) {
+        let bestE = null, bestC = -1;
+        for (const [e, arr] of byEl.entries()) {
+          if (e === "unknown") continue;
+          if (arr.length > bestC) { bestC = arr.length; bestE = e; }
+        }
+        if (bestE) candidates.push(bestE);
+      }
+
+      let bestPick = null;
+      for (const e of candidates) {
+        const allowedIds = new Set(byEl.get(e).map(v => v.id));
+        const lockedIds = new Set(locked || []);
+        // keep locked even if off-element (user explicitly locked them)
+        const restrictedPool = pool.filter(v => lockedIds.has(v.id) || allowedIds.has(v.id));
+
+        const pick = beamSearchStory(restrictedPool, locked, storyNeed, options);
+        if (!bestPick) bestPick = pick;
+        else if (pick.story.score > bestPick.story.score + EPS) bestPick = pick;
+        else if (Math.abs(pick.story.score - bestPick.story.score) <= EPS) {
+          // tie-break by teamAtk then lex
+          const ta = pick.story.teamAtk, tb = bestPick.story.teamAtk;
+          if (ta > tb + EPS) bestPick = pick;
+          else if (Math.abs(ta - tb) <= EPS) {
+            const as = (pick.pickedIds || []).join("|");
+            const bs = (bestPick.pickedIds || []).join("|");
+            if (as < bs) bestPick = pick;
+          }
+        }
+      }
+
+      if (bestPick) {
+        // Use the best forced-mono pick by short-circuiting the standard search later.
+        var __forcedStoryPick = bestPick;
+      }
+    }
+
+    if (mode === "force_rainbow" && pool.length) {
+      // Rainbow enforcement is handled by scoring forceFactor, but we also expand the pool if needed,
+      // because a small candidate pool may not contain enough distinct elements.
+      const rainbowMin = DOCTRINE.monoVsRainbow.rainbowThreshold.storyDistinctElementsMin;
+      const distinctInOwned = new Set(ownedViews.map(v => v.element).filter(e => e && e !== "unknown")).size;
+      if (distinctInOwned >= rainbowMin) {
+        // Expand pool to all owned (still respecting bans), to give beam search enough element variety.
+        pool = sortStableBy(ownedViews.slice(), (a, b) => lexCompare(a.id, b.id));
+      }
+    }
     // ensure story picks from pool, but if owned < poolSize, ok
-    const storyPick = beamSearchStory(pool, locked, storySize);
+    const storyPick = (typeof __forcedStoryPick !== 'undefined' && __forcedStoryPick) ? __forcedStoryPick : beamSearchStory(pool, locked, storySize, options);
     const storyViews = storyPick.picked;
 
     const leaderId = storyPick.story.leaderId;
@@ -1108,7 +1400,7 @@
     // stable by id
     const remainingSorted = sortStableBy(remainingViews, (a, b) => lexCompare(a.id, b.id));
 
-    const platoons = buildPlatoons(remainingSorted);
+    const platoons = buildPlatoons(remainingSorted, options);
 
     return {
       story: {
@@ -1128,6 +1420,9 @@
       },
       platoons
     };
+    } finally {
+      DOCTRINE = __savedDoctrine;
+    }
   }
 
   global.OptimizerEngine = { run };
