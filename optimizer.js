@@ -1,5 +1,5 @@
 /* optimizer.js — WHOLE FILE
-   Adds Locked Leader support for the optimizer run.
+   Adds slot-locks for Story + Platoons and passes to engine.
 */
 
 const DATA_CHARACTERS = "./data/characters.json";
@@ -8,7 +8,7 @@ const LAYOUT_KEY = "evertale_team_layout_v1";
 
 const LS_TEAMTYPE_KEY = "evertale_optimizer_teamType_v1";
 const LS_PRESET_KEY = "evertale_optimizer_preset_v1";
-const LS_LEADERLOCK_KEY = "evertale_optimizer_leaderLock_v1";
+const LS_LOCKS_KEY = "evertale_optimizer_slotLocks_v1";
 
 const STORY_MAIN = 5;
 const STORY_BACK = 3;
@@ -20,6 +20,7 @@ const state = {
   ownedIds: new Set(),
   ownedUnits: [],
   layout: null,
+  locks: null, // { storyMain:bool[5], storyBack:bool[3], platoons:bool[20][5] }
   mode: "story",
 };
 
@@ -39,47 +40,42 @@ function getPresetPref() {
 function setTeamTypePref(v) { localStorage.setItem(LS_TEAMTYPE_KEY, v); }
 function setPresetPref(v) { localStorage.setItem(LS_PRESET_KEY, v); }
 
-function getLeaderLockPref() {
-  return normId(localStorage.getItem(LS_LEADERLOCK_KEY) || "");
+function defaultLocks() {
+  return {
+    storyMain: Array(STORY_MAIN).fill(false),
+    storyBack: Array(STORY_BACK).fill(false),
+    platoons: Array.from({ length: PLATOON_COUNT }, () => Array(PLATOON_SIZE).fill(false)),
+  };
 }
-function setLeaderLockPref(v) {
-  localStorage.setItem(LS_LEADERLOCK_KEY, normId(v));
+
+function loadLocks() {
+  const obj = safeJsonParse(localStorage.getItem(LS_LOCKS_KEY) || "null", null);
+  const base = defaultLocks();
+  if (!obj) return base;
+
+  if (Array.isArray(obj.storyMain)) base.storyMain = obj.storyMain.slice(0,STORY_MAIN).map(Boolean);
+  if (Array.isArray(obj.storyBack)) base.storyBack = obj.storyBack.slice(0,STORY_BACK).map(Boolean);
+  if (Array.isArray(obj.platoons)) {
+    base.platoons = obj.platoons.slice(0,PLATOON_COUNT).map(row => {
+      const r = Array.isArray(row) ? row.slice(0,PLATOON_SIZE).map(Boolean) : [];
+      return r.concat(Array(PLATOON_SIZE).fill(false)).slice(0,PLATOON_SIZE);
+    });
+    while (base.platoons.length < PLATOON_COUNT) base.platoons.push(Array(PLATOON_SIZE).fill(false));
+  }
+  return base;
+}
+
+function saveLocks() {
+  localStorage.setItem(LS_LOCKS_KEY, JSON.stringify(state.locks));
 }
 
 function initSharedOptimizerFiltersUI() {
   const teamSel = el("teamTypeSelect");
   const presetSel = el("presetSelect");
-
   if (teamSel) teamSel.value = getTeamTypePref();
   if (presetSel) presetSel.value = getPresetPref();
-
   teamSel?.addEventListener("change", (e) => setTeamTypePref(e.target.value || "auto"));
   presetSel?.addEventListener("change", (e) => setPresetPref(e.target.value || "auto"));
-}
-
-function initLeaderLockUI() {
-  const lockSel = el("leaderLockSelect");
-  if (!lockSel) return;
-
-  // populate from owned units
-  const cur = getLeaderLockPref();
-
-  const opts = [`<option value="">Locked Leader: (none)</option>`];
-  for (const u of state.ownedUnits) {
-    const id = normId(u.id);
-    opts.push(`<option value="${id}">${u.name} (${u.element} ${u.rarity})</option>`);
-  }
-  lockSel.innerHTML = opts.join("");
-  lockSel.value = cur;
-
-  lockSel.addEventListener("change", () => {
-    setLeaderLockPref(lockSel.value || "");
-  });
-
-  el("clearLeaderLock")?.addEventListener("click", () => {
-    setLeaderLockPref("");
-    lockSel.value = "";
-  });
 }
 
 function getOwnedIds() {
@@ -124,8 +120,7 @@ async function loadCharacters() {
   const res = await fetch(DATA_CHARACTERS, { cache: "no-store" });
   if (!res.ok) throw new Error(`Failed to fetch ${DATA_CHARACTERS}: ${res.status}`);
   const json = await res.json();
-  const chars = Array.isArray(json) ? json : (json && Array.isArray(json.characters) ? json.characters : []);
-  return chars;
+  return Array.isArray(json) ? json : (json && Array.isArray(json.characters) ? json.characters : []);
 }
 
 function optionList(units) {
@@ -136,7 +131,7 @@ function optionList(units) {
   return opts.join("");
 }
 
-function slotCardHTML(slotKey, idx, currentId, units) {
+function slotCardHTML(slotKey, idx, currentId, units, locked) {
   const cid = normId(currentId);
   const u = units.find(x => normId(x.id) === cid);
 
@@ -154,21 +149,47 @@ function slotCardHTML(slotKey, idx, currentId, units) {
         </div>
       </div>
 
-      ${u ? `
-        <div class="slotMetaRow">
-          <span class="slotChip">${u.rarity || ""}</span>
-          <span class="slotChip">${u.element || ""}</span>
-        </div>
-      ` : ""}
+      <div style="display:flex; justify-content:space-between; gap:10px; align-items:center; margin-top:8px;">
+        <label class="muted" style="display:flex; gap:8px; align-items:center; user-select:none;">
+          <input type="checkbox" class="slotLock" data-slot="${slotKey}" data-idx="${idx}" ${locked ? "checked" : ""}/>
+          Lock
+        </label>
+        ${u ? `
+          <div class="slotMetaRow" style="margin:0;">
+            <span class="slotChip">${u.rarity || ""}</span>
+            <span class="slotChip">${u.element || ""}</span>
+          </div>
+        ` : `<div></div>`}
+      </div>
 
-      <select class="slotSelect" data-slot="${slotKey}" data-idx="${idx}">
+      <select class="slotSelect" data-slot="${slotKey}" data-idx="${idx}" ${locked ? "disabled" : ""}>
         ${optionList(units)}
       </select>
     </div>
   `;
 }
 
-function wireSelects(units) {
+function getLockFor(slotKey, idx) {
+  if (slotKey === "storyMain") return !!state.locks.storyMain[idx];
+  if (slotKey === "storyBack") return !!state.locks.storyBack[idx];
+  if (slotKey.startsWith("platoon_")) {
+    const p = parseInt(slotKey.split("_")[1], 10);
+    return !!state.locks.platoons[p][idx];
+  }
+  return false;
+}
+
+function setLockFor(slotKey, idx, val) {
+  if (slotKey === "storyMain") state.locks.storyMain[idx] = !!val;
+  else if (slotKey === "storyBack") state.locks.storyBack[idx] = !!val;
+  else if (slotKey.startsWith("platoon_")) {
+    const p = parseInt(slotKey.split("_")[1], 10);
+    state.locks.platoons[p][idx] = !!val;
+  }
+  saveLocks();
+}
+
+function wireSelects() {
   document.querySelectorAll("select.slotSelect").forEach(sel => {
     const slot = sel.getAttribute("data-slot");
     const idx = parseInt(sel.getAttribute("data-idx"), 10);
@@ -185,50 +206,50 @@ function wireSelects(units) {
 
     sel.addEventListener("change", () => {
       const v = normId(sel.value);
-
       if (slot === "storyMain") state.layout.storyMain[idx] = v;
       else if (slot === "storyBack") state.layout.storyBack[idx] = v;
       else if (slot.startsWith("platoon_")) {
         const p = parseInt(slot.split("_")[1], 10);
         state.layout.platoons[p][idx] = v;
       }
-
       saveLayout();
+      renderAll();
+    });
+  });
+
+  document.querySelectorAll("input.slotLock").forEach(cb => {
+    const slot = cb.getAttribute("data-slot");
+    const idx = parseInt(cb.getAttribute("data-idx"), 10);
+    cb.addEventListener("change", () => {
+      setLockFor(slot, idx, cb.checked);
       renderAll();
     });
   });
 }
 
-function renderStory(payload) {
-  if (payload && payload.main && payload.back) {
-    state.layout.storyMain = payload.main.map(normId).slice(0, STORY_MAIN).concat(Array(STORY_MAIN).fill("")).slice(0, STORY_MAIN);
-    state.layout.storyBack = payload.back.map(normId).slice(0, STORY_BACK).concat(Array(STORY_BACK).fill("")).slice(0, STORY_BACK);
-    saveLayout();
-  }
-
+function renderStory() {
   const mainEl = el("storyMain");
   const backEl = el("storyBack");
   if (!mainEl || !backEl) return;
 
-  mainEl.innerHTML = state.layout.storyMain.map((id,i) => slotCardHTML("storyMain", i, id, state.ownedUnits)).join("");
-  backEl.innerHTML = state.layout.storyBack.map((id,i) => slotCardHTML("storyBack", i, id, state.ownedUnits)).join("");
+  mainEl.innerHTML = state.layout.storyMain.map((id,i) =>
+    slotCardHTML("storyMain", i, id, state.ownedUnits, getLockFor("storyMain", i))
+  ).join("");
+
+  backEl.innerHTML = state.layout.storyBack.map((id,i) =>
+    slotCardHTML("storyBack", i, id, state.ownedUnits, getLockFor("storyBack", i))
+  ).join("");
 }
 
-function renderPlatoons(payload) {
-  if (Array.isArray(payload)) {
-    state.layout.platoons = payload.slice(0, PLATOON_COUNT).map(p => {
-      const units = Array.isArray(p.units) ? p.units.map(normId) : [];
-      return units.slice(0, PLATOON_SIZE).concat(Array(PLATOON_SIZE).fill("")).slice(0, PLATOON_SIZE);
-    });
-    while (state.layout.platoons.length < PLATOON_COUNT) state.layout.platoons.push(Array(PLATOON_SIZE).fill(""));
-    saveLayout();
-  }
-
+function renderPlatoons() {
   const grid = el("platoonsGrid");
   if (!grid) return;
 
   grid.innerHTML = state.layout.platoons.map((row,p) => {
-    const slots = row.map((id,i) => slotCardHTML(`platoon_${p}`, i, id, state.ownedUnits)).join("");
+    const slots = row.map((id,i) =>
+      slotCardHTML(`platoon_${p}`, i, id, state.ownedUnits, getLockFor(`platoon_${p}`, i))
+    ).join("");
+
     return `
       <div class="panel platoonPanel">
         <div class="panelTitle">Platoon ${p+1}</div>
@@ -289,11 +310,7 @@ function renderAll() {
   renderStory();
   renderPlatoons();
   renderStorage();
-  wireSelects(state.ownedUnits);
-
-  // expose for hook
-  window.renderStory = renderStory;
-  window.renderPlatoons = renderPlatoons;
+  wireSelects();
 }
 
 function clearTeams() {
@@ -309,18 +326,24 @@ function clearTeams() {
 function applyEngineResult(result) {
   if (!result || !result.story) return;
 
-  const main = Array.isArray(result.story.main) ? result.story.main.map(normId).filter(Boolean) : [];
-  const back = Array.isArray(result.story.back) ? result.story.back.map(normId).filter(Boolean) : [];
+  // Apply only into unlocked slots. Locked slots keep what user has.
+  const main = Array.isArray(result.story.main) ? result.story.main.map(normId) : [];
+  const back = Array.isArray(result.story.back) ? result.story.back.map(normId) : [];
 
-  state.layout.storyMain = main.slice(0, STORY_MAIN).concat(Array(STORY_MAIN).fill("")).slice(0, STORY_MAIN);
-  state.layout.storyBack = back.slice(0, STORY_BACK).concat(Array(STORY_BACK).fill("")).slice(0, STORY_BACK);
+  for (let i=0;i<STORY_MAIN;i++) {
+    if (!state.locks.storyMain[i]) state.layout.storyMain[i] = main[i] || "";
+  }
+  for (let i=0;i<STORY_BACK;i++) {
+    if (!state.locks.storyBack[i]) state.layout.storyBack[i] = back[i] || "";
+  }
 
   if (Array.isArray(result.platoons)) {
-    state.layout.platoons = result.platoons.slice(0, PLATOON_COUNT).map(p => {
-      const units = Array.isArray(p.units) ? p.units.map(normId).filter(Boolean) : [];
-      return units.slice(0, PLATOON_SIZE).concat(Array(PLATOON_SIZE).fill("")).slice(0, PLATOON_SIZE);
-    });
-    while (state.layout.platoons.length < PLATOON_COUNT) state.layout.platoons.push(Array(PLATOON_SIZE).fill(""));
+    for (let p=0;p<PLATOON_COUNT;p++) {
+      const row = (result.platoons[p]?.units || []).map(normId);
+      for (let i=0;i<PLATOON_SIZE;i++) {
+        if (!state.locks.platoons[p][i]) state.layout.platoons[p][i] = row[i] || "";
+      }
+    }
   }
 
   saveLayout();
@@ -330,11 +353,9 @@ function applyEngineResult(result) {
 function buildEngineOptions() {
   const teamType = (el("teamTypeSelect")?.value || getTeamTypePref());
   const preset   = (el("presetSelect")?.value || getPresetPref());
-  const lockedLeaderId = (el("leaderLockSelect")?.value || getLeaderLockPref());
 
   setTeamTypePref(teamType);
   setPresetPref(preset);
-  setLeaderLockPref(lockedLeaderId);
 
   const options = {};
   options.doctrineOverrides = {};
@@ -346,10 +367,15 @@ function buildEngineOptions() {
   options.presetTag = (preset === "auto") ? "" : preset;
   options.presetMode = (preset === "auto") ? "auto" : "hard";
 
-  // Leader lock
-  options.lockedLeaderId = normId(lockedLeaderId);
+  // Pass current layout + locks so engine can treat locked units as forced picks.
+  options.currentLayout = structuredCloneSafe(state.layout);
+  options.slotLocks = structuredCloneSafe(state.locks);
 
   return options;
+}
+
+function structuredCloneSafe(obj) {
+  try { return structuredClone(obj); } catch { return JSON.parse(JSON.stringify(obj || {})); }
 }
 
 function runEngine() {
@@ -388,14 +414,34 @@ function installModeButtons() {
   });
 }
 
+function lockFilledStorySlots() {
+  for (let i=0;i<STORY_MAIN;i++) state.locks.storyMain[i] = !!state.layout.storyMain[i];
+  for (let i=0;i<STORY_BACK;i++) state.locks.storyBack[i] = !!state.layout.storyBack[i];
+  saveLocks();
+  renderAll();
+}
+
+function lockFilledPlatoons() {
+  for (let p=0;p<PLATOON_COUNT;p++) {
+    for (let i=0;i<PLATOON_SIZE;i++) {
+      state.locks.platoons[p][i] = !!state.layout.platoons[p][i];
+    }
+  }
+  saveLocks();
+  renderAll();
+}
+
+function unlockAllLocks() {
+  state.locks = defaultLocks();
+  saveLocks();
+  renderAll();
+}
+
+// Hook entrypoint
 window.refreshOptimizerFromOwned = function refreshOptimizerFromOwned() {
   state.ownedIds = getOwnedIds();
   state.ownedUnits = state.all.filter(u => state.ownedIds.has(normId(u.id)));
   window.__optimizerOwnedUnits = state.ownedUnits;
-
-  // refresh leader lock options whenever owned changes
-  initLeaderLockUI();
-
   renderAll();
 };
 
@@ -408,19 +454,18 @@ async function init() {
 
   state.all = await loadCharacters();
   state.layout = loadLayout();
+  state.locks = loadLocks();
 
   state.ownedIds = getOwnedIds();
   state.ownedUnits = state.all.filter(u => state.ownedIds.has(normId(u.id)));
   window.__optimizerOwnedUnits = state.ownedUnits;
 
-  // init leader lock dropdown from owned
-  initLeaderLockUI();
-
   el("buildBest")?.addEventListener("click", runEngine);
   el("clearTeams")?.addEventListener("click", clearTeams);
 
-  el("teamTypeSelect")?.addEventListener("change", () => setTeamTypePref(el("teamTypeSelect").value || "auto"));
-  el("presetSelect")?.addEventListener("change", () => setPresetPref(el("presetSelect").value || "auto"));
+  el("lockFilledStory")?.addEventListener("click", lockFilledStorySlots);
+  el("lockFilledPlatoons")?.addEventListener("click", lockFilledPlatoons);
+  el("unlockAllLocks")?.addEventListener("click", unlockAllLocks);
 
   installModeButtons();
   renderAll();
