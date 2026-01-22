@@ -67,74 +67,6 @@
     };
   }
 
-  function collectUnitText(unit, leaderObj) {
-    const parts = [];
-    if (unit && unit.name) parts.push(String(unit.name));
-    if (unit && unit.title) parts.push(String(unit.title));
-    if (leaderObj) {
-      if (leaderObj.name) parts.push(String(leaderObj.name));
-      if (leaderObj.description) parts.push(String(leaderObj.description));
-    }
-    const act = Array.isArray(unit.activeSkillDetails) ? unit.activeSkillDetails
-              : (Array.isArray(unit.activeSkills) ? unit.activeSkills : []);
-    for (const s of act) {
-      if (!s || typeof s !== "object") continue;
-      if (s.name) parts.push(String(s.name));
-      if (s.raw) parts.push(String(s.raw));
-      if (s.target) parts.push(String(s.target));
-      if (s.description) parts.push(String(s.description));
-    }
-    const pas = Array.isArray(unit.passiveSkillDetails) ? unit.passiveSkillDetails : [];
-    for (const p of pas) {
-      if (!p || typeof p !== "object") continue;
-      if (p.name) parts.push(String(p.name));
-      if (p.description) parts.push(String(p.description));
-    }
-    const ps = Array.isArray(unit.passiveSkills) ? unit.passiveSkills : [];
-    for (const p of ps) if (p != null) parts.push(String(p));
-    return parts.join(" ");
-  }
-
-
-  function collectUnitText(unit, leaderObj) {
-    const parts = [];
-    // identity
-    if (unit && unit.name) parts.push(String(unit.name));
-    if (unit && unit.title) parts.push(String(unit.title));
-
-    // leader
-    if (leaderObj) {
-      if (leaderObj.name) parts.push(String(leaderObj.name));
-      if (leaderObj.description) parts.push(String(leaderObj.description));
-    }
-
-    // active skills (support both activeSkillDetails and activeSkills shapes)
-    const act = Array.isArray(unit.activeSkillDetails)
-      ? unit.activeSkillDetails
-      : (Array.isArray(unit.activeSkills) ? unit.activeSkills : []);
-    for (const sk of act) {
-      if (!sk || typeof sk !== 'object') continue;
-      if (sk.name) parts.push(String(sk.name));
-      if (sk.raw) parts.push(String(sk.raw));
-      if (sk.target) parts.push(String(sk.target));
-      if (sk.description) parts.push(String(sk.description));
-    }
-
-    // passive skill details
-    const pas = Array.isArray(unit.passiveSkillDetails) ? unit.passiveSkillDetails : [];
-    for (const pa of pas) {
-      if (!pa || typeof pa !== 'object') continue;
-      if (pa.name) parts.push(String(pa.name));
-      if (pa.description) parts.push(String(pa.description));
-    }
-
-    // passive skills as strings (if present)
-    const ps = Array.isArray(unit.passiveSkills) ? unit.passiveSkills : [];
-    for (const x of ps) if (x != null) parts.push(String(x));
-
-    return parts.join(' ');
-  }
-
   function extractPercentMax(text) {
     if (!DOCTRINE.leaderSkill.parsing.detectPercents) return 0;
     const s = safeLower(text);
@@ -180,6 +112,75 @@
       }
     }
     return tags;
+  }
+
+
+  // Build a searchable skill corpus from active/passive skills without mutating unit data.
+  function buildSkillCorpus(unit) {
+    const parts = [];
+    function push(v) { if (v != null) { const s = String(v).trim(); if (s) parts.push(s); } }
+
+    // Active skills: prefer detailed objects but support alternate shapes
+    const act = Array.isArray(unit.activeSkillDetails) ? unit.activeSkillDetails
+              : Array.isArray(unit.activeSkills) ? unit.activeSkills
+              : [];
+    for (const s of act) {
+      if (!s) continue;
+      if (typeof s === "string") { push(s); continue; }
+      push(s.name);
+      push(s.description);
+      push(s.raw);
+      push(s.target);
+    }
+
+    // Passive details
+    const passDet = Array.isArray(unit.passiveSkillDetails) ? unit.passiveSkillDetails : [];
+    for (const p of passDet) {
+      if (!p) continue;
+      if (typeof p === "string") { push(p); continue; }
+      push(p.name);
+      push(p.description);
+    }
+
+    // Passive names (strings)
+    const pass = Array.isArray(unit.passiveSkills) ? unit.passiveSkills : [];
+    for (const p of pass) push(p);
+
+    return parts.join("\n");
+  }
+
+  // More nuanced status context tags inferred from skill text.
+  // These tags are additive (do not replace base tags like 'burn', 'poison').
+  function statusContextTags(text) {
+    const s = safeLower(text);
+    const out = new Set();
+
+    // Common "negative interaction" patterns:
+    // - "cannot be used if the user has Burn"
+    // - "if an ally is poisoned, this skill is locked"
+    const negWords = "(cannot|can't|locked|unusable|disabled|reduced|decrease|less|penalty|weaken|weaker)";
+    const burnRe = new RegExp(`(?:\\bif\\b|\\bwhile\\b|\\bwhen\\b)[^\n]{0,80}\\bburn(?:ing)?\\b[^\n]{0,80}\\b${negWords}\\b`, "i");
+    const poisonRe = new RegExp(`(?:\\bif\\b|\\bwhile\\b|\\bwhen\\b)[^\n]{0,80}\\bpoison(?:ed)?\\b[^\n]{0,80}\\b${negWords}\\b`, "i");
+
+    if (/cannot be used[^\n]{0,80}\bburn/i.test(s) || burnRe.test(s)) out.add("anti_burn");
+    if (/cannot be used[^\n]{0,80}\bpoison/i.test(s) || poisonRe.test(s)) out.add("anti_poison");
+
+    // Cleanse / remove debuffs (beyond generic keyword tag)
+    if (/(remove|cleans|cleanse|purif)[^\n]{0,60}(burn|poison|sleep|stun|debuff)/i.test(s)) out.add("cleanse");
+
+    // Revive / resurrect tag (so backline preference can see it explicitly)
+    if (/\brevive\b|\bresurrect\b/i.test(s)) out.add("revive");
+
+    return out;
+  }
+
+  function tagsFromSkills(unit) {
+    const corpus = buildSkillCorpus(unit);
+    const base = tagsFromKeywords(corpus); // uses doctrine keywordsToTag
+    const out = new Set();
+    for (const t of base) out.add(String(t).toLowerCase());
+    for (const t of statusContextTags(corpus)) out.add(String(t).toLowerCase());
+    return out;
   }
 
   function coerceTagSet(unit) {
@@ -311,14 +312,19 @@
       const stats = extractStats(u);
       const leader = normalizeLeaderSkill(u);
       const leaderText = `${leader.name} ${leader.description}`;
-      const unitText = collectUnitText(u, leader);
 
       const elementsMentioned = detectElementsMentioned(leaderText);
       const parsedPercentMax = extractPercentMax(leaderText);
-      const keywordTags = tagsFromKeywords(unitText);
+      const keywordTags = tagsFromKeywords(leaderText);
       const isGenericAllies = detectGenericAllies(leaderText);
 
-      const tagSet = coerceTagSet(u);
+      const providedTags = coerceTagSet(u);
+      const derivedTags = tagsFromSkills(u);
+
+      // Prefer derived tags (from skills) when available, otherwise fall back to provided tags.
+      // This prevents stale/incorrect tags in characters.json from dominating.
+      const tagSet = derivedTags.size ? derivedTags : providedTags;
+
       // merge tags from leader parsing; note doctrine tags are camelCase in JSON but we store lowercase for internal
       for (const t of keywordTags) tagSet.add(String(t).toLowerCase());
 
@@ -437,6 +443,10 @@
         const aPoBurn = hasTag(a, "poison") || hasTag(a, "burn");
         const bPoBurn = hasTag(b, "poison") || hasTag(b, "burn");
         if (aPoBurn && bPoBurn) s += 0.08;
+
+        // Negative synergies: units that are penalized by burn/poison on self/allies
+        if ((hasTag(a, "anti_burn") && hasTag(b, "burn")) || (hasTag(b, "anti_burn") && hasTag(a, "burn"))) s -= 0.06;
+        if ((hasTag(a, "anti_poison") && hasTag(b, "poison")) || (hasTag(b, "anti_poison") && hasTag(a, "poison"))) s -= 0.06;
 
         if (hasTag(a, "turn") && hasTag(b, "turn")) s += 0.08;
 
