@@ -10,36 +10,9 @@
 (function (global) {
   "use strict";
 
-  let DOCTRINE = (global.OPTIMIZER_DOCTRINE && global.OPTIMIZER_DOCTRINE.OPTIMIZER_DOCTRINE)
+  const DOCTRINE = (global.OPTIMIZER_DOCTRINE && global.OPTIMIZER_DOCTRINE.OPTIMIZER_DOCTRINE)
     ? global.OPTIMIZER_DOCTRINE.OPTIMIZER_DOCTRINE
     : global.OPTIMIZER_DOCTRINE;
-
-  function deepMerge(dst, src) {
-    if (!src || typeof src !== "object") return dst;
-    for (const k of Object.keys(src)) {
-      const sv = src[k];
-      const dv = dst[k];
-      if (Array.isArray(sv)) {
-        dst[k] = sv.slice();
-      } else if (sv && typeof sv === "object") {
-        dst[k] = deepMerge(dv && typeof dv === "object" ? Object.assign({}, dv) : {}, sv);
-      } else {
-        dst[k] = sv;
-      }
-    }
-    return dst;
-  }
-
-  function resolveDoctrine(overrides) {
-    const base = (global.OPTIMIZER_DOCTRINE && global.OPTIMIZER_DOCTRINE.OPTIMIZER_DOCTRINE)
-      ? global.OPTIMIZER_DOCTRINE.OPTIMIZER_DOCTRINE
-      : global.OPTIMIZER_DOCTRINE;
-
-    const merged = base && typeof base === "object" ? Object.assign({}, base) : {};
-    if (overrides && typeof overrides === "object") deepMerge(merged, overrides);
-    return merged;
-  }
-
 
   if (!DOCTRINE) {
     console.error("[OptimizerEngine] OPTIMIZER_DOCTRINE not found on window.");
@@ -92,6 +65,74 @@
       name: hasAny ? (name || fallback.name) : fallback.name,
       description: hasAny ? (description || fallback.description) : fallback.description
     };
+  }
+
+  function collectUnitText(unit, leaderObj) {
+    const parts = [];
+    if (unit && unit.name) parts.push(String(unit.name));
+    if (unit && unit.title) parts.push(String(unit.title));
+    if (leaderObj) {
+      if (leaderObj.name) parts.push(String(leaderObj.name));
+      if (leaderObj.description) parts.push(String(leaderObj.description));
+    }
+    const act = Array.isArray(unit.activeSkillDetails) ? unit.activeSkillDetails
+              : (Array.isArray(unit.activeSkills) ? unit.activeSkills : []);
+    for (const s of act) {
+      if (!s || typeof s !== "object") continue;
+      if (s.name) parts.push(String(s.name));
+      if (s.raw) parts.push(String(s.raw));
+      if (s.target) parts.push(String(s.target));
+      if (s.description) parts.push(String(s.description));
+    }
+    const pas = Array.isArray(unit.passiveSkillDetails) ? unit.passiveSkillDetails : [];
+    for (const p of pas) {
+      if (!p || typeof p !== "object") continue;
+      if (p.name) parts.push(String(p.name));
+      if (p.description) parts.push(String(p.description));
+    }
+    const ps = Array.isArray(unit.passiveSkills) ? unit.passiveSkills : [];
+    for (const p of ps) if (p != null) parts.push(String(p));
+    return parts.join(" ");
+  }
+
+
+  function collectUnitText(unit, leaderObj) {
+    const parts = [];
+    // identity
+    if (unit && unit.name) parts.push(String(unit.name));
+    if (unit && unit.title) parts.push(String(unit.title));
+
+    // leader
+    if (leaderObj) {
+      if (leaderObj.name) parts.push(String(leaderObj.name));
+      if (leaderObj.description) parts.push(String(leaderObj.description));
+    }
+
+    // active skills (support both activeSkillDetails and activeSkills shapes)
+    const act = Array.isArray(unit.activeSkillDetails)
+      ? unit.activeSkillDetails
+      : (Array.isArray(unit.activeSkills) ? unit.activeSkills : []);
+    for (const sk of act) {
+      if (!sk || typeof sk !== 'object') continue;
+      if (sk.name) parts.push(String(sk.name));
+      if (sk.raw) parts.push(String(sk.raw));
+      if (sk.target) parts.push(String(sk.target));
+      if (sk.description) parts.push(String(sk.description));
+    }
+
+    // passive skill details
+    const pas = Array.isArray(unit.passiveSkillDetails) ? unit.passiveSkillDetails : [];
+    for (const pa of pas) {
+      if (!pa || typeof pa !== 'object') continue;
+      if (pa.name) parts.push(String(pa.name));
+      if (pa.description) parts.push(String(pa.description));
+    }
+
+    // passive skills as strings (if present)
+    const ps = Array.isArray(unit.passiveSkills) ? unit.passiveSkills : [];
+    for (const x of ps) if (x != null) parts.push(String(x));
+
+    return parts.join(' ');
   }
 
   function extractPercentMax(text) {
@@ -270,10 +311,11 @@
       const stats = extractStats(u);
       const leader = normalizeLeaderSkill(u);
       const leaderText = `${leader.name} ${leader.description}`;
+      const unitText = collectUnitText(u, leader);
 
       const elementsMentioned = detectElementsMentioned(leaderText);
       const parsedPercentMax = extractPercentMax(leaderText);
-      const keywordTags = tagsFromKeywords(leaderText);
+      const keywordTags = tagsFromKeywords(unitText);
       const isGenericAllies = detectGenericAllies(leaderText);
 
       const tagSet = coerceTagSet(u);
@@ -1016,7 +1058,6 @@
 
   /* ---------- main run ---------- */
   function run(unitsRaw, options) {
-    DOCTRINE = resolveDoctrine(options && options.doctrineOverrides);
     const ownedViewsAll = buildUnitViews(unitsRaw || []);
 
     const ownedSet = new Set(ownedViewsAll.map(v => v.id));
