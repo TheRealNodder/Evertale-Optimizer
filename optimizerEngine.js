@@ -1,4 +1,4 @@
-/* optimizerEngine.js — Presets from derivedTags + Auto preset + Locked Leader inclusion
+/* optimizerEngine.js — derivedTags presets + slot locks + hard mono enforcement
    Exposes: window.OptimizerEngine.run(ownedUnits, options)
 */
 
@@ -8,7 +8,7 @@
   const normId = (v) => (v == null || v === "" ? "" : String(v));
   const lc = (s) => String(s || "").trim().toLowerCase();
 
-  // ---------- DOCTRINE MERGE ----------
+  // ---------- DOCTRINE ----------
   function structuredCloneSafe(obj) {
     try { return structuredClone(obj); } catch { return JSON.parse(JSON.stringify(obj || {})); }
   }
@@ -42,59 +42,21 @@
   }
 
   const PRESET_DEFS = {
-    burn: {
-      include: ["burn_apply","burn_synergy","frostburn_apply","burn_tier_healing","burn_tier_mega_healing"],
-      soft: ["status_spread","infect","tu_manip","purify","ward_burn"],
-      exclude: ["burn_anti"]
-    },
-    poison: {
-      include: ["poison_apply","poison_synergy","poison_tier_lethal","poison_tier_mega","poison_tier_super"],
-      soft: ["status_spread","infect","tu_manip","purify","ward_poison"],
-      exclude: ["poison_anti"]
-    },
-    sleep: {
-      include: ["sleep_apply","sleep_synergy","frostburn_apply"],
-      soft: ["tu_manip","ward_sleep","purify"],
-      exclude: ["sleep_anti"]
-    },
-    stun: {
-      include: ["stun_apply","stun_synergy"],
-      soft: ["tu_manip","ward_stun","purify"],
-      exclude: ["stun_anti"]
-    },
-    heal: {
-      include: ["heal","revive","purify"],
-      soft: ["damage_reduction"],
-      exclude: []
-    },
-    turn: {
-      include: ["tu_manip"],
-      soft: ["sleep_apply","stun_apply"],
-      exclude: []
-    },
-    cleanse: {
-      include: ["purify"],
-      soft: ["ward_burn","ward_poison","ward_sleep","ward_stun"],
-      exclude: []
-    },
-    hpBuff: {
-      include: ["damage_reduction"],
-      soft: ["heal","purify"],
-      exclude: []
-    },
-    atkBuff: { include: [], soft: [], exclude: [] }
+    burn:   { include:["burn_apply","burn_synergy","frostburn_apply","burn_tier_healing","burn_tier_mega_healing"], soft:["status_spread","infect","tu_manip","purify","ward_burn"], exclude:["burn_anti"] },
+    poison: { include:["poison_apply","poison_synergy","poison_tier_lethal","poison_tier_mega","poison_tier_super"], soft:["status_spread","infect","tu_manip","purify","ward_poison"], exclude:["poison_anti"] },
+    sleep:  { include:["sleep_apply","sleep_synergy","frostburn_apply"], soft:["tu_manip","ward_sleep","purify"], exclude:["sleep_anti"] },
+    stun:   { include:["stun_apply","stun_synergy"], soft:["tu_manip","ward_stun","purify"], exclude:["stun_anti"] },
+    heal:   { include:["heal","revive","purify"], soft:["damage_reduction"], exclude:[] },
+    turn:   { include:["tu_manip"], soft:["sleep_apply","stun_apply"], exclude:[] },
+    cleanse:{ include:["purify"], soft:["ward_burn","ward_poison","ward_sleep","ward_stun"], exclude:[] },
+    hpBuff: { include:["damage_reduction"], soft:["heal","purify"], exclude:[] },
+    atkBuff:{ include:[], soft:[], exclude:[] }
   };
-
   const PRESET_KEYS = Object.keys(PRESET_DEFS).filter(k => k !== "atkBuff");
 
-  function anyTag(tags, list) {
-    for (const t of list) if (tags.has(t)) return true;
-    return false;
-  }
-
+  function anyTag(tags, list) { for (const t of list) if (tags.has(t)) return true; return false; }
   function scoreUnitForPreset(tags, presetKey) {
-    const def = PRESET_DEFS[presetKey];
-    if (!def) return 0;
+    const def = PRESET_DEFS[presetKey]; if (!def) return 0;
     let score = 0;
     for (const t of def.include) if (tags.has(t)) score += 3;
     for (const t of def.soft) if (tags.has(t)) score += 1;
@@ -102,35 +64,23 @@
     return score;
   }
 
-  // Auto-preset: choose best supported plan; bias toward locked leader tags if present
-  function chooseAutoPreset(units, lockedLeader) {
-    let best = { key: "", strongCount: -1, total: -Infinity };
+  function chooseAutoPreset(units, forcedUnits) {
+    let best = { key: "", strong: -1, total: -Infinity };
     for (const key of PRESET_KEYS) {
       const def = PRESET_DEFS[key];
-      let strong = 0;
-      let total = 0;
-
+      let strong = 0, total = 0;
       for (const u of units) {
-        const tags = u.__opt.tags;
-        total += scoreUnitForPreset(tags, key);
-        if (anyTag(tags, def.include)) strong += 1;
+        total += scoreUnitForPreset(u.__opt.tags, key);
+        if (anyTag(u.__opt.tags, def.include)) strong++;
       }
-
-      // bias: if locked leader supports this preset, add a big bump
-      if (lockedLeader) {
-        const lt = lockedLeader.__opt.tags;
-        if (anyTag(lt, def.include)) {
-          strong += 3;
-          total += 25;
-        }
-        if (anyTag(lt, def.exclude)) {
-          total -= 25;
+      // bias: if forced units support, boost; if forced is anti, reduce
+      if (forcedUnits && forcedUnits.length) {
+        for (const fu of forcedUnits) {
+          if (anyTag(fu.__opt.tags, def.include)) { strong += 2; total += 20; }
+          if (anyTag(fu.__opt.tags, def.exclude)) { total -= 20; }
         }
       }
-
-      if (strong > best.strongCount || (strong === best.strongCount && total > best.total)) {
-        best = { key, strongCount: strong, total };
-      }
+      if (strong > best.strong || (strong === best.strong && total > best.total)) best = { key, strong, total };
     }
     return best.key || "burn";
   }
@@ -140,29 +90,18 @@
     const s = u.stats || {};
     return {
       atk: +((s.atk ?? u.atk) || 0),
-      hp: +((s.hp ?? u.hp) || 0),
+      hp:  +((s.hp  ?? u.hp)  || 0),
       spd: +((s.spd ?? u.spd) || 0),
-      cost: +((s.cost ?? u.cost) || 1),
+      cost:+((s.cost?? u.cost)|| 1),
     };
   }
 
   // ---------- ELEMENT ----------
   function getElement(u) {
-    if (u.__opt.tags) {
+    if (u.__opt && u.__opt.tags) {
       for (const t of u.__opt.tags) if (t.startsWith("elem_")) return t.slice(5);
     }
     return lc(u.element);
-  }
-
-  function elementProfile(team) {
-    const counts = new Map();
-    for (const u of team) {
-      const e = getElement(u) || "unknown";
-      counts.set(e, (counts.get(e) || 0) + 1);
-    }
-    const sorted = [...counts.entries()].sort((a,b)=>b[1]-a[1]);
-    const top = sorted[0] || ["unknown", 0];
-    return { distinct: counts.size, topCount: top[1], topElement: top[0] };
   }
 
   // ---------- SCORING ----------
@@ -170,7 +109,6 @@
     const w = doctrine.scoringModel?.baseStats || {};
     const { atk, hp, spd, cost } = stats(u);
     const eff = atk / Math.max(1, cost);
-
     let score =
       atk * (w.atkWeight ?? 0.42) +
       spd * (w.spdWeight ?? 0.28) +
@@ -178,9 +116,7 @@
       eff * (w.efficiencyAtkPerCostWeight ?? 0.10);
 
     const presetKey = options?.presetKey || "";
-    if (presetKey && PRESET_DEFS[presetKey]) {
-      score += scoreUnitForPreset(u.__opt.tags, presetKey) * 1500;
-    }
+    if (presetKey && PRESET_DEFS[presetKey]) score += scoreUnitForPreset(u.__opt.tags, presetKey) * 1500;
 
     return score;
   }
@@ -193,34 +129,16 @@
     let presetCohesion = 0;
     if (presetKey && PRESET_DEFS[presetKey]) {
       const def = PRESET_DEFS[presetKey];
-      let strongCount = 0;
-      let antiCount = 0;
+      let strong = 0, anti = 0;
       for (const u of team) {
-        if (anyTag(u.__opt.tags, def.include)) strongCount++;
-        if (anyTag(u.__opt.tags, def.exclude)) antiCount++;
+        if (anyTag(u.__opt.tags, def.include)) strong++;
+        if (anyTag(u.__opt.tags, def.exclude)) anti++;
       }
-      presetCohesion += strongCount * 1.2;
-      presetCohesion -= antiCount * 2.5;
+      presetCohesion += strong * 1.2;
+      presetCohesion -= anti * 2.5;
     }
 
-    const prof = elementProfile(team);
-    const selMode = doctrine.monoVsRainbow?.selectionMode || "auto";
-
-    let elemScore = 0;
-    if (selMode === "force_mono") {
-      elemScore += (prof.distinct === 1) ? 5.0 : -9999;
-    } else if (selMode === "force_rainbow") {
-      const minDistinct = doctrine.monoVsRainbow?.rainbowThreshold?.storyDistinctElementsMin ?? 4;
-      elemScore += (prof.distinct >= minDistinct) ? 2.5 : -4.0;
-    } else {
-      const monoRatio = prof.topCount / Math.max(1, team.length);
-      if (monoRatio >= 0.75) elemScore += 0.8;
-      if (prof.distinct >= 4) elemScore += 0.6;
-    }
-
-    return (base / 5000) +
-      (presetCohesion * (add.pairSynergyWeight ?? 0.35)) +
-      (elemScore * (add.elementStrategyWeight ?? 0.4));
+    return (base / 5000) + (presetCohesion * (add.pairSynergyWeight ?? 0.35));
   }
 
   function topCandidates(units, limit) {
@@ -228,40 +146,67 @@
     return sorted.slice(0, Math.min(limit, sorted.length));
   }
 
-  // Beam search with optional forced-in units
-  function buildStoryBeam(doctrine, pool, options, forcedUnits) {
-    const beamWidth = doctrine.optimizerSearch?.beamWidthStory ?? 120;
-    const target = 8;
-
-    const forced = Array.isArray(forcedUnits) ? forcedUnits : [];
-    const forcedIds = new Set(forced.map(u => normId(u.id)));
-    const startTeam = forced.slice(0, target);
-
-    let beam = [{ team: startTeam, score: teamScore(doctrine, startTeam, options) }];
-
-    for (let step = startTeam.length; step < target; step++) {
-      const next = [];
-      for (const b of beam) {
-        for (const u of pool) {
-          const id = normId(u.id);
-          if (b.team.some(x => normId(x.id) === id)) continue;
-          // never add duplicates of forced
-          if (forcedIds.has(id) && !b.team.some(x => normId(x.id) === id)) {
-            // (already handled by duplicate check; kept for clarity)
-          }
-          const t = b.team.concat([u]);
-          const s = teamScore(doctrine, t, options);
-          next.push({ team: t, score: s });
-        }
+  // ---------- LOCK EXTRACTION ----------
+  function forcedFromLocks(unitsById, layout, locks, sectionKey, maxSlots) {
+    // sectionKey: "storyMain"|"storyBack"|`platoon_${p}`
+    const forced = [];
+    for (let i=0;i<maxSlots;i++) {
+      let locked = false;
+      let id = "";
+      if (sectionKey === "storyMain") { locked = !!locks.storyMain[i]; id = normId(layout.storyMain[i] || ""); }
+      else if (sectionKey === "storyBack") { locked = !!locks.storyBack[i]; id = normId(layout.storyBack[i] || ""); }
+      else if (sectionKey.startsWith("platoon_")) {
+        const p = parseInt(sectionKey.split("_")[1], 10);
+        locked = !!locks.platoons[p][i];
+        id = normId((layout.platoons[p] && layout.platoons[p][i]) || "");
       }
-      next.sort((a,b)=>b.score - a.score);
-      beam = next.slice(0, beamWidth);
+      if (locked && id && unitsById.has(id)) forced.push(unitsById.get(id));
+    }
+    return forced;
+  }
+
+  // ---------- HARD MONO ENFORCEMENT ----------
+  function pickAnchorElementForTeam(forcedUnits, candidateUnits, neededCount) {
+    // If forced exists, anchor = element of first forced
+    if (forcedUnits && forcedUnits.length) return getElement(forcedUnits[0]) || "";
+
+    // Else pick the element with most candidates available to fill neededCount
+    const counts = new Map();
+    for (const u of candidateUnits) {
+      const e = getElement(u) || "";
+      if (!e) continue;
+      counts.set(e, (counts.get(e) || 0) + 1);
+    }
+    let bestElem = "";
+    let bestCnt = -1;
+    for (const [e,c] of counts.entries()) {
+      if (c > bestCnt) { bestCnt = c; bestElem = e; }
+    }
+    // If best cannot fill, still return it (best possible mono)
+    if (bestCnt >= neededCount) return bestElem;
+    return bestElem;
+  }
+
+  // Beam-ish fill: forced first, then greedily fill from best candidates
+  function buildTeamFixedSize(doctrine, pool, forcedUnits, size, options) {
+    const forcedIds = new Set((forcedUnits||[]).map(u => normId(u.id)));
+    const team = [...(forcedUnits || [])].slice(0, size);
+
+    for (const u of pool) {
+      if (team.length >= size) break;
+      const id = normId(u.id);
+      if (forcedIds.has(id)) continue;
+      if (team.some(x => normId(x.id) === id)) continue;
+      team.push(u);
     }
 
-    const best = beam[0]?.team || [];
+    // If still short, just return what we have
+    return team;
+  }
 
-    // Assign main/back
-    const scored = best.map(u => {
+  function assignStoryMainBack(team8) {
+    // heuristic: fast/control -> main, atk/sustain -> back
+    const scored = team8.map(u => {
       const st = stats(u);
       const tags = u.__opt.tags;
       const control = (tags.has("sleep_apply") || tags.has("stun_apply") || tags.has("tu_manip")) ? 1 : 0;
@@ -269,100 +214,115 @@
 
       const front = st.spd * 0.6 + control * 2000 + st.hp * 0.1;
       const back  = st.atk * 0.6 + sustain * 2000;
-
       return { u, front, back };
     });
 
     scored.sort((a,b)=>b.front - a.front);
     const main = scored.slice(0,5).map(x => normId(x.u.id));
     const rest = scored.slice(5);
-
     rest.sort((a,b)=>b.back - a.back);
     const back = rest.slice(0,3).map(x => normId(x.u.id));
-
-    return { main, back, used: new Set(main.concat(back).filter(Boolean)) };
+    return { main, back };
   }
 
-  function buildStory(doctrine, units, options, lockedLeader) {
+  // ---------- BUILD STORY ----------
+  function buildStory(doctrine, units, options, unitsById) {
     const poolSize = doctrine.optimizerSearch?.candidatePoolSize ?? 80;
     const presetKey = options.presetKey || "";
     const def = presetKey ? PRESET_DEFS[presetKey] : null;
 
-    // force mono element to locked leader’s element when locked leader + force_mono
-    const forceMono = doctrine.monoVsRainbow?.selectionMode === "force_mono";
-    const lockedElem = lockedLeader ? getElement(lockedLeader) : "";
+    const layout = options.currentLayout || {};
+    const locks = options.slotLocks || null;
+    const forcedMain = locks ? forcedFromLocks(unitsById, layout, locks, "storyMain", 5) : [];
+    const forcedBack = locks ? forcedFromLocks(unitsById, layout, locks, "storyBack", 3) : [];
+    const forcedUnits = [...forcedMain, ...forcedBack];
 
-    // Base pool
-    let basePool = topCandidates(units, poolSize);
-
-    // If force mono + locked leader -> restrict to leader element if feasible
-    if (forceMono && lockedLeader && lockedElem) {
-      const monoPool = basePool.filter(u => getElement(u) === lockedElem);
-      if (monoPool.length >= 8) basePool = monoPool;
+    // preset resolution (auto can be biased by forced units)
+    if (!options.presetKey && options.presetMode === "auto") {
+      options.presetKey = chooseAutoPreset(units, forcedUnits);
     }
 
-    // Preset hard filtering for non-locked picks:
-    // Avoid exclude tags if possible, but never exclude the locked leader.
+    // candidates (exclude forced duplicates)
+    const forcedIds = new Set(forcedUnits.map(u => normId(u.id)));
+    let pool = topCandidates(units.filter(u => !forcedIds.has(normId(u.id))), poolSize);
+
+    // preset filtering for non-forced picks
     if (def) {
-      const positives = basePool.filter(u => anyTag(u.__opt.tags, def.include));
+      const positives = pool.filter(u => anyTag(u.__opt.tags, def.include));
       const safePositives = positives.filter(u => !anyTag(u.__opt.tags, def.exclude));
-
-      if (safePositives.length >= 8) basePool = safePositives;
-      else if (positives.length >= 8) basePool = positives;
+      if (safePositives.length >= (8 - forcedUnits.length)) pool = safePositives;
+      else if (positives.length >= (8 - forcedUnits.length)) pool = positives;
     }
 
-    // If locked leader exists, force-in to beam start
-    const forced = lockedLeader ? [lockedLeader] : [];
-    // Ensure pool does not accidentally remove locked leader
-    const pool = basePool;
+    // mono enforcement (per team)
+    const forceMono = doctrine.monoVsRainbow?.selectionMode === "force_mono";
+    if (forceMono) {
+      const anchor = pickAnchorElementForTeam(forcedUnits, pool, 8 - forcedUnits.length);
+      if (anchor) {
+        pool = pool.filter(u => getElement(u) === anchor);
+      }
+    }
 
-    return buildStoryBeam(doctrine, pool, options, forced);
+    // Build 8
+    const team8 = buildTeamFixedSize(doctrine, pool, forcedUnits, 8, options);
+
+    // Assign main/back but keep locked placements later (optimizer.js applies only into unlocked slots)
+    const ids = assignStoryMainBack(team8);
+    const used = new Set([...ids.main, ...ids.back].filter(Boolean));
+    return { main: ids.main, back: ids.back, used };
   }
 
-  function buildPlatoons(doctrine, units, used, options) {
+  // ---------- BUILD PLATOONS ----------
+  function buildPlatoons(doctrine, units, used, options, unitsById) {
     const presetKey = options.presetKey || "";
     const def = presetKey ? PRESET_DEFS[presetKey] : null;
 
-    const remaining = units.filter(u => !used.has(normId(u.id)));
-    const poolAll = topCandidates(remaining, Math.max(remaining.length, 200));
+    const layout = options.currentLayout || {};
+    const locks = options.slotLocks || null;
 
+    const consumed = new Set([...used].map(normId));
     const platoons = [];
-    const consumed = new Set([...used]);
 
-    for (let p = 0; p < 20; p++) {
-      const team = [];
+    for (let p=0;p<20;p++) {
+      const forced = locks ? forcedFromLocks(unitsById, layout, locks, `platoon_${p}`, 5) : [];
+      const forcedIds = new Set(forced.map(u => normId(u.id)));
 
+      // start from remaining (exclude consumed and forced)
+      let candidates = units.filter(u => !consumed.has(normId(u.id)) && !forcedIds.has(normId(u.id)));
+      // compute base pool
+      candidates = topCandidates(candidates, Math.max(200, candidates.length));
+
+      // preset filtering for non-forced picks
       if (def) {
-        const candidates = poolAll
-          .filter(u => !consumed.has(normId(u.id)))
-          .filter(u => anyTag(u.__opt.tags, def.include));
-
-        const safe = candidates.filter(u => !anyTag(u.__opt.tags, def.exclude));
-        const takeFrom = safe.length ? safe : candidates;
-
-        for (const u of takeFrom) {
-          if (team.length >= 5) break;
-          team.push(u);
-          consumed.add(normId(u.id));
-        }
+        const positives = candidates.filter(u => anyTag(u.__opt.tags, def.include));
+        const safe = positives.filter(u => !anyTag(u.__opt.tags, def.exclude));
+        if (safe.length >= (5 - forced.length)) candidates = safe;
+        else if (positives.length >= (5 - forced.length)) candidates = positives;
       }
 
-      for (const u of poolAll) {
-        if (team.length >= 5) break;
-        if (consumed.has(normId(u.id))) continue;
-        team.push(u);
-        consumed.add(normId(u.id));
+      // mono enforcement per platoon
+      const forceMono = doctrine.monoVsRainbow?.selectionMode === "force_mono";
+      if (forceMono) {
+        const anchor = pickAnchorElementForTeam(forced, candidates, 5 - forced.length);
+        if (anchor) candidates = candidates.filter(u => getElement(u) === anchor);
       }
 
-      platoons.push({ units: team.map(u => normId(u.id)) });
+      const team = buildTeamFixedSize(doctrine, candidates, forced, 5, options);
+      const ids = team.map(u => normId(u.id));
+
+      // mark consumed
+      for (const id of ids) if (id) consumed.add(id);
+
+      platoons.push({ units: ids });
     }
 
     return platoons;
   }
 
+  // ---------- RUN ----------
   function run(ownedUnits, options) {
     const doctrine = getDoctrineMerged(options || {});
-    const opts = options || {};
+    const opts = structuredCloneSafe(options || {});
 
     const units = (ownedUnits || []).map(u => {
       const clone = Object.assign({}, u);
@@ -371,35 +331,21 @@
       return clone;
     });
 
-    // Locked leader resolve
-    const lockedLeaderId = normId(opts.lockedLeaderId || "");
-    const lockedLeader = lockedLeaderId ? units.find(u => normId(u.id) === lockedLeaderId) : null;
-
-    // preset resolution
+    // preset key handling
     let presetKey = lc(opts.presetTag || "");
     const presetMode = lc(opts.presetMode || "off");
-
-    if (!presetKey && presetMode === "auto") {
-      presetKey = chooseAutoPreset(units, lockedLeader);
-    }
     if (presetKey && !PRESET_DEFS[presetKey]) presetKey = "";
+    opts.presetKey = presetKey;
+    opts.presetMode = presetMode;
 
-    const runOptions = Object.assign({}, opts, { presetKey });
+    for (const u of units) u.__opt.base = unitBase(doctrine, u, opts);
 
-    // compute base scores
-    for (const u of units) {
-      u.__opt.base = unitBase(doctrine, u, runOptions);
-    }
+    const unitsById = new Map(units.map(u => [normId(u.id), u]));
 
-    if (units.length === 0) return { story: { main: [], back: [] }, platoons: [] };
+    const story = buildStory(doctrine, units, opts, unitsById);
+    const platoons = buildPlatoons(doctrine, units, story.used, opts, unitsById);
 
-    // Story: forced locked leader included (if present)
-    const story = buildStory(doctrine, units, runOptions, lockedLeader);
-
-    // Platoons: built from remaining (locked leader already consumed if in story)
-    const platoons = buildPlatoons(doctrine, units, story.used, runOptions);
-
-    return { story: { main: story.main, back: story.back }, platoons, presetKey };
+    return { story: { main: story.main, back: story.back }, platoons, presetKey: opts.presetKey || "" };
   }
 
   window.OptimizerEngine = { run };
