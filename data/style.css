@@ -1,0 +1,96 @@
+/* =========================================================
+   FIX: Desktop Compact overflow / “card doesn’t contain items”
+   Paste this NEAR THE END of style.css so it overrides earlier rules.
+   ========================================================= */
+
+/* 1) Compact grid: prevent cards from getting too narrow */
+body.mobile-compact #unitGrid {
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)) !important;
+  gap: 12px !important;
+}
+
+/* 2) Remove the old desktop compact overrides that crush width
+      (DELETE these if they exist earlier in your file):
+
+@media (min-width: 700px) {
+  body.mobile-compact #unitGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+}
+@media (min-width: 1000px) {
+  body.mobile-compact #unitGrid {
+    grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+  }
+}
+*/
+
+/* 3) Keep content visually contained inside the card */
+.unitCard {
+  overflow: hidden;
+  min-width: 0;
+}
+
+/* 4) Allow text to wrap instead of pushing layout outside */
+.unitName,
+.unitTitle,
+.unitSub,
+.leaderDesc {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* 5) (Optional but recommended) tighten the compact card layout a bit
+      so it looks “compact” without breaking */
+body.mobile-compact .unitCard {
+  grid-template-columns: 72px 1fr;
+  gap: 10px;
+  padding: 10px;
+}
+
+body.mobile-compact .unitThumb {
+  width: 72px;
+  height: 72px;
+  border-radius: 10px;
+}
+
+/* ================================
+   View mode scoping fix
+   - Desktop always uses detailed layout
+   - Mobile compact/detailed only apply on small screens
+   ================================= */
+
+/* Desktop: always detailed */
+@media (min-width: 901px) {
+  /* Ensure details are visible on desktop even if body has mobile-compact */
+  .unitDetails { display: block !important; }
+
+  /* Make desktop grid roomy */
+  #unitGrid, .unitGrid, .grid {
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)) !important;
+  }
+}
+
+/* Mobile-only: compact/detailed modes */
+@media (max-width: 900px) {
+  /* Compact: 3 per row, hide long details */
+  body.mobile-compact #unitGrid,
+  body.mobile-compact .unitGrid,
+  body.mobile-compact .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+
+  body.mobile-compact .unitDetails {
+    display: none !important;
+  }
+
+  /* Detailed: 1 per row, show details */
+  body.mobile-detailed #unitGrid,
+  body.mobile-detailed .unitGrid,
+  body.mobile-detailed .grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  body.mobile-detailed .unitDetails {
+    display: block !important;
+  }
+}
