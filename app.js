@@ -3,6 +3,7 @@
    - De-dupe characters.json by id (prevents duplicate roster cards)
    - Tap anywhere on card toggles Owned
    - Long-press + drag across cards toggles many quickly (each card once per drag)
+   - Desktop fix: mobile compact/detailed classes only apply on mobile widths
 */
 
 const DATA_CHARACTERS = "./data/characters.json";
@@ -33,22 +34,40 @@ const dragState = {
 const $ = (s) => document.querySelector(s);
 
 function loadOwned() {
-  try { return new Set(JSON.parse(localStorage.getItem(LS_OWNED_KEY) || "[]")); }
-  catch { return new Set(); }
+  try {
+    return new Set(JSON.parse(localStorage.getItem(LS_OWNED_KEY) || "[]"));
+  } catch {
+    return new Set();
+  }
 }
 function saveOwned() {
   localStorage.setItem(LS_OWNED_KEY, JSON.stringify([...state.owned]));
 }
 
 function getMobileViewPref() {
-  try { return localStorage.getItem(LS_MOBILE_VIEW_KEY) || "compact"; }
-  catch { return "compact"; }
+  try {
+    return localStorage.getItem(LS_MOBILE_VIEW_KEY) || "compact";
+  } catch {
+    return "compact";
+  }
 }
 function setMobileViewPref(v) {
-  try { localStorage.setItem(LS_MOBILE_VIEW_KEY, v); } catch {}
+  try {
+    localStorage.setItem(LS_MOBILE_VIEW_KEY, v);
+  } catch {}
 }
+
+/**
+ * Desktop fix: only apply mobile compact/detailed classes when viewport is "mobile".
+ * On desktop, we remove both classes so the desktop layout is never forced compact.
+ */
 function applyMobileViewClass(view) {
+  const isMobile = window.matchMedia("(max-width: 900px)").matches;
+
   document.body.classList.remove("mobile-compact", "mobile-detailed");
+
+  if (!isMobile) return;
+
   if (view === "detailed") document.body.classList.add("mobile-detailed");
   else document.body.classList.add("mobile-compact");
 }
@@ -222,7 +241,10 @@ function endDragSelect() {
     clearTimeout(dragState.timer);
     dragState.timer = null;
   }
-  setTimeout(() => { dragState.suppressNextClick = false; }, 0);
+  // allow click again after release
+  setTimeout(() => {
+    dragState.suppressNextClick = false;
+  }, 0);
 }
 
 function armLongPress(startX, startY) {
@@ -232,6 +254,7 @@ function armLongPress(startX, startY) {
 
   if (dragState.timer) clearTimeout(dragState.timer);
 
+  // Long-press threshold (ms)
   dragState.timer = setTimeout(() => {
     if (!dragState.armed || dragState.active) return;
     beginDragSelect();
@@ -251,62 +274,79 @@ function cancelLongPress() {
 function dragToggleCardOnce(cardEl) {
   const id = cardEl.getAttribute("data-unit-id");
   if (!id) return;
-  if (dragState.toggledIds.has(id)) return;
+  if (dragState.toggledIds.has(id)) return; // only once per drag
   dragState.toggledIds.add(id);
   toggleOwnedForCard(cardEl);
 }
 
 function wireDragSelect(gridEl) {
-  // Prevent wiring multiple times per render
   if (gridEl.__dragWired) return;
   gridEl.__dragWired = true;
 
-  gridEl.addEventListener("pointerdown", (e) => {
-    const card = e.target?.closest?.(".unitCard");
-    if (!card) return;
+  gridEl.addEventListener(
+    "pointerdown",
+    (e) => {
+      const card = e.target?.closest?.(".unitCard");
+      if (!card) return;
 
-    if (e.target && (e.target.tagName === "INPUT" || e.target.closest("label"))) return;
+      // direct checkbox/label interaction should not arm drag-select
+      if (e.target && (e.target.tagName === "INPUT" || e.target.closest("label"))) return;
 
-    dragState.pointerId = e.pointerId;
-    dragState.lastX = e.clientX;
-    dragState.lastY = e.clientY;
+      dragState.pointerId = e.pointerId;
+      dragState.lastX = e.clientX;
+      dragState.lastY = e.clientY;
 
-    armLongPress(e.clientX, e.clientY);
-  }, { passive: true });
+      armLongPress(e.clientX, e.clientY);
+    },
+    { passive: true }
+  );
 
-  gridEl.addEventListener("pointermove", (e) => {
-    if (dragState.pointerId != null && e.pointerId !== dragState.pointerId) return;
+  gridEl.addEventListener(
+    "pointermove",
+    (e) => {
+      if (dragState.pointerId != null && e.pointerId !== dragState.pointerId) return;
 
-    dragState.lastX = e.clientX;
-    dragState.lastY = e.clientY;
+      dragState.lastX = e.clientX;
+      dragState.lastY = e.clientY;
 
-    if (!dragState.active && dragState.armed) {
-      const dx = Math.abs(e.clientX - dragState.startX);
-      const dy = Math.abs(e.clientY - dragState.startY);
-      if (dx + dy > 10) cancelLongPress();
-      return;
-    }
+      // If finger moved before long-press triggers, cancel long-press and allow scroll
+      if (!dragState.active && dragState.armed) {
+        const dx = Math.abs(e.clientX - dragState.startX);
+        const dy = Math.abs(e.clientY - dragState.startY);
+        if (dx + dy > 10) cancelLongPress();
+        return;
+      }
 
-    if (dragState.active) {
-      const card = cardFromPoint(e.clientX, e.clientY);
-      if (card) dragToggleCardOnce(card);
-      e.preventDefault?.();
-    }
-  }, { passive: false });
+      if (dragState.active) {
+        const card = cardFromPoint(e.clientX, e.clientY);
+        if (card) dragToggleCardOnce(card);
+        e.preventDefault?.();
+      }
+    },
+    { passive: false }
+  );
 
-  gridEl.addEventListener("pointerup", (e) => {
-    if (dragState.pointerId != null && e.pointerId !== dragState.pointerId) return;
-    cancelLongPress();
-    if (dragState.active) endDragSelect();
-    else dragState.pointerId = null;
-  }, { passive: true });
+  gridEl.addEventListener(
+    "pointerup",
+    (e) => {
+      if (dragState.pointerId != null && e.pointerId !== dragState.pointerId) return;
+      cancelLongPress();
+      if (dragState.active) endDragSelect();
+      else dragState.pointerId = null;
+    },
+    { passive: true }
+  );
 
-  gridEl.addEventListener("pointercancel", (e) => {
-    if (dragState.pointerId != null && e.pointerId !== dragState.pointerId) return;
-    cancelLongPress();
-    if (dragState.active) endDragSelect();
-    else dragState.pointerId = null;
-  }, { passive: true });
+  gridEl.addEventListener(
+    "pointercancel",
+    (e) => {
+      if (dragState.pointerId != null && e.pointerId !== dragState.pointerId) return;
+      cancelLongPress();
+      if (dragState.active) endDragSelect();
+      else dragState.pointerId = null;
+    },
+    { passive: true }
+  );
 }
 
 function renderRoster() {
@@ -457,6 +497,12 @@ async function init() {
 
   const view = getMobileViewPref();
   applyMobileViewClass(view);
+
+  // Desktop fix: re-apply when resizing / rotating
+  window.addEventListener("resize", () => {
+    applyMobileViewClass(getMobileViewPref());
+  });
+
   const viewBtn = $("#mobileViewBtn");
   if (viewBtn) viewBtn.textContent = `View: ${view === "compact" ? "Compact" : "Detailed"}`;
 
