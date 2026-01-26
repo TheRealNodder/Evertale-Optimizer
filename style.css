@@ -45,20 +45,45 @@ html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:
    ========================================================= */
 .rosterGrid{display:grid;gap:12px}
 
-/* Default grid before JS applies mode class */
+/* Default grid (desktop/tablet baseline) */
 #unitGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 @media (min-width:700px){#unitGrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (min-width:1000px){#unitGrid{grid-template-columns:repeat(4,minmax(0,1fr))}}
 
-/* Detailed = 1 per row */
-body.mobile-detailed #unitGrid{grid-template-columns:1fr!important;gap:12px!important}
-body.mobile-detailed .unitDetails{display:block!important}
+/* =========================================================
+   VIEW MODES (COMPACT vs DETAILED)
+   - Applies up to 900px (phones + tablets)
+   - Compact keeps stats + leader visible; hides heavy panels only
+   ========================================================= */
+@media (max-width:900px){
 
-/* Compact = adaptive columns, prevents “letters in a column” on desktop */
-body.mobile-compact #unitGrid{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))!important;gap:12px!important}
-body.mobile-compact .unitDetails{display:none!important}
-body.mobile-compact .unitCard.expanded .unitDetails{
-  display:block!important;border-top:1px solid var(--line)!important;padding-top:8px!important;margin-top:6px!important
+  /* Detailed = 1 per row */
+  body.mobile-detailed #unitGrid{
+    grid-template-columns:1fr!important;
+    gap:12px!important;
+  }
+  body.mobile-detailed .unitDetails{
+    display:block!important;
+  }
+  body.mobile-detailed .unitDetails .panel{
+    display:block!important;
+  }
+
+  /* Compact = 3 per row */
+  body.mobile-compact #unitGrid{
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    gap:10px!important;
+  }
+
+  /* IMPORTANT: do not hide unitDetails globally (leader/stats live there) */
+  body.mobile-compact .unitDetails{
+    display:block!important;
+  }
+
+  /* Compact: hide heavy panels (skills/passives) */
+  body.mobile-compact .unitDetails .panel{
+    display:none!important;
+  }
 }
 
 /* =========================================================
@@ -100,7 +125,7 @@ body.mobile-compact .unitCard.expanded .unitDetails{
 .ownedRow{display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:12px;font-weight:900}
 .ownedCheck{width:18px;height:18px}
 
-/* Compact card tweak */
+/* Compact card tweak (general) */
 body.mobile-compact .unitCard{grid-template-columns:72px 1fr;gap:10px;padding:10px}
 body.mobile-compact .unitThumb{width:72px;height:72px;border-radius:10px}
 
@@ -147,16 +172,11 @@ body.mobile-compact .unitThumb{width:72px;height:72px;border-radius:10px}
 .slotSelect{width:100%;background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:8px 10px;outline:none}
 
 /* =========================================================
-   MOBILE: keep 3-per-row compact without vertical “letter columns”
+   MOBILE (<=900px): compact card layout + optimizer grids
    ========================================================= */
-@media (max-width:620px){
+@media (max-width:900px){
 
-  /* In compact mode on phones, use true compact cards (image on top + truncate) */
-  body.mobile-compact #unitGrid{
-    grid-template-columns:repeat(3,minmax(0,1fr))!important;
-    gap:10px!important;
-  }
-
+  /* Compact cards (image on top + truncate) */
   body.mobile-compact .unitCard{
     grid-template-columns:1fr!important;
     padding:8px!important;
