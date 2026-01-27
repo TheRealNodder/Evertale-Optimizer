@@ -108,8 +108,8 @@ html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:
 .unitThumb .ph{width:100%;height:100%;display:grid;place-items:center;font-weight:900;font-size:28px}
 .meta{display:flex;flex-direction:column;gap:8px;min-width:0}
 .topRow{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
-.unitName{font-weight:900;line-height:1.15;font-size:16px;overflow-wrap:anywhere;word-break:break-word}
-.unitTitle,.unitSub{font-size:13px;color:var(--muted);margin-top:2px;line-height:1.2;overflow-wrap:anywhere;word-break:break-word}
+.unitName{font-weight:900;line-height:1.15;font-size:16px;overflow-wrap:break-word;word-break:normal}
+.unitTitle,.unitSub{font-size:13px;color:var(--muted);margin-top:2px;line-height:1.2;overflow-wrap:break-word;word-break:normal}
 .tags{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
 .tag{font-size:12px;padding:4px 8px;border-radius:999px;background:var(--chip);border:1px solid var(--line);white-space:nowrap}
 .tag.rarity{background:var(--chip2);font-weight:900}
@@ -122,7 +122,7 @@ html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:
 /* Leader always visible */
 .leaderBlock{border-top:1px solid var(--line);padding-top:8px;display:block!important;visibility:visible!important;opacity:1!important}
 .leaderName{font-weight:900;font-size:13px}
-.leaderDesc{color:var(--muted);font-size:13px;margin-top:2px;line-height:1.25;overflow-wrap:anywhere;word-break:break-word}
+.leaderDesc{color:var(--muted);font-size:13px;margin-top:2px;line-height:1.25;overflow-wrap:break-word;word-break:normal}
 
 .ownedRow{display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:12px;font-weight:900}
 .ownedCheck{width:18px;height:18px}
@@ -167,8 +167,8 @@ body.mobile-compact .unitThumb{width:72px;height:72px;border-radius:10px}
 .slotImg{width:56px;height:56px;border-radius:10px;overflow:hidden;background:rgba(255,255,255,.06);display:grid;place-items:center}
 .slotImg img{width:100%;height:100%;object-fit:cover;display:block}
 .slotImg .ph{font-weight:900}
-.slotName{font-weight:900;line-height:1.15;font-size:13px;overflow-wrap:anywhere;word-break:break-word}
-.slotSub{color:var(--muted);font-size:12px;margin-top:2px;line-height:1.2;overflow-wrap:anywhere;word-break:break-word}
+.slotName{font-weight:900;line-height:1.15;font-size:13px;overflow-wrap:break-word;word-break:normal}
+.slotSub{color:var(--muted);font-size:12px;margin-top:2px;line-height:1.2;overflow-wrap:break-word;word-break:normal}
 .slotMetaRow{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .slotChip{font-size:11px;padding:3px 7px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.06);white-space:nowrap}
 .slotSelect{width:100%;background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:8px 10px;outline:none}
@@ -177,6 +177,31 @@ body.mobile-compact .unitThumb{width:72px;height:72px;border-radius:10px}
    MOBILE (<=900px): compact card layout + optimizer grids
    ========================================================= */
 @media (max-width:900px){
+  /* Detailed cards (full view) — avoid ultra-narrow text columns */
+  body.mobile-detailed .unitCard{
+    grid-template-columns:1fr!important;
+    padding:10px!important;
+    gap:10px!important;
+  }
+  body.mobile-detailed .unitThumb{
+    width:100%!important;
+    height:120px!important;
+    border-radius:12px!important;
+  }
+  body.mobile-detailed .topRow{
+    flex-direction:column!important;
+    align-items:flex-start!important;
+    justify-content:flex-start!important;
+    gap:6px!important;
+  }
+  body.mobile-detailed .tags{justify-content:flex-start!important}
+  body.mobile-detailed .unitName{
+    white-space:normal!important;
+    overflow:visible!important;
+    text-overflow:clip!important;
+  }
+  body.mobile-detailed .unitTitle{display:block!important}
+
 
   /* Compact cards (image on top + truncate) */
   body.mobile-compact .unitCard{
