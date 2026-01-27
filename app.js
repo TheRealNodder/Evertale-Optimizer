@@ -1,12 +1,13 @@
 /* app.js — WHOLE FILE
-   Fixes:
-   - Wires to current HTML ids: #viewToggle, #elementSelect, #raritySelect
-   - View toggle works (Compact/Detailed)
-   - De-dupe characters.json by id (prevents duplicate roster cards)
-   - Owned: stored in localStorage (evertale_owned_units_v1)
-   - Single tap on a card toggles Owned (except clicking checkbox)
-   - Long-press + drag across cards toggles many quickly (each card once per drag)
-   - Double-tap toggles "expanded" details in Compact mode (matches CSS expanded behavior)
+   Features:
+   - Dedupes characters.json by id (prevents duplicate roster cards)
+   - Tap anywhere on a card toggles Owned (except checkbox/label)
+   - Long-press + drag multi-toggle Owned
+   - View toggle button (Compact/Detailed) using body classes:
+       body.mobile-compact / body.mobile-detailed
+   - NEW: Paste list into search:
+       - Filters to only pasted units
+       - Prompts to auto-select Owned for matched units
 */
 
 const DATA_CHARACTERS = "./data/characters.json";
@@ -16,8 +17,12 @@ const LS_MOBILE_VIEW_KEY = "evertale_mobile_view_v1"; // "compact" | "detailed"
 const state = {
   units: [],
   owned: new Set(),
-  filters: { q: "", element: "all", rarity: "all" },
-  view: "compact",
+  filters: {
+    q: "",
+    element: "all",
+    rarity: "all",
+    listTokens: null, // array of tokens when user pastes list
+  },
 };
 
 // Drag-select state
@@ -34,36 +39,40 @@ const dragState = {
   pointerId: null,
 };
 
-function el(id) { return document.getElementById(id); }
+const $ = (id) => document.getElementById(id);
+
+function safeJsonParse(raw, fallback) {
+  try { return JSON.parse(raw); } catch { return fallback; }
+}
 
 function loadOwned() {
-  try { return new Set(JSON.parse(localStorage.getItem(LS_OWNED_KEY) || "[]")); }
-  catch { return new Set(); }
+  const arr = safeJsonParse(localStorage.getItem(LS_OWNED_KEY) || "[]", []);
+  return new Set(Array.isArray(arr) ? arr.map(String) : []);
 }
 function saveOwned() {
   localStorage.setItem(LS_OWNED_KEY, JSON.stringify([...state.owned]));
 }
-
-function getViewPref() {
-  try {
-    const v = localStorage.getItem(LS_MOBILE_VIEW_KEY);
-    return (v === "detailed" || v === "compact") ? v : "compact";
-  } catch {
-    return "compact";
-  }
-}
-function setViewPref(v) {
-  try { localStorage.setItem(LS_MOBILE_VIEW_KEY, v); } catch {}
+function updateOwnedCount() {
+  const el = $("ownedCount");
+  if (el) el.textContent = String(state.owned.size);
 }
 
-function applyViewClass(view) {
+function getMobileViewPref() {
+  const v = localStorage.getItem(LS_MOBILE_VIEW_KEY);
+  return (v === "detailed" || v === "compact") ? v : "compact";
+}
+function setMobileViewPref(v) {
+  localStorage.setItem(LS_MOBILE_VIEW_KEY, v);
+}
+function applyMobileViewClass(view) {
   document.body.classList.remove("mobile-compact", "mobile-detailed");
   document.body.classList.add(view === "detailed" ? "mobile-detailed" : "mobile-compact");
 }
-
-function setViewButtonText(view) {
-  const btn = el("viewToggle");
-  if (btn) btn.textContent = `View: ${view === "detailed" ? "Detailed" : "Compact"}`;
+function syncViewToggleText() {
+  const btn = $("viewToggle");
+  if (!btn) return;
+  const v = getMobileViewPref();
+  btn.textContent = `View: ${v === "compact" ? "Compact" : "Detailed"}`;
 }
 
 async function loadCharacters() {
@@ -82,6 +91,7 @@ async function loadCharacters() {
     seen.add(id);
     deduped.push(u);
   }
+
   state.units = deduped;
 }
 
@@ -90,6 +100,58 @@ function safeText(s) {
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;");
+}
+
+// Normalize to match pasted names reliably
+function normKey(s) {
+  return String(s ?? "")
+    .toLowerCase()
+    .replace(/[\u2019']/g, "")          // apostrophes
+    .replace(/[^a-z0-9]+/g, " ")        // punctuation -> spaces
+    .trim()
+    .replace(/\s+/g, " ");             // collapse spaces
+}
+
+function parseListTokens(text) {
+  // Split on newlines / commas / tabs / semicolons
+  const raw = String(text ?? "");
+  const parts = raw
+    .split(/[\n\r,;\t]+/g)
+    .map(s => s.trim())
+    .filter(Boolean);
+
+  // If it looks like a single normal search, don't treat as list mode
+  if (parts.length <= 1) return null;
+
+  // Normalize tokens, keep originals for exact compare too
+  const tokens = [];
+  const seen = new Set();
+  for (const p of parts) {
+    const k = normKey(p);
+    if (!k) continue;
+    if (seen.has(k)) continue;
+    seen.add(k);
+    tokens.push(k);
+  }
+  return tokens.length ? tokens : null;
+}
+
+function unitMatchesTokenList(u, tokens) {
+  const id = normKey(u?.id);
+  const name = normKey(u?.name);
+  const title = normKey(u?.title);
+
+  for (const t of tokens) {
+    if (!t) continue;
+    // exact match on id/name/title
+    if (t === id || t === name || t === title) return true;
+
+    // allow contains match for longer tokens (more forgiving)
+    if (t.length >= 4) {
+      if (name.includes(t) || title.includes(t)) return true;
+    }
+  }
+  return false;
 }
 
 function renderUnitCard(unit) {
@@ -150,16 +212,13 @@ function renderUnitCard(unit) {
               ? `<div class="panel">
                    <div class="panelTitle">Active Skills</div>
                    <div class="muted" style="white-space:pre-wrap; line-height:1.25">
-                     ${activeSkills
-                       .slice(0, 4)
-                       .map((s) => {
-                         const nm = safeText(s.name);
-                         const tu = s.tu != null ? ` • ${s.tu}TU` : "";
-                         const sp = s.spirit != null ? ` • ${s.spirit}SP` : "";
-                         const desc = safeText(s.description || "");
-                         return `<strong>${nm}</strong>${tu}${sp}\n${desc}\n`;
-                       })
-                       .join("\n")}
+                     ${activeSkills.slice(0,4).map(s=>{
+                       const nm=safeText(s.name);
+                       const tu=s.tu!=null?` • ${s.tu}TU`:"";
+                       const sp=s.spirit!=null?` • ${s.spirit}SP`:"";
+                       const desc=safeText(s.description||"");
+                       return `<strong>${nm}</strong>${tu}${sp}\n${desc}\n`;
+                     }).join("\n")}
                    </div>
                  </div>`
               : ``
@@ -170,14 +229,11 @@ function renderUnitCard(unit) {
               ? `<div class="panel">
                    <div class="panelTitle">Passives</div>
                    <div class="muted" style="white-space:pre-wrap; line-height:1.25">
-                     ${passiveDetails
-                       .slice(0, 6)
-                       .map((p) => {
-                         const nm = safeText(p.name);
-                         const desc = safeText(p.description);
-                         return `<strong>${nm}</strong>\n${desc}\n`;
-                       })
-                       .join("\n")}
+                     ${passiveDetails.slice(0,6).map(p=>{
+                       const nm=safeText(p.name);
+                       const desc=safeText(p.description);
+                       return `<strong>${nm}</strong>\n${desc}\n`;
+                     }).join("\n")}
                    </div>
                  </div>`
               : ``
@@ -193,12 +249,6 @@ function renderUnitCard(unit) {
   `;
 }
 
-function cardFromPoint(x, y) {
-  const elAt = document.elementFromPoint(x, y);
-  if (!elAt) return null;
-  return elAt.closest?.(".unitCard") || null;
-}
-
 function toggleOwnedForCard(cardEl) {
   const cb = cardEl?.querySelector?.("input[data-owned-id]");
   if (!cb) return;
@@ -210,6 +260,13 @@ function toggleOwnedForCard(cardEl) {
   else state.owned.delete(id);
 
   saveOwned();
+  updateOwnedCount();
+}
+
+function cardFromPoint(x, y) {
+  const elAt = document.elementFromPoint(x, y);
+  if (!elAt) return null;
+  return elAt.closest?.(".unitCard") || null;
 }
 
 function beginDragSelect() {
@@ -268,7 +325,6 @@ function wireDragSelect(gridEl) {
   gridEl.addEventListener("pointerdown", (e) => {
     const card = e.target?.closest?.(".unitCard");
     if (!card) return;
-
     if (e.target && (e.target.tagName === "INPUT" || e.target.closest("label"))) return;
 
     dragState.pointerId = e.pointerId;
@@ -312,31 +368,24 @@ function wireDragSelect(gridEl) {
   }, { passive: true });
 }
 
-function normalizeElementFilter(v) {
-  const s = String(v || "").trim();
-  if (!s || s.toLowerCase() === "all") return "all";
-  return s.toLowerCase();
-}
-function normalizeRarityFilter(v) {
-  const s = String(v || "").trim();
-  if (!s || s.toLowerCase() === "all") return "all";
-  return s.toLowerCase();
-}
-
 function renderRoster() {
-  const grid = el("unitGrid");
+  const grid = $("unitGrid");
   if (!grid) return;
 
-  const q = (state.filters.q || "").toLowerCase().trim();
-  const elFilter = normalizeElementFilter(state.filters.element);
-  const rFilter = normalizeRarityFilter(state.filters.rarity);
+  const q = (state.filters.q || "").toLowerCase();
+  const elFilter = state.filters.element;
+  const rFilter = state.filters.rarity;
+  const tokens = state.filters.listTokens;
 
   const filtered = state.units.filter((u) => {
-    const uEl = String(u.element || "").toLowerCase();
-    const uR = String(u.rarity || "").toLowerCase();
+    // List mode (paste): only show matches
+    if (tokens && tokens.length) {
+      return unitMatchesTokenList(u, tokens);
+    }
 
-    if (elFilter !== "all" && uEl !== elFilter) return false;
-    if (rFilter !== "all" && uR !== rFilter) return false;
+    // Normal mode
+    if (elFilter !== "all" && String(u.element || "") !== elFilter) return false;
+    if (rFilter !== "all" && String(u.rarity || "") !== rFilter) return false;
 
     if (q) {
       const hay = `${u.name || ""} ${u.title || ""} ${u.element || ""} ${u.rarity || ""}`.toLowerCase();
@@ -345,12 +394,15 @@ function renderRoster() {
     return true;
   });
 
-  const status = el("statusText");
-  if (status) status.textContent = `${filtered.length} units shown`;
+  const status = $("statusText");
+  if (status) {
+    status.textContent = tokens?.length
+      ? `${filtered.length} matched from pasted list`
+      : `${filtered.length} units shown`;
+  }
 
   grid.innerHTML = filtered.map(renderUnitCard).join("");
 
-  // Apply owned + checkbox listeners
   grid.querySelectorAll("input[data-owned-id]").forEach((cb) => {
     const id = cb.getAttribute("data-owned-id");
     cb.checked = state.owned.has(id);
@@ -359,29 +411,15 @@ function renderRoster() {
       if (cb.checked) state.owned.add(id);
       else state.owned.delete(id);
       saveOwned();
+      updateOwnedCount();
     });
   });
 
-  // Single tap: toggle owned. Double tap: expand details in compact mode.
   grid.querySelectorAll(".unitCard").forEach((card) => {
     card.addEventListener("click", (e) => {
       if (dragState.suppressNextClick) return;
-
       const t = e.target;
       if (t && (t.tagName === "INPUT" || t.closest("label"))) return;
-
-      const now = Date.now();
-      const last = Number(card.dataset.lastTap || "0");
-      card.dataset.lastTap = String(now);
-
-      // Double tap within 280ms toggles expanded (compact only)
-      if ((now - last) < 280) {
-        if (document.body.classList.contains("mobile-compact")) {
-          card.classList.toggle("expanded");
-        }
-        return;
-      }
-
       toggleOwnedForCard(card);
     });
   });
@@ -389,70 +427,96 @@ function renderRoster() {
   wireDragSelect(grid);
 }
 
+/* NEW: paste list handler (filters + optional auto-owned) */
+function handleSearchPaste(e) {
+  const pasted = (e.clipboardData || window.clipboardData)?.getData("text") || "";
+  const tokens = parseListTokens(pasted);
+
+  if (!tokens) return; // normal paste
+
+  // Let the paste happen, then apply list mode
+  setTimeout(() => {
+    state.filters.listTokens = tokens;
+    state.filters.q = ""; // list mode overrides normal q
+    const inp = $("searchInput");
+    if (inp) inp.value = pasted;
+    renderRoster();
+
+    const matches = state.units.filter(u => unitMatchesTokenList(u, tokens));
+    if (!matches.length) return;
+
+    const ok = window.confirm(`Found ${matches.length} matching units.\nApply these to Owned?`);
+    if (!ok) return;
+
+    for (const u of matches) state.owned.add(String(u.id));
+    saveOwned();
+    updateOwnedCount();
+    renderRoster();
+
+    // If optimizer page is open elsewhere, allow it to refresh
+    if (typeof window.refreshOptimizerFromOwned === "function") {
+      try { window.refreshOptimizerFromOwned(); } catch {}
+    }
+  }, 0);
+}
+
 function wireControls() {
-  const search = el("searchInput");
-  const elementSel = el("elementSelect");
-  const raritySel = el("raritySelect");
-  const viewBtn = el("viewToggle");
+  const search = $("searchInput");
+  const elSel = $("elementSelect");
+  const rSel = $("raritySelect");
+  const viewBtn = $("viewToggle");
 
   search?.addEventListener("input", () => {
-    state.filters.q = search.value || "";
+    // If user types (not pastes list), disable list mode unless the text still looks like a list
+    const v = search.value || "";
+    const maybeList = parseListTokens(v);
+    state.filters.listTokens = maybeList;
+    state.filters.q = maybeList ? "" : v;
     renderRoster();
   });
 
-  elementSel?.addEventListener("change", () => {
-    state.filters.element = elementSel.value || "all";
+  search?.addEventListener("paste", handleSearchPaste);
+
+  elSel?.addEventListener("change", () => {
+    state.filters.element = String(elSel.value || "all");
     renderRoster();
   });
 
-  raritySel?.addEventListener("change", () => {
-    state.filters.rarity = raritySel.value || "all";
+  rSel?.addEventListener("change", () => {
+    state.filters.rarity = String(rSel.value || "all");
     renderRoster();
   });
 
   viewBtn?.addEventListener("click", () => {
-    state.view = (state.view === "compact") ? "detailed" : "compact";
-    setViewPref(state.view);
-    applyViewClass(state.view);
-    setViewButtonText(state.view);
-
-    // Collapse expanded cards when leaving compact
-    if (state.view !== "compact") {
-      document.querySelectorAll(".unitCard.expanded").forEach(c => c.classList.remove("expanded"));
-    }
+    const cur = getMobileViewPref();
+    const next = (cur === "compact") ? "detailed" : "compact";
+    setMobileViewPref(next);
+    applyMobileViewClass(next);
+    syncViewToggleText();
   });
 
-  // Maintain view on resize/orientation changes
   window.addEventListener("resize", () => {
-    applyViewClass(getViewPref());
+    // re-apply classes (helps with orientation changes)
+    applyMobileViewClass(getMobileViewPref());
   });
 }
 
 async function init() {
   state.owned = loadOwned();
-  state.view = getViewPref();
-  applyViewClass(state.view);
-  setViewButtonText(state.view);
+  updateOwnedCount();
+
+  applyMobileViewClass(getMobileViewPref());
+  syncViewToggleText();
 
   await loadCharacters();
-
-  // Initialize filter selects to defaults
-  const elementSel = el("elementSelect");
-  const raritySel = el("raritySelect");
-  if (elementSel && !elementSel.value) elementSel.value = "all";
-  if (raritySel && !raritySel.value) raritySel.value = "all";
-
   wireControls();
   renderRoster();
-
-  // Let optimizer page refresh itself if it opened in another tab
-  window.refreshOptimizerFromOwned?.();
 }
 
 document.addEventListener("DOMContentLoaded", () => {
   init().catch((err) => {
     console.error(err);
-    const status = el("statusText");
+    const status = $("statusText");
     if (status) status.textContent = `Error: ${String(err.message || err)}`;
   });
 });
