@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Evertale Optimizer</title>
+  <title>Evertale Optimizer • Catalog</title>
   <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
@@ -11,11 +11,12 @@
     <div class="topbar-inner">
       <div>
         <div class="brandTitle">Evertale Optimizer</div>
-        <div class="brandSub">Roster → Owned → Optimizer</div>
+        <div class="brandSub">Catalog → Roster → Optimizer</div>
       </div>
 
       <nav class="tabs">
-        <a class="tab active" href="./index.html">Roster</a>
+        <a class="tab active" href="./index.html">Catalog</a>
+        <a class="tab" href="./roster.html">Roster</a>
         <a class="tab" href="./optimizer.html">Optimizer</a>
       </nav>
     </div>
@@ -23,65 +24,28 @@
 
   <main class="page">
     <div class="controls">
-      <input id="searchInput" class="input" type="search" placeholder="Search name/title/element/rarity..." />
+      <input id="catalogSearch" class="input" type="search" placeholder="Search characters, weapons, accessories, bosses..." />
 
-      <select id="elementSelect" class="input">
-        <option value="all">All Elements</option>
-        <option value="Fire">Fire</option>
-        <option value="Water">Water</option>
-        <option value="Storm">Storm</option>
-        <option value="Earth">Earth</option>
-        <option value="Light">Light</option>
-        <option value="Dark">Dark</option>
-      </select>
-
-      <select id="raritySelect" class="input">
-        <option value="all">All Rarities</option>
-        <option value="N">N</option>
-        <option value="R">R</option>
-        <option value="SR">SR</option>
-        <option value="SSR">SSR</option>
+      <select id="catalogType" class="input" aria-label="Catalog type">
+        <option value="all">All</option>
+        <option value="characters">Characters</option>
+        <option value="weapons">Weapons</option>
+        <option value="accessories">Accessories</option>
+        <option value="bosses">Bosses</option>
       </select>
 
       <button id="viewToggle" class="btn" type="button">View: Compact</button>
-      <a class="btn" href="./optimizer.html" style="text-decoration:none; display:inline-flex; align-items:center;">Go to Optimizer</a>
     </div>
 
-    <!-- Shared optimizer filters available on BOTH tabs -->
-    <div class="controls" style="margin-top:-4px;">
-      <select id="teamTypeSelect" class="input">
-        <option value="auto">Team Type: Auto</option>
-        <option value="mono">Team Type: Mono</option>
-        <option value="rainbow">Team Type: Rainbow</option>
-      </select>
+    <div id="statusText">Loading...</div>
 
-      <select id="presetSelect" class="input">
-        <option value="auto">Preset: Auto</option>
-        <option value="burn">Preset: Burn</option>
-        <option value="poison">Preset: Poison</option>
-        <option value="sleep">Preset: Sleep</option>
-        <option value="stun">Preset: Stun</option>
-        <option value="heal">Preset: Heal</option>
-        <option value="turn">Preset: Turn</option>
-        <option value="atkBuff">Preset: ATK Buff</option>
-        <option value="hpBuff">Preset: HP Buff</option>
-        <option value="cleanse">Preset: Cleanse</option>
-      </select>
-
-      <div class="muted" style="align-self:center;">
-        Used by Optimizer page.
-      </div>
-    </div>
-
-    <div id="statusText"></div>
-    <div id="unitGrid" class="rosterGrid"></div>
+    <div id="catalogGrid" class="rosterGrid"></div>
 
     <div class="footerHint">
-      Compact: multi-column, tap card to expand.<br/>
-      Detailed: 1 per row, always expanded.
+      Tip: paste a list of names in the search box (one per line) to filter quickly.
     </div>
   </main>
 
-  <script src="./app.js"></script>
+  <script src="./catalog.js"></script>
 </body>
 </html>
