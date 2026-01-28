@@ -139,7 +139,9 @@ function normalizeCharacters(arr) {
       element: pickFirst(u.element, ""),
       stats: { atk, hp, spd, cost },
       image: pickFirst(u.image, ""),
-      extraText: pickFirst(u.leaderSkill?.name, ""),
+      leaderSkillName: pickFirst(u.leaderSkill?.name, ""),
+      leaderSkillDesc: pickFirst(u.leaderSkill?.description, ""),
+      extraText: "",
     });
   }
   return out;
@@ -229,6 +231,14 @@ function renderCard(item) {
 
         <div class="unitDetails">
           ${statParts.length ? `<div class="statLine">${statParts.join("")}</div>` : ""}
+          ${
+            item.kind === "characters" && (item.leaderSkillName || item.leaderSkillDesc)
+              ? `<div class="leaderBlock">
+                   <div class="leaderName">${safeText(item.leaderSkillName || "No Leader Skill")}</div>
+                   <div class="leaderDesc">${safeText(item.leaderSkillDesc || "This unit does not provide a leader skill.")}</div>
+                 </div>`
+              : ""
+          }
           ${extra}
         </div>
       </div>
