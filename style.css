@@ -53,42 +53,39 @@ html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:
 
 /* =========================================================
    VIEW MODES (COMPACT vs DETAILED)
-   - Applies up to 900px (phones + tablets)
-   - Compact keeps stats + leader visible; hides heavy panels only
+   - Works on desktop + mobile
+   - Compact keeps stats + leader visible; hides heavy panels (skills/passives)
    ========================================================= */
+
+/* Desktop + all sizes: make toggle actually change layout */
+body.mobile-detailed #unitGrid,
+body.mobile-detailed #catalogGrid{
+  grid-template-columns:1fr!important;
+  gap:12px!important;
+}
+body.mobile-compact #unitGrid,
+body.mobile-compact #catalogGrid{
+  grid-template-columns:repeat(auto-fit,minmax(240px,1fr))!important;
+  gap:12px!important;
+}
+
+/* Panels: detailed shows, compact hides */
+body.mobile-detailed .unitDetails{display:block!important}
+body.mobile-detailed .unitDetails .panel{display:block!important}
+body.mobile-compact .unitDetails{display:block!important}
+body.mobile-compact .unitDetails .panel{display:none!important}
+
+/* Mobile tuning */
 @media (max-width:900px){
-
-  /* Detailed = 1 per row */
-  body.mobile-detailed #unitGrid{
-    grid-template-columns:1fr!important;
-    gap:12px!important;
-  }
-  body.mobile-detailed .unitDetails{
-    display:block!important;
-  }
-  body.mobile-detailed .unitDetails .panel{
-    display:block!important;
-  }
-
-  /* Compact = 3 per row */
+  /* Compact = 3 per row on phones/tablets */
   body.mobile-compact #unitGrid,
   body.mobile-compact #catalogGrid{
     grid-template-columns:repeat(3,minmax(0,1fr))!important;
     gap:10px!important;
   }
-
-  /* IMPORTANT: do not hide unitDetails globally (leader/stats live there) */
-  body.mobile-compact .unitDetails{
-    display:block!important;
-  }
-
-  /* Compact: hide heavy panels (skills/passives) */
-  body.mobile-compact .unitDetails .panel{
-    display:none!important;
-  }
 }
 
-/* =========================================================
+ /* =========================================================
    ROSTER CARD
    ========================================================= */
 .unitCard{
