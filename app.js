@@ -172,17 +172,17 @@ function renderUnitCard(u) {
       <div class="unitThumb">${img}</div>
 
       <div class="meta">
-        <div class="topRow">
-          <div>
-            <div class="unitName">${safeText(u.name)}</div>
-            <div class="unitTitle">${safeText(u.title)}</div>
-          </div>
+	        <div class="metaHeader">
+	          <div class="nameBlock">
+	            <div class="unitName">${safeText(u.name)}</div>
+	            <div class="unitTitle">${safeText(u.title)}</div>
+	          </div>
 
-          <div class="tags">
-            <span class="tag rarity">${safeText(u.rarity)}</span>
-            <span class="tag element">${safeText(u.element)}</span>
-          </div>
-        </div>
+	          <div class="chipCol">
+	            ${u.element ? `<span class="tag element">${safeText(u.element)}</span>` : ``}
+	            ${u.rarity ? `<span class="tag rarity">${safeText(u.rarity)}</span>` : ``}
+	          </div>
+	        </div>
 
         <div class="unitDetails">
           <div class="statLine">
