@@ -171,7 +171,7 @@ function normalizeAccessories(arr) {
     element: pickFirst(a?.element, ""),
     stats: { atk: pickFirst(a?.atk, ""), hp: pickFirst(a?.hp, ""), spd: pickFirst(a?.spd, ""), cost: pickFirst(a?.cost, "") },
     image: pickFirst(a?.image, ""),
-    extraText: pickFirst(a?.url, ""),
+    extraText: pickFirst(a?.profile, ""),
   })).filter(x => x.id && x.name);
 }
 
