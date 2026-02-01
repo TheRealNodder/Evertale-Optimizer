@@ -103,6 +103,23 @@ body.mobile-compact .unitDetails .panel{display:none!important}
 .unitThumb{width:88px;height:88px;border-radius:12px;overflow:hidden;background:rgba(255,255,255,.06);display:grid;place-items:center}
 .unitThumb img{width:100%;height:100%;object-fit:cover;object-position:center top;display:block}
 .unitThumb .ph{width:100%;height:100%;display:grid;place-items:center;font-weight:900;font-size:28px}
+
+/* Detailed view: portrait hero image */
+body.mobile-detailed .unitCard{
+  grid-template-columns:1fr!important;
+}
+body.mobile-detailed .unitThumb{
+  width:100%!important;
+  height:clamp(320px, 60vh, 720px)!important;
+  border-radius:14px!important;
+  background:#000!important;
+}
+body.mobile-detailed .unitThumb img{
+  object-fit:contain!important;
+  object-position:center!important;
+}
+/* Keep chips pinned right, even with portrait layout */
+body.mobile-detailed .metaHeader{grid-template-columns:1fr auto!important}
 .meta{display:flex;flex-direction:column;gap:8px;min-width:0}
 .topRow{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
 /* New, more uniform header: name on left, fixed chip column on right */
@@ -140,6 +157,14 @@ body.mobile-compact .unitThumb{width:72px;height:72px;border-radius:10px}
 /* =========================================================
    OPTIMIZER: SLOT BOXES + GRIDS
    ========================================================= */
+/* Desktop-only: taller portrait thumbs for platoons (keeps layout readable) */
+@media (min-width:1100px){
+  .platoonSlots .slotTop{grid-template-columns:1fr!important;gap:8px!important}
+  .platoonSlots .slotImg{width:100%!important;height:140px!important;border-radius:12px!important}
+  .platoonSlots .slotImg img{object-fit:cover!important;object-position:center top!important}
+  .platoonSlots .slotName{font-size:12px!important}
+}
+
 .optHeader{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px}
 .platoonTools{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 .teamBlock{margin-top:10px}
@@ -266,69 +291,3 @@ body.mobile-compact .unitThumb{width:72px;height:72px;border-radius:10px}
   }
 
 }}
-
-
-/* =========================================================
-   DESKTOP OPTIMIZER — PLATOONS ROW LAYOUT (>=1100px)
-   Forces one platoon per row with 5 compact slots.
-   ========================================================= */
-@media (min-width:1100px){
-
-  /* One platoon panel per row */
-  .platoonsGrid{
-    grid-template-columns:1fr !important;
-  }
-
-  /* Platoon panel becomes a row: title column + slots strip */
-  .platoonPanel{
-    display:grid !important;
-    grid-template-columns: 150px 1fr;
-    gap: 14px;
-    align-items: start;
-  }
-
-  .platoonPanel .panelTitle{
-    margin: 0 !important;
-    padding-top: 6px;
-    position: sticky;
-    top: 70px; /* stays visible under topbar */
-    align-self: start;
-  }
-
-  /* Slots strip: 5 across */
-  .platoonPanel .platoonSlots{
-    grid-template-columns: repeat(5, minmax(0,1fr)) !important;
-    gap: 10px !important;
-  }
-
-  /* Compact slot cards for 1920x1080 */
-  .platoonPanel .slotCard{
-    padding: 8px !important;
-    min-height: 88px !important;
-  }
-  .platoonPanel .slotTop{
-    grid-template-columns: 48px 1fr !important;
-    gap: 8px !important;
-  }
-  .platoonPanel .slotImg{
-    width: 48px !important;
-    height: 48px !important;
-    border-radius: 10px !important;
-  }
-  .platoonPanel .slotName{
-    font-size: 12px !important;
-    line-height: 1.15 !important;
-  }
-  .platoonPanel .slotSub{
-    font-size: 11px !important;
-    line-height: 1.15 !important;
-  }
-  .platoonPanel .slotChip{
-    font-size: 10px !important;
-    padding: 2px 6px !important;
-  }
-  .platoonPanel .slotSelect{
-    padding: 7px 9px !important;
-  }
-}
-
