@@ -199,7 +199,7 @@ function kindLabel(kind) {
 
 function renderCard(item) {
   const img = item.image
-    ? `<img src="${safeText((item.imagesLarge && item.imagesLarge[0]) || item.image)}" alt="${safeText(item.name)}">`
+    ? `<img src="${safeText(item.image)}" alt="${safeText(item.name)}">`
     : `<div class="ph">?</div>`;
 
   const chips = [];

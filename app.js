@@ -164,7 +164,7 @@ function renderUnitCard(u) {
   const passiveDetails = Array.isArray(u.passiveSkillDetails) ? u.passiveSkillDetails : [];
 
   const img = u.image
-    ? `<img src="${safeText((u.imagesLarge && u.imagesLarge[0]) || u.image)}" alt="${safeText(u.name)}">`
+    ? `<img src="${safeText(u.image)}" alt="${safeText(u.name)}">`
     : `<div class="ph">?</div>`;
 
   return `
