@@ -1,1 +1,115 @@
+import os
+import re
+import sys
+import time
+from pathlib import Path
+from urllib.parse import quote
 
+import requests
+
+BASE = "https://ik.imagekit.io/evertaletoolbox/monsters/large/"
+OUT_DIR = Path("images")
+OUT_DIR.mkdir(parents=True, exist_ok=True)
+
+# change if you want more/less retries
+SUFFIXES = ["01", "02", "03"]
+EXTS = [".png", ".PNG"]  # try both, site can be case-sensitive
+
+# polite delay so you don't hammer the host
+DELAY_SEC = 0.15
+
+def extract_prefix(line: str) -> str:
+    """
+    Turns:
+      'MusashiDark (Musashi)' -> 'MusashiDark'
+      'VenusRegular (Venus)'  -> 'VenusRegular'
+    Ignores blank lines and headers like 'Characters'
+    """
+    s = line.strip()
+    if not s:
+        return ""
+    if s.lower() == "characters":
+        return ""
+    # remove everything from first space + '(' onward
+    s = re.split(r"\s*\(", s, maxsplit=1)[0].strip()
+    return s
+
+def try_download(url: str, dest: Path, session: requests.Session) -> bool:
+    try:
+        r = session.get(url, timeout=30)
+    except Exception as e:
+        print(f"ERR  {url}  ({e})")
+        return False
+
+    if r.status_code == 200 and r.content:
+        dest.write_bytes(r.content)
+        print(f"OK   {dest.name}")
+        return True
+
+    if r.status_code == 404:
+        # common case
+        return False
+
+    print(f"FAIL {r.status_code}  {url}")
+    return False
+
+def main():
+    # default input file name
+    in_path = Path(sys.argv[1]) if len(sys.argv) > 1 else Path("Characters_Prefix.txt")
+    if not in_path.exists():
+        print(f"Could not find input file: {in_path.resolve()}")
+        print("Put Characters_Prefix.txt in this folder, or run: python download_images.py path\\to\\Characters_Prefix.txt")
+        sys.exit(1)
+
+    lines = in_path.read_text(encoding="utf-8", errors="ignore").splitlines()
+    prefixes = []
+    for line in lines:
+        p = extract_prefix(line)
+        if p:
+            prefixes.append(p)
+
+    if not prefixes:
+        print("No prefixes found in the input file.")
+        sys.exit(1)
+
+    session = requests.Session()
+
+    downloaded = 0
+    missing = 0
+
+    for prefix in prefixes:
+        # some names could contain spaces or weird chars; quote just in case
+        safe_prefix = quote(prefix)
+
+        for suf in SUFFIXES:
+            # Try both .png and .PNG
+            got_one = False
+            for ext in EXTS:
+                filename = f"{prefix}{suf}{ext}"
+                url = f"{BASE}{safe_prefix}{suf}{ext}"
+                dest = OUT_DIR / filename
+
+                # skip if already downloaded
+                if dest.exists() and dest.stat().st_size > 0:
+                    print(f"SKIP {dest.name}")
+                    got_one = True
+                    break
+
+                if try_download(url, dest, session):
+                    downloaded += 1
+                    got_one = True
+                    break
+
+                time.sleep(DELAY_SEC)
+
+            if not got_one:
+                missing += 1
+                print(f"404  {prefix}{suf} (tried .png and .PNG)")
+
+    print("\nDone.")
+    print(f"Downloaded: {downloaded}")
+    print(f"Missing:    {missing}")
+    print(f"Saved to:   {OUT_DIR.resolve()}")
+
+if __name__ == "__main__":
+    main()
