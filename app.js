@@ -108,6 +108,25 @@ function safeText(s) {
     .replaceAll(">", "&gt;");
 }
 
+
+function normalizeElementName(el) {
+  return String(el || "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "");
+}
+
+function elementClassForUnit(unit) {
+  const e = normalizeElementName(unit?.element || unit?.affinity || unit?.type);
+  if (e === "fire") return "el-fire";
+  if (e === "water") return "el-water";
+  if (e === "storm" || e === "lightning" || e === "electric") return "el-storm";
+  if (e === "earth") return "el-earth";
+  if (e === "light" || e === "holy") return "el-light";
+  if (e === "dark" || e === "shadow") return "el-dark";
+  return "";
+}
+
 function parseListTokens(text) {
   const raw = String(text ?? "");
   const parts = raw
@@ -168,7 +187,7 @@ function renderUnitCard(u) {
     : `<div class="ph">?</div>`;
 
   return `
-    <div class="unitCard" data-unit-id="${safeText(u.id)}">
+    <div class="unitCard ${elementClassForUnit(u)}" data-unit-id="${safeText(u.id)}">
       <div class="unitThumb">${img}</div>
 
       <div class="meta">

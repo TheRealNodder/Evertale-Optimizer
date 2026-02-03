@@ -267,3 +267,96 @@ body.mobile-compact .unitThumb{width:72px;height:72px;border-radius:10px}
   }
 
 }}
+/* =========================================================
+   OPTIMIZER: ELEMENT COLOR CODING (PLACED UNITS)
+   Guard rails:
+   - Purely presentational (CSS only)
+   - Driven by slotCard having class el-fire/el-water/... added by optimizer.js
+   ========================================================= */
+:root{
+  --el-fire:#ff3b3b;
+  --el-water:#2f8bff;
+  --el-storm:#ffd84a;
+  --el-earth:#41d26b;
+  --el-light:#f4f6ff;
+  --el-dark:#a855f7;
+}
+
+/* Optional: subtle modernized page background (safe override) */
+body{
+  background:
+    radial-gradient(1200px 700px at 20% 0%, rgba(84,110,255,0.22), transparent 55%),
+    radial-gradient(900px 600px at 80% 10%, rgba(168,85,247,0.16), transparent 60%),
+    var(--bg);
+}
+
+.slotCard{
+  position:relative; /* needed for the color rail */
+  overflow:hidden;
+}
+
+/* Set --el by element */
+.slotCard.el-fire  { --el:var(--el-fire); }
+.slotCard.el-water { --el:var(--el-water); }
+.slotCard.el-storm { --el:var(--el-storm); }
+.slotCard.el-earth { --el:var(--el-earth); }
+.slotCard.el-light { --el:var(--el-light); }
+.slotCard.el-dark  { --el:var(--el-dark); }
+
+/* Color rail */
+.slotCard[class*="el-"]::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:0;
+  bottom:0;
+  width:8px;
+  background:var(--el);
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,0.25);
+}
+
+/* Tint + border */
+.slotCard[class*="el-"]{
+  border-color: color-mix(in srgb, var(--el) 55%, var(--line));
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--el) 10%, var(--panel2)),
+    var(--panel2)
+  );
+}
+
+/* Ensure readable text for Light */
+.slotCard.el-light{ color: rgba(10,12,20,0.92); }
+.slotCard.el-light .slotSub,
+.slotCard.el-light .muted{ color: rgba(10,12,20,0.68); }
+.slotCard.el-light .slotChip{
+  background: rgba(255,255,255,0.55);
+  border-color: rgba(10,12,20,0.15);
+  color: rgba(10,12,20,0.85);
+}
+
+
+/* ===== Element accents for roster (mobile/desktop) without changing owned logic ===== */
+.unitCard.el-fire  { border-left: 6px solid var(--el-fire);  }
+.unitCard.el-water { border-left: 6px solid var(--el-water); }
+.unitCard.el-storm { border-left: 6px solid var(--el-storm); }
+.unitCard.el-earth { border-left: 6px solid var(--el-earth); }
+.unitCard.el-light { border-left: 6px solid var(--el-light); }
+.unitCard.el-dark  { border-left: 6px solid var(--el-dark);  }
+
+.unitCard.el-fire  .ownedRow{ border-color: color-mix(in srgb, var(--el-fire) 55%, var(--line)); }
+.unitCard.el-water .ownedRow{ border-color: color-mix(in srgb, var(--el-water) 55%, var(--line)); }
+.unitCard.el-storm .ownedRow{ border-color: color-mix(in srgb, var(--el-storm) 55%, var(--line)); }
+.unitCard.el-earth .ownedRow{ border-color: color-mix(in srgb, var(--el-earth) 55%, var(--line)); }
+.unitCard.el-light .ownedRow{ border-color: color-mix(in srgb, var(--el-light) 55%, var(--line)); }
+.unitCard.el-dark  .ownedRow{ border-color: color-mix(in srgb, var(--el-dark) 55%, var(--line)); }
+
+/* Mobile compact: keep the checkbox row visually tied to element color */
+@media (max-width: 560px){
+  body.mobile-compact .unitCard.el-fire  .ownedRow{ box-shadow: 0 0 0 2px color-mix(in srgb, var(--el-fire) 28%, transparent); }
+  body.mobile-compact .unitCard.el-water .ownedRow{ box-shadow: 0 0 0 2px color-mix(in srgb, var(--el-water) 28%, transparent); }
+  body.mobile-compact .unitCard.el-storm .ownedRow{ box-shadow: 0 0 0 2px color-mix(in srgb, var(--el-storm) 28%, transparent); }
+  body.mobile-compact .unitCard.el-earth .ownedRow{ box-shadow: 0 0 0 2px color-mix(in srgb, var(--el-earth) 28%, transparent); }
+  body.mobile-compact .unitCard.el-light .ownedRow{ box-shadow: 0 0 0 2px color-mix(in srgb, var(--el-light) 28%, transparent); }
+  body.mobile-compact .unitCard.el-dark  .ownedRow{ box-shadow: 0 0 0 2px color-mix(in srgb, var(--el-dark) 28%, transparent); }
+}
