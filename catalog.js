@@ -1,33 +1,352 @@
+/* catalog.js — WHOLE FILE
+   Catalog (no Owned):
+   - Shows Characters, Weapons, Accessories, Bosses in one unified grid.
+   - Search supports:
+     - normal substring search
+     - paste list (multi-line / comma-separated) => filters to only those items
+   - Uses same view toggle as roster: body.mobile-compact / body.mobile-detailed
+*/
 
-// STATE TOGGLE
-document.addEventListener("click",e=>{
- const btn=e.target.closest(".stateBtn"); if(!btn)return;
- const img=document.getElementById(btn.dataset.target);
- const imgs=JSON.parse(img.dataset.imgs);
- img.src=imgs[btn.dataset.idx];
- document.querySelectorAll(`[data-target="${btn.dataset.target}"]`).forEach(b=>b.classList.remove("active"));
- btn.classList.add("active");
-});
+const DATA = {
+  characters: "./data/characters.json",
+  weapons: "./data/weapons.json",
+  accessories: "./data/accessories.json",
+  bosses: "./data/bosses.json",
+};
 
-function renderStateRow(u){
-  if(!u || !Array.isArray(u.imagesLarge) || u.imagesLarge.length < 2) return "";
-  const btns = u.imagesLarge.map((_,i)=>`<button type="button" class="stateBtn ${i===0?"active":""}" data-idx="${i}">${i+1}</button>`).join("");
-  return `<div class="stateRow" data-imgs='${JSON.stringify(u.imagesLarge)}'>State: ${btns}</div>`;
+const LS_MOBILE_VIEW_KEY = "evertale_mobile_view_v1"; // shared with roster
+
+const state = {
+  items: [], // { kind, id, name, subtitle, rarity, element, stats, image, extraText }
+  q: "",
+  type: "all",
+  listTokens: null,
+};
+
+const $ = (id) => document.getElementById(id);
+
+function safeJsonParse(raw, fallback) {
+  try { return JSON.parse(raw); } catch { return fallback; }
 }
 
-document.addEventListener("click",(e)=>{
-  const btn = e.target.closest(".stateBtn");
-  if(!btn) return;
-  const row = btn.closest(".stateRow");
-  if(!row) return;
-  const imgs = JSON.parse(row.getAttribute("data-imgs") || "[]");
-  if(!imgs.length) return;
-  const card = row.closest(".unitCard, .slotCard, .card, .catalogCard") || row.parentElement;
-  const img = card ? card.querySelector("img") : null;
-  if(!img) return;
-  const idx = parseInt(btn.getAttribute("data-idx") || "0", 10);
-  if(!Number.isFinite(idx) || idx < 0 || idx >= imgs.length) return;
-  img.src = imgs[idx];
-  row.querySelectorAll(".stateBtn").forEach(b=>b.classList.remove("active"));
-  btn.classList.add("active");
+function getMobileViewPref() {
+  const v = localStorage.getItem(LS_MOBILE_VIEW_KEY);
+  return (v === "detailed" || v === "compact") ? v : "compact";
+}
+function setMobileViewPref(v) {
+  localStorage.setItem(LS_MOBILE_VIEW_KEY, v);
+}
+function applyMobileViewClass(view) {
+  document.body.classList.remove("mobile-compact", "mobile-detailed");
+  document.body.classList.add(view === "detailed" ? "mobile-detailed" : "mobile-compact");
+}
+function syncViewToggleText() {
+  const btn = $("viewToggle");
+  if (!btn) return;
+  const v = getMobileViewPref();
+  btn.textContent = `View: ${v === "compact" ? "Compact" : "Detailed"}`;
+}
+
+function safeText(s) {
+  return String(s ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
+}
+
+function normKey(s) {
+  return String(s ?? "")
+    .toLowerCase()
+    .replace(/[\u2019']/g, "")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim()
+    .replace(/\s+/g, " ");
+}
+
+function parseListTokens(text) {
+  const raw = String(text ?? "");
+  const parts = raw
+    .split(/[\n\r,;\t]+/g)
+    .map(s => s.trim())
+    .filter(Boolean);
+
+  if (parts.length <= 1) return null;
+
+  const tokens = [];
+  const seen = new Set();
+  for (const p of parts) {
+    const k = normKey(p);
+    if (!k) continue;
+    if (seen.has(k)) continue;
+    seen.add(k);
+    tokens.push(k);
+  }
+  return tokens.length ? tokens : null;
+}
+
+function matchesTokens(item, tokens) {
+  const id = normKey(item.id);
+  const name = normKey(item.name);
+  const sub = normKey(item.subtitle);
+  for (const t of tokens) {
+    if (!t) continue;
+    if (t === id || t === name || t === sub) return true;
+    if (t.length >= 4) {
+      if (name.includes(t) || sub.includes(t)) return true;
+    }
+  }
+  return false;
+}
+
+async function fetchJson(url) {
+  const res = await fetch(url, { cache: "no-store" });
+  if (!res.ok) throw new Error(`Failed to fetch ${url}: ${res.status}`);
+  return await res.json();
+}
+
+function toArray(json, keyGuess) {
+  if (Array.isArray(json)) return json;
+  if (json && Array.isArray(json[keyGuess])) return json[keyGuess];
+  if (json && Array.isArray(json.items)) return json.items;
+  return [];
+}
+
+function pickFirst(...vals) {
+  for (const v of vals) if (v !== undefined && v !== null && v !== "") return v;
+  return "";
+}
+
+function normalizeCharacters(arr) {
+  // Deduplicate by id (keep first occurrence)
+  const seen = new Set();
+  const out = [];
+  for (const u of arr) {
+    const id = String(u?.id ?? "");
+    if (!id || seen.has(id)) continue;
+    seen.add(id);
+
+    const atk = u.atk ?? u.stats?.atk ?? "";
+    const hp  = u.hp  ?? u.stats?.hp  ?? "";
+    const spd = u.spd ?? u.stats?.spd ?? "";
+    const cost= u.cost?? u.stats?.cost?? "";
+
+    out.push({
+      kind: "characters",
+      id,
+      name: pickFirst(u.name, id),
+      subtitle: pickFirst(u.title, ""),
+      rarity: pickFirst(u.rarity, ""),
+      element: pickFirst(u.element, ""),
+      stats: { atk, hp, spd, cost },
+      image: pickFirst(u.image, ""),
+      leaderSkillName: pickFirst(u.leaderSkill?.name, ""),
+      leaderSkillDesc: pickFirst(u.leaderSkill?.description, ""),
+      extraText: "",
+    });
+  }
+  return out;
+}
+
+function normalizeWeapons(arr) {
+  return arr.map(w => ({
+    kind: "weapons",
+    id: String(w?.id ?? ""),
+    name: pickFirst(w?.name, ""),
+    subtitle: pickFirst(w?.weaponType, w?.category, ""),
+    rarity: pickFirst(w?.rarity, ""),
+    element: "", // weapons may not have element
+    stats: { atk: pickFirst(w?.atk, ""), hp: pickFirst(w?.hp, ""), spd: "", cost: "" },
+    image: pickFirst(w?.image, ""),
+    extraText: pickFirst(w?.effect, w?.source, ""),
+  })).filter(x => x.id && x.name);
+}
+
+function normalizeAccessories(arr) {
+  return arr.map(a => ({
+    kind: "accessories",
+    id: String(a?.id ?? ""),
+    name: pickFirst(a?.name, ""),
+    subtitle: pickFirst(a?.category, ""),
+    rarity: pickFirst(a?.rarity, a?.stars, ""),
+    element: pickFirst(a?.element, ""),
+    stats: { atk: pickFirst(a?.atk, ""), hp: pickFirst(a?.hp, ""), spd: pickFirst(a?.spd, ""), cost: pickFirst(a?.cost, "") },
+    image: pickFirst(a?.image, ""),
+    extraText: pickFirst(a?.profile, ""),
+  })).filter(x => x.id && x.name);
+}
+
+function normalizeBosses(arr) {
+  return arr.map(b => ({
+    kind: "bosses",
+    id: String(b?.id ?? ""),
+    name: pickFirst(b?.name, ""),
+    subtitle: pickFirst(b?.weaponType, b?.category, ""),
+    rarity: pickFirst(b?.rarity, b?.stars, ""),
+    element: pickFirst(b?.element, ""),
+    stats: { atk: pickFirst(b?.atk, ""), hp: pickFirst(b?.hp, ""), spd: pickFirst(b?.spd, ""), cost: "" },
+    image: pickFirst(b?.image, ""),
+    extraText: "", // keep clean
+  })).filter(x => x.id && x.name);
+}
+
+function kindLabel(kind) {
+  if (kind === "characters") return "Character";
+  if (kind === "weapons") return "Weapon";
+  if (kind === "accessories") return "Accessory";
+  if (kind === "bosses") return "Boss";
+  return kind;
+}
+
+function renderCard(item) {
+  const img = item.image
+    ? `<img src="${safeText(item.image)}" alt="${safeText(item.name)}">`
+    : `<div class="ph">?</div>`;
+
+  const chips = [];
+  chips.push(`<span class="tag rarity">${safeText(kindLabel(item.kind))}</span>`);
+  if (item.rarity) chips.push(`<span class="tag">${safeText(item.rarity)}</span>`);
+  if (item.element) chips.push(`<span class="tag element">${safeText(item.element)}</span>`);
+
+  const { atk, hp, spd, cost } = item.stats || {};
+  const statParts = [];
+  if (atk !== "" && atk != null) statParts.push(`<div class="stat"><strong>ATK</strong> ${safeText(atk)}</div>`);
+  if (hp !== "" && hp != null) statParts.push(`<div class="stat"><strong>HP</strong> ${safeText(hp)}</div>`);
+  if (spd !== "" && spd != null) statParts.push(`<div class="stat"><strong>SPD</strong> ${safeText(spd)}</div>`);
+  if (cost !== "" && cost != null) statParts.push(`<div class="stat"><strong>COST</strong> ${safeText(cost)}</div>`);
+
+  // For compact mode, panels are hidden via CSS; this keeps markup consistent
+  const extra = item.extraText ? `<div class="panel"><div class="panelTitle">Info</div><div class="muted" style="white-space:pre-wrap">${safeText(item.extraText)}</div></div>` : "";
+
+  return `
+    <div class="unitCard" data-kind="${safeText(item.kind)}" data-id="${safeText(item.id)}">
+      <div class="unitThumb">${img}</div>
+      <div class="meta">
+        <div class="topRow">
+          <div>
+            <div class="unitName">${safeText(item.name)}</div>
+            <div class="unitTitle">${safeText(item.subtitle || "")}</div>
+          </div>
+          <div class="tags">${chips.join("")}</div>
+        </div>
+
+        <div class="unitDetails">
+          ${statParts.length ? `<div class="statLine">${statParts.join("")}</div>` : ""}
+          ${
+            item.kind === "characters" && (item.leaderSkillName || item.leaderSkillDesc)
+              ? `<div class="leaderBlock">
+                   <div class="leaderName">${safeText(item.leaderSkillName || "No Leader Skill")}</div>
+                   <div class="leaderDesc">${safeText(item.leaderSkillDesc || "This unit does not provide a leader skill.")}</div>
+                 </div>`
+              : ""
+          }
+          ${extra}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function render() {
+  const grid = $("catalogGrid");
+  const status = $("statusText");
+  if (!grid) return;
+
+  const q = (state.q || "").toLowerCase();
+  const tokens = state.listTokens;
+
+  let items = state.items;
+
+  if (state.type !== "all") items = items.filter(i => i.kind === state.type);
+
+  items = items.filter(i => {
+    if (tokens && tokens.length) return matchesTokens(i, tokens);
+
+    if (!q) return true;
+    const hay = `${i.name} ${i.subtitle} ${i.rarity} ${i.element} ${i.kind}`.toLowerCase();
+    return hay.includes(q);
+  });
+
+  if (status) {
+    status.textContent = tokens?.length
+      ? `${items.length} matched from pasted list`
+      : `${items.length} items shown`;
+  }
+
+  grid.innerHTML = items.map(renderCard).join("");
+}
+
+async function init() {
+  applyMobileViewClass(getMobileViewPref());
+  syncViewToggleText();
+
+  const [charsJson, weaponsJson, accJson, bossesJson] = await Promise.all([
+    fetchJson(DATA.characters),
+    fetchJson(DATA.weapons),
+    fetchJson(DATA.accessories),
+    fetchJson(DATA.bosses),
+  ]);
+
+  const charsArr = toArray(charsJson, "characters");
+  const weaponsArr = toArray(weaponsJson, "weapons");
+  const accArr = toArray(accJson, "accessories");
+  const bossesArr = toArray(bossesJson, "bosses");
+
+  state.items = [
+    ...normalizeCharacters(charsArr),
+    ...normalizeWeapons(weaponsArr),
+    ...normalizeAccessories(accArr),
+    ...normalizeBosses(bossesArr),
+  ];
+
+  // Controls
+  const search = $("catalogSearch");
+  const typeSel = $("catalogType");
+  const viewBtn = $("viewToggle");
+
+  search?.addEventListener("input", () => {
+    const v = search.value || "";
+    const maybeList = parseListTokens(v);
+    state.listTokens = maybeList;
+    state.q = maybeList ? "" : v;
+    render();
+  });
+
+  search?.addEventListener("paste", (e) => {
+    const pasted = (e.clipboardData || window.clipboardData)?.getData("text") || "";
+    setTimeout(() => {
+      const tokens = parseListTokens(pasted);
+      if (tokens) {
+        state.listTokens = tokens;
+        state.q = "";
+        render();
+      }
+    }, 0);
+  });
+
+  typeSel?.addEventListener("change", () => {
+    state.type = String(typeSel.value || "all");
+    render();
+  });
+
+  viewBtn?.addEventListener("click", () => {
+    const cur = getMobileViewPref();
+    const next = (cur === "compact") ? "detailed" : "compact";
+    setMobileViewPref(next);
+    applyMobileViewClass(next);
+    syncViewToggleText();
+  });
+
+  window.addEventListener("resize", () => {
+    applyMobileViewClass(getMobileViewPref());
+  });
+
+  render();
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  init().catch(err => {
+    console.error(err);
+    const status = $("statusText");
+    if (status) status.textContent = `Error: ${String(err.message || err)}`;
+  });
 });
