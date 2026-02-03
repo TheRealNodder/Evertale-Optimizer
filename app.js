@@ -163,9 +163,8 @@ function renderUnitCard(u) {
   const activeSkills = Array.isArray(u.activeSkills) ? u.activeSkills : [];
   const passiveDetails = Array.isArray(u.passiveSkillDetails) ? u.passiveSkillDetails : [];
 
-  const imgs = (Array.isArray(u.imagesLarge) && u.imagesLarge.length) ? u.imagesLarge : (u.image ? [u.image] : []);
-  const img = imgs.length
-    ? `<img src="${safeText(imgs[0])}" data-imgs="${safeText(encodeURIComponent(JSON.stringify(imgs)))}" data-state="0" alt="${safeText(u.name)}">`
+  const img = u.image
+    ? `<img src="${safeText(u.image)}" alt="${safeText(u.name)}">`
     : `<div class="ph">?</div>`;
 
   return `
@@ -184,8 +183,6 @@ function renderUnitCard(u) {
 	            ${u.rarity ? `<span class="tag rarity">${safeText(u.rarity)}</span>` : ``}
 	          </div>
 	        </div>
-
-        ${stateRowHtml(imgs)}
 
         <div class="unitDetails">
           <div class="statLine">
@@ -397,7 +394,7 @@ function renderRoster() {
     card.addEventListener("click", (e) => {
       if (drag.suppressNextClick) return;
       const t = e.target;
-      if (t && (t.tagName === "INPUT" || t.closest("label") || t.closest(".stateRow") || t.closest(".unitThumb"))) return;
+      if (t && (t.tagName === "INPUT" || t.closest("label"))) return;
       toggleOwnedForCard(card);
       saveOwned();
       renderRoster();
@@ -492,69 +489,6 @@ function wireControls() {
   });
 }
 
-
-function stateRowHtml(imgs){
-  if(!Array.isArray(imgs) || imgs.length < 2) return "";
-  const enc = encodeURIComponent(JSON.stringify(imgs));
-  const btns = imgs.map((_,i)=>`<button type="button" class="stateBtn ${i===0?"active":""}" data-idx="${i}">${i+1}</button>`).join("");
-  return `<div class="stateRow" data-imgs="${enc}">${btns}</div>`;
-}
-
-function attachStateHandlers(root){
-  // Button click: jump to state
-  root.addEventListener("click",(e)=>{
-    const btn = e.target.closest(".stateBtn");
-    if(!btn) return;
-    e.preventDefault();
-    e.stopPropagation();
-    const row = btn.closest(".stateRow");
-    const enc = row?.getAttribute("data-imgs") || "";
-    let imgs=[];
-    try{ imgs = JSON.parse(decodeURIComponent(enc)); }catch{}
-    if(!imgs.length) return;
-
-    const card = btn.closest(".unitCard");
-    const imgEl = card?.querySelector(".unitThumb img");
-    if(!imgEl) return;
-
-    const idx = parseInt(btn.getAttribute("data-idx")||"0",10);
-    if(!Number.isFinite(idx) || idx<0 || idx>=imgs.length) return;
-
-    imgEl.src = imgs[idx];
-    imgEl.setAttribute("data-state", String(idx));
-    row.querySelectorAll(".stateBtn").forEach(b=>b.classList.remove("active"));
-    btn.classList.add("active");
-  });
-
-  // Image click: cycle state
-  root.addEventListener("click",(e)=>{
-    const img = e.target.closest(".unitThumb img");
-    if(!img) return;
-    const card = img.closest(".unitCard");
-    if(!card) return;
-
-    const enc = img.getAttribute("data-imgs") || card.querySelector(".stateRow")?.getAttribute("data-imgs") || "";
-    let imgs=[];
-    try{ imgs = JSON.parse(decodeURIComponent(enc)); }catch{}
-    if(!Array.isArray(imgs) || imgs.length < 2) return;
-
-    e.preventDefault();
-    e.stopPropagation();
-
-    const cur = parseInt(img.getAttribute("data-state")||"0",10);
-    const next = (Number.isFinite(cur) ? (cur+1) : 1) % imgs.length;
-
-    img.src = imgs[next];
-    img.setAttribute("data-state", String(next));
-
-    const row = card.querySelector(".stateRow");
-    if(row){
-      row.querySelectorAll(".stateBtn").forEach((b,i)=>b.classList.toggle("active", i===next));
-    }
-  });
-}
-
-
 async function init() {
   state.owned = loadOwned();
 
@@ -565,8 +499,6 @@ async function init() {
   await loadCharacters();
   wireControls();
   renderRoster();
-  const grid = $("unitGrid");
-  if (grid) attachStateHandlers(grid);
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -575,4 +507,45 @@ document.addEventListener("DOMContentLoaded", () => {
     const status = $("statusText");
     if (status) status.textContent = `Error: ${String(err.message || err)}`;
   });
+});
+
+// ---------------------------------------------------------------------------
+// Shared image state toggle helpers
+//
+// Optimizer/Catalog/Roster may render the 1/2/3 state buttons by calling a
+// helper named `renderImageStateControls`. iOS Safari throws
+// "Can't find variable: renderImageStateControls" if it's missing.
+// Define it globally and add a delegated click handler.
+
+function renderImageStateControls(u){
+  if(!u || !Array.isArray(u.imagesLarge) || u.imagesLarge.length < 2) return "";
+  const btns = u.imagesLarge
+    .map((_, i) => `<button type="button" class="stateBtn ${i===0 ? 'active' : ''}" data-idx="${i}">${i+1}</button>`)
+    .join("");
+  return `<div class="stateRow" data-imgs='${JSON.stringify(u.imagesLarge)}'>${btns}</div>`;
+}
+
+// Expose globally
+window.renderImageStateControls = renderImageStateControls;
+
+// Delegated handler: swap the card image to the selected state
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest(".stateBtn");
+  if(!btn) return;
+
+  const row = btn.closest(".stateRow");
+  if(!row) return;
+
+  let imgs = [];
+  try { imgs = JSON.parse(row.getAttribute("data-imgs") || "[]"); } catch(_) { imgs = []; }
+  if(!imgs.length) return;
+
+  const idx = Number.parseInt(btn.getAttribute("data-idx") || "0", 10);
+  if(!Number.isFinite(idx) || idx < 0 || idx >= imgs.length) return;
+
+  const card = row.closest(".unitCard, .slotCard, .card, .catalogCard, .gridCard") || row.parentElement;
+  const img = card ? card.querySelector("img") : null;
+  if(img) img.src = imgs[idx];
+
+  row.querySelectorAll(".stateBtn").forEach((b) => b.classList.toggle("active", b===btn));
 });
