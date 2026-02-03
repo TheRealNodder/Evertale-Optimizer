@@ -149,17 +149,8 @@ body.mobile-compact .unitThumb{width:72px;height:72px;border-radius:10px}
 .storyBackGrid{grid-template-columns:repeat(3,minmax(0,1fr))}
 
 /* Platoons container */
-.platoonsGrid{display:grid;gap:12px;margin-top:10px;grid-template-columns:1fr}
-
-/* Platoon slots: always 5 across on desktop, wrap on smaller screens */
-.platoonSlots{display:flex;gap:10px;flex-wrap:wrap}
-@media (min-width:900px){
-  .platoonSlots{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
-}
-
-/* Locking by clicking the image */
-.slotCard.locked .slotImg{outline:2px solid #c33;outline-offset:2px}
-.slotCard .lockRow{display:none}
+.platoonsGrid{display:grid;gap:12px;margin-top:10px;grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (min-width:900px){.platoonsGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
 /* Storage grid */
 .grid{display:grid;gap:10px;margin-top:10px;grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -281,4 +272,58 @@ body.mobile-compact .unitThumb{width:72px;height:72px;border-radius:10px}
 .stateRow{display:flex;gap:6px;margin-top:6px}
 .stateBtn{padding:4px 8px;border-radius:10px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:inherit}
 .stateBtn.active{background:rgba(255,255,255,.16)}
-@media(min-width:1000px){.platoonsGrid{grid-template-columns:1fr!important}}
+@media(min-width:1000px){.platoonsGrid{grid-template-columns:repeat(2,1fr)!important}}
+
+
+/* === PATCH: tag row + state toggles (catalog/roster) === */
+.tags, .tagRow, .card-tags, .unit-tags{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  align-items:center;
+}
+.tags .tag, .tagRow .tag, .card-tags .tag, .unit-tags .tag{
+  white-space:nowrap;
+}
+.stateRow{
+  display:inline-flex;
+  gap:6px;
+  align-items:center;
+  flex-wrap:nowrap;
+  margin-top:8px;
+}
+.stateBtn{
+  border:1px solid rgba(255,255,255,.18);
+  background:rgba(255,255,255,.06);
+  color:inherit;
+  padding:4px 10px;
+  border-radius:999px;
+  font-size:12px;
+  line-height:18px;
+  cursor:pointer;
+}
+.stateBtn.active{ background:rgba(255,255,255,.16); }
+
+/* Prevent state controls from overlapping tag row on Catalog/Roster */
+.unitCard .stateRow, .catalogCard .stateRow{ position:static !important; }
+
+/* === PATCH: optimizer-only placement of per-slot state controls (desktop) === */
+@media (min-width: 900px){
+  #storySection .slotCard .stateRow,
+  #platoonsSection .slotCard .stateRow,
+  #storageGrid .slotCard .stateRow{
+    position:absolute;
+    left:10px;
+    bottom:10px;
+    margin-top:0;
+  }
+  #storySection .slotCard,
+  #platoonsSection .slotCard,
+  #storageGrid .slotCard{
+    position:relative;
+    padding-bottom:38px; /* room for stateRow */
+  }
+}
+
+/* Optimizer: locked outline */
+.slotCard.locked{ outline:2px solid rgba(255,60,60,.95); outline-offset:2px; }
