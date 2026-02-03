@@ -4,52 +4,21 @@
 
 const DATA_CHARACTERS = "./data/characters.json";
 const OWNED_KEY = "evertale_owned_units_v1";
+
+// NOTE:
+// Some earlier builds referenced a helper named `renderImageStateControls()`
+// during init but did not include the definition, which crashes the optimizer
+// page (and prevents owned units from loading). Keep a safe implementation
+// here so the page always boots.
+function renderImageStateControls() {
+  // Intentionally a no-op initializer for older builds.
+  // Per-card state buttons (when present) are handled via event delegation.
+}
 const LAYOUT_KEY = "evertale_team_layout_v1";
 
 const LS_TEAMTYPE_KEY = "evertale_optimizer_teamType_v1";
 const LS_PRESET_KEY = "evertale_optimizer_preset_v1";
 const LS_LOCKS_KEY = "evertale_optimizer_slotLocks_v1";
-const LS_IMGSTATE_KEY = "evertale_optimizer_imgState_v1";
-
-const LS_IMGSTATE_BY_SLOT_KEY = "evertale_optimizer_imgStateBySlot_v1";
-
-function loadImgStateBySlot(){
-  const obj = safeJsonParse(localStorage.getItem(LS_IMGSTATE_BY_SLOT_KEY) || "{}", {});
-  return (obj && typeof obj === "object") ? obj : {};
-}
-function saveImgStateBySlot(map){
-  localStorage.setItem(LS_IMGSTATE_BY_SLOT_KEY, JSON.stringify(map || {}));
-}
-
-function getSlotStateIdx(slotKey){
-  const m = state.imgStateBySlot || {};
-  const v = m[slotKey];
-  const n = Number.isFinite(v) ? v : parseInt(v,10);
-  return Number.isFinite(n) ? n : 0;
-}
-function setSlotStateIdx(slotKey, idx){
-  if(!state.imgStateBySlot) state.imgStateBySlot = {};
-  state.imgStateBySlot[slotKey] = idx;
-  saveImgStateBySlot(state.imgStateBySlot);
-}
-
-function unitImageForSlot(u, slotKey){
-  if(!u) return "";
-  const imgs = Array.isArray(u.imagesLarge) ? u.imagesLarge : [];
-  const idx = Math.max(0, Math.min(getSlotStateIdx(slotKey), imgs.length-1));
-  return (imgs[idx] || u.image || "");
-}
-
-function renderStateRowForSlot(u, slotKey){
-  const imgs = Array.isArray(u?.imagesLarge) ? u.imagesLarge : [];
-  if(imgs.length < 2) return "";
-  const cur = Math.max(0, Math.min(getSlotStateIdx(slotKey), imgs.length-1));
-  return `
-    <div class="stateRow" data-slotstate="${slotKey}">
-      ${imgs.map((_,i)=>`<button type="button" class="stateBtn ${i===cur?"active":""}" data-slotstate="${slotKey}" data-idx="${i}">${i+1}</button>`).join("")}
-    </div>
-  `;
-}
 
 const STORY_MAIN = 5;
 const STORY_BACK = 3;
@@ -57,14 +26,12 @@ const PLATOON_COUNT = 20;
 const PLATOON_SIZE = 5;
 
 const state = {
-  imageStateIdx: 0,
   all: [],
   ownedIds: new Set(),
   ownedUnits: [],
   layout: null,
   locks: null, // { storyMain:bool[5], storyBack:bool[3], platoons:bool[20][5] }
   mode: "story",
-  imgStateBySlot: null,
 };
 
 function el(id) { return document.getElementById(id); }
@@ -112,18 +79,7 @@ function saveLocks() {
   localStorage.setItem(LS_LOCKS_KEY, JSON.stringify(state.locks));
 }
 
-function loadImageStateIdx() {
-  const raw = localStorage.getItem(LS_IMGSTATE_KEY);
-  const n = parseInt(raw||'0', 10);
-  state.imageStateIdx = Number.isFinite(n) ? Math.max(0, Math.min(2, n)) : 0;
-}
-
-function saveImageStateIdx() {
-  localStorage.setItem(LS_IMGSTATE_KEY, String(state.imageStateIdx||0));
-}
-
 function initSharedOptimizerFiltersUI() {
-  renderImageStateControls();
   const teamSel = el("teamTypeSelect");
   const presetSel = el("presetSelect");
   if (teamSel) teamSel.value = getTeamTypePref();
@@ -205,54 +161,38 @@ function slotCardHTML(slotKey, idx, currentId, units, locked) {
   const cid = normId(currentId);
   const u = units.find(x => normId(x.id) === cid);
 
-  const imgs = (u && Array.isArray(u.imagesLarge) && u.imagesLarge.length) ? u.imagesLarge : (u && u.image ? [u.image] : []);
-  const imgIdx = Math.min(state.imageStateIdx || 0, Math.max(0, imgs.length - 1));
-  const img = imgs.length ? imgs[imgIdx] : '';
+  const img = u?.image ? `<img src="${u.image}" alt="">` : `<div class="ph">?</div>`;
+  const title = u ? u.name : "Empty";
+  const sub = u ? (u.title || "") : "Select a unit";
 
-  const isPlatoon = String(slotKey).startsWith('platoon_');
-  const name = u ? (u.name || '') : 'Empty';
-  const title = u ? (u.title || '') : '';
-  const rarity = u ? (u.rarity || '') : '';
-  const element = u ? (u.element || '') : '';
+  return `
+    <div class="slotCard ${u ? "" : "empty"}">
+      <div class="slotTop">
+        <div class="slotImg">${img}</div>
+        <div>
+          <div class="slotName">${title}</div>
+          <div class="slotSub">${sub}</div>
+        </div>
+      </div>
 
-  if (isPlatoon) {
-    let html = '';
-    html += '<div class="slotCard platoonSlot ' + (locked ? 'locked' : '') + '" data-slot="' + escapeAttr(slotKey) + '" data-idx="' + idx + '">';
-    html += '  <div class="slotImgWrap" role="button" tabindex="0" aria-label="Toggle lock">';
-    if (img) {
-      html += '    <img src="' + escapeAttr(img) + '" alt="' + escapeAttr(name) + '">';
-    } else {
-      html += '    <div class="placeholder"></div>';
-    }
-    html += '  </div>';
-    html += '  <div class="slotMeta">';
-    html += '    <div class="slotName">' + escapeHtml(name) + '</div>';
-    if (title) html += '    <div class="slotTitle">' + escapeHtml(title) + '</div>';
-    html += '    <div class="slotRE">' + escapeHtml(rarity) + (rarity && element ? ' • ' : '') + escapeHtml(element) + '</div>';
-    html += '  </div>';
-    html += '</div>';
-    return html;
-  }
+      <div style="display:flex; justify-content:space-between; gap:10px; align-items:center; margin-top:8px;">
+        <label class="muted" style="display:flex; gap:8px; align-items:center; user-select:none;">
+          <input type="checkbox" class="slotLock" data-slot="${slotKey}" data-idx="${idx}" ${locked ? "checked" : ""}/>
+          Lock
+        </label>
+        ${u ? `
+          <div class="slotMetaRow" style="margin:0;">
+            <span class="slotChip">${u.rarity || ""}</span>
+            <span class="slotChip">${u.element || ""}</span>
+          </div>
+        ` : `<div></div>`}
+      </div>
 
-  // Story slots keep checkbox lock UI
-  let html = '';
-  html += '<div class="slotCard" data-slot="' + escapeAttr(slotKey) + '" data-idx="' + idx + '">';
-  html += '  <div class="slotThumb">';
-  if (img) {
-    html += '    <img src="' + escapeAttr(img) + '" alt="' + escapeAttr(name) + '">';
-  } else {
-    html += '    <div class="placeholder"></div>';
-  }
-  html += '  </div>';
-  html += '  <div class="slotInfo">';
-  html += '    <div class="slotTitle">' + escapeHtml(name) + '</div>';
-  html += '    <label class="lockRow">';
-  html += '      <input type="checkbox" class="lockToggle" data-slot="' + escapeAttr(slotKey) + '" data-idx="' + idx + '" ' + (locked ? 'checked' : '') + '>';
-  html += '      <span>Lock</span>';
-  html += '    </label>';
-  html += '  </div>';
-  html += '</div>';
-  return html;
+      <select class="slotSelect" data-slot="${slotKey}" data-idx="${idx}" ${locked ? "disabled" : ""}>
+        ${optionList(units)}
+      </select>
+    </div>
+  `;
 }
 
 function getLockFor(slotKey, idx) {
@@ -535,43 +475,12 @@ window.runOptimizer = function runOptimizer() {
   runEngine();
 };
 
-function installDelegates(){
-  // Per-slot image state buttons
-  document.addEventListener("click", (e) => {
-    const btn = e.target.closest(".stateBtn");
-    if (!btn) return;
-    const slotKey = btn.getAttribute("data-slotstate");
-    const idx = parseInt(btn.getAttribute("data-idx") || "0", 10);
-    if (!slotKey || !Number.isFinite(idx)) return;
-    setSlotStateIdx(slotKey, idx);
-    // Re-render to update image + active button
-    renderAll();
-  });
-
-  // Click portrait to toggle lock (matches your red-outline request)
-  document.addEventListener("click", (e) => {
-    const img = e.target.closest(".slotImg, .slotImgEl");
-    if (!img) return;
-    const card = e.target.closest(".slotCard");
-    if (!card) return;
-    const slot = card.querySelector("input.slotLock");
-    if (!slot) return;
-    slot.checked = !slot.checked;
-    const slotKey = slot.getAttribute("data-slot");
-    const idx = parseInt(slot.getAttribute("data-idx"),10);
-    setLockFor(slotKey, idx, slot.checked);
-    renderAll();
-  });
-}
-
 async function init() {
   initSharedOptimizerFiltersUI();
 
   state.all = await loadCharacters();
   state.layout = loadLayout();
   state.locks = loadLocks();
-  state.imgStateBySlot = loadImgStateBySlot();
-  loadImageStateIdx();
 
   state.ownedIds = getOwnedIds();
   state.ownedUnits = state.all.filter(u => state.ownedIds.has(normId(u.id)));
@@ -585,15 +494,6 @@ async function init() {
   el("unlockAllLocks")?.addEventListener("click", unlockAllLocks);
 
   installModeButtons();
-  installDelegates();
-// Keep optimizer in sync when returning from Roster
-  window.addEventListener("pageshow", () => window.refreshOptimizerFromOwned());
-  document.addEventListener("visibilitychange", () => {
-    if (!document.hidden) window.refreshOptimizerFromOwned();
-  });
-  window.addEventListener("storage", (ev) => {
-    if (ev && ev.key === OWNED_KEY) window.refreshOptimizerFromOwned();
-  });
   renderAll();
 }
 

@@ -112,13 +112,15 @@ body.mobile-compact .unitDetails .panel{display:none!important}
 .chipCol .tag{white-space:nowrap}
 .unitName{font-weight:900;line-height:1.15;font-size:16px;overflow-wrap:break-word;word-break:normal}
 .unitTitle,.unitSub{font-size:13px;color:var(--muted);margin-top:2px;line-height:1.2;overflow-wrap:break-word;word-break:normal}
-.tags{display:flex;flex-direction:row;gap:6px;flex-wrap:wrap;align-items:center;justify-content:flex-start;min-width:0}
-/* Ensure bubbles stay on one line when space allows */
-.tag{white-space:nowrap}
-/* Keep type/rarity/element on one row */
-.tag{font-size:12px;padding:4px 8px;border-radius:999px;background:var(--chip);border:1px solid var(--line);white-space:nowrap}
-.tag.rarity{background:var(--chip2);font-weight:900}
-.tag.element{color:var(--muted)}
+.tags{display:flex;flex-direction:row;gap:6px;flex-wrap:wrap;align-items:center;justify-content:flex-end;min-width:0}
+/* If older markup uses .tags, keep bubbles pinned to the right */
+.topRow .tags{flex-direction:row;align-items:center;justify-content:flex-end}
+
+/* Image state buttons (1/2/3) */
+.stateRow{display:flex;gap:6px;align-items:center;justify-content:flex-end;flex-wrap:nowrap;margin-top:6px}
+.stateRow .stateBtn{border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:var(--text);
+  border-radius:10px;padding:4px 8px;font-size:12px;line-height:1;cursor:pointer}
+.stateRow .stateBtn.active{background:rgba(255,255,255,.18)}
 .unitDetails{display:block}
 .statLine{display:flex;flex-wrap:wrap;gap:10px;font-weight:800;letter-spacing:.2px}
 .stat{font-size:13px}
@@ -150,7 +152,7 @@ body.mobile-compact .unitThumb{width:72px;height:72px;border-radius:10px}
 
 /* Platoons container */
 .platoonsGrid{display:grid;gap:12px;margin-top:10px;grid-template-columns:repeat(2,minmax(0,1fr))}
-@media (min-width:900px){.platoonsGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (min-width:900px){.platoonsGrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 
 /* Storage grid */
 .grid{display:grid;gap:10px;margin-top:10px;grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -265,65 +267,3 @@ body.mobile-compact .unitThumb{width:72px;height:72px;border-radius:10px}
   }
 
 }}
-
-/* --- UI Fix Patch (merged) --- */
-/* Bubble line fix */
-.card-meta{display:flex;gap:6px;flex-wrap:nowrap}
-.stateRow{display:flex;gap:6px;margin-top:6px}
-.stateBtn{padding:4px 8px;border-radius:10px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:inherit}
-.stateBtn.active{background:rgba(255,255,255,.16)}
-@media(min-width:1000px){.platoonsGrid{grid-template-columns:repeat(2,1fr)!important}}
-
-
-/* === PATCH: tag row + state toggles (catalog/roster) === */
-.tags, .tagRow, .card-tags, .unit-tags{
-  display:flex;
-  flex-wrap:wrap;
-  gap:6px;
-  align-items:center;
-}
-.tags .tag, .tagRow .tag, .card-tags .tag, .unit-tags .tag{
-  white-space:nowrap;
-}
-.stateRow{
-  display:inline-flex;
-  gap:6px;
-  align-items:center;
-  flex-wrap:nowrap;
-  margin-top:8px;
-}
-.stateBtn{
-  border:1px solid rgba(255,255,255,.18);
-  background:rgba(255,255,255,.06);
-  color:inherit;
-  padding:4px 10px;
-  border-radius:999px;
-  font-size:12px;
-  line-height:18px;
-  cursor:pointer;
-}
-.stateBtn.active{ background:rgba(255,255,255,.16); }
-
-/* Prevent state controls from overlapping tag row on Catalog/Roster */
-.unitCard .stateRow, .catalogCard .stateRow{ position:static !important; }
-
-/* === PATCH: optimizer-only placement of per-slot state controls (desktop) === */
-@media (min-width: 900px){
-  #storySection .slotCard .stateRow,
-  #platoonsSection .slotCard .stateRow,
-  #storageGrid .slotCard .stateRow{
-    position:absolute;
-    left:10px;
-    bottom:10px;
-    margin-top:0;
-  }
-  #storySection .slotCard,
-  #platoonsSection .slotCard,
-  #storageGrid .slotCard{
-    position:relative;
-    padding-bottom:38px; /* room for stateRow */
-  }
-}
-
-/* Optimizer: locked outline */
-.slotCard.locked{ outline:2px solid rgba(255,60,60,.95); outline-offset:2px; }
