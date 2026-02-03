@@ -11,6 +11,46 @@ const LS_PRESET_KEY = "evertale_optimizer_preset_v1";
 const LS_LOCKS_KEY = "evertale_optimizer_slotLocks_v1";
 const LS_IMGSTATE_KEY = "evertale_optimizer_imgState_v1";
 
+const LS_IMGSTATE_BY_SLOT_KEY = "evertale_optimizer_imgStateBySlot_v1";
+
+function loadImgStateBySlot(){
+  const obj = safeJsonParse(localStorage.getItem(LS_IMGSTATE_BY_SLOT_KEY) || "{}", {});
+  return (obj && typeof obj === "object") ? obj : {};
+}
+function saveImgStateBySlot(map){
+  localStorage.setItem(LS_IMGSTATE_BY_SLOT_KEY, JSON.stringify(map || {}));
+}
+
+function getSlotStateIdx(slotKey){
+  const m = state.imgStateBySlot || {};
+  const v = m[slotKey];
+  const n = Number.isFinite(v) ? v : parseInt(v,10);
+  return Number.isFinite(n) ? n : 0;
+}
+function setSlotStateIdx(slotKey, idx){
+  if(!state.imgStateBySlot) state.imgStateBySlot = {};
+  state.imgStateBySlot[slotKey] = idx;
+  saveImgStateBySlot(state.imgStateBySlot);
+}
+
+function unitImageForSlot(u, slotKey){
+  if(!u) return "";
+  const imgs = Array.isArray(u.imagesLarge) ? u.imagesLarge : [];
+  const idx = Math.max(0, Math.min(getSlotStateIdx(slotKey), imgs.length-1));
+  return (imgs[idx] || u.image || "");
+}
+
+function renderStateRowForSlot(u, slotKey){
+  const imgs = Array.isArray(u?.imagesLarge) ? u.imagesLarge : [];
+  if(imgs.length < 2) return "";
+  const cur = Math.max(0, Math.min(getSlotStateIdx(slotKey), imgs.length-1));
+  return `
+    <div class="stateRow" data-slotstate="${slotKey}">
+      ${imgs.map((_,i)=>`<button type="button" class="stateBtn ${i===cur?"active":""}" data-slotstate="${slotKey}" data-idx="${i}">${i+1}</button>`).join("")}
+    </div>
+  `;
+}
+
 const STORY_MAIN = 5;
 const STORY_BACK = 3;
 const PLATOON_COUNT = 20;
@@ -24,6 +64,7 @@ const state = {
   layout: null,
   locks: null, // { storyMain:bool[5], storyBack:bool[3], platoons:bool[20][5] }
   mode: "story",
+  imgStateBySlot: null,
 };
 
 function el(id) { return document.getElementById(id); }
@@ -494,12 +535,42 @@ window.runOptimizer = function runOptimizer() {
   runEngine();
 };
 
+function installDelegates(){
+  // Per-slot image state buttons
+  document.addEventListener("click", (e) => {
+    const btn = e.target.closest(".stateBtn");
+    if (!btn) return;
+    const slotKey = btn.getAttribute("data-slotstate");
+    const idx = parseInt(btn.getAttribute("data-idx") || "0", 10);
+    if (!slotKey || !Number.isFinite(idx)) return;
+    setSlotStateIdx(slotKey, idx);
+    // Re-render to update image + active button
+    renderAll();
+  });
+
+  // Click portrait to toggle lock (matches your red-outline request)
+  document.addEventListener("click", (e) => {
+    const img = e.target.closest(".slotImg, .slotImgEl");
+    if (!img) return;
+    const card = e.target.closest(".slotCard");
+    if (!card) return;
+    const slot = card.querySelector("input.slotLock");
+    if (!slot) return;
+    slot.checked = !slot.checked;
+    const slotKey = slot.getAttribute("data-slot");
+    const idx = parseInt(slot.getAttribute("data-idx"),10);
+    setLockFor(slotKey, idx, slot.checked);
+    renderAll();
+  });
+}
+
 async function init() {
   initSharedOptimizerFiltersUI();
 
   state.all = await loadCharacters();
   state.layout = loadLayout();
   state.locks = loadLocks();
+  state.imgStateBySlot = loadImgStateBySlot();
   loadImageStateIdx();
 
   state.ownedIds = getOwnedIds();
@@ -514,6 +585,15 @@ async function init() {
   el("unlockAllLocks")?.addEventListener("click", unlockAllLocks);
 
   installModeButtons();
+  installDelegates();
+// Keep optimizer in sync when returning from Roster
+  window.addEventListener("pageshow", () => window.refreshOptimizerFromOwned());
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) window.refreshOptimizerFromOwned();
+  });
+  window.addEventListener("storage", (ev) => {
+    if (ev && ev.key === OWNED_KEY) window.refreshOptimizerFromOwned();
+  });
   renderAll();
 }
 
