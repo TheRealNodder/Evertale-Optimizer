@@ -139,6 +139,7 @@ function normalizeCharacters(arr) {
       element: pickFirst(u.element, ""),
       stats: { atk, hp, spd, cost },
       image: pickFirst(u.image, ""),
+      imagesLarge: Array.isArray(u.imagesLarge) ? u.imagesLarge : (u.image ? [u.image] : []),
       leaderSkillName: pickFirst(u.leaderSkill?.name, ""),
       leaderSkillDesc: pickFirst(u.leaderSkill?.description, ""),
       extraText: "",
@@ -198,8 +199,9 @@ function kindLabel(kind) {
 }
 
 function renderCard(item) {
-  const img = item.image
-    ? `<img src="${safeText(item.image)}" alt="${safeText(item.name)}">`
+  const imgs = (item.kind==="characters" && Array.isArray(item.imagesLarge) && item.imagesLarge.length) ? item.imagesLarge : (item.image ? [item.image] : []);
+  const img = imgs.length
+    ? `<img src="${safeText(imgs[0])}" data-imgs="${safeText(encodeURIComponent(JSON.stringify(imgs)))}" data-state="0" alt="${safeText(item.name)}">`
     : `<div class="ph">?</div>`;
 
   const chips = [];
@@ -227,6 +229,7 @@ function renderCard(item) {
             <div class="unitTitle">${safeText(item.subtitle || "")}</div>
           </div>
           <div class="tags">${chips.join("")}</div>
+        ${item.kind==="characters" ? stateRowHtml(imgs) : ""}
         </div>
 
         <div class="unitDetails">
@@ -274,6 +277,69 @@ function render() {
 
   grid.innerHTML = items.map(renderCard).join("");
 }
+
+
+function stateRowHtml(imgs){
+  if(!Array.isArray(imgs) || imgs.length < 2) return "";
+  const enc = encodeURIComponent(JSON.stringify(imgs));
+  const btns = imgs.map((_,i)=>`<button type="button" class="stateBtn ${i===0?"active":""}" data-idx="${i}">${i+1}</button>`).join("");
+  return `<div class="stateRow" data-imgs="${enc}">${btns}</div>`;
+}
+
+function attachStateHandlers(root){
+  // Button click: jump to state
+  root.addEventListener("click",(e)=>{
+    const btn = e.target.closest(".stateBtn");
+    if(!btn) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const row = btn.closest(".stateRow");
+    const enc = row?.getAttribute("data-imgs") || "";
+    let imgs=[];
+    try{ imgs = JSON.parse(decodeURIComponent(enc)); }catch{}
+    if(!imgs.length) return;
+
+    const card = btn.closest(".unitCard");
+    const imgEl = card?.querySelector(".unitThumb img");
+    if(!imgEl) return;
+
+    const idx = parseInt(btn.getAttribute("data-idx")||"0",10);
+    if(!Number.isFinite(idx) || idx<0 || idx>=imgs.length) return;
+
+    imgEl.src = imgs[idx];
+    imgEl.setAttribute("data-state", String(idx));
+    row.querySelectorAll(".stateBtn").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+  });
+
+  // Image click: cycle state
+  root.addEventListener("click",(e)=>{
+    const img = e.target.closest(".unitThumb img");
+    if(!img) return;
+    const card = img.closest(".unitCard");
+    if(!card) return;
+
+    const enc = img.getAttribute("data-imgs") || card.querySelector(".stateRow")?.getAttribute("data-imgs") || "";
+    let imgs=[];
+    try{ imgs = JSON.parse(decodeURIComponent(enc)); }catch{}
+    if(!Array.isArray(imgs) || imgs.length < 2) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    const cur = parseInt(img.getAttribute("data-state")||"0",10);
+    const next = (Number.isFinite(cur) ? (cur+1) : 1) % imgs.length;
+
+    img.src = imgs[next];
+    img.setAttribute("data-state", String(next));
+
+    const row = card.querySelector(".stateRow");
+    if(row){
+      row.querySelectorAll(".stateBtn").forEach((b,i)=>b.classList.toggle("active", i===next));
+    }
+  });
+}
+
 
 async function init() {
   applyMobileViewClass(getMobileViewPref());
@@ -341,6 +407,10 @@ async function init() {
   });
 
   render();
+
+  // enable state toggles
+  const grid = $("catalogGrid");
+  if (grid) attachStateHandlers(grid);
 }
 
 document.addEventListener("DOMContentLoaded", () => {
