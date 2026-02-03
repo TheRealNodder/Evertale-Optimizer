@@ -9,6 +9,7 @@ const LAYOUT_KEY = "evertale_team_layout_v1";
 const LS_TEAMTYPE_KEY = "evertale_optimizer_teamType_v1";
 const LS_PRESET_KEY = "evertale_optimizer_preset_v1";
 const LS_LOCKS_KEY = "evertale_optimizer_slotLocks_v1";
+const LS_IMGSTATE_KEY = "evertale_optimizer_imgState_v1";
 
 const STORY_MAIN = 5;
 const STORY_BACK = 3;
@@ -16,6 +17,7 @@ const PLATOON_COUNT = 20;
 const PLATOON_SIZE = 5;
 
 const state = {
+  imageStateIdx: 0,
   all: [],
   ownedIds: new Set(),
   ownedUnits: [],
@@ -69,7 +71,18 @@ function saveLocks() {
   localStorage.setItem(LS_LOCKS_KEY, JSON.stringify(state.locks));
 }
 
+function loadImageStateIdx() {
+  const raw = localStorage.getItem(LS_IMGSTATE_KEY);
+  const n = parseInt(raw||'0', 10);
+  state.imageStateIdx = Number.isFinite(n) ? Math.max(0, Math.min(2, n)) : 0;
+}
+
+function saveImageStateIdx() {
+  localStorage.setItem(LS_IMGSTATE_KEY, String(state.imageStateIdx||0));
+}
+
 function initSharedOptimizerFiltersUI() {
+  renderImageStateControls();
   const teamSel = el("teamTypeSelect");
   const presetSel = el("presetSelect");
   if (teamSel) teamSel.value = getTeamTypePref();
@@ -151,38 +164,54 @@ function slotCardHTML(slotKey, idx, currentId, units, locked) {
   const cid = normId(currentId);
   const u = units.find(x => normId(x.id) === cid);
 
-  const img = u?.image ? `<img src="${u.image}" alt="">` : `<div class="ph">?</div>`;
-  const title = u ? u.name : "Empty";
-  const sub = u ? (u.title || "") : "Select a unit";
+  const imgs = (u && Array.isArray(u.imagesLarge) && u.imagesLarge.length) ? u.imagesLarge : (u && u.image ? [u.image] : []);
+  const imgIdx = Math.min(state.imageStateIdx || 0, Math.max(0, imgs.length - 1));
+  const img = imgs.length ? imgs[imgIdx] : '';
 
-  return `
-    <div class="slotCard ${u ? "" : "empty"}">
-      <div class="slotTop">
-        <div class="slotImg">${img}</div>
-        <div>
-          <div class="slotName">${title}</div>
-          <div class="slotSub">${sub}</div>
-        </div>
-      </div>
+  const isPlatoon = String(slotKey).startsWith('platoon_');
+  const name = u ? (u.name || '') : 'Empty';
+  const title = u ? (u.title || '') : '';
+  const rarity = u ? (u.rarity || '') : '';
+  const element = u ? (u.element || '') : '';
 
-      <div style="display:flex; justify-content:space-between; gap:10px; align-items:center; margin-top:8px;">
-        <label class="muted" style="display:flex; gap:8px; align-items:center; user-select:none;">
-          <input type="checkbox" class="slotLock" data-slot="${slotKey}" data-idx="${idx}" ${locked ? "checked" : ""}/>
-          Lock
-        </label>
-        ${u ? `
-          <div class="slotMetaRow" style="margin:0;">
-            <span class="slotChip">${u.rarity || ""}</span>
-            <span class="slotChip">${u.element || ""}</span>
-          </div>
-        ` : `<div></div>`}
-      </div>
+  if (isPlatoon) {
+    let html = '';
+    html += '<div class="slotCard platoonSlot ' + (locked ? 'locked' : '') + '" data-slot="' + escapeAttr(slotKey) + '" data-idx="' + idx + '">';
+    html += '  <div class="slotImgWrap" role="button" tabindex="0" aria-label="Toggle lock">';
+    if (img) {
+      html += '    <img src="' + escapeAttr(img) + '" alt="' + escapeAttr(name) + '">';
+    } else {
+      html += '    <div class="placeholder"></div>';
+    }
+    html += '  </div>';
+    html += '  <div class="slotMeta">';
+    html += '    <div class="slotName">' + escapeHtml(name) + '</div>';
+    if (title) html += '    <div class="slotTitle">' + escapeHtml(title) + '</div>';
+    html += '    <div class="slotRE">' + escapeHtml(rarity) + (rarity && element ? ' • ' : '') + escapeHtml(element) + '</div>';
+    html += '  </div>';
+    html += '</div>';
+    return html;
+  }
 
-      <select class="slotSelect" data-slot="${slotKey}" data-idx="${idx}" ${locked ? "disabled" : ""}>
-        ${optionList(units)}
-      </select>
-    </div>
-  `;
+  // Story slots keep checkbox lock UI
+  let html = '';
+  html += '<div class="slotCard" data-slot="' + escapeAttr(slotKey) + '" data-idx="' + idx + '">';
+  html += '  <div class="slotThumb">';
+  if (img) {
+    html += '    <img src="' + escapeAttr(img) + '" alt="' + escapeAttr(name) + '">';
+  } else {
+    html += '    <div class="placeholder"></div>';
+  }
+  html += '  </div>';
+  html += '  <div class="slotInfo">';
+  html += '    <div class="slotTitle">' + escapeHtml(name) + '</div>';
+  html += '    <label class="lockRow">';
+  html += '      <input type="checkbox" class="lockToggle" data-slot="' + escapeAttr(slotKey) + '" data-idx="' + idx + '" ' + (locked ? 'checked' : '') + '>';
+  html += '      <span>Lock</span>';
+  html += '    </label>';
+  html += '  </div>';
+  html += '</div>';
+  return html;
 }
 
 function getLockFor(slotKey, idx) {
@@ -471,6 +500,7 @@ async function init() {
   state.all = await loadCharacters();
   state.layout = loadLayout();
   state.locks = loadLocks();
+  loadImageStateIdx();
 
   state.ownedIds = getOwnedIds();
   state.ownedUnits = state.all.filter(u => state.ownedIds.has(normId(u.id)));
