@@ -337,6 +337,77 @@ body{
 
 
 /* ===== Element accents for roster (mobile/desktop) without changing owned logic ===== */
+
+/* Restore rarity/element “bubble” chips (the markup uses .tag) */
+.tag{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:4px 8px;
+  border-radius:999px;
+  font-size:12px;
+  line-height:1;
+  font-weight:900;
+  letter-spacing:.2px;
+  border:1px solid rgba(255,255,255,.18);
+  background:rgba(255,255,255,.08);
+  color:var(--text);
+}
+.tag.element{ text-transform:capitalize; }
+.tag.rarity{ opacity:.95; }
+
+/* Element chip tint follows the card’s element class */
+.unitCard.el-fire  .tag.element{ border-color:color-mix(in srgb, var(--el-fire) 60%, rgba(255,255,255,.18)); background:color-mix(in srgb, var(--el-fire) 16%, rgba(255,255,255,.08)); }
+.unitCard.el-water .tag.element{ border-color:color-mix(in srgb, var(--el-water) 60%, rgba(255,255,255,.18)); background:color-mix(in srgb, var(--el-water) 16%, rgba(255,255,255,.08)); }
+.unitCard.el-storm .tag.element{ border-color:color-mix(in srgb, var(--el-storm) 60%, rgba(255,255,255,.18)); background:color-mix(in srgb, var(--el-storm) 16%, rgba(255,255,255,.08)); }
+.unitCard.el-earth .tag.element{ border-color:color-mix(in srgb, var(--el-earth) 60%, rgba(255,255,255,.18)); background:color-mix(in srgb, var(--el-earth) 16%, rgba(255,255,255,.08)); }
+.unitCard.el-light .tag.element{ border-color:rgba(10,12,20,.20); background:rgba(255,255,255,.70); color:rgba(10,12,20,.88); }
+.unitCard.el-dark  .tag.element{ border-color:color-mix(in srgb, var(--el-dark) 60%, rgba(255,255,255,.18)); background:color-mix(in srgb, var(--el-dark) 16%, rgba(255,255,255,.08)); }
+
+/* Optional rarity emphasis (kept neutral, no logic changes) */
+.tag.rarity{ background:rgba(255,255,255,.10); }
+
+/* Make the whole card read as the unit’s element (mobile expectation: “entire square”) */
+.unitCard{ position:relative; }
+.unitCard.el-fire,
+.unitCard.el-water,
+.unitCard.el-storm,
+.unitCard.el-earth,
+.unitCard.el-light,
+.unitCard.el-dark{ --el: transparent; }
+.unitCard.el-fire  { --el: var(--el-fire); }
+.unitCard.el-water { --el: var(--el-water); }
+.unitCard.el-storm { --el: var(--el-storm); }
+.unitCard.el-earth { --el: var(--el-earth); }
+.unitCard.el-light { --el: var(--el-light); }
+.unitCard.el-dark  { --el: var(--el-dark); }
+
+/* Subtle tint by default; stronger on mobile-compact */
+.unitCard[class*="el-"]{
+  background:
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--el) 10%, var(--panel)),
+      var(--panel)
+    );
+  border-color: color-mix(in srgb, var(--el) 38%, var(--line));
+}
+@media (max-width: 560px){
+  body.mobile-compact .unitCard[class*="el-"]{
+    background:
+      linear-gradient(180deg,
+        color-mix(in srgb, var(--el) 22%, var(--panel)),
+        color-mix(in srgb, var(--el) 10%, var(--panel))
+      );
+  }
+}
+
+/* Light element: keep text readable when the whole card is tinted */
+.unitCard.el-light{ color: rgba(10,12,20,0.92); }
+.unitCard.el-light .unitTitle,
+.unitCard.el-light .unitSub,
+.unitCard.el-light .leaderDesc{ color: rgba(10,12,20,0.68); }
+.unitCard.el-light .tag.rarity{ border-color:rgba(10,12,20,.18); background:rgba(255,255,255,.55); color:rgba(10,12,20,.85); }
+
 .unitCard.el-fire  { border-left: 6px solid var(--el-fire);  }
 .unitCard.el-water { border-left: 6px solid var(--el-water); }
 .unitCard.el-storm { border-left: 6px solid var(--el-storm); }
