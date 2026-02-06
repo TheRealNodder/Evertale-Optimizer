@@ -41,6 +41,137 @@
     return new Set();
   }
 
+
+  // Tag normalization / synonym expansion to improve passive melding.
+  // Keeps canonical tags stable for scoring, while allowing multiple phrases to map to the same mechanic.
+  function canonicalTag(raw) {
+    const t = lc(raw);
+    // keep only [a-z0-9_], normalize separators to "_"
+    return t.replace(/[^a-z0-9]+/g, "_").replace(/_+/g, "_").replace(/^_+|_+$/g, "");
+  }
+
+  // IMPORTANT: synonyms map to an existing canonical mechanic-tag.
+  // Do not include broad substring matching here; keep it explicit to avoid accidental collisions
+  // (e.g., burn_tier_healing should NOT become heal).
+  const TAG_SYNONYMS = {
+    // Healing / sustain
+    healing: "heal",
+    heal_over_time: "heal",
+    regen: "heal",
+    regeneration: "heal",
+    lifesteal: "heal",
+    life_steal: "heal",
+    leech: "heal",
+    vampiric: "heal",
+    drain: "heal",
+
+    // Cleanse / purification
+    cleanse: "purify",
+    cleansing: "purify",
+    purge: "purify",
+    purged: "purify",
+    remove_debuffs: "purify",
+    debuff_remove: "purify",
+    debuff_removal: "purify",
+    cleanse_team: "purify",
+    cleanse_self: "purify",
+
+    // Revive
+    resurrect: "revive",
+    resurrection: "revive",
+    reanimate: "revive",
+    bring_back: "revive",
+
+    // Mitigation
+    mitigate: "damage_reduction",
+    mitigation: "damage_reduction",
+    reduce_damage: "damage_reduction",
+    damage_mitigation: "damage_reduction",
+    toughness: "damage_reduction",
+    resilient: "damage_reduction",
+    resilience: "damage_reduction",
+    fortified: "damage_reduction",
+    hardened: "damage_reduction",
+
+    // Barrier / shielding (new coverage key)
+    shield: "barrier",
+    shielding: "barrier",
+    barrier: "barrier",
+    ward: "barrier",
+    protect_shield: "barrier",
+
+    // Guard / cover (new coverage key)
+    taunt: "guard",
+    guarding: "guard",
+    bodyguard: "guard",
+    cover: "guard",
+    protect: "guard",
+
+    // Dispel (new coverage key)
+    dispel: "dispel",
+    strip: "dispel",
+    strip_buffs: "dispel",
+    remove_buffs: "dispel",
+    buff_remove: "dispel",
+
+    // Stealth / untargetable (new coverage key)
+    stealth: "stealth",
+    hidden: "stealth",
+    hide: "stealth",
+    invis: "stealth",
+    invisible: "stealth",
+
+    // Evasion (new coverage key)
+    evasion: "evasion",
+    dodge: "evasion",
+    dodging: "evasion",
+    avoid: "evasion",
+
+    // Tempo manipulation
+    haste: "tu_manip",
+    quicken: "tu_manip",
+    speed_up: "tu_manip",
+    speedup: "tu_manip",
+    reduce_tu: "tu_manip",
+    tu_reduce: "tu_manip",
+    tu_reduction: "tu_manip",
+    extra_turn: "tu_manip",
+    turn_gain: "tu_manip",
+
+    // Status engines (apply/payoff/anti) — allows alternate phrasing to map to your canonical tags.
+    ignite_apply: "burn_apply",
+    burning_apply: "burn_apply",
+    fire_dot_apply: "burn_apply",
+    burn_bonus: "burn_synergy",
+    vs_burning: "burn_synergy",
+
+    toxin_apply: "poison_apply",
+    venom_apply: "poison_apply",
+    poison_bonus: "poison_synergy",
+    vs_poisoned: "poison_synergy",
+
+    slumber_apply: "sleep_apply",
+    sleep_bonus: "sleep_synergy",
+    vs_sleeping: "sleep_synergy",
+
+    shock_apply: "stun_apply",
+    stun_bonus: "stun_synergy",
+    vs_stunned: "stun_synergy",
+  };
+
+  // Converts unit tags into a canonical + expanded set used by the optimizer.
+  function expandUnitTags(tagSet) {
+    const out = new Set();
+    for (const raw of (tagSet || [])) {
+      const t = canonicalTag(raw);
+      if (!t) continue;
+      out.add(t);
+      const syn = TAG_SYNONYMS[t];
+      if (syn) out.add(syn);
+    }
+    return out;
+  }
+
   const PRESET_DEFS = {
     burn:   { include:["burn_apply","burn_synergy","frostburn_apply","burn_tier_healing","burn_tier_mega_healing"], soft:["status_spread","infect","tu_manip","purify","ward_burn"], exclude:["burn_anti"] },
     poison: { include:["poison_apply","poison_synergy","poison_tier_lethal","poison_tier_mega","poison_tier_super"], soft:["status_spread","infect","tu_manip","purify","ward_poison"], exclude:["poison_anti"] },
@@ -121,30 +252,152 @@
     return score;
   }
 
+  function extractTeamFeatures(team) {
+    const tagCount = new Map();
+    const elemCount = new Map();
+    for (const u of team) {
+      const e = getElement(u) || "";
+      if (e) elemCount.set(e, (elemCount.get(e) || 0) + 1);
+      for (const t of u.__opt.tags) tagCount.set(t, (tagCount.get(t) || 0) + 1);
+    }
+    const has = (t) => (tagCount.get(t) || 0) > 0;
+    const n = (t) => (tagCount.get(t) || 0);
+
+    const engines = {
+      burn:   { apply: n("burn_apply") + n("frostburn_apply"), payoff: n("burn_synergy") + n("burn_tier_healing") + n("burn_tier_mega_healing"), anti: n("burn_anti"), support: n("status_spread") + n("infect") + n("tu_manip") + n("ward_burn") },
+      poison: { apply: n("poison_apply"), payoff: n("poison_synergy") + n("poison_tier_lethal") + n("poison_tier_mega") + n("poison_tier_super"), anti: n("poison_anti"), support: n("status_spread") + n("infect") + n("tu_manip") + n("ward_poison") },
+      sleep:  { apply: n("sleep_apply"), payoff: n("sleep_synergy"), anti: n("sleep_anti"), support: n("tu_manip") + n("ward_sleep") },
+      stun:   { apply: n("stun_apply"), payoff: n("stun_synergy"), anti: n("stun_anti"), support: n("tu_manip") + n("ward_stun") },
+    };
+
+    const coverage = {
+      heal: has("heal"),
+      revive: has("revive"),
+      cleanse: has("purify"),
+      mitigation: has("damage_reduction"),
+      tempo: has("tu_manip"),
+
+      // expanded coverage (synonyms map here via expandUnitTags)
+      barrier: has("barrier"),
+      guard: has("guard"),
+      dispel: has("dispel"),
+      stealth: has("stealth"),
+      evasion: has("evasion"),
+    };
+
+    return { tagCount, elemCount, engines, coverage, size: team.length };
+  }
+
+  function clamp01(x){ return x < 0 ? 0 : (x > 1 ? 1 : x); }
+
+  function engineScore(eng) {
+    const pair = Math.min(eng.apply, eng.payoff);
+    const partial = (eng.apply + eng.payoff) - 2 * pair;
+    let s = 0;
+    s += pair * 3.0;
+    s += partial * 0.75;
+    s += clamp01(eng.support / 4) * (pair > 0 ? 2.0 : 1.0);
+    s -= eng.anti * 3.5;
+    if (eng.apply >= 3 && eng.payoff === 0) s -= 2.0;
+    if (eng.payoff >= 3 && eng.apply === 0) s -= 2.0;
+    return s;
+  }
+
+  function redundancyPenalty(features) {
+    const n = (t)=>features.tagCount.get(t)||0;
+    let p = 0;
+
+    // Core redundancies
+    const healers = n("heal");
+    const cleansers = n("purify");
+    const mitig = n("damage_reduction");
+
+    // Expanded redundancies (lighter penalties)
+    const barriers = n("barrier");
+    const guards = n("guard");
+
+    if (healers > 2) p += (healers - 2) * 0.9;
+    if (cleansers > 2) p += (cleansers - 2) * 1.1;
+    if (mitig > 2) p += (mitig - 2) * 0.7;
+
+    if (barriers > 2) p += (barriers - 2) * 0.5;
+    if (guards > 2) p += (guards - 2) * 0.6;
+
+    return p;
+  }
+
+  function coverageBonus(features) {
+    let b = 0;
+
+    // Core coverage
+    if (features.coverage.heal) b += 1.0;
+    if (features.coverage.cleanse) b += 1.2;
+    if (features.coverage.revive) b += 0.8;
+    if (features.coverage.mitigation) b += 0.9;
+    if (features.coverage.tempo) b += 0.7;
+
+    // Expanded coverage (smaller, but helps teams feel "complete")
+    if (features.coverage.barrier) b += 0.6;
+    if (features.coverage.guard) b += 0.6;
+    if (features.coverage.dispel) b += 0.5;
+    if (features.coverage.stealth) b += 0.35;
+    if (features.coverage.evasion) b += 0.35;
+
+    // Combo bonuses
+    if (features.coverage.mitigation && (features.coverage.heal || features.coverage.revive)) b += 0.8;
+    if (features.coverage.guard && (features.coverage.barrier || features.coverage.mitigation)) b += 0.4;
+    if ((features.engines.sleep.apply || features.engines.stun.apply) && features.coverage.tempo) b += 0.6;
+
+    return b;
+  }
+
+  function presetCohesionScore(team, presetKey) {
+    const def = PRESET_DEFS[presetKey];
+    if (!def) return 0;
+    let strong = 0, anti = 0, soft = 0;
+    for (const u of team) {
+      if (anyTag(u.__opt.tags, def.include)) strong++;
+      if (anyTag(u.__opt.tags, def.soft)) soft++;
+      if (anyTag(u.__opt.tags, def.exclude)) anti++;
+    }
+    return strong * 2.0 + soft * 0.6 - anti * 3.2;
+  }
+
+  function teamSynergyScore(doctrine, team, options) {
+    const presetKey = options?.presetKey || "";
+    const features = extractTeamFeatures(team);
+
+    let s = 0;
+    s += engineScore(features.engines.burn);
+    s += engineScore(features.engines.poison);
+    s += engineScore(features.engines.sleep);
+    s += engineScore(features.engines.stun);
+
+    if (presetKey && PRESET_DEFS[presetKey]) s += presetCohesionScore(team, presetKey);
+
+    s += coverageBonus(features);
+    s -= redundancyPenalty(features);
+
+    return s;
+  }
+
   function teamScore(doctrine, team, options) {
     const add = doctrine.scoringModel?.teamAdditives || {};
     const base = team.reduce((a,u)=>a + u.__opt.base, 0) / Math.max(1, team.length);
 
-    const presetKey = options?.presetKey || "";
-    let presetCohesion = 0;
-    if (presetKey && PRESET_DEFS[presetKey]) {
-      const def = PRESET_DEFS[presetKey];
-      let strong = 0, anti = 0;
-      for (const u of team) {
-        if (anyTag(u.__opt.tags, def.include)) strong++;
-        if (anyTag(u.__opt.tags, def.exclude)) anti++;
-      }
-      presetCohesion += strong * 1.2;
-      presetCohesion -= anti * 2.5;
-    }
+    const synergy = teamSynergyScore(doctrine, team, options);
 
-    return (base / 5000) + (presetCohesion * (add.pairSynergyWeight ?? 0.35));
+    const basePart = (base / 5000);
+    const synergyPart = synergy * (add.pairSynergyWeight ?? 0.35);
+
+    return basePart + synergyPart;
   }
 
   function topCandidates(units, limit) {
     const sorted = [...units].sort((a,b)=>b.__opt.base - a.__opt.base);
     return sorted.slice(0, Math.min(limit, sorted.length));
   }
+
 
   // ---------- LOCK EXTRACTION ----------
   function forcedFromLocks(unitsById, layout, locks, sectionKey, maxSlots) {
@@ -191,16 +444,43 @@
   function buildTeamFixedSize(doctrine, pool, forcedUnits, size, options) {
     const forcedIds = new Set((forcedUnits||[]).map(u => normId(u.id)));
     const team = [...(forcedUnits || [])].slice(0, size);
+    const chosen = new Set(team.map(u => normId(u.id)));
 
-    for (const u of pool) {
-      if (team.length >= size) break;
-      const id = normId(u.id);
-      if (forcedIds.has(id)) continue;
-      if (team.some(x => normId(x.id) === id)) continue;
-      team.push(u);
+    // Greedy synergy-aware fill:
+    // At each step, pick the candidate that maximizes teamScore(team ∪ {cand}).
+    // Lookahead is capped for performance and determinism.
+    const lookahead = doctrine.optimizerSearch?.greedyLookahead ?? 80;
+
+    while (team.length < size) {
+      let best = null;
+      let bestScore = -Infinity;
+
+      // Consider the top-N remaining candidates (pool is already roughly sorted by base).
+      let seen = 0;
+      for (const u of pool) {
+        if (team.length >= size) break;
+        const id = normId(u.id);
+        if (forcedIds.has(id) || chosen.has(id)) continue;
+
+        // cap
+        if (seen++ >= lookahead) break;
+
+        const score = teamScore(doctrine, [...team, u], options);
+
+        // tie-break: higher base, then stable id
+        if (score > bestScore ||
+            (score === bestScore && best && u.__opt.base > best.__opt.base) ||
+            (score === bestScore && best && u.__opt.base === best.__opt.base && id < normId(best.id))) {
+          bestScore = score;
+          best = u;
+        }
+      }
+
+      if (!best) break;
+      team.push(best);
+      chosen.add(normId(best.id));
     }
 
-    // If still short, just return what we have
     return team;
   }
 
@@ -327,7 +607,7 @@
     const units = (ownedUnits || []).map(u => {
       const clone = Object.assign({}, u);
       clone.id = normId(u.id);
-      clone.__opt = { tags: getUnitTags(u) };
+      clone.__opt = { tags: expandUnitTags(getUnitTags(u)) };
       return clone;
     });
 
