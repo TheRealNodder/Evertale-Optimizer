@@ -428,14 +428,106 @@ body{
 }
 
 /* =========================================================
-   ROSTER TEXT COLOR LOCK (prevents accidental black text)
+   ROSTER TEXT COLOR LOCK (safer)
+   - Default: keep text consistent
+   - Exception: Light element uses dark text for contrast
    ========================================================= */
 .unitCard,
 .unitCard *{
-  color: var(--text) !important;
+  color: var(--text);
 }
 .unitCard .unitTitle,
 .unitCard .unitSub,
 .unitCard .leaderDesc{
-  color: var(--muted) !important;
+  color: var(--muted);
 }
+
+/* Light element: allow dark text where needed */
+.unitCard.el-light,
+.unitCard.el-light *{
+  color: rgba(10,12,20,0.92);
+}
+.unitCard.el-light .unitTitle,
+.unitCard.el-light .unitSub,
+.unitCard.el-light .leaderDesc{
+  color: rgba(10,12,20,0.68);
+}
+.unitCard.el-light .tag{
+  border-color: rgba(10,12,20,.20);
+  background: rgba(255,255,255,.70);
+  color: rgba(10,12,20,.88);
+}
+
+/* ===========================
+   CATALOG OVERLAP FIX
+   =========================== */
+
+/* The row that contains name/chips and the (1)(2)(3) buttons */
+.unitCard .unitTop,
+.unitCard .unitHeader,
+.unitCard .unitRowTop{
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+/* Left side: allow shrinking without overflowing into the right side */
+.unitCard .unitTopLeft,
+.unitCard .unitHeaderLeft,
+.unitCard .unitInfo{
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Make chips wrap instead of stacking on top of text */
+.unitCard .tagRow,
+.unitCard .unitBadges,
+.unitCard .unitTags{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  min-width: 0;
+}
+
+/* Keep long names from forcing overlap */
+.unitCard .unitName,
+.unitCard .unitTitleLine,
+.unitCard .unitTitle{
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Right side (1/2/3 buttons): never shrink into the text area */
+.unitCard .unitTopRight,
+.unitCard .unitHeaderRight,
+.unitCard .tierBtns,
+.unitCard .rankBtns{
+  flex: 0 0 auto;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  white-space: nowrap;
+  position: relative;
+  z-index: 1;
+}
+
+/* Mobile: stack the right-side buttons under the header */
+@media (max-width: 520px){
+  .unitCard .unitTop,
+  .unitCard .unitHeader,
+  .unitCard .unitRowTop{
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .unitCard .unitTopRight,
+  .unitCard .unitHeaderRight,
+  .unitCard .tierBtns,
+  .unitCard .rankBtns{
+    justify-content: flex-start;
+  }
+}
+
