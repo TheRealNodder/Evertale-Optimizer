@@ -530,76 +530,81 @@ body{
     justify-content: flex-start;
   }
 }
-
 /* =========================================================
-   CATALOG – DESKTOP COMPACT CARD (GRID-BASED, CLEAN)
-   Matches diagram:
-   [Thumb] [Name/Title        ][Badges]
-   [Toggles][Name/Title       ][Badges]
-   [Toggles][Stats + LeaderSkill        ]
+   CATALOG – DESKTOP COMPACT (SAFE WITH CURRENT DOM)
+   Uses existing .unitCard two-column layout:
+   - Left column: portrait
+   - Right column (.meta) becomes a 3-column grid:
+       [toggles][name/title][badges]
+     then body spans name/title + badges
    ========================================================= */
 
 @media (min-width: 901px){
+  /* Keep the card's outer grid as-is (thumb + meta) */
   #catalogGrid .unitCard{
+    grid-template-columns: 92px 1fr;
+    align-items:start;
+  }
+  #catalogGrid .unitThumb{
+    width:92px;
+    height:92px;
+  }
+
+  /* Turn meta into the diagram grid */
+  #catalogGrid .unitCard .meta{
     display:grid;
-    grid-template-columns: 92px 1fr auto;
+    grid-template-columns: 40px 1fr auto;
     grid-template-rows: auto auto 1fr;
     grid-template-areas:
-      "thumb head badges"
+      "toggles head badges"
       "toggles head badges"
       "toggles body body";
     gap: 10px 12px;
-    align-items:start;
-  }
-
-  /* Portrait */
-  #catalogGrid .unitThumb{
-    grid-area: thumb;
-    width:92px;
-    height:92px;
-    border-radius:12px;
-  }
-
-  /* Header (name + title) */
-  #catalogGrid .meta,
-  #catalogGrid .metaHeader,
-  #catalogGrid .nameBlock{
-    grid-area: head;
     min-width:0;
   }
 
-  #catalogGrid .unitName,
-  #catalogGrid .unitTitle{
-    white-space:nowrap;
+  /* Name/Title region */
+  #catalogGrid .unitCard .metaHeader,
+  #catalogGrid .unitCard .nameBlock{
+    grid-area: head;
+    min-width:0;
+  }
+  #catalogGrid .unitCard .unitName,
+  #catalogGrid .unitCard .unitTitle,
+  #catalogGrid .unitCard .unitSub{
+    min-width:0;
     overflow:hidden;
     text-overflow:ellipsis;
+    white-space:nowrap;
   }
 
-  /* Rectangular badges on the right */
-  #catalogGrid .chipCol,
-  #catalogGrid .tags{
+  /* Badges region (rectangles on the right) */
+  #catalogGrid .unitCard .chipCol,
+  #catalogGrid .unitCard .tags{
     grid-area: badges;
     display:flex;
     flex-direction:column;
     align-items:flex-end;
     gap:8px;
+    white-space:nowrap;
   }
-
-  #catalogGrid .tag{
+  #catalogGrid .unitCard .tag{
     border-radius:10px;
     padding:6px 12px;
     min-height:28px;
   }
 
   /* Toggle squares (1/2/3) */
-  #catalogGrid .stateRow{
+  #catalogGrid .unitCard .stateRow{
     grid-area: toggles;
+    display:flex;
     flex-direction:column;
     align-items:flex-start;
     gap:10px;
+    justify-content:flex-start;
+    margin-top:0;
   }
-
-  #catalogGrid .stateRow .stateBtn{
+  #catalogGrid .unitCard .stateRow .stateBtn{
     width:34px;
     height:34px;
     padding:0;
@@ -609,15 +614,15 @@ body{
   }
 
   /* Stats + leader skill */
-  #catalogGrid .unitDetails,
-  #catalogGrid .leaderBlock{
+  #catalogGrid .unitCard .unitDetails,
+  #catalogGrid .unitCard .leaderBlock{
     grid-area: body;
+    min-width:0;
   }
 
-  /* Safety: disable absolute positioning in catalog only */
-  #catalogGrid .stateRow,
-  #catalogGrid .chipCol{
-    position:static !important;
+  /* Prevent any inherited right-justification that causes collisions */
+  #catalogGrid .unitCard .topRow,
+  #catalogGrid .unitCard .metaHeader{
+    align-items:start;
   }
 }
-
