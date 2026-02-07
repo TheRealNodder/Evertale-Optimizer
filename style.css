@@ -531,3 +531,93 @@ body{
   }
 }
 
+/* =========================================================
+   CATALOG – DESKTOP COMPACT CARD (GRID-BASED, CLEAN)
+   Matches diagram:
+   [Thumb] [Name/Title        ][Badges]
+   [Toggles][Name/Title       ][Badges]
+   [Toggles][Stats + LeaderSkill        ]
+   ========================================================= */
+
+@media (min-width: 901px){
+  #catalogGrid .unitCard{
+    display:grid;
+    grid-template-columns: 92px 1fr auto;
+    grid-template-rows: auto auto 1fr;
+    grid-template-areas:
+      "thumb head badges"
+      "toggles head badges"
+      "toggles body body";
+    gap: 10px 12px;
+    align-items:start;
+  }
+
+  /* Portrait */
+  #catalogGrid .unitThumb{
+    grid-area: thumb;
+    width:92px;
+    height:92px;
+    border-radius:12px;
+  }
+
+  /* Header (name + title) */
+  #catalogGrid .meta,
+  #catalogGrid .metaHeader,
+  #catalogGrid .nameBlock{
+    grid-area: head;
+    min-width:0;
+  }
+
+  #catalogGrid .unitName,
+  #catalogGrid .unitTitle{
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+
+  /* Rectangular badges on the right */
+  #catalogGrid .chipCol,
+  #catalogGrid .tags{
+    grid-area: badges;
+    display:flex;
+    flex-direction:column;
+    align-items:flex-end;
+    gap:8px;
+  }
+
+  #catalogGrid .tag{
+    border-radius:10px;
+    padding:6px 12px;
+    min-height:28px;
+  }
+
+  /* Toggle squares (1/2/3) */
+  #catalogGrid .stateRow{
+    grid-area: toggles;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:10px;
+  }
+
+  #catalogGrid .stateRow .stateBtn{
+    width:34px;
+    height:34px;
+    padding:0;
+    display:grid;
+    place-items:center;
+    border-radius:10px;
+  }
+
+  /* Stats + leader skill */
+  #catalogGrid .unitDetails,
+  #catalogGrid .leaderBlock{
+    grid-area: body;
+  }
+
+  /* Safety: disable absolute positioning in catalog only */
+  #catalogGrid .stateRow,
+  #catalogGrid .chipCol{
+    position:static !important;
+  }
+}
+
