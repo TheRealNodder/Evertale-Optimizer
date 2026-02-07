@@ -266,7 +266,7 @@ body.mobile-compact .unitThumb{width:72px;height:72px;border-radius:10px}
     opacity:.9;
   }
 
-}}
+}
 /* =========================================================
    OPTIMIZER: ELEMENT COLOR CODING (PLACED UNITS)
    Guard rails:
@@ -401,12 +401,7 @@ body{
   }
 }
 
-/* Light element: keep text readable when the whole card is tinted */
-.unitCard.el-light{ color: rgba(10,12,20,0.92); }
-.unitCard.el-light .unitTitle,
-.unitCard.el-light .unitSub,
-.unitCard.el-light .leaderDesc{ color: rgba(10,12,20,0.68); }
-.unitCard.el-light .tag.rarity{ border-color:rgba(10,12,20,.18); background:rgba(255,255,255,.55); color:rgba(10,12,20,.85); }
+/* Light element: keep roster text consistent (no black text overrides) */
 
 .unitCard.el-fire  { border-left: 6px solid var(--el-fire);  }
 .unitCard.el-water { border-left: 6px solid var(--el-water); }
@@ -430,4 +425,17 @@ body{
   body.mobile-compact .unitCard.el-earth .ownedRow{ box-shadow: 0 0 0 2px color-mix(in srgb, var(--el-earth) 28%, transparent); }
   body.mobile-compact .unitCard.el-light .ownedRow{ box-shadow: 0 0 0 2px color-mix(in srgb, var(--el-light) 28%, transparent); }
   body.mobile-compact .unitCard.el-dark  .ownedRow{ box-shadow: 0 0 0 2px color-mix(in srgb, var(--el-dark) 28%, transparent); }
+}
+
+/* =========================================================
+   ROSTER TEXT COLOR LOCK (prevents accidental black text)
+   ========================================================= */
+.unitCard,
+.unitCard *{
+  color: var(--text) !important;
+}
+.unitCard .unitTitle,
+.unitCard .unitSub,
+.unitCard .leaderDesc{
+  color: var(--muted) !important;
 }
