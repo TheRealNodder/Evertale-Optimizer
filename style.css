@@ -428,128 +428,14 @@ body{
 }
 
 /* =========================================================
-   ROSTER TEXT COLOR LOCK (safer)
-   - Default: keep text consistent
-   - Exception: Light element uses dark text for contrast
+   ROSTER TEXT COLOR LOCK (prevents accidental black text)
    ========================================================= */
 .unitCard,
 .unitCard *{
-  color: var(--text);
+  color: var(--text) !important;
 }
 .unitCard .unitTitle,
 .unitCard .unitSub,
 .unitCard .leaderDesc{
-  color: var(--muted);
-}
-
-/* Light element: allow dark text where needed */
-.unitCard.el-light,
-.unitCard.el-light *{
-  color: rgba(10,12,20,0.92);
-}
-.unitCard.el-light .unitTitle,
-.unitCard.el-light .unitSub,
-.unitCard.el-light .leaderDesc{
-  color: rgba(10,12,20,0.68);
-}
-.unitCard.el-light .tag{
-  border-color: rgba(10,12,20,.20);
-  background: rgba(255,255,255,.70);
-  color: rgba(10,12,20,.88);
-}
-
-/* =========================================================
-   CATALOG – DESKTOP COMPACT (DIAGRAM LAYOUT)
-   Green box containment achieved by reserving grid columns:
-   [Photo][Toggles][Name/Title][Badges]
-   Stats + Leader span the last two columns beneath.
-   Applies only when View: Compact is active (body.mobile-compact) on desktop.
-   ========================================================= */
-
-@media (min-width: 901px){
-  body.mobile-compact #catalogGrid .unitCard{
-    display: grid;
-    grid-template-columns: 92px 40px 1fr auto; /* Blue | Red | Name/Title | Yellow */
-    grid-template-rows: auto 1fr;
-    gap: 10px 12px;
-    align-items: start;
-  }
-
-  body.mobile-compact #catalogGrid .unitThumb{
-    grid-column: 1;
-    grid-row: 1;
-    width: 92px;
-    height: 92px;
-    border-radius: 12px;
-  }
-
-  /* Red toggles: left vertical column */
-  body.mobile-compact #catalogGrid .stateRow{
-    grid-column: 2;
-    grid-row: 1 / span 2;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: flex-start;
-    gap: 10px;
-    margin: 0;
-  }
-  body.mobile-compact #catalogGrid .stateRow .stateBtn{
-    width: 34px;
-    height: 34px;
-    padding: 0;
-    display: grid;
-    place-items: center;
-    border-radius: 10px;
-  }
-
-  /* Name + title */
-  body.mobile-compact #catalogGrid .metaHeader,
-  body.mobile-compact #catalogGrid .nameBlock{
-    grid-column: 3;
-    grid-row: 1;
-    min-width: 0;
-  }
-  body.mobile-compact #catalogGrid .unitName{
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  body.mobile-compact #catalogGrid .unitTitle,
-  body.mobile-compact #catalogGrid .unitSub{
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  /* Yellow badges: right column as rectangles */
-  body.mobile-compact #catalogGrid .chipCol,
-  body.mobile-compact #catalogGrid .tags{
-    grid-column: 4;
-    grid-row: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 8px;
-    white-space: nowrap;
-  }
-  body.mobile-compact #catalogGrid .tag{
-    border-radius: 10px;
-    padding: 6px 12px;
-    min-height: 28px;
-  }
-
-  /* Stats + LeaderSkill: bottom, spanning content+badges */
-  body.mobile-compact #catalogGrid .unitDetails{
-    grid-column: 3 / span 2;
-    grid-row: 2;
-    display: block !important;
-    min-width: 0;
-  }
-  body.mobile-compact #catalogGrid .leaderBlock{
-    display: block !important;
-  }
-
-  /* Neutralize inherited right-justification that caused collisions */
-  body.mobile-compact #catalogGrid .stateRow{ justify-content: flex-start; }
+  color: var(--muted) !important;
 }
