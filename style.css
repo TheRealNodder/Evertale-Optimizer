@@ -510,3 +510,61 @@ body{
   body.mobile-compact .stateRow .stateBtn:nth-child(2)::before{ content: "2"; }
   body.mobile-compact .stateRow .stateBtn:nth-child(3)::before{ content: "3"; }
 }
+
+/* =========================================================
+   MOBILE COMPACT: SHOW FULL NAME + TITLE, CENTERED BADGES
+   - Phones/tablets only (desktop untouched)
+   - Badges on one centered row: Element • Character • SSR
+   ========================================================= */
+@media (max-width: 900px){
+  body.mobile-compact .metaHeader{
+    grid-template-columns: 1fr !important;   /* stack name + badges */
+    justify-items: center !important;
+    text-align: center !important;
+    gap: 8px !important;
+  }
+
+  body.mobile-compact .nameBlock{
+    width: 100% !important;
+  }
+
+  /* Show full unit name (no ellipsis) */
+  body.mobile-compact .unitName{
+    font-size: 14px !important;
+    line-height: 1.15 !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    word-break: normal !important;
+  }
+
+  /* Show full title/subtitle (no truncation) */
+  body.mobile-compact .unitTitle,
+  body.mobile-compact .unitSub{
+    display: block !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    max-width: 100% !important;
+  }
+
+  /* Badges row centered to eliminate wasted right-side space */
+  body.mobile-compact .chipCol{
+    width: 100% !important;
+    flex-direction: row !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 8px !important;
+  }
+
+  /* Re-order badges: Element first, Character (non-element/non-rarity) second, SSR (rarity) third */
+  body.mobile-compact .chipCol .tag.element{ order: 1 !important; }
+  body.mobile-compact .chipCol .tag:not(.element):not(.rarity){ order: 2 !important; }
+  body.mobile-compact .chipCol .tag.rarity{ order: 3 !important; }
+
+  /* Keep badges compact but readable */
+  body.mobile-compact .chipCol .tag{
+    min-height: 24px !important;
+    padding: 5px 10px !important;
+  }
+}
