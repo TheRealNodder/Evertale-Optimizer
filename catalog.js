@@ -199,11 +199,18 @@ function kindLabel(kind) {
 }
 
 function renderCard(item) {
-  const imgs = (item.kind==="characters" && Array.isArray(item.imagesLarge) && item.imagesLarge.length) ? item.imagesLarge : (item.image ? [item.image] : []);
+  const imgs = (item.kind==="characters" && Array.isArray(item.imagesLarge) && item.imagesLarge.length)
+    ? item.imagesLarge
+    : (item.image ? [item.image] : []);
+
   const img = imgs.length
     ? `<img src="${safeText(imgs[0])}" data-imgs="${safeText(encodeURIComponent(JSON.stringify(imgs)))}" data-state="0" alt="${safeText(item.name)}">`
     : `<div class="ph">?</div>`;
 
+  // Element class only applies to characters
+  const elClass = (item.kind==="characters" && item.element) ? ` el-${safeText(String(item.element).toLowerCase())}` : "";
+
+  // Right-side badges (rectangles)
   const chips = [];
   chips.push(`<span class="tag rarity">${safeText(kindLabel(item.kind))}</span>`);
   if (item.rarity) chips.push(`<span class="tag">${safeText(item.rarity)}</span>`);
@@ -217,19 +224,24 @@ function renderCard(item) {
   if (cost !== "" && cost != null) statParts.push(`<div class="stat"><strong>COST</strong> ${safeText(cost)}</div>`);
 
   // For compact mode, panels are hidden via CSS; this keeps markup consistent
-  const extra = item.extraText ? `<div class="panel"><div class="panelTitle">Info</div><div class="muted" style="white-space:pre-wrap">${safeText(item.extraText)}</div></div>` : "";
+  const extra = item.extraText
+    ? `<div class="panel"><div class="panelTitle">Info</div><div class="muted" style="white-space:pre-wrap">${safeText(item.extraText)}</div></div>`
+    : "";
 
   return `
-    <div class="unitCard" data-kind="${safeText(item.kind)}" data-id="${safeText(item.id)}">
-      <div class="unitThumb">${img}</div>
+    <div class="unitCard${elClass}" data-kind="${safeText(item.kind)}" data-id="${safeText(item.id)}">
+      <div class="unitLeft">
+        <div class="unitThumb">${img}</div>
+        ${item.kind==="characters" ? stateRowHtml(imgs) : ""}
+      </div>
+
       <div class="meta">
-        <div class="topRow">
-          <div>
+        <div class="metaHeader">
+          <div class="nameBlock">
             <div class="unitName">${safeText(item.name)}</div>
             <div class="unitTitle">${safeText(item.subtitle || "")}</div>
           </div>
-          <div class="tags">${chips.join("")}</div>
-        ${item.kind==="characters" ? stateRowHtml(imgs) : ""}
+          <div class="chipCol">${chips.join("")}</div>
         </div>
 
         <div class="unitDetails">
@@ -249,7 +261,7 @@ function renderCard(item) {
   `;
 }
 
-function render() {
+function render(function render() {
   const grid = $("catalogGrid");
   const status = $("statusText");
   if (!grid) return;
@@ -282,7 +294,7 @@ function render() {
 function stateRowHtml(imgs){
   if(!Array.isArray(imgs) || imgs.length < 2) return "";
   const enc = encodeURIComponent(JSON.stringify(imgs));
-  const btns = imgs.map((_,i)=>`<button type="button" class="stateBtn ${i===0?"active":""}" data-idx="${i}">${i+1}</button>`).join("");
+  const btns = imgs.map((_,i)=>`<button type="button" class="stateBtn ${i===0?"active":""}" data-idx="${i}" aria-label="State ${i+1}"></button>`).join("");
   return `<div class="stateRow" data-imgs="${enc}">${btns}</div>`;
 }
 
