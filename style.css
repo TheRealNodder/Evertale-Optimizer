@@ -682,3 +682,76 @@ body{
     order: 3 !important;
   }
 }
+
+/* =========================================================
+   MOBILE DETAILED (CATALOG ONLY): TOGGLES 1–3 + ELEMENT POSITION
+   - Does NOT affect desktop
+   - Does NOT affect compact view
+   Desired:
+     - Toggle states as 1/2/3 (horizontal)
+     - Badges: Character on its own line; Element + SSR side-by-side (Element first)
+   ========================================================= */
+@media (max-width: 900px){
+
+  /* 1) Toggle states: horizontal row, centered, labeled 1–3 */
+  body.mobile-detailed #catalogGrid .stateRow{
+    flex-direction: row !important;
+    justify-content: flex-start !important;  /* sits under name area like your reference */
+    align-items: center !important;
+    gap: 10px !important;
+    margin: 8px 0 0 0 !important;
+  }
+
+  body.mobile-detailed #catalogGrid .stateRow .stateBtn{
+    display: grid !important;
+    place-items: center !important;
+    width: 30px !important;
+    height: 30px !important;
+    padding: 0 !important;
+    border-radius: 999px !important;
+    font-size: 0 !important; /* hide any existing text */
+  }
+
+  body.mobile-detailed #catalogGrid .stateRow .stateBtn::before{
+    content: "" !important;
+    font-size: 12px !important;
+    line-height: 1 !important;
+    font-weight: 900 !important;
+    color: var(--text) !important;
+  }
+  body.mobile-detailed #catalogGrid .stateRow .stateBtn:nth-child(1)::before{ content: "1" !important; }
+  body.mobile-detailed #catalogGrid .stateRow .stateBtn:nth-child(2)::before{ content: "2" !important; }
+  body.mobile-detailed #catalogGrid .stateRow .stateBtn:nth-child(3)::before{ content: "3" !important; }
+
+  /* If stateRow is inside .unitLeft, prevent vertical stacking in detailed catalog */
+  body.mobile-detailed #catalogGrid .unitLeft .stateRow{
+    flex-direction: row !important;
+    align-items: center !important;
+  }
+
+  /* 2) Badge layout: Character line, then Element + SSR line (Element first) */
+  body.mobile-detailed #catalogGrid .chipCol{
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    gap: 10px !important;
+  }
+
+  /* Character badge on its own row */
+  body.mobile-detailed #catalogGrid .chipCol .tag:not(.element):not(.rarity){
+    flex: 0 0 100% !important;
+    order: 1 !important;
+    justify-content: flex-end !important;
+    margin-bottom: 2px !important;
+  }
+
+  /* Element then SSR on same row */
+  body.mobile-detailed #catalogGrid .chipCol .tag.element{
+    order: 2 !important;
+  }
+  body.mobile-detailed #catalogGrid .chipCol .tag.rarity{
+    order: 3 !important;
+  }
+}
