@@ -261,7 +261,7 @@ function renderCard(item) {
   `;
 }
 
-function render(function render() {
+function render() {
   const grid = $("catalogGrid");
   const status = $("statusText");
   if (!grid) return;
