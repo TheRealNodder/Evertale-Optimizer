@@ -9,6 +9,19 @@
 
 const PLACEHOLDER_IMG = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='128' height='128'><rect width='100%' height='100%' fill='%23121522'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='%23aab1d6' font-family='Arial' font-size='14'>No Image</text></svg>";
 
+const BAD_IMG_CACHE_KEY = "evertale_bad_img_urls_v1";
+const BAD_IMG_CACHE = new Set(safeJsonParse(localStorage.getItem(BAD_IMG_CACHE_KEY), []));
+function markBadImgUrl(url){
+  try{
+    if(!url) return;
+    BAD_IMG_CACHE.add(url);
+    localStorage.setItem(BAD_IMG_CACHE_KEY, JSON.stringify(Array.from(BAD_IMG_CACHE)));
+  }catch{}
+}
+function isBadImgUrl(url){
+  try{ return !!url && BAD_IMG_CACHE.has(url); }catch{ return false; }
+}
+
 const DATA = {
   characters: "./data/characters.json",
   weapons: "./data/weapons.json",
@@ -201,9 +214,10 @@ function kindLabel(kind) {
 }
 
 function renderCard(item) {
-  const imgs = (item.kind==="characters" && Array.isArray(item.imagesLarge) && item.imagesLarge.length)
+  const imgsRaw = (item.kind==="characters" && Array.isArray(item.imagesLarge) && item.imagesLarge.length)
     ? item.imagesLarge
     : (item.image ? [item.image] : []);
+  const imgs = (imgsRaw || []).filter(u => u && !isBadImgUrl(u));
 
   const img = imgs.length
     ? `<img src="${safeText(imgs[0])}" data-imgs="${safeText(encodeURIComponent(JSON.stringify(imgs)))}" data-state="0" alt="${safeText(item.name)}" onerror="this.onerror=null;this.src=PLACEHOLDER_IMG;">`
