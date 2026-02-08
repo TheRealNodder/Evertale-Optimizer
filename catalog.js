@@ -228,16 +228,22 @@ function renderCard(item) {
 
   // Right-side badges (rectangles)
   const chips = [];
-  chips.push(`<span class="tag rarity">${safeText(kindLabel(item.kind))}</span>`);
-  if (item.rarity) chips.push(`<span class="tag">${safeText(item.rarity)}</span>`);
+  // Classes are intentional so CSS can be strict about placement:
+  // - .kind   => Character/Weapon/Accessory/Boss badge
+  // - .element=> Element badge (characters/accessories/bosses)
+  // - .rarity => Rarity badge (SSR/SR/R...)
+  chips.push(`<span class="tag kind">${safeText(kindLabel(item.kind))}</span>`);
   if (item.element) chips.push(`<span class="tag element">${safeText(item.element)}</span>`);
+  if (item.rarity) chips.push(`<span class="tag rarity">${safeText(item.rarity)}</span>`);
 
   const { atk, hp, spd, cost } = item.stats || {};
   const statParts = [];
-  if (atk !== "" && atk != null) statParts.push(`<div class="stat"><strong>ATK</strong> ${safeText(atk)}</div>`);
-  if (hp !== "" && hp != null) statParts.push(`<div class="stat"><strong>HP</strong> ${safeText(hp)}</div>`);
-  if (spd !== "" && spd != null) statParts.push(`<div class="stat"><strong>SPD</strong> ${safeText(spd)}</div>`);
-  if (cost !== "" && cost != null) statParts.push(`<div class="stat"><strong>COST</strong> ${safeText(cost)}</div>`);
+  // Two-line stat markup (label above value) so mobile can center-align cleanly.
+  const stat = (label, val) => `<div class="stat"><div class="statLabel">${label}</div><div class="statVal">${safeText(val)}</div></div>`;
+  if (atk !== "" && atk != null) statParts.push(stat("ATK", atk));
+  if (hp  !== "" && hp  != null) statParts.push(stat("HP", hp));
+  if (spd !== "" && spd != null) statParts.push(stat("SPD", spd));
+  if (cost!== "" && cost!= null) statParts.push(stat("COST", cost));
 
   // For compact mode, panels are hidden via CSS; this keeps markup consistent
   const extra = item.extraText

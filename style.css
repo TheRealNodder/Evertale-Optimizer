@@ -1251,3 +1251,89 @@ body{
 
   body.mobile-detailed #unitGrid .leaderBlock{ grid-area: leader !important; }
 }
+
+/* =========================================================
+   MOBILE DETAILED (CATALOG): FINAL HOOKS (matches catalog.js markup)
+   - catalog.js now emits: .tag.kind / .tag.element / .tag.rarity
+   - catalog.js stats are: .statLabel above .statVal
+   This block ensures the intended mobile-detailed catalog layout
+   actually applies regardless of earlier experimental rules.
+   ========================================================= */
+@media (max-width: 900px){
+  /* Badge placement: Kind (Character) on top; Element + Rarity below */
+  body.mobile-detailed #catalogGrid .chipCol,
+  body.mobile-detailed #unitGrid .chipCol{
+    display: grid !important;
+    grid-template-columns: auto auto !important;
+    grid-template-rows: auto auto !important;
+    grid-template-areas:
+      "kind kind"
+      "element rarity" !important;
+    gap: 10px !important;
+    justify-items: end !important;
+    align-items: center !important;
+  }
+
+  body.mobile-detailed #catalogGrid .chipCol .tag.kind,
+  body.mobile-detailed #unitGrid .chipCol .tag.kind{
+    grid-area: kind !important;
+    justify-self: end !important;
+  }
+  body.mobile-detailed #catalogGrid .chipCol .tag.element,
+  body.mobile-detailed #unitGrid .chipCol .tag.element{
+    grid-area: element !important;
+  }
+  body.mobile-detailed #catalogGrid .chipCol .tag.rarity,
+  body.mobile-detailed #unitGrid .chipCol .tag.rarity{
+    grid-area: rarity !important;
+    width: auto !important; /* SSR short */
+    min-width: 0 !important;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+
+  /* Element tint (like compact) */
+  body.mobile-detailed #catalogGrid .unitCard[class*="el-"] .chipCol .tag.element,
+  body.mobile-detailed #unitGrid .unitCard[class*="el-"] .chipCol .tag.element{
+    border-color: color-mix(in srgb, var(--el) 60%, rgba(255,255,255,.18)) !important;
+    background: color-mix(in srgb, var(--el) 16%, rgba(255,255,255,.08)) !important;
+  }
+  body.mobile-detailed #catalogGrid .unitCard.el-light .chipCol .tag.element,
+  body.mobile-detailed #unitGrid .unitCard.el-light .chipCol .tag.element{
+    border-color: rgba(10,12,20,.20) !important;
+    background: rgba(255,255,255,.70) !important;
+    color: rgba(10,12,20,.88) !important;
+  }
+
+  /* Stats: 4-up centered, 2-line (label then value) */
+  body.mobile-detailed #catalogGrid .statLine,
+  body.mobile-detailed #unitGrid .statLine{
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+    justify-items: center !important;
+    align-items: start !important;
+    width: 100% !important;
+  }
+  body.mobile-detailed #catalogGrid .stat,
+  body.mobile-detailed #unitGrid .stat{
+    display: grid !important;
+    grid-template-rows: auto auto !important;
+    justify-items: center !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+  }
+  body.mobile-detailed #catalogGrid .statLabel,
+  body.mobile-detailed #unitGrid .statLabel{
+    font-size: 12px !important;
+    font-weight: 900 !important;
+    letter-spacing: .4px !important;
+  }
+  body.mobile-detailed #catalogGrid .statVal,
+  body.mobile-detailed #unitGrid .statVal{
+    margin-top: 4px !important;
+    font-size: 16px !important;
+    font-weight: 900 !important;
+    letter-spacing: .2px !important;
+  }
+}
