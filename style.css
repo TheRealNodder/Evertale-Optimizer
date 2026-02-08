@@ -856,3 +856,125 @@ body{
     border-radius: 12px !important;
   }
 }
+
+/* =========================================================
+   MOBILE DETAILED (CATALOG ONLY) — STRICT PLACEMENT FIX
+   Goal layout (3-column header row under image):
+     Row1: hero image (full width)
+     Row2: Name (col1-2) | Badges (col3)
+     Row3: Title (col1) | Toggles 1-3 (col2) | Badges (col3)
+     Row4+: Stats / Leader / etc (full width)
+   Badges (col3):
+     - Top line: Character (longer)
+     - Bottom line: Element + SSR (Element first, SSR short)
+   Notes:
+     - Compact view untouched
+     - Desktop untouched
+   ========================================================= */
+@media (max-width: 900px){
+  body.mobile-detailed #catalogGrid .unitCard{
+    display: grid !important;
+    grid-template-columns: 1fr auto auto !important;
+    grid-template-rows: auto auto auto auto auto !important;
+    grid-template-areas:
+      "thumb thumb thumb"
+      "name  name  badges"
+      "title toggles badges"
+      "stats stats stats"
+      "leader leader leader" !important;
+    gap: 10px !important;
+  }
+
+  /* Flatten wrappers so children can be placed by the card grid */
+  body.mobile-detailed #catalogGrid .unitLeft{ display: contents !important; }
+  body.mobile-detailed #catalogGrid .meta{ display: contents !important; }
+  body.mobile-detailed #catalogGrid .metaHeader{ display: contents !important; }
+  body.mobile-detailed #catalogGrid .nameBlock{ display: contents !important; }
+
+  /* Hero */
+  body.mobile-detailed #catalogGrid .unitThumb{ grid-area: thumb !important; }
+
+  /* Name + title */
+  body.mobile-detailed #catalogGrid .unitName{
+    grid-area: name !important;
+    align-self: end !important;
+    margin: 0 !important;
+  }
+  body.mobile-detailed #catalogGrid .unitTitle{
+    grid-area: title !important;
+    display: block !important;
+    align-self: start !important;
+    margin: 0 !important;
+  }
+
+  /* Toggles in the "between" space */
+  body.mobile-detailed #catalogGrid .stateRow{
+    grid-area: toggles !important;
+    justify-content: center !important;
+    align-items: center !important;
+    margin: 0 !important;
+  }
+
+  /* Ensure toggles are numbered 1–3 */
+  body.mobile-detailed #catalogGrid .stateRow .stateBtn{
+    font-size: 0 !important;
+  }
+  body.mobile-detailed #catalogGrid .stateRow .stateBtn::before{
+    font-size: 12px !important;
+    font-weight: 900 !important;
+    color: var(--text) !important;
+  }
+  body.mobile-detailed #catalogGrid .stateRow .stateBtn:nth-child(1)::before{ content:"1" !important; }
+  body.mobile-detailed #catalogGrid .stateRow .stateBtn:nth-child(2)::before{ content:"2" !important; }
+  body.mobile-detailed #catalogGrid .stateRow .stateBtn:nth-child(3)::before{ content:"3" !important; }
+
+  /* Stats + leader occupy full width rows */
+  body.mobile-detailed #catalogGrid .statLine{
+    grid-area: stats !important;
+    margin-top: 2px !important;
+  }
+  body.mobile-detailed #catalogGrid .leaderBlock{
+    grid-area: leader !important;
+  }
+
+  /* Badges column */
+  body.mobile-detailed #catalogGrid .chipCol{
+    grid-area: badges !important;
+    display: grid !important;
+    grid-template-columns: auto auto !important;
+    grid-template-rows: auto auto !important;
+    grid-template-areas:
+      "character character"
+      "element   rarity" !important;
+    gap: 10px !important;
+    justify-items: end !important;
+    align-items: center !important;
+  }
+
+  /* Swap so Character is the top long badge */
+  body.mobile-detailed #catalogGrid .chipCol .tag:not(.element):not(.rarity){
+    grid-area: character !important;
+    justify-self: end !important;
+  }
+
+  /* Element + SSR on the lower line (Element first) */
+  body.mobile-detailed #catalogGrid .chipCol .tag.element{
+    grid-area: element !important;
+    justify-self: end !important;
+  }
+  body.mobile-detailed #catalogGrid .chipCol .tag.rarity{
+    grid-area: rarity !important;
+    justify-self: end !important;
+    width: auto !important;        /* SSR short */
+    min-width: 0 !important;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+
+  /* Prevent any earlier "full-width bar" styling in detailed */
+  body.mobile-detailed #catalogGrid .chipCol .tag{
+    border-radius: 12px !important;
+    border: 1px solid rgba(255,255,255,.18) !important;
+    background: rgba(255,255,255,.08) !important;
+  }
+}
