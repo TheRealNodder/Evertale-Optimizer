@@ -1057,3 +1057,97 @@ body{
     overflow-wrap: anywhere !important;
   }
 }
+
+/* =========================================================
+   MOBILE DETAILED (CATALOG ONLY): STRICT BADGE SWAP + CENTER STATS
+   Fixes issues seen in screenshot:
+   - Forces Character to be the TOP badge
+   - Forces Element + SSR to be the BOTTOM row (Element left, SSR right)
+   - Ensures stats are centered 4-up with clear spacing (no merged "ATKHP...")
+   ========================================================= */
+@media (max-width: 900px){
+
+  /* Some catalog markup uses .tags instead of .chipCol — normalize both */
+  body.mobile-detailed #catalogGrid .chipCol,
+  body.mobile-detailed #catalogGrid .tags{
+    grid-area: badges !important;
+    display: grid !important;
+    grid-template-columns: auto auto !important;
+    grid-template-rows: auto auto !important;
+    grid-template-areas:
+      "character character"
+      "element   rarity" !important;
+    gap: 10px !important;
+    justify-items: end !important;
+    align-items: center !important;
+    justify-self: end !important;
+  }
+
+  /* Character TOP (full row) */
+  body.mobile-detailed #catalogGrid .chipCol .tag:not(.element):not(.rarity),
+  body.mobile-detailed #catalogGrid .tags   .tag:not(.element):not(.rarity){
+    grid-area: character !important;
+    justify-self: end !important;
+    width: auto !important;
+  }
+
+  /* Element bottom-left */
+  body.mobile-detailed #catalogGrid .chipCol .tag.element,
+  body.mobile-detailed #catalogGrid .tags   .tag.element{
+    grid-area: element !important;
+    justify-self: end !important;
+  }
+
+  /* SSR bottom-right (SHORT) */
+  body.mobile-detailed #catalogGrid .chipCol .tag.rarity,
+  body.mobile-detailed #catalogGrid .tags   .tag.rarity{
+    grid-area: rarity !important;
+    justify-self: end !important;
+    width: auto !important;
+    min-width: 0 !important;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+
+  /* Restore element tint (like compact) */
+  body.mobile-detailed #catalogGrid .unitCard[class*="el-"] .tag.element{
+    border-color: color-mix(in srgb, var(--el) 60%, rgba(255,255,255,.18)) !important;
+    background: color-mix(in srgb, var(--el) 16%, rgba(255,255,255,.08)) !important;
+  }
+  body.mobile-detailed #catalogGrid .unitCard.el-light .tag.element{
+    border-color: rgba(10,12,20,.20) !important;
+    background: rgba(255,255,255,.70) !important;
+    color: rgba(10,12,20,.88) !important;
+  }
+
+  /* Stats: centered 4-up, labels separate from values (no merge) */
+  body.mobile-detailed #catalogGrid .statLine{
+    grid-area: stats !important;
+    width: 100% !important;
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+    justify-items: center !important;
+    align-items: start !important;
+    margin: 6px 0 0 0 !important;
+  }
+
+  body.mobile-detailed #catalogGrid .stat{
+    min-width: 0 !important;
+    display: grid !important;
+    grid-template-rows: auto auto !important;
+    justify-items: center !important;
+    text-align: center !important;
+    font-size: 12px !important;
+    font-weight: 900 !important;
+    letter-spacing: .4px !important;
+    white-space: nowrap !important;
+  }
+
+  body.mobile-detailed #catalogGrid .stat strong{
+    margin-top: 4px !important;
+    font-size: 16px !important;
+    font-weight: 900 !important;
+    letter-spacing: .2px !important;
+  }
+}
