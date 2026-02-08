@@ -1151,3 +1151,103 @@ body{
     letter-spacing: .2px !important;
   }
 }
+
+/* =========================================================
+   FORCE APPLY (MOBILE DETAILED): if Catalog is using #unitGrid
+   Some builds reuse #unitGrid for Catalog. Apply the SAME
+   detailed-catalog layout to BOTH #catalogGrid and #unitGrid.
+   If this ends up affecting Roster detailed on mobile, tell me
+   and I will re-scope with the correct container hook.
+   ========================================================= */
+@media (max-width: 900px){
+  body.mobile-detailed #unitGrid .unitCard{
+    display: grid !important;
+    grid-template-columns: 1fr auto auto !important;
+    grid-template-rows: auto auto auto auto auto !important;
+    grid-template-areas:
+      "thumb thumb thumb"
+      "name  name  badges"
+      "title toggles badges"
+      "stats stats stats"
+      "leader leader leader" !important;
+    gap: 10px !important;
+  }
+
+  body.mobile-detailed #unitGrid .unitLeft{ display: contents !important; }
+  body.mobile-detailed #unitGrid .meta{ display: contents !important; }
+  body.mobile-detailed #unitGrid .metaHeader{ display: contents !important; }
+  body.mobile-detailed #unitGrid .nameBlock{ display: contents !important; }
+
+  body.mobile-detailed #unitGrid .unitThumb{ grid-area: thumb !important; }
+  body.mobile-detailed #unitGrid .unitName{ grid-area: name !important; margin:0 !important; align-self:end !important; }
+  body.mobile-detailed #unitGrid .unitTitle{ grid-area: title !important; margin:0 !important; }
+
+  body.mobile-detailed #unitGrid .stateRow{
+    grid-area: toggles !important;
+    justify-content: center !important;
+    align-items: center !important;
+    margin: 0 !important;
+  }
+  body.mobile-detailed #unitGrid .stateRow .stateBtn{ font-size:0 !important; }
+  body.mobile-detailed #unitGrid .stateRow .stateBtn::before{ font-size:12px !important; font-weight:900 !important; color:var(--text) !important; }
+  body.mobile-detailed #unitGrid .stateRow .stateBtn:nth-child(1)::before{ content:"1" !important; }
+  body.mobile-detailed #unitGrid .stateRow .stateBtn:nth-child(2)::before{ content:"2" !important; }
+  body.mobile-detailed #unitGrid .stateRow .stateBtn:nth-child(3)::before{ content:"3" !important; }
+
+  /* Badges: Character on top, Element + SSR below */
+  body.mobile-detailed #unitGrid .chipCol,
+  body.mobile-detailed #unitGrid .tags{
+    grid-area: badges !important;
+    display: grid !important;
+    grid-template-columns: auto auto !important;
+    grid-template-rows: auto auto !important;
+    grid-template-areas:
+      "character character"
+      "element   rarity" !important;
+    gap: 10px !important;
+    justify-items: end !important;
+    align-items: center !important;
+    justify-self: end !important;
+  }
+  body.mobile-detailed #unitGrid .tag:not(.element):not(.rarity){ grid-area: character !important; }
+  body.mobile-detailed #unitGrid .tag.element{ grid-area: element !important; }
+  body.mobile-detailed #unitGrid .tag.rarity{
+    grid-area: rarity !important;
+    width:auto !important;
+    padding-left:12px !important;
+    padding-right:12px !important;
+  }
+
+  body.mobile-detailed #unitGrid .unitCard[class*="el-"] .tag.element{
+    border-color: color-mix(in srgb, var(--el) 60%, rgba(255,255,255,.18)) !important;
+    background: color-mix(in srgb, var(--el) 16%, rgba(255,255,255,.08)) !important;
+  }
+
+  /* Centered 4-up stats (2 lines) */
+  body.mobile-detailed #unitGrid .statLine{
+    grid-area: stats !important;
+    width: 100% !important;
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+    justify-items: center !important;
+    align-items: start !important;
+    margin: 6px 0 0 0 !important;
+  }
+  body.mobile-detailed #unitGrid .stat{
+    display: grid !important;
+    grid-template-rows: auto auto !important;
+    justify-items: center !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+    font-size: 12px !important;
+    font-weight: 900 !important;
+  }
+  body.mobile-detailed #unitGrid .stat strong{
+    margin-top: 4px !important;
+    font-size: 16px !important;
+    font-weight: 900 !important;
+  }
+
+  body.mobile-detailed #unitGrid .leaderBlock{ grid-area: leader !important; }
+}
