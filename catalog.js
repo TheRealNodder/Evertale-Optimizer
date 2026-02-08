@@ -7,6 +7,8 @@
    - Uses same view toggle as roster: body.mobile-compact / body.mobile-detailed
 */
 
+const PLACEHOLDER_IMG = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='128' height='128'><rect width='100%' height='100%' fill='%23121522'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='%23aab1d6' font-family='Arial' font-size='14'>No Image</text></svg>";
+
 const DATA = {
   characters: "./data/characters.json",
   weapons: "./data/weapons.json",
@@ -204,7 +206,7 @@ function renderCard(item) {
     : (item.image ? [item.image] : []);
 
   const img = imgs.length
-    ? `<img src="${safeText(imgs[0])}" data-imgs="${safeText(encodeURIComponent(JSON.stringify(imgs)))}" data-state="0" alt="${safeText(item.name)}">`
+    ? `<img src="${safeText(imgs[0])}" data-imgs="${safeText(encodeURIComponent(JSON.stringify(imgs)))}" data-state="0" alt="${safeText(item.name)}" onerror="this.onerror=null;this.src=PLACEHOLDER_IMG;">`
     : `<div class="ph">?</div>`;
 
   // Element class only applies to characters
