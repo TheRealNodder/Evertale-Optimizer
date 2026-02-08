@@ -220,7 +220,7 @@ function renderCard(item) {
   const imgs = (imgsRaw || []).filter(u => u && !isBadImgUrl(u));
 
   const img = imgs.length
-    ? `<img src="${safeText(imgs[0])}" data-imgs="${safeText(encodeURIComponent(JSON.stringify(imgs)))}" data-state="0" alt="${safeText(item.name)}" onerror="this.onerror=null;this.src=PLACEHOLDER_IMG;">`
+    ? `<img src="${safeText(imgs[0])}" data-imgs="${safeText(encodeURIComponent(JSON.stringify(imgs)))}" data-state="0" alt="${safeText(item.name)}" onerror="markBadImgUrl(this.src);this.onerror=null;this.src=PLACEHOLDER_IMG;">`
     : `<div class="ph">?</div>`;
 
   // Element class only applies to characters
