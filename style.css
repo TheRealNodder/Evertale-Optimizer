@@ -1252,49 +1252,100 @@ body{
   body.mobile-detailed #unitGrid .leaderBlock{ grid-area: leader !important; }
 }
 
+
 /* =========================================================
-   MOBILE DETAILED (CATALOG): FINAL HOOKS (matches catalog.js markup)
-   - catalog.js now emits: .tag.kind / .tag.element / .tag.rarity
-   - catalog.js stats are: .statLabel above .statVal
-   This block ensures the intended mobile-detailed catalog layout
-   actually applies regardless of earlier experimental rules.
+   CATALOG MOBILE DETAILED — CLEAN WIREFRAME LAYOUT (STRICT)
+   Matches: Image | (Name+Title left) (Toggles center) (Badges right)
+   Badges: Kind (purple) on top-right; Element (red-tinted) + Rarity (green) below
+   Stats: ATK/HP/SPD/COST in one row, values under (centered)
+   Applies to Catalog grids (#catalogGrid and #unitGrid) in mobile-detailed only.
+   Desktop + compact untouched.
    ========================================================= */
 @media (max-width: 900px){
-  /* Badge placement: Kind (Character) on top; Element + Rarity below */
+  /* If Catalog uses #unitGrid, include it */
+  body.mobile-detailed #catalogGrid .metaHeader,
+  body.mobile-detailed #unitGrid .metaHeader{
+    display:grid !important;
+    grid-template-columns: 1fr auto auto !important; /* name/title | toggles | badges */
+    column-gap: 12px !important;
+    row-gap: 6px !important;
+    align-items:center !important;
+  }
+
+  /* Name/title block left */
+  body.mobile-detailed #catalogGrid .nameBlock,
+  body.mobile-detailed #unitGrid .nameBlock{
+    grid-column: 1 !important;
+  }
+
+  /* Toggles in the middle: show only mid version in detailed */
+  body.mobile-detailed #catalogGrid .stateRow--mid,
+  body.mobile-detailed #unitGrid .stateRow--mid{
+    grid-column: 2 !important;
+    justify-self:center !important;
+    display:flex !important;
+    gap:10px !important;
+  }
+  body.mobile-detailed #catalogGrid .stateRow--left,
+  body.mobile-detailed #unitGrid .stateRow--left{
+    display:none !important;
+  }
+
+  /* Buttons already contain 1/2/3 text; make them round */
+  body.mobile-detailed #catalogGrid .stateRow .stateBtn,
+  body.mobile-detailed #unitGrid .stateRow .stateBtn{
+    width:34px !important;
+    height:34px !important;
+    border-radius:999px !important;
+    display:grid !important;
+    place-items:center !important;
+    font-weight:900 !important;
+    padding:0 !important;
+  }
+
+  /* Badges right: strict 2-row grid */
   body.mobile-detailed #catalogGrid .chipCol,
   body.mobile-detailed #unitGrid .chipCol{
-    display: grid !important;
+    grid-column: 3 !important;
+    display:grid !important;
     grid-template-columns: auto auto !important;
     grid-template-rows: auto auto !important;
     grid-template-areas:
       "kind kind"
       "element rarity" !important;
-    gap: 10px !important;
-    justify-items: end !important;
-    align-items: center !important;
+    gap:10px !important;
+    justify-items:end !important;
+    align-items:center !important;
   }
 
   body.mobile-detailed #catalogGrid .chipCol .tag.kind,
   body.mobile-detailed #unitGrid .chipCol .tag.kind{
-    grid-area: kind !important;
-    justify-self: end !important;
+    grid-area:kind !important;
+    background: rgba(168,85,247,.20) !important;
+    border:1px solid rgba(168,85,247,.35) !important;
   }
   body.mobile-detailed #catalogGrid .chipCol .tag.element,
-  body.mobile-detailed #unitGrid .chipCol .tag.element{
-    grid-area: element !important;
-  }
+  body.mobile-detailed #unitGrid .chipCol .tag.element{ grid-area:element !important; }
   body.mobile-detailed #catalogGrid .chipCol .tag.rarity,
   body.mobile-detailed #unitGrid .chipCol .tag.rarity{
-    grid-area: rarity !important;
-    width: auto !important; /* SSR short */
-    min-width: 0 !important;
-    padding-left: 12px !important;
-    padding-right: 12px !important;
+    grid-area:rarity !important;
+    width:auto !important;
+    padding-left:12px !important;
+    padding-right:12px !important;
+    background: rgba(65,210,107,.16) !important;
+    border:1px solid rgba(65,210,107,.35) !important;
   }
 
-  /* Element tint (like compact) */
-  body.mobile-detailed #catalogGrid .unitCard[class*="el-"] .chipCol .tag.element,
-  body.mobile-detailed #unitGrid .unitCard[class*="el-"] .chipCol .tag.element{
+  /* Ensure unitCard sets --el like slotCard */
+  .unitCard.el-fire  { --el:var(--el-fire); }
+  .unitCard.el-water { --el:var(--el-water); }
+  .unitCard.el-storm { --el:var(--el-storm); }
+  .unitCard.el-earth { --el:var(--el-earth); }
+  .unitCard.el-light { --el:var(--el-light); }
+  .unitCard.el-dark  { --el:var(--el-dark); }
+
+  body.mobile-detailed #catalogGrid .chipCol .tag.element,
+  body.mobile-detailed #unitGrid .chipCol .tag.element{
     border-color: color-mix(in srgb, var(--el) 60%, rgba(255,255,255,.18)) !important;
     background: color-mix(in srgb, var(--el) 16%, rgba(255,255,255,.08)) !important;
   }
@@ -1305,35 +1356,41 @@ body{
     color: rgba(10,12,20,.88) !important;
   }
 
-  /* Stats: 4-up centered, 2-line (label then value) */
+  /* Stats: 4-up centered with 2 lines (label above, value below) */
   body.mobile-detailed #catalogGrid .statLine,
   body.mobile-detailed #unitGrid .statLine{
-    display: grid !important;
+    display:grid !important;
     grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-    gap: 12px !important;
-    justify-items: center !important;
-    align-items: start !important;
-    width: 100% !important;
+    gap: 14px !important;
+    justify-items:center !important;
+    align-items:start !important;
+    margin-top: 10px !important;
   }
   body.mobile-detailed #catalogGrid .stat,
   body.mobile-detailed #unitGrid .stat{
-    display: grid !important;
-    grid-template-rows: auto auto !important;
-    justify-items: center !important;
-    text-align: center !important;
-    white-space: nowrap !important;
+    display:grid !important;
+    grid-template-rows:auto auto !important;
+    justify-items:center !important;
+    text-align:center !important;
   }
   body.mobile-detailed #catalogGrid .statLabel,
   body.mobile-detailed #unitGrid .statLabel{
-    font-size: 12px !important;
-    font-weight: 900 !important;
-    letter-spacing: .4px !important;
+    font-weight:900 !important;
+    letter-spacing:.4px !important;
+    font-size:12px !important;
+    opacity:.95 !important;
   }
   body.mobile-detailed #catalogGrid .statVal,
   body.mobile-detailed #unitGrid .statVal{
-    margin-top: 4px !important;
-    font-size: 16px !important;
-    font-weight: 900 !important;
-    letter-spacing: .2px !important;
+    margin-top:4px !important;
+    font-weight:900 !important;
+    font-size:16px !important;
+  }
+
+  /* Leader wraps cleanly */
+  body.mobile-detailed #catalogGrid .leaderDesc,
+  body.mobile-detailed #unitGrid .leaderDesc{
+    white-space:normal !important;
+    overflow-wrap:anywhere !important;
   }
 }
