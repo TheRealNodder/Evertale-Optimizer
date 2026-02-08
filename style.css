@@ -489,10 +489,11 @@ body{
   body.page-catalog.mobile-detailed #unitGrid .unitCard{
     display: grid !important;
     grid-template-columns: 1fr auto auto !important; /* left | toggles | badges */
-    grid-template-rows: auto auto auto !important;   /* image | header | details */
+    grid-template-rows: auto auto auto auto !important;   /* image | name | title/toggles | details */
     grid-template-areas:
       "thumb thumb thumb"
-      "name  toggles badges"
+      "name  .      badges"
+      "title toggles badges"
       "details details details" !important;
     gap: 10px !important;
   }
@@ -521,6 +522,9 @@ body{
   body.page-catalog.mobile-detailed #catalogGrid .unitName,
   body.page-catalog.mobile-detailed #unitGrid .unitName{
     grid-area: name !important;
+    align-self: end !important;
+    margin: 0 !important;
+    white-space: normal !important;
     align-self: end !important;
     margin: 0 !important;
   }
@@ -653,5 +657,34 @@ body{
   body.page-catalog.mobile-detailed #unitGrid .leaderDesc{
     white-space: normal !important;
     overflow-wrap: anywhere !important;
+  }
+}
+
+/* =========================================================
+   PAGE-CATALOG: MOBILE COMPACT — ENSURE NAME ABOVE TITLE (CENTERED)
+   (Restores the previous compact look; does not affect detailed/desktop)
+   ========================================================= */
+@media (max-width: 900px){
+  body.page-catalog.mobile-compact #catalogGrid .nameBlock,
+  body.page-catalog.mobile-compact #unitGrid .nameBlock{
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    gap: 4px !important;
+  }
+  body.page-catalog.mobile-compact #catalogGrid .unitName,
+  body.page-catalog.mobile-compact #unitGrid .unitName{
+    order: 1 !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+  }
+  body.page-catalog.mobile-compact #catalogGrid .unitTitle,
+  body.page-catalog.mobile-compact #unitGrid .unitTitle{
+    order: 2 !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
   }
 }
