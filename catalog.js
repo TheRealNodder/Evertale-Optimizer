@@ -226,35 +226,31 @@ function renderCard(item) {
   // Element class only applies to characters
   const elClass = (item.kind==="characters" && item.element) ? ` el-${safeText(String(item.element).toLowerCase())}` : "";
 
-  // Right-side badges (rectangles)
+  // Badges: Kind (purple), Element (red-ish via element tint), Rarity (green)
   const chips = [];
-  // Classes are intentional so CSS can be strict about placement:
-  // - .kind   => Character/Weapon/Accessory/Boss badge
-  // - .element=> Element badge (characters/accessories/bosses)
-  // - .rarity => Rarity badge (SSR/SR/R...)
   chips.push(`<span class="tag kind">${safeText(kindLabel(item.kind))}</span>`);
-  if (item.element) chips.push(`<span class="tag element">${safeText(item.element)}</span>`);
-  if (item.rarity) chips.push(`<span class="tag rarity">${safeText(item.rarity)}</span>`);
+  if (item.kind==="characters" && item.element) chips.push(`<span class="tag element">${safeText(item.element)}</span>`);
+  if (item.rarity) chips.push(`<span class="tag rarity rar-${safeText(String(item.rarity).toLowerCase())}">${safeText(item.rarity)}</span>`);
 
   const { atk, hp, spd, cost } = item.stats || {};
   const statParts = [];
-  // Two-line stat markup (label above value) so mobile can center-align cleanly.
-  const stat = (label, val) => `<div class="stat"><div class="statLabel">${label}</div><div class="statVal">${safeText(val)}</div></div>`;
-  if (atk !== "" && atk != null) statParts.push(stat("ATK", atk));
-  if (hp  !== "" && hp  != null) statParts.push(stat("HP", hp));
-  if (spd !== "" && spd != null) statParts.push(stat("SPD", spd));
-  if (cost!== "" && cost!= null) statParts.push(stat("COST", cost));
+  if (atk !== "" && atk != null) statParts.push(`<div class="stat"><div class="statLabel">ATK</div><div class="statVal">${safeText(atk)}</div></div>`);
+  if (hp !== "" && hp != null) statParts.push(`<div class="stat"><div class="statLabel">HP</div><div class="statVal">${safeText(hp)}</div></div>`);
+  if (spd !== "" && spd != null) statParts.push(`<div class="stat"><div class="statLabel">SPD</div><div class="statVal">${safeText(spd)}</div></div>`);
+  if (cost !== "" && cost != null) statParts.push(`<div class="stat"><div class="statLabel">COST</div><div class="statVal">${safeText(cost)}</div></div>`);
 
-  // For compact mode, panels are hidden via CSS; this keeps markup consistent
   const extra = item.extraText
     ? `<div class="panel"><div class="panelTitle">Info</div><div class="muted" style="white-space:pre-wrap">${safeText(item.extraText)}</div></div>`
     : "";
+
+  const stateLeft = item.kind==="characters" ? stateRowHtml(imgs, "stateRow--left") : "";
+  const stateMid  = item.kind==="characters" ? stateRowHtml(imgs, "stateRow--mid") : "";
 
   return `
     <div class="unitCard${elClass}" data-kind="${safeText(item.kind)}" data-id="${safeText(item.id)}">
       <div class="unitLeft">
         <div class="unitThumb">${img}</div>
-        ${item.kind==="characters" ? stateRowHtml(imgs) : ""}
+        ${stateLeft}
       </div>
 
       <div class="meta">
@@ -263,6 +259,7 @@ function renderCard(item) {
             <div class="unitName">${safeText(item.name)}</div>
             <div class="unitTitle">${safeText(item.subtitle || "")}</div>
           </div>
+          ${stateMid}
           <div class="chipCol">${chips.join("")}</div>
         </div>
 
@@ -313,11 +310,12 @@ function render() {
 }
 
 
-function stateRowHtml(imgs){
+function stateRowHtml(imgs, extraClass=""){
   if(!Array.isArray(imgs) || imgs.length < 2) return "";
   const enc = encodeURIComponent(JSON.stringify(imgs));
-  const btns = imgs.map((_,i)=>`<button type="button" class="stateBtn ${i===0?"active":""}" data-idx="${i}" aria-label="State ${i+1}"></button>`).join("");
-  return `<div class="stateRow" data-imgs="${enc}">${btns}</div>`;
+  const cls = extraClass ? ` ${extraClass}` : "";
+  const btns = imgs.map((_,i)=>`<button type="button" class="stateBtn ${i===0?"active":""}" data-idx="${i}" aria-label="State ${i+1}">${i+1}</button>`).join("");
+  return `<div class="stateRow${cls}" data-imgs="${enc}">${btns}</div>`;
 }
 
 function attachStateHandlers(root){
