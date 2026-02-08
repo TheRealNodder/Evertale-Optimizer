@@ -978,3 +978,82 @@ body{
     background: rgba(255,255,255,.08) !important;
   }
 }
+
+/* =========================================================
+   MOBILE DETAILED (CATALOG ONLY): COLOR BARS + STAT 2-LINE GRID
+   Fixes:
+   - Restore element/rarity badge color treatment (like compact)
+   - Ensure badge swap: Character on top; Element + SSR below
+   - Stats become 4-up with label on row 1 and value on row 2
+   ========================================================= */
+@media (max-width: 900px){
+
+  /* Re-assert badge grid areas (swap: Character on top, Element+SSR below) */
+  body.mobile-detailed #catalogGrid .chipCol{
+    grid-template-areas:
+      "character character"
+      "element   rarity" !important;
+  }
+  body.mobile-detailed #catalogGrid .chipCol .tag:not(.element):not(.rarity){ grid-area: character !important; }
+  body.mobile-detailed #catalogGrid .chipCol .tag.element{ grid-area: element !important; }
+  body.mobile-detailed #catalogGrid .chipCol .tag.rarity{ grid-area: rarity !important; }
+
+  /* Restore colored Element badge using the unit element color */
+  body.mobile-detailed #catalogGrid .chipCol .tag.element{
+    border: 1px solid color-mix(in srgb, var(--el) 60%, rgba(255,255,255,.18)) !important;
+    background: color-mix(in srgb, var(--el) 16%, rgba(255,255,255,.08)) !important;
+  }
+  /* Light element: readable */
+  body.mobile-detailed #catalogGrid .unitCard.el-light .chipCol .tag.element{
+    border-color: rgba(10,12,20,.20) !important;
+    background: rgba(255,255,255,.70) !important;
+    color: rgba(10,12,20,.88) !important;
+  }
+
+  /* Rarity badge: neutral pill (short) */
+  body.mobile-detailed #catalogGrid .chipCol .tag.rarity{
+    background: rgba(255,255,255,.12) !important;
+    border: 1px solid rgba(255,255,255,.18) !important;
+    width: auto !important;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+
+  /* Character badge: slightly stronger than rarity */
+  body.mobile-detailed #catalogGrid .chipCol .tag:not(.element):not(.rarity){
+    background: rgba(255,255,255,.10) !important;
+    border: 1px solid rgba(255,255,255,.18) !important;
+  }
+
+  /* Stats: 4 columns, each stat becomes 2 lines (label then value) */
+  body.mobile-detailed #catalogGrid .statLine{
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+    align-items: start !important;
+  }
+  body.mobile-detailed #catalogGrid .stat{
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    text-align: center !important;
+    font-size: 12px !important;
+    letter-spacing: .2px !important;
+  }
+  body.mobile-detailed #catalogGrid .stat strong{
+    display: block !important;
+    margin-top: 4px !important;
+    font-size: 18px !important;
+    letter-spacing: .4px !important;
+  }
+
+  /* Leader block wraps nicely at bottom */
+  body.mobile-detailed #catalogGrid .leaderName{
+    margin-top: 6px !important;
+  }
+  body.mobile-detailed #catalogGrid .leaderDesc{
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+  }
+}
