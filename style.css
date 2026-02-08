@@ -476,215 +476,592 @@ body{
 }
 
 /* =========================================================
-   PAGE-CATALOG: MOBILE DETAILED — CLEAN WIREFRAME LAYOUT
-   Strict layout (only affects Catalog + mobile-detailed)
-   - Image full width top
-   - Name+Title left
-   - Toggles centered between title and badges
-   - Badges right: Kind (top, purple), Element (bottom-left, red-ish), Rarity (bottom-right, green)
-   - Stats centered 4-up with label row + value row
+   MOBILE COMPACT: STATE TOGGLES (1–3) HORIZONTAL + CENTERED
+   - Phones/tablets only (desktop untouched)
+   - Forces 1/2/3 labels for consistency
    ========================================================= */
 @media (max-width: 900px){
-  body.page-catalog.mobile-detailed #catalogGrid .unitCard,
-  body.page-catalog.mobile-detailed #unitGrid .unitCard{
-    display: grid !important;
-    grid-template-columns: 1fr auto auto !important; /* left | toggles | badges */
-    grid-template-rows: auto auto auto auto !important;   /* image | name | title/toggles | details */
-    grid-template-areas:
-      "thumb thumb thumb"
-      "name  .      badges"
-      "title toggles badges"
-      "details details details" !important;
-    gap: 10px !important;
-  }
-
-  /* Pull nested pieces up so they can be placed on the card grid */
-  body.page-catalog.mobile-detailed #catalogGrid .unitLeft,
-  body.page-catalog.mobile-detailed #unitGrid .unitLeft,
-  body.page-catalog.mobile-detailed #catalogGrid .meta,
-  body.page-catalog.mobile-detailed #unitGrid .meta{
-    display: contents !important;
-  }
-
-  body.page-catalog.mobile-detailed #catalogGrid .metaHeader,
-  body.page-catalog.mobile-detailed #unitGrid .metaHeader,
-  body.page-catalog.mobile-detailed #catalogGrid .nameBlock,
-  body.page-catalog.mobile-detailed #unitGrid .nameBlock{
-    display: contents !important;
-  }
-
-  /* Areas */
-  body.page-catalog.mobile-detailed #catalogGrid .unitThumb,
-  body.page-catalog.mobile-detailed #unitGrid .unitThumb{
-    grid-area: thumb !important;
-  }
-
-  body.page-catalog.mobile-detailed #catalogGrid .unitName,
-  body.page-catalog.mobile-detailed #unitGrid .unitName{
-    grid-area: name !important;
-    align-self: end !important;
-    margin: 0 !important;
-    white-space: normal !important;
-    align-self: end !important;
-    margin: 0 !important;
-  }
-
-  /* Title sits under name, still in left column */
-  body.page-catalog.mobile-detailed #catalogGrid .unitTitle,
-  body.page-catalog.mobile-detailed #unitGrid .unitTitle{
-    grid-area: name !important;
-    align-self: start !important;
-    margin-top: 34px !important; /* creates the "Name then Title" stack in same grid cell */
-  }
-
-  /* Toggle states BETWEEN title and badges */
-  body.page-catalog.mobile-detailed #catalogGrid .stateRow,
-  body.page-catalog.mobile-detailed #unitGrid .stateRow{
-    grid-area: toggles !important;
-    justify-self: center !important;
-    align-self: center !important;
-    margin: 0 !important;
+  body.mobile-compact .unitLeft .stateRow,
+  body.mobile-compact .stateRow{
     flex-direction: row !important;
-    gap: 10px !important;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 100% !important;
+    gap: 8px !important;
+    margin-top: 0 !important;
   }
 
-  body.page-catalog.mobile-detailed #catalogGrid .stateRow .stateBtn,
-  body.page-catalog.mobile-detailed #unitGrid .stateRow .stateBtn{
-    width: 30px !important;
-    height: 30px !important;
+  body.mobile-compact .stateRow .stateBtn{
     display: grid !important;
     place-items: center !important;
-    font-size: 0 !important;
-  }
-  body.page-catalog.mobile-detailed #catalogGrid .stateRow .stateBtn::before,
-  body.page-catalog.mobile-detailed #unitGrid .stateRow .stateBtn::before{
-    font-size: 12px !important;
+    width: 30px !important;
+    height: 30px !important;
+    padding: 0 !important;
+    font-size: 0 !important; /* hide any existing text, we render labels via ::before */
     font-weight: 900 !important;
+  }
+
+  body.mobile-compact .stateRow .stateBtn::before{
+    font-size: 12px !important;
     line-height: 1 !important;
     color: var(--text) !important;
   }
-  body.page-catalog.mobile-detailed #catalogGrid .stateRow .stateBtn:nth-child(1)::before,
-  body.page-catalog.mobile-detailed #unitGrid .stateRow .stateBtn:nth-child(1)::before{ content:"1" !important; }
-  body.page-catalog.mobile-detailed #catalogGrid .stateRow .stateBtn:nth-child(2)::before,
-  body.page-catalog.mobile-detailed #unitGrid .stateRow .stateBtn:nth-child(2)::before{ content:"2" !important; }
-  body.page-catalog.mobile-detailed #catalogGrid .stateRow .stateBtn:nth-child(3)::before,
-  body.page-catalog.mobile-detailed #unitGrid .stateRow .stateBtn:nth-child(3)::before{ content:"3" !important; }
+  body.mobile-compact .stateRow .stateBtn:nth-child(1)::before{ content: "1"; }
+  body.mobile-compact .stateRow .stateBtn:nth-child(2)::before{ content: "2"; }
+  body.mobile-compact .stateRow .stateBtn:nth-child(3)::before{ content: "3"; }
+}
 
-  /* Badges container on the right */
-  body.page-catalog.mobile-detailed #catalogGrid .chipCol,
-  body.page-catalog.mobile-detailed #unitGrid .chipCol{
+/* =========================================================
+   MOBILE COMPACT: SHOW FULL NAME + TITLE, CENTERED BADGES
+   - Phones/tablets only (desktop untouched)
+   - Badges on one centered row: Element • Character • SSR
+   ========================================================= */
+@media (max-width: 900px){
+  body.mobile-compact .metaHeader{
+    grid-template-columns: 1fr !important;   /* stack name + badges */
+    justify-items: center !important;
+    text-align: center !important;
+    gap: 8px !important;
+  }
+
+  body.mobile-compact .nameBlock{
+    width: 100% !important;
+  }
+
+  /* Show full unit name (no ellipsis) */
+  body.mobile-compact .unitName{
+    font-size: 14px !important;
+    line-height: 1.15 !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    word-break: normal !important;
+  }
+
+  /* Show full title/subtitle (no truncation) */
+  body.mobile-compact .unitTitle,
+  body.mobile-compact .unitSub{
+    display: block !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    max-width: 100% !important;
+  }
+
+  /* Badges row centered to eliminate wasted right-side space */
+  body.mobile-compact .chipCol{
+    width: 100% !important;
+    flex-direction: row !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 8px !important;
+  }
+
+  /* Re-order badges: Element first, Character (non-element/non-rarity) second, SSR (rarity) third */
+  body.mobile-compact .chipCol .tag.element{ order: 1 !important; }
+  body.mobile-compact .chipCol .tag:not(.element):not(.rarity){ order: 2 !important; }
+  body.mobile-compact .chipCol .tag.rarity{ order: 3 !important; }
+
+  /* Keep badges compact but readable */
+  body.mobile-compact .chipCol .tag{
+    min-height: 24px !important;
+    padding: 5px 10px !important;
+  }
+}
+
+/* =========================================================
+   MOBILE COMPACT: CHARACTER BADGE ON ITS OWN LINE
+   - Phones/tablets only
+   - Character tag centered on its own row
+   - Element + SSR remain together
+   ========================================================= */
+@media (max-width: 900px){
+  body.mobile-compact .chipCol{
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 6px !important;
+  }
+
+  /* Row 1: Element + SSR */
+  body.mobile-compact .chipCol .tag.element,
+  body.mobile-compact .chipCol .tag.rarity{
+    display: inline-flex !important;
+  }
+
+  /* Row 2: Character only */
+  body.mobile-compact .chipCol .tag:not(.element):not(.rarity){
+    order: 2 !important;
+    display: inline-flex !important;
+  }
+}
+
+/* =========================================================
+   MOBILE COMPACT: ELEMENT + RARITY AS SOLID BARS (CENTERED)
+   - Replaces chip look with clean bars like your reference
+   - Character badge remains its own line
+   ========================================================= */
+@media (max-width: 900px){
+
+  /* Container already centered from previous patches */
+  body.mobile-compact .chipCol{
+    width: 100% !important;
+    align-items: center !important;
+  }
+
+  /* Element + rarity become solid bars */
+  body.mobile-compact .chipCol .tag.element,
+  body.mobile-compact .chipCol .tag.rarity{
+    width: 70% !important;
+    justify-content: center !important;
+    border-radius: 12px !important;
+    padding: 6px 0 !important;
+    font-size: 13px !important;
+    font-weight: 900 !important;
+    letter-spacing: .3px !important;
+    border: none !important;
+    color: #fff !important;
+  }
+
+  /* Element color controls bar color */
+  body.mobile-compact .unitCard.el-fire  .tag.element{ background: color-mix(in srgb, var(--el-fire) 70%, #000); }
+  body.mobile-compact .unitCard.el-water .tag.element{ background: color-mix(in srgb, var(--el-water) 70%, #000); }
+  body.mobile-compact .unitCard.el-storm .tag.element{ background: color-mix(in srgb, var(--el-storm) 70%, #000); color:#000 !important; }
+  body.mobile-compact .unitCard.el-earth .tag.element{ background: color-mix(in srgb, var(--el-earth) 70%, #000); }
+  body.mobile-compact .unitCard.el-light .tag.element{ background: #f4f6ff; color:#111 !important; }
+  body.mobile-compact .unitCard.el-dark  .tag.element{ background: color-mix(in srgb, var(--el-dark) 70%, #000); }
+
+  /* Rarity bar (neutral but strong) */
+  body.mobile-compact .chipCol .tag.rarity{
+    background: rgba(255,255,255,.22) !important;
+  }
+
+  /* Character badge stays smaller + separate */
+  body.mobile-compact .chipCol .tag:not(.element):not(.rarity){
+    width: auto !important;
+    padding: 5px 14px !important;
+    font-size: 12px !important;
+    opacity: .9 !important;
+  }
+}
+
+/* =========================================================
+   MOBILE DETAILED (CATALOG): BADGE LAYOUT LIKE REFERENCE
+   - Character badge on its own line (top)
+   - Element + Rarity on the next line (side-by-side)
+   - Does NOT affect compact mode or desktop
+   ========================================================= */
+@media (max-width: 900px){
+  body.mobile-detailed #catalogGrid .metaHeader{
+    grid-template-columns: 1fr auto !important;
+    align-items: end !important;
+  }
+
+  body.mobile-detailed #catalogGrid .chipCol{
+    /* allow wrapping so Character can occupy its own line */
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    gap: 8px !important;
+  }
+
+  /* Character on its own row */
+  body.mobile-detailed #catalogGrid .chipCol .tag:not(.element):not(.rarity){
+    flex: 0 0 100% !important;
+    justify-content: flex-end !important;
+    margin-bottom: 2px !important;
+    order: 1 !important;
+  }
+
+  /* Element + SSR on same row */
+  body.mobile-detailed #catalogGrid .chipCol .tag.element{
+    order: 2 !important;
+  }
+  body.mobile-detailed #catalogGrid .chipCol .tag.rarity{
+    order: 3 !important;
+  }
+}
+
+/* =========================================================
+   MOBILE DETAILED (CATALOG ONLY): TOGGLES 1–3 + ELEMENT POSITION
+   - Does NOT affect desktop
+   - Does NOT affect compact view
+   Desired:
+     - Toggle states as 1/2/3 (horizontal)
+     - Badges: Character on its own line; Element + SSR side-by-side (Element first)
+   ========================================================= */
+@media (max-width: 900px){
+
+  /* 1) Toggle states: horizontal row, centered, labeled 1–3 */
+  body.mobile-detailed #catalogGrid .stateRow{
+    flex-direction: row !important;
+    justify-content: flex-start !important;  /* sits under name area like your reference */
+    align-items: center !important;
+    gap: 10px !important;
+    margin: 8px 0 0 0 !important;
+  }
+
+  body.mobile-detailed #catalogGrid .stateRow .stateBtn{
+    display: grid !important;
+    place-items: center !important;
+    width: 30px !important;
+    height: 30px !important;
+    padding: 0 !important;
+    border-radius: 999px !important;
+    font-size: 0 !important; /* hide any existing text */
+  }
+
+  body.mobile-detailed #catalogGrid .stateRow .stateBtn::before{
+    content: "" !important;
+    font-size: 12px !important;
+    line-height: 1 !important;
+    font-weight: 900 !important;
+    color: var(--text) !important;
+  }
+  body.mobile-detailed #catalogGrid .stateRow .stateBtn:nth-child(1)::before{ content: "1" !important; }
+  body.mobile-detailed #catalogGrid .stateRow .stateBtn:nth-child(2)::before{ content: "2" !important; }
+  body.mobile-detailed #catalogGrid .stateRow .stateBtn:nth-child(3)::before{ content: "3" !important; }
+
+  /* If stateRow is inside .unitLeft, prevent vertical stacking in detailed catalog */
+  body.mobile-detailed #catalogGrid .unitLeft .stateRow{
+    flex-direction: row !important;
+    align-items: center !important;
+  }
+
+  /* 2) Badge layout: Character line, then Element + SSR line (Element first) */
+  body.mobile-detailed #catalogGrid .chipCol{
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    gap: 10px !important;
+  }
+
+  /* Character badge on its own row */
+  body.mobile-detailed #catalogGrid .chipCol .tag:not(.element):not(.rarity){
+    flex: 0 0 100% !important;
+    order: 1 !important;
+    justify-content: flex-end !important;
+    margin-bottom: 2px !important;
+  }
+
+  /* Element then SSR on same row */
+  body.mobile-detailed #catalogGrid .chipCol .tag.element{
+    order: 2 !important;
+  }
+  body.mobile-detailed #catalogGrid .chipCol .tag.rarity{
+    order: 3 !important;
+  }
+}
+
+/* =========================================================
+   MOBILE DETAILED (CATALOG ONLY): NAME + CHARACTER (ROW 1),
+   TITLE + TOGGLES + (ELEMENT + RARITY) (ROW 2)
+   - Locks desktop + compact: NOT affected
+   - Swaps Character vs SSR placement:
+       * Character = top-right (row 1)
+       * SSR = next to Element (row 2) and SHORT (auto width)
+   - Places toggle states BETWEEN title and badges
+   ========================================================= */
+@media (max-width: 900px){
+
+  /* Make meta a 2-row, 3-column grid */
+  body.mobile-detailed #catalogGrid .meta{
+    display: grid !important;
+    grid-template-columns: 1fr auto auto !important; /* title | toggles | badges */
+    grid-template-rows: auto auto !important;
+    column-gap: 12px !important;
+    row-gap: 8px !important;
+    align-items: end !important;
+  }
+
+  /* Let unitName + unitTitle become direct grid items */
+  body.mobile-detailed #catalogGrid .nameBlock{
+    display: contents !important;
+  }
+
+  /* Row 1: Name (left) */
+  body.mobile-detailed #catalogGrid .unitName{
+    grid-column: 1 / span 2 !important;
+    grid-row: 1 !important;
+    justify-self: start !important;
+  }
+
+  /* Row 2: Title (left) */
+  body.mobile-detailed #catalogGrid .unitTitle{
+    grid-column: 1 !important;
+    grid-row: 2 !important;
+    justify-self: start !important;
+    margin-top: 0 !important;
+  }
+
+  /* Row 2: Toggles (middle) */
+  body.mobile-detailed #catalogGrid .stateRow{
+    grid-column: 2 !important;
+    grid-row: 2 !important;
+    justify-self: center !important;
+    align-self: center !important;
+    margin: 0 !important;
+  }
+
+  /* Column 3: Badges container spans both rows */
+  body.mobile-detailed #catalogGrid .chipCol{
+    grid-column: 3 !important;
+    grid-row: 1 / span 2 !important;
+
+    display: grid !important;
+    grid-template-rows: auto auto !important; /* row1: Character, row2: Element+SSR */
+    justify-items: end !important;
+    align-items: center !important;
+    row-gap: 10px !important;
+    width: auto !important;
+  }
+
+  /* Character badge (top-right) */
+  body.mobile-detailed #catalogGrid .chipCol .tag:not(.element):not(.rarity){
+    grid-row: 1 !important;
+    justify-self: end !important;
+  }
+
+  /* Element + SSR on same row (row 2) */
+  body.mobile-detailed #catalogGrid .chipCol .tag.element{
+    grid-row: 2 !important;
+    justify-self: start !important;
+  }
+  body.mobile-detailed #catalogGrid .chipCol .tag.rarity{
+    grid-row: 2 !important;
+    justify-self: end !important;
+
+    /* Make SSR SHORT (no full-width bar) */
+    width: auto !important;
+    min-width: 0 !important;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+
+  /* Ensure Element appears left of SSR on row 2 */
+  body.mobile-detailed #catalogGrid .chipCol{
+    grid-template-columns: auto auto !important;
+  }
+  body.mobile-detailed #catalogGrid .chipCol .tag.element{ grid-column: 1 !important; }
+  body.mobile-detailed #catalogGrid .chipCol .tag.rarity{ grid-column: 2 !important; }
+
+  /* Small safety: prevent the earlier "full-width rarity bar" look from leaking into detailed */
+  body.mobile-detailed #catalogGrid .chipCol .tag.element,
+  body.mobile-detailed #catalogGrid .chipCol .tag.rarity{
+    border: 1px solid rgba(255,255,255,.18) !important;
+    background: rgba(255,255,255,.08) !important;
+    border-radius: 12px !important;
+  }
+}
+
+/* =========================================================
+   MOBILE DETAILED (CATALOG ONLY) — STRICT PLACEMENT FIX
+   Goal layout (3-column header row under image):
+     Row1: hero image (full width)
+     Row2: Name (col1-2) | Badges (col3)
+     Row3: Title (col1) | Toggles 1-3 (col2) | Badges (col3)
+     Row4+: Stats / Leader / etc (full width)
+   Badges (col3):
+     - Top line: Character (longer)
+     - Bottom line: Element + SSR (Element first, SSR short)
+   Notes:
+     - Compact view untouched
+     - Desktop untouched
+   ========================================================= */
+@media (max-width: 900px){
+  body.mobile-detailed #catalogGrid .unitCard{
+    display: grid !important;
+    grid-template-columns: 1fr auto auto !important;
+    grid-template-rows: auto auto auto auto auto !important;
+    grid-template-areas:
+      "thumb thumb thumb"
+      "name  name  badges"
+      "title toggles badges"
+      "stats stats stats"
+      "leader leader leader" !important;
+    gap: 10px !important;
+  }
+
+  /* Flatten wrappers so children can be placed by the card grid */
+  body.mobile-detailed #catalogGrid .unitLeft{ display: contents !important; }
+  body.mobile-detailed #catalogGrid .meta{ display: contents !important; }
+  body.mobile-detailed #catalogGrid .metaHeader{ display: contents !important; }
+  body.mobile-detailed #catalogGrid .nameBlock{ display: contents !important; }
+
+  /* Hero */
+  body.mobile-detailed #catalogGrid .unitThumb{ grid-area: thumb !important; }
+
+  /* Name + title */
+  body.mobile-detailed #catalogGrid .unitName{
+    grid-area: name !important;
+    align-self: end !important;
+    margin: 0 !important;
+  }
+  body.mobile-detailed #catalogGrid .unitTitle{
+    grid-area: title !important;
+    display: block !important;
+    align-self: start !important;
+    margin: 0 !important;
+  }
+
+  /* Toggles in the "between" space */
+  body.mobile-detailed #catalogGrid .stateRow{
+    grid-area: toggles !important;
+    justify-content: center !important;
+    align-items: center !important;
+    margin: 0 !important;
+  }
+
+  /* Ensure toggles are numbered 1–3 */
+  body.mobile-detailed #catalogGrid .stateRow .stateBtn{
+    font-size: 0 !important;
+  }
+  body.mobile-detailed #catalogGrid .stateRow .stateBtn::before{
+    font-size: 12px !important;
+    font-weight: 900 !important;
+    color: var(--text) !important;
+  }
+  body.mobile-detailed #catalogGrid .stateRow .stateBtn:nth-child(1)::before{ content:"1" !important; }
+  body.mobile-detailed #catalogGrid .stateRow .stateBtn:nth-child(2)::before{ content:"2" !important; }
+  body.mobile-detailed #catalogGrid .stateRow .stateBtn:nth-child(3)::before{ content:"3" !important; }
+
+  /* Stats + leader occupy full width rows */
+  body.mobile-detailed #catalogGrid .statLine{
+    grid-area: stats !important;
+    margin-top: 2px !important;
+  }
+  body.mobile-detailed #catalogGrid .leaderBlock{
+    grid-area: leader !important;
+  }
+
+  /* Badges column */
+  body.mobile-detailed #catalogGrid .chipCol{
     grid-area: badges !important;
     display: grid !important;
     grid-template-columns: auto auto !important;
     grid-template-rows: auto auto !important;
     grid-template-areas:
-      "kind kind"
-      "element rarity" !important;
+      "character character"
+      "element   rarity" !important;
     gap: 10px !important;
     justify-items: end !important;
     align-items: center !important;
   }
 
-  body.page-catalog.mobile-detailed #catalogGrid .chipCol .tag.kind,
-  body.page-catalog.mobile-detailed #unitGrid .chipCol .tag.kind{
-    grid-area: kind !important;
+  /* Swap so Character is the top long badge */
+  body.mobile-detailed #catalogGrid .chipCol .tag:not(.element):not(.rarity){
+    grid-area: character !important;
     justify-self: end !important;
-    background: rgba(168, 80, 255, .20) !important;
-    border: 1px solid rgba(168, 80, 255, .45) !important;
   }
 
-  body.page-catalog.mobile-detailed #catalogGrid .chipCol .tag.element,
-  body.page-catalog.mobile-detailed #unitGrid .chipCol .tag.element{
+  /* Element + SSR on the lower line (Element first) */
+  body.mobile-detailed #catalogGrid .chipCol .tag.element{
     grid-area: element !important;
     justify-self: end !important;
   }
-
-  body.page-catalog.mobile-detailed #catalogGrid .chipCol .tag.rarity,
-  body.page-catalog.mobile-detailed #unitGrid .chipCol .tag.rarity{
+  body.mobile-detailed #catalogGrid .chipCol .tag.rarity{
     grid-area: rarity !important;
     justify-self: end !important;
-    width: auto !important;
+    width: auto !important;        /* SSR short */
     min-width: 0 !important;
     padding-left: 12px !important;
     padding-right: 12px !important;
-    background: rgba(60, 255, 180, .16) !important;
-    border: 1px solid rgba(60, 255, 180, .38) !important;
   }
 
-  /* Details full width */
-  body.page-catalog.mobile-detailed #catalogGrid .unitDetails,
-  body.page-catalog.mobile-detailed #unitGrid .unitDetails{
-    grid-area: details !important;
-    width: 100% !important;
-  }
-
-  /* Centered 4-up stats (label then value) */
-  body.page-catalog.mobile-detailed #catalogGrid .statLine,
-  body.page-catalog.mobile-detailed #unitGrid .statLine{
-    width: 100% !important;
-    display: grid !important;
-    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-    gap: 12px !important;
-    justify-items: center !important;
-    align-items: start !important;
-    margin-top: 6px !important;
-  }
-
-  body.page-catalog.mobile-detailed #catalogGrid .stat,
-  body.page-catalog.mobile-detailed #unitGrid .stat{
-    display: grid !important;
-    grid-template-rows: auto auto !important;
-    justify-items: center !important;
-    text-align: center !important;
-    white-space: nowrap !important;
-    font-weight: 900 !important;
-  }
-  body.page-catalog.mobile-detailed #catalogGrid .stat .statLabel,
-  body.page-catalog.mobile-detailed #unitGrid .stat .statLabel{
-    font-size: 12px !important;
-    letter-spacing: .4px !important;
-    opacity: .95 !important;
-  }
-  body.page-catalog.mobile-detailed #catalogGrid .stat .statVal,
-  body.page-catalog.mobile-detailed #unitGrid .stat .statVal{
-    margin-top: 4px !important;
-    font-size: 16px !important;
-    letter-spacing: .2px !important;
-  }
-
-  /* Leader wraps nicely */
-  body.page-catalog.mobile-detailed #catalogGrid .leaderDesc,
-  body.page-catalog.mobile-detailed #unitGrid .leaderDesc{
-    white-space: normal !important;
-    overflow-wrap: anywhere !important;
+  /* Prevent any earlier "full-width bar" styling in detailed */
+  body.mobile-detailed #catalogGrid .chipCol .tag{
+    border-radius: 12px !important;
+    border: 1px solid rgba(255,255,255,.18) !important;
+    background: rgba(255,255,255,.08) !important;
   }
 }
 
 /* =========================================================
-   PAGE-CATALOG: MOBILE COMPACT — ENSURE NAME ABOVE TITLE (CENTERED)
-   (Restores the previous compact look; does not affect detailed/desktop)
+   MOBILE COMPACT (CATALOG/UNIT GRID): RESTORE CLEAN STACK
+   Required layout:
+     Image
+     Toggles (1–3) horizontal + centered (under image)
+     Name (above) + Title (below)
+     Badges on separate lines: Character, Element, Rarity (centered)
    ========================================================= */
 @media (max-width: 900px){
-  body.page-catalog.mobile-compact #catalogGrid .nameBlock,
-  body.page-catalog.mobile-compact #unitGrid .nameBlock{
+
+  /* Make compact cards a simple vertical stack */
+  body.mobile-compact #catalogGrid .unitCard,
+  body.mobile-compact #unitGrid .unitCard{
     display: flex !important;
     flex-direction: column !important;
-    align-items: center !important;
-    text-align: center !important;
-    gap: 4px !important;
+    align-items: stretch !important;
   }
-  body.page-catalog.mobile-compact #catalogGrid .unitName,
-  body.page-catalog.mobile-compact #unitGrid .unitName{
+
+  /* Image first */
+  body.mobile-compact #catalogGrid .unitThumb,
+  body.mobile-compact #unitGrid .unitThumb{
     order: 1 !important;
-    white-space: normal !important;
-    overflow: visible !important;
-    text-overflow: clip !important;
   }
-  body.page-catalog.mobile-compact #catalogGrid .unitTitle,
-  body.page-catalog.mobile-compact #unitGrid .unitTitle{
+
+  /* Toggles directly under image, centered, horizontal */
+  body.mobile-compact #catalogGrid .stateRow,
+  body.mobile-compact #unitGrid .stateRow{
     order: 2 !important;
-    white-space: normal !important;
-    overflow: visible !important;
-    text-overflow: clip !important;
+    width: 100% !important;
+    flex-direction: row !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 10px !important;
+    margin: 10px 0 6px 0 !important;
+  }
+
+  /* Header stack: name/title centered, badges below */
+  body.mobile-compact #catalogGrid .metaHeader,
+  body.mobile-compact #unitGrid .metaHeader{
+    order: 3 !important;
+    grid-template-columns: 1fr !important;
+    justify-items: center !important;
+    text-align: center !important;
+    gap: 8px !important;
+  }
+
+  body.mobile-compact #catalogGrid .unitName,
+  body.mobile-compact #unitGrid .unitName{
+    margin-top: 2px !important;
+  }
+
+  body.mobile-compact #catalogGrid .unitTitle,
+  body.mobile-compact #unitGrid .unitTitle{
+    margin-top: 2px !important;
+  }
+
+  /* Badges: separate lines, centered; order = Character, Element, Rarity */
+  body.mobile-compact #catalogGrid .chipCol,
+  body.mobile-compact #unitGrid .chipCol{
+    width: 100% !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+
+  body.mobile-compact #catalogGrid .chipCol .tag,
+  body.mobile-compact #unitGrid .chipCol .tag{
+    width: 70% !important;
+    justify-content: center !important;
+    text-align: center !important;
+  }
+
+  body.mobile-compact #catalogGrid .chipCol .tag:not(.element):not(.rarity),
+  body.mobile-compact #unitGrid .chipCol .tag:not(.element):not(.rarity){
+    order: 1 !important; /* Character/Weapon/Boss */
+  }
+  body.mobile-compact #catalogGrid .chipCol .tag.element,
+  body.mobile-compact #unitGrid .chipCol .tag.element{
+    order: 2 !important;
+  }
+  body.mobile-compact #catalogGrid .chipCol .tag.rarity,
+  body.mobile-compact #unitGrid .chipCol .tag.rarity{
+    order: 3 !important;
   }
 }
