@@ -1268,3 +1268,73 @@ body{
     width: 100% !important;
   }
 }
+
+/* === AUTO-PATCH: DETAIL VIEW STATS/LAYOUT FIX === */
+
+/* =========================================================
+   FIX: MOBILE DETAILED DETAILS REGION (STATS/LEADER) NOT PLACED
+   - Does NOT affect name/title/toggles/badges
+   - Prevents stat overlap by giving unitDetails the correct grid area
+   ========================================================= */
+@media (max-width: 900px){
+
+  /* Put the whole details section in the "stats" row of the unitCard grid */
+  body.mobile-detailed #catalogGrid .unitCard .unitDetails,
+  body.mobile-detailed #unitGrid .unitCard .unitDetails{
+    grid-area: stats !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  /* If leader is inside unitDetails, keep it spanning full width */
+  body.mobile-detailed #catalogGrid .unitCard .leaderBlock,
+  body.mobile-detailed #unitGrid .unitCard .leaderBlock{
+    grid-column: 1 / -1 !important;
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  /* HARDEN stats to 2-line layout even when markup is just .stat + <strong>LABEL</strong> VALUE */
+  body.mobile-detailed #catalogGrid .unitCard .statLine,
+  body.mobile-detailed #unitGrid .unitCard .statLine{
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 14px !important;
+    width: 100% !important;
+    margin-top: 8px !important;
+    align-items: start !important;
+    justify-items: center !important;
+  }
+
+  body.mobile-detailed #catalogGrid .unitCard .statLine .stat,
+  body.mobile-detailed #unitGrid .unitCard .statLine .stat{
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    min-width: 0 !important;
+  }
+
+  /* LABEL line */
+  body.mobile-detailed #catalogGrid .unitCard .statLine .stat strong,
+  body.mobile-detailed #unitGrid .unitCard .statLine .stat strong{
+    display: block !important;
+    font-size: 14px !important;
+    line-height: 1.05 !important;
+    letter-spacing: .6px !important;
+  }
+
+  /* VALUE line (the text node after <strong>) */
+  body.mobile-detailed #catalogGrid .unitCard .statLine .stat,
+  body.mobile-detailed #unitGrid .unitCard .statLine .stat{
+    font-size: 22px !important;        /* value inherits here if it's plain text */
+    line-height: 1.05 !important;
+    font-weight: 900 !important;
+  }
+
+  /* But keep the label from inheriting the large value size */
+  body.mobile-detailed #catalogGrid .unitCard .statLine .stat strong,
+  body.mobile-detailed #unitGrid .unitCard .statLine .stat strong{
+    font-weight: 900 !important;
+  }
+}
