@@ -157,74 +157,71 @@ function optionList(units) {
   return opts.join("");
 }
 
-function slotCardHTML(slotKey, idx, currentId, units, locked) {
-  const cid = normId(currentId);
-  const u = units.find(x => normId(x.id) === cid);
+function slotCardHTML(slot, opts, kind, optsKey, isPlatoon=false){
+  const u = slot?.unit || null;
 
-  const img = u?.image ? `<img src="${u.image}" alt="">` : `<div class="ph">?</div>`;
-  const title = u ? u.name : "Empty";
-  const sub = u ? (u.title || "") : "Select a unit";
+  // platoon slots: compact portrait + dropdown + title + badges (match catalog/roster feel)
+  if(isPlatoon){
+    const name = u?.name || "?";
+    const title = u?.title || "Select a unit";
+    const element = u?.element || "";
+    const rarity = u?.rarity || "";
+    const elClass = element ? `el-${element.toLowerCase()}` : "el-none";
+    const rarClass = rarity ? `rar-${rarity.toLowerCase()}` : "rar-none";
 
-  const isPlatoon = slotKey.startsWith("platoon_");
+    const img = u?.image
+      ? `<img class="unitPortrait" src="${u.image}" alt="${name}" loading="lazy" decoding="async" />`
+      : `<div class="unitPortraitPlaceholder">?</div>`;
 
-  if (isPlatoon) {
+    const select = (opts||[]).length
+      ? `<select class="slotSelect" data-slot="${slot.slotId}" data-kind="${kind}" data-opts="${optsKey}">
+           ${opts.map(o=>`<option value="${o.value}" ${o.value===slot.value?'selected':''}>${o.label}</option>`).join('')}
+         </select>`
+      : `<div class="slotSelectPlaceholder">(empty)</div>`;
+
+    const lock = `<label class="lockRow"><input type="checkbox" class="slotLock" data-slot="${slot.slotId}" ${slot.locked?'checked':''}/> <span>Lock</span></label>`;
+
     return `
-      <div class="slotCard ${u ? "" : "empty"}">
-        <div class="slotImg">${img}</div>
-
-        <select class="slotSelect" data-slot="${slotKey}" data-idx="${idx}" ${locked ? "disabled" : ""}>
-          ${optionList(units)}
-        </select>
-
-        <div class="slotSub">${sub}</div>
-
-        ${u ? `
-          <div class="slotMetaRow" style="margin:0;">
-            <span class="slotChip">${u.rarity || ""}</span>
-            <span class="slotChip">${u.element || ""}</span>
-          </div>
-        ` : `<div></div>`}
-
-        <div class="slotLockRow">
-          <label class="muted" style="display:flex; gap:8px; align-items:center; user-select:none;">
-            <input type="checkbox" class="slotLock" data-slot="${slotKey}" data-idx="${idx}" ${locked ? "checked" : ""}/>
-            Lock
-          </label>
-          <div></div>
+      <div class="slotCard platoonSlotCard ${kind} ${elClass} ${rarClass}" data-element="${element}" data-rarity="${rarity}">
+        <div class="slotTop">
+          <div class="slotImg">${img}</div>
         </div>
-      </div>
-    `;
+
+        <div class="slotMid">
+          ${select}
+          <div class="slotTitle">${title}</div>
+          <div class="slotBadges">
+            <span class="tag kind">${kind[0].toUpperCase()+kind.slice(1)}</span>
+            ${element ? `<span class="tag element ${element.toLowerCase()}">${element}</span>` : ``}
+            ${rarity ? `<span class="tag rarity ${rarity.toLowerCase()}">${rarity}</span>` : ``}
+          </div>
+        </div>
+
+        <div class="slotBottom">
+          ${lock}
+        </div>
+      </div>`;
   }
 
-  // Default (story/storage) layout unchanged
+  // non-platoon: original card
+  const img = u?.image ? `<img src="${u.image}" alt="${u?.name||''}" loading="lazy" decoding="async">` : "";
+  const name = u?.name || "?";
+  const title = u?.title || "";
+  const rarity = u?.rarity || "";
+  const element = u?.element || "";
+  const stats = u ? `<div class="slotStats">ATK ${u.atk} · HP ${u.hp} · SPD ${u.spd} · COST ${u.cost}</div>` : "";
+  const lock = `<label class="lockRow"><input type="checkbox" class="slotLock" data-slot="${slot.slotId}" ${slot.locked?'checked':''}/> Lock</label>`;
+  const select = (opts||[]).length ? `<select class="slotSelect" data-slot="${slot.slotId}" data-kind="${kind}" data-opts="${optsKey}">${opts.map(o=>`<option value="${o.value}" ${o.value===slot.value?'selected':''}>${o.label}</option>`).join('')}</select>` : "";
+  const badges = u ? `<div class="slotBadges"><span class="badge">${rarity}</span><span class="badge">${element}</span></div>` : "";
   return `
-    <div class="slotCard ${u ? "" : "empty"}">
+    <div class="slotCard ${kind}">
       <div class="slotTop">
         <div class="slotImg">${img}</div>
-        <div>
-          <div class="slotName">${title}</div>
-          <div class="slotSub">${sub}</div>
-        </div>
+        <div class="slotName">${name}</div>
       </div>
-
-      <div style="display:flex; justify-content:space-between; gap:10px; align-items:center; margin-top:8px;">
-        <label class="muted" style="display:flex; gap:8px; align-items:center; user-select:none;">
-          <input type="checkbox" class="slotLock" data-slot="${slotKey}" data-idx="${idx}" ${locked ? "checked" : ""}/>
-          Lock
-        </label>
-        ${u ? `
-          <div class="slotMetaRow" style="margin:0;">
-            <span class="slotChip">${u.rarity || ""}</span>
-            <span class="slotChip">${u.element || ""}</span>
-          </div>
-        ` : `<div></div>`}
-      </div>
-
-      <select class="slotSelect" data-slot="${slotKey}" data-idx="${idx}" ${locked ? "disabled" : ""}>
-        ${optionList(units)}
-      </select>
-    </div>
-  `;
+      <div class="slotMid">${title}${badges}${stats}</div>
+      <div class="slotBottom">${select}${lock}</div>
+    </div>`;
 }
 
 
