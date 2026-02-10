@@ -980,274 +980,73 @@ body{
 }
 
 /* =========================================================
-   MOBILE DETAILED (CATALOG ONLY): COLOR BARS + STAT 2-LINE GRID
-   Fixes:
-   - Restore element/rarity badge color treatment (like compact)
-   - Ensure badge swap: Character on top; Element + SSR below
-   - Stats become 4-up with label on row 1 and value on row 2
+   OPTIMIZER PLATOONS (DESKTOP): FORCE 2 PER ROW + TIGHTER SLOTS
+   - Keeps roster/catalog styling untouched
    ========================================================= */
-@media (max-width: 900px){
-
-  /* Re-assert badge grid areas (swap: Character on top, Element+SSR below) */
-  body.mobile-detailed #catalogGrid .chipCol{
-    grid-template-areas:
-      "character character"
-      "element   rarity" !important;
-  }
-  body.mobile-detailed #catalogGrid .chipCol .tag:not(.element):not(.rarity){ grid-area: character !important; }
-  body.mobile-detailed #catalogGrid .chipCol .tag.element{ grid-area: element !important; }
-  body.mobile-detailed #catalogGrid .chipCol .tag.rarity{ grid-area: rarity !important; }
-
-  /* Restore colored Element badge using the unit element color */
-  body.mobile-detailed #catalogGrid .chipCol .tag.element{
-    border: 1px solid color-mix(in srgb, var(--el) 60%, rgba(255,255,255,.18)) !important;
-    background: color-mix(in srgb, var(--el) 16%, rgba(255,255,255,.08)) !important;
-  }
-  /* Light element: readable */
-  body.mobile-detailed #catalogGrid .unitCard.el-light .chipCol .tag.element{
-    border-color: rgba(10,12,20,.20) !important;
-    background: rgba(255,255,255,.70) !important;
-    color: rgba(10,12,20,.88) !important;
-  }
-
-  /* Rarity badge: neutral pill (short) */
-  body.mobile-detailed #catalogGrid .chipCol .tag.rarity{
-    background: rgba(255,255,255,.12) !important;
-    border: 1px solid rgba(255,255,255,.18) !important;
-    width: auto !important;
-    padding-left: 12px !important;
-    padding-right: 12px !important;
-  }
-
-  /* Character badge: slightly stronger than rarity */
-  body.mobile-detailed #catalogGrid .chipCol .tag:not(.element):not(.rarity){
-    background: rgba(255,255,255,.10) !important;
-    border: 1px solid rgba(255,255,255,.18) !important;
-  }
-
-  /* Stats: 4 columns, each stat becomes 2 lines (label then value) */
-  body.mobile-detailed #catalogGrid .statLine{
-    display: grid !important;
-    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-    gap: 10px !important;
-    align-items: start !important;
-  }
-  body.mobile-detailed #catalogGrid .stat{
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: flex-start !important;
-    text-align: center !important;
-    font-size: 12px !important;
-    letter-spacing: .2px !important;
-  }
-  body.mobile-detailed #catalogGrid .stat strong{
-    display: block !important;
-    margin-top: 4px !important;
-    font-size: 18px !important;
-    letter-spacing: .4px !important;
-  }
-
-  /* Leader block wraps nicely at bottom */
-  body.mobile-detailed #catalogGrid .leaderName{
-    margin-top: 6px !important;
-  }
-  body.mobile-detailed #catalogGrid .leaderDesc{
-    white-space: normal !important;
-    overflow-wrap: anywhere !important;
+@media (min-width: 900px){
+  .platoonsGrid{
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   }
 }
 
-/* =========================================================
-   MOBILE DETAILED (CATALOG ONLY): STRICT BADGE SWAP + CENTER STATS
-   Fixes issues seen in screenshot:
-   - Forces Character to be the TOP badge
-   - Forces Element + SSR to be the BOTTOM row (Element left, SSR right)
-   - Ensures stats are centered 4-up with clear spacing (no merged "ATKHP...")
-   ========================================================= */
-@media (max-width: 900px){
-
-  /* Some catalog markup uses .tags instead of .chipCol — normalize both */
-  body.mobile-detailed #catalogGrid .chipCol,
-  body.mobile-detailed #catalogGrid .tags{
-    grid-area: badges !important;
-    display: grid !important;
-    grid-template-columns: auto auto !important;
-    grid-template-rows: auto auto !important;
-    grid-template-areas:
-      "character character"
-      "element   rarity" !important;
-    gap: 10px !important;
-    justify-items: end !important;
-    align-items: center !important;
-    justify-self: end !important;
-  }
-
-  /* Character TOP (full row) */
-  body.mobile-detailed #catalogGrid .chipCol .tag:not(.element):not(.rarity),
-  body.mobile-detailed #catalogGrid .tags   .tag:not(.element):not(.rarity){
-    grid-area: character !important;
-    justify-self: end !important;
-    width: auto !important;
-  }
-
-  /* Element bottom-left */
-  body.mobile-detailed #catalogGrid .chipCol .tag.element,
-  body.mobile-detailed #catalogGrid .tags   .tag.element{
-    grid-area: element !important;
-    justify-self: end !important;
-  }
-
-  /* SSR bottom-right (SHORT) */
-  body.mobile-detailed #catalogGrid .chipCol .tag.rarity,
-  body.mobile-detailed #catalogGrid .tags   .tag.rarity{
-    grid-area: rarity !important;
-    justify-self: end !important;
-    width: auto !important;
-    min-width: 0 !important;
-    padding-left: 12px !important;
-    padding-right: 12px !important;
-  }
-
-  /* Restore element tint (like compact) */
-  body.mobile-detailed #catalogGrid .unitCard[class*="el-"] .tag.element{
-    border-color: color-mix(in srgb, var(--el) 60%, rgba(255,255,255,.18)) !important;
-    background: color-mix(in srgb, var(--el) 16%, rgba(255,255,255,.08)) !important;
-  }
-  body.mobile-detailed #catalogGrid .unitCard.el-light .tag.element{
-    border-color: rgba(10,12,20,.20) !important;
-    background: rgba(255,255,255,.70) !important;
-    color: rgba(10,12,20,.88) !important;
-  }
-
-  /* Stats: centered 4-up, labels separate from values (no merge) */
-  body.mobile-detailed #catalogGrid .statLine{
-    grid-area: stats !important;
-    width: 100% !important;
-    display: grid !important;
-    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-    gap: 12px !important;
-    justify-items: center !important;
-    align-items: start !important;
-    margin: 6px 0 0 0 !important;
-  }
-
-  body.mobile-detailed #catalogGrid .stat{
-    min-width: 0 !important;
-    display: grid !important;
-    grid-template-rows: auto auto !important;
-    justify-items: center !important;
-    text-align: center !important;
-    font-size: 12px !important;
-    font-weight: 900 !important;
-    letter-spacing: .4px !important;
-    white-space: nowrap !important;
-  }
-
-  body.mobile-detailed #catalogGrid .stat strong{
-    margin-top: 4px !important;
-    font-size: 16px !important;
-    font-weight: 900 !important;
-    letter-spacing: .2px !important;
-  }
+/* Tighten platoon slot spacing so units fit cleanly */
+.platoonsGrid .slotGrid{
+  gap: 8px !important;
 }
 
-/* =========================================================
-   FORCE APPLY (MOBILE DETAILED): if Catalog is using #unitGrid
-   Some builds reuse #unitGrid for Catalog. Apply the SAME
-   detailed-catalog layout to BOTH #catalogGrid and #unitGrid.
-   If this ends up affecting Roster detailed on mobile, tell me
-   and I will re-scope with the correct container hook.
-   ========================================================= */
-@media (max-width: 900px){
-  body.mobile-detailed #unitGrid .unitCard{
-    display: grid !important;
-    grid-template-columns: 1fr auto auto !important;
-    grid-template-rows: auto auto auto auto auto !important;
-    grid-template-areas:
-      "thumb thumb thumb"
-      "name  name  badges"
-      "title toggles badges"
-      "stats stats stats"
-      "leader leader leader" !important;
-    gap: 10px !important;
-  }
-
-  body.mobile-detailed #unitGrid .unitLeft{ display: contents !important; }
-  body.mobile-detailed #unitGrid .meta{ display: contents !important; }
-  body.mobile-detailed #unitGrid .metaHeader{ display: contents !important; }
-  body.mobile-detailed #unitGrid .nameBlock{ display: contents !important; }
-
-  body.mobile-detailed #unitGrid .unitThumb{ grid-area: thumb !important; }
-  body.mobile-detailed #unitGrid .unitName{ grid-area: name !important; margin:0 !important; align-self:end !important; }
-  body.mobile-detailed #unitGrid .unitTitle{ grid-area: title !important; margin:0 !important; }
-
-  body.mobile-detailed #unitGrid .stateRow{
-    grid-area: toggles !important;
-    justify-content: center !important;
-    align-items: center !important;
-    margin: 0 !important;
-  }
-  body.mobile-detailed #unitGrid .stateRow .stateBtn{ font-size:0 !important; }
-  body.mobile-detailed #unitGrid .stateRow .stateBtn::before{ font-size:12px !important; font-weight:900 !important; color:var(--text) !important; }
-  body.mobile-detailed #unitGrid .stateRow .stateBtn:nth-child(1)::before{ content:"1" !important; }
-  body.mobile-detailed #unitGrid .stateRow .stateBtn:nth-child(2)::before{ content:"2" !important; }
-  body.mobile-detailed #unitGrid .stateRow .stateBtn:nth-child(3)::before{ content:"3" !important; }
-
-  /* Badges: Character on top, Element + SSR below */
-  body.mobile-detailed #unitGrid .chipCol,
-  body.mobile-detailed #unitGrid .tags{
-    grid-area: badges !important;
-    display: grid !important;
-    grid-template-columns: auto auto !important;
-    grid-template-rows: auto auto !important;
-    grid-template-areas:
-      "character character"
-      "element   rarity" !important;
-    gap: 10px !important;
-    justify-items: end !important;
-    align-items: center !important;
-    justify-self: end !important;
-  }
-  body.mobile-detailed #unitGrid .tag:not(.element):not(.rarity){ grid-area: character !important; }
-  body.mobile-detailed #unitGrid .tag.element{ grid-area: element !important; }
-  body.mobile-detailed #unitGrid .tag.rarity{
-    grid-area: rarity !important;
-    width:auto !important;
-    padding-left:12px !important;
-    padding-right:12px !important;
-  }
-
-  body.mobile-detailed #unitGrid .unitCard[class*="el-"] .tag.element{
-    border-color: color-mix(in srgb, var(--el) 60%, rgba(255,255,255,.18)) !important;
-    background: color-mix(in srgb, var(--el) 16%, rgba(255,255,255,.08)) !important;
-  }
-
-  /* Centered 4-up stats (2 lines) */
-  body.mobile-detailed #unitGrid .statLine{
-    grid-area: stats !important;
-    width: 100% !important;
-    display: grid !important;
-    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-    gap: 12px !important;
-    justify-items: center !important;
-    align-items: start !important;
-    margin: 6px 0 0 0 !important;
-  }
-  body.mobile-detailed #unitGrid .stat{
-    display: grid !important;
-    grid-template-rows: auto auto !important;
-    justify-items: center !important;
-    text-align: center !important;
-    white-space: nowrap !important;
-    font-size: 12px !important;
-    font-weight: 900 !important;
-  }
-  body.mobile-detailed #unitGrid .stat strong{
-    margin-top: 4px !important;
-    font-size: 16px !important;
-    font-weight: 900 !important;
-  }
-
-  body.mobile-detailed #unitGrid .leaderBlock{ grid-area: leader !important; }
+/* Compact the slot cards within platoons */
+.platoonsGrid .slotCard{
+  padding: 8px !important;
+  gap: 6px !important;
+  min-height: 0 !important;
 }
+
+/* Portrait condenser: hard-lock to 56px, center-crop, no overflow */
+.platoonsGrid .slotImg{
+  width: 56px !important;
+  height: 56px !important;
+  min-width: 56px !important;
+  min-height: 56px !important;
+  max-width: 56px !important;
+  max-height: 56px !important;
+  overflow: hidden !important;
+  display: grid !important;
+  place-items: center !important;
+  position: relative !important; /* enables optional badge overlay inside */
+}
+
+.platoonsGrid .slotImg img{
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;         /* trims/crops image */
+  object-position: 50% 35% !important;  /* slightly above center for faces */
+  display: block !important;
+}
+
+/* If platoon badges are rendered inside the image container, overlay them */
+.platoonsGrid .slotImg .slotBadges,
+.platoonsGrid .slotImg .platoon-unit-badges,
+.platoonsGrid .slotImg .unitBadges{
+  position: absolute !important;
+  top: 4px !important;
+  right: 4px !important;
+  display: flex !important;
+  gap: 4px !important;
+  z-index: 2 !important;
+  pointer-events: none !important;
+}
+
+/* Make overlay badges small so they stay inside 56px portrait */
+.platoonsGrid .slotImg .slotBadges .tag,
+.platoonsGrid .slotImg .platoon-unit-badges .tag,
+.platoonsGrid .slotImg .unitBadges .tag{
+  font-size: 10px !important;
+  padding: 1px 5px !important;
+  line-height: 1.2 !important;
+  border-radius: 999px !important;
+}
+
+/* Tighten name/subtitle spacing under the portrait inside platoon slots */
+.platoonsGrid .slotName{ margin: 0 !important; }
+.platoonsGrid .slotSub{ margin-top: 2px !important; }
+.platoonsGrid .slotMetaRow{ gap: 4px !important; }
