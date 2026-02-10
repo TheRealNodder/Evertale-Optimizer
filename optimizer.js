@@ -161,18 +161,46 @@ function slotCardHTML(slotKey, idx, currentId, units, locked) {
   const cid = normId(currentId);
   const u = units.find(x => normId(x.id) === cid);
 
-  // Hard-lock thumbnail sizing so portraits never overflow their slot.
-  // This keeps the layout stable even if CSS is cached/overridden.
-  const img = u?.image
-    ? `<img src="${u.image}" alt="" width="56" height="56" style="width:56px;height:56px;object-fit:cover;display:block;"/>`
-    : `<div class="ph">?</div>`;
+  const img = u?.image ? `<img src="${u.image}" alt="">` : `<div class="ph">?</div>`;
   const title = u ? u.name : "Empty";
   const sub = u ? (u.title || "") : "Select a unit";
 
+  const isPlatoon = slotKey.startsWith("platoon_");
+
+  if (isPlatoon) {
+    return `
+      <div class="slotCard ${u ? "" : "empty"}">
+        <div class="slotImg">${img}</div>
+
+        <select class="slotSelect" data-slot="${slotKey}" data-idx="${idx}" ${locked ? "disabled" : ""}>
+          ${optionList(units)}
+        </select>
+
+        <div class="slotSub">${sub}</div>
+
+        ${u ? `
+          <div class="slotMetaRow" style="margin:0;">
+            <span class="slotChip">${u.rarity || ""}</span>
+            <span class="slotChip">${u.element || ""}</span>
+          </div>
+        ` : `<div></div>`}
+
+        <div class="slotLockRow">
+          <label class="muted" style="display:flex; gap:8px; align-items:center; user-select:none;">
+            <input type="checkbox" class="slotLock" data-slot="${slotKey}" data-idx="${idx}" ${locked ? "checked" : ""}/>
+            Lock
+          </label>
+          <div></div>
+        </div>
+      </div>
+    `;
+  }
+
+  // Default (story/storage) layout unchanged
   return `
     <div class="slotCard ${u ? "" : "empty"}">
       <div class="slotTop">
-        <div class="slotImg" style="width:56px;height:56px;overflow:hidden;">${img}</div>
+        <div class="slotImg">${img}</div>
         <div>
           <div class="slotName">${title}</div>
           <div class="slotSub">${sub}</div>
@@ -198,6 +226,7 @@ function slotCardHTML(slotKey, idx, currentId, units, locked) {
     </div>
   `;
 }
+
 
 function getLockFor(slotKey, idx) {
   if (slotKey === "storyMain") return !!state.locks.storyMain[idx];
