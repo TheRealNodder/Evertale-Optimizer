@@ -151,6 +151,84 @@ body.mobile-compact .unitThumb{width:72px;height:72px;border-radius:10px}
 
 /* Story grids */
 .slotGrid{display:grid;gap:10px;margin-top:8px;grid-template-columns:repeat(5,minmax(0,1fr))}
+
+/* Platoons use a portrait tile layout (5 columns) */
+.platoonSlots{grid-template-columns:repeat(5,minmax(72px,1fr))}
+
+.platoonTile{
+  position:relative;
+  border:1px solid rgba(255,255,255,0.12);
+  border-radius:14px;
+  background:rgba(20,24,40,0.55);
+  overflow:hidden;
+  height:180px;
+}
+
+.platoonTile .platoonImg{
+  position:absolute;
+  top:0; left:0; right:0;
+  height:70%;
+  background:rgba(0,0,0,0.25);
+}
+.platoonTile .platoonImg img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+.platoonTile .platoonPh{display:flex;align-items:center;justify-content:center;height:100%;font-weight:700;opacity:0.6}
+
+.platoonTile .platoonFooter{
+  position:absolute;
+  left:0; right:0; bottom:0;
+  height:30%;
+  padding:6px 6px 8px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:4px;
+  background:linear-gradient(to top, rgba(10,12,20,0.90), rgba(10,12,20,0.0));
+}
+.platoonTile .platoonName{
+  font-size:12px;
+  line-height:1.05;
+  font-weight:800;
+  text-align:center;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.platoonTile .platoonBadges{display:flex;justify-content:center;gap:6px;flex-wrap:nowrap}
+.platoonTile .miniBadge{
+  font-size:10px;
+  padding:2px 8px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,0.18);
+  background:rgba(255,255,255,0.08);
+  font-weight:700;
+}
+.platoonTile .miniBadge.element{border-color:rgba(169,86,255,0.6)}
+.platoonTile .miniBadge.rarity{border-color:rgba(110,240,170,0.35)}
+
+/* Invisible select overlay to keep the UI clean */
+.platoonSelectOverlay{
+  position:absolute;
+  inset:0;
+  opacity:0;
+  width:100%;
+  height:100%;
+  cursor:pointer;
+}
+
+.platoonLock{
+  position:absolute;
+  top:6px;
+  right:6px;
+  font-size:12px;
+  background:rgba(0,0,0,0.35);
+  border:1px solid rgba(255,255,255,0.18);
+  border-radius:999px;
+  padding:2px 6px;
+}
 .storyBackGrid{grid-template-columns:repeat(3,minmax(0,1fr))}
 
 /* Platoons container */
@@ -1337,18 +1415,4 @@ body{
   body.mobile-detailed #unitGrid .unitCard .statLine .stat strong{
     font-weight: 900 !important;
   }
-}
-
-/* =========================================================
-   ROSTER UI PATCH: OPTIMIZER MOBILE SLOT GRID
-   - Keeps desktop unchanged
-   - Mobile: show slots 2 per row (then 1 per row on very small screens)
-   ========================================================= */
-@media (max-width: 900px){
-  body.optimizer-page .slotGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
-  body.optimizer-page .storyBackGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
-}
-@media (max-width: 520px){
-  body.optimizer-page .slotGrid{grid-template-columns:repeat(1,minmax(0,1fr))}
-  body.optimizer-page .storyBackGrid{grid-template-columns:repeat(1,minmax(0,1fr))}
 }

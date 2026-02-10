@@ -195,6 +195,57 @@ function slotCardHTML(slotKey, idx, currentId, units, locked) {
   `;
 }
 
+// Cleaner platoon UI (5 portrait columns) with an invisible select overlay.
+function platoonSlotHTML(slotKey, idx, currentId, units, locked) {
+  const cid = normId(currentId);
+  const u = units.find(x => normId(x.id) === cid);
+
+  const img = u?.image
+    ? `<img src="${u.image}" alt="">`
+    : `<div class="platoonPh">?</div>`;
+
+  const name = u?.name || "Empty";
+  const el = u?.element || "";
+  const rarity = u?.rarity || "";
+
+  // Keep the same option set as slotCardHTML, but make it a full-tile overlay.
+  const options = [`<option value="">(empty)</option>`, ...units.map(x => {
+    const id = String(x.id);
+    return `<option value="${id}" ${normId(id)===cid?"selected":""}>${x.name}</option>`;
+  })].join("");
+
+  const lock = locked ? `<div class="slotLock" title="Locked">🔒</div>` : "";
+
+  // IDs are consumed by listeners elsewhere; keep the same pattern.
+  const selectId = `sel_${slotKey}_${idx}`;
+
+  return `
+    <div class="platoonTile" data-slot="${slotKey}" data-idx="${idx}">
+      ${lock}
+      <div class="platoonImg">${img}</div>
+      <div class="platoonFooter">
+        <div class="platoonName" title="${escapeHTML(name)}">${escapeHTML(name)}</div>
+        <div class="platoonBadges">
+          ${el ? `<span class="badge element ${escapeHTML(el)}">${escapeHTML(el)}</span>` : ""}
+          ${rarity ? `<span class="badge rarity">${escapeHTML(rarity)}</span>` : ""}
+        </div>
+      </div>
+      <select id="${selectId}" class="slotSelect platoonSelectOverlay" ${locked?"disabled":""}>
+        ${options}
+      </select>
+    </div>
+  `;
+}
+
+function escapeHTML(s) {
+  return String(s)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
 function getLockFor(slotKey, idx) {
   if (slotKey === "storyMain") return !!state.locks.storyMain[idx];
   if (slotKey === "storyBack") return !!state.locks.storyBack[idx];
@@ -273,7 +324,7 @@ function renderPlatoons() {
 
   grid.innerHTML = state.layout.platoons.map((row,p) => {
     const slots = row.map((id,i) =>
-      slotCardHTML(`platoon_${p}`, i, id, state.ownedUnits, getLockFor(`platoon_${p}`, i))
+      platoonSlotHTML(`platoon_${p}`, i, id, state.ownedUnits, getLockFor(`platoon_${p}`, i))
     ).join("");
 
     return `
