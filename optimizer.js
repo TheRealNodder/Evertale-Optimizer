@@ -239,7 +239,7 @@ function slotCardHTML(slotKey, idx, currentId, ownedUnits, locked){
   const badges = selectedUnit ? `<div class="slotBadges"><span class="badge">${rarity}</span><span class="badge">${element}</span></div>` : "";
 
   return `
-    <div class="slotCard ${kind}">
+    <div class="slotCard storySlotCard ${kind} ${elClass} ${rarClass}" data-element="${element}" data-rarity="${rarity}">
       <div class="slotTop">
         <div class="slotImg">${selectedUnit?.image ? `<img src="${selectedUnit.image}" alt="${name}" loading="lazy" decoding="async">` : ""}</div>
         <div class="slotName">${name}</div>
