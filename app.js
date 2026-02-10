@@ -12,7 +12,9 @@
 */
 
 const DATA_CHARACTERS = "./data/characters.json";
+// Current + legacy keys (older builds used `evertale_owned`).
 const LS_OWNED_KEY = "evertale_owned_units_v1";
+const LS_OWNED_KEY_LEGACY = "evertale_owned";
 const LS_MOBILE_VIEW_KEY = "evertale_mobile_view_v1"; // "compact" | "detailed"
 
 const state = {
@@ -54,7 +56,9 @@ function normKey(s) {
 }
 
 function loadOwned() {
-  const arr = safeJsonParse(localStorage.getItem(LS_OWNED_KEY) || "[]", []);
+  const rawCurrent = localStorage.getItem(LS_OWNED_KEY);
+  const rawLegacy = localStorage.getItem(LS_OWNED_KEY_LEGACY);
+  const arr = safeJsonParse((rawCurrent && rawCurrent !== "[]") ? rawCurrent : (rawLegacy || "[]"), []);
   const set = new Set();
   if (Array.isArray(arr)) for (const v of arr) set.add(String(v));
   return set;
@@ -62,6 +66,8 @@ function loadOwned() {
 
 function saveOwned() {
   localStorage.setItem(LS_OWNED_KEY, JSON.stringify([...state.owned]));
+  // Keep legacy key in sync for older pages/builds.
+  localStorage.setItem(LS_OWNED_KEY_LEGACY, JSON.stringify([...state.owned]));
 }
 
 function getMobileViewPref() {

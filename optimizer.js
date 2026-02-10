@@ -3,7 +3,9 @@
 */
 
 const DATA_CHARACTERS = "./data/characters.json";
+// Current + legacy keys (older builds used `evertale_owned`).
 const OWNED_KEY = "evertale_owned_units_v1";
+const OWNED_KEY_LEGACY = "evertale_owned";
 
 // NOTE:
 // Some earlier builds referenced a helper named `renderImageStateControls()`
@@ -89,8 +91,20 @@ function initSharedOptimizerFiltersUI() {
 }
 
 function getOwnedIds() {
-  const arr = safeJsonParse(localStorage.getItem(OWNED_KEY) || "[]", []);
-  const ids = Array.isArray(arr) ? arr : [];
+  const rawCurrent = localStorage.getItem(OWNED_KEY);
+  const rawLegacy = localStorage.getItem(OWNED_KEY_LEGACY);
+
+  let ids = safeJsonParse(rawCurrent || "null", null);
+  if (!Array.isArray(ids)) {
+    ids = safeJsonParse(rawLegacy || "[]", []);
+  }
+  ids = Array.isArray(ids) ? ids : [];
+
+  // If we're reading from legacy, also write-through to the current key.
+  if (!rawCurrent && rawLegacy && ids.length) {
+    try { localStorage.setItem(OWNED_KEY, JSON.stringify(ids)); } catch (_) {}
+  }
+
   return new Set(ids.map(normId).filter(Boolean));
 }
 
