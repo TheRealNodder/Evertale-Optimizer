@@ -1339,32 +1339,107 @@ body{
   }
 }
 
+/* ------------------------------ */
+/* Optimizer Platoons (portrait layout) */
+/* Desktop: 2 platoons per row. Portraits: 56x70, cropped center, no overflow. */
+/* ------------------------------ */
 
-
-/* === Platoons layout overrides (desktop: 2 platoons per row) === */
-.platoonsGrid{grid-template-columns:repeat(2,minmax(0,1fr));}
-
-/* Keep 2 per row even on wide desktop (override prior 3-col rule) */
-@media (min-width:900px){
-  .platoonsGrid{grid-template-columns:repeat(2,minmax(0,1fr));}
+.platoonsGrid{
+  display:grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
 }
 
-/* Platoon slot portraits: 56px wide, 70px tall, cropped centered, no overflow */
-.platoonPanel .slotCard{overflow:hidden;}
-.platoonPanel .slotTop{min-width:0;}
-.platoonPanel .slotImg{
-  width:56px !important;
-  height:70px !important;
-  overflow:hidden !important;
-  border-radius:10px;
-  background:rgba(255,255,255,.06);
+@media (min-width: 900px){
+  .platoonsGrid{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
-.platoonPanel .slotImg img{
-  width:100% !important;
-  height:100% !important;
-  max-width:100% !important;
-  max-height:100% !important;
-  object-fit:cover !important;
-  object-position:center !important;
-  display:block !important;
+
+/* Platoon panel itself */
+.panel.platoonPanel{
+  padding: 12px;
+}
+
+/* Slots grid inside each platoon */
+.panel.platoonPanel .platoonSlots{
+  display:grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+
+/* Each slot card: tight, no overflow */
+.panel.platoonPanel .slotCard{
+  padding: 8px;
+  border-radius: 12px;
+  overflow: hidden;
+  min-width: 0;
+}
+
+/* Top row: portrait + text */
+.panel.platoonPanel .slotTop{
+  display:flex;
+  align-items:center;
+  gap: 8px;
+  min-width: 0;
+}
+
+/* Portrait container */
+.panel.platoonPanel .slotImg{
+  width: 56px;
+  height: 70px;
+  flex: 0 0 56px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: rgba(255,255,255,0.06);
+}
+
+/* Actual image: fill + crop center */
+.panel.platoonPanel .slotImg img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 50%;
+  display:block;
+}
+
+/* Placeholder if missing image */
+.panel.platoonPanel .slotImg .ph{
+  width:100%;
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:700;
+  opacity:0.6;
+}
+
+/* Text: clamp so it doesn't force card wide/tall */
+.panel.platoonPanel .slotName{
+  font-size: 12px;
+  line-height: 1.1;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.panel.platoonPanel .slotSub{
+  font-size: 11px;
+  line-height: 1.1;
+  opacity: 0.75;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Meta row (element/rarity badges etc) */
+.panel.platoonPanel .slotMetaRow{
+  margin-top: 6px;
+  gap: 6px;
+}
+
+/* Keep lock row from pushing height too much */
+.panel.platoonPanel .slotCard label.muted{
+  font-size: 11px;
 }
