@@ -175,7 +175,17 @@ body.mobile-compact .unitThumb{width:72px;height:72px;border-radius:10px}
 }
 .slotTop{display:grid;grid-template-columns:56px 1fr;gap:10px;align-items:center;min-width:0}
 .slotImg{width:56px;height:56px;border-radius:10px;overflow:hidden;background:rgba(255,255,255,.06);display:grid;place-items:center}
-.slotImg img{width:100%;height:100%;object-fit:cover;display:block}
+.slotImg img{width:100%;height:100%;max-width:100%;max-height:100%;object-fit:cover;display:block}
+
+/* Force optimizer thumbnails to stay within 56px even if other rules override */
+.platoonCard .slotImg,
+.storyBlock .slotImg,
+.platoonGrid .slotImg,
+.storySlots .slotImg{width:56px !important;height:56px !important;overflow:hidden !important}
+.platoonCard .slotImg img,
+.storyBlock .slotImg img,
+.platoonGrid .slotImg img,
+.storySlots .slotImg img{width:100% !important;height:100% !important;max-width:100% !important;max-height:100% !important;object-fit:cover !important}
 .slotImg .ph{font-weight:900}
 .slotName{font-weight:900;line-height:1.15;font-size:13px;overflow-wrap:break-word;word-break:normal}
 .slotSub{color:var(--muted);font-size:12px;margin-top:2px;line-height:1.2;overflow-wrap:break-word;word-break:normal}
@@ -980,73 +990,361 @@ body{
 }
 
 /* =========================================================
-   OPTIMIZER PLATOONS (DESKTOP): FORCE 2 PER ROW + TIGHTER SLOTS
-   - Keeps roster/catalog styling untouched
+   MOBILE COMPACT (CATALOG/UNIT GRID): RESTORE CLEAN STACK
+   Required layout:
+     Image
+     Toggles (1–3) horizontal + centered (under image)
+     Name (above) + Title (below)
+     Badges on separate lines: Character, Element, Rarity (centered)
    ========================================================= */
-@media (min-width: 900px){
-  .platoonsGrid{
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+@media (max-width: 900px){
+
+  /* Make compact cards a simple vertical stack */
+  body.mobile-compact #catalogGrid .unitCard,
+  body.mobile-compact #unitGrid .unitCard{
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  /* Image first */
+  body.mobile-compact #catalogGrid .unitThumb,
+  body.mobile-compact #unitGrid .unitThumb{
+    order: 1 !important;
+  }
+
+  /* Toggles directly under image, centered, horizontal */
+  body.mobile-compact #catalogGrid .stateRow,
+  body.mobile-compact #unitGrid .stateRow{
+    order: 2 !important;
+    width: 100% !important;
+    flex-direction: row !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 10px !important;
+    margin: 10px 0 6px 0 !important;
+  }
+
+  /* Header stack: name/title centered, badges below */
+  body.mobile-compact #catalogGrid .metaHeader,
+  body.mobile-compact #unitGrid .metaHeader{
+    order: 3 !important;
+    grid-template-columns: 1fr !important;
+    justify-items: center !important;
+    text-align: center !important;
+    gap: 8px !important;
+  }
+
+  body.mobile-compact #catalogGrid .unitName,
+  body.mobile-compact #unitGrid .unitName{
+    margin-top: 2px !important;
+  }
+
+  body.mobile-compact #catalogGrid .unitTitle,
+  body.mobile-compact #unitGrid .unitTitle{
+    margin-top: 2px !important;
+  }
+
+  /* Badges: separate lines, centered; order = Character, Element, Rarity */
+  body.mobile-compact #catalogGrid .chipCol,
+  body.mobile-compact #unitGrid .chipCol{
+    width: 100% !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+
+  body.mobile-compact #catalogGrid .chipCol .tag,
+  body.mobile-compact #unitGrid .chipCol .tag{
+    width: 70% !important;
+    justify-content: center !important;
+    text-align: center !important;
+  }
+
+  body.mobile-compact #catalogGrid .chipCol .tag:not(.element):not(.rarity),
+  body.mobile-compact #unitGrid .chipCol .tag:not(.element):not(.rarity){
+    order: 1 !important; /* Character/Weapon/Boss */
+  }
+  body.mobile-compact #catalogGrid .chipCol .tag.element,
+  body.mobile-compact #unitGrid .chipCol .tag.element{
+    order: 2 !important;
+  }
+  body.mobile-compact #catalogGrid .chipCol .tag.rarity,
+  body.mobile-compact #unitGrid .chipCol .tag.rarity{
+    order: 3 !important;
   }
 }
 
-/* Tighten platoon slot spacing so units fit cleanly */
-.platoonsGrid .slotGrid{
-  gap: 8px !important;
+/* =========================================================
+   MOBILE DETAILED (CATALOG): MORE SQUARE PHOTO + FULL-WIDTH TEXT
+   - Compact view remains locked by earlier rules
+   - Makes hero image taller (more square) to show more
+   - Pushes content lower and lets leader text use full width
+   ========================================================= */
+@media (max-width: 900px){
+
+  /* More square hero image (taller) */
+  body.mobile-detailed #catalogGrid .unitThumb,
+  body.mobile-detailed #unitGrid .unitThumb{
+    height: clamp(240px, 62vw, 360px) !important;
+  }
+
+  body.mobile-detailed #catalogGrid .unitThumb img,
+  body.mobile-detailed #unitGrid .unitThumb img{
+    object-fit: cover !important;
+    object-position: center top !important;
+  }
+
+  /* Add breathing room under the image so the block sits lower */
+  body.mobile-detailed #catalogGrid .unitThumb,
+  body.mobile-detailed #unitGrid .unitThumb{
+    margin-bottom: 10px !important;
+  }
+
+  /* Ensure leader text uses full width and wraps */
+  body.mobile-detailed #catalogGrid .leaderBlock,
+  body.mobile-detailed #unitGrid .leaderBlock,
+  body.mobile-detailed #catalogGrid .leaderDesc,
+  body.mobile-detailed #unitGrid .leaderDesc{
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  body.mobile-detailed #catalogGrid .leaderDesc,
+  body.mobile-detailed #unitGrid .leaderDesc{
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    overflow-wrap: anywhere !important;
+    line-height: 1.25 !important;
+  }
+
+  /* Give the bottom a bit more usable space */
+  body.mobile-detailed #catalogGrid .unitCard,
+  body.mobile-detailed #unitGrid .unitCard{
+    padding-bottom: 14px !important;
+  }
+
+  body.mobile-detailed #catalogGrid .statLine,
+  body.mobile-detailed #unitGrid .statLine{
+    margin-bottom: 6px !important;
+  }
 }
 
-/* Compact the slot cards within platoons */
-.platoonsGrid .slotCard{
-  padding: 8px !important;
-  gap: 6px !important;
-  min-height: 0 !important;
+/* =========================================================
+   MOBILE DETAILED (CATALOG): STATS 2-LINE + CENTERED LEADER TEXT
+   - Does NOT change name/title/toggles/badges placement
+   - Only reforms stat block + leader block formatting
+   ========================================================= */
+@media (max-width: 900px){
+
+  body.mobile-detailed #catalogGrid .statLine,
+  body.mobile-detailed #unitGrid .statLine{
+    width: 100% !important;
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 14px !important;
+    justify-items: center !important;
+    align-items: start !important;
+    margin-top: 8px !important;
+  }
+
+  body.mobile-detailed #catalogGrid .stat,
+  body.mobile-detailed #unitGrid .stat{
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    text-align: center !important;
+    min-width: 0 !important;
+  }
+
+  body.mobile-detailed #catalogGrid .statLabel,
+  body.mobile-detailed #unitGrid .statLabel{
+    display: block !important;
+    font-weight: 900 !important;
+    letter-spacing: .6px !important;
+    font-size: 14px !important;
+    line-height: 1.05 !important;
+  }
+
+  body.mobile-detailed #catalogGrid .statVal,
+  body.mobile-detailed #unitGrid .statVal{
+    display: block !important;
+    margin-top: 4px !important;
+    font-weight: 900 !important;
+    font-size: 22px !important;
+    letter-spacing: .2px !important;
+    line-height: 1.05 !important;
+  }
+
+  /* Leader skill centered and allowed to use full width */
+  body.mobile-detailed #catalogGrid .leaderBlock,
+  body.mobile-detailed #unitGrid .leaderBlock{
+    width: 100% !important;
+    max-width: 100% !important;
+    text-align: center !important;
+    margin-top: 10px !important;
+  }
+
+  body.mobile-detailed #catalogGrid .leaderName,
+  body.mobile-detailed #unitGrid .leaderName{
+    font-weight: 900 !important;
+    letter-spacing: .2px !important;
+  }
+
+  body.mobile-detailed #catalogGrid .leaderDesc,
+  body.mobile-detailed #unitGrid .leaderDesc{
+    width: 100% !important;
+    max-width: 100% !important;
+    text-align: center !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    overflow-wrap: anywhere !important;
+    line-height: 1.25 !important;
+  }
 }
 
-/* Portrait condenser: hard-lock to 56px, center-crop, no overflow */
-.platoonsGrid .slotImg{
-  width: 56px !important;
-  height: 56px !important;
-  min-width: 56px !important;
-  min-height: 56px !important;
-  max-width: 56px !important;
-  max-height: 56px !important;
-  overflow: hidden !important;
-  display: grid !important;
-  place-items: center !important;
-  position: relative !important; /* enables optional badge overlay inside */
+/* =========================================================
+   MOBILE COMPACT: IMAGE FILL
+   - Only affects the image area so it fills the empty top space
+   - Keeps compact layout otherwise locked
+   ========================================================= */
+@media (max-width: 900px){
+
+  body.mobile-compact #catalogGrid .unitThumb,
+  body.mobile-compact #unitGrid .unitThumb{
+    height: clamp(180px, 46vw, 280px) !important;
+  }
+
+  body.mobile-compact #catalogGrid .unitThumb img,
+  body.mobile-compact #unitGrid .unitThumb img{
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center top !important;
+    display: block !important;
+  }
 }
 
-.platoonsGrid .slotImg img{
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important;         /* trims/crops image */
-  object-position: 50% 35% !important;  /* slightly above center for faces */
-  display: block !important;
+/* =========================================================
+   MOBILE DETAILED: LEADER TEXT USES FULL CARD WIDTH (UNBUNDLED)
+   Strict: does NOT touch name/title/toggles/badges layout.
+   Expands the leader skill block to fill the red-squiggle area.
+   ========================================================= */
+@media (max-width: 900px){
+
+  body.mobile-detailed #catalogGrid .leaderBlock,
+  body.mobile-detailed #unitGrid .leaderBlock{
+    width: 100% !important;
+    max-width: none !important;
+    align-self: stretch !important;
+    justify-self: stretch !important;
+    margin-top: 8px !important;
+    padding: 0 10px 6px 10px !important;
+    text-align: center !important;
+  }
+
+  body.mobile-detailed #catalogGrid .leaderName,
+  body.mobile-detailed #unitGrid .leaderName{
+    width: 100% !important;
+    max-width: none !important;
+    margin: 6px auto 6px auto !important;
+    text-align: center !important;
+  }
+
+  body.mobile-detailed #catalogGrid .leaderDesc,
+  body.mobile-detailed #unitGrid .leaderDesc{
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 auto !important;
+    text-align: center !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+    line-height: 1.3 !important;
+  }
+
+  /* If any container is constraining content to a narrow column, force it to stretch */
+  body.mobile-detailed #catalogGrid .meta,
+  body.mobile-detailed #unitGrid .meta,
+  body.mobile-detailed #catalogGrid .metaBody,
+  body.mobile-detailed #unitGrid .metaBody{
+    max-width: none !important;
+    width: 100% !important;
+  }
 }
 
-/* If platoon badges are rendered inside the image container, overlay them */
-.platoonsGrid .slotImg .slotBadges,
-.platoonsGrid .slotImg .platoon-unit-badges,
-.platoonsGrid .slotImg .unitBadges{
-  position: absolute !important;
-  top: 4px !important;
-  right: 4px !important;
-  display: flex !important;
-  gap: 4px !important;
-  z-index: 2 !important;
-  pointer-events: none !important;
-}
+/* === AUTO-PATCH: DETAIL VIEW STATS/LAYOUT FIX === */
 
-/* Make overlay badges small so they stay inside 56px portrait */
-.platoonsGrid .slotImg .slotBadges .tag,
-.platoonsGrid .slotImg .platoon-unit-badges .tag,
-.platoonsGrid .slotImg .unitBadges .tag{
-  font-size: 10px !important;
-  padding: 1px 5px !important;
-  line-height: 1.2 !important;
-  border-radius: 999px !important;
-}
+/* =========================================================
+   FIX: MOBILE DETAILED DETAILS REGION (STATS/LEADER) NOT PLACED
+   - Does NOT affect name/title/toggles/badges
+   - Prevents stat overlap by giving unitDetails the correct grid area
+   ========================================================= */
+@media (max-width: 900px){
 
-/* Tighten name/subtitle spacing under the portrait inside platoon slots */
-.platoonsGrid .slotName{ margin: 0 !important; }
-.platoonsGrid .slotSub{ margin-top: 2px !important; }
-.platoonsGrid .slotMetaRow{ gap: 4px !important; }
+  /* Put the whole details section in the "stats" row of the unitCard grid */
+  body.mobile-detailed #catalogGrid .unitCard .unitDetails,
+  body.mobile-detailed #unitGrid .unitCard .unitDetails{
+    grid-area: stats !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  /* If leader is inside unitDetails, keep it spanning full width */
+  body.mobile-detailed #catalogGrid .unitCard .leaderBlock,
+  body.mobile-detailed #unitGrid .unitCard .leaderBlock{
+    grid-column: 1 / -1 !important;
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  /* HARDEN stats to 2-line layout even when markup is just .stat + <strong>LABEL</strong> VALUE */
+  body.mobile-detailed #catalogGrid .unitCard .statLine,
+  body.mobile-detailed #unitGrid .unitCard .statLine{
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 14px !important;
+    width: 100% !important;
+    margin-top: 8px !important;
+    align-items: start !important;
+    justify-items: center !important;
+  }
+
+  body.mobile-detailed #catalogGrid .unitCard .statLine .stat,
+  body.mobile-detailed #unitGrid .unitCard .statLine .stat{
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    min-width: 0 !important;
+  }
+
+  /* LABEL line */
+  body.mobile-detailed #catalogGrid .unitCard .statLine .stat strong,
+  body.mobile-detailed #unitGrid .unitCard .statLine .stat strong{
+    display: block !important;
+    font-size: 14px !important;
+    line-height: 1.05 !important;
+    letter-spacing: .6px !important;
+  }
+
+  /* VALUE line (the text node after <strong>) */
+  body.mobile-detailed #catalogGrid .unitCard .statLine .stat,
+  body.mobile-detailed #unitGrid .unitCard .statLine .stat{
+    font-size: 22px !important;        /* value inherits here if it's plain text */
+    line-height: 1.05 !important;
+    font-weight: 900 !important;
+  }
+
+  /* But keep the label from inheriting the large value size */
+  body.mobile-detailed #catalogGrid .unitCard .statLine .stat strong,
+  body.mobile-detailed #unitGrid .unitCard .statLine .stat strong{
+    font-weight: 900 !important;
+  }
+}
