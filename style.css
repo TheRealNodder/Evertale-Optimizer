@@ -1613,3 +1613,136 @@ body{
   #platoonsGrid.platoonsGrid{ grid-template-columns: 1fr; }
   #platoonsGrid .platoonSlots{ justify-content: space-between; }
 }
+
+
+
+/* =========================================================
+   Optimizer controls (missing base styles)
+   ========================================================= */
+.panelRow{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  align-items:flex-end;
+  justify-content:space-between;
+}
+.optMode{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+.pill{
+  border:1px solid var(--line);
+  background:var(--panel2);
+  color:var(--text);
+  padding:10px 12px;
+  border-radius:999px;
+  font-weight:900;
+  cursor:pointer;
+}
+.pill.active{
+  background:rgba(255,255,255,0.08);
+  border-color:rgba(255,255,255,0.18);
+}
+.pill:active{transform:translateY(1px)}
+
+/* =========================================================
+   Optimizer layout: remove horizontal scrolling for platoon slots
+   (use wrapping grids instead)
+   ========================================================= */
+#platoonsGrid.platoonsGrid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(360px,1fr));
+  gap:16px;
+}
+#platoonsGrid .platoonSlots{
+  display:grid;
+  gap:10px;
+  grid-template-columns:repeat(5,minmax(56px,1fr));
+  align-items:stretch;
+  overflow:visible !important;
+}
+#platoonsGrid .platoonSlotCard{
+  width:auto;
+  min-width:0;
+}
+
+/* =========================================================
+   Mobile major rework
+   ========================================================= */
+@media (max-width: 720px){
+  .page{padding:10px 10px 34px}
+
+  /* Top bar: stack + full width tabs */
+  .topbar{padding:10px 10px}
+  .topbar-inner{
+    flex-direction:column;
+    align-items:stretch;
+    gap:10px;
+  }
+  .tabs{
+    width:100%;
+    gap:8px;
+  }
+  .tab{
+    flex:1;
+    text-align:center;
+    padding:10px 8px;
+  }
+
+  /* Panels: reduce visual noise */
+  .panel{padding:12px;border-radius:14px}
+  .optHeader{
+    flex-direction:column;
+    align-items:stretch;
+    gap:10px;
+  }
+  .optHeader .btn{width:100%;justify-content:center}
+
+  .panelRow{
+    flex-direction:column;
+    align-items:stretch;
+    gap:10px;
+  }
+
+  /* Inputs + buttons become full width */
+  .btn{width:100%;justify-content:center}
+  .input, select.input{
+    width:100%;
+  }
+
+  /* Mode pills: 2-up */
+  .optMode{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:10px;
+  }
+  .pill{width:100%;padding:12px 10px}
+
+  /* Story grids: wrap instead of tiny squares */
+  .slotGrid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .storyBackGrid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  /* Slot cards: slightly tighter */
+  .slotCard{border-radius:14px}
+  .slotImg{height:74px}
+
+  /* Platoons: single column, wrap slots */
+  #platoonsGrid.platoonsGrid{
+    grid-template-columns:1fr;
+    gap:12px;
+  }
+  #platoonsGrid .platoonBlock{padding:12px}
+  #platoonsGrid .platoonSlots{
+    grid-template-columns:repeat(3,minmax(56px,1fr));
+  }
+
+  /* Storage: 1 column for readability */
+  .grid{grid-template-columns:1fr}
+}
+
+@media (max-width: 420px){
+  .slotGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  #platoonsGrid .platoonSlots{grid-template-columns:repeat(2,minmax(56px,1fr))}
+  .tab{padding:10px 6px;font-size:13px}
+}
