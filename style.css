@@ -1837,3 +1837,47 @@ body{
   background: rgba(255,255,255,.14) !important;
 }
 
+
+/* =========================================================
+   CATALOG: BOSSES PAGE — BADGE PARITY (ELEMENT + RARITY)
+   Goal:
+   - Boss cards use the same badge look as roster/catalog cards
+   - No black text on the purple UI
+   - Works regardless of whether bosses use #bossGrid, #bossesGrid, or .bossCard
+   ========================================================= */
+
+/* Keep bosses text readable on the purple gradient */
+#bossGrid, #bossesGrid, #bossCatalogGrid,
+#bossGrid *, #bossesGrid *, #bossCatalogGrid *,
+.bossCard, .bossCard *{
+  color: var(--text);
+}
+
+/* Ensure badge rows render like the rest of the app */
+#bossGrid .tags, #bossesGrid .tags, #bossCatalogGrid .tags,
+#bossGrid .bossBadges, #bossesGrid .bossBadges, #bossCatalogGrid .bossBadges,
+#bossGrid .slotBadges, #bossesGrid .slotBadges, #bossCatalogGrid .slotBadges{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+/* Element badge tints (scoped to bosses containers + boss cards) */
+#bossGrid .tag.element.fire,  #bossesGrid .tag.element.fire,  #bossCatalogGrid .tag.element.fire,  .bossCard .tag.element.fire  { background: rgba(255, 80, 80, 0.22); border-color: rgba(255, 80, 80, 0.35); }
+#bossGrid .tag.element.water, #bossesGrid .tag.element.water, #bossCatalogGrid .tag.element.water, .bossCard .tag.element.water { background: rgba(80, 160, 255, 0.22); border-color: rgba(80, 160, 255, 0.35); }
+#bossGrid .tag.element.storm, #bossesGrid .tag.element.storm, #bossCatalogGrid .tag.element.storm, .bossCard .tag.element.storm { background: rgba(255, 220, 80, 0.22); border-color: rgba(255, 220, 80, 0.35); }
+#bossGrid .tag.element.earth, #bossesGrid .tag.element.earth, #bossCatalogGrid .tag.element.earth, .bossCard .tag.element.earth { background: rgba(90, 220, 120, 0.22); border-color: rgba(90, 220, 120, 0.35); }
+#bossGrid .tag.element.dark,  #bossesGrid .tag.element.dark,  #bossCatalogGrid .tag.element.dark,  .bossCard .tag.element.dark  { background: rgba(170, 90, 255, 0.22); border-color: rgba(170, 90, 255, 0.35); }
+
+/* Light element: keep uniform text (no black) */
+#bossGrid .tag.element.light, #bossesGrid .tag.element.light, #bossCatalogGrid .tag.element.light, .bossCard .tag.element.light{
+  background: color-mix(in srgb, var(--el-light) 35%, #000);
+  border-color: rgba(255,255,255,0.30);
+  color: var(--text);
+}
+
+/* Rarity badge styling (bosses) */
+#bossGrid .tag.rarity, #bossesGrid .tag.rarity, #bossCatalogGrid .tag.rarity, .bossCard .tag.rarity{
+  background: rgba(255,255,255,.12);
+}
