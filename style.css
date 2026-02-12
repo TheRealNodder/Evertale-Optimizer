@@ -1746,3 +1746,94 @@ body{
   #platoonsGrid .platoonSlots{grid-template-columns:repeat(2,minmax(56px,1fr))}
   .tab{padding:10px 6px;font-size:13px}
 }
+
+
+/* =========================================================
+   HOTFIX: UNIFORM TEXT COLOR + RESTORE BADGES (RARITY/ELEMENT)
+   - Keeps overall purple gradient readability
+   - Prevents any black text on optimizer badges/cards
+   - Ensures badge classes used across variants (.tag / .slotChip / .badge) display correctly
+   ========================================================= */
+
+/* 1) Never render black text on the purple UI */
+#platoonsGrid .platoonSlotCard,
+#platoonsGrid .platoonSlotCard * ,
+#storyMain .storySlotCard,
+#storyMain .storySlotCard *,
+#storyBack .storySlotCard,
+#storyBack .storySlotCard *,
+.slotCard,
+.slotCard *{
+  color: var(--text) !important;
+}
+
+/* Keep muted text muted */
+#platoonsGrid .platoonSlotCard .slotTitle,
+#platoonsGrid .platoonSlotCard .muted,
+.slotSub,
+.slotSub *,
+.unitSub,
+.unitTitle,
+.leaderDesc{
+  color: var(--muted) !important;
+}
+
+/* Light element previously forced dark text; keep uniform */
+.slotCard.el-light,
+#storyMain .storySlotCard.el-light,
+#storyBack .storySlotCard.el-light{
+  color: var(--text) !important;
+}
+
+/* 2) Badge base styles (covers different markup variants) */
+.tag,
+.slotChip,
+.badge{
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 4px 8px !important;
+  border-radius: 999px !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  letter-spacing: .2px !important;
+  border: 1px solid rgba(255,255,255,.18) !important;
+  background: rgba(255,255,255,.08) !important;
+  color: var(--text) !important;
+  white-space: nowrap !important;
+}
+
+/* Ensure badge rows are visible */
+.slotMetaRow,
+.slotBadges{
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 6px !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* 3) Element badge colors (supports .tag.element.<el>, .slotChip.element.<el>, .badge.element.<el>) */
+.tag.element.fire,  .slotChip.element.fire,  .badge.element.fire  { background: rgba(255, 80, 80, 0.22) !important; border-color: rgba(255, 80, 80, 0.35) !important; }
+.tag.element.water, .slotChip.element.water, .badge.element.water { background: rgba(80, 160, 255, 0.22) !important; border-color: rgba(80, 160, 255, 0.35) !important; }
+.tag.element.storm, .slotChip.element.storm, .badge.element.storm { background: rgba(255, 220, 80, 0.22) !important; border-color: rgba(255, 220, 80, 0.35) !important; }
+.tag.element.earth, .slotChip.element.earth, .badge.element.earth { background: rgba(90, 220, 120, 0.22) !important; border-color: rgba(90, 220, 120, 0.35) !important; }
+.tag.element.dark,  .slotChip.element.dark,  .badge.element.dark  { background: rgba(170, 90, 255, 0.22) !important; border-color: rgba(170, 90, 255, 0.35) !important; }
+
+/* Light element: keep WHITE text, darken the background slightly for contrast */
+.tag.element.light, .slotChip.element.light, .badge.element.light{
+  background: color-mix(in srgb, var(--el-light) 35%, #000) !important;
+  border-color: rgba(255,255,255,0.30) !important;
+  color: var(--text) !important;
+}
+
+/* 4) Rarity badges (supports .tag.rarity, .slotChip.rarity, .badge.rarity) */
+.tag.rarity, .slotChip.rarity, .badge.rarity{
+  background: rgba(255,255,255,.12) !important;
+}
+
+/* If someone uses lowercase rarity tokens */
+.tag.rarity.ssr, .slotChip.rarity.ssr, .badge.rarity.ssr{
+  background: rgba(255,255,255,.14) !important;
+}
+
