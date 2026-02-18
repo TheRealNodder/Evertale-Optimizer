@@ -158,6 +158,8 @@ function normalizeCharacters(arr) {
       imagesLarge: Array.isArray(u.imagesLarge) ? u.imagesLarge : (u.image ? [u.image] : []),
       leaderSkillName: pickFirst(u.leaderSkill?.name, ""),
       leaderSkillDesc: pickFirst(u.leaderSkill?.description, ""),
+      activeSkills: Array.isArray(u.activeSkills) ? u.activeSkills : [],
+      passiveSkillDetails: Array.isArray(u.passiveSkillDetails) ? u.passiveSkillDetails : [],
       extraText: "",
     });
   }
@@ -276,6 +278,38 @@ function renderCard(item) {
               : ""
           }
           ${extra}
+
+${
+  item.kind === "characters" && Array.isArray(item.activeSkills) && item.activeSkills.length
+    ? `<div class="panel">
+         <div class="panelTitle">Active Skills</div>
+         <div class="muted" style="white-space:pre-wrap; line-height:1.25">
+           ${item.activeSkills.slice(0,4).map(s=>{
+             const nm=safeText(s.name);
+             const tu=s.tu!=null?` • ${s.tu}TU`:"";
+             const sp=(s.spirit!=null?` • ${s.spirit}SP`:(s.sp!=null?` • ${s.sp}SP`:""));
+             const desc=safeText(s.description||"");
+             return `<strong>${nm}</strong>${tu}${sp}\n${desc}\n`;
+           }).join("\n")}
+         </div>
+       </div>`
+    : ``
+}
+
+${
+  item.kind === "characters" && Array.isArray(item.passiveSkillDetails) && item.passiveSkillDetails.length
+    ? `<div class="panel">
+         <div class="panelTitle">Passives</div>
+         <div class="muted" style="white-space:pre-wrap; line-height:1.25">
+           ${item.passiveSkillDetails.slice(0,6).map(p=>{
+             const nm=safeText(p.name);
+             const desc=safeText(p.description);
+             return `<strong>${nm}</strong>\n${desc}\n`;
+           }).join("\n")}
+         </div>
+       </div>`
+    : ``
+}
         </div>
       </div>
     </div>
