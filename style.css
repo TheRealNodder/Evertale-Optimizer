@@ -1747,51 +1747,249 @@ body{
   .tab{padding:10px 6px;font-size:13px}
 }
 
+
 /* =========================================================
-   TYPOGRAPHY: UNIFY FONTS + WEIGHTS (Optimizer matches site)
+   HOTFIX: UNIFORM TEXT COLOR + RESTORE BADGES (RARITY/ELEMENT)
+   - Keeps overall purple gradient readability
+   - Prevents any black text on optimizer badges/cards
+   - Ensures badge classes used across variants (.tag / .slotChip / .badge) display correctly
+   ========================================================= */
+
+/* 1) Never render black text on the purple UI */
+#platoonsGrid .platoonSlotCard,
+#platoonsGrid .platoonSlotCard * ,
+#storyMain .storySlotCard,
+#storyMain .storySlotCard *,
+#storyBack .storySlotCard,
+#storyBack .storySlotCard *,
+.slotCard,
+.slotCard *{
+  color: var(--text) !important;
+}
+
+/* Keep muted text muted */
+#platoonsGrid .platoonSlotCard .slotTitle,
+#platoonsGrid .platoonSlotCard .muted,
+.slotSub,
+.slotSub *,
+.unitSub,
+.unitTitle,
+.leaderDesc{
+  color: var(--muted) !important;
+}
+
+/* Light element previously forced dark text; keep uniform */
+.slotCard.el-light,
+#storyMain .storySlotCard.el-light,
+#storyBack .storySlotCard.el-light{
+  color: var(--text) !important;
+}
+
+/* 2) Badge base styles (covers different markup variants) */
+.tag,
+.slotChip,
+.badge{
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 4px 8px !important;
+  border-radius: 999px !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  letter-spacing: .2px !important;
+  border: 1px solid rgba(255,255,255,.18) !important;
+  background: rgba(255,255,255,.08) !important;
+  color: var(--text) !important;
+  white-space: nowrap !important;
+}
+
+/* Ensure badge rows are visible */
+.slotMetaRow,
+.slotBadges{
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 6px !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* 3) Element badge colors (supports .tag.element.<el>, .slotChip.element.<el>, .badge.element.<el>) */
+.tag.element.fire,  .slotChip.element.fire,  .badge.element.fire  { background: rgba(255, 80, 80, 0.22) !important; border-color: rgba(255, 80, 80, 0.35) !important; }
+.tag.element.water, .slotChip.element.water, .badge.element.water { background: rgba(80, 160, 255, 0.22) !important; border-color: rgba(80, 160, 255, 0.35) !important; }
+.tag.element.storm, .slotChip.element.storm, .badge.element.storm { background: rgba(255, 220, 80, 0.22) !important; border-color: rgba(255, 220, 80, 0.35) !important; }
+.tag.element.earth, .slotChip.element.earth, .badge.element.earth { background: rgba(90, 220, 120, 0.22) !important; border-color: rgba(90, 220, 120, 0.35) !important; }
+.tag.element.dark,  .slotChip.element.dark,  .badge.element.dark  { background: rgba(170, 90, 255, 0.22) !important; border-color: rgba(170, 90, 255, 0.35) !important; }
+
+/* Light element: keep WHITE text, darken the background slightly for contrast */
+.tag.element.light, .slotChip.element.light, .badge.element.light{
+  background: color-mix(in srgb, var(--el-light) 35%, #000) !important;
+  border-color: rgba(255,255,255,0.30) !important;
+  color: var(--text) !important;
+}
+
+/* 4) Rarity badges (supports .tag.rarity, .slotChip.rarity, .badge.rarity) */
+.tag.rarity, .slotChip.rarity, .badge.rarity{
+  background: rgba(255,255,255,.12) !important;
+}
+
+/* If someone uses lowercase rarity tokens */
+.tag.rarity.ssr, .slotChip.rarity.ssr, .badge.rarity.ssr{
+  background: rgba(255,255,255,.14) !important;
+}
+
+/* =========================================================
+   PLATOONS: LARGE PORTRAITS (160px cards, 140x160 portraits)
+   - Fixes conflicts with earlier platoonSlots flex/scroll rules
+   - Keeps 5 slots per platoon on wide screens
+   - Wraps to 3/2 on smaller screens (no horizontal scroll)
+   ========================================================= */
+
+#platoonsGrid .platoonSlots{
+  display: grid !important;
+  gap: 12px !important;
+  grid-template-columns: repeat(5, 160px) !important;
+  justify-content: center !important;
+  align-items: stretch !important;
+  overflow: visible !important;
+}
+
+#platoonsGrid .platoonSlotCard,
+#platoonsGrid .platoonSlots .slotCard{
+  width: 160px !important;
+  min-width: 160px !important;
+  max-width: 160px !important;
+  border-radius: 14px !important;
+}
+
+#platoonsGrid .platoonSlotCard .slotTop,
+#platoonsGrid .platoonSlots .slotCard .slotTop{
+  display: flex !important;
+  justify-content: center !important;
+  padding: 10px 10px 0 10px !important;
+}
+
+#platoonsGrid .platoonSlotCard .slotImg,
+#platoonsGrid .platoonSlots .slotCard .slotImg{
+  width: 140px !important;
+  height: 160px !important;
+  border-radius: 14px !important;
+  overflow: hidden !important;
+  background: rgba(255,255,255,0.06) !important;
+}
+
+#platoonsGrid .platoonSlotCard .unitPortrait,
+#platoonsGrid .platoonSlots .slotCard .unitPortrait,
+#platoonsGrid .platoonSlotCard .slotImg img,
+#platoonsGrid .platoonSlots .slotCard .slotImg img{
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: 50% 35% !important;
+  display: block !important;
+}
+
+/* Keep controls readable under bigger portrait */
+#platoonsGrid .platoonSlotCard .slotMid{
+  padding: 10px 10px 12px 10px !important;
+  gap: 8px !important;
+}
+#platoonsGrid .platoonSlotCard .slotSelect{
+  padding: 8px 10px !important;
+  font-size: 12px !important;
+  border-radius: 10px !important;
+}
+#platoonsGrid .platoonSlotCard .slotTitle,
+#platoonsGrid .platoonSlots .slotCard .slotSub{
+  text-align: center !important;
+}
+
+/* Responsive: 3 per row */
+@media (max-width: 980px){
+  #platoonsGrid .platoonSlots{
+    grid-template-columns: repeat(3, 160px) !important;
+  }
+}
+
+/* Responsive: 2 per row */
+@media (max-width: 560px){
+  #platoonsGrid .platoonSlots{
+    grid-template-columns: repeat(2, 160px) !important;
+  }
+}
+
+/* Very small screens: avoid forced horizontal scroll by letting cards shrink */
+@media (max-width: 380px){
+  #platoonsGrid .platoonSlots{
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  #platoonsGrid .platoonSlotCard,
+  #platoonsGrid .platoonSlots .slotCard{
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+  }
+  #platoonsGrid .platoonSlotCard .slotImg,
+  #platoonsGrid .platoonSlots .slotCard .slotImg{
+    width: 100% !important;
+  }
+}
+
+/* =========================================================
+   FIX: Each Platoon Takes Full Width (No Overlap)
+   ========================================================= */
+
+/* One platoon per row (prevents 2-column overlap) */
+#platoonsGrid.platoonsGrid{
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 20px !important;
+}
+
+/* Keep 5 slots in one line within each platoon */
+#platoonsGrid .platoonSlots{
+  display: grid !important;
+  grid-template-columns: repeat(5, 160px) !important;
+  gap: 12px !important;
+  justify-content: center !important;
+  align-items: stretch !important;
+  overflow: visible !important;
+}
+
+/* =========================================================
+   TYPOGRAPHY + COLOR LOCK (No Platoon mutations)
+   - Ensures optimizer matches site font + text color
+   - Does NOT change layout rules (platoons/cards/grids)
    ========================================================= */
 
 :root{
-  --font-sans: system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
-  --font-base: 14px;
-  --font-line: 1.45;
-  --font-weight-regular: 400;
-  --font-weight-medium: 600;
-  --font-weight-bold: 700;
+  --font-sans: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
 }
 
-html, body{
+/* Force all form controls to inherit the same font + text color */
+button, input, select, textarea, option, optgroup{
   font-family: var(--font-sans) !important;
-  font-size: var(--font-base);
-  line-height: var(--font-line);
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  color: var(--text) !important;
 }
 
-/* Ensure form controls + buttons use the same font everywhere */
-button, input, select, textarea{
+/* Ensure selects don't render black text / white background in some browsers */
+select, option, optgroup{
+  background-color: var(--panel2) !important;
+}
+
+/* Optimizer-specific: lock typography to site defaults */
+.optHeader, .platoonTools, .teamSubTitle, .panelRow, .optMode,
+.slotCard, .slotName, .slotSub, .slotChip, .slotSelect,
+#platoonsGrid, #storyMain, #storyBack{
   font-family: var(--font-sans) !important;
-  font-size: 1em;
-  line-height: inherit;
+  color: var(--text) !important;
 }
 
-/* Normalize common UI components */
-.topbar, .tabs, .tab, .panel, .btn, .pill, .slotSelect, .input, .tag, .badge{
-  font-family: var(--font-sans) !important;
-}
-
-/* Make weights consistent (Optimizer pills were heavier than the rest) */
-.btn{ font-weight: var(--font-weight-bold); }
-.tab{ font-weight: var(--font-weight-bold); }
-.pill{ font-weight: var(--font-weight-bold) !important; }
-
-/* Slot/card text consistency */
-.slotTitle, .slotName, .slotSub, .slotMeta, .slotBadges{
-  font-weight: var(--font-weight-medium);
-}
-
-/* Prevent optimizer-only tiny text on some browsers */
-#optimizer, #optimizerPage, .optimizer, .optHeader, .panelRow{
-  font-size: 1em;
+/* Keep intended muted styling */
+.muted,
+#statusText,
+.slotSub,
+.unitSub,
+.unitTitle,
+.leaderDesc{
+  color: var(--muted) !important;
 }
