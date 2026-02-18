@@ -1673,3 +1673,106 @@ body{
   background: rgba(255, 215, 0, .18) !important;
   box-shadow: 0 0 14px rgba(255, 215, 0, .22);
 }
+
+/* =========================================================
+   CATALOG: PORTRAIT EMPHASIS + STATE TOGGLES (★5 / ★6 / ★FA)
+   - Scoped to catalog only (no roster/optimizer mutations)
+   - Moves toggle row into the meta header area
+   - Enlarges portrait area so more art is visible (compact + detailed)
+   ========================================================= */
+
+body.page-catalog .unitCard{
+  align-items: stretch;
+}
+
+/* Left portrait column (bigger, like your mock) */
+body.page-catalog .unitLeft{
+  width: 220px;
+  flex: 0 0 220px;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+}
+
+body.page-catalog .unitThumb{
+  width: 200px;
+  height: 280px;
+  border-radius: 18px;
+  overflow: hidden;
+  background: rgba(255,255,255,0.06);
+}
+
+body.page-catalog .unitThumb img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 35%;
+  display: block;
+}
+
+/* Compact view: slightly shorter portrait to fit more cards */
+body.page-catalog.view-compact .unitLeft{
+  width: 190px;
+  flex-basis: 190px;
+}
+body.page-catalog.view-compact .unitThumb{
+  width: 170px;
+  height: 220px;
+}
+
+/* Put the state toggles in the "empty space" under title */
+body.page-catalog .nameBlock .stateRow{
+  margin-top: 10px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+/* Toggle buttons become labeled stars */
+body.page-catalog .stateRow .stateBtn{
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  border: 2px solid rgba(255,255,255,0.22);
+  background: rgba(255,255,255,0.08);
+  color: var(--text);
+  font-weight: 800;
+  font-size: 14px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+/* Labels */
+body.page-catalog .stateRow .stateBtn:nth-child(1)::before{ content: "★5"; }
+body.page-catalog .stateRow .stateBtn:nth-child(2)::before{ content: "★6"; }
+body.page-catalog .stateRow .stateBtn:nth-child(3)::before{ content: "★FA"; }
+
+/* Medal colors */
+body.page-catalog .stateRow .stateBtn:nth-child(1){
+  color: #f3c59a;
+  border-color: rgba(243,197,154,0.45);
+}
+body.page-catalog .stateRow .stateBtn:nth-child(2){
+  color: #d7dee8;
+  border-color: rgba(215,222,232,0.45);
+}
+body.page-catalog .stateRow .stateBtn:nth-child(3){
+  color: #ffd37a;
+  border-color: rgba(255,211,122,0.50);
+}
+
+/* Active glow */
+body.page-catalog .stateRow .stateBtn.active{
+  background: rgba(255,255,255,0.12);
+  box-shadow: 0 0 14px rgba(255,211,122,0.22);
+}
+
+/* Keep meta header from wasting space */
+body.page-catalog .metaHeader{
+  align-items: flex-start;
+  gap: 14px;
+}
