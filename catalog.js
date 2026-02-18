@@ -255,7 +255,7 @@ function renderCard(item) {
     <div class="unitCard${elClass}" data-kind="${safeText(item.kind)}" data-id="${safeText(item.id)}">
       <div class="unitLeft">
         <div class="unitThumb">${img}</div>
-        ${item.kind==="characters" ? stateRowHtml(imgs) : ""}
+        
       </div>
 
       <div class="meta">
@@ -264,6 +264,7 @@ function renderCard(item) {
             <div class="unitName">${safeText(item.name)}</div>
             <div class="unitTitle">${safeText(item.subtitle || "")}</div>
           </div>
+            ${item.kind==="characters" ? stateRowHtml(imgs) : ""}
           <div class="chipCol">${chips.join("")}</div>
         </div>
 

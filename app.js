@@ -211,29 +211,18 @@ function renderUnitCard(u) {
 	        </div>
 
         <div class="unitDetails">
-          <div class="statLine">
-            <div class="stat"><strong>ATK</strong> ${atk}</div>
-            <div class="stat"><strong>HP</strong> ${hp}</div>
-            <div class="stat"><strong>SPD</strong> ${spd}</div>
-            <div class="stat"><strong>COST</strong> ${cost}</div>
-          </div>
+  <div class="statLine">
+    <div class="stat"><strong>ATK</strong> ${atk}</div>
+    <div class="stat"><strong>HP</strong> ${hp}</div>
+    <div class="stat"><strong>SPD</strong> ${spd}</div>
+    <div class="stat"><strong>COST</strong> ${cost}</div>
+  </div>
 
-          <div class="leaderBlock">
-            <div class="leaderName">${safeText(leaderName)}</div>
-            <div class="leaderDesc">${safeText(leaderDesc)}</div>
-          </div>
-
-          ).join("\n")}
-                   </div>
-                 </div>`
-              : ``
-          }
-
-          ).join("\n")}
-                   </div>
-                 </div>`
-              : ``
-          }
+  <div class="leaderBlock">
+    <div class="leaderName">${safeText(leaderName)}</div>
+    <div class="leaderDesc">${safeText(leaderDesc)}</div>
+  </div>
+</div>
         </div>
 
         <label class="ownedRow">
