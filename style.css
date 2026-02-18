@@ -1837,47 +1837,99 @@ body{
   background: rgba(255,255,255,.14) !important;
 }
 
-
 /* =========================================================
-   CATALOG: BOSSES PAGE — BADGE PARITY (ELEMENT + RARITY)
-   Goal:
-   - Boss cards use the same badge look as roster/catalog cards
-   - No black text on the purple UI
-   - Works regardless of whether bosses use #bossGrid, #bossesGrid, or .bossCard
+   PLATOONS: LARGE PORTRAITS (160px cards, 140x160 portraits)
+   - Fixes conflicts with earlier platoonSlots flex/scroll rules
+   - Keeps 5 slots per platoon on wide screens
+   - Wraps to 3/2 on smaller screens (no horizontal scroll)
    ========================================================= */
 
-/* Keep bosses text readable on the purple gradient */
-#bossGrid, #bossesGrid, #bossCatalogGrid,
-#bossGrid *, #bossesGrid *, #bossCatalogGrid *,
-.bossCard, .bossCard *{
-  color: var(--text);
+#platoonsGrid .platoonSlots{
+  display: grid !important;
+  gap: 12px !important;
+  grid-template-columns: repeat(5, 160px) !important;
+  justify-content: center !important;
+  align-items: stretch !important;
+  overflow: visible !important;
 }
 
-/* Ensure badge rows render like the rest of the app */
-#bossGrid .tags, #bossesGrid .tags, #bossCatalogGrid .tags,
-#bossGrid .bossBadges, #bossesGrid .bossBadges, #bossCatalogGrid .bossBadges,
-#bossGrid .slotBadges, #bossesGrid .slotBadges, #bossCatalogGrid .slotBadges{
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  align-items: center;
+#platoonsGrid .platoonSlotCard,
+#platoonsGrid .platoonSlots .slotCard{
+  width: 160px !important;
+  min-width: 160px !important;
+  max-width: 160px !important;
+  border-radius: 14px !important;
 }
 
-/* Element badge tints (scoped to bosses containers + boss cards) */
-#bossGrid .tag.element.fire,  #bossesGrid .tag.element.fire,  #bossCatalogGrid .tag.element.fire,  .bossCard .tag.element.fire  { background: rgba(255, 80, 80, 0.22); border-color: rgba(255, 80, 80, 0.35); }
-#bossGrid .tag.element.water, #bossesGrid .tag.element.water, #bossCatalogGrid .tag.element.water, .bossCard .tag.element.water { background: rgba(80, 160, 255, 0.22); border-color: rgba(80, 160, 255, 0.35); }
-#bossGrid .tag.element.storm, #bossesGrid .tag.element.storm, #bossCatalogGrid .tag.element.storm, .bossCard .tag.element.storm { background: rgba(255, 220, 80, 0.22); border-color: rgba(255, 220, 80, 0.35); }
-#bossGrid .tag.element.earth, #bossesGrid .tag.element.earth, #bossCatalogGrid .tag.element.earth, .bossCard .tag.element.earth { background: rgba(90, 220, 120, 0.22); border-color: rgba(90, 220, 120, 0.35); }
-#bossGrid .tag.element.dark,  #bossesGrid .tag.element.dark,  #bossCatalogGrid .tag.element.dark,  .bossCard .tag.element.dark  { background: rgba(170, 90, 255, 0.22); border-color: rgba(170, 90, 255, 0.35); }
-
-/* Light element: keep uniform text (no black) */
-#bossGrid .tag.element.light, #bossesGrid .tag.element.light, #bossCatalogGrid .tag.element.light, .bossCard .tag.element.light{
-  background: color-mix(in srgb, var(--el-light) 35%, #000);
-  border-color: rgba(255,255,255,0.30);
-  color: var(--text);
+#platoonsGrid .platoonSlotCard .slotTop,
+#platoonsGrid .platoonSlots .slotCard .slotTop{
+  display: flex !important;
+  justify-content: center !important;
+  padding: 10px 10px 0 10px !important;
 }
 
-/* Rarity badge styling (bosses) */
-#bossGrid .tag.rarity, #bossesGrid .tag.rarity, #bossCatalogGrid .tag.rarity, .bossCard .tag.rarity{
-  background: rgba(255,255,255,.12);
+#platoonsGrid .platoonSlotCard .slotImg,
+#platoonsGrid .platoonSlots .slotCard .slotImg{
+  width: 140px !important;
+  height: 160px !important;
+  border-radius: 14px !important;
+  overflow: hidden !important;
+  background: rgba(255,255,255,0.06) !important;
+}
+
+#platoonsGrid .platoonSlotCard .unitPortrait,
+#platoonsGrid .platoonSlots .slotCard .unitPortrait,
+#platoonsGrid .platoonSlotCard .slotImg img,
+#platoonsGrid .platoonSlots .slotCard .slotImg img{
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: 50% 35% !important;
+  display: block !important;
+}
+
+/* Keep controls readable under bigger portrait */
+#platoonsGrid .platoonSlotCard .slotMid{
+  padding: 10px 10px 12px 10px !important;
+  gap: 8px !important;
+}
+#platoonsGrid .platoonSlotCard .slotSelect{
+  padding: 8px 10px !important;
+  font-size: 12px !important;
+  border-radius: 10px !important;
+}
+#platoonsGrid .platoonSlotCard .slotTitle,
+#platoonsGrid .platoonSlots .slotCard .slotSub{
+  text-align: center !important;
+}
+
+/* Responsive: 3 per row */
+@media (max-width: 980px){
+  #platoonsGrid .platoonSlots{
+    grid-template-columns: repeat(3, 160px) !important;
+  }
+}
+
+/* Responsive: 2 per row */
+@media (max-width: 560px){
+  #platoonsGrid .platoonSlots{
+    grid-template-columns: repeat(2, 160px) !important;
+  }
+}
+
+/* Very small screens: avoid forced horizontal scroll by letting cards shrink */
+@media (max-width: 380px){
+  #platoonsGrid .platoonSlots{
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  #platoonsGrid .platoonSlotCard,
+  #platoonsGrid .platoonSlots .slotCard{
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+  }
+  #platoonsGrid .platoonSlotCard .slotImg,
+  #platoonsGrid .platoonSlots .slotCard .slotImg{
+    width: 100% !important;
+  }
 }
