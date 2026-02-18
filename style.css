@@ -1778,103 +1778,151 @@ body.page-catalog .metaHeader{
 }
 
 /* =========================================================
-   CATALOG CARD LAYOUT OVERRIDES (STRICT, APPENDED)
-   Goal (matches provided mock):
-   - Portrait constrained to a left rectangle (no full-bleed background)
-   - Toggles (★5 / ★6 / ★FA) sit in the empty space between title and badges
-   - No changes to optimizer/platoons
-   - No changes to roster layout (scoped to body.page-catalog / #catalogGrid)
+   CATALOG MOCK CARD LAYOUT (STRICT)
+   Matches the provided mock:
+   - Left portrait rectangle (cropped to middle), not full-bleed
+   - Name/title top-left, badges on right, toggles under title
+   - Scoped to Catalog only (does not affect roster/optimizer)
    ========================================================= */
 
 body.page-catalog #catalogGrid .unitCard{
-  /* Override the base 88px thumb column for catalog */
-  grid-template-columns: 220px 1fr !important;
+  display: grid !important;
+  grid-template-columns: 260px 1fr !important;
+  gap: 14px !important;
   align-items: start !important;
 }
 
+/* Keep left column as a real column (prevents any 'display:contents' mobile rules from taking over) */
 body.page-catalog #catalogGrid .unitLeft{
-  width: 220px !important;
-  min-width: 220px !important;
   display: flex !important;
   flex-direction: column !important;
   align-items: center !important;
   justify-content: flex-start !important;
-  overflow: hidden !important; /* prevents image bleeding into meta column */
+  width: 260px !important;
+  min-width: 260px !important;
 }
 
+/* Portrait rectangle (blue box in mock) */
 body.page-catalog #catalogGrid .unitThumb{
-  width: 200px !important;
-  height: 280px !important;
-  max-width: 100% !important;
-  border-radius: 18px !important;
+  width: 240px !important;
+  height: 360px !important;
+  border-radius: 22px !important;
   overflow: hidden !important;
-  background: rgba(255,255,255,0.06) !important;
+  background: rgba(255,255,255,.06) !important;
 }
 
+/* Crop to the middle of the portrait */
 body.page-catalog #catalogGrid .unitThumb img{
   width: 100% !important;
   height: 100% !important;
   object-fit: cover !important;
-  object-position: 50% 35% !important;
+  object-position: 50% 40% !important;
   display: block !important;
 }
 
-/* Catalog header becomes 3 columns: name/title | toggles | badges */
+/* Header: left stack + right badge column */
 body.page-catalog #catalogGrid .metaHeader{
   display: grid !important;
-  grid-template-columns: 1fr auto auto !important;
-  column-gap: 14px !important;
-  row-gap: 6px !important;
+  grid-template-columns: 1fr auto !important;
+  gap: 10px !important;
   align-items: start !important;
 }
 
-/* Ensure name block remains left */
-body.page-catalog #catalogGrid .nameBlock{
+/* Left stack: name/title + toggles underneath (empty space area) */
+body.page-catalog #catalogGrid .metaMain{
+  display: flex !important;
+  flex-direction: column !important;
   min-width: 0 !important;
 }
 
-/* Place toggles in the intended "empty" space (center column) */
-body.page-catalog #catalogGrid .metaHeader .stateRow{
-  margin-top: 34px !important; /* pushes below title to the empty area */
+body.page-catalog #catalogGrid .metaMain .stateRow{
+  margin-top: 18px !important;   /* pushes into the empty space below title */
+  display: flex !important;
   justify-content: center !important;
-  align-items: center !important;
-  gap: 12px !important;
-  width: auto !important;
+  gap: 16px !important;
 }
 
-/* Keep badge column right */
+/* Toggle buttons as numbered stars (★5 / ★6 / ★FA) */
+body.page-catalog #catalogGrid .stateRow .stateBtn{
+  width: 56px !important;
+  height: 56px !important;
+  border-radius: 50% !important;
+  border: 2px solid rgba(255,255,255,.22) !important;
+  background: rgba(255,255,255,.08) !important;
+  position: relative !important;
+  font-size: 0 !important; /* hide any text nodes */
+}
+body.page-catalog #catalogGrid .stateRow .stateBtn::before{
+  position: absolute !important;
+  inset: 0 !important;
+  display: grid !important;
+  place-items: center !important;
+  font-weight: 900 !important;
+  letter-spacing: .3px !important;
+  font-size: 14px !important;
+  color: var(--text) !important;
+}
+body.page-catalog #catalogGrid .stateRow .stateBtn:nth-child(1)::before{ content:"★5" !important; }
+body.page-catalog #catalogGrid .stateRow .stateBtn:nth-child(2)::before{ content:"★6" !important; }
+body.page-catalog #catalogGrid .stateRow .stateBtn:nth-child(3)::before{ content:"★FA" !important; }
+
+/* Bronze / Silver / Gold rings */
+body.page-catalog #catalogGrid .stateRow .stateBtn:nth-child(1){
+  border-color: rgba(205,127,50,.55) !important;
+  box-shadow: 0 0 0 2px rgba(205,127,50,.18) inset !important;
+}
+body.page-catalog #catalogGrid .stateRow .stateBtn:nth-child(2){
+  border-color: rgba(192,192,192,.55) !important;
+  box-shadow: 0 0 0 2px rgba(192,192,192,.18) inset !important;
+}
+body.page-catalog #catalogGrid .stateRow .stateBtn:nth-child(3){
+  border-color: rgba(255,215,0,.55) !important;
+  box-shadow: 0 0 0 2px rgba(255,215,0,.18) inset !important;
+}
+
+/* Active glow matches the ring color */
+body.page-catalog #catalogGrid .stateRow .stateBtn.active:nth-child(1){
+  box-shadow: 0 0 14px rgba(205,127,50,.35) !important, 0 0 0 2px rgba(205,127,50,.18) inset !important;
+}
+body.page-catalog #catalogGrid .stateRow .stateBtn.active:nth-child(2){
+  box-shadow: 0 0 14px rgba(192,192,192,.35) !important, 0 0 0 2px rgba(192,192,192,.18) inset !important;
+}
+body.page-catalog #catalogGrid .stateRow .stateBtn.active:nth-child(3){
+  box-shadow: 0 0 14px rgba(255,215,0,.35) !important, 0 0 0 2px rgba(255,215,0,.18) inset !important;
+}
+
+/* Badge column on the right stays stacked */
 body.page-catalog #catalogGrid .chipCol{
+  display: flex !important;
+  flex-direction: column !important;
   align-items: flex-end !important;
+  gap: 10px !important;
 }
 
-/* Compact vs detailed sizing based on existing view classes (mobile-compact/detailed) */
+/* Compact mode: slightly smaller portrait, keep the same structure */
 body.page-catalog.mobile-compact #catalogGrid .unitCard{
-  grid-template-columns: 200px 1fr !important;
+  grid-template-columns: 230px 1fr !important;
 }
 body.page-catalog.mobile-compact #catalogGrid .unitLeft{
-  width: 200px !important;
-  min-width: 200px !important;
+  width: 230px !important;
+  min-width: 230px !important;
 }
 body.page-catalog.mobile-compact #catalogGrid .unitThumb{
-  width: 180px !important;
-  height: 240px !important;
+  width: 210px !important;
+  height: 300px !important;
 }
 
-/* IMPORTANT: prevent earlier mobile rules from turning catalog cards into full-bleed image stacks */
+/* Mobile widths: keep portrait-left layout (do NOT switch to full-bleed thumb-on-top) */
 @media (max-width: 900px){
   body.page-catalog #catalogGrid .unitCard{
-    grid-template-columns: 220px 1fr !important;
-    grid-template-rows: auto !important;
+    grid-template-columns: 240px 1fr !important;
+  }
+  body.page-catalog #catalogGrid .unitLeft{
+    width: 240px !important;
+    min-width: 240px !important;
   }
   body.page-catalog #catalogGrid .unitThumb{
-    width: 200px !important;
-    height: 280px !important;
-  }
-  body.page-catalog.mobile-compact #catalogGrid .unitCard{
-    grid-template-columns: 200px 1fr !important;
-  }
-  body.page-catalog.mobile-compact #catalogGrid .unitThumb{
-    width: 180px !important;
-    height: 240px !important;
+    width: 220px !important;
+    height: 320px !important;
   }
 }
