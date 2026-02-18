@@ -1776,3 +1776,105 @@ body.page-catalog .metaHeader{
   align-items: flex-start;
   gap: 14px;
 }
+
+/* =========================================================
+   CATALOG CARD LAYOUT OVERRIDES (STRICT, APPENDED)
+   Goal (matches provided mock):
+   - Portrait constrained to a left rectangle (no full-bleed background)
+   - Toggles (★5 / ★6 / ★FA) sit in the empty space between title and badges
+   - No changes to optimizer/platoons
+   - No changes to roster layout (scoped to body.page-catalog / #catalogGrid)
+   ========================================================= */
+
+body.page-catalog #catalogGrid .unitCard{
+  /* Override the base 88px thumb column for catalog */
+  grid-template-columns: 220px 1fr !important;
+  align-items: start !important;
+}
+
+body.page-catalog #catalogGrid .unitLeft{
+  width: 220px !important;
+  min-width: 220px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  overflow: hidden !important; /* prevents image bleeding into meta column */
+}
+
+body.page-catalog #catalogGrid .unitThumb{
+  width: 200px !important;
+  height: 280px !important;
+  max-width: 100% !important;
+  border-radius: 18px !important;
+  overflow: hidden !important;
+  background: rgba(255,255,255,0.06) !important;
+}
+
+body.page-catalog #catalogGrid .unitThumb img{
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: 50% 35% !important;
+  display: block !important;
+}
+
+/* Catalog header becomes 3 columns: name/title | toggles | badges */
+body.page-catalog #catalogGrid .metaHeader{
+  display: grid !important;
+  grid-template-columns: 1fr auto auto !important;
+  column-gap: 14px !important;
+  row-gap: 6px !important;
+  align-items: start !important;
+}
+
+/* Ensure name block remains left */
+body.page-catalog #catalogGrid .nameBlock{
+  min-width: 0 !important;
+}
+
+/* Place toggles in the intended "empty" space (center column) */
+body.page-catalog #catalogGrid .metaHeader .stateRow{
+  margin-top: 34px !important; /* pushes below title to the empty area */
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 12px !important;
+  width: auto !important;
+}
+
+/* Keep badge column right */
+body.page-catalog #catalogGrid .chipCol{
+  align-items: flex-end !important;
+}
+
+/* Compact vs detailed sizing based on existing view classes (mobile-compact/detailed) */
+body.page-catalog.mobile-compact #catalogGrid .unitCard{
+  grid-template-columns: 200px 1fr !important;
+}
+body.page-catalog.mobile-compact #catalogGrid .unitLeft{
+  width: 200px !important;
+  min-width: 200px !important;
+}
+body.page-catalog.mobile-compact #catalogGrid .unitThumb{
+  width: 180px !important;
+  height: 240px !important;
+}
+
+/* IMPORTANT: prevent earlier mobile rules from turning catalog cards into full-bleed image stacks */
+@media (max-width: 900px){
+  body.page-catalog #catalogGrid .unitCard{
+    grid-template-columns: 220px 1fr !important;
+    grid-template-rows: auto !important;
+  }
+  body.page-catalog #catalogGrid .unitThumb{
+    width: 200px !important;
+    height: 280px !important;
+  }
+  body.page-catalog.mobile-compact #catalogGrid .unitCard{
+    grid-template-columns: 200px 1fr !important;
+  }
+  body.page-catalog.mobile-compact #catalogGrid .unitThumb{
+    width: 180px !important;
+    height: 240px !important;
+  }
+}
