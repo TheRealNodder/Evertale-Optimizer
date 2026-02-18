@@ -78,6 +78,7 @@ function setMobileViewPref(v) {
   localStorage.setItem(LS_MOBILE_VIEW_KEY, v);
 }
 function applyMobileViewClass(view) {
+  document.body.classList.add("page-roster");
   document.body.classList.remove("mobile-compact", "mobile-detailed");
   document.body.classList.add(view === "detailed" ? "mobile-detailed" : "mobile-compact");
 }
@@ -222,33 +223,13 @@ function renderUnitCard(u) {
             <div class="leaderDesc">${safeText(leaderDesc)}</div>
           </div>
 
-          ${
-            activeSkills.length
-              ? `<div class="panel">
-                   <div class="panelTitle">Active Skills</div>
-                   <div class="muted" style="white-space:pre-wrap; line-height:1.25">
-                     ${activeSkills.slice(0,4).map(s=>{
-                       const nm=safeText(s.name);
-                       const tu=s.tu!=null?` • ${s.tu}TU`:"";
-                       const sp=s.spirit!=null?` • ${s.spirit}SP`:"";
-                       const desc=safeText(s.description||"");
-                       return `<strong>${nm}</strong>${tu}${sp}\n${desc}\n`;
-                     }).join("\n")}
+          ).join("\n")}
                    </div>
                  </div>`
               : ``
           }
 
-          ${
-            passiveDetails.length
-              ? `<div class="panel">
-                   <div class="panelTitle">Passives</div>
-                   <div class="muted" style="white-space:pre-wrap; line-height:1.25">
-                     ${passiveDetails.slice(0,6).map(p=>{
-                       const nm=safeText(p.name);
-                       const desc=safeText(p.description);
-                       return `<strong>${nm}</strong>\n${desc}\n`;
-                     }).join("\n")}
+          ).join("\n")}
                    </div>
                  </div>`
               : ``
