@@ -1993,3 +1993,79 @@ select, option, optgroup{
 .leaderDesc{
   color: var(--muted) !important;
 }
+
+/* =========================================================
+   BOSSES: ELEMENT TINTS (Catalog Bosses page)
+   - Pure CSS; does not alter optimizer logic
+   - Supports common boss card selectors + element identification
+   ========================================================= */
+
+/* 1) Card-level tinting (when element class el-* exists) */
+.bossCard{ position: relative; }
+.bossCard.el-fire,
+.bossCard.el-water,
+.bossCard.el-storm,
+.bossCard.el-earth,
+.bossCard.el-light,
+.bossCard.el-dark{
+  --el: transparent;
+  border-color: color-mix(in srgb, var(--el) 38%, var(--line));
+  background:
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--el) 10%, var(--panel)),
+      var(--panel)
+    );
+}
+.bossCard.el-fire  { --el: var(--el-fire);  border-left: 6px solid var(--el-fire); }
+.bossCard.el-water { --el: var(--el-water); border-left: 6px solid var(--el-water); }
+.bossCard.el-storm { --el: var(--el-storm); border-left: 6px solid var(--el-storm); }
+.bossCard.el-earth { --el: var(--el-earth); border-left: 6px solid var(--el-earth); }
+.bossCard.el-light { --el: var(--el-light); border-left: 6px solid var(--el-light); }
+.bossCard.el-dark  { --el: var(--el-dark);  border-left: 6px solid var(--el-dark); }
+
+/* 2) Fallback: tint when element is stored as data-element (common in generators) */
+.bossCard[data-element="Fire"]  { --el: var(--el-fire);  border-left: 6px solid var(--el-fire); }
+.bossCard[data-element="Water"] { --el: var(--el-water); border-left: 6px solid var(--el-water); }
+.bossCard[data-element="Storm"] { --el: var(--el-storm); border-left: 6px solid var(--el-storm); }
+.bossCard[data-element="Earth"] { --el: var(--el-earth); border-left: 6px solid var(--el-earth); }
+.bossCard[data-element="Light"] { --el: var(--el-light); border-left: 6px solid var(--el-light); }
+.bossCard[data-element="Dark"]  { --el: var(--el-dark);  border-left: 6px solid var(--el-dark); }
+
+/* Apply the same tint background for data-element cases */
+.bossCard[data-element]{
+  border-color: color-mix(in srgb, var(--el) 38%, var(--line));
+  background:
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--el) 10%, var(--panel)),
+      var(--panel)
+    );
+}
+
+/* 3) Boss badges: element + rarity bubbles match roster */
+.bossCard .tag.element.fire  { border-color:color-mix(in srgb, var(--el-fire) 60%, rgba(255,255,255,.18)); background:color-mix(in srgb, var(--el-fire) 16%, rgba(255,255,255,.08)); }
+.bossCard .tag.element.water { border-color:color-mix(in srgb, var(--el-water) 60%, rgba(255,255,255,.18)); background:color-mix(in srgb, var(--el-water) 16%, rgba(255,255,255,.08)); }
+.bossCard .tag.element.storm { border-color:color-mix(in srgb, var(--el-storm) 60%, rgba(255,255,255,.18)); background:color-mix(in srgb, var(--el-storm) 16%, rgba(255,255,255,.08)); }
+.bossCard .tag.element.earth { border-color:color-mix(in srgb, var(--el-earth) 60%, rgba(255,255,255,.18)); background:color-mix(in srgb, var(--el-earth) 16%, rgba(255,255,255,.08)); }
+.bossCard .tag.element.dark  { border-color:color-mix(in srgb, var(--el-dark) 60%, rgba(255,255,255,.18)); background:color-mix(in srgb, var(--el-dark) 16%, rgba(255,255,255,.08)); }
+
+/* Light element: keep readable and consistent (no black text) */
+.bossCard .tag.element.light{
+  border-color: rgba(255,255,255,.30);
+  background: rgba(255,255,255,.14);
+  color: var(--text) !important;
+}
+
+/* Rarity badge stays neutral */
+.bossCard .tag.rarity{ background: rgba(255,255,255,.10) !important; }
+
+/* 4) If the bosses grid uses a unique container id, apply el-* tinting there too (safe no-op if unused) */
+#bossGrid .unitCard[class*="el-"],
+#bossesGrid .unitCard[class*="el-"],
+#bossCatalogGrid .unitCard[class*="el-"]{
+  border-color: color-mix(in srgb, var(--el) 38%, var(--line));
+  background:
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--el) 10%, var(--panel)),
+      var(--panel)
+    );
+}
