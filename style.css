@@ -1332,3 +1332,56 @@ body.page-catalog.mobile-compact #catalogGrid .unitThumb{
     gap: 10px !important;
   }
 }
+
+/* =========================================================
+   CATALOG TOGGLES + PORTRAIT TUNING (STRICT OVERRIDE)
+   - Shrinks toggle circles + label text (★5 / ★6 / ★FA)
+   - Improves portrait crop in compact portrait mode
+   - Catalog-only scope (no effect on roster/optimizer)
+   ========================================================= */
+
+/* Default catalog (both detailed + compact): smaller toggles than current 84px */
+body.page-catalog #catalogGrid .metaMain .stateRow .stateBtn{
+  width: 56px !important;
+  height: 56px !important;
+}
+body.page-catalog #catalogGrid .metaMain .stateRow .stateBtn::before{
+  font-size: 12px !important;
+  letter-spacing: .15px !important;
+}
+
+/* Keep 3 states visible even if wrapping occurs */
+body.page-catalog #catalogGrid .metaMain .stateRow{
+  flex-wrap: nowrap !important;
+}
+
+/* Compact catalog: slightly smaller still */
+body.page-catalog.mobile-compact #catalogGrid .metaMain .stateRow .stateBtn{
+  width: 48px !important;
+  height: 48px !important;
+}
+body.page-catalog.mobile-compact #catalogGrid .metaMain .stateRow .stateBtn::before{
+  font-size: 11px !important;
+}
+
+/* Narrow portrait phones: keep toggles present + readable without crowding */
+@media (max-width: 430px){
+  body.page-catalog.mobile-compact #catalogGrid .metaMain .stateRow{
+    gap: 10px !important;
+  }
+  body.page-catalog.mobile-compact #catalogGrid .metaMain .stateRow .stateBtn{
+    width: 42px !important;
+    height: 42px !important;
+  }
+  body.page-catalog.mobile-compact #catalogGrid .metaMain .stateRow .stateBtn::before{
+    font-size: 10px !important;
+  }
+
+  /* Portrait tuning: slightly shorter rectangle and center crop for better face framing */
+  body.page-catalog.mobile-compact #catalogGrid .unitThumb{
+    height: 280px !important;
+  }
+  body.page-catalog.mobile-compact #catalogGrid .unitThumb img{
+    object-position: 50% 35% !important;
+  }
+}
