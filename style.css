@@ -1296,3 +1296,39 @@ body.page-catalog.mobile-compact #catalogGrid .unitThumb{
     height: 70px !important;
   }
 }
+
+
+/* =========================================================
+   CATALOG COMPACT PORTRAIT: SINGLE-COLUMN SAFETY
+   - Fixes compact-mode warping on narrow portrait phones
+   - Only triggers for Catalog + compact + narrow widths
+   - Keeps portrait constrained (cropped center), prevents horizontal overflow
+   ========================================================= */
+
+@media (max-width: 430px){
+  body.page-catalog.mobile-compact #catalogGrid .unitCard{
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+  body.page-catalog.mobile-compact #catalogGrid .unitLeft{
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+  body.page-catalog.mobile-compact #catalogGrid .unitThumb{
+    width: calc(100% - 24px) !important;
+    max-width: 360px !important;
+    height: 320px !important;
+    margin: 0 auto !important;
+  }
+  /* Keep header layout stable under the portrait */
+  body.page-catalog.mobile-compact #catalogGrid .metaHeader{
+    grid-template-columns: 1fr auto !important;
+  }
+  body.page-catalog.mobile-compact #catalogGrid .metaMain .stateRow{
+    justify-content: flex-start !important;
+    margin-top: 12px !important;
+  }
+  body.page-catalog.mobile-compact #catalogGrid .chipCol{
+    gap: 10px !important;
+  }
+}
