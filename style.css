@@ -1385,3 +1385,120 @@ body.page-catalog.mobile-compact #catalogGrid .metaMain .stateRow .stateBtn::bef
     object-position: 50% 35% !important;
   }
 }
+
+/* =========================================================
+   CATALOG MOBILE DETAILED PORTRAIT LAYOUT FIX
+   Goal (per screenshots):
+   - In DETAILED + phone portrait: big portrait on left, name/badges on right
+   - Skills/text (unitDetails panels) appear UNDER the portrait/header (full width)
+   - Toggles remain CIRCLES and all 3 states are visible
+   Scope: Catalog only
+   ========================================================= */
+
+/* 1) Detailed portrait: use a 2-column header grid, then details full width */
+@media (max-width: 560px){
+  body.page-catalog.mobile-detailed #catalogGrid .unitCard{
+    display: grid !important;
+    grid-template-columns: minmax(0, 58%) minmax(0, 42%) !important;
+    grid-auto-rows: auto !important;
+    gap: 12px !important;
+    align-items: start !important;
+  }
+
+  /* Make meta children participate in the card grid so details can span full width */
+  body.page-catalog.mobile-detailed #catalogGrid .unitCard .meta{
+    display: contents !important;
+  }
+
+  /* Left column: portrait rectangle */
+  body.page-catalog.mobile-detailed #catalogGrid .unitLeft{
+    width: auto !important;
+    min-width: 0 !important;
+    align-items: stretch !important;
+  }
+  body.page-catalog.mobile-detailed #catalogGrid .unitThumb{
+    width: 100% !important;
+    height: clamp(300px, 62vw, 380px) !important;
+    border-radius: 18px !important;
+    overflow: hidden !important;
+  }
+  body.page-catalog.mobile-detailed #catalogGrid .unitThumb img{
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: 50% 40% !important;
+    display: block !important;
+  }
+
+  /* Right column: name/title + badges */
+  body.page-catalog.mobile-detailed #catalogGrid .metaHeader{
+    grid-column: 2 / 3 !important;
+    grid-row: 1 !important;
+    align-self: start !important;
+  }
+  body.page-catalog.mobile-detailed #catalogGrid .chipCol{
+    align-items: flex-end !important;
+    gap: 10px !important;
+  }
+
+  /* Ensure name doesn't break into vertical letters */
+  body.page-catalog.mobile-detailed #catalogGrid .unitName{
+    font-size: 18px !important;
+    line-height: 1.1 !important;
+    white-space: normal !important;
+    word-break: keep-all !important;
+    overflow-wrap: break-word !important;
+  }
+  body.page-catalog.mobile-detailed #catalogGrid .unitTitle,
+  body.page-catalog.mobile-detailed #catalogGrid .unitSub{
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+  }
+
+  /* 2) Toggles: keep them circular + smaller so they fit inside the right column */
+  body.page-catalog.mobile-detailed #catalogGrid .stateRow{
+    justify-content: flex-start !important;
+    gap: 10px !important;
+    margin-top: 10px !important;
+    flex-wrap: nowrap !important;
+  }
+  body.page-catalog.mobile-detailed #catalogGrid .stateRow .stateBtn{
+    width: 34px !important;
+    height: 34px !important;
+    border-radius: 999px !important;
+    padding: 0 !important;
+  }
+  body.page-catalog.mobile-detailed #catalogGrid .stateRow .stateBtn::before{
+    font-size: 10px !important;
+  }
+
+  /* 3) Details (skills/text) UNDER the header area, spanning full width */
+  body.page-catalog.mobile-detailed #catalogGrid .unitDetails{
+    grid-column: 1 / -1 !important;
+    grid-row: 2 !important;
+    width: 100% !important;
+    margin-top: 6px !important;
+  }
+  body.page-catalog.mobile-detailed #catalogGrid .unitDetails .panel{
+    width: 100% !important;
+  }
+}
+
+/* 4) Compact: make toggle circles smaller so they fit cleanly inside the card */
+@media (max-width: 560px){
+  body.page-catalog.mobile-compact #catalogGrid .stateRow{
+    gap: 8px !important;
+    justify-content: center !important;
+    flex-wrap: nowrap !important;
+  }
+  body.page-catalog.mobile-compact #catalogGrid .stateRow .stateBtn{
+    width: 26px !important;
+    height: 26px !important;
+    border-radius: 999px !important;
+    padding: 0 !important;
+  }
+  body.page-catalog.mobile-compact #catalogGrid .stateRow .stateBtn::before{
+    font-size: 9px !important;
+  }
+}
