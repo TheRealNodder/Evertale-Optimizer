@@ -255,14 +255,15 @@ function renderCard(item) {
     <div class="unitCard${elClass}" data-kind="${safeText(item.kind)}" data-id="${safeText(item.id)}">
       <div class="unitLeft">
         <div class="unitThumb">${img}</div>
-        ${item.kind==="characters" ? stateRowHtml(imgs) : ""}
       </div>
 
       <div class="meta">
         <div class="metaHeader">
-          <div class="nameBlock">
+          <div class="metaMain"><div class="nameBlock">
             <div class="unitName">${safeText(item.name)}</div>
             <div class="unitTitle">${safeText(item.subtitle || "")}</div>
+          </div>
+            ${item.kind==="characters" ? stateRowHtml(imgs) : ""}
           </div>
           <div class="chipCol">${chips.join("")}</div>
         </div>
