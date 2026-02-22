@@ -1642,54 +1642,47 @@ body.page-catalog.mobile-detailed #catalogGrid .unitDetails *{
 }
 
 /* =========================================================
-   CATALOG MOBILE DETAILED: FILL EMPTY LEFT SPACE WITH DETAILS (STRICT)
+   CATALOG MOBILE DETAILED: LEADER TEXT FILL LEFT GAP (STRICT, NO LAYOUT MOVE)
    Goal:
-   - In Catalog DETAILED (mobile), move the DETAILS/skills section into a full-width
-     row under the portrait+meta, so it fills the empty area under the portrait.
-   - Does NOT move badges/toggles/portrait within their respective areas.
-   Scope:
-   - Catalog only + detailed only + mobile widths
+   - Keep the current 2-column detailed layout exactly the same.
+   - Only make the Leader/description block visually extend into the empty
+     space under the portrait (the red-scribble area), so the card looks shorter/cleaner.
+   How:
+   - Expand .leaderBlock width using negative margin + width calc.
+   - No grid/template changes; badges/toggles/portrait positions untouched.
    ========================================================= */
 
 @media (max-width: 900px){
-  body.page-catalog.mobile-detailed #catalogGrid .unitCard{
-    /* Keep your 2-col portrait-left layout, add a full-width row for details */
-    display: grid !important;
-    grid-template-columns: 245px 1fr !important;
-    grid-template-areas:
-      "left meta"
-      "details details" !important;
-    align-items: start !important;
+  /* Default detailed catalog left column + gap (matches your current rules) */
+  body.page-catalog.mobile-detailed{
+    --catLeftCol: 245px;
+    --catColGap: 14px;
   }
 
-  body.page-catalog.mobile-detailed #catalogGrid .unitLeft{ grid-area: left !important; }
-  body.page-catalog.mobile-detailed #catalogGrid .meta{ grid-area: meta !important; min-width: 0 !important; }
-
-  /* Put leader + skill panels into the new full-width row */
-  body.page-catalog.mobile-detailed #catalogGrid .unitDetails{
-    grid-area: details !important;
-    width: 100% !important;
-    max-width: none !important;
-    min-width: 0 !important;
-    margin-top: 10px !important;
-  }
-
-  body.page-catalog.mobile-detailed #catalogGrid .leaderBlock{
-    width: 100% !important;
-    max-width: none !important;
-    min-width: 0 !important;
-  }
-
-  /* If leaderBlock is inside .meta, allow it to span into the details row visually */
+  /* Extend the leader block across both columns (visual only) */
   body.page-catalog.mobile-detailed #catalogGrid .meta .leaderBlock{
-    grid-column: 1 / -1 !important;
+    width: calc(100% + var(--catLeftCol) + var(--catColGap)) !important;
+    margin-left: calc(-1 * (var(--catLeftCol) + var(--catColGap))) !important;
+    max-width: none !important;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+    box-sizing: border-box !important;
   }
 
-  /* Ensure details panels wrap and do not clip */
-  body.page-catalog.mobile-detailed #catalogGrid .unitDetails,
-  body.page-catalog.mobile-detailed #catalogGrid .unitDetails .panel{
-    width: 100% !important;
+  /* Ensure the text wraps cleanly and uses the new width */
+  body.page-catalog.mobile-detailed #catalogGrid .meta .leaderName,
+  body.page-catalog.mobile-detailed #catalogGrid .meta .leaderDesc{
     max-width: none !important;
-    min-width: 0 !important;
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+    white-space: normal !important;
+  }
+}
+
+/* Smaller phones where the catalog left column shrinks */
+@media (max-width: 520px){
+  body.page-catalog.mobile-detailed{
+    --catLeftCol: 210px;
+    --catColGap: 14px;
   }
 }
