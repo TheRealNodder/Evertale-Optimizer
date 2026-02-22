@@ -1686,3 +1686,71 @@ body.page-catalog.mobile-detailed #catalogGrid .unitDetails *{
     --catColGap: 14px;
   }
 }
+
+/* =========================================================
+   CATALOG MOBILE DETAILED: EXTEND PANELS + SKILL LINE BREAKS (STRICT)
+   Requests:
+   - Leader block: drop down a few px so it does not overlap the portrait.
+   - Active/Passive skill panels: extend into the left empty space the same way as leader.
+   - In each skill entry, the bold title must be on its own line; description below it.
+   Scope:
+   - Catalog only + mobile detailed only
+   - Does NOT touch badges/toggles/portrait/card geometry.
+   ========================================================= */
+
+@media (max-width: 900px){
+  body.page-catalog.mobile-detailed{
+    --catLeftCol: 245px;
+    --catColGap: 14px;
+  }
+
+  /* 1) Leader: same extension, but shifted down to avoid portrait overlap */
+  body.page-catalog.mobile-detailed #catalogGrid .meta .leaderBlock{
+    width: calc(100% + var(--catLeftCol) + var(--catColGap)) !important;
+    margin-left: calc(-1 * (var(--catLeftCol) + var(--catColGap))) !important;
+    margin-top: 12px !important;             /* moved down a bit */
+    padding-top: 10px !important;            /* extra separation from the line above */
+    max-width: none !important;
+    box-sizing: border-box !important;
+  }
+
+  /* 2) Active/Passive panels: extend like leader (fill the empty left space) */
+  body.page-catalog.mobile-detailed #catalogGrid .unitDetails{
+    width: calc(100% + var(--catLeftCol) + var(--catColGap)) !important;
+    margin-left: calc(-1 * (var(--catLeftCol) + var(--catColGap))) !important;
+    max-width: none !important;
+    box-sizing: border-box !important;
+    margin-top: 12px !important;
+  }
+  body.page-catalog.mobile-detailed #catalogGrid .unitDetails .panel{
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+  }
+
+  /* 3) Skill formatting: bold title on its own line, description below */
+  body.page-catalog.mobile-detailed #catalogGrid .unitDetails .skillLine{
+    margin: 10px 0 !important;
+  }
+  body.page-catalog.mobile-detailed #catalogGrid .unitDetails .skillLine strong{
+    display: block !important;
+    margin: 0 0 6px 0 !important;
+    line-height: 1.15 !important;
+  }
+  body.page-catalog.mobile-detailed #catalogGrid .unitDetails .skillText{
+    display: block !important;
+    margin: 0 !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+    line-height: 1.35 !important;
+  }
+}
+
+/* Smaller phones where the catalog left column shrinks */
+@media (max-width: 520px){
+  body.page-catalog.mobile-detailed{
+    --catLeftCol: 210px;
+    --catColGap: 14px;
+  }
+}
