@@ -1601,41 +1601,42 @@ body.page-catalog.mobile-compact #catalogGrid .metaMain .stateRow .stateBtn::bef
   body.page-catalog.mobile-compact #catalogGrid .leaderDesc{ font-size: 13px !important; line-height: 1.25 !important; text-align: center !important; overflow-wrap: anywhere !important; }
 }
 
-
 /* =========================================================
-   CATALOG COMPACT — STATS TWO-ROW FORMAT (STRICT PATCHED)
-   ATK HP SPD COST
-   1367 7585 430 34
-   Does NOT modify card box, portrait, badges, or toggles.
+   DETAILED MODE ONLY: SKILLS TEXT WRAP + FILL (STRICT)
+   - Makes skills/description panels use available width
+   - Ensures long sentences/keywords wrap cleanly
+   - Does NOT move badges, toggles, portrait, or card structure
    ========================================================= */
 
-@media (max-width: 900px){
-  body.page-catalog.mobile-compact #catalogGrid .statLine{
-    display: grid !important;
-    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-    gap: 4px !important;
-    text-align: center !important;
-    width: 100% !important;
-  }
-
-  body.page-catalog.mobile-compact #catalogGrid .stat{
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    font-weight: 900 !important;
-    min-width: 0 !important;
-    font-size: 18px !important;
-    line-height: 1.15 !important;
-    white-space: nowrap !important;
-  }
-
-  body.page-catalog.mobile-compact #catalogGrid .stat strong{
-    display: block !important;
-    font-size: 12px !important;
-    letter-spacing: .6px !important;
-    line-height: 1.1 !important;
-    white-space: nowrap !important;
-  }
+body.page-catalog.mobile-detailed #catalogGrid .unitDetails,
+body.page-catalog.mobile-detailed #catalogGrid .unitDetails .panel{
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
 }
 
+body.page-catalog.mobile-detailed #catalogGrid .unitDetails .panel{
+  overflow: visible !important;
+}
+
+body.page-catalog.mobile-detailed #catalogGrid .unitDetails .panelTitle,
+body.page-catalog.mobile-detailed #catalogGrid .unitDetails .skillLine,
+body.page-catalog.mobile-detailed #catalogGrid .unitDetails .skillText,
+body.page-catalog.mobile-detailed #catalogGrid .unitDetails .muted{
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  overflow-wrap: anywhere !important;
+  word-break: break-word !important;
+  hyphens: auto !important;
+}
+
+body.page-catalog.mobile-detailed #catalogGrid .unitDetails .skillText,
+body.page-catalog.mobile-detailed #catalogGrid .unitDetails .muted{
+  line-height: 1.35 !important;
+}
+
+/* If any inner containers constrain width, force them to shrink correctly */
+body.page-catalog.mobile-detailed #catalogGrid .unitDetails *{
+  min-width: 0 !important;
+}
