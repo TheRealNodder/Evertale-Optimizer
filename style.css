@@ -1387,216 +1387,35 @@ body.page-catalog.mobile-compact #catalogGrid .metaMain .stateRow .stateBtn::bef
 }
 
 /* =========================================================
-   CATALOG COMPACT WRAP + DETAILED TOGGLES FIX (STRICT)
-   Addresses:
-   1) Catalog COMPACT on mobile should wrap cleanly (2-up grid, vertical cards)
-   2) Catalog DETAILED portrait must show 3 toggle CIRCLES (★5 / ★6 / ★FA)
-   Scope: Catalog only (body.page-catalog + #catalogGrid)
+   CATALOG COMPACT STATS: LABEL ROW + VALUE ROW (OVERRIDE)
+   - Labels on top line, numbers underneath
+   - Catalog + compact only, mobile
    ========================================================= */
-
-/* ---- 1) COMPACT (mobile): force vertical card layout and clean wrapping ---- */
 @media (max-width: 900px){
-  /* Keep 2 cards per row on phones for catalog compact */
-  body.page-catalog.mobile-compact #catalogGrid{
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    gap: 12px !important;
-  }
-
-  /* Override the "mock" portrait-left layout ONLY for compact */
-  body.page-catalog.mobile-compact #catalogGrid .unitCard{
-    display: grid !important;
-    grid-template-columns: 1fr !important;   /* vertical */
-    gap: 10px !important;
-    padding: 10px !important;
-    align-items: start !important;
-  }
-
-  body.page-catalog.mobile-compact #catalogGrid .unitLeft{
-    width: 100% !important;
-    min-width: 0 !important;
-    align-items: stretch !important;
-  }
-
-  /* Portrait fills the top of the card */
-  body.page-catalog.mobile-compact #catalogGrid .unitThumb{
-    width: 100% !important;
-    height: clamp(210px, 48vw, 300px) !important;
-    border-radius: 16px !important;
-    overflow: hidden !important;
-  }
-  body.page-catalog.mobile-compact #catalogGrid .unitThumb img{
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: cover !important;
-    object-position: 50% 40% !important;
-    display: block !important;
-  }
-
-  /* Name at top, then badges, then toggles in-row */
-  body.page-catalog.mobile-compact #catalogGrid .metaHeader{
-    display: grid !important;
-    grid-template-columns: 1fr !important; /* stack */
-    gap: 8px !important;
-    align-items: start !important;
-  }
-  body.page-catalog.mobile-compact #catalogGrid .chipCol{
-    flex-direction: row !important;
-    flex-wrap: wrap !important;
-    justify-content: flex-start !important;
-    align-items: center !important;
-    gap: 8px !important;
-  }
-
-  /* Toggle circles: small enough to fit inside the box */
-  body.page-catalog.mobile-compact #catalogGrid .stateRow{
-    justify-content: flex-start !important;
-    gap: 8px !important;
-    flex-wrap: nowrap !important;
-    margin-top: 0 !important;
-  }
-  body.page-catalog.mobile-compact #catalogGrid .stateRow .stateBtn{
-    width: 28px !important;
-    height: 28px !important;
-    border-radius: 999px !important;
-    border: 1px solid rgba(255,255,255,.22) !important;
-    background: rgba(255,255,255,.06) !important;
-    padding: 0 !important;
-  }
-  body.page-catalog.mobile-compact #catalogGrid .stateRow .stateBtn::before{
-    font-size: 9px !important;
-    line-height: 1 !important;
-  }
-}
-
-/* Narrow phones: keep 1-up if needed, but do NOT warp */
-@media (max-width: 430px){
-  body.page-catalog.mobile-compact #catalogGrid{
-    grid-template-columns: 1fr !important;
-  }
-}
-
-/* ---- 2) DETAILED (portrait <=560): ensure 3 circle toggles render and stay visible ---- */
-@media (max-width: 560px){
-  body.page-catalog.mobile-detailed #catalogGrid .stateRow{
-    display: flex !important;
-    gap: 10px !important;
-    align-items: center !important;
-    justify-content: flex-start !important;
-    flex-wrap: nowrap !important;
-  }
-  body.page-catalog.mobile-detailed #catalogGrid .stateRow .stateBtn{
-    display: inline-grid !important;
-    place-items: center !important;
-    width: 30px !important;
-    height: 30px !important;
-    border-radius: 999px !important;
-    border: 1px solid rgba(255,255,255,.22) !important;
-    background: rgba(255,255,255,.06) !important;
-    padding: 0 !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-  }
-  body.page-catalog.mobile-detailed #catalogGrid .stateRow .stateBtn::before{
-    font-size: 9px !important;
-    line-height: 1 !important;
-  }
-
-  /* Ensure the toggle row isn't forced into unitLeft vertical stack rules */
-  body.page-catalog.mobile-detailed #catalogGrid .unitLeft .stateRow{
-    flex-direction: row !important;
-    align-items: center !important;
-  }
-}
-
-/* =========================================================
-   CATALOG COMPACT CLEANUP (UNIFORM BADGES + CENTER STATS)
-   Goal (mobile compact):
-   - Badges in ONE column (stacked), all same sizing (no wide bars)
-   - Rarity not oversized; match other badges
-   - Stats centered and readable (no jammed text)
-   - Text wraps cleanly inside card
-   Scope: Catalog only + compact only
-   ========================================================= */
-
-@media (max-width: 900px){
-  body.page-catalog.mobile-compact #catalogGrid .meta{
-    min-width: 0 !important;
-  }
-
-  /* Badge column: single vertical stack */
-  body.page-catalog.mobile-compact #catalogGrid .chipCol{
-    width: 100% !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: flex-start !important;
-    gap: 6px !important;
-  }
-
-  /* Uniform badge sizing (override previous "solid bars") */
-  body.page-catalog.mobile-compact #catalogGrid .chipCol .tag{
-    width: auto !important;
-    min-width: 0 !important;
-    border-radius: 12px !important;
-    padding: 6px 12px !important;
-    min-height: 28px !important;
-    font-size: 12px !important;
-    border: 1px solid rgba(255,255,255,.18) !important;
-    background: rgba(255,255,255,.08) !important;
-    color: var(--text) !important;
-    white-space: nowrap !important;
-  }
-
-  /* Keep element chip tinted but NOT bar-sized */
-  body.page-catalog.mobile-compact #catalogGrid .unitCard.el-fire  .chipCol .tag.element{ background: color-mix(in srgb, var(--el-fire) 18%, rgba(255,255,255,.08)) !important; border-color: color-mix(in srgb, var(--el-fire) 55%, rgba(255,255,255,.18)) !important; }
-  body.page-catalog.mobile-compact #catalogGrid .unitCard.el-water .chipCol .tag.element{ background: color-mix(in srgb, var(--el-water) 18%, rgba(255,255,255,.08)) !important; border-color: color-mix(in srgb, var(--el-water) 55%, rgba(255,255,255,.18)) !important; }
-  body.page-catalog.mobile-compact #catalogGrid .unitCard.el-storm .chipCol .tag.element{ background: color-mix(in srgb, var(--el-storm) 18%, rgba(255,255,255,.08)) !important; border-color: color-mix(in srgb, var(--el-storm) 55%, rgba(255,255,255,.18)) !important; color: var(--text) !important; }
-  body.page-catalog.mobile-compact #catalogGrid .unitCard.el-earth .chipCol .tag.element{ background: color-mix(in srgb, var(--el-earth) 18%, rgba(255,255,255,.08)) !important; border-color: color-mix(in srgb, var(--el-earth) 55%, rgba(255,255,255,.18)) !important; }
-  body.page-catalog.mobile-compact #catalogGrid .unitCard.el-light .chipCol .tag.element{ background: rgba(255,255,255,.70) !important; border-color: rgba(10,12,20,.20) !important; color: rgba(10,12,20,.88) !important; }
-  body.page-catalog.mobile-compact #catalogGrid .unitCard.el-dark  .chipCol .tag.element{ background: color-mix(in srgb, var(--el-dark) 18%, rgba(255,255,255,.08)) !important; border-color: color-mix(in srgb, var(--el-dark) 55%, rgba(255,255,255,.18)) !important; }
-
-  /* Rarity: same size as others (no wide bar) */
-  body.page-catalog.mobile-compact #catalogGrid .chipCol .tag.rarity{
-    background: rgba(255,255,255,.10) !important;
-    opacity: .95 !important;
-  }
-
-  /* Ensure name/title wrap cleanly */
-  body.page-catalog.mobile-compact #catalogGrid .unitName{
-    white-space: normal !important;
-    overflow: visible !important;
-    text-overflow: clip !important;
-    overflow-wrap: anywhere !important;
-    word-break: break-word !important;
-    text-align: center !important;
-  }
-  body.page-catalog.mobile-compact #catalogGrid .unitTitle,
-  body.page-catalog.mobile-compact #catalogGrid .unitSub{
-    white-space: normal !important;
-    overflow: visible !important;
-    text-overflow: clip !important;
-    overflow-wrap: anywhere !important;
-    word-break: break-word !important;
-    text-align: center !important;
-  }
-
-  /* Stats: center and format as 2x2 grid */
   body.page-catalog.mobile-compact #catalogGrid .statLine{
     display: grid !important;
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    gap: 8px 14px !important;
-    justify-items: center !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 10px !important;
     width: 100% !important;
-    margin-top: 8px !important;
+    margin-top: 10px !important;
+    align-items: start !important;
+    justify-items: center !important;
   }
-  body.page-catalog.mobile-compact #catalogGrid .stat{
-    font-size: 13px !important;
-    font-weight: 900 !important;
-    letter-spacing: .2px !important;
+  body.page-catalog.mobile-compact #catalogGrid .statLine .stat{
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
     text-align: center !important;
     white-space: nowrap !important;
+    font-size: 16px !important; /* value */
+    font-weight: 900 !important;
+    line-height: 1.05 !important;
   }
-
-  /* Reduce overall card text density slightly */
-  body.page-catalog.mobile-compact #catalogGrid .leaderName{ font-size: 13px !important; text-align: center !important; }
-  body.page-catalog.mobile-compact #catalogGrid .leaderDesc{ font-size: 13px !important; line-height: 1.25 !important; text-align: center !important; overflow-wrap: anywhere !important; }
+  body.page-catalog.mobile-compact #catalogGrid .statLine .stat strong{
+    display:block !important;
+    font-size: 11px !important; /* label */
+    letter-spacing: .6px !important;
+    margin-bottom: 4px !important;
+    opacity: .95 !important;
+  }
 }
