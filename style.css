@@ -1834,44 +1834,77 @@ body.page-catalog.mobile-detailed #catalogGrid .unitDetails *{
   }
 }
 
-/* =========================================================
-   CATALOG MOBILE DETAILED: LEADER/STATS FIT (STRICT)
-   Request:
-   - Lower the stats line so it never sits on top of the portrait/image area.
-   - Make leader skill + stats small enough to stay within the right-column box.
-   - Leaves the Active/Passive skills panels (their box) unchanged.
-   Scope: Catalog only + mobile detailed only
-   ========================================================= */
-
+/* =====================
+   FINAL OVERRIDES: CATALOG MOBILE DETAILED FIT
+   Purpose:
+   - Force stats + leader to stay BELOW the portrait area (no overlay).
+   - Keep stats/leader compact enough to fit within the right column.
+   - Make skill entries visually separated; bold titles on their own line.
+   Notes:
+   - Uses only existing classes (#catalogGrid + body.mobile-detailed) so it applies
+     even if page-catalog class is missing.
+   ===================== */
 @media (max-width: 900px){
 
-  /* 1) Keep stats visually in the right column and push them down */
-  body.page-catalog.mobile-detailed #catalogGrid .unitDetails .statLine{
-    margin-top: 22px !important;  /* lower the whole stats block */
-    row-gap: 10px !important;
-    column-gap: 12px !important;
-  }
-
-  /* 2) Reduce stat label/value sizes to fit the meta box */
-  body.page-catalog.mobile-detailed #catalogGrid .unitDetails .statLine .stat strong{
-    font-size: 12px !important;
-    letter-spacing: .4px !important;
-  }
-  body.page-catalog.mobile-detailed #catalogGrid .unitDetails .statLine .stat{
-    font-size: 18px !important;   /* value (inherited) */
-    line-height: 1.05 !important;
-  }
-
-  /* 3) Leader block: ensure it starts below stats and uses smaller text */
-  body.page-catalog.mobile-detailed #catalogGrid .meta .leaderBlock{
-    margin-top: 14px !important;  /* after stats/leader separation */
+  /* Stats: hard-cancel any negative margins/transforms and push down */
+  body.mobile-detailed #catalogGrid .unitCard .statLine{
+    margin-top: 34px !important;   /* pushes stats below the portrait bottom */
+    margin-left: 0 !important;
+    width: 100% !important;
     padding-top: 8px !important;
+    position: relative !important;
+    top: 0 !important;
+    transform: none !important;
+    z-index: 2 !important;
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 10px 10px !important;
+    align-items: start !important;
+    justify-items: center !important;
   }
-  body.page-catalog.mobile-detailed #catalogGrid .meta .leaderName{
+
+  /* Two-line stat: label on row 1, value on row 2 (uses existing <strong>LABEL</strong>VALUE) */
+  body.mobile-detailed #catalogGrid .unitCard .statLine .stat{
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    font-size: 16px !important;     /* value size */
+    line-height: 1.05 !important;
+    font-weight: 900 !important;
+    min-width: 0 !important;
+    white-space: nowrap !important;
+  }
+  body.mobile-detailed #catalogGrid .unitCard .statLine .stat strong{
+    display: block !important;
+    font-size: 12px !important;     /* label size */
+    letter-spacing: .5px !important;
+    margin-bottom: 4px !important;
+  }
+
+  /* Leader: ensure it sits below stats and stays compact */
+  body.mobile-detailed #catalogGrid .unitCard .leaderBlock{
+    margin-top: 14px !important;
+    padding-top: 10px !important;
+  }
+  body.mobile-detailed #catalogGrid .unitCard .leaderName{
     font-size: 12px !important;
   }
-  body.page-catalog.mobile-detailed #catalogGrid .meta .leaderDesc{
+  body.mobile-detailed #catalogGrid .unitCard .leaderDesc{
     font-size: 12px !important;
     line-height: 1.25 !important;
+  }
+
+  /* Skill separation (Active/Passive): each skill line is its own block + title on its own line */
+  body.mobile-detailed #catalogGrid .unitDetails .panel .skillLine{
+    margin: 10px 0 !important;
+    padding-top: 10px !important;
+  }
+  body.mobile-detailed #catalogGrid .unitDetails .panel .skillLine + .skillLine{
+    border-top: 1px solid var(--line) !important;
+  }
+  body.mobile-detailed #catalogGrid .unitDetails .panel .skillLine strong{
+    display: block !important;      /* forces title to its own line */
+    margin-bottom: 6px !important;
   }
 }
