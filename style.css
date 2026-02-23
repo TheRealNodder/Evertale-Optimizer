@@ -1833,3 +1833,45 @@ body.page-catalog.mobile-detailed #catalogGrid .unitDetails *{
     --catLeftShift: calc(var(--catLeftCol) + var(--catColGap));
   }
 }
+
+/* =========================================================
+   CATALOG MOBILE DETAILED: LEADER/STATS FIT (STRICT)
+   Request:
+   - Lower the stats line so it never sits on top of the portrait/image area.
+   - Make leader skill + stats small enough to stay within the right-column box.
+   - Leaves the Active/Passive skills panels (their box) unchanged.
+   Scope: Catalog only + mobile detailed only
+   ========================================================= */
+
+@media (max-width: 900px){
+
+  /* 1) Keep stats visually in the right column and push them down */
+  body.page-catalog.mobile-detailed #catalogGrid .unitDetails .statLine{
+    margin-top: 22px !important;  /* lower the whole stats block */
+    row-gap: 10px !important;
+    column-gap: 12px !important;
+  }
+
+  /* 2) Reduce stat label/value sizes to fit the meta box */
+  body.page-catalog.mobile-detailed #catalogGrid .unitDetails .statLine .stat strong{
+    font-size: 12px !important;
+    letter-spacing: .4px !important;
+  }
+  body.page-catalog.mobile-detailed #catalogGrid .unitDetails .statLine .stat{
+    font-size: 18px !important;   /* value (inherited) */
+    line-height: 1.05 !important;
+  }
+
+  /* 3) Leader block: ensure it starts below stats and uses smaller text */
+  body.page-catalog.mobile-detailed #catalogGrid .meta .leaderBlock{
+    margin-top: 14px !important;  /* after stats/leader separation */
+    padding-top: 8px !important;
+  }
+  body.page-catalog.mobile-detailed #catalogGrid .meta .leaderName{
+    font-size: 12px !important;
+  }
+  body.page-catalog.mobile-detailed #catalogGrid .meta .leaderDesc{
+    font-size: 12px !important;
+    line-height: 1.25 !important;
+  }
+}
