@@ -1834,18 +1834,32 @@ body.page-catalog.mobile-detailed #catalogGrid .unitDetails *{
   }
 }
 
+
+/* Slightly smaller phones */
+@media (max-width: 520px){
+  body.mobile-detailed #catalogGrid .unitCard{
+    grid-template-columns: 210px 1fr !important;
+  }
+  body.mobile-detailed #catalogGrid .unitLeft{ width: 210px !important; min-width: 210px !important; }
+  body.mobile-detailed #catalogGrid .unitThumb{ width: 195px !important; height: 300px !important; }
+}
+
 /* =====================
-   FINAL OVERRIDES: CATALOG MOBILE DETAILED LAYOUT LOCK
-   Goal:
-   - Stop stats/leader from overlapping the portrait by putting them in their own grid rows.
-   - Stats ABOVE leader, both contained inside the card border.
-   - Do NOT touch the skills panel styling.
-   Applies to: mobile detailed on Catalog.
+   FINAL OVERRIDES: CATALOG MOBILE DETAILED (GRID + CONTENTS)
+   Why this exists:
+   - In the current markup, .statLine and .leaderBlock live INSIDE .meta.
+   - CSS Grid areas only work for DIRECT grid children. If .meta stays as one grid item,
+     stats/leader cannot move into their own rows and will appear "too high"/over the portrait.
+   Fix:
+   - Make .meta act like "transparent wrapper" via display: contents
+   - Assign grid areas to metaHeader/statLine/leaderBlock/unitDetails
+   - Cancel any left-extension hacks (negative margins / width calc) so everything stays in-bounds
+   Scope: Catalog page + mobile detailed only.
    ===================== */
 @media (max-width: 900px){
 
-  /* Lock the catalog detailed card to a predictable grid */
-  body.mobile-detailed #catalogGrid .unitCard{
+  /* 1) Define the grid on the card */
+  body.page-catalog.mobile-detailed #catalogGrid .unitCard{
     display: grid !important;
     grid-template-columns: 245px 1fr !important;
     grid-template-areas:
@@ -1855,85 +1869,102 @@ body.page-catalog.mobile-detailed #catalogGrid .unitDetails *{
       "details details" !important;
     gap: 12px !important;
     align-items: start !important;
+    overflow: hidden !important;
   }
 
-  /* Thumb/left column */
-  body.mobile-detailed #catalogGrid .unitLeft{ grid-area: thumb !important; width: 245px !important; min-width: 245px !important; }
-  body.mobile-detailed #catalogGrid .unitThumb{ width: 225px !important; height: 335px !important; border-radius: 16px !important; margin: 0 auto !important; }
-  body.mobile-detailed #catalogGrid .unitThumb img{ object-fit: cover !important; object-position: 50% 40% !important; }
+  /* 2) Left/portrait stays in thumb area */
+  body.page-catalog.mobile-detailed #catalogGrid .unitLeft{ grid-area: thumb !important; width: 245px !important; min-width: 245px !important; }
+  body.page-catalog.mobile-detailed #catalogGrid .unitThumb{ width: 225px !important; height: 335px !important; border-radius: 16px !important; margin: 0 auto !important; }
+  body.page-catalog.mobile-detailed #catalogGrid .unitThumb img{ width:100% !important; height:100% !important; object-fit: cover !important; object-position: 50% 40% !important; }
 
-  /* Meta (name/title/badges/toggles) stays in the right column */
-  body.mobile-detailed #catalogGrid .meta{ grid-area: meta !important; min-width: 0 !important; }
+  /* 3) Critical: make .meta not block grid placement of its children */
+  body.page-catalog.mobile-detailed #catalogGrid .meta{
+    display: contents !important;
+  }
 
-  /* Stats row: its own row, full width, never overlay */
-  body.mobile-detailed #catalogGrid .statLine{
+  /* 4) Place meta header in the right column (top-right area) */
+  body.page-catalog.mobile-detailed #catalogGrid .metaHeader{
+    grid-area: meta !important;
+    min-width: 0 !important;
+  }
+
+  /* 5) Stats: full-width row UNDER the portrait, centered */
+  body.page-catalog.mobile-detailed #catalogGrid .statLine{
     grid-area: stats !important;
     margin: 0 !important;
-    padding-top: 4px !important;
+    padding: 10px 0 0 0 !important;     /* pushes it below the thumb bottom visually */
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+
+    /* cancel any "extend into left gap" hacks */
+    margin-left: 0 !important;
+    transform: none !important;
     position: relative !important;
     top: 0 !important;
-    transform: none !important;
-    width: 100% !important;
 
     display: grid !important;
     grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
     gap: 10px 10px !important;
-    align-items: start !important;
     justify-items: center !important;
+    align-items: start !important;
+    text-align: center !important;
   }
 
-  /* Two-line stat: label then value */
-  body.mobile-detailed #catalogGrid .statLine .stat{
+  /* Two-line stat: LABEL then VALUE */
+  body.page-catalog.mobile-detailed #catalogGrid .statLine .stat{
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    text-align: center !important;
-    font-size: 16px !important;
-    line-height: 1.05 !important;
-    font-weight: 900 !important;
     white-space: nowrap !important;
     min-width: 0 !important;
+    font-size: 18px !important;        /* value */
+    line-height: 1.05 !important;
+    font-weight: 900 !important;
   }
-  body.mobile-detailed #catalogGrid .statLine .stat strong{
+  body.page-catalog.mobile-detailed #catalogGrid .statLine .stat strong{
     display: block !important;
-    font-size: 12px !important;
+    font-size: 12px !important;        /* label */
     letter-spacing: .5px !important;
     margin-bottom: 4px !important;
   }
 
-  /* Leader row: full width, directly under stats, contained */
-  body.mobile-detailed #catalogGrid .leaderBlock{
+  /* 6) Leader: full-width row under stats, centered, wrap inside card */
+  body.page-catalog.mobile-detailed #catalogGrid .leaderBlock{
     grid-area: leader !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+
     margin: 0 !important;
+    margin-left: 0 !important;         /* cancel negative margins from earlier rules */
     padding-top: 10px !important;
     border-top: 1px solid var(--line) !important;
-    width: 100% !important;
-    max-width: none !important;
-    box-sizing: border-box !important;
+    text-align: center !important;
   }
-  body.mobile-detailed #catalogGrid .leaderName{ font-size: 12px !important; }
-  body.mobile-detailed #catalogGrid .leaderDesc{
-    font-size: 12px !important;
-    line-height: 1.25 !important;
+  body.page-catalog.mobile-detailed #catalogGrid .leaderDesc{
     max-width: 100% !important;
     overflow-wrap: anywhere !important;
     word-break: break-word !important;
     white-space: normal !important;
   }
 
-  /* Skills/details section stays below leader */
-  body.mobile-detailed #catalogGrid .unitDetails{
+  /* 7) Details (skills panel): below leader */
+  body.page-catalog.mobile-detailed #catalogGrid .unitDetails{
     grid-area: details !important;
-    margin: 0 !important;
     width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    margin-left: 0 !important;         /* cancel earlier left-extension */
+    box-sizing: border-box !important;
   }
 
-  /* Ensure skill titles break to their own line (separate skills) */
-  body.mobile-detailed #catalogGrid .unitDetails .panel .skillLine strong{
+  /* Skill list readability: title (bold) on its own line + separators */
+  body.page-catalog.mobile-detailed #catalogGrid .unitDetails .panel .skillLine strong{
     display: block !important;
     margin-bottom: 6px !important;
   }
-  body.mobile-detailed #catalogGrid .unitDetails .panel .skillLine + .skillLine{
+  body.page-catalog.mobile-detailed #catalogGrid .unitDetails .panel .skillLine + .skillLine{
     border-top: 1px solid var(--line) !important;
     padding-top: 10px !important;
   }
@@ -1941,9 +1972,9 @@ body.page-catalog.mobile-detailed #catalogGrid .unitDetails *{
 
 /* Slightly smaller phones */
 @media (max-width: 520px){
-  body.mobile-detailed #catalogGrid .unitCard{
+  body.page-catalog.mobile-detailed #catalogGrid .unitCard{
     grid-template-columns: 210px 1fr !important;
   }
-  body.mobile-detailed #catalogGrid .unitLeft{ width: 210px !important; min-width: 210px !important; }
-  body.mobile-detailed #catalogGrid .unitThumb{ width: 195px !important; height: 300px !important; }
+  body.page-catalog.mobile-detailed #catalogGrid .unitLeft{ width: 210px !important; min-width: 210px !important; }
+  body.page-catalog.mobile-detailed #catalogGrid .unitThumb{ width: 195px !important; height: 300px !important; }
 }
