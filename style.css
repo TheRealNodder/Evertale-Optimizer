@@ -1968,6 +1968,48 @@ body.page-catalog.mobile-detailed #catalogGrid .unitDetails *{
     border-top: 1px solid var(--line) !important;
     padding-top: 10px !important;
   }
+
+  /*
+    Additional overrides to out-specify earlier mobile-detailed hacks.
+    Many prior patches in this stylesheet applied negative margins and width
+    calculations to the stats and leader sections. Those older rules use
+    selectors like `.unitDetails .statLine` and `.meta .leaderBlock`, which are
+    more specific than the generic `.statLine`/`.leaderBlock` rules above.
+    To ensure the grid-based layout remains intact, we repeat the final
+    definitions here with the same specific selectors, cancelling any
+    lingering margin or width adjustments.
+  */
+  body.page-catalog.mobile-detailed #catalogGrid .unitDetails .statLine{
+    grid-area: stats !important;
+    margin: 0 !important;
+    padding: 10px 0 0 0 !important;     /* ensure spacing below the portrait */
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    margin-left: 0 !important;
+    transform: none !important;
+    position: relative !important;
+    top: 0 !important;
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 10px 10px !important;
+    justify-items: center !important;
+    align-items: start !important;
+    text-align: center !important;
+  }
+
+  body.page-catalog.mobile-detailed #catalogGrid .meta .leaderBlock{
+    grid-area: leader !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+    margin-left: 0 !important;         /* cancel earlier negative margin hacks */
+    padding-top: 10px !important;
+    border-top: 1px solid var(--line) !important;
+    text-align: center !important;
+    clear: none !important;
+  }
 }
 
 /* Slightly smaller phones */
