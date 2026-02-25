@@ -1888,6 +1888,80 @@ body.page-catalog.mobile-detailed #catalogGrid .unitDetails *{
     min-width: 0 !important;
   }
 
+  /*
+    Meta header reflow (mobile-detailed / catalog only):
+    - Keep badges (chipCol) in the top-right (do not move their position)
+    - Move name + title UNDER the badges, centered within the available space
+    - Keep star toggles (★5/★6/★FA) horizontal like landscape, but sized to fit
+      within the right-column constraints
+  */
+  body.page-catalog.mobile-detailed #catalogGrid .metaHeader{
+    display: grid !important;
+    grid-template-columns: 1fr auto !important;
+    grid-template-rows: auto auto auto !important;
+    grid-template-areas:
+      "left badges"
+      "left name"
+      "left toggles" !important;
+    column-gap: 12px !important;
+    row-gap: 8px !important;
+    align-items: start !important;
+  }
+
+  /* Flatten metaMain so nameBlock/stateRow can be placed as grid items */
+  body.page-catalog.mobile-detailed #catalogGrid .metaMain{ display: contents !important; }
+
+  /* Badges stay top-right */
+  body.page-catalog.mobile-detailed #catalogGrid .chipCol{
+    grid-area: badges !important;
+    align-items: flex-end !important;
+    justify-self: end !important;
+    align-self: start !important;
+  }
+
+  /* Name + title under badges, centered */
+  body.page-catalog.mobile-detailed #catalogGrid .nameBlock{
+    grid-area: name !important;
+    justify-self: center !important;
+    align-self: start !important;
+    text-align: center !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+  body.page-catalog.mobile-detailed #catalogGrid .unitName,
+  body.page-catalog.mobile-detailed #catalogGrid .unitTitle,
+  body.page-catalog.mobile-detailed #catalogGrid .unitSub{
+    text-align: center !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+  }
+
+  /* Toggles row under name/title: horizontal like landscape, but constrained */
+  body.page-catalog.mobile-detailed #catalogGrid .stateRow{
+    grid-area: toggles !important;
+    justify-self: center !important;
+    align-self: start !important;
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 10px !important;
+    flex-wrap: nowrap !important;
+    width: 100% !important;
+    margin-top: 2px !important;
+  }
+  body.page-catalog.mobile-detailed #catalogGrid .stateRow .stateBtn{
+    width: 34px !important;
+    height: 34px !important;
+    border-radius: 999px !important;
+  }
+  body.page-catalog.mobile-detailed #catalogGrid .stateRow .stateBtn::before{
+    font-size: 10px !important;
+  }
+
   /* 5) Stats: full-width row UNDER the portrait, centered */
   body.page-catalog.mobile-detailed #catalogGrid .statLine{
     grid-area: stats !important;
