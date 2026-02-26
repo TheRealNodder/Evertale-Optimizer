@@ -1641,208 +1641,14 @@ body.page-catalog.mobile-detailed #catalogGrid .unitDetails *{
   min-width: 0 !important;
 }
 
-/* =========================================================
-   CATALOG MOBILE DETAILED: LEADER TEXT FILL LEFT GAP (STRICT, NO LAYOUT MOVE)
-   Goal:
-   - Keep the current 2-column detailed layout exactly the same.
-   - Only make the Leader/description block visually extend into the empty
-     space under the portrait (the red-scribble area), so the card looks shorter/cleaner.
-   How:
-   - Expand .leaderBlock width using negative margin + width calc.
-   - No grid/template changes; badges/toggles/portrait positions untouched.
-   ========================================================= */
 
-@media (max-width: 900px){
-  /* Default detailed catalog left column + gap (matches your current rules) */
-  body.page-catalog.mobile-detailed{
-    --catLeftCol: 245px;
-    --catColGap: 14px;
-  }
-
-  /* Extend the leader block across both columns (visual only) */
-  body.page-catalog.mobile-detailed #catalogGrid .meta .leaderBlock{
-    width: calc(100% + var(--catLeftCol) + var(--catColGap)) !important;
-    margin-left: calc(-1 * (var(--catLeftCol) + var(--catColGap))) !important;
-    max-width: none !important;
-    padding-left: 12px !important;
-    padding-right: 12px !important;
-    box-sizing: border-box !important;
-  }
-
-  /* Ensure the text wraps cleanly and uses the new width */
-  body.page-catalog.mobile-detailed #catalogGrid .meta .leaderName,
-  body.page-catalog.mobile-detailed #catalogGrid .meta .leaderDesc{
-    max-width: none !important;
-    overflow-wrap: anywhere !important;
-    word-break: break-word !important;
-    white-space: normal !important;
-  }
-}
-
-/* Smaller phones where the catalog left column shrinks */
-@media (max-width: 520px){
-  body.page-catalog.mobile-detailed{
-    --catLeftCol: 210px;
-    --catColGap: 14px;
-  }
-}
 
 /* =========================================================
-   CATALOG MOBILE DETAILED: EXTEND PANELS + SKILL LINE BREAKS (STRICT)
-   Requests:
-   - Leader block: drop down a few px so it does not overlap the portrait.
-   - Active/Passive skill panels: extend into the left empty space the same way as leader.
-   - In each skill entry, the bold title must be on its own line; description below it.
-   Scope:
-   - Catalog only + mobile detailed only
-   - Does NOT touch badges/toggles/portrait/card geometry.
+   NOTE:
+   Older mobile-detailed catalog override blocks were removed to avoid
+   conflicting negative margins/width hacks. The grid-based solution below
+   is the single source of truth.
    ========================================================= */
-
-@media (max-width: 900px){
-  body.page-catalog.mobile-detailed{
-    --catLeftCol: 245px;
-    --catColGap: 14px;
-  }
-
-  /* 1) Leader: same extension, but shifted down to avoid portrait overlap */
-  body.page-catalog.mobile-detailed #catalogGrid .meta .leaderBlock{
-    width: calc(100% + var(--catLeftCol) + var(--catColGap)) !important;
-    margin-left: calc(-1 * (var(--catLeftCol) + var(--catColGap))) !important;
-    margin-top: 12px !important;             /* moved down a bit */
-    padding-top: 10px !important;            /* extra separation from the line above */
-    max-width: none !important;
-    box-sizing: border-box !important;
-  }
-
-  /* 2) Active/Passive panels: extend like leader (fill the empty left space) */
-  body.page-catalog.mobile-detailed #catalogGrid .unitDetails{
-    width: calc(100% + var(--catLeftCol) + var(--catColGap)) !important;
-    margin-left: calc(-1 * (var(--catLeftCol) + var(--catColGap))) !important;
-    max-width: none !important;
-    box-sizing: border-box !important;
-    margin-top: 12px !important;
-  }
-  body.page-catalog.mobile-detailed #catalogGrid .unitDetails .panel{
-    width: 100% !important;
-    max-width: none !important;
-    min-width: 0 !important;
-  }
-
-  /* 3) Skill formatting: bold title on its own line, description below */
-  body.page-catalog.mobile-detailed #catalogGrid .unitDetails .skillLine{
-    margin: 10px 0 !important;
-  }
-  body.page-catalog.mobile-detailed #catalogGrid .unitDetails .skillLine strong{
-    display: block !important;
-    margin: 0 0 6px 0 !important;
-    line-height: 1.15 !important;
-  }
-  body.page-catalog.mobile-detailed #catalogGrid .unitDetails .skillText{
-    display: block !important;
-    margin: 0 !important;
-    white-space: normal !important;
-    overflow-wrap: anywhere !important;
-    word-break: break-word !important;
-    line-height: 1.35 !important;
-  }
-}
-
-/* Smaller phones where the catalog left column shrinks */
-@media (max-width: 520px){
-  body.page-catalog.mobile-detailed{
-    --catLeftCol: 210px;
-    --catColGap: 14px;
-  }
-}
-
-/* =========================================================
-   CATALOG MOBILE DETAILED: PREVENT STATS/LEADER OVER IMAGE (STRICT)
-   - Keeps the Active/Passive skills panel untouched.
-   - Only moves the STAT line + Leader block down so they do not sit over the portrait.
-   - Catalog only + mobile detailed only.
-   ========================================================= */
-@media (max-width: 900px){
-  /* Create breathing room between meta header (top) and the stats/leader section */
-  body.page-catalog.mobile-detailed #catalogGrid .statLine{
-    margin-top: 18px !important;
-  }
-
-  /* The leader block is extended left; ensure it starts below the portrait area */
-  body.page-catalog.mobile-detailed #catalogGrid .meta .leaderBlock{
-    margin-top: 22px !important;
-  }
-}
-
-/* =========================================================
-   CATALOG MOBILE DETAILED: FIX STATS/LEADER OVERLAP + SKILL SEPARATORS (STRICT)
-   - The Active/Passive skills box (panel styling) is left alone.
-   - Fixes STATS + LEADER overlapping the portrait by cancelling the left-extension
-     on the stats row and ensuring it sits below the image area.
-   - Adds clean separators between multiple skills inside Active/Passive panels
-     (each skillLine becomes visually distinct; bold title already on its own line).
-   Scope: Catalog only + mobile-detailed only
-   ========================================================= */
-
-@media (max-width: 900px){
-  body.page-catalog.mobile-detailed{
-    --catLeftCol: 245px;
-    --catColGap: 14px;
-    --catLeftShift: calc(var(--catLeftCol) + var(--catColGap));
-  }
-
-  /* 1) Stats: cancel any "extend left" effect so stats never sit over the portrait */
-  body.page-catalog.mobile-detailed #catalogGrid .unitDetails .statLine{
-    margin-left: var(--catLeftShift) !important;
-    width: calc(100% - var(--catLeftShift)) !important;
-    margin-top: 12px !important;
-    position: relative !important;
-    z-index: 1 !important;
-  }
-
-  /* Keep stat grid from spilling outside its column */
-  body.page-catalog.mobile-detailed #catalogGrid .unitDetails .statLine .stat{
-    min-width: 0 !important;
-  }
-
-  /* 2) Leader: ensure it starts below the portrait edge (no overlap) */
-  body.page-catalog.mobile-detailed #catalogGrid .meta .leaderBlock{
-    clear: both !important;
-    margin-top: 16px !important;
-  }
-
-  /* 3) Active/Passive: visually separate each skill entry */
-  body.page-catalog.mobile-detailed #catalogGrid .unitDetails .panel .skillLine{
-    padding-top: 10px !important;
-    margin: 10px 0 !important;
-  }
-  body.page-catalog.mobile-detailed #catalogGrid .unitDetails .panel .skillLine + .skillLine{
-    border-top: 1px solid var(--line) !important;
-  }
-
-  body.page-catalog.mobile-detailed #catalogGrid .unitDetails .panel .skillLine strong{
-    display: block !important;
-    margin-bottom: 6px !important;
-  }
-}
-
-/* Smaller phones where the catalog left column shrinks */
-@media (max-width: 520px){
-  body.page-catalog.mobile-detailed{
-    --catLeftCol: 210px;
-    --catColGap: 14px;
-    --catLeftShift: calc(var(--catLeftCol) + var(--catColGap));
-  }
-}
-
-
-/* Slightly smaller phones */
-@media (max-width: 520px){
-  body.mobile-detailed #catalogGrid .unitCard{
-    grid-template-columns: 210px 1fr !important;
-  }
-  body.mobile-detailed #catalogGrid .unitLeft{ width: 210px !important; min-width: 210px !important; }
-  body.mobile-detailed #catalogGrid .unitThumb{ width: 195px !important; height: 300px !important; }
-}
 
 /* =====================
    FINAL OVERRIDES: CATALOG MOBILE DETAILED (GRID + CONTENTS)
@@ -1886,6 +1692,8 @@ body.page-catalog.mobile-detailed #catalogGrid .unitDetails *{
   body.page-catalog.mobile-detailed #catalogGrid .metaHeader{
     grid-area: meta !important;
     min-width: 0 !important;
+    min-height: 335px !important;
+    align-content: center !important;
   }
 
   /*
@@ -1966,7 +1774,8 @@ body.page-catalog.mobile-detailed #catalogGrid .unitDetails *{
   body.page-catalog.mobile-detailed #catalogGrid .statLine{
     grid-area: stats !important;
     margin: 0 !important;
-    padding: 10px 0 0 0 !important;     /* pushes it below the thumb bottom visually */
+    margin-top: -3px !important;
+    padding: 7px 0 0 0 !important;     /* pushes it below the thumb bottom visually */
     width: 100% !important;
     max-width: 100% !important;
     box-sizing: border-box !important;
@@ -2056,7 +1865,8 @@ body.page-catalog.mobile-detailed #catalogGrid .unitDetails *{
   body.page-catalog.mobile-detailed #catalogGrid .unitDetails .statLine{
     grid-area: stats !important;
     margin: 0 !important;
-    padding: 10px 0 0 0 !important;     /* ensure spacing below the portrait */
+    margin-top: -3px !important;
+    padding: 7px 0 0 0 !important;     /* ensure spacing below the portrait */
     width: 100% !important;
     max-width: 100% !important;
     box-sizing: border-box !important;
@@ -2093,4 +1903,5 @@ body.page-catalog.mobile-detailed #catalogGrid .unitDetails *{
   }
   body.page-catalog.mobile-detailed #catalogGrid .unitLeft{ width: 210px !important; min-width: 210px !important; }
   body.page-catalog.mobile-detailed #catalogGrid .unitThumb{ width: 195px !important; height: 300px !important; }
+  body.page-catalog.mobile-detailed #catalogGrid .metaHeader{ min-height: 300px !important; }
 }
