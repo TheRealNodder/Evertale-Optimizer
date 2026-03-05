@@ -484,6 +484,61 @@
     return team;
   }
 
+  // Fallback fill used when strict filtering (preset/mono/candidate caps) produces
+  // fewer than the requested size. This intentionally relaxes constraints and
+  // prioritizes "best available fit" so platoons don't end up with empty slots.
+  //
+  // Strategy:
+  // 1) Greedy add using teamScore against a relaxed pool (no preset/mono filters)
+  // 2) If still short, fill by highest base to guarantee completion
+  //
+  // Note: This does NOT allow duplicates within the same team. Callers may
+  // optionally allow reuse across teams if the roster is exhausted.
+  function fillTeamToSizeRelaxed(doctrine, team, relaxedPool, size, options) {
+    const chosen = new Set(team.map(u => normId(u.id)));
+    const lookahead = Math.max(200, doctrine.optimizerSearch?.greedyLookahead ?? 80);
+
+    // Phase 1: synergy-aware greedy add
+    while (team.length < size) {
+      let best = null;
+      let bestScore = -Infinity;
+      let seen = 0;
+
+      for (const u of relaxedPool) {
+        const id = normId(u.id);
+        if (chosen.has(id)) continue;
+        if (seen++ >= lookahead) break;
+
+        const score = teamScore(doctrine, [...team, u], options);
+        if (score > bestScore ||
+            (score === bestScore && best && u.__opt.base > best.__opt.base) ||
+            (score === bestScore && best && u.__opt.base === best.__opt.base && id < normId(best.id))) {
+          bestScore = score;
+          best = u;
+        }
+      }
+
+      if (!best) break;
+      team.push(best);
+      chosen.add(normId(best.id));
+    }
+
+    // Phase 2: guarantee completion (highest base)
+    if (team.length < size) {
+      const remaining = relaxedPool
+        .filter(u => !chosen.has(normId(u.id)))
+        .sort((a,b)=> (b.__opt.base - a.__opt.base) || (normId(a.id) < normId(b.id) ? -1 : 1));
+
+      for (const u of remaining) {
+        if (team.length >= size) break;
+        team.push(u);
+        chosen.add(normId(u.id));
+      }
+    }
+
+    return team;
+  }
+
   function assignStoryMainBack(team8) {
     // heuristic: fast/control -> main, atk/sustain -> back
     const scored = team8.map(u => {
@@ -588,6 +643,25 @@
       }
 
       const team = buildTeamFixedSize(doctrine, candidates, forced, 5, options);
+
+      // If strict candidate filtering results in an incomplete platoon, fill the
+      // remaining slots with the best available units (relaxed constraints).
+      if (team.length < 5) {
+        const chosenIds = new Set(team.map(u => normId(u.id)));
+
+        // Prefer unused units first
+        let relaxedPool = units.filter(u => !forcedIds.has(normId(u.id)) && !chosenIds.has(normId(u.id)) && !consumed.has(normId(u.id)));
+        relaxedPool = topCandidates(relaxedPool, Math.max(400, relaxedPool.length));
+
+        // If roster is exhausted (common late platoons), allow reuse across teams
+        // so we still output 5 slots. This keeps duplicates OUT of the same platoon.
+        if (relaxedPool.length === 0) {
+          relaxedPool = units.filter(u => !forcedIds.has(normId(u.id)) && !chosenIds.has(normId(u.id)));
+          relaxedPool = topCandidates(relaxedPool, Math.max(400, relaxedPool.length));
+        }
+
+        fillTeamToSizeRelaxed(doctrine, team, relaxedPool, 5, options);
+      }
       const ids = team.map(u => normId(u.id));
 
       // mark consumed
