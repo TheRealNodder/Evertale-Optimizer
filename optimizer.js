@@ -34,6 +34,7 @@ const state = {
   layout: null,
   locks: null, // { storyMain:bool[5], storyBack:bool[3], platoons:bool[20][5] }
   mode: "story",
+  exampleMode: false, // when true, slots can show units not owned (greyed out)
 };
 
 function el(id) { return document.getElementById(id); }
@@ -171,14 +172,14 @@ function optionList(units) {
   return opts.join("");
 }
 
-function slotCardHTML(slotKey, idx, currentId, ownedUnits, locked){
+function slotCardHTML(slotKey, idx, currentId, poolUnits, locked, ownedIdSet){
   const currentNorm = normId(currentId || "");
   const isPlatoon = String(slotKey).startsWith("platoon_");
 
-  // Build options from ownedUnits
+  // Build options from the current pool (owned for normal mode, all for example mode)
   const opts = [];
   opts.push({ value: "", label: "(empty)" });
-  for (const u of (ownedUnits || [])) {
+  for (const u of (poolUnits || [])) {
     const id = normId(u?.id);
     if (!id) continue;
     const el = u?.element || "";
@@ -186,12 +187,15 @@ function slotCardHTML(slotKey, idx, currentId, ownedUnits, locked){
     opts.push({ value: id, label: `${u?.name || "?"} (${el} ${rar})` });
   }
 
-  const selectedUnit = (ownedUnits || []).find(u => normId(u?.id) === currentNorm) || null;
+  const selectedUnit = (poolUnits || []).find(u => normId(u?.id) === currentNorm) || null;
   const name = selectedUnit?.name || "?";
   const title = selectedUnit?.title || (isPlatoon ? "Select a unit" : "");
   const element = selectedUnit?.element || "";
   const rarity = selectedUnit?.rarity || "";
   const kind = isPlatoon ? "platoon" : (String(slotKey).includes("Main") ? "main" : "back");
+
+  const isOwned = !currentNorm ? true : !!(ownedIdSet && ownedIdSet.has(currentNorm));
+  const ownedClass = (!isOwned && selectedUnit) ? "missingOwned" : "";
 
   const elClass = element ? `el-${String(element).toLowerCase()}` : "el-none";
   const rarClass = rarity ? `rar-${String(rarity).toLowerCase()}` : "rar-none";
@@ -213,7 +217,7 @@ function slotCardHTML(slotKey, idx, currentId, ownedUnits, locked){
   // Platoon: compact card to match your revamped UI
   if (isPlatoon) {
     return `
-      <div class="slotCard platoonSlotCard ${kind} ${elClass} ${rarClass}" data-element="${element}" data-rarity="${rarity}">
+      <div class="slotCard platoonSlotCard ${kind} ${elClass} ${rarClass} ${ownedClass}" data-element="${element}" data-rarity="${rarity}">
         <div class="slotTop">
           <div class="slotImg">${img}</div>
         </div>
@@ -239,7 +243,7 @@ function slotCardHTML(slotKey, idx, currentId, ownedUnits, locked){
   const badges = selectedUnit ? `<div class="slotBadges"><span class="badge">${rarity}</span><span class="badge">${element}</span></div>` : "";
 
   return `
-    <div class="slotCard storySlotCard ${kind} ${elClass} ${rarClass}" data-element="${element}" data-rarity="${rarity}">
+    <div class="slotCard storySlotCard ${kind} ${elClass} ${rarClass} ${ownedClass}" data-element="${element}" data-rarity="${rarity}">
       <div class="slotTop">
         <div class="slotImg">${selectedUnit?.image ? `<img src="${selectedUnit.image}" alt="${name}" loading="lazy" decoding="async">` : ""}</div>
         <div class="slotName">${name}</div>
@@ -314,12 +318,13 @@ function renderStory() {
   const backEl = el("storyBack");
   if (!mainEl || !backEl) return;
 
+  const pool = state.exampleMode ? state.all : state.ownedUnits;
   mainEl.innerHTML = state.layout.storyMain.map((id,i) =>
-    slotCardHTML("storyMain", i, id, state.ownedUnits, getLockFor("storyMain", i))
+    slotCardHTML("storyMain", i, id, pool, getLockFor("storyMain", i), state.ownedIds)
   ).join("");
 
   backEl.innerHTML = state.layout.storyBack.map((id,i) =>
-    slotCardHTML("storyBack", i, id, state.ownedUnits, getLockFor("storyBack", i))
+    slotCardHTML("storyBack", i, id, pool, getLockFor("storyBack", i), state.ownedIds)
   ).join("");
 }
 
@@ -327,9 +332,10 @@ function renderPlatoons() {
   const grid = el("platoonsGrid");
   if (!grid) return;
 
+  const pool = state.exampleMode ? state.all : state.ownedUnits;
   grid.innerHTML = state.layout.platoons.map((row,p) => {
     const slots = row.map((id,i) =>
-      slotCardHTML(`platoon_${p}`, i, id, state.ownedUnits, getLockFor(`platoon_${p}`, i))
+      slotCardHTML(`platoon_${p}`, i, id, pool, getLockFor(`platoon_${p}`, i), state.ownedIds)
     ).join("");
 
     return `
@@ -395,7 +401,54 @@ function renderAll() {
   wireSelects();
 }
 
+function buildExampleOptions() {
+  // Example teams ignore owned constraints for selection, but we keep ownedIds for grey-out.
+  const teamType = (el("teamTypeSelect")?.value || getTeamTypePref());
+  const preset = (el("presetSelect")?.value || getPresetPref());
+  const style = (el("exampleStyleSelect")?.value || "best");
+
+  const options = buildEngineOptions();
+
+  // Force preset behavior for examples
+  // - "best": let engine auto-pick (and we allow presetSelect to bias if user chose a specific preset)
+  // - other styles: choose a practical preset mapping
+  if (style === "best") {
+    options.presetTag = (preset === "auto") ? "" : preset;
+    options.presetMode = (preset === "auto") ? "auto" : "hard";
+  } else if (style === "aggro") {
+    // Tanky / DR / guard-leaning examples
+    options.presetTag = "hpBuff";
+    options.presetMode = "hard";
+  } else if (style === "timestop") {
+    // Tempo/control examples
+    options.presetTag = "turn";
+    options.presetMode = "hard";
+  } else if (style === "sustain") {
+    // Healing / cleanse / revive examples
+    options.presetTag = "heal";
+    options.presetMode = "hard";
+  }
+
+  // Keep team type selection as-is
+  if (teamType === "mono") options.doctrineOverrides.monoVsRainbow = { selectionMode: "force_mono" };
+  else if (teamType === "rainbow") options.doctrineOverrides.monoVsRainbow = { selectionMode: "force_rainbow" };
+  else options.doctrineOverrides.monoVsRainbow = { selectionMode: "auto" };
+
+  return options;
+}
+
+function buildExampleTeam() {
+  if (!window.OptimizerEngine || typeof window.OptimizerEngine.run !== "function") return;
+  if (!state.all || !state.all.length) return;
+
+  state.exampleMode = true;
+  const options = buildExampleOptions();
+  const result = window.OptimizerEngine.run(state.all, options);
+  applyEngineResult(result);
+}
+
 function clearTeams() {
+  state.exampleMode = false;
   state.layout = {
     storyMain: Array(STORY_MAIN).fill(""),
     storyBack: Array(STORY_BACK).fill(""),
@@ -456,24 +509,18 @@ function buildEngineOptions() {
   return options;
 }
 
-function structuredCloneSafe(obj) {
-  try { return structuredClone(obj); } catch { return JSON.parse(JSON.stringify(obj || {})); }
+function runEngine() {
+  // normal optimizer = owned-only
+  state.exampleMode = false;
+  const owned = state.ownedUnits || [];
+  if (!owned.length || !window.OptimizerEngine || typeof window.OptimizerEngine.run !== "function") return;
+  const options = buildEngineOptions();
+  const result = window.OptimizerEngine.run(owned, options);
+  applyEngineResult(result);
 }
 
-function runEngine() {
-  if (!window.OptimizerEngine || typeof window.OptimizerEngine.run !== "function") {
-    console.error("OptimizerEngine not loaded");
-    return;
-  }
-
-  window.__optimizerOwnedUnits = state.ownedUnits;
-  const options = buildEngineOptions();
-  window.__optimizerOptions = options;
-
-  const result = window.OptimizerEngine.run(window.__optimizerOwnedUnits || [], options);
-  window.__optimizerResult = result;
-
-  applyEngineResult(result);
+function structuredCloneSafe(obj) {
+  try { return structuredClone(obj); } catch { return JSON.parse(JSON.stringify(obj || {})); }
 }
 
 function installModeButtons() {
@@ -521,6 +568,7 @@ function unlockAllLocks() {
 
 // Hook entrypoint
 window.refreshOptimizerFromOwned = function refreshOptimizerFromOwned() {
+  state.exampleMode = false;
   state.ownedIds = getOwnedIds();
   state.ownedUnits = state.all.filter(u => state.ownedIds.has(normId(u.id)));
   window.__optimizerOwnedUnits = state.ownedUnits;
@@ -543,6 +591,7 @@ async function init() {
   window.__optimizerOwnedUnits = state.ownedUnits;
 
   el("buildBest")?.addEventListener("click", runEngine);
+  el("buildExample")?.addEventListener("click", buildExampleTeam);
   el("clearTeams")?.addEventListener("click", clearTeams);
 
   el("lockFilledStory")?.addEventListener("click", lockFilledStorySlots);
