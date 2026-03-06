@@ -673,6 +673,23 @@
     return platoons;
   }
 
+  function scoreResult(doctrine, result, unitsById, options) {
+    let total = 0;
+
+    const storyUnits = [
+      ...((result?.story?.main || []).map(id => unitsById.get(normId(id))).filter(Boolean)),
+      ...((result?.story?.back || []).map(id => unitsById.get(normId(id))).filter(Boolean)),
+    ];
+    if (storyUnits.length) total += teamScore(doctrine, storyUnits, options) * 2.0;
+
+    for (const row of (result?.platoons || [])) {
+      const team = (row?.units || []).map(id => unitsById.get(normId(id))).filter(Boolean);
+      if (team.length) total += teamScore(doctrine, team, options);
+    }
+
+    return total;
+  }
+
   // ---------- RUN ----------
   function run(ownedUnits, options) {
     const doctrine = getDoctrineMerged(options || {});
@@ -699,7 +716,9 @@
     const story = buildStory(doctrine, units, opts, unitsById);
     const platoons = buildPlatoons(doctrine, units, story.used, opts, unitsById);
 
-    return { story: { main: story.main, back: story.back }, platoons, presetKey: opts.presetKey || "" };
+    const result = { story: { main: story.main, back: story.back }, platoons, presetKey: opts.presetKey || "" };
+    result.totalScore = scoreResult(doctrine, result, unitsById, opts);
+    return result;
   }
 
   window.OptimizerEngine = { run };
