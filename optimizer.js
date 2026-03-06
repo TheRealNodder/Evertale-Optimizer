@@ -445,8 +445,37 @@ function buildExampleTeam() {
   if (!state.all || !state.all.length) return;
 
   state.exampleMode = true;
-  const options = buildExampleOptions();
-  const result = window.OptimizerEngine.run(state.all, options);
+  // Example teams should only suggest SSRs and can include units not owned.
+  const ssrPool = state.all.filter(u => String(u?.rarity || "").toUpperCase() === "SSR");
+  const style = (el("exampleStyleSelect")?.value || "best");
+
+  let result = null;
+
+  // For "best", actually try all practical preset families and keep the
+  // highest-scoring example instead of relying on the generic auto path.
+  if (style === "best") {
+    const candidatePresets = ["burn","poison","sleep","stun","heal","turn","cleanse","atkBuff","hpBuff"];
+    let best = null;
+    let bestScore = -Infinity;
+
+    for (const presetKey of candidatePresets) {
+      const options = buildEngineOptions();
+      options.presetTag = presetKey;
+      options.presetMode = "hard";
+      const candidate = window.OptimizerEngine.run(ssrPool, options);
+      const score = Number(candidate?.totalScore || 0);
+      if (score > bestScore) {
+        best = candidate;
+        bestScore = score;
+      }
+    }
+
+    result = best;
+  } else {
+    const options = buildExampleOptions();
+    result = window.OptimizerEngine.run(ssrPool, options);
+  }
+
   applyEngineResult(result);
 }
 
