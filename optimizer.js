@@ -415,16 +415,19 @@ function buildExampleOptions() {
   if (style === "best") {
     options.presetTag = (preset === "auto") ? "" : preset;
     options.presetMode = (preset === "auto") ? "auto" : "hard";
+  } else if (["burn","poison","sleep","stun","heal","turn","atkBuff","hpBuff","cleanse"].includes(style)) {
+    options.presetTag = style;
+    options.presetMode = "hard";
   } else if (style === "aggro") {
-    // Tanky / DR / guard-leaning examples
-    options.presetTag = "hpBuff";
+    // Practical aggressive examples: bias toward ATK buff / pressure teams.
+    options.presetTag = "atkBuff";
     options.presetMode = "hard";
   } else if (style === "timestop") {
-    // Tempo/control examples
+    // Tempo/control examples.
     options.presetTag = "turn";
     options.presetMode = "hard";
   } else if (style === "sustain") {
-    // Healing / cleanse / revive examples
+    // Healing / cleanse / revive examples.
     options.presetTag = "heal";
     options.presetMode = "hard";
   }
