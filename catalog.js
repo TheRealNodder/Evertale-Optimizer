@@ -413,14 +413,15 @@ async function init() {
   applyMobileViewClass(getMobileViewPref());
   syncViewToggleText();
 
-  const [charsJson, weaponsJson, accJson, bossesJson] = await Promise.all([
-    fetchJson(DATA.characters),
+  const [charsArr, weaponsJson, accJson, bossesJson] = await Promise.all([
+    window.EvertaleData && window.EvertaleData.loadCharactersMerged
+      ? window.EvertaleData.loadCharactersMerged()
+      : [],
     fetchJson(DATA.weapons),
     fetchJson(DATA.accessories),
     fetchJson(DATA.bosses),
   ]);
 
-  const charsArr = toArray(charsJson, "characters");
   const weaponsArr = toArray(weaponsJson, "weapons");
   const accArr = toArray(accJson, "accessories");
   const bossesArr = toArray(bossesJson, "bosses");

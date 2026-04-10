@@ -2,6 +2,10 @@
 
 :root{
   --bg:#0b0d12;
+  --season-a:#0b0d12;
+  --season-b:#182131;
+  --season-c:#24324a;
+  --season-d:#dce6ff;
   --panel:#121522;
   --panel2:#0f1220;
   --text:#e9ecff;
@@ -13,10 +17,24 @@
 
 *{box-sizing:border-box}
 html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+body{position:relative;min-height:100vh;background:linear-gradient(180deg, rgba(7,10,18,.72), rgba(7,10,18,.90));}
+body::before{content:"";position:fixed;inset:0;z-index:-2;background:
+  radial-gradient(circle at top left, color-mix(in srgb, var(--season-c) 72%, transparent) 0%, transparent 38%),
+  radial-gradient(circle at top right, color-mix(in srgb, var(--season-d) 24%, transparent) 0%, transparent 34%),
+  linear-gradient(135deg, var(--season-a) 0%, var(--season-b) 36%, var(--season-c) 68%, color-mix(in srgb, var(--season-d) 38%, var(--season-b)) 100%);
+  opacity:1;pointer-events:none;}
+body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.22;background:
+  linear-gradient(180deg, rgba(255,255,255,.05), transparent 24%),
+  radial-gradient(circle at 20% 20%, rgba(255,255,255,.12) 0 1px, transparent 1px 100%),
+  radial-gradient(circle at 80% 28%, rgba(255,255,255,.08) 0 1px, transparent 1px 100%);background-size:auto, 22px 22px, 28px 28px;background-position:0 0, 0 0, 8px 10px;}
+body[data-theme-holiday="christmas"]::after,
+body[data-theme-holiday="newyear"]::after,
+body[data-theme-holiday="valentine"]::after,
+body[data-theme-holiday="easter"]::after{opacity:.28;}
 .hidden{display:none!important}
 
 /* Top bar */
-.topbar{position:sticky;top:0;z-index:10;background:rgba(11,13,18,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:10px 12px}
+.topbar{position:sticky;top:0;z-index:10;background:rgba(8,10,18,.76);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:10px 12px}
 .topbar-inner{display:flex;align-items:center;justify-content:space-between;gap:12px;max-width:1150px;margin:0 auto}
 .brandTitle{font-weight:900;letter-spacing:.2px}
 .brandSub{font-size:12px;color:var(--muted);margin-top:2px}

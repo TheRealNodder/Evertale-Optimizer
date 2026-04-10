@@ -90,12 +90,10 @@ function syncViewToggleText() {
 }
 
 async function loadCharacters() {
-  const res = await fetch(DATA_CHARACTERS, { cache: "no-store" });
-  if (!res.ok) throw new Error(`Failed to fetch ${DATA_CHARACTERS}: ${res.status}`);
-  const json = await res.json();
-  const raw = Array.isArray(json) ? json : (json && Array.isArray(json.characters) ? json.characters : []);
+  const raw = window.EvertaleData && window.EvertaleData.loadCharactersMerged
+    ? await window.EvertaleData.loadCharactersMerged()
+    : [];
 
-  // Deduplicate by ID (keep first occurrence)
   const seen = new Set();
   const deduped = [];
   for (const u of raw) {
