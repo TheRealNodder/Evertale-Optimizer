@@ -24,7 +24,7 @@ const LS_LOCKS_KEY = "evertale_optimizer_slotLocks_v1";
 const LS_PRIMARY_ARCHETYPE_KEY = "evertale_optimizer_primaryArchetype_v1";
 const LS_SECONDARY_ARCHETYPE_KEY = "evertale_optimizer_secondaryArchetype_v1";
 
-const ARCHETYPE_OPTIONS = new Set(["","burn","poison","sleep","stun","heal","turn","cleanse","defense","stealth","spirit","charge"]);
+const ARCHETYPE_OPTIONS = new Set(["","none","burn","poison","sleep","stun","heal","turn","cleanse","defense","stealth","spirit","charge"]);
 
 const STORY_MAIN = 5;
 const STORY_BACK = 3;
@@ -61,11 +61,11 @@ function getPrimaryArchetypePref() {
   return ARCHETYPE_OPTIONS.has(v) ? v : "";
 }
 function getSecondaryArchetypePref() {
-  const v = localStorage.getItem(LS_SECONDARY_ARCHETYPE_KEY) || "";
-  return ARCHETYPE_OPTIONS.has(v) ? v : "";
+  const v = localStorage.getItem(LS_SECONDARY_ARCHETYPE_KEY) || "none";
+  return ARCHETYPE_OPTIONS.has(v) ? v : "none";
 }
 function setPrimaryArchetypePref(v) { localStorage.setItem(LS_PRIMARY_ARCHETYPE_KEY, ARCHETYPE_OPTIONS.has(v) ? v : ""); }
-function setSecondaryArchetypePref(v) { localStorage.setItem(LS_SECONDARY_ARCHETYPE_KEY, ARCHETYPE_OPTIONS.has(v) ? v : ""); }
+function setSecondaryArchetypePref(v) { localStorage.setItem(LS_SECONDARY_ARCHETYPE_KEY, ARCHETYPE_OPTIONS.has(v) ? v : "none"); }
 
 function defaultLocks() {
   return {
@@ -100,14 +100,14 @@ function syncArchetypeDropdowns() {
   const primarySel = el("primaryArchetypeSelect");
   const secondarySel = el("secondaryArchetypeSelect");
   const primary = primarySel?.value || "";
-  const secondary = secondarySel?.value || "";
+  const secondary = secondarySel?.value || "none";
 
   if (secondarySel) {
     Array.from(secondarySel.options).forEach(opt => {
-      if (!opt.value) { opt.disabled = false; return; }
+      if (!opt.value || opt.value === "none") { opt.disabled = false; return; }
       opt.disabled = opt.value === primary;
     });
-    if (secondary && secondary === primary) secondarySel.value = "";
+    if (secondary && secondary !== "none" && secondary === primary) secondarySel.value = "none";
   }
 }
 
@@ -119,7 +119,7 @@ function initSharedOptimizerFiltersUI() {
   if (teamSel) teamSel.value = getTeamTypePref();
   if (presetSel) presetSel.value = getPresetPref();
   if (primarySel) primarySel.value = getPrimaryArchetypePref();
-  if (secondarySel) secondarySel.value = getSecondaryArchetypePref();
+  if (secondarySel) secondarySel.value = getSecondaryArchetypePref() || "none";
   syncArchetypeDropdowns();
   teamSel?.addEventListener("change", (e) => setTeamTypePref(e.target.value || "auto"));
   presetSel?.addEventListener("change", (e) => setPresetPref(e.target.value || "auto"));
@@ -128,7 +128,7 @@ function initSharedOptimizerFiltersUI() {
     syncArchetypeDropdowns();
   });
   secondarySel?.addEventListener("change", (e) => {
-    setSecondaryArchetypePref(e.target.value || "");
+    setSecondaryArchetypePref(e.target.value || "none");
     syncArchetypeDropdowns();
   });
 }
@@ -575,7 +575,8 @@ function buildEngineOptions() {
   options.presetMode = (preset === "auto") ? "auto" : "hard";
 
   const primaryArchetype = (el("primaryArchetypeSelect")?.value || getPrimaryArchetypePref() || "");
-  const secondaryArchetype = (el("secondaryArchetypeSelect")?.value || getSecondaryArchetypePref() || "");
+  const secondaryArchetypeRaw = (el("secondaryArchetypeSelect")?.value || getSecondaryArchetypePref() || "none");
+  const secondaryArchetype = secondaryArchetypeRaw === "none" ? "" : secondaryArchetypeRaw;
   options.archetypes = [primaryArchetype, secondaryArchetype].filter((v, i, arr) => v && arr.indexOf(v) === i);
 
   // Pass current layout + locks so engine can treat locked units as forced picks.
