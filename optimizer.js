@@ -21,6 +21,10 @@ const LAYOUT_KEY = "evertale_team_layout_v1";
 const LS_TEAMTYPE_KEY = "evertale_optimizer_teamType_v1";
 const LS_PRESET_KEY = "evertale_optimizer_preset_v1";
 const LS_LOCKS_KEY = "evertale_optimizer_slotLocks_v1";
+const LS_PRIMARY_ARCHETYPE_KEY = "evertale_optimizer_primaryArchetype_v1";
+const LS_SECONDARY_ARCHETYPE_KEY = "evertale_optimizer_secondaryArchetype_v1";
+
+const ARCHETYPE_OPTIONS = new Set(["","burn","poison","sleep","stun","heal","turn","cleanse","defense","stealth","spirit","charge"]);
 
 const STORY_MAIN = 5;
 const STORY_BACK = 3;
@@ -52,6 +56,16 @@ function getPresetPref() {
 }
 function setTeamTypePref(v) { localStorage.setItem(LS_TEAMTYPE_KEY, v); }
 function setPresetPref(v) { localStorage.setItem(LS_PRESET_KEY, v); }
+function getPrimaryArchetypePref() {
+  const v = localStorage.getItem(LS_PRIMARY_ARCHETYPE_KEY) || "";
+  return ARCHETYPE_OPTIONS.has(v) ? v : "";
+}
+function getSecondaryArchetypePref() {
+  const v = localStorage.getItem(LS_SECONDARY_ARCHETYPE_KEY) || "";
+  return ARCHETYPE_OPTIONS.has(v) ? v : "";
+}
+function setPrimaryArchetypePref(v) { localStorage.setItem(LS_PRIMARY_ARCHETYPE_KEY, ARCHETYPE_OPTIONS.has(v) ? v : ""); }
+function setSecondaryArchetypePref(v) { localStorage.setItem(LS_SECONDARY_ARCHETYPE_KEY, ARCHETYPE_OPTIONS.has(v) ? v : ""); }
 
 function defaultLocks() {
   return {
@@ -82,13 +96,41 @@ function saveLocks() {
   localStorage.setItem(LS_LOCKS_KEY, JSON.stringify(state.locks));
 }
 
+function syncArchetypeDropdowns() {
+  const primarySel = el("primaryArchetypeSelect");
+  const secondarySel = el("secondaryArchetypeSelect");
+  const primary = primarySel?.value || "";
+  const secondary = secondarySel?.value || "";
+
+  if (secondarySel) {
+    Array.from(secondarySel.options).forEach(opt => {
+      if (!opt.value) { opt.disabled = false; return; }
+      opt.disabled = opt.value === primary;
+    });
+    if (secondary && secondary === primary) secondarySel.value = "";
+  }
+}
+
 function initSharedOptimizerFiltersUI() {
   const teamSel = el("teamTypeSelect");
   const presetSel = el("presetSelect");
+  const primarySel = el("primaryArchetypeSelect");
+  const secondarySel = el("secondaryArchetypeSelect");
   if (teamSel) teamSel.value = getTeamTypePref();
   if (presetSel) presetSel.value = getPresetPref();
+  if (primarySel) primarySel.value = getPrimaryArchetypePref();
+  if (secondarySel) secondarySel.value = getSecondaryArchetypePref();
+  syncArchetypeDropdowns();
   teamSel?.addEventListener("change", (e) => setTeamTypePref(e.target.value || "auto"));
   presetSel?.addEventListener("change", (e) => setPresetPref(e.target.value || "auto"));
+  primarySel?.addEventListener("change", (e) => {
+    setPrimaryArchetypePref(e.target.value || "");
+    syncArchetypeDropdowns();
+  });
+  secondarySel?.addEventListener("change", (e) => {
+    setSecondaryArchetypePref(e.target.value || "");
+    syncArchetypeDropdowns();
+  });
 }
 
 function getOwnedIds() {
@@ -403,6 +445,9 @@ function buildExampleOptions() {
   const style = (el("exampleStyleSelect")?.value || "best");
 
   const options = buildEngineOptions();
+  if (["burn","poison","sleep","stun","heal","turn","cleanse"].includes(style) && (!options.archetypes || !options.archetypes.length)) {
+    options.archetypes = [style];
+  }
 
   // Force preset behavior for examples
   // - "best": let engine auto-pick (and we allow presetSelect to bias if user chose a specific preset)
@@ -528,6 +573,10 @@ function buildEngineOptions() {
 
   options.presetTag = (preset === "auto") ? "" : preset;
   options.presetMode = (preset === "auto") ? "auto" : "hard";
+
+  const primaryArchetype = (el("primaryArchetypeSelect")?.value || getPrimaryArchetypePref() || "");
+  const secondaryArchetype = (el("secondaryArchetypeSelect")?.value || getSecondaryArchetypePref() || "");
+  options.archetypes = [primaryArchetype, secondaryArchetype].filter((v, i, arr) => v && arr.indexOf(v) === i);
 
   // Pass current layout + locks so engine can treat locked units as forced picks.
   options.currentLayout = structuredCloneSafe(state.layout);

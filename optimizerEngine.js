@@ -172,6 +172,20 @@
     return out;
   }
 
+  const ARCHETYPE_DEFS = {
+    burn:   { include:["burn_apply","burn_synergy","frostburn_apply","burn_tier_healing","burn_tier_mega_healing"], soft:["status_spread","infect","tu_manip","purify","ward_burn"], exclude:["burn_anti"] },
+    poison: { include:["poison_apply","poison_synergy","poison_payoff","poison_tier_lethal","poison_tier_mega","poison_tier_super"], soft:["status_spread","infect","tu_manip","purify","ward_poison","spirit_steal"], exclude:["poison_anti"] },
+    sleep:  { include:["sleep_apply","sleep_synergy","frostburn_apply"], soft:["tu_manip","ward_sleep","purify"], exclude:["sleep_anti"] },
+    stun:   { include:["stun_apply","stun_synergy"], soft:["tu_manip","ward_stun","purify"], exclude:["stun_anti"] },
+    heal:   { include:["heal","revive","purify"], soft:["damage_reduction","ward_sleep","ward_stun","ward_poison","ward_burn"], exclude:[] },
+    turn:   { include:["tu_manip","turn_grant"], soft:["sleep_apply","stun_apply","spirit_gain","spirit_control"], exclude:[] },
+    cleanse:{ include:["purify"], soft:["heal","ward_burn","ward_poison","ward_sleep","ward_stun"], exclude:[] },
+    defense:{ include:["damage_reduction","hold_ground","barrier","guard"], soft:["heal","purify","ward_sleep","ward_stun","ward_poison","ward_burn"], exclude:[] },
+    stealth:{ include:["stealth","super_stealth","stealth_shield"], soft:["tu_manip","heal"], exclude:[] },
+    spirit: { include:["spirit_gain","spirit_synergy","spirit_control"], soft:["turn_grant","tu_manip","heal"], exclude:[] },
+    charge: { include:["charge"], soft:["execute","turn_grant","tu_manip","heal"], exclude:[] },
+  };
+
   const PRESET_DEFS = {
     burn:   { include:["burn_apply","burn_synergy","frostburn_apply","burn_tier_healing","burn_tier_mega_healing"], soft:["status_spread","infect","tu_manip","purify","ward_burn"], exclude:["burn_anti"] },
     poison: { include:["poison_apply","poison_synergy","poison_tier_lethal","poison_tier_mega","poison_tier_super"], soft:["status_spread","infect","tu_manip","purify","ward_poison"], exclude:["poison_anti"] },
@@ -193,6 +207,31 @@
     for (const t of def.soft) if (tags.has(t)) score += 1;
     for (const t of def.exclude) if (tags.has(t)) score -= 4;
     return score;
+  }
+
+  function scoreUnitForArchetype(tags, archetypeKey) {
+    const def = ARCHETYPE_DEFS[archetypeKey]; if (!def) return 0;
+    let score = 0;
+    for (const t of def.include) if (tags.has(t)) score += 3;
+    for (const t of def.soft) if (tags.has(t)) score += 1;
+    for (const t of def.exclude) if (tags.has(t)) score -= 4;
+    return score;
+  }
+
+  function getArchetypeDefs(archetypes) {
+    return (archetypes || []).map(k => ({ key:k, def:ARCHETYPE_DEFS[k] })).filter(x => !!x.def);
+  }
+
+  function filterCandidatesForArchetypes(candidates, archetypes, requiredCount) {
+    const defs = getArchetypeDefs(archetypes);
+    if (!defs.length) return candidates;
+
+    const strong = candidates.filter(u => defs.some(({key}) => scoreUnitForArchetype(u.__opt.tags, key) >= 3));
+    const bridge = candidates.filter(u => defs.some(({key}) => scoreUnitForArchetype(u.__opt.tags, key) > 0));
+
+    if (strong.length >= requiredCount) return strong;
+    if (bridge.length >= requiredCount) return bridge;
+    return candidates;
   }
 
   function chooseAutoPreset(units, forcedUnits) {
@@ -248,6 +287,11 @@
 
     const presetKey = options?.presetKey || "";
     if (presetKey && PRESET_DEFS[presetKey]) score += scoreUnitForPreset(u.__opt.tags, presetKey) * 1500;
+
+    const archetypes = options?.archetypes || [];
+    for (const key of archetypes) {
+      if (ARCHETYPE_DEFS[key]) score += scoreUnitForArchetype(u.__opt.tags, key) * 1200;
+    }
 
     return score;
   }
@@ -349,6 +393,37 @@
     if ((features.engines.sleep.apply || features.engines.stun.apply) && features.coverage.tempo) b += 0.6;
 
     return b;
+  }
+
+  function archetypeCohesionScore(team, archetypes) {
+    const defs = getArchetypeDefs(archetypes);
+    if (!defs.length) return 0;
+
+    let s = 0;
+    for (const {key} of defs) {
+      let strong = 0, support = 0, anti = 0;
+      for (const u of team) {
+        const score = scoreUnitForArchetype(u.__opt.tags, key);
+        if (score >= 3) strong++;
+        else if (score > 0) support++;
+        else if ((ARCHETYPE_DEFS[key]?.exclude || []).some(t => u.__opt.tags.has(t))) anti++;
+      }
+      s += strong * 1.9 + support * 0.75 - anti * 1.5;
+      if (strong === 0) s -= 3.0;
+      else if (strong === 1) s -= 0.9;
+    }
+
+    if (defs.length >= 2) {
+      let bridge = 0;
+      for (const u of team) {
+        const hits = defs.reduce((acc, {key}) => acc + (scoreUnitForArchetype(u.__opt.tags, key) > 0 ? 1 : 0), 0);
+        if (hits >= 2) bridge++;
+      }
+      s += bridge * 2.2;
+      if (bridge === 0) s -= 1.5;
+    }
+
+    return s;
   }
 
   function presetCohesionScore(team, presetKey) {
@@ -581,6 +656,9 @@
     const forcedIds = new Set(forcedUnits.map(u => normId(u.id)));
     let pool = topCandidates(units.filter(u => !forcedIds.has(normId(u.id))), poolSize);
 
+    // archetype filtering for non-forced picks
+    pool = filterCandidatesForArchetypes(pool, options.archetypes || [], 8 - forcedUnits.length);
+
     // preset filtering for non-forced picks
     if (def) {
       const positives = pool.filter(u => anyTag(u.__opt.tags, def.include));
@@ -626,6 +704,9 @@
       let candidates = units.filter(u => !consumed.has(normId(u.id)) && !forcedIds.has(normId(u.id)));
       // compute base pool
       candidates = topCandidates(candidates, Math.max(200, candidates.length));
+
+      // archetype filtering for non-forced picks
+      candidates = filterCandidatesForArchetypes(candidates, options.archetypes || [], 5 - forced.length);
 
       // preset filtering for non-forced picks
       if (def) {
@@ -706,6 +787,17 @@
     let presetKey = lc(opts.presetTag || "");
     const presetMode = lc(opts.presetMode || "off");
     if (presetKey && !PRESET_DEFS[presetKey]) presetKey = "";
+    opts.archetypes = Array.isArray(opts.archetypes)
+      ? opts.archetypes.map(v => lc(v || "")).filter((v, i, arr) => v && ARCHETYPE_DEFS[v] && arr.indexOf(v) === i).slice(0,2)
+      : [];
+    if (!presetKey && opts.archetypes.length) {
+      const first = opts.archetypes[0];
+      if (PRESET_DEFS[first]) presetKey = first;
+      else if (first === "defense") presetKey = "hpBuff";
+      else if (first === "stealth") presetKey = "turn";
+      else if (first === "spirit") presetKey = "turn";
+      else if (first === "charge") presetKey = "atkBuff";
+    }
     opts.presetKey = presetKey;
     opts.presetMode = presetMode;
 
