@@ -222,16 +222,67 @@
     return (archetypes || []).map(k => ({ key:k, def:ARCHETYPE_DEFS[k] })).filter(x => !!x.def);
   }
 
+  function getArchetypeTier(tags, primaryKey, secondaryKey) {
+    const primaryScore = primaryKey ? scoreUnitForArchetype(tags, primaryKey) : 0;
+    const secondaryScore = secondaryKey ? scoreUnitForArchetype(tags, secondaryKey) : 0;
+
+    const primaryStrong = primaryScore >= 3;
+    const secondaryStrong = secondaryScore >= 3;
+    const primarySupport = primaryScore > 0;
+    const secondarySupport = secondaryScore > 0;
+
+    if (primaryStrong && secondaryStrong) return 4;   // bridge unit
+    if (primaryStrong) return 3;                      // primary core
+    if (secondaryStrong) return 2;                    // secondary core
+    if (primarySupport || secondarySupport) return 1; // support to selected effects
+    return 0;                                         // unrelated
+  }
+
+  function sortByStrictArchetypes(candidates, archetypes) {
+    const primaryKey = archetypes?.[0] || "";
+    const secondaryKey = archetypes?.[1] || "";
+    if (!primaryKey && !secondaryKey) return [...candidates];
+
+    return [...candidates].sort((a, b) => {
+      const tierA = getArchetypeTier(a.__opt.tags, primaryKey, secondaryKey);
+      const tierB = getArchetypeTier(b.__opt.tags, primaryKey, secondaryKey);
+      if (tierB !== tierA) return tierB - tierA;
+      if (b.__opt.base !== a.__opt.base) return b.__opt.base - a.__opt.base;
+      return normId(a.id).localeCompare(normId(b.id));
+    });
+  }
+
   function filterCandidatesForArchetypes(candidates, archetypes, requiredCount) {
-    const defs = getArchetypeDefs(archetypes);
-    if (!defs.length) return candidates;
+    const primaryKey = archetypes?.[0] || "";
+    const secondaryKey = archetypes?.[1] || "";
+    if (!primaryKey && !secondaryKey) return [...candidates];
 
-    const strong = candidates.filter(u => defs.some(({key}) => scoreUnitForArchetype(u.__opt.tags, key) >= 3));
-    const bridge = candidates.filter(u => defs.some(({key}) => scoreUnitForArchetype(u.__opt.tags, key) > 0));
+    const sorted = sortByStrictArchetypes(candidates, archetypes);
+    const bridge = sorted.filter(u => getArchetypeTier(u.__opt.tags, primaryKey, secondaryKey) >= 4);
+    const primaryCore = sorted.filter(u => getArchetypeTier(u.__opt.tags, primaryKey, secondaryKey) === 3);
+    const secondaryCore = sorted.filter(u => getArchetypeTier(u.__opt.tags, primaryKey, secondaryKey) === 2);
+    const support = sorted.filter(u => getArchetypeTier(u.__opt.tags, primaryKey, secondaryKey) === 1);
 
-    if (strong.length >= requiredCount) return strong;
-    if (bridge.length >= requiredCount) return bridge;
-    return candidates;
+    let strictPool = [];
+    if (primaryKey && secondaryKey) {
+      strictPool = [...bridge, ...primaryCore, ...secondaryCore, ...support];
+    } else {
+      strictPool = [...primaryCore, ...support];
+    }
+
+    const seen = new Set();
+    strictPool = strictPool.filter(u => {
+      const id = normId(u.id);
+      if (!id || seen.has(id)) return false;
+      seen.add(id);
+      return true;
+    });
+
+    // Be strict until we truly cannot fill the requested size.
+    if (strictPool.length >= requiredCount) return strictPool;
+
+    // Still sort the relaxed full pool by relevance so fallbacks are the least-random possible.
+    return sorted;
   }
 
   function chooseAutoPreset(units, forcedUnits) {
@@ -676,8 +727,17 @@
       }
     }
 
-    // Build 8
+    // Build 8 strictly from the filtered pool first.
     const team8 = buildTeamFixedSize(doctrine, pool, forcedUnits, 8, options);
+
+    // If strict filtering could not fill all 8, only then fall back to the best
+    // remaining roster units, still sorted by archetype relevance when possible.
+    if (team8.length < 8) {
+      const chosenIds = new Set(team8.map(u => normId(u.id)));
+      let relaxedPool = units.filter(u => !forcedIds.has(normId(u.id)) && !chosenIds.has(normId(u.id)));
+      relaxedPool = sortByStrictArchetypes(topCandidates(relaxedPool, Math.max(240, relaxedPool.length)), options.archetypes || []);
+      fillTeamToSizeRelaxed(doctrine, team8, relaxedPool, 8, options);
+    }
 
     // Assign main/back but keep locked placements later (optimizer.js applies only into unlocked slots)
     const ids = assignStoryMainBack(team8);
@@ -732,13 +792,13 @@
 
         // Prefer unused units first
         let relaxedPool = units.filter(u => !forcedIds.has(normId(u.id)) && !chosenIds.has(normId(u.id)) && !consumed.has(normId(u.id)));
-        relaxedPool = topCandidates(relaxedPool, Math.max(400, relaxedPool.length));
+        relaxedPool = sortByStrictArchetypes(topCandidates(relaxedPool, Math.max(400, relaxedPool.length)), options.archetypes || []);
 
         // If roster is exhausted (common late platoons), allow reuse across teams
         // so we still output 5 slots. This keeps duplicates OUT of the same platoon.
         if (relaxedPool.length === 0) {
           relaxedPool = units.filter(u => !forcedIds.has(normId(u.id)) && !chosenIds.has(normId(u.id)));
-          relaxedPool = topCandidates(relaxedPool, Math.max(400, relaxedPool.length));
+          relaxedPool = sortByStrictArchetypes(topCandidates(relaxedPool, Math.max(400, relaxedPool.length)), options.archetypes || []);
         }
 
         fillTeamToSizeRelaxed(doctrine, team, relaxedPool, 5, options);
