@@ -6,7 +6,7 @@
   <title>Evertale Optimizer • Optimizer</title>
   <link rel="stylesheet" href="./style.css?v=1770741089" />
 </head>
-<body>
+<body class="page-optimizer">
   <header class="topbar">
     <div class="topbar-inner">
       <div>
@@ -31,61 +31,64 @@
         <a class="btn" href="./index.html" style="text-decoration:none; display:inline-flex; align-items:center;">Back to Roster</a>
       </div>
 
-      <div class="panelRow" style="margin-top:10px;">
-        <div style="display:flex; flex-direction:column; gap:6px;">
+      <div class="optimizerControls" style="margin-top:10px;">
+        <div class="optimizerControlCard">
           <div class="panelTitle" style="margin:0;">Team Mode</div>
           <div class="optMode">
             <button id="modeStory" class="pill active" type="button">Story (5 + 3)</button>
             <button id="modePlatoons" class="pill" type="button">Platoons (20 × 5)</button>
           </div>
+          <div id="ownedCount" class="muted">0 selected</div>
         </div>
 
-        <div style="display:flex; flex-direction:column; gap:6px; align-items:flex-end;">
-          <div class="panelTitle" style="margin:0;">Owned Units</div>
-          <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-            <div id="ownedCount" class="muted">0 selected</div>
+        <div class="optimizerControlCard optimizerFiltersCard">
+          <div class="panelTitle" style="margin:0;">Passive Effect Focus</div>
+          <div class="optimizerFilterGrid optimizerFilterGridDualOnly">
+            <label class="optimizerField">
+              <span>Primary Effect Type</span>
+              <select id="primaryArchetypeSelect" class="input">
+                <option value="">Any passive effect type</option>
+                <option value="burn">Burn</option>
+                <option value="poison">Poison</option>
+                <option value="sleep">Sleep</option>
+                <option value="stun">Stun</option>
+                <option value="heal">Heal</option>
+                <option value="turn">Turn / Tempo</option>
+                <option value="cleanse">Cleanse</option>
+                <option value="defense">Tank / Defense</option>
+                <option value="stealth">Stealth</option>
+                <option value="spirit">Spirit</option>
+                <option value="charge">Charge</option>
+              </select>
+            </label>
+            <label class="optimizerField">
+              <span>Extra Effect Type</span>
+              <select id="secondaryArchetypeSelect" class="input">
+                <option value="">No extra added effects</option>
+                <option value="burn">Burn</option>
+                <option value="poison">Poison</option>
+                <option value="sleep">Sleep</option>
+                <option value="stun">Stun</option>
+                <option value="heal">Heal</option>
+                <option value="turn">Turn / Tempo</option>
+                <option value="cleanse">Cleanse</option>
+                <option value="defense">Tank / Defense</option>
+                <option value="stealth">Stealth</option>
+                <option value="spirit">Spirit</option>
+                <option value="charge">Charge</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <div class="optimizerControlCard optimizerActionsCard">
+          <div class="panelTitle" style="margin:0;">Build Tools</div>
+          <div class="optimizerActionGrid optimizerActionGridSimple">
             <button id="buildBest" class="btn" type="button">Build Best Team</button>
-            <select id="exampleStyleSelect" class="input" style="max-width:260px;">
-              <option value="best">Example: Best (auto)</option>
-              <option value="burn">Example: Burn</option>
-              <option value="poison">Example: Poison</option>
-              <option value="sleep">Example: Sleep</option>
-              <option value="stun">Example: Stun</option>
-              <option value="heal">Example: Heal</option>
-              <option value="turn">Example: Turn / Time Stop</option>
-              <option value="cleanse">Example: Cleanse</option>
-              <option value="atkBuff">Example: Aggro / ATK Buff</option>
-              <option value="hpBuff">Example: Tank / Damage Reduction</option>
-              <option value="aggro">Example: Aggro / Tank</option>
-              <option value="timestop">Example: Time Stop</option>
-              <option value="sustain">Example: Sustain</option>
-            </select>
             <button id="buildExample" class="btn" type="button">Build Example Team</button>
             <button id="clearTeams" class="btn" type="button">Clear</button>
           </div>
         </div>
-      </div>
-
-      <!-- Shared optimizer filters -->
-      <div class="panelRow" style="margin-top:10px;">
-        <select id="teamTypeSelect" class="input">
-          <option value="auto">Team Type: Auto</option>
-          <option value="mono">Team Type: Mono</option>
-          <option value="rainbow">Team Type: Rainbow</option>
-        </select>
-
-        <select id="presetSelect" class="input">
-          <option value="auto">Preset: Auto</option>
-          <option value="burn">Preset: Burn</option>
-          <option value="poison">Preset: Poison</option>
-          <option value="sleep">Preset: Sleep</option>
-          <option value="stun">Preset: Stun</option>
-          <option value="heal">Preset: Heal</option>
-          <option value="turn">Preset: Turn</option>
-          <option value="atkBuff">Preset: ATK Buff</option>
-          <option value="hpBuff">Preset: HP Buff</option>
-          <option value="cleanse">Preset: Cleanse</option>
-        </select>
       </div>
 
       <!-- Lock helpers -->
