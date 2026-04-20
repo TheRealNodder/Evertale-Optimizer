@@ -278,10 +278,7 @@
       return true;
     });
 
-    // Be strict until we truly cannot fill the requested size.
     if (strictPool.length >= requiredCount) return strictPool;
-
-    // Still sort the relaxed full pool by relevance so fallbacks are the least-random possible.
     return sorted;
   }
 
