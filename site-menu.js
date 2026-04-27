@@ -1,101 +1,31 @@
 (function(){
-  function pageKey(){
-    const path = (location.pathname || '').toLowerCase();
-    if (path.includes('roster')) return 'roster';
-    if (path.includes('optimizer')) return 'optimizer';
-    return 'catalog';
+  const themes=[['auto','Auto Style'],['spring','Spring'],['summer','Summer'],['autumn','Autumn'],['winter','Winter'],['newyear','New Year'],['valentine','Valentine'],['stpatrick',"St. Patrick's"],['easter','Easter'],['independence','Independence Day'],['halloween','Halloween'],['thanksgiving','Thanksgiving'],['christmas','Christmas']];
+  function q(p){ return './index.html?' + new URLSearchParams(p).toString(); }
+  function current(){ const p=location.pathname.toLowerCase(); return p.includes('optimizer')?'optimizer':p.includes('roster')?'roster':'catalog'; }
+  function themeSelect(){
+    const wrap=document.createElement('label'); wrap.className='siteThemeField'; wrap.innerHTML='<span>Style</span>';
+    const s=document.createElement('select'); s.className='siteThemeSelect'; s.ariaLabel='Style selector';
+    themes.forEach(([v,l])=>{ const o=document.createElement('option'); o.value=v; o.textContent=l; s.appendChild(o); });
+    s.value=window.EvertaleTheme?.getPreference?.()||localStorage.getItem('evertale_theme_pref_v1')||'auto';
+    s.addEventListener('change',()=>{ if(window.EvertaleTheme?.setPreference) window.EvertaleTheme.setPreference(s.value); else localStorage.setItem('evertale_theme_pref_v1',s.value); });
+    wrap.appendChild(s); return wrap;
   }
-  function themeOptions(){
-    const labels = window.EvertaleTheme?.labels || {};
-    const keys = ['auto','default','spring','summer','autumn','winter','halloween','thanksgiving','christmas','newyear','valentine','stpatrick','easter','independence'];
-    return keys.map(k=>`<option value="${k}">${labels[k] || k}</option>`).join('');
-  }
-  function closeMenu(){
-    document.body.classList.remove('sideMenuOpen');
-    document.querySelector('.sideMenu')?.setAttribute('aria-hidden','true');
-    document.querySelector('.sideMenuToggle')?.setAttribute('aria-expanded','false');
-  }
-  function openMenu(){
-    document.body.classList.add('sideMenuOpen');
-    document.querySelector('.sideMenu')?.setAttribute('aria-hidden','false');
-    document.querySelector('.sideMenuToggle')?.setAttribute('aria-expanded','true');
-  }
-  function toggleMenu(){ document.body.classList.contains('sideMenuOpen') ? closeMenu() : openMenu(); }
-
   function build(){
-    if (document.querySelector('.sideMenu')) return;
-    const cur = pageKey();
-    const topbarInner = document.querySelector('.topbar-inner');
-    if (topbarInner && !document.querySelector('.sideMenuToggle')) {
-      const btn = document.createElement('button');
-      btn.className = 'sideMenuToggle';
-      btn.type = 'button';
-      btn.setAttribute('aria-label','Open menu');
-      btn.setAttribute('aria-expanded','false');
-      btn.innerHTML = '<span></span><span></span><span></span>';
-      topbarInner.prepend(btn);
-    }
-
-    const overlay = document.createElement('div');
-    overlay.className = 'sideMenuOverlay';
-    overlay.setAttribute('aria-hidden','true');
-
-    const menu = document.createElement('aside');
-    menu.className = 'sideMenu';
-    menu.setAttribute('aria-hidden','true');
-    menu.innerHTML = `
-      <div class="sideMenuHead">
-        <div>
-          <div class="sideMenuTitle">Evertale Optimizer</div>
-          <div class="sideMenuSub">Quick navigation</div>
-        </div>
-        <button class="sideMenuClose" type="button" aria-label="Close menu">×</button>
-      </div>
-
-      <div class="sideThemeBlock">
-        <label class="sideThemeLabel" for="sideThemeSelect">Style</label>
-        <select id="sideThemeSelect" class="input sideThemeSelect">${themeOptions()}</select>
-      </div>
-
-      <nav class="sideNav" aria-label="Site navigation">
-        <details class="sideGroup" ${cur==='catalog'?'open':''}>
-          <summary>Catalog</summary>
-          <a href="./index.html?type=all">All</a>
-          <a href="./index.html?type=characters">Characters</a>
-          <a href="./index.html?type=weapons">Weapons</a>
-          <a href="./index.html?type=accessories">Accessories</a>
-          <a href="./index.html?type=bosses">Bosses</a>
-        </details>
-        <details class="sideGroup" ${cur==='roster'?'open':''}>
-          <summary>Roster</summary>
-          <a href="./roster.html">My Roster</a>
-          <a href="./roster.html#owned">Owned Units</a>
-          <a href="./roster.html#filters">Filters</a>
-        </details>
-        <details class="sideGroup" ${cur==='optimizer'?'open':''}>
-          <summary>Optimizer</summary>
-          <a href="./optimizer.html">Optimizer Home</a>
-          <a href="./optimizer.html#storySection">Story Team</a>
-          <a href="./optimizer.html#platoonsSection">Platoons</a>
-          <a href="./optimizer.html#storageGrid">Storage</a>
-        </details>
-      </nav>
-    `;
-    document.body.appendChild(overlay);
-    document.body.appendChild(menu);
-
-    const select = menu.querySelector('#sideThemeSelect');
-    if (select) {
-      select.value = window.EvertaleTheme?.getChoice?.() || 'auto';
-      select.addEventListener('change', ()=>window.EvertaleTheme?.applyTheme?.(select.value));
-      document.addEventListener('evertale-theme-change', e => { select.value = e.detail?.choice || 'auto'; });
-    }
-
-    document.querySelector('.sideMenuToggle')?.addEventListener('click', toggleMenu);
-    menu.querySelector('.sideMenuClose')?.addEventListener('click', closeMenu);
-    overlay.addEventListener('click', closeMenu);
-    menu.addEventListener('click', e => { if (e.target.closest('a')) closeMenu(); });
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+    if(document.getElementById('siteSideMenu')) return;
+    const c=current();
+    const overlay=document.createElement('div'); overlay.className='siteMenuOverlay';
+    const aside=document.createElement('aside'); aside.id='siteSideMenu'; aside.className='siteSideMenu'; aside.ariaHidden='true';
+    aside.innerHTML=`<div class="siteMenuHead"><div><div class="siteMenuTitle">Evertale Optimizer</div><div class="siteMenuSub">Quick Navigation</div></div><button class="siteMenuClose" type="button" aria-label="Close menu">×</button></div><div class="siteMenuTheme"></div><nav class="siteMenuNav"><details class="siteMenuGroup" ${c==='catalog'?'open':''}><summary>Catalog</summary><a href="./index.html">All</a><a href="${q({type:'characters'})}">Characters</a><a href="${q({type:'weapons'})}">Weapons</a><a href="${q({type:'accessories'})}">Accessories</a><a href="${q({type:'bosses'})}">Bosses</a></details><details class="siteMenuGroup" ${c==='roster'?'open':''}><summary>Roster</summary><a href="./roster.html">Owned Roster</a><a href="./roster.html?view=compact">Compact View</a><a href="./roster.html?view=detailed">Detailed View</a></details><details class="siteMenuGroup" ${c==='optimizer'?'open':''}><summary>Optimizer</summary><a href="./optimizer.html">Build Teams</a><a href="./optimizer.html#storySection">Story Team</a><a href="./optimizer.html#platoonsSection">Platoons</a></details></nav>`;
+    aside.querySelector('.siteMenuTheme').appendChild(themeSelect());
+    document.body.append(overlay,aside);
+    overlay.addEventListener('click',close); aside.querySelector('.siteMenuClose').addEventListener('click',close); aside.addEventListener('click',e=>{ if(e.target.closest('a')) close(); });
+    document.addEventListener('keydown',e=>{ if(e.key==='Escape') close(); });
   }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', build, {once:true}); else build();
+  function open(){ build(); document.body.classList.add('site-menu-open'); document.getElementById('siteSideMenu')?.setAttribute('aria-hidden','false'); }
+  function close(){ document.body.classList.remove('site-menu-open'); document.getElementById('siteSideMenu')?.setAttribute('aria-hidden','true'); }
+  function init(){
+    const inner=document.querySelector('.topbar-inner'); if(inner&&!document.querySelector('.siteMenuButton')){ const b=document.createElement('button'); b.className='siteMenuButton'; b.type='button'; b.ariaLabel='Open menu'; b.innerHTML='<span></span><span></span><span></span>'; inner.insertBefore(b,inner.firstChild); b.addEventListener('click',open); }
+    build();
+  }
+  document.readyState==='loading'?document.addEventListener('DOMContentLoaded',init,{once:true}):init();
 })();
