@@ -315,6 +315,17 @@
   }
 
   // ---------- ELEMENT ----------
+  function normalizeElementValue(value) {
+    const e = String(value || '').trim().toLowerCase().replace(/[^a-z0-9]+/g, '');
+    if (e === 'fire' || e === 'flame') return 'fire';
+    if (e === 'water' || e === 'ice') return 'water';
+    if (e === 'storm' || e === 'air' || e === 'wind' || e === 'thunder' || e === 'lightning' || e === 'electric') return 'storm';
+    if (e === 'earth' || e === 'terra' || e === 'ground') return 'earth';
+    if (e === 'light' || e === 'life' || e === 'holy') return 'light';
+    if (e === 'dark' || e === 'death' || e === 'shadow') return 'dark';
+    return e || String(value || '');
+  }
+
   function getElement(u) {
     if (u.__opt && u.__opt.tags) {
       for (const t of u.__opt.tags) if (t.startsWith("elem_")) return t.slice(5);

@@ -121,6 +121,31 @@ function normalizeElementName(el) {
     .replace(/\s+/g, "");
 }
 
+function normalizeElementDisplay(el) {
+  const raw = String(el || "").trim();
+  if (!raw) return "";
+  return raw
+    .replace(/[_-]+/g, " ")
+    .replace(/\b\w/g, c => c.toUpperCase());
+}
+
+function normalizeElementGroup(el) {
+  const e = normalizeElementName(el).replace(/[^a-z0-9]+/g, "");
+  if (e === "fire" || e === "flame") return "fire";
+  if (e === "water" || e === "ice") return "water";
+  if (e === "storm" || e === "air" || e === "wind" || e === "thunder" || e === "lightning" || e === "electric") return "storm";
+  if (e === "earth" || e === "terra" || e === "ground") return "earth";
+  if (e === "light" || e === "life" || e === "holy") return "light";
+  if (e === "dark" || e === "death" || e === "shadow") return "dark";
+  return e;
+}
+
+function elementMatchesFilter(unitElement, filterValue) {
+  if (!filterValue || filterValue === "all") return true;
+  return normalizeElementGroup(unitElement) === normalizeElementGroup(filterValue);
+}
+
+
 function elementClassForUnit(unit) {
   const e = normalizeElementName(unit?.element || unit?.affinity || unit?.type);
   if (e === "fire") return "el-fire";
@@ -360,7 +385,7 @@ function renderRoster() {
     if (tokens && tokens.length) return unitMatchesTokens(u, tokens);
 
     // Normal mode
-    if (elFilter !== "all" && String(u.element || "") !== elFilter) return false;
+    if (!elementMatchesFilter(u.element, elFilter)) return false;
     if (rFilter !== "all" && String(u.rarity || "") !== rFilter) return false;
 
     if (q) {
