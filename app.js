@@ -129,6 +129,27 @@ function normalizeElementDisplay(el) {
     .replace(/\b\w/g, c => c.toUpperCase());
 }
 
+function normalizeSkillArray(arr) { return Array.isArray(arr) ? arr.filter(Boolean) : []; }
+function skillMetaText(skill) {
+  const parts = [];
+  if (skill && skill.tu !== undefined && skill.tu !== null && skill.tu !== '') parts.push(String(skill.tu) + ' TU');
+  const sp = skill ? (skill.sp ?? skill.spirit) : null;
+  if (sp !== undefined && sp !== null && sp !== '') parts.push((Number(sp) > 0 ? '+' : '') + String(sp) + ' SP');
+  if (skill && skill.targeting) parts.push(String(skill.targeting));
+  return parts.join(' • ');
+}
+function renderSkillBoxes(title, skills, kindClass) {
+  const rows = normalizeSkillArray(skills);
+  if (!rows.length) return '';
+  const boxes = rows.map(s => {
+    const name = safeText((s && s.name) || 'Unnamed');
+    const meta = safeText(skillMetaText(s));
+    const desc = safeText((s && s.description) || '').replace(/\n/g, '<br>');
+    return '<div class="skillBox"><div class="skillBoxHead"><strong>' + name + '</strong>' + (meta ? '<span>' + meta + '</span>' : '') + '</div>' + (desc ? '<div class="skillBoxText">' + desc + '</div>' : '') + '</div>';
+  }).join('');
+  return '<div class="panel skillPanel ' + (kindClass || '') + '"><div class="panelTitle">' + safeText(title) + '</div><div class="skillBoxList">' + boxes + '</div></div>';
+}
+
 function normalizeElementGroup(el) {
   const e = normalizeElementName(el).replace(/[^a-z0-9]+/g, "");
   if (e === "fire" || e === "flame") return "fire";
