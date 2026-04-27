@@ -38,6 +38,22 @@
     return out;
   }
 
+  function normalizeElementValue(value) {
+    const e = String(value || '').trim().toLowerCase().replace(/[^a-z0-9]+/g, '');
+    if (e === 'fire' || e === 'flame') return 'fire';
+    if (e === 'water' || e === 'ice') return 'water';
+    if (e === 'storm' || e === 'air' || e === 'wind' || e === 'thunder' || e === 'lightning' || e === 'electric') return 'storm';
+    if (e === 'earth' || e === 'terra' || e === 'ground') return 'earth';
+    if (e === 'light' || e === 'life' || e === 'holy') return 'light';
+    if (e === 'dark' || e === 'death' || e === 'shadow') return 'dark';
+    return e || String(value || '');
+  }
+  function normalizeElementTag(tag) {
+    const raw = String(tag || '');
+    if (!raw.startsWith('elem_')) return raw;
+    return 'elem_' + normalizeElementValue(raw.slice(5));
+  }
+
   function passiveNamesFromArray(passives) {
     if (!Array.isArray(passives)) return [];
     return passives.map(p => typeof p === 'string' ? p : String(p?.name ?? '')).filter(Boolean);
@@ -51,13 +67,13 @@
       fetchJson(DATA_FILES.passives, true),
     ]);
 
-    const baseRows = dedupeById(toArray(baseJson, 'characters')).map(row => ({ ...row }));
+    const baseRows = dedupeById(toArray(baseJson, 'characters')).map(row => ({ ...row, element: normalizeElementValue(row?.element) }));
     const byId = new Map(baseRows.map(row => [String(row.id), row]));
 
     for (const tagRow of dedupeById(toArray(tagJson, 'character_tags'))) {
       const target = byId.get(String(tagRow.id));
       if (!target) continue;
-      if (Array.isArray(tagRow.derivedTags)) target.derivedTags = [...tagRow.derivedTags];
+      if (Array.isArray(tagRow.derivedTags)) target.derivedTags = [...tagRow.derivedTags].map(normalizeElementTag);
       if (tagRow.tagEvidence && typeof tagRow.tagEvidence === 'object') target.tagEvidence = { ...tagRow.tagEvidence };
     }
 

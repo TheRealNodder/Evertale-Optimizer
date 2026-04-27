@@ -319,7 +319,7 @@
     if (u.__opt && u.__opt.tags) {
       for (const t of u.__opt.tags) if (t.startsWith("elem_")) return t.slice(5);
     }
-    return lc(u.element);
+    return normalizeElementValue(u.element);
   }
 
   // ---------- SCORING ----------
