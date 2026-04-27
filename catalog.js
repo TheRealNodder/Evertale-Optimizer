@@ -117,7 +117,7 @@ function normalizeElementClass(el) {
   if (e === 'light' || e === 'life' || e === 'holy') return 'el-light';
   if (e === 'dark' || e === 'death' || e === 'shadow') return 'el-dark';
   return e ? `el-${e}` : '';
-}` : ""; }
+}
 
 function parseListTokens(text) {
   const raw = String(text ?? "");

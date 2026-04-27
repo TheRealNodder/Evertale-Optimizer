@@ -1,21 +1,9 @@
-Evertale Optimizer replace-only package
+Replace-only patch.
 
-Replace only these files in the GitHub repo. This package intentionally does not include unchanged repo files.
+Files included:
+- app.js: adds missing renderSkillBoxes helper used by roster detailed mode.
+- catalog.js: fixes corrupted normalizeElementClass function that caused catalog loading failures.
+- seasonal-theme.js: adds a user-selectable Style dropdown with Auto Style support.
+- style.css: adds scoped style switcher CSS.
 
-Includes:
-- data/characters.json
-- data/character_actives.json
-- data/character_passives.json
-- data/character_tags.json
-- data/weapons.json
-- data/accessories.json
-- data/bosses.json
-- data-loader.js
-- optimizer.js
-- optimizer-hook.js
-- optimizerEngine.js
-
-Notes:
-- Data files are the final extracted-data replacements.
-- Optimizer files are included so the split data and optimizer logic remain aligned.
-- Existing image URLs in the data files are preserved from the current project data layer.
+No data files included. No layout/data mutation beyond runtime fixes and theme switcher.
