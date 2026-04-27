@@ -79,6 +79,40 @@ function normKey(s) {
     .replace(/\s+/g, " ");
 }
 
+
+function normalizeElementDisplay(el) {
+  const e = String(el || '').trim().toLowerCase().replace(/[^a-z0-9]+/g, '');
+  if (e === 'fire' || e === 'flame') return 'Fire';
+  if (e === 'water' || e === 'ice') return 'Water';
+  if (e === 'storm' || e === 'air' || e === 'wind' || e === 'thunder' || e === 'lightning' || e === 'electric') return 'Storm';
+  if (e === 'earth' || e === 'terra' || e === 'ground') return 'Earth';
+  if (e === 'light' || e === 'life' || e === 'holy') return 'Light';
+  if (e === 'dark' || e === 'death' || e === 'shadow') return 'Dark';
+  return String(el || '');
+}
+function normalizeSkillArray(arr) { return Array.isArray(arr) ? arr.filter(Boolean) : []; }
+function skillMetaText(skill) {
+  const parts = [];
+  if (skill && skill.tu !== undefined && skill.tu !== null && skill.tu !== '') parts.push(String(skill.tu) + ' TU');
+  const sp = skill ? (skill.sp ?? skill.spirit) : null;
+  if (sp !== undefined && sp !== null && sp !== '') parts.push((Number(sp) > 0 ? '+' : '') + String(sp) + ' SP');
+  if (skill && skill.targeting) parts.push(String(skill.targeting));
+  return parts.join(' • ');
+}
+function renderSkillBoxes(title, skills, kindClass) {
+  const rows = normalizeSkillArray(skills);
+  if (!rows.length) return '';
+  const boxes = rows.map(s => {
+    const name = safeText((s && s.name) || 'Unnamed');
+    const meta = safeText(skillMetaText(s));
+    const desc = safeText((s && s.description) || '').replace(/\n/g, '<br>');
+    return '<div class="skillBox"><div class="skillBoxHead"><strong>' + name + '</strong>' + (meta ? '<span>' + meta + '</span>' : '') + '</div>' + (desc ? '<div class="skillBoxText">' + desc + '</div>' : '') + '</div>';
+  }).join('');
+  return '<div class="panel skillPanel ' + (kindClass || '') + '"><div class="panelTitle">' + safeText(title) + '</div><div class="skillBoxList">' + boxes + '</div></div>';
+}
+
+function normalizeElementClass(el) { const label = normalizeElementDisplay(el).toLowerCase(); return label ? `el-${label}` : ""; }
+
 function parseListTokens(text) {
   const raw = String(text ?? "");
   const parts = raw
@@ -152,7 +186,7 @@ function normalizeCharacters(arr) {
       name: pickFirst(u.name, id),
       subtitle: pickFirst(u.title, ""),
       rarity: pickFirst(u.rarity, ""),
-      element: pickFirst(u.element, ""),
+      element: normalizeElementDisplay(pickFirst(u.element, "")),
       stats: { atk, hp, spd, cost },
       image: pickFirst(u.image, ""),
       imagesLarge: Array.isArray(u.imagesLarge) ? u.imagesLarge : (u.image ? [u.image] : []),
@@ -227,7 +261,7 @@ function renderCard(item) {
     : `<div class="ph">?</div>`;
 
   // Element class only applies to characters
-  const elClass = (item.kind==="characters" && item.element) ? ` el-${safeText(String(item.element).toLowerCase())}` : "";
+  const elClass = (item.kind==="characters" && item.element) ? ` ${safeText(normalizeElementClass(item.element))}` : "";
 
   // Right-side badges
   // Strict classes so CSS can place them:
@@ -236,7 +270,7 @@ function renderCard(item) {
   //   .tag.rarity => SSR/SR/R/etc
   const chips = [];
   chips.push(`<span class="tag kind">${safeText(kindLabel(item.kind))}</span>`);
-  if (item.element) chips.push(`<span class="tag element">${safeText(item.element)}</span>`);
+  if (item.element) chips.push(`<span class="tag element">${safeText(normalizeElementDisplay(item.element))}</span>`);
   if (item.rarity)  chips.push(`<span class="tag rarity">${safeText(item.rarity)}</span>`);
 
   const { atk, hp, spd, cost } = item.stats || {};
@@ -280,37 +314,8 @@ function renderCard(item) {
           }
           ${extra}
 
-${
-  item.kind === "characters" && Array.isArray(item.activeSkills) && item.activeSkills.length
-    ? `<div class="panel">
-         <div class="panelTitle">Active Skills</div>
-         <div class="muted" style="white-space:pre-wrap; line-height:1.25">
-           ${item.activeSkills.slice(0,4).map(s=>{
-             const nm=safeText(s.name);
-             const tu=s.tu!=null?` • ${s.tu}TU`:"";
-             const sp=(s.spirit!=null?` • ${s.spirit}SP`:(s.sp!=null?` • ${s.sp}SP`:""));
-             const desc=safeText(s.description||"");
-             return `<strong>${nm}</strong>${tu}${sp}\n${desc}\n`;
-           }).join("\n")}
-         </div>
-       </div>`
-    : ``
-}
-
-${
-  item.kind === "characters" && Array.isArray(item.passiveSkillDetails) && item.passiveSkillDetails.length
-    ? `<div class="panel">
-         <div class="panelTitle">Passives</div>
-         <div class="muted" style="white-space:pre-wrap; line-height:1.25">
-           ${item.passiveSkillDetails.slice(0,6).map(p=>{
-             const nm=safeText(p.name);
-             const desc=safeText(p.description);
-             return `<strong>${nm}</strong>\n${desc}\n`;
-           }).join("\n")}
-         </div>
-       </div>`
-    : ``
-}
+${item.kind === "characters" ? renderSkillBoxes("Active Skills", item.activeSkills, "activeSkillPanel") : ``}
+${item.kind === "characters" ? renderSkillBoxes("Passive Skills", item.passiveSkillDetails, "passiveSkillPanel") : ``}
         </div>
       </div>
     </div>
