@@ -67,7 +67,7 @@
       fetchJson(DATA_FILES.passives, true),
     ]);
 
-    const baseRows = dedupeById(toArray(baseJson, 'characters')).map(row => ({ ...row, element: normalizeElementValue(row?.element) }));
+    const baseRows = dedupeById(toArray(baseJson, 'characters')).map(row => ({ ...row }));
     const byId = new Map(baseRows.map(row => [String(row.id), row]));
 
     for (const tagRow of dedupeById(toArray(tagJson, 'character_tags'))) {
@@ -100,6 +100,8 @@
   window.EvertaleData = {
     fetchJson,
     toArray,
+    normalizeElementValue,
+    normalizeElementTag,
     loadCharactersMerged,
   };
 })();

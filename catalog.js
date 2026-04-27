@@ -81,14 +81,11 @@ function normKey(s) {
 
 
 function normalizeElementDisplay(el) {
-  const e = String(el || '').trim().toLowerCase().replace(/[^a-z0-9]+/g, '');
-  if (e === 'fire' || e === 'flame') return 'Fire';
-  if (e === 'water' || e === 'ice') return 'Water';
-  if (e === 'storm' || e === 'air' || e === 'wind' || e === 'thunder' || e === 'lightning' || e === 'electric') return 'Storm';
-  if (e === 'earth' || e === 'terra' || e === 'ground') return 'Earth';
-  if (e === 'light' || e === 'life' || e === 'holy') return 'Light';
-  if (e === 'dark' || e === 'death' || e === 'shadow') return 'Dark';
-  return String(el || '');
+  const raw = String(el || '').trim();
+  if (!raw) return '';
+  return raw
+    .replace(/[_-]+/g, ' ')
+    .replace(/\b\w/g, c => c.toUpperCase());
 }
 function normalizeSkillArray(arr) { return Array.isArray(arr) ? arr.filter(Boolean) : []; }
 function skillMetaText(skill) {
@@ -111,7 +108,16 @@ function renderSkillBoxes(title, skills, kindClass) {
   return '<div class="panel skillPanel ' + (kindClass || '') + '"><div class="panelTitle">' + safeText(title) + '</div><div class="skillBoxList">' + boxes + '</div></div>';
 }
 
-function normalizeElementClass(el) { const label = normalizeElementDisplay(el).toLowerCase(); return label ? `el-${label}` : ""; }
+function normalizeElementClass(el) {
+  const e = String(el || '').trim().toLowerCase().replace(/[^a-z0-9]+/g, '');
+  if (e === 'fire' || e === 'flame') return 'el-fire';
+  if (e === 'water' || e === 'ice') return 'el-water';
+  if (e === 'storm' || e === 'air' || e === 'wind' || e === 'thunder' || e === 'lightning' || e === 'electric') return 'el-storm';
+  if (e === 'earth' || e === 'terra' || e === 'ground') return 'el-earth';
+  if (e === 'light' || e === 'life' || e === 'holy') return 'el-light';
+  if (e === 'dark' || e === 'death' || e === 'shadow') return 'el-dark';
+  return e ? `el-${e}` : '';
+}` : ""; }
 
 function parseListTokens(text) {
   const raw = String(text ?? "");
