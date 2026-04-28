@@ -24,7 +24,7 @@
   function open(){ build(); document.body.classList.add('site-menu-open'); document.getElementById('siteSideMenu')?.setAttribute('aria-hidden','false'); }
   function close(){ document.body.classList.remove('site-menu-open'); document.getElementById('siteSideMenu')?.setAttribute('aria-hidden','true'); }
   function init(){
-    const inner=document.querySelector('.topbar-inner'); if(inner&&!document.querySelector('.siteMenuButton')){ const b=document.createElement('button'); b.className='siteMenuButton'; b.type='button'; b.ariaLabel='Open menu'; b.innerHTML='<span></span><span></span><span></span>'; inner.insertBefore(b,inner.firstChild); b.addEventListener('click',open); }
+    const inner=document.querySelector('.topbar-inner'); if(inner&&!document.querySelector('.siteMenuButton')){ const b=document.createElement('button'); b.className='siteMenuButton'; b.type='button'; b.ariaLabel='Open menu'; b.innerHTML='<span class="siteMenuIcon" aria-hidden="true"><i></i><i></i><i></i></span><span class="siteMenuText">Menu</span>'; b.title='Open menu'; inner.insertBefore(b,inner.firstChild); b.addEventListener('click',open); }
     build();
   }
   document.readyState==='loading'?document.addEventListener('DOMContentLoaded',init,{once:true}):init();
