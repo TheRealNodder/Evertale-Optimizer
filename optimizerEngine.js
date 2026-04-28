@@ -137,6 +137,8 @@
     tu_reduction: "tu_manip",
     extra_turn: "tu_manip",
     turn_gain: "tu_manip",
+    turn_grant: "tu_manip",
+    give_turn: "tu_manip",
 
     // Status engines (apply/payoff/anti) — allows alternate phrasing to map to your canonical tags.
     ignite_apply: "burn_apply",
@@ -172,6 +174,107 @@
     return out;
   }
 
+  function asArray(v) { return Array.isArray(v) ? v : []; }
+  function pushTag(out, tag) { if (tag) out.add(canonicalTag(tag)); }
+  function textBlobForUnit(u) {
+    const parts = [];
+    const add = (v) => { if (v != null && v !== "") parts.push(String(v)); };
+    add(u.name); add(u.title); add(u.element); add(u.weaponPref); add(u.attackType); add(u.family); add(u.class);
+    for (const skill of asArray(u.activeSkills)) {
+      add(skill.name); add(skill.description); add(skill.targeting); add(skill.effect); add(skill.config);
+      for (const f of asArray(skill.flags)) add(f);
+      for (const c of asArray(skill.components)) add(c);
+      const ai = skill.ai || {};
+      if (ai.conditions) for (const k of Object.keys(ai.conditions)) add(k);
+      if (ai.sourceConditions) for (const k of Object.keys(ai.sourceConditions)) add(k);
+      for (const sc of asArray(ai.ignoreScalors)) add(sc);
+    }
+    for (const ps of asArray(u.passiveSkillDetails || u.passiveSkills)) {
+      if (typeof ps === "string") add(ps);
+      else { add(ps.name); add(ps.description); add(ps.internalId); }
+    }
+    return parts.join(" \n ").toLowerCase();
+  }
+
+  function deriveAITags(u) {
+    const out = new Set();
+    const blob = textBlobForUnit(u);
+    const has = (re) => re.test(blob);
+
+    if (has(/frostburn|burning|\bburn\b|isburning|burned/)) pushTag(out, "burn_apply");
+    if (has(/sleeping|deep sleep|\bsleep\b|issleeping/)) pushTag(out, "sleep_apply");
+    if (has(/poisoned|\bpoison\b|venom|toxin/)) pushTag(out, "poison_apply");
+    if (has(/stunned|\bstun\b|shock|push back/)) pushTag(out, "stun_apply");
+
+    if (has(/plus .*sleep|sleeping or frostburned|damage .*sleep|vs_sleep|issleeping|sleeping enemy|sleeping enemies/)) pushTag(out, "sleep_synergy");
+    if (has(/plus .*burn|burning enemy|burning enemies|frostburned enemy|frostburned enemies|vs_burning|isburning/)) pushTag(out, "burn_synergy");
+    if (has(/plus .*poison|poisoned enemy|poisoned enemies|vs_poison|ispoisoned/)) pushTag(out, "poison_synergy");
+    if (has(/plus .*stun|stunned enemy|stunned enemies|vs_stunned|isstunned/)) pushTag(out, "stun_synergy");
+
+    if (has(/heal|restor|recover|lifesteal|drain hp|regeneration/)) pushTag(out, "heal");
+    if (has(/purif|cleanse|remove negative|remove debuff|negative status effects are removed/)) pushTag(out, "purify");
+    if (has(/revive|resurrect|return.*battlefield/)) pushTag(out, "revive");
+    if (has(/damage reduction|barrier|armor|shield|less damage|naval barrier/)) pushTag(out, "damage_reduction");
+    if (has(/survive .*1\s*hp|hold ground|cannot be defeated|survives with 1 hp/)) pushTag(out, "hold_ground");
+    if (has(/guardian|guardians|protecting|protector|protect allies|bodyguard/)) pushTag(out, "guard");
+    if (has(/stealth|hidden|invisible/)) pushTag(out, "stealth");
+    if (has(/counter stance|counterattack|counter attack/)) pushTag(out, "counter");
+    if (has(/give.*next turn|next turns|reduce.*current tu|tu reduced|tu to 0|turn_grant|quicken|haste/)) pushTag(out, "tu_manip");
+    if (has(/ally spirit|enemy spirit|spirit is|spirit to|gain.*spirit|spirit.*doubled/)) pushTag(out, "spirit_synergy");
+    if (has(/gain.*spirit|allies gain.*spirit|raises ally spirit/)) pushTag(out, "spirit_gain");
+    if (has(/charge|power charge|charges/)) pushTag(out, "charge");
+    if (has(/immediately defeated|defeated without damage|instant death|execute/)) pushTag(out, "execute");
+    if (has(/enrage|intense rage|attack increased to 1\.5|attack up/)) pushTag(out, "atk_buff");
+    if (has(/weaken|attack reduced to 0\.75|attack down/)) pushTag(out, "weaken");
+    if (has(/dispel|remove.*buff|remove positive|strip/)) pushTag(out, "dispel");
+
+    if (has(/sleep ward|sleep immunity/)) pushTag(out, "ward_sleep");
+    if (has(/stun ward|stun immunity/)) pushTag(out, "ward_stun");
+    if (has(/poison ward|poison immunity/)) pushTag(out, "ward_poison");
+    if (has(/burn ward|burn immunity|cannot be defeated by damage from burn/)) pushTag(out, "ward_burn");
+    if (has(/instant death ward/)) pushTag(out, "ward_instant_death");
+
+    let allEnemy = 0, multiEnemy = 0, allyTarget = 0, selfTarget = 0, finisher = 0, protectorBias = 0, lowHpBias = 0;
+    for (const skill of asArray(u.activeSkills)) {
+      const target = lc(skill.targeting || "");
+      if (target.includes("allenem")) allEnemy++;
+      if (target.includes("2enemy") || target.includes("twoenemy") || target.includes("allenem")) multiEnemy++;
+      if (target.includes("ally") || target.includes("allally")) allyTarget++;
+      if (target.includes("self")) selfTarget++;
+      const ai = skill.ai || {};
+      const cond = Object.assign({}, ai.conditions || {}, ai.sourceConditions || {});
+      for (const k of Object.keys(cond)) {
+        const ck = lc(k);
+        if (ck.includes("1hp") || ck.includes("hpbelow25") || ck.includes("hpbelow50")) lowHpBias++;
+        if (ck.includes("protect") || ck.includes("guardian")) protectorBias++;
+        if (ck.includes("sleep") || ck.includes("frostburn")) pushTag(out, "ai_prioritizes_sleep_frostburn");
+        if (ck.includes("burn")) pushTag(out, "ai_prioritizes_burn");
+        if (ck.includes("poison")) pushTag(out, "ai_prioritizes_poison");
+        if (ck.includes("stun")) pushTag(out, "ai_prioritizes_stun");
+      }
+      if (/immediately defeated|defeated without damage|10% or less|1 hp/i.test(String(skill.description || ""))) finisher++;
+    }
+    if (allEnemy) pushTag(out, "target_all_enemies");
+    if (multiEnemy) pushTag(out, "target_multi_enemy");
+    if (allyTarget) pushTag(out, "target_allies");
+    if (selfTarget) pushTag(out, "target_self");
+    if (finisher || lowHpBias) pushTag(out, "ai_finisher");
+    if (protectorBias) pushTag(out, "ai_guardian_breaker");
+
+    if (out.has("execute") || out.has("charge") || out.has("burn_synergy") || out.has("poison_synergy") || out.has("sleep_synergy") || out.has("stun_synergy")) pushTag(out, "role_dps");
+    if (out.has("heal") || out.has("purify") || out.has("revive") || out.has("damage_reduction")) pushTag(out, "role_support");
+    if (out.has("guard") || out.has("damage_reduction") || out.has("hold_ground")) pushTag(out, "role_tank");
+    if (out.has("sleep_apply") || out.has("stun_apply") || out.has("tu_manip") || out.has("weaken") || out.has("dispel")) pushTag(out, "role_control");
+
+    return out;
+  }
+
+  function mergeTagSets(...sets) {
+    const out = new Set();
+    for (const set of sets) for (const t of (set || [])) out.add(t);
+    return expandUnitTags(out);
+  }
+
   const ARCHETYPE_DEFS = {
     burn:   { include:["burn_apply","burn_synergy","frostburn_apply","burn_tier_healing","burn_tier_mega_healing"], soft:["status_spread","infect","tu_manip","purify","ward_burn"], exclude:["burn_anti"] },
     poison: { include:["poison_apply","poison_synergy","poison_payoff","poison_tier_lethal","poison_tier_mega","poison_tier_super"], soft:["status_spread","infect","tu_manip","purify","ward_poison","spirit_steal"], exclude:["poison_anti"] },
@@ -194,8 +297,8 @@
     heal:   { include:["heal","revive","purify"], soft:["damage_reduction"], exclude:[] },
     turn:   { include:["tu_manip"], soft:["sleep_apply","stun_apply"], exclude:[] },
     cleanse:{ include:["purify"], soft:["ward_burn","ward_poison","ward_sleep","ward_stun"], exclude:[] },
-    hpBuff: { include:["damage_reduction"], soft:["heal","purify"], exclude:[] },
-    atkBuff:{ include:[], soft:[], exclude:[] }
+    hpBuff: { include:["damage_reduction","hold_ground","guard"], soft:["heal","purify","barrier"], exclude:[] },
+    atkBuff:{ include:["atk_buff"], soft:["charge","execute","tu_manip"], exclude:[] }
   };
   const PRESET_KEYS = Object.keys(PRESET_DEFS).filter(k => k !== "atkBuff");
 
@@ -386,6 +489,12 @@
       dispel: has("dispel"),
       stealth: has("stealth"),
       evasion: has("evasion"),
+      dps: has("role_dps"),
+      supportRole: has("role_support"),
+      tankRole: has("role_tank"),
+      controlRole: has("role_control"),
+      allEnemies: has("target_all_enemies"),
+      finisher: has("ai_finisher"),
     };
 
     return { tagCount, elemCount, engines, coverage, size: team.length };
@@ -426,6 +535,10 @@
     if (barriers > 2) p += (barriers - 2) * 0.5;
     if (guards > 2) p += (guards - 2) * 0.6;
 
+    if (!features.coverage.dps) p += 1.6;
+    if (!features.coverage.supportRole && !features.coverage.tankRole) p += 1.2;
+    if (!features.coverage.controlRole && !features.coverage.tempo) p += 0.8;
+
     return p;
   }
 
@@ -450,6 +563,12 @@
     if (features.coverage.mitigation && (features.coverage.heal || features.coverage.revive)) b += 0.8;
     if (features.coverage.guard && (features.coverage.barrier || features.coverage.mitigation)) b += 0.4;
     if ((features.engines.sleep.apply || features.engines.stun.apply) && features.coverage.tempo) b += 0.6;
+
+    if (features.coverage.dps) b += 0.65;
+    if (features.coverage.supportRole) b += 0.55;
+    if (features.coverage.tankRole) b += 0.45;
+    if (features.coverage.controlRole) b += 0.55;
+    if (features.coverage.allEnemies && features.coverage.finisher) b += 0.35;
 
     return b;
   }
@@ -508,6 +627,7 @@
     s += engineScore(features.engines.stun);
 
     if (presetKey && PRESET_DEFS[presetKey]) s += presetCohesionScore(team, presetKey);
+    if (Array.isArray(options?.archetypes) && options.archetypes.length) s += archetypeCohesionScore(team, options.archetypes);
 
     s += coverageBonus(features);
     s -= redundancyPenalty(features);
@@ -847,7 +967,7 @@
     const units = (ownedUnits || []).map(u => {
       const clone = Object.assign({}, u);
       clone.id = normId(u.id);
-      clone.__opt = { tags: expandUnitTags(getUnitTags(u)) };
+      clone.__opt = { tags: mergeTagSets(getUnitTags(u), deriveAITags(u)) };
       return clone;
     });
 
@@ -876,7 +996,7 @@
     const story = buildStory(doctrine, units, opts, unitsById);
     const platoons = buildPlatoons(doctrine, units, story.used, opts, unitsById);
 
-    const result = { story: { main: story.main, back: story.back }, platoons, presetKey: opts.presetKey || "" };
+    const result = { story: { main: story.main, back: story.back }, platoons, presetKey: opts.presetKey || "", aiAware: true };
     result.totalScore = scoreResult(doctrine, result, unitsById, opts);
     return result;
   }
