@@ -1,9 +1,12 @@
-Replace-only patch.
+Replace-only patch for clean AI-aware optimizer integration.
 
 Files included:
-- app.js: adds missing renderSkillBoxes helper used by roster detailed mode.
-- catalog.js: fixes corrupted normalizeElementClass function that caused catalog loading failures.
-- seasonal-theme.js: adds a user-selectable Style dropdown with Auto Style support.
-- style.css: adds scoped style switcher CSS.
+- optimizer.html
+- optimizer.js
+- optimizerEngine.js
 
-No data files included. No layout/data mutation beyond runtime fixes and theme switcher.
+Purpose:
+- Fix secondary dropdown value so "No extra added effects" is treated as none.
+- Keep existing UI/layout intact.
+- Improve optimizer synergy scoring using AI-derived tags, roles, targeting, and selected archetypes.
+- Filter by selected archetypes before candidate capping so relevant lower-stat units are not discarded too early.

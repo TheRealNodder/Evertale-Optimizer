@@ -573,6 +573,53 @@
     return b;
   }
 
+
+  function aiTeamCohesionScore(team, features, options) {
+    const n = (t)=>features.tagCount.get(t)||0;
+    let s = 0;
+
+    const dps = n("role_dps");
+    const support = n("role_support");
+    const tank = n("role_tank");
+    const control = n("role_control");
+    const tempo = n("tu_manip");
+    const finisher = n("ai_finisher") + n("execute");
+    const aoe = n("target_all_enemies");
+    const multi = n("target_multi_enemy");
+
+    if (dps >= 2) s += 1.4; else if (dps === 1) s += 0.5; else s -= 2.4;
+    if (support >= 1) s += 1.1; else s -= 0.9;
+    if (control >= 1) s += 0.9;
+    if (tank >= 1) s += 0.65;
+    if (tempo >= 1) s += 0.7;
+
+    if (dps > 4) s -= (dps - 4) * 0.7;
+    if (support > 3) s -= (support - 3) * 0.45;
+    if (tank > 3) s -= (tank - 3) * 0.35;
+
+    if ((aoe || multi) && finisher) s += 0.7;
+    if ((aoe || multi) && (features.engines.burn.apply || features.engines.sleep.apply || features.engines.poison.apply || features.engines.stun.apply)) s += 0.65;
+    if (tempo && finisher) s += 0.5;
+    if (features.coverage.cleanse && (features.coverage.heal || features.coverage.mitigation)) s += 0.55;
+    if (features.coverage.guard && (features.coverage.heal || features.coverage.mitigation || features.coverage.barrier)) s += 0.6;
+
+    if (n("ai_prioritizes_sleep_frostburn") && (n("sleep_apply") || n("sleep_synergy") || n("burn_apply") || n("burn_synergy"))) s += 0.7;
+    if (n("ai_prioritizes_burn") && (n("burn_apply") || n("burn_synergy"))) s += 0.55;
+    if (n("ai_prioritizes_poison") && (n("poison_apply") || n("poison_synergy"))) s += 0.55;
+    if (n("ai_prioritizes_stun") && (n("stun_apply") || n("stun_synergy"))) s += 0.55;
+
+    for (const key of (options?.archetypes || [])) {
+      const def = ARCHETYPE_DEFS[key];
+      if (!def) continue;
+      const coreCount = team.reduce((acc,u)=>acc + (anyTag(u.__opt.tags, def.include) ? 1 : 0), 0);
+      if (coreCount === 0) s -= 3.0;
+      else if (coreCount === 1) s -= 0.5;
+      else s += Math.min(2.0, coreCount * 0.45);
+    }
+
+    return s;
+  }
+
   function archetypeCohesionScore(team, archetypes) {
     const defs = getArchetypeDefs(archetypes);
     if (!defs.length) return 0;
@@ -630,6 +677,7 @@
     if (Array.isArray(options?.archetypes) && options.archetypes.length) s += archetypeCohesionScore(team, options.archetypes);
 
     s += coverageBonus(features);
+    s += aiTeamCohesionScore(team, features, options);
     s -= redundancyPenalty(features);
 
     return s;
@@ -833,10 +881,12 @@
 
     // candidates (exclude forced duplicates)
     const forcedIds = new Set(forcedUnits.map(u => normId(u.id)));
-    let pool = topCandidates(units.filter(u => !forcedIds.has(normId(u.id))), poolSize);
+    let pool = units.filter(u => !forcedIds.has(normId(u.id)));
 
-    // archetype filtering for non-forced picks
+    // archetype filtering for non-forced picks happens before candidate capping,
+    // so lower-stat but mechanically relevant units are not discarded too early.
     pool = filterCandidatesForArchetypes(pool, options.archetypes || [], 8 - forcedUnits.length);
+    pool = topCandidates(pool, poolSize);
 
     // preset filtering for non-forced picks
     if (def) {
@@ -890,11 +940,11 @@
 
       // start from remaining (exclude consumed and forced)
       let candidates = units.filter(u => !consumed.has(normId(u.id)) && !forcedIds.has(normId(u.id)));
-      // compute base pool
-      candidates = topCandidates(candidates, Math.max(200, candidates.length));
 
-      // archetype filtering for non-forced picks
+      // archetype filtering for non-forced picks happens before candidate capping,
+      // so lower-stat but mechanically relevant units are not discarded too early.
       candidates = filterCandidatesForArchetypes(candidates, options.archetypes || [], 5 - forced.length);
+      candidates = topCandidates(candidates, Math.max(200, candidates.length));
 
       // preset filtering for non-forced picks
       if (def) {
