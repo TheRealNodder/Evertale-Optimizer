@@ -65,7 +65,7 @@ function getSecondaryArchetypePref() {
   return ARCHETYPE_OPTIONS.has(v) ? v : "none";
 }
 function setPrimaryArchetypePref(v) { localStorage.setItem(LS_PRIMARY_ARCHETYPE_KEY, ARCHETYPE_OPTIONS.has(v) ? v : ""); }
-function setSecondaryArchetypePref(v) { localStorage.setItem(LS_SECONDARY_ARCHETYPE_KEY, ARCHETYPE_OPTIONS.has(v) ? v : "none"); }
+function setSecondaryArchetypePref(v) { localStorage.setItem(LS_SECONDARY_ARCHETYPE_KEY, (v && ARCHETYPE_OPTIONS.has(v)) ? v : "none"); }
 
 function defaultLocks() {
   return {
