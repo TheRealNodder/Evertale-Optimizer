@@ -1,0 +1,52 @@
+{
+  "version": 1,
+  "status": "authorized-sandbox-schema",
+  "purpose": "Resolve raw Monster entries into optimizer-ready character records without mutating live site files.",
+  "sourceOfTruth": "Raw APK JSON and MonsterEntries.zip",
+  "familyRule": "Clean family name is used as catalog identity. Raw form IDs keep suffixes such as 01, 02, and 03.",
+  "resolvedCharacterShape": {
+    "family": "string",
+    "displayName": "string|null",
+    "category": "character",
+    "forms": [
+      {
+        "id": "string",
+        "formType": "base|evolved|finalAwaken|variant|unknown",
+        "stars": "number|null",
+        "evolvedStars": "number|null",
+        "image": "string|null",
+        "stats": {
+          "baseAttack": "number|null",
+          "baseMaxHp": "number|null",
+          "speed": "number|null",
+          "cost": "number|null"
+        },
+        "element": "string|null",
+        "weaponPref": "string|null",
+        "activeSkills": "object",
+        "activeSkillsAI": "object|null",
+        "passives": "object|null",
+        "aiSequence": "string|null"
+      }
+    ],
+    "optimizer": {
+      "tags": [],
+      "skillTags": [],
+      "passiveTags": [],
+      "unresolvedRefs": []
+    }
+  },
+  "requiredInputs": [
+    "apkfiles/MonsterEntries.zip",
+    "apkfiles/maps/optimizer_tag_map.json",
+    "apkfiles/maps/optimizer_skill_tag_rules.json"
+  ],
+  "generatedOutputs": [
+    "apkfiles/maps/characters_image_map.json",
+    "apkfiles/maps/character_logic_map.json",
+    "apkfiles/maps/character_optimizer_tag_map.json",
+    "apkfiles/CatalogOrder/character_order.txt",
+    "apkfiles/reports/character_resolver_report.txt",
+    "apkfiles/reports/unresolved_character_refs.txt"
+  ]
+}
