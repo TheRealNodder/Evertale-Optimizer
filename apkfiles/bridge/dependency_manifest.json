@@ -1,0 +1,132 @@
+{
+  "version": 1,
+  "status": "sandbox-generated",
+  "purpose": "Inventory every raw APK dependency needed to build the catalog, image maps, character resolver, and optimizer bridge without touching live website files.",
+  "basis": "apkfiles/ORIGINAL_IDEA_BASIS.md",
+  "liveSiteMutation": false,
+  "dependencyGroups": {
+    "catalogIdentity": {
+      "description": "Defines what exists and how entries are split, ordered, and grouped.",
+      "required": [
+        {
+          "file": "Monster.json",
+          "role": "Primary raw unit/monster/boss source. Feeds character and boss entry generation.",
+          "feeds": ["MonsterEntries.zip", "BossEntries.zip", "character_order.txt", "boss_order.txt", "characters_image_map.json", "bosses_image_map.json"]
+        },
+        {
+          "file": "Weapon.json",
+          "role": "Primary raw weapon source. Feeds weapon entries, weapon order, weapon image mapping.",
+          "feeds": ["WeaponEntries.zip", "weapon_order.txt", "weapons_image_map.json"]
+        },
+        {
+          "file": "Equipment.json",
+          "role": "Primary raw accessory/equipment source. Equipment equals accessories in the website layer.",
+          "feeds": ["EquipmentEntries.zip", "accessory_order.txt", "accessories_image_map.json"]
+        },
+        {
+          "file": "GCodes.json",
+          "role": "Tutorial/special code mappings. Feeds GCodes entry split and reference reports.",
+          "feeds": ["GCodesEntries.zip", "gcode_order.txt"]
+        }
+      ]
+    },
+    "abilityResolution": {
+      "description": "Resolves active skills and passives into real optimizer-readable logic.",
+      "required": [
+        {
+          "file": "AbilityConfig.json",
+          "role": "Primary ability definition lookup. Links character activeSkills/passives to TU/SP/cost/target/effect/scalar references.",
+          "feeds": ["character_logic_map.json", "character_optimizer_tag_map.json", "unresolved_character_refs.txt"]
+        },
+        {
+          "file": "AbilityEffect.json",
+          "role": "Defines ability effects used by AbilityConfig.",
+          "feeds": ["character_logic_map.json", "optimizer_skill_tag_rules.json"]
+        },
+        {
+          "file": "AbilityComponent.json",
+          "role": "Breaks effects into components such as damage, heal, status, summon, cleanse, buff, etc.",
+          "feeds": ["character_logic_map.json", "character_optimizer_tag_map.json"]
+        },
+        {
+          "file": "AttackScalor.json",
+          "aliases": ["AttackScalar.json"],
+          "role": "Damage/healing/scaling table. Official spelling appears to be AttackScalor in the APK data.",
+          "feeds": ["character_logic_map.json", "optimizer_tag_map.json"]
+        },
+        {
+          "file": "TargetingData.json",
+          "role": "Target selection and target count rules for abilities.",
+          "feeds": ["character_logic_map.json", "optimizer_skill_tag_rules.json"]
+        },
+        {
+          "file": "Buff.json",
+          "role": "Buff/status definitions used by abilities and passives.",
+          "feeds": ["character_logic_map.json", "character_optimizer_tag_map.json"]
+        },
+        {
+          "file": "MonsterConditions.json",
+          "role": "Condition resolver for element/status/HP/TU/team-state checks.",
+          "feeds": ["character_logic_map.json", "optimizer_skill_tag_rules.json", "character_optimizer_tag_map.json"]
+        }
+      ]
+    },
+    "aiResolution": {
+      "description": "Optional but important for boss behavior and future optimizer accuracy.",
+      "required": [
+        {
+          "file": "AbilityAI.json",
+          "role": "Ability usage priority/eligibility logic.",
+          "feeds": ["character_logic_map.json", "boss_logic_map.json"]
+        },
+        {
+          "file": "AbilityAISequence.json",
+          "role": "AI sequence definitions referenced by aiSequence fields.",
+          "feeds": ["character_logic_map.json", "boss_logic_map.json"]
+        },
+        {
+          "file": "AIThreat.json",
+          "role": "Threat/target weighting logic.",
+          "feeds": ["boss_logic_map.json", "optimizer_tag_map.json"]
+        },
+        {
+          "file": "BattleBehavior.json",
+          "role": "Battle behavior overlays and special AI behavior.",
+          "feeds": ["boss_logic_map.json", "character_logic_map.json"]
+        }
+      ]
+    },
+    "websiteBridge": {
+      "description": "Generated files that translate APK data into the existing website expectations.",
+      "generated": [
+        "apkfiles/bridge/optimizer_manifest.json",
+        "apkfiles/bridge/character_resolver_schema.json",
+        "apkfiles/bridge/dependency_manifest.json",
+        "apkfiles/maps/characters_image_map.json",
+        "apkfiles/maps/weapons_image_map.json",
+        "apkfiles/maps/accessories_image_map.json",
+        "apkfiles/maps/bosses_image_map.json",
+        "apkfiles/maps/character_logic_map.json",
+        "apkfiles/maps/character_optimizer_tag_map.json",
+        "apkfiles/maps/optimizer_tag_map.json",
+        "apkfiles/maps/optimizer_skill_tag_rules.json",
+        "apkfiles/reports/bridge_compatibility_report.txt",
+        "apkfiles/reports/character_resolver_report.txt",
+        "apkfiles/reports/missing_images.txt",
+        "apkfiles/reports/missing_tags.txt",
+        "apkfiles/reports/unresolved_character_refs.txt",
+        "apkfiles/reports/unresolved_optimizer_refs.txt"
+      ]
+    }
+  },
+  "completionState": {
+    "foundation": "created",
+    "catalogSplit": "partial/generated in ZIPs",
+    "imageMaps": "partial",
+    "characterResolver": "schema-created; full resolver pending raw dependency verification",
+    "abilityResolution": "pending",
+    "aiResolution": "pending",
+    "liveIntegration": "not started"
+  },
+  "nextRequiredAction": "Verify each required raw dependency exists in apkfiles or uploaded source bundle, then generate character_logic_map.json and unresolved reports."
+}
