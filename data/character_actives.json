@@ -6,67 +6,333 @@
     "internalMonsterId": "SnowWhiteNew01",
     "activeSkills": [
       {
-        "name": "Single Attack",
-        "description": "Raw active skill reference: SingleAttackASnowWhiteNew.",
-        "tu": null,
-        "sp": null,
+        "name": "Poison Apple",
+        "description": "Damage to 1 enemy. Damage increases the longer Snow White has been on the battlefield. This attack ignores enemy Armor, Skin passive effects, and effects of non-boss enemies that would prevent defeat. The target is purified of Burn and Sleep protections, then afflicted with Lethal Poison. If the enemy has reinforcements, Snow White schedules a Death Minion to be added to random reinforcements. This skill also removes the lock from Fairytale Finale.",
+        "tu": 50,
+        "sp": 2,
         "internalId": "SingleAttackASnowWhiteNew",
         "config": "SingleAttackASnowWhiteNew",
-        "targeting": "Unknown",
-        "flags": [],
-        "components": [],
-        "effect": null,
-        "ai": null,
+        "targeting": "1Enemy",
+        "flags": [
+          "Summon",
+          "Poisoner"
+        ],
+        "components": [
+          "Damage",
+          "ApplyBuff",
+          "ApplyBuff",
+          "ApplyBuff"
+        ],
+        "effect": "SnowWhiteNewAttack1",
         "rawRefs": {
-          "source": "Monster.json"
+          "abilityScalor": 3,
+          "conditionalAbilityScalors": [
+            6,
+            9
+          ],
+          "targetData": {
+            "class": "TargetingData",
+            "enemyTargets": 1
+          },
+          "configData": {
+            "class": "AbilityConfig",
+            "targetingData": "1Enemy",
+            "components": [
+              "Damage",
+              "ApplyBuff",
+              "ApplyBuff",
+              "ApplyBuff"
+            ],
+            "componentOverrides": [
+              {
+                "damageBoosts": [
+                  "RegularAttackDamageBoost"
+                ],
+                "applyToTargetType": "Enemy",
+                "damageFlags": [
+                  "IgnoreArmor",
+                  "IgnoreSkin",
+                  "HardIgnoreBlockDeath"
+                ]
+              },
+              {
+                "buffs": [
+                  "RemoveBurn",
+                  "RemoveSleep",
+                  "BurnImmunityTempForRevenge",
+                  "LethalPoison"
+                ],
+                "chance": 1.0,
+                "applyToTargetType": "Enemy",
+                "skipAbilityEffect": true
+              },
+              {
+                "buffs": [
+                  "Add1DeathMinionToRandomReinforcementsEOT"
+                ],
+                "applyToSourceOnly": true,
+                "skipAbilityEffect": true,
+                "showMissConditions": "ShowNoMiss",
+                "applyConditions": "IsEnemyHasReinforcementsCheck"
+              },
+              {
+                "buffs": [
+                  "RemoveActive3LOCKSnowWhiteNew"
+                ],
+                "applyToSourceOnly": true,
+                "skipAbilityEffect": true,
+                "showMissConditions": "ShowNoMiss"
+              }
+            ],
+            "enemyEventType": "Hit",
+            "sourceEventType": "Finish",
+            "attackScalors": [
+              "TimeInCombat100",
+              "TimeInCombat200"
+            ],
+            "conditionedAbilityEffects": [
+              "SnowWhiteNewAttack1",
+              "SnowWhiteNewAttack1"
+            ],
+            "flags": [
+              "Summon",
+              "Poisoner"
+            ],
+            "recommendEffectWhenUsable": -2,
+            "abilityEffect": "SnowWhiteNewAttack1"
+          }
         }
       },
       {
-        "name": "Bloody Buff",
-        "description": "Raw active skill reference: BloodyBuffASnowWhiteNew.",
-        "tu": null,
-        "sp": null,
+        "name": "Queen’s Retinue",
+        "description": "Adds three random token reinforcements from Excalibur Minion or Super Life Minion to the end of allied reinforcements when valid. This is a fast setup skill that costs Spirit and supports Snow White’s summoned-token package.",
+        "tu": 1,
+        "sp": -1,
         "internalId": "BloodyBuffASnowWhiteNew",
         "config": "BloodyBuffASnowWhiteNew",
-        "targeting": "Unknown",
-        "flags": [],
-        "components": [],
-        "effect": null,
-        "ai": null,
+        "targeting": "AllAlly",
+        "flags": [
+          "Devour",
+          "Summon",
+          "SleepChance",
+          "NoDamage"
+        ],
+        "components": [
+          "ApplyBuff",
+          "ApplyBuff",
+          "ApplyBuff",
+          "ApplyBuff",
+          "ApplyBuff",
+          "ApplyBuff"
+        ],
+        "effect": "SnowWhiteNewMori",
         "rawRefs": {
-          "source": "Monster.json"
+          "abilityScalor": null,
+          "conditionalAbilityScalors": [],
+          "targetData": {
+            "class": "TargetingData",
+            "allFriends": true
+          },
+          "configData": {
+            "class": "AbilityConfig",
+            "targetingData": "AllAlly",
+            "components": [
+              "ApplyBuff",
+              "ApplyBuff",
+              "ApplyBuff",
+              "ApplyBuff",
+              "ApplyBuff",
+              "ApplyBuff"
+            ],
+            "componentOverrides": [
+              {
+                "buffs": [
+                  "EmptyPlaceholder"
+                ],
+                "applyToTargetType": "Friendly",
+                "showMissConditions": "ShowNoMiss"
+              },
+              {
+                "randomBuffFromList": [
+                  "Add1ExcaliburTokenToEnd",
+                  "Add1SuperLifeMinionToEnd"
+                ],
+                "applyToSourceOnly": true,
+                "skipAbilityEffect": true,
+                "showMissConditions": "ShowNoMiss",
+                "applyConditions": "NoTokenLastInReinforcements"
+              },
+              {
+                "randomBuffFromList": [
+                  "Add1ExcaliburTokenToEnd",
+                  "Add1SuperLifeMinionToEnd"
+                ],
+                "applyToSourceOnly": true,
+                "skipAbilityEffect": true,
+                "showMissConditions": "ShowNoMiss",
+                "applyConditions": "NoTokenLastInReinforcements"
+              },
+              {
+                "randomBuffFromList": [
+                  "Add1ExcaliburTokenToEnd",
+                  "Add1SuperLifeMinionToEnd"
+                ],
+                "applyToSourceOnly": true,
+                "skipAbilityEffect": true,
+                "showMissConditions": "ShowNoMiss",
+                "applyConditions": "NoTokenLastInReinforcements"
+              },
+              {
+                "buffs": [
+                  "TokenElementCheckSnowWhiteNew",
+                  "SacLastReinforcement"
+                ],
+                "applyToSourceOnly": true,
+                "skipAbilityEffect": true,
+                "showMissConditions": "ShowNoMiss",
+                "applyConditions": "AllyHasReinforcementsTokenInBack"
+              },
+              {
+                "buffs": [
+                  "SnowWhiteNewActive2Cooldown50",
+                  "RemoveActive3LOCKSnowWhiteNew"
+                ],
+                "applyToSourceOnly": true,
+                "skipAbilityEffect": true,
+                "showMissConditions": "ShowNoMiss"
+              }
+            ],
+            "friendlyEventType": "Finish",
+            "sourceEventType": "Finish",
+            "abilityEffect": "SnowWhiteNewMori",
+            "flags": [
+              "Devour",
+              "Summon",
+              "SleepChance",
+              "NoDamage"
+            ],
+            "useCondition": "NotInstantCooldown"
+          }
         }
       },
       {
-        "name": "Ally Buff",
-        "description": "Raw active skill reference: AllyBuffASnowWhiteNew.",
-        "tu": null,
-        "sp": null,
+        "name": "White Snow",
+        "description": "Heals all allies for 500% of the user’s Attack and removes Sleep and Poison from allies. This locks Fairytale Finale and arms Snow White’s delayed execution effects, with stronger delayed defeat effects depending on her awakening/count state. Usable only while the lock is not already active.",
+        "tu": 1,
+        "sp": 1,
         "internalId": "AllyBuffASnowWhiteNew",
         "config": "AllyBuffASnowWhiteNew",
-        "targeting": "Unknown",
-        "flags": [],
-        "components": [],
-        "effect": null,
-        "ai": null,
+        "targeting": "All",
+        "flags": [
+          "NoDamage",
+          "Healer"
+        ],
+        "components": [
+          "ApplyBuff",
+          "ApplyBuff"
+        ],
+        "effect": "SnowWhiteNewWhiteSnow",
         "rawRefs": {
-          "source": "Monster.json"
+          "abilityScalor": null,
+          "conditionalAbilityScalors": [],
+          "targetData": {
+            "class": "TargetingData",
+            "all": true
+          },
+          "configData": {
+            "class": "AbilityConfig",
+            "targetingData": "All",
+            "components": [
+              "ApplyBuff",
+              "ApplyBuff"
+            ],
+            "componentOverrides": [
+              {
+                "buffs": [
+                  "RemoveSleep",
+                  "RemovePoison",
+                  "Heal500Percent"
+                ],
+                "applyToTargetType": "Friendly",
+                "showMissConditions": "ShowNoMiss"
+              },
+              {
+                "buffs": [
+                  "Active3LOCKSnowWhiteNew",
+                  "KillRandomEnemyEOTAndCreditKillSnowWhiteNewLV4",
+                  "KillRandomEnemyEOTAndCreditKillSnowWhiteNewLV3",
+                  "KillRandomEnemyEOTAndCreditKillSnowWhiteNewLV2",
+                  "KillRandomEnemyEOTAndCreditKillSnowWhiteNewLV1",
+                  "UsedAbilityCounter"
+                ],
+                "applyToSourceOnly": true,
+                "skipAbilityEffect": true,
+                "showMissConditions": "ShowNoMiss"
+              }
+            ],
+            "enemyEventType": "Hit",
+            "friendlyEventType": "Hit",
+            "sourceEventType": "Finish",
+            "abilityEffect": "SnowWhiteNewWhiteSnow",
+            "flags": [
+              "NoDamage",
+              "Healer"
+            ],
+            "useCondition": "IsNotActive3LOCKSnowWhiteNew"
+          }
         }
       },
       {
-        "name": "Special Attack",
-        "description": "Raw active skill reference: SpecialAttackASnowWhiteNew.",
-        "tu": null,
-        "sp": null,
+        "name": "Fairytale Finale",
+        "description": "700% damage to 2 random enemies. This attack ignores Armor and effects of non-boss enemies that would prevent defeat. Usable only when the World Death counter condition is met, and removes the White Snow lock after use.",
+        "tu": 70,
+        "sp": -2,
         "internalId": "SpecialAttackASnowWhiteNew",
         "config": "SpecialAttackASnowWhiteNew",
-        "targeting": "Unknown",
+        "targeting": "2RandomEnemy",
         "flags": [],
-        "components": [],
-        "effect": null,
-        "ai": null,
+        "components": [
+          "Damage",
+          "ApplyBuff"
+        ],
+        "effect": "SnowWhiteNewSpecial",
         "rawRefs": {
-          "source": "Monster.json"
+          "abilityScalor": 7,
+          "conditionalAbilityScalors": [],
+          "targetData": {
+            "class": "TargetingData",
+            "twoRandomEnemy": true
+          },
+          "configData": {
+            "class": "AbilityConfig",
+            "targetingData": "2RandomEnemy",
+            "components": [
+              "Damage",
+              "ApplyBuff"
+            ],
+            "componentOverrides": [
+              {
+                "damageFlags": [
+                  "IgnoreArmor",
+                  "HardIgnoreBlockDeath"
+                ],
+                "applyToTargetType": "Enemy"
+              },
+              {
+                "buffs": [
+                  "RemoveActive3LOCKSnowWhiteNew"
+                ],
+                "applyToSourceOnly": true,
+                "skipAbilityEffect": true,
+                "showMissConditions": "ShowNoMiss"
+              }
+            ],
+            "enemyEventType": "Hit",
+            "friendlyEventType": "Finish",
+            "sourceEventType": "Finish",
+            "abilityEffect": "SnowWhiteNewSpecial",
+            "useCondition": "IsWorldDeathCounter5"
+          }
         }
       }
     ]
