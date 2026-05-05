@@ -1,0 +1,1507 @@
+{
+  "schemaVersion": 3,
+  "order": 613,
+  "id": "excalibur-regular-02",
+  "name": "ExcaliburRegular02",
+  "category": "character",
+  "rarity": null,
+  "stars": 6,
+  "evolvedStars": 6,
+  "element": "Dark",
+  "weaponType": "GreatSword",
+  "stats": {
+    "atk": 1277,
+    "hp": 8035,
+    "spd": 416,
+    "cost": 34
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/ExcaliburRegular02.png",
+  "refs": {
+    "activeSkills": [
+      "SummonSweepAExcaliburRegular",
+      "MoriSacrificeAttackAExcaliburRegular",
+      "KillStrikeAExcaliburRegular",
+      "AllBuffAExcaliburRegular"
+    ],
+    "passives": [
+      "PassiveAllyBuffAExcaliburRegular",
+      "MoriCompanionPassiveAExcaliburRegular",
+      "PlusAttackBoostLv3",
+      "PlusHPBoostLv3",
+      "LifeMinusDamageLv3",
+      "AddWeaponPrefGreatAxe"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": "AttackAndHPUp6Death",
+    "leaderBuffCondition": "IsDeath",
+    "summonableMonsters": [
+      "ExcaliburMinion01"
+    ]
+  },
+  "resolved": {
+    "activeSkills": {
+      "SummonSweepAExcaliburRegular": {
+        "id": "SummonSweepAExcaliburRegular",
+        "found": true,
+        "ability": {
+          "name": "SummonSweepAExcaliburRegular",
+          "class": "Ability",
+          "abilityScalor": 0,
+          "config": "SummonSweepAExcaliburRegular",
+          "tuCost": 70,
+          "useLimit": 0,
+          "spiritGain": 3,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "AllEnemy",
+          "components": [
+            "Damage",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "Add1ExcaliburTokenToEnd",
+                "Add1ExcaliburTokenToEnd",
+                "Add1ExcaliburTokenToEnd"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss"
+            },
+            {
+              "buffs": [
+                "AttackPlus50Percent1TurnOnly"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss"
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "ExcaliburAttack1",
+          "flags": [
+            "Summon"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "allEnemies": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.6,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_castingpurple2/batfx_castingpurple2",
+            "batfx_impactmagic2/batfx_impactmagic2",
+            "batsfx_prefab/batsfx_slash1"
+          ],
+          "sortOrderOffset": [
+            2,
+            2,
+            2,
+            2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            true,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "Add1ExcaliburTokenToEnd": {
+            "class": "Buff",
+            "behaviors": [
+              "SummonMonster"
+            ],
+            "behaviorOverrides": [
+              {
+                "monsterType": "ExcaliburMinion01"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "AttackPlus50Percent1TurnOnly": {
+            "class": "Buff",
+            "stackName": "AttackPlus50Percent",
+            "behaviors": [
+              "RemoveAfterTurnsBehavior",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "turnCount": 1,
+                "scalorStatBonuses": {
+                  "Attack": 0.5
+                }
+              },
+              {
+                "name": "AttackMinus25Percent"
+              }
+            ],
+            "iconSpriteName": "IconRedRage01",
+            "showAsTimer": true,
+            "duration": -1
+          }
+        },
+        "attackScalors": {},
+        "conditions": {},
+        "localization": {
+          "name": "Mori Sweep",
+          "description": "Damage to all enemies. Adds 3 Super Kuromoris to the very end of the allied reinforcements, and the user's Attack is increased to 1.5x until the end of its next turn. This will overwrite the effects of other Enrage skills on the user.",
+          "selected": "Damage all enemies, adds 3 Moris"
+        }
+      },
+      "MoriSacrificeAttackAExcaliburRegular": {
+        "id": "MoriSacrificeAttackAExcaliburRegular",
+        "found": true,
+        "ability": {
+          "name": "MoriSacrificeAttackAExcaliburRegular",
+          "class": "Ability",
+          "abilityScalor": 4,
+          "config": "MoriSacrificeAttackAExcaliburRegular",
+          "tuCost": 70,
+          "useLimit": 0,
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "applyToTargetType": "Enemy",
+              "damageFlags": [
+                "IgnoreArmor"
+              ]
+            },
+            {
+              "buffs": [
+                "Add1ExcaliburTokenToFront"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss"
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "ExcaliburThlow",
+          "useCondition": "AllyHasReinforcementsTokenInBackOrTokenOnBattlefield"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0,
+            0.1,
+            0,
+            0,
+            1.5,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0.4,
+            0.5,
+            0.2,
+            0.3
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_timestrike1",
+            "batfx_ChristmasDarkPrep1/batfx_ChristmasDarkPrep1",
+            "batsfx_prefab/batsfx_whoosh1",
+            "batsfx_prefab/batsfx_gravityball",
+            "batfx_Excalibur/batfx_tailwindchange1",
+            "batfx_Excalibur/batfx_ExcaliburCharge1",
+            "batsfx_prefab/batsfx_charge1",
+            "batfx_snowwhiteswimsuit1/batfx_throwwaterorb1",
+            "batfx_throwparticle11/batfx_throwparticle11",
+            "batsfx_prefab/batsfx_blaster1",
+            "batfx_Excalibur/batfx_ExcaliburCharge2",
+            "batfx_Excalibur/batfx_antareslashPurple1",
+            "batfx_Excalibur/batfx_ExcaliburWeapon",
+            "batfx_snowwhitedmg1/batfx_snowwhitedmg1",
+            "batsfx_prefab/batsfx_bomb1",
+            "batfx_snowwhitebride1/batfx_darknuke1",
+            "batfx_common/batfx_whiteout1"
+          ],
+          "sortOrderOffset": [
+            2,
+            -2,
+            1,
+            -2,
+            -100,
+            -1,
+            3,
+            3,
+            3,
+            3,
+            3,
+            2,
+            2,
+            2,
+            -2,
+            10,
+            50
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            false,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true
+          ],
+          "isProjectileFX": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "projectileFlightDuration": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0.5,
+            0.5,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "projectileStartOffsetY": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            100,
+            100,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "projectileStartOffsetX": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            100,
+            100,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "Add1ExcaliburTokenToFront": {
+            "class": "Buff",
+            "behaviors": [
+              "SummonMonster"
+            ],
+            "behaviorOverrides": [
+              {
+                "monsterType": "ExcaliburMinion01",
+                "frontOfLineup": true
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "AllyHasReinforcementsTokenInBackOrTokenOnBattlefield": {
+            "class": "MonsterConditions",
+            "allyReinforcements": 1,
+            "myTeamLastReplacementMonsterCondition": "IsToken",
+            "or": {
+              "class": "MonsterConditions",
+              "myTeamMonsterConditionMatchesNeeded": {
+                "IsToken": 1
+              }
+            }
+          }
+        },
+        "localization": {
+          "name": "Sacred Blade",
+          "description": "500% damage to 2 enemies, and adds 1 Super Kuromori to the very front of the allied reinforcements. This attack ignores enemy damage reduction effects. Usable only if there is an ally Mori on the battlefield or a Mori in the very back of allied reinforcements.",
+          "selected": "500% damage to 2 enemies, ignores armor"
+        }
+      },
+      "KillStrikeAExcaliburRegular": {
+        "id": "KillStrikeAExcaliburRegular",
+        "found": true,
+        "ability": {
+          "name": "KillStrikeAExcaliburRegular",
+          "class": "Ability",
+          "abilityScalor": 5,
+          "config": "KillStrikeAExcaliburRegular",
+          "tuCost": 50,
+          "useLimit": 0,
+          "spiritCost": 3,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "applyToTargetType": "Enemy",
+              "damageFlags": [
+                "HardIgnoreBlockDeath"
+              ]
+            },
+            {
+              "buffs": [
+                "Add1ExcaliburTokenToFront"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss"
+            },
+            {
+              "buffs": [
+                "RemoveKillStrikeAExcaliburRegularEnabled"
+              ],
+              "applyToTargetType": "Source",
+              "chance": 1.0,
+              "skipAbilityEffect": true
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "ExcaliburSpecial",
+          "flags": [
+            "Summon"
+          ],
+          "useCondition": "CanUseKillStrikeAExcaliburRegular"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.6,
+            0,
+            0.1,
+            0.6,
+            0.8,
+            1.2,
+            0,
+            0.5,
+            0,
+            0,
+            0,
+            0.1,
+            0.2,
+            0,
+            0,
+            0,
+            0.5,
+            0.2
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_cinderelladark1/batfx_quickcharge2",
+            "batfx_Excalibur/batfx_ExcaliburSword1",
+            "batsfx_prefab/batsfx_multislash1",
+            "batsfx_prefab/batsfx_multislash1",
+            "batfx_Excalibur/batfx_ExcaliburSword2",
+            "batsfx_prefab/batsfx_gravityball",
+            "batfx_tailwindfire3/batfx_tailwindfire3",
+            "batsfx_prefab/batsfx_ring2",
+            "batfx_knifeslash1/batfx_knifeslash1",
+            "batfx_UnicornRegular/batfx_bluntimpactR2",
+            "batsfx_prefab/batsfx_multislash2",
+            "batfx_lokiregular1/batfx_multiscythe1",
+            "batsfx_prefab/batsfx_slash1",
+            "batfx_slash5/batfx_slash5",
+            "batfx_Excalibur/batfx_firemultiNosound2",
+            "batsfx_prefab/batsfx_slash1",
+            "batfx_lokiregular1/batfx_multipleslash3",
+            "batfx_Napoleon/batfx_Stunbombimpact2",
+            "batfx_common/batfx_whiteout1"
+          ],
+          "sortOrderOffset": [
+            2,
+            2,
+            2,
+            2,
+            2,
+            4,
+            1,
+            -2,
+            1,
+            1,
+            50,
+            1,
+            50,
+            1,
+            1,
+            1,
+            1,
+            50,
+            50,
+            40
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            true,
+            true
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            true,
+            true
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "Add1ExcaliburTokenToFront": {
+            "class": "Buff",
+            "behaviors": [
+              "SummonMonster"
+            ],
+            "behaviorOverrides": [
+              {
+                "monsterType": "ExcaliburMinion01",
+                "frontOfLineup": true
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "RemoveKillStrikeAExcaliburRegularEnabled": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "KillStrikeAExcaliburRegularEnabled"
+              }
+            ],
+            "duration": 0,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "CanUseKillStrikeAExcaliburRegular": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "KillStrikeAExcaliburRegularEnabled"
+            ]
+          }
+        },
+        "localization": {
+          "name": "Sword Storm",
+          "description": "600% damage to 1 enemy, and adds 1 Super Kuromori to the very front of the allied reinforcements. This attack ignores any effects of non-boss enemies that would prevent the target from being defeated. Unlocked each time an enemy on the battlefield is defeated or sacrificed by any source. This skill is locked again after each use unless it defeats an enemy. This skill is also locked again if the user leaves the battlefield.",
+          "selected": "600% damage, adds a Mori to allies"
+        }
+      },
+      "AllBuffAExcaliburRegular": {
+        "id": "AllBuffAExcaliburRegular",
+        "found": true,
+        "ability": {
+          "name": "AllBuffAExcaliburRegular",
+          "class": "Ability",
+          "config": "AllBuffAExcaliburRegular",
+          "tuCost": 1,
+          "useLimit": 0,
+          "spiritGain": 4,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "AllFriendsAndEnemies",
+          "components": [
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "RemoveBuffs"
+              ],
+              "applyToTargetType": "Friendly"
+            },
+            {
+              "buffs": [
+                "MegaPoison"
+              ],
+              "applyToTargetType": "Enemy",
+              "buffAppliedEffects": [
+                "MidPoison1"
+              ],
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "RemoveAllBuffEnabled"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss"
+            }
+          ],
+          "enemyEventType": "Hit",
+          "friendlyEventType": "Finish",
+          "sourceEventType": "Finish",
+          "abilityEffect": "ExcaliburAbility1",
+          "flags": [
+            "Purify",
+            "Poisoner",
+            "NoDamage",
+            "Retribution"
+          ],
+          "recommendEffectWhenUsable": 1,
+          "killLockSkillIcon": "IconRedEx01",
+          "killLockUnlockedSkillIcon": "IconGreenCircle01",
+          "killLockUnlockedKey": "SkillReadyToUseKey",
+          "killLockLockedKey": "RetributionAttackDoubleAUseConditionFailureMessageKey",
+          "useCondition": "CanUseAllBuffAExcaliburRegularSkill"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "all": true,
+          "allEnemies": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0.3,
+            0,
+            0,
+            0,
+            0,
+            0.5,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_castingpurple2/batfx_castingpurple2",
+            "batfx_castingpurple1/batfx_castingpurple1",
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_Excalibur/batfx_BigCure1",
+            "batfx_Excalibur/batfx_BigCure2",
+            "batfx_Excalibur/batfx_BigPoison1",
+            "batfx_Excalibur/batfx_BigPoison2",
+            "batfx_ripplegreenlow/batfx_ripplegreenlow",
+            "batsfx_prefab/batsfx_heal1",
+            "batfx_healbottom1/batfx_healbottom1",
+            "batfx_healtop1/batfx_healtop1",
+            "batfx_cleopatraDark/batfx_puffredPurple",
+            "batsfx_prefab/batsfx_poison1",
+            "batfx_cleopatraDark/batfx_poisonmidPurple",
+            "batsfx_prefab/batsfx_poison1",
+            "batfx_spotpurple/batfx_spotpurple",
+            "batfx_ripplepurplelow/batfx_ripplepurplelow"
+          ],
+          "sortOrderOffset": [
+            2,
+            -2,
+            2,
+            -2,
+            50,
+            10,
+            50,
+            10,
+            -2,
+            -2,
+            -2,
+            2,
+            2,
+            0,
+            1,
+            -2,
+            -2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            true,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            false,
+            false,
+            false,
+            true,
+            false,
+            true,
+            false,
+            false
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            false,
+            false,
+            false,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "isEnemyTargetEffect": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isFriendlyTargetEffect": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "MegaPoison": {
+            "class": "Buff",
+            "stackName": "Poison",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "DamageOverTime"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "percentOfAttack": 0.05,
+                "damageColor": "Green",
+                "abilityEffect": "MidDeath1MegaPoison",
+                "extraDamageFlag": "MegaPoison"
+              }
+            ],
+            "tags": [
+              "Poison",
+              "MegaPoison"
+            ],
+            "canBePurified": true,
+            "duration": 200,
+            "showAsTimer": true,
+            "statusEffect": "MegaPoisonStatus",
+            "statusEffectOffset": 0.1,
+            "damageType": "Poison",
+            "iconSpriteName": "IconPurplePoison01"
+          },
+          "RemoveAllBuffEnabled": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "AllBuffEnabled"
+              }
+            ],
+            "duration": 0,
+            "isHiddenFromPlayers": true
+          },
+          "RemoveBuffs": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "CanUseAllBuffAExcaliburRegularSkill": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "AllBuffEnabled"
+            ]
+          }
+        },
+        "localization": {
+          "name": "Redemption Pulse",
+          "description": "Grants all enemies the Mega Poison status effect for 200TU, and Purifies (removes negative status effects like Sleep, Burn or Poison) all allies. Unlocked each time a Mori ally on the battlefield is defeated or sacrificed by any source, even if the Mori was Ephemeral. This skill is locked again after each use or if the user leaves the battlefield.\n\nMega Poison will overwrite other status effects on those enemies. Mega Poison deals 20 times the damage of normal Poison and cannot be overwritten by normal Poison or Super Poison.",
+          "selected": "Purify allies, Mega Poisons enemies\n(Will overwrite other status effects)"
+        }
+      }
+    },
+    "passives": {
+      "PassiveAllyBuffAExcaliburRegular": {
+        "id": "PassiveAllyBuffAExcaliburRegular",
+        "found": false
+      },
+      "MoriCompanionPassiveAExcaliburRegular": {
+        "id": "MoriCompanionPassiveAExcaliburRegular",
+        "found": false
+      },
+      "PlusAttackBoostLv3": {
+        "id": "PlusAttackBoostLv3",
+        "found": false
+      },
+      "PlusHPBoostLv3": {
+        "id": "PlusHPBoostLv3",
+        "found": false
+      },
+      "LifeMinusDamageLv3": {
+        "id": "LifeMinusDamageLv3",
+        "found": false
+      },
+      "AddWeaponPrefGreatAxe": {
+        "id": "AddWeaponPrefGreatAxe",
+        "found": false
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": {
+      "class": "MonsterConditions",
+      "elements": [
+        "Death"
+      ]
+    }
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "ExcaliburRegular02",
+    "family": "ExcaliburRegular",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "ExcaliburRegular02",
+    "family": "ExcaliburRegular",
+    "class": "Monster",
+    "leaderBuff": "AttackAndHPUp6Death",
+    "leaderBuffCondition": "IsDeath",
+    "activeSkills": {
+      "0": "SummonSweepAExcaliburRegular",
+      "1": "MoriSacrificeAttackAExcaliburRegular",
+      "2": "KillStrikeAExcaliburRegular",
+      "3": "AllBuffAExcaliburRegular"
+    },
+    "passives": {
+      "0": "PassiveAllyBuffAExcaliburRegular",
+      "1": "MoriCompanionPassiveAExcaliburRegular",
+      "2": "PlusAttackBoostLv3",
+      "3": "PlusHPBoostLv3",
+      "4": "LifeMinusDamageLv3",
+      "5": "AddWeaponPrefGreatAxe"
+    },
+    "cost": 34,
+    "baseAttack": 1277,
+    "baseMaxHp": 8035,
+    "speed": 416,
+    "element": "Death",
+    "weaponPref": "GreatSword",
+    "weaponPivotIndex": 0,
+    "secure": 1,
+    "evolveFrom": "ExcaliburRegular01",
+    "aiTargetPickWeight": 1,
+    "stars": 6,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 0,
+    "battleOrbImageFlip": 0,
+    "attackType": "Bash",
+    "formTwitterShare": 1,
+    "cosmoName": "ExcaliburRegular03",
+    "cosmoBattleOrbImageFlip": 1,
+    "summonableMonsters": [
+      "ExcaliburMinion01"
+    ],
+    "summonableMatchSource": [
+      false
+    ],
+    "skillVoices": {
+      "0": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "1": [
+        9,
+        10,
+        11,
+        12
+      ],
+      "2": [
+        13,
+        14,
+        15,
+        16
+      ],
+      "3": [
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "damageVoices": [
+      17,
+      18,
+      19,
+      20
+    ],
+    "deathVoices": [
+      21,
+      22,
+      23,
+      24
+    ],
+    "victoryVoices": [
+      25,
+      26
+    ],
+    "lineupVoices": [
+      27,
+      28,
+      29,
+      30,
+      31,
+      32
+    ],
+    "evolutionVoices": [
+      38
+    ],
+    "trainVoices": [
+      33,
+      34,
+      35,
+      36,
+      37,
+      39,
+      40,
+      41,
+      42,
+      43
+    ],
+    "titleVoices": [
+      44
+    ],
+    "gachaVoices": [
+      45
+    ],
+    "loginVoices": [
+      46
+    ],
+    "tapVoices": [
+      47,
+      48,
+      49
+    ],
+    "idleVoices": [
+      50
+    ]
+  },
+  "_build": {
+    "scriptVersion": "3-incremental-checkpoint",
+    "sourceHash": "885ee98c276b4a73378f4aa09eafc5faa340f87eaaa57ce9a4ede9a6dc96a006",
+    "dependencyHash": "b53df6b5a23da31a29ee5a23c7e26ac60f4a9d40ee346333667a7b7f7cc27822",
+    "generatedAt": 1778013998
+  }
+}

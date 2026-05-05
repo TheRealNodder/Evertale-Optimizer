@@ -1,0 +1,737 @@
+{
+  "schemaVersion": 3,
+  "order": 226,
+  "id": "horse-idol-girl-boss-03",
+  "name": "HorseIdolGirlBoss03",
+  "category": "bosse",
+  "rarity": null,
+  "stars": 6,
+  "evolvedStars": 6,
+  "element": "Water",
+  "weaponType": "Mace",
+  "stats": {
+    "atk": 1100,
+    "hp": 40000,
+    "spd": 800,
+    "cost": 999
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/HorseIdolGirl03.png",
+  "refs": {
+    "activeSkills": [
+      "SleepAttackAHorseIdolGirlBoss",
+      "DreamHuntDoubleAHorseIdolGirlBoss",
+      "SendbackSelfABoss"
+    ],
+    "passives": [
+      "ArmorSelfEntranceA",
+      "HoldGround",
+      "HealSelf10PercentEntranceBoss",
+      "SleepImmunity"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": null,
+    "leaderBuffCondition": null,
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "SleepAttackAHorseIdolGirlBoss": {
+        "id": "SleepAttackAHorseIdolGirlBoss",
+        "found": true,
+        "ability": {
+          "name": "SleepAttackAHorseIdolGirlBoss",
+          "class": "Ability",
+          "abilityScalor": 0,
+          "config": "SleepAttackAHorseIdolGirlBoss",
+          "tuCost": 60,
+          "useLimit": 0,
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "damageFlags": [
+                "DoNotWake",
+                "IgnoreSkin"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "BurnImmunityTempForRevengeSleepAttack",
+                "SleepForced"
+              ],
+              "chance": 1.0,
+              "buffAppliedEffects": [
+                "SleepBuffInstant"
+              ],
+              "applyToTargetType": "Enemy",
+              "showMissConditions": "ShowNoMiss",
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "AlreadyAttacked"
+              ],
+              "applyToSourceOnly": true,
+              "showMissConditions": "ShowNoMiss",
+              "skipAbilityEffect": true
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "MidSleep1",
+          "flags": [
+            "SleepChance",
+            "SleepWithDamage",
+            "StealthWorthy"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0.3,
+            0,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_castingpurple1/batfx_castingpurple1",
+            "batfx_castingpurple2/batfx_castingpurple2",
+            "batfx_sleep1/batfx_sleep1",
+            "batsfx_prefab/batsfx_sleep1",
+            "batfx_spotpurple/batfx_spotpurple",
+            "batfx_ripplepurplelow/batfx_ripplepurplelow"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -2,
+            2,
+            1,
+            -2,
+            -2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            false,
+            true,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "AlreadyAttacked": {
+            "class": "Buff",
+            "stackName": "AlreadyAttacked",
+            "duration": -1,
+            "isHiddenFromPlayers": true,
+            "showAsTimer": false
+          },
+          "BurnImmunityTempForRevengeSleepAttack": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Burn",
+                  "BurnAfterTurn",
+                  "BurnAtEndOfTurn"
+                ],
+                "dontShowText": true
+              },
+              {
+                "name": "BurnAfterTurn"
+              },
+              {
+                "name": "BurnSelfOnHit"
+              }
+            ],
+            "duration": 1,
+            "showAsTimer": false,
+            "applyConditions": "IsNotAnySleepImmune",
+            "showAsPermanent": false,
+            "tags": [
+              "BurnImmune"
+            ],
+            "stackName": "BurnImmunityTempForRevenge",
+            "isHiddenFromPlayers": true
+          },
+          "SleepForced": {
+            "class": "Buff",
+            "stackName": "Sleep",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "LoseTurn",
+              "RemoveOnHurt"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "PurifyChain"
+              },
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "name": "AutoPurifyAfterTurnNoSleep"
+              },
+              {},
+              {
+                "ignoreIfHurtBySelf": true,
+                "cancelFromDamageFlags": [
+                  "DoNotWake"
+                ]
+              }
+            ],
+            "duration": 200,
+            "showAsTimer": true,
+            "statusEffect": "SleepStatus",
+            "statusEffectOffset": 0.1,
+            "iconSpriteName": "IconWhiteSleepZs01",
+            "textKeyToShowWhenApplied": "SleepKey",
+            "canBePurified": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {},
+        "localization": {
+          "name": "Sleep Attack",
+          "description": "Damage to 1 enemy. 100% chance of forcing that enemy to Sleep for 200TU, even if it has already slept while on the battlefield. If Sleep is applied, it will overwrite other status effects on that enemy. Damage from this attack does not wake up sleeping enemies. This attack ignores skin passive skills and the Counter Stance status effect.",
+          "selected": "Damage to 1 enemy, applies sleep\n(Will overwrite other status effects)"
+        }
+      },
+      "DreamHuntDoubleAHorseIdolGirlBoss": {
+        "id": "DreamHuntDoubleAHorseIdolGirlBoss",
+        "found": true,
+        "ability": {
+          "name": "DreamHuntDoubleAHorseIdolGirlBoss",
+          "class": "Ability",
+          "abilityScalor": -2,
+          "conditionalAbilityScalors": [
+            5
+          ],
+          "config": "DreamHuntDoubleAHorseIdolGirlBoss",
+          "tuCost": 80,
+          "useLimit": 0,
+          "spiritCost": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "DreamhuntDamageBoost"
+              ],
+              "damageFlags": [
+                "DoNotWake",
+                "DreamDamage",
+                "IgnoreArmor"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "SpiritGainB"
+              ],
+              "applyConditions": "IsSleeping",
+              "applyToTargetOnly": true,
+              "buffBackMode": true,
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "AlreadyAttacked"
+              ],
+              "applyToSourceOnly": true,
+              "showMissConditions": "ShowNoMiss",
+              "skipAbilityEffect": true
+            }
+          ],
+          "attackScalors": [
+            "GoodVsSleeping"
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "SmallHitRanged1",
+          "conditionedAbilityEffects": [
+            "DreamHuntAbility2R",
+            "DreamHuntAbility2R"
+          ],
+          "flags": [
+            "Dreamhunt",
+            "StealthWorthy",
+            "DreamhuntDouble"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.8,
+            0
+          ],
+          "prefabs": [
+            "batfx_bluntimpact1/batfx_bluntimpact1",
+            "batsfx_prefab/batsfx_impactsmall1"
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            true
+          ],
+          "scale": [
+            0.4,
+            1
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "AlreadyAttacked": {
+            "class": "Buff",
+            "stackName": "AlreadyAttacked",
+            "duration": -1,
+            "isHiddenFromPlayers": true,
+            "showAsTimer": false
+          },
+          "SpiritGainB": {
+            "class": "Buff",
+            "behaviors": [
+              "AddSpirit"
+            ],
+            "behaviorOverrides": [
+              {
+                "percentOfMax": 0.2
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {
+          "GoodVsSleeping": {
+            "class": "AttackScalor",
+            "targetCondition": "IsSleeping"
+          }
+        },
+        "conditions": {
+          "IsSleeping": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "Sleep"
+            ]
+          }
+        },
+        "localization": {
+          "name": "Nightmare Assassin",
+          "description": "600% damage to 2 enemies if they are sleeping, this damage will not wake up the enemies. Allies gain 2 Spirit for each sleeping target. This attack ignores enemy damage reduction effects.",
+          "selected": "600% damage to sleeping targets, does not wake"
+        }
+      },
+      "SendbackSelfABoss": {
+        "id": "SendbackSelfABoss",
+        "found": true,
+        "ability": {
+          "name": "SendbackSelfABoss",
+          "class": "Ability",
+          "config": "SendbackSelfABoss",
+          "tuCost": 0,
+          "useLimit": 0,
+          "spiritCost": 0,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "SelfOnly",
+          "components": [
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "SendToBackOfReinforcements",
+                "RemoveBuffs"
+              ]
+            }
+          ],
+          "sourceEventType": "Finish",
+          "abilityEffect": "KnockbackEffect",
+          "useCondition": "AllyHasReinforcements"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "selfOnly": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.3,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_casting4/batfx_casting4",
+            "batfx_bluehelix1/batfx_bluehelix1",
+            "batsfx_prefab/batsfx_knockback1",
+            "batfx_ripplebluelow/batfx_ripplebluelow"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -2,
+            1,
+            -2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            true,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "RemoveBuffs": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "SendToBackOfReinforcements": {
+            "class": "Buff",
+            "stackName": "Knockback",
+            "behaviors": [
+              "SendToReinforcements"
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "AllyHasReinforcements": {
+            "class": "MonsterConditions",
+            "allyReinforcements": 1
+          }
+        },
+        "localization": {
+          "name": "Fall Back",
+          "description": "Sends user away from the battlefield to the very end of allied reinforcements.",
+          "selected": "Sends user to rear of reinforcements"
+        }
+      }
+    },
+    "passives": {
+      "ArmorSelfEntranceA": {
+        "id": "ArmorSelfEntranceA",
+        "found": false
+      },
+      "HoldGround": {
+        "id": "HoldGround",
+        "found": false
+      },
+      "HealSelf10PercentEntranceBoss": {
+        "id": "HealSelf10PercentEntranceBoss",
+        "found": false
+      },
+      "SleepImmunity": {
+        "id": "SleepImmunity",
+        "found": false
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": null
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "HorseIdolGirlBoss03",
+    "family": "HorseIdolGirlBoss",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "HorseIdolGirlBoss03",
+    "class": "Monster",
+    "family": "HorseIdolGirlBoss",
+    "activeSkills": {
+      "0": "SleepAttackAHorseIdolGirlBoss",
+      "1": "DreamHuntDoubleAHorseIdolGirlBoss",
+      "2": "SendbackSelfABoss"
+    },
+    "passives": {
+      "0": "ArmorSelfEntranceA",
+      "1": "HoldGround",
+      "2": "HealSelf10PercentEntranceBoss",
+      "4": "SleepImmunity"
+    },
+    "cost": 999,
+    "baseAttack": 1100,
+    "baseMaxHp": 40000,
+    "speed": 800,
+    "element": "Water",
+    "weaponPref": "Mace",
+    "weaponPivotIndex": 0,
+    "walkSound": "TestSound",
+    "secure": 1,
+    "aiTargetPickWeight": 1,
+    "stars": 6,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 1,
+    "battleOrbImageFlip": 0,
+    "skillVoices": {
+      "0": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "1": [
+        13,
+        14,
+        15,
+        16
+      ],
+      "2": [
+        2,
+        3,
+        4
+      ]
+    },
+    "damageVoices": [
+      17,
+      18,
+      19,
+      20
+    ],
+    "deathVoices": [
+      21,
+      22,
+      23,
+      24
+    ]
+  },
+  "_build": {
+    "scriptVersion": "3-incremental-checkpoint",
+    "sourceHash": "db1d6eca6bdab18b363d2cd91477fb4ba7c5613daebae417d9c0fa0f9b9afac0",
+    "dependencyHash": "2bfa15212d58e6414d0938e286aa73b5b893a2f6b51d1e82815f7e1b7e301a92",
+    "generatedAt": 1778014035
+  }
+}

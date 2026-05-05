@@ -1,0 +1,1255 @@
+{
+  "schemaVersion": 3,
+  "order": 321,
+  "id": "earth-kaiju-01",
+  "name": "EarthKaiju01",
+  "category": "character",
+  "rarity": null,
+  "stars": 5,
+  "evolvedStars": 6,
+  "element": "Earth",
+  "weaponType": "GreatAxe",
+  "stats": {
+    "atk": 1068,
+    "hp": 5862,
+    "spd": 244,
+    "cost": 28
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/EarthKaiju01.png",
+  "refs": {
+    "activeSkills": [
+      "GainAttackSingleAEarthKaiju01",
+      "NullifyDrainSingleAEarthKaiju01",
+      "DesperateBiteAEarthKaiju01",
+      "TimeBombAllAEarthKaiju01"
+    ],
+    "passives": [
+      "HoldGround",
+      "PlusHPBoostLv3",
+      "AttackUpTargetEquippedHammerLv3",
+      "PlusAttackBoostLv3",
+      "AddWeaponPrefHammer"
+    ],
+    "activeSkillsAI": {
+      "0": "GainAttackSingleAEarthKaiju_AI",
+      "1": "NullifyDrainSingleAEarthKaiju_AI",
+      "2": "DesperateBiteAEarthKaiju_AI",
+      "3": "TimeBombAllAEarthKaiju_AI"
+    },
+    "aiSequence": null,
+    "leaderBuff": "AttackAndHPUp6Earth",
+    "leaderBuffCondition": "IsEarth",
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "GainAttackSingleAEarthKaiju01": {
+        "id": "GainAttackSingleAEarthKaiju01",
+        "found": true,
+        "ability": {
+          "name": "GainAttackSingleAEarthKaiju01",
+          "class": "Ability",
+          "abilityScalor": 0,
+          "config": "GainAttackSingleAEarthKaiju01",
+          "tuCost": 130,
+          "useLimit": 0,
+          "nameKey": "GainAttackSingleA",
+          "descriptionKey": "GainAttackSingleA",
+          "spiritGain": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ]
+            }
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "MidEarth1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.06,
+            0.24,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_casting8/batfx_casting8",
+            "batsfx_prefab/batsfx_earth1",
+            "batfx_earthmid2/batfx_earthmid2",
+            "batfx_ripplegreenlow/batfx_ripplegreenlow"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -2,
+            -2,
+            1,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {},
+        "conditions": {}
+      },
+      "NullifyDrainSingleAEarthKaiju01": {
+        "id": "NullifyDrainSingleAEarthKaiju01",
+        "found": true,
+        "ability": {
+          "name": "NullifyDrainSingleAEarthKaiju01",
+          "class": "Ability",
+          "abilityScalor": 0,
+          "conditionalAbilityScalors": [
+            0
+          ],
+          "config": "NullifyDrainSingleAEarthKaiju01",
+          "tuCost": 50,
+          "useLimit": 0,
+          "nameKey": "NullifyDrainSingleA",
+          "descriptionKey": "NullifyDrainSingleA",
+          "spiritGain": 0,
+          "spiritCost": 0,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "SlightHeal",
+                "SpiritGainD"
+              ],
+              "applyConditions": "HasStatusEffectExceptUnRemovalStatusEffect",
+              "applyToTargetOnly": true,
+              "buffBackMode": true,
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "RemoveBuffs",
+                "RemoveStealth",
+                "RemoveArmor",
+                "RemoveStance",
+                "RemoveHealingBurn"
+              ],
+              "applyToTargetOnly": true,
+              "applyConditions": "HasStatusEffectExceptUnRemovalStatusEffect"
+            }
+          ],
+          "attackScalors": [
+            "GoodVsStatusEffect"
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "StatDrain1",
+          "flags": [
+            "Purify",
+            "NoDamage"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0,
+            0.3,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_ripplebluelow/batfx_ripplebluelow",
+            "batfx_castinggreen1/batfx_castinggreen1",
+            "batfx_castinggreen2/batfx_castinggreen2",
+            "batfx_ripplebluelow/batfx_ripplebluelow",
+            "batsfx_prefab/batsfx_heal1",
+            "batfx_statdrain1/batfx_statdrain1"
+          ],
+          "sortOrderOffset": [
+            2,
+            -50,
+            -2,
+            2,
+            -2,
+            -2,
+            2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "RemoveArmor": {
+            "class": "Buff",
+            "stackName": "RemoveArmor",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "Armor"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "RemoveBuffs": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "RemoveHealingBurn": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "Burn"
+              }
+            ],
+            "duration": 0,
+            "applyConditions": "HasHealingBurn",
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "RemoveStance": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "Stance"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "RemoveStealth": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "SlightHeal": {
+            "class": "Buff",
+            "behaviors": [
+              "AdjustHp"
+            ],
+            "behaviorOverrides": [
+              {
+                "percent": 0.1,
+                "abilityEffect": "Blank",
+                "hpboosts": [
+                  "HealBoost"
+                ]
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "SpiritGainD": {
+            "class": "Buff",
+            "behaviors": [
+              "AddSpirit"
+            ],
+            "behaviorOverrides": [
+              {
+                "percentOfMax": 0.1
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {
+          "GoodVsStatusEffect": {
+            "class": "AttackScalor",
+            "targetCondition": "HasStatusEffect"
+          }
+        },
+        "conditions": {
+          "HasStatusEffectExceptUnRemovalStatusEffect": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "Explosive"
+            ],
+            "or": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "Poison"
+              ],
+              "not": {
+                "class": "MonsterConditions",
+                "monsterTags": [
+                  "LethalPoison"
+                ]
+              },
+              "or": {
+                "class": "MonsterConditions",
+                "buffStackNames": [
+                  "Sleep"
+                ],
+                "or": {
+                  "class": "MonsterConditions",
+                  "buffStackNames": [
+                    "StunSkinStatus"
+                  ],
+                  "or": {
+                    "class": "MonsterConditions",
+                    "buffStackNames": [
+                      "Freeze"
+                    ],
+                    "or": {
+                      "class": "MonsterConditions",
+                      "buffStackNames": [
+                        "Armor"
+                      ],
+                      "or": {
+                        "class": "MonsterConditions",
+                        "buffStackNames": [
+                          "Stealth"
+                        ],
+                        "or": {
+                          "class": "MonsterConditions",
+                          "buffStackNames": [
+                            "Stance"
+                          ],
+                          "or": {
+                            "class": "MonsterConditions",
+                            "buffStackNames": [
+                              "SpiritLeaking"
+                            ],
+                            "or": {
+                              "class": "MonsterConditions",
+                              "buffStackNames": [
+                                "SpiritLeakReady"
+                              ],
+                              "or": {
+                                "class": "MonsterConditions",
+                                "buffStackNames": [
+                                  "Condemn"
+                                ],
+                                "or": {
+                                  "class": "MonsterConditions",
+                                  "buffStackNames": [
+                                    "Slowed"
+                                  ],
+                                  "or": {
+                                    "class": "MonsterConditions",
+                                    "buffStackNames": [
+                                      "Burn"
+                                    ],
+                                    "not": {
+                                      "class": "MonsterConditions",
+                                      "monsterTags": [
+                                        "SilentBurn"
+                                      ]
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "DesperateBiteAEarthKaiju01": {
+        "id": "DesperateBiteAEarthKaiju01",
+        "found": true,
+        "ability": {
+          "name": "DesperateBiteAEarthKaiju01",
+          "class": "Ability",
+          "abilityScalor": 4,
+          "config": "DesperateBiteAEarthKaiju01",
+          "tuCost": 160,
+          "useLimit": 0,
+          "nameKey": "DesperateBiteA",
+          "descriptionKey": "DesperateBiteA",
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "applyToTargetType": "Enemy",
+              "damageBoosts": [
+                "DesperateDamageBoost"
+              ]
+            },
+            {
+              "applyToTargetOnly": true,
+              "buffs": [
+                "HealHalfStack"
+              ],
+              "skipAbilityEffect": true,
+              "buffBackMode": true
+            }
+          ],
+          "useCondition": "HPBelow25Percent",
+          "flags": [
+            "Desperate"
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Hit",
+          "abilityEffect": "DesperateBiteEarthKaijuBaby1",
+          "recommendEffectWhenUsable": 1
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.65,
+            0.05,
+            0,
+            0.1,
+            0.3,
+            0,
+            0.1,
+            0.6,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_timestrike1",
+            "batfx_desperatestrikeSSR/batfx_desperatestrikeSSR",
+            "batsfx_prefab/batsfx_whoosh1",
+            "batfx_kaijuslash2/batfx_kaijuslash2",
+            "batsfx_prefab/batsfx_whoosh1",
+            "batfx_argafloor/batfx_argafloor",
+            "batfx_slash5/batfx_slash5",
+            "batsfx_prefab/batsfx_slash1",
+            "batsfx_prefab/batsfx_slash1",
+            "batfx_healtop1/batfx_healtop1",
+            "batsfx_prefab/batsfx_heal1"
+          ],
+          "sortOrderOffset": [
+            2,
+            -2,
+            -2,
+            3,
+            0,
+            -2,
+            1,
+            -2,
+            -2,
+            3,
+            3
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            false,
+            true,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "scale": [
+            0,
+            0,
+            0,
+            0.8,
+            0,
+            2,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "HealHalfStack": {
+            "class": "Buff",
+            "stackName": "Healing",
+            "behaviors": [
+              "AdjustHp"
+            ],
+            "behaviorOverrides": [
+              {
+                "percent": 0.5,
+                "abilityEffect": "SmallHeal1"
+              }
+            ],
+            "duration": 0,
+            "applyConditions": "IsNotHealing",
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {
+          "HPBelow25Percent": {
+            "class": "AttackScalor",
+            "sourceCondition": "HPBelow25Percent"
+          }
+        },
+        "conditions": {
+          "HPBelow25Percent": {
+            "class": "MonsterConditions",
+            "hpLessThanPercent": 0.2500001
+          }
+        }
+      },
+      "TimeBombAllAEarthKaiju01": {
+        "id": "TimeBombAllAEarthKaiju01",
+        "found": true,
+        "ability": {
+          "name": "TimeBombAllAEarthKaiju01",
+          "class": "Ability",
+          "abilityScalor": 3,
+          "conditionalAbilityScalors": [
+            4
+          ],
+          "config": "TimeBombAllAEarthKaiju01",
+          "useLimit": 0,
+          "nameKey": "TimeBombAllA",
+          "descriptionKey": "TimeBombAllA",
+          "spiritCost": 4,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 1
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "AllEnemy",
+          "components": [
+            "Damage",
+            "ChanceToDie"
+          ],
+          "componentOverrides": [
+            {
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "chance": 1.0,
+              "applyToTargetType": "Source"
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "BombAbilityEarthKaijuLarge1",
+          "bombSkillIcon": "IconBrownCountdownClock01",
+          "bombSkillIconDescriptionKey": "TimeBombAllACountdownKey",
+          "useCondition": "TimeInCombat300",
+          "flags": [
+            "Duration"
+          ],
+          "attackScalors": [
+            "TimeInCombat400"
+          ],
+          "conditionedAbilityEffects": [
+            "BombAbilityEarthKaijuLarge1"
+          ],
+          "killsUser": true,
+          "usesExtraSurvivalScalor": true,
+          "recommendEffectWhenUsable": 1
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "allEnemies": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            1.3,
+            0.1,
+            0.15,
+            0,
+            0.1,
+            0,
+            0.1,
+            0,
+            0.15,
+            0,
+            0.12,
+            0.12,
+            0.12,
+            1.8
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_survivor1",
+            "batfx_kaijucharge1/batfx_kaijucharge1",
+            "batsfx_prefab/batsfx_bomb1",
+            "batfx_kaijunuke1/batfx_kaijunuke1",
+            "batsfx_prefab/batsfx_bomb1",
+            "batfx_bombopaque1/batfx_bombopaque1",
+            "batsfx_prefab/batsfx_bomb1",
+            "batfx_bombopaque1/batfx_bombopaque2",
+            "batsfx_prefab/batsfx_bomb1",
+            "batfx_bombopaque1/batfx_bombopaque3",
+            "batsfx_prefab/batsfx_bomb1",
+            "batfx_bombopaque1/batfx_bombopaque4",
+            "batfx_bombopaque1/batfx_bombopaque5",
+            "batfx_bombopaque1/batfx_bombopaque1",
+            "batfx_bombopaque1/batfx_bombopaque2",
+            "batfx_bombopaque1/batfx_bombopaque2"
+          ],
+          "sortOrderOffset": [
+            0,
+            1,
+            1,
+            100,
+            110,
+            110,
+            110,
+            110,
+            110,
+            110,
+            110,
+            110,
+            110,
+            110,
+            300,
+            500
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            false,
+            true,
+            false,
+            true,
+            false,
+            true,
+            true,
+            true,
+            false
+          ],
+          "useTeamEffectPosition": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            true,
+            false,
+            true,
+            false,
+            true,
+            true,
+            true,
+            true,
+            false
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ChanceToDie": {
+            "class": "ChanceToDieAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {
+          "TimeInCombat300": {
+            "class": "AttackScalor",
+            "sourceCondition": "TimeInCombat300"
+          },
+          "TimeInCombat400": {
+            "class": "AttackScalor",
+            "sourceCondition": "TimeInCombat400"
+          }
+        },
+        "conditions": {
+          "TimeInCombat300": {
+            "class": "MonsterConditions",
+            "timeInCombat": 300
+          },
+          "TimeInCombat400": {
+            "class": "MonsterConditions",
+            "timeInCombat": 400
+          }
+        }
+      }
+    },
+    "passives": {
+      "HoldGround": {
+        "id": "HoldGround",
+        "found": false
+      },
+      "PlusHPBoostLv3": {
+        "id": "PlusHPBoostLv3",
+        "found": false
+      },
+      "AttackUpTargetEquippedHammerLv3": {
+        "id": "AttackUpTargetEquippedHammerLv3",
+        "found": false
+      },
+      "PlusAttackBoostLv3": {
+        "id": "PlusAttackBoostLv3",
+        "found": false
+      },
+      "AddWeaponPrefHammer": {
+        "id": "AddWeaponPrefHammer",
+        "found": false
+      }
+    },
+    "activeSkillsAI": {
+      "0": {
+        "id": "GainAttackSingleAEarthKaiju_AI",
+        "found": true,
+        "ai": {
+          "class": "AbilityAI",
+          "baseAITargetingWeight": 1,
+          "globalScalorsToIgnore": [
+            "HPAbove1Percent",
+            "HPBelow5Percent"
+          ],
+          "aiTargetingMonsterConditions": {
+            "HPBelow10Percent": 2,
+            "HPBelow50Percent": 1.1
+          }
+        }
+      },
+      "1": {
+        "id": "NullifyDrainSingleAEarthKaiju_AI",
+        "found": true,
+        "ai": {
+          "class": "AbilityAI",
+          "baseAITargetingWeight": 0.25,
+          "globalScalorsToIgnore": [
+            "CurrentTULessThan200",
+            "IsSleeping",
+            "ElementWeakness",
+            "IsSleeper",
+            "ActiveStunAndAllyNoAbsorb",
+            "IsBurning",
+            "HasRevenge",
+            "HasNastyRevenge",
+            "HasSkin",
+            "IsActiveStun",
+            "0SpiritDamageReducerAt0Spirit"
+          ],
+          "aiTargetingMonsterConditions": {
+            "IsPoisoned": 0.1,
+            "IsSleeping": 0.1,
+            "IsBurnBlasterAndBurning": 2,
+            "IsBurningNotSilent": 2.5,
+            "RarityGreaterThan3": 1.1,
+            "RarityGreaterThan4": 1.1,
+            "RarityGreaterThan5": 1.1,
+            "IsStealth": 5,
+            "HasArmor": 5,
+            "IsOverwatch": 5
+          }
+        }
+      },
+      "2": {
+        "id": "DesperateBiteAEarthKaiju_AI",
+        "found": true,
+        "ai": {
+          "class": "AbilityAI",
+          "baseAITargetingWeight": 2
+        }
+      },
+      "3": {
+        "id": "TimeBombAllAEarthKaiju_AI",
+        "found": true,
+        "ai": {
+          "class": "AbilityAI",
+          "baseAITargetingWeight": 1.02,
+          "globalScalorsToIgnore": [
+            "IsBurning",
+            "HasRevenge",
+            "HasNastyRevenge",
+            "HasSkin",
+            "0SpiritDamageReducerAt0Spirit"
+          ],
+          "aiTargetingSourceMonsterConditions": {
+            "IsAlone": 0,
+            "3EnemiesStealthed": 0.25,
+            "4EnemiesStealthed": 0.5,
+            "HPBelow50Percent": 1.5
+          }
+        }
+      }
+    },
+    "aiSequence": null,
+    "leaderCondition": {
+      "class": "MonsterConditions",
+      "elements": [
+        "Earth"
+      ]
+    }
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "EarthKaiju01",
+    "family": "EarthKaiju",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "EarthKaiju01",
+    "family": "EarthKaiju",
+    "class": "Monster",
+    "leaderBuff": "AttackAndHPUp6Earth",
+    "leaderBuffCondition": "IsEarth",
+    "activeSkills": {
+      "0": "GainAttackSingleAEarthKaiju01",
+      "1": "NullifyDrainSingleAEarthKaiju01",
+      "2": "DesperateBiteAEarthKaiju01",
+      "3": "TimeBombAllAEarthKaiju01"
+    },
+    "activeSkillsFamily": {
+      "0": "GainAttackSingleAEarthKaiju",
+      "1": "NullifyDrainSingleAEarthKaiju",
+      "2": "DesperateBiteAEarthKaiju",
+      "3": "TimeBombAllAEarthKaiju"
+    },
+    "passives": {
+      "0": "HoldGround",
+      "2": "PlusHPBoostLv3",
+      "3": "AttackUpTargetEquippedHammerLv3",
+      "4": "PlusAttackBoostLv3",
+      "5": "AddWeaponPrefHammer"
+    },
+    "cost": 28,
+    "baseAttack": 1068,
+    "baseMaxHp": 5862,
+    "speed": 244,
+    "element": "Earth",
+    "weaponPref": "GreatAxe",
+    "weaponPivotIndex": 0,
+    "secure": 1,
+    "superEvolve1": "EarthKaiju02",
+    "aiTargetPickWeight": 1,
+    "stars": 5,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 0,
+    "battleOrbImageFlip": 1,
+    "attackType": "Weapon",
+    "visible": 1,
+    "formTwitterShare": 1,
+    "activeSkillsAI": {
+      "0": "GainAttackSingleAEarthKaiju_AI",
+      "1": "NullifyDrainSingleAEarthKaiju_AI",
+      "2": "DesperateBiteAEarthKaiju_AI",
+      "3": "TimeBombAllAEarthKaiju_AI"
+    },
+    "skillVoices": {
+      "0": [
+        1,
+        2,
+        3
+      ],
+      "1": [
+        1,
+        2,
+        3
+      ],
+      "2": [
+        1,
+        2,
+        3
+      ],
+      "3": [
+        1,
+        2,
+        3
+      ]
+    },
+    "damageVoices": [
+      5
+    ],
+    "deathVoices": [
+      6
+    ],
+    "victoryVoices": [
+      1
+    ],
+    "lineupVoices": [
+      1
+    ],
+    "evolutionVoices": [
+      1
+    ],
+    "trainVoices": [
+      1
+    ]
+  },
+  "_build": {
+    "scriptVersion": "3-incremental-checkpoint",
+    "sourceHash": "956e0acd2912648955832b765f409166bffb7bfdcd07780437675aa8ad31995b",
+    "dependencyHash": "1140ab3d46f7ffc416139cc110127194f012ba1ec1949d2d0085b9c0c9c1d878",
+    "generatedAt": 1778013989
+  }
+}

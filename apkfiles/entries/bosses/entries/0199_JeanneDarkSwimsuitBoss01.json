@@ -1,0 +1,1450 @@
+{
+  "schemaVersion": 3,
+  "order": 199,
+  "id": "jeanne-dark-swimsuit-boss-01",
+  "name": "JeanneDarkSwimsuitBoss01",
+  "category": "bosse",
+  "rarity": null,
+  "stars": 6,
+  "evolvedStars": 0,
+  "element": "Dark",
+  "weaponType": "Spear",
+  "stats": {
+    "atk": 1650,
+    "hp": 80000,
+    "spd": 643,
+    "cost": 999
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/JeanneDarkSwimsuit01.png",
+  "refs": {
+    "activeSkills": [
+      "GainAttackSingleStealthAJeanneDarkSwimBoss",
+      "StealthShieldSelfAJeanneDarkSwimBoss",
+      "SneakAttackSingleSJeanneDarkSwimBoss",
+      "SurvivorDrainAJeanneDarkSwimBoss"
+    ],
+    "passives": [
+      "HasteUpStealth",
+      "BlockDeathByBuffDamage"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": null,
+    "leaderBuffCondition": null,
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "GainAttackSingleStealthAJeanneDarkSwimBoss": {
+        "id": "GainAttackSingleStealthAJeanneDarkSwimBoss",
+        "found": true,
+        "ability": {
+          "name": "GainAttackSingleStealthAJeanneDarkSwimBoss",
+          "class": "Ability",
+          "abilityScalor": -0.33,
+          "config": "GainAttackSingleStealthAJeanneDarkSwimBoss",
+          "tuCost": 30,
+          "useLimit": 0,
+          "nameKey": "GainAttackSingleStealthA",
+          "descriptionKey": "GainAttackSingleStealthA",
+          "spiritGain": 3,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "ActiveStealthJustGained",
+                "Stealth",
+                "BurnImmunityTempForRevenge"
+              ],
+              "applyToSourceOnly": true,
+              "showMissConditions": "ShowNoMiss",
+              "skipAbilityEffect": true
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "MidDeath1",
+          "flags": [
+            "Stealth"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.3,
+            0.35,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_casting7/batfx_casting7",
+            "batfx_deathmid1/batfx_deathmid1",
+            "batsfx_prefab/batsfx_death1",
+            "batfx_ripplepurplelow/batfx_ripplepurplelow"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -2,
+            1,
+            -2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            true
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            true
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            true,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "ActiveStealthJustGained": {
+            "class": "Buff",
+            "stackName": "ActiveStealthJustGained",
+            "duration": 1,
+            "isHiddenFromPlayers": true,
+            "applyConditions": "IsNotStealth"
+          },
+          "BurnImmunityTempForRevenge": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Burn",
+                  "BurnAfterTurn",
+                  "BurnAtEndOfTurn"
+                ],
+                "dontShowText": true
+              },
+              {
+                "name": "BurnAfterTurn"
+              },
+              {
+                "name": "BurnSelfOnHit"
+              }
+            ],
+            "duration": 1,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "tags": [
+              "BurnImmune"
+            ],
+            "stackName": "BurnImmunityTempForRevenge",
+            "isHiddenFromPlayers": true
+          },
+          "Stealth": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "ManipulateTargeting",
+              "RemoveOnHurt",
+              "Immunity",
+              "Immunity"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "LockHideSkills"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "dodgeMultitarget": true,
+                "forceAllowAllEnemiesAChanceToManipulate": true,
+                "removeAfterTriggers": 1,
+                "abilityFlagsToIgnore": [
+                  "Stun",
+                  "NoDamage",
+                  "Sneak",
+                  "IgnoreStealth"
+                ]
+              },
+              {},
+              {
+                "stackNamesToBlock": [
+                  "Stealth"
+                ],
+                "dontShowText": true
+              },
+              {
+                "stackNamesToBlock": [
+                  "Placeholder"
+                ],
+                "dontShowText": true,
+                "activateCondition": "MissingStealthOrStealthShield"
+              }
+            ],
+            "tags": [
+              "Stealth"
+            ],
+            "duration": -1,
+            "showAsTimer": true,
+            "iconSpriteName": "IconBlackStealth01",
+            "stackName": "Stealth",
+            "useCount": 1
+          }
+        },
+        "attackScalors": {},
+        "conditions": {}
+      },
+      "StealthShieldSelfAJeanneDarkSwimBoss": {
+        "id": "StealthShieldSelfAJeanneDarkSwimBoss",
+        "found": true,
+        "ability": {
+          "name": "StealthShieldSelfAJeanneDarkSwimBoss",
+          "class": "Ability",
+          "config": "StealthShieldSelfAJeanneDarkSwimBoss",
+          "tuCost": 15,
+          "useLimit": 0,
+          "spiritGain": 3,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "SelfOnly",
+          "components": [
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "Stealth",
+                "StealthShieldOnce",
+                "SlightHeal",
+                "AttackPlus50Percent1TurnOnly"
+              ],
+              "applyToSourceOnly": true
+            }
+          ],
+          "useCondition": "MissingStealthOrStealthShield",
+          "friendlyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "JeanneDarkAttack1",
+          "flags": [
+            "Stealth",
+            "ApplyStatusToSelf"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "selfOnly": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0.4,
+            0,
+            0,
+            0.2,
+            0.1,
+            0.1
+          ],
+          "prefabs": [
+            "batfx_tailwindspace4/batfx_tailwindspace4",
+            "batsfx_prefab/batsfx_beautyring1",
+            "batfx_jeannedarkswim1/batfx_sparkler1",
+            "batfx_jeannedarkswim1/batfx_sparkler1",
+            "batsfx_prefab/batsfx_bomb1",
+            "batfx_darkastridfireworks1/batfx_darkastridfireworks3",
+            "batsfx_prefab/batsfx_bomb1",
+            "batfx_darkastridfireworks1/batfx_darkastridfireworks1",
+            "batfx_darkastridfireworks1/batfx_darkastridfireworks5",
+            "batsfx_prefab/batsfx_bomb1",
+            "batsfx_prefab/batsfx_bomb1",
+            "batfx_jeannedarkswim1/batfx_jeannedarkfireworks1"
+          ],
+          "sortOrderOffset": [
+            -100,
+            2,
+            2,
+            2,
+            -50,
+            -50,
+            -50,
+            -50,
+            -50,
+            -50,
+            -50,
+            3
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "audiobundle1",
+            "BattleEffectsBundle2"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            true,
+            false,
+            false,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            false
+          ],
+          "boneToAttachTo": [
+            "",
+            "",
+            "sparkbone1",
+            "sparkbone2",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "AttackPlus50Percent1TurnOnly": {
+            "class": "Buff",
+            "stackName": "AttackPlus50Percent",
+            "behaviors": [
+              "RemoveAfterTurnsBehavior",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "turnCount": 1,
+                "scalorStatBonuses": {
+                  "Attack": 0.5
+                }
+              },
+              {
+                "name": "AttackMinus25Percent"
+              }
+            ],
+            "iconSpriteName": "IconRedRage01",
+            "showAsTimer": true,
+            "duration": -1
+          },
+          "SlightHeal": {
+            "class": "Buff",
+            "behaviors": [
+              "AdjustHp"
+            ],
+            "behaviorOverrides": [
+              {
+                "percent": 0.1,
+                "abilityEffect": "Blank",
+                "hpboosts": [
+                  "HealBoost"
+                ]
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "Stealth": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "ManipulateTargeting",
+              "RemoveOnHurt",
+              "Immunity",
+              "Immunity"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "LockHideSkills"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "dodgeMultitarget": true,
+                "forceAllowAllEnemiesAChanceToManipulate": true,
+                "removeAfterTriggers": 1,
+                "abilityFlagsToIgnore": [
+                  "Stun",
+                  "NoDamage",
+                  "Sneak",
+                  "IgnoreStealth"
+                ]
+              },
+              {},
+              {
+                "stackNamesToBlock": [
+                  "Stealth"
+                ],
+                "dontShowText": true
+              },
+              {
+                "stackNamesToBlock": [
+                  "Placeholder"
+                ],
+                "dontShowText": true,
+                "activateCondition": "MissingStealthOrStealthShield"
+              }
+            ],
+            "tags": [
+              "Stealth"
+            ],
+            "duration": -1,
+            "showAsTimer": true,
+            "iconSpriteName": "IconBlackStealth01",
+            "stackName": "Stealth",
+            "useCount": 1
+          },
+          "StealthShieldOnce": {
+            "class": "Buff",
+            "stackName": "StealthShieldOnce",
+            "behaviors": [
+              "Immunity"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Sleep",
+                  "Armor",
+                  "Poison",
+                  "Burn",
+                  "Stance",
+                  "SpiritLeaking",
+                  "SpiritLeakReady",
+                  "Condemn",
+                  "Slowed",
+                  "StunSkinStatus",
+                  "Decay"
+                ],
+                "activateCondition": "IsStealth",
+                "useLimit": 1
+              }
+            ],
+            "duration": -1,
+            "showAsTimer": true,
+            "iconSpriteName": "IconBlackStealthShield01"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "MissingStealthOrStealthShield": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "Stealth",
+                "StealthShieldOnce"
+              ]
+            }
+          }
+        },
+        "localization": {
+          "name": "Shielded Stealth",
+          "description": "The user is healed for HP equal to 500% of the user's Attack, becomes Enraged, and gains Stealth with a Stealth Shield. Usable only if the user does not have both Stealth and a Stealth Shield. Stealth Shield prevents the next non-stealth status effect the user would gain while Stealthed from applying.",
+          "selected": "Heals, Enrages, Stealths and Stealth Shields self\n(Will overwrite other status effects)"
+        }
+      },
+      "SneakAttackSingleSJeanneDarkSwimBoss": {
+        "id": "SneakAttackSingleSJeanneDarkSwimBoss",
+        "found": true,
+        "ability": {
+          "name": "SneakAttackSingleSJeanneDarkSwimBoss",
+          "class": "Ability",
+          "abilityScalor": 4,
+          "config": "SneakAttackSingleSJeanneDarkSwimBoss",
+          "tuCost": 70,
+          "useLimit": 0,
+          "nameKey": "SneakAttackC",
+          "descriptionKey": "SneakAttackC",
+          "spiritCost": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "SkipRevengeDamage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "SneakAttackDamageBoost"
+              ],
+              "damageFlags": [
+                "Sneak"
+              ]
+            }
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "JeanneDarkSwimAbility2",
+          "useCondition": "IsStealth",
+          "flags": [
+            "Sneak"
+          ],
+          "recommendEffectWhenUsable": 1
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            2,
+            0,
+            0,
+            1,
+            0,
+            0.3,
+            0.1,
+            0,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batfx_common/batfx_empty",
+            "batsfx_prefab/batsfx_timestrike1",
+            "batfx_jeannedarkswim1/batfx_JeanneDarkWater1",
+            "batfx_jeannedarkswim1/batfx_waterpillar1",
+            "batfx_jeannedarkswim1/batfx_fauxAreaLightBlue1",
+            "batsfx_prefab/batsfx_water1",
+            "batfx_jeannedarkswim1/batfx_jdswimswipe1",
+            "batsfx_prefab/batsfx_whoosh1",
+            "batfx_jeannedarkswim1/batfx_JDSwimAura1",
+            "batfx_jeannedarkswim1/batfx_slashwater1",
+            "batsfx_prefab/batsfx_slash1",
+            "batfx_spotgreen/batfx_spotgreen",
+            "batfx_ripplegreenlow/batfx_ripplegreenlow"
+          ],
+          "sortOrderOffset": [
+            0,
+            2,
+            -2,
+            10,
+            4,
+            0,
+            100,
+            0,
+            0,
+            1,
+            -2,
+            -2,
+            -2
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            false,
+            false
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false
+          ],
+          "scale": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            2,
+            0,
+            0,
+            0,
+            0
+          ],
+          "boneToAttachTo": [
+            "sword",
+            "",
+            "",
+            "sword",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        "components": {
+          "SkipRevengeDamage": {
+            "class": "DamageAbilityComponent",
+            "revengeEffectsToSkip": [
+              "AddJeanneDarkAngel02Next",
+              "AddJeanneDarkAngel01Next",
+              "CloneSourceToBackIfNotSummoned",
+              "MegaElixirEffect",
+              "HasteUp20Percent",
+              "Armor",
+              "200PercentDamageForRevenge",
+              "KeepBurningStuff",
+              "SleepAfterDelay",
+              "AttackPlus50Percent1TurnOnly",
+              "BurnAfterTurn",
+              "RemoveBuffsAfterDelay",
+              "HealAfterDelay",
+              "AddSkeletonToEnd",
+              "SpiritGainBContra",
+              "Stun200Revenge",
+              "Stun150Revenge",
+              "Stun100Revenge",
+              "Stun75Revenge",
+              "TUMinus50",
+              "TUMinus100",
+              "HealHalf",
+              "RemoveBuffs",
+              "SendToFrontOfReinforcements",
+              "SendToBackOfReinforcements",
+              "SpiritGainAContra",
+              "SpiritGainCContra",
+              "SpiritLossD",
+              "SpiritLossC",
+              "MegaPoison",
+              "Poison",
+              "Sleep",
+              "TUMinusRevengeA",
+              "TUMinusRevengeB",
+              "HealFull",
+              "Explosive",
+              "TUMinusAfterDelayA",
+              "HealFullAfterDelay",
+              "Add1DeathMinionToEndForRevenge",
+              "Add1FireMinionToEndForRevenge",
+              "Add1EarthMinionToEndForRevenge",
+              "Stealth",
+              "StealthAfterDelay",
+              "TUMinus300",
+              "CloneSourceToRandomIfNotSummoned",
+              "SpiritSiphonDContra",
+              "Burn",
+              "Heal800PercentAfterDelay"
+            ]
+          }
+        },
+        "buffs": {},
+        "attackScalors": {},
+        "conditions": {
+          "IsStealth": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "Stealth"
+            ]
+          }
+        }
+      },
+      "SurvivorDrainAJeanneDarkSwimBoss": {
+        "id": "SurvivorDrainAJeanneDarkSwimBoss",
+        "found": true,
+        "ability": {
+          "name": "SurvivorDrainAJeanneDarkSwimBoss",
+          "class": "Ability",
+          "abilityScalor": 4,
+          "config": "SurvivorDrainAJeanneDarkSwimBoss",
+          "tuCost": 100,
+          "useLimit": 0,
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "SurvivorDamageBoost"
+              ],
+              "damageFlags": [
+                "IgnoreArmor"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "SlightHeal",
+                "ActiveStealthJustGained",
+                "Stealth",
+                "StealthShieldOnce"
+              ],
+              "applyToSourceOnly": true,
+              "showMissConditions": "ShowNoMiss",
+              "skipAbilityEffect": true
+            }
+          ],
+          "useCondition": "TimeInCombat300",
+          "bombSkillIcon": "IconBrownCountdownClock01",
+          "bombSkillIconDescriptionKey": "SurvivorDrainAJeanneDarkSwimBossCountdownKey",
+          "flags": [
+            "Survivor",
+            "Duration",
+            "Stealth",
+            "ApplyStatusToSelf"
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "recommendEffectWhenUsable": 1,
+          "abilityEffect": "JeanneDarkSpecial1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            1.1,
+            0.25,
+            0.5,
+            0,
+            0,
+            0,
+            0.1,
+            0.1,
+            0.1,
+            0
+          ],
+          "prefabs": [
+            "batfx_jeannedarkswim1/batfx_tailwindsurf3",
+            "batsfx_prefab/batsfx_timestrike1",
+            "batfx_drizswim1/batfx_speedlines1",
+            "batsfx_prefab/batsfx_watersplash1",
+            "batfx_bluntimpact3/batfx_bluntimpact3",
+            "batfx_jeannedarkswim1/batfx_impactcoco1",
+            "batsfx_prefab/batsfx_bluntimpact1",
+            "batsfx_prefab/batsfx_bomb1",
+            "batfx_drizswim1/batfx_ult1",
+            "batfx_drizswim1/batfx_ult2",
+            "batfx_common/batfx_whiteout1",
+            "batsfx_prefab/batsfx_bomb1"
+          ],
+          "sortOrderOffset": [
+            -100,
+            0,
+            200,
+            0,
+            2,
+            200,
+            0,
+            50,
+            75,
+            100,
+            0
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            true,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            true,
+            true,
+            true,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "ActiveStealthJustGained": {
+            "class": "Buff",
+            "stackName": "ActiveStealthJustGained",
+            "duration": 1,
+            "isHiddenFromPlayers": true,
+            "applyConditions": "IsNotStealth"
+          },
+          "SlightHeal": {
+            "class": "Buff",
+            "behaviors": [
+              "AdjustHp"
+            ],
+            "behaviorOverrides": [
+              {
+                "percent": 0.1,
+                "abilityEffect": "Blank",
+                "hpboosts": [
+                  "HealBoost"
+                ]
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "Stealth": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "ManipulateTargeting",
+              "RemoveOnHurt",
+              "Immunity",
+              "Immunity"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "LockHideSkills"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "dodgeMultitarget": true,
+                "forceAllowAllEnemiesAChanceToManipulate": true,
+                "removeAfterTriggers": 1,
+                "abilityFlagsToIgnore": [
+                  "Stun",
+                  "NoDamage",
+                  "Sneak",
+                  "IgnoreStealth"
+                ]
+              },
+              {},
+              {
+                "stackNamesToBlock": [
+                  "Stealth"
+                ],
+                "dontShowText": true
+              },
+              {
+                "stackNamesToBlock": [
+                  "Placeholder"
+                ],
+                "dontShowText": true,
+                "activateCondition": "MissingStealthOrStealthShield"
+              }
+            ],
+            "tags": [
+              "Stealth"
+            ],
+            "duration": -1,
+            "showAsTimer": true,
+            "iconSpriteName": "IconBlackStealth01",
+            "stackName": "Stealth",
+            "useCount": 1
+          },
+          "StealthShieldOnce": {
+            "class": "Buff",
+            "stackName": "StealthShieldOnce",
+            "behaviors": [
+              "Immunity"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Sleep",
+                  "Armor",
+                  "Poison",
+                  "Burn",
+                  "Stance",
+                  "SpiritLeaking",
+                  "SpiritLeakReady",
+                  "Condemn",
+                  "Slowed",
+                  "StunSkinStatus",
+                  "Decay"
+                ],
+                "activateCondition": "IsStealth",
+                "useLimit": 1
+              }
+            ],
+            "duration": -1,
+            "showAsTimer": true,
+            "iconSpriteName": "IconBlackStealthShield01"
+          }
+        },
+        "attackScalors": {
+          "TimeInCombat300": {
+            "class": "AttackScalor",
+            "sourceCondition": "TimeInCombat300"
+          }
+        },
+        "conditions": {
+          "TimeInCombat300": {
+            "class": "MonsterConditions",
+            "timeInCombat": 300
+          }
+        },
+        "localization": {
+          "name": "Survivor's Raid+",
+          "description": "500% damage to 1 enemy. This attack ignores enemy damage reduction effects. The user is healed for 10% of max HP, and is granted the Stealth status effect with a Stealth Shield. Locked for 300TU after the user has entered the battlefield.",
+          "selected": "500% damage, user heals and is Stealthed\n(Will overwrite other status effects)"
+        }
+      }
+    },
+    "passives": {
+      "HasteUpStealth": {
+        "id": "HasteUpStealth",
+        "found": false
+      },
+      "BlockDeathByBuffDamage": {
+        "id": "BlockDeathByBuffDamage",
+        "found": false
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": null
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "JeanneDarkSwimsuitBoss01",
+    "family": "JeanneDarkSwimsuitBoss",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "JeanneDarkSwimsuitBoss01",
+    "class": "Monster",
+    "family": "JeanneDarkSwimsuitBoss",
+    "activeSkills": {
+      "0": "GainAttackSingleStealthAJeanneDarkSwimBoss",
+      "1": "StealthShieldSelfAJeanneDarkSwimBoss",
+      "2": "SneakAttackSingleSJeanneDarkSwimBoss",
+      "3": "SurvivorDrainAJeanneDarkSwimBoss"
+    },
+    "passives": {
+      "0": "HasteUpStealth",
+      "1": "BlockDeathByBuffDamage"
+    },
+    "cost": 999,
+    "baseAttack": 1650,
+    "baseMaxHp": 80000,
+    "speed": 643,
+    "element": "Death",
+    "weaponPref": "Spear",
+    "weaponPivotIndex": 0,
+    "walkSound": "TestSound",
+    "secure": 1,
+    "aiTargetPickWeight": 1,
+    "stars": 6,
+    "evolvedStars": 0,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 1,
+    "battleOrbImageFlip": 0,
+    "skillVoices": {
+      "0": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "1": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "2": [
+        9,
+        10,
+        11,
+        12
+      ],
+      "3": [
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+      ]
+    },
+    "damageVoices": [
+      19,
+      20,
+      21,
+      22
+    ],
+    "deathVoices": [
+      23,
+      24,
+      25,
+      26
+    ]
+  },
+  "_build": {
+    "scriptVersion": "3-incremental-checkpoint",
+    "sourceHash": "3e75f782d1cde51a7475b2e134563b755a4ad2f9f9b19988892184174c70c7a8",
+    "dependencyHash": "d0b5d66aea1825df212757255d1ab34be767816288019b3542ca12b5aad7f8ce",
+    "generatedAt": 1778014035
+  }
+}

@@ -1,0 +1,1098 @@
+{
+  "schemaVersion": 3,
+  "order": 291,
+  "id": "ice-witch-01",
+  "name": "IceWitch01",
+  "category": "character",
+  "rarity": null,
+  "stars": 5,
+  "evolvedStars": 6,
+  "element": "Water",
+  "weaponType": "Staff",
+  "stats": {
+    "atk": 1020,
+    "hp": 5741,
+    "spd": 274,
+    "cost": 28
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/IceWitch01.png",
+  "refs": {
+    "activeSkills": [
+      "IcyTouchAIceWitch",
+      "IceBreakerAWaterIceWitch",
+      "FreezeAllyAIceWitch"
+    ],
+    "passives": [
+      "SpiritGainRevengeA",
+      "HealFrozenAllyOnTurnA",
+      "PlusAttackBoostLv3",
+      "AttackUpTargetEquippedGreatAxeLv3",
+      "PlusHPBoostLv3",
+      "AddWeaponPrefSword"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": "AttackAndHPUp6Water",
+    "leaderBuffCondition": "IsWater",
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "IcyTouchAIceWitch": {
+        "id": "IcyTouchAIceWitch",
+        "found": true,
+        "ability": {
+          "name": "IcyTouchAIceWitch",
+          "class": "Ability",
+          "config": "IcyTouchAIceWitch",
+          "tuCost": 70,
+          "useLimit": 0,
+          "nameKey": "IcyTouchA",
+          "descriptionKey": "IcyTouchA",
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "AllowMoreFreeze",
+                "Freeze",
+                "Freeze",
+                "DenyMoreFreeze",
+                "RemoveFrost"
+              ],
+              "showMissConditions": "IsFrozen",
+              "applyConditions": "IsFrosted2"
+            },
+            {
+              "buffs": [
+                "Frost2"
+              ],
+              "showMissConditions": "ShowNoMiss",
+              "applyConditions": "NotFrozenOrFrosted"
+            }
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "Frost1",
+          "immuneSuggestionCondition": "IcyTouchWillDoNothing",
+          "recommendEffectWhenUsable": -1,
+          "flags": [
+            "Freezer",
+            "NoDamage",
+            "Froster"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0,
+            0.3,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_ripplebluelow/batfx_ripplebluelow",
+            "batfx_castingblue1/batfx_castingblue1",
+            "batfx_castingblue2/batfx_castingblue2",
+            "batfx_ripplebluelow/batfx_ripplebluelow",
+            "batsfx_prefab/batsfx_frost1",
+            "batfx_frost1/batfx_frost1"
+          ],
+          "sortOrderOffset": [
+            2,
+            2,
+            -2,
+            2,
+            -2,
+            -2,
+            4
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            true,
+            true,
+            true,
+            false,
+            true,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "AllowMoreFreeze": {
+            "class": "Buff",
+            "stackName": "AllowMoreFreeze",
+            "duration": 1,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "DenyMoreFreeze": {
+            "class": "Buff",
+            "stackName": "DenyMoreFreeze",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "AllowMoreFreeze"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "Freeze": {
+            "class": "Buff",
+            "stackName": "Freeze",
+            "stackLimit": 2,
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "ModifyDamage",
+              "LoseTurn",
+              "Immunity",
+              "Immunity",
+              "BuffWhenMonsterHurt"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "percent": 0.1,
+                "cancelFromDamageFlags": [
+                  "Sneak",
+                  "IceBreak",
+                  "IgnoreArmor"
+                ]
+              },
+              {},
+              {
+                "stackNamesToBlock": [
+                  "ActiveStealthJustGained",
+                  "Sleep",
+                  "Poison",
+                  "Armor",
+                  "Burn",
+                  "BurnAfterTurn",
+                  "Stealth",
+                  "Stance",
+                  "SpiritLeaking",
+                  "SpiritLeakReady",
+                  "Condemn",
+                  "Slowed",
+                  "StunSkinStatus",
+                  "Frost1",
+                  "Frost2",
+                  "Decay"
+                ]
+              },
+              {
+                "stackNamesToBlock": [
+                  "Freeze"
+                ],
+                "activateCondition": "FrozenNotFreezing",
+                "dontShowText": true
+              },
+              {
+                "selfBuffs": [
+                  "RemoveFreezeCount1"
+                ],
+                "includeAllDamage": true
+              }
+            ],
+            "duration": 120,
+            "showAsTimer": true,
+            "tags": [
+              "Freeze",
+              "SleepImmune",
+              "BurnImmune",
+              "StatusImmune"
+            ],
+            "textKeyToShowWhenApplied": "FreezeNameKey",
+            "usesStackCountAndTUInDescription": true,
+            "iconSpriteName": "IconBlueIce01",
+            "canBePurified": true
+          },
+          "Frost1": {
+            "class": "Buff",
+            "stackName": "Frost1",
+            "duration": -1,
+            "showAsTimer": true,
+            "iconSpriteName": "IconSnowMark01"
+          },
+          "Frost2": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "Frost1"
+              }
+            ],
+            "stackName": "Frost2",
+            "duration": -1,
+            "showAsTimer": true,
+            "iconSpriteName": "IconSnowMark03"
+          },
+          "RemoveFrost": {
+            "class": "Buff",
+            "stackName": "RemoveFrost",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "Frost2"
+              },
+              {
+                "name": "Frost1"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "IcyTouchWillDoNothing": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "Freeze"
+            ]
+          },
+          "IsFrosted2": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "Frost2"
+            ]
+          },
+          "IsFrozen": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "Freeze"
+            ]
+          },
+          "NotFrozenOrFrosted": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "Freeze"
+              ],
+              "or": {
+                "class": "MonsterConditions",
+                "buffStackNames": [
+                  "Frost1"
+                ],
+                "or": {
+                  "class": "MonsterConditions",
+                  "buffStackNames": [
+                    "Frost2"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "IceBreakerAWaterIceWitch": {
+        "id": "IceBreakerAWaterIceWitch",
+        "found": true,
+        "ability": {
+          "name": "IceBreakerAWaterIceWitch",
+          "class": "Ability",
+          "abilityScalor": 0.5,
+          "conditionalAbilityScalors": [
+            4
+          ],
+          "config": "IceBreakerAWaterIceWitch",
+          "tuCost": 100,
+          "useLimit": 0,
+          "nameKey": "IceBreakerAWater",
+          "descriptionKey": "IceBreakerAWater",
+          "spiritCost": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "IceDamageBoost"
+              ],
+              "damageFlags": [
+                "IceBreak"
+              ]
+            },
+            {
+              "buffs": [
+                "RemoveFreeze"
+              ],
+              "skipAbilityEffect": true
+            }
+          ],
+          "attackScalors": [
+            "GoodVsFrozen"
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "MidIce1",
+          "recommendEffectWhenUsable": -2,
+          "conditionedAbilityEffects": [
+            "IceBreakIceWitch1",
+            "IceBreakIceWitch1"
+          ],
+          "flags": [
+            "IceBreak",
+            "Ice",
+            "StealthWorthy"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0.01,
+            0.7,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_castingblue1/batfx_castingblue1",
+            "batfx_castingblue2/batfx_castingblue2",
+            "batsfx_prefab/batsfx_ice1New",
+            "batfx_icelarge1/batfx_icelarge1",
+            "batfx_spotblue/batfx_spotblue",
+            "batfx_ripplebluelow/batfx_ripplebluelow"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -2,
+            2,
+            1,
+            1,
+            -2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "RemoveFreeze": {
+            "class": "Buff",
+            "stackName": "RemoveFreeze",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "Freeze"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {
+          "GoodVsFrozen": {
+            "class": "AttackScalor",
+            "targetCondition": "IsFrozen"
+          }
+        },
+        "conditions": {}
+      },
+      "FreezeAllyAIceWitch": {
+        "id": "FreezeAllyAIceWitch",
+        "found": true,
+        "ability": {
+          "name": "FreezeAllyAIceWitch",
+          "class": "Ability",
+          "config": "FreezeAllyAIceWitch",
+          "tuCost": 100,
+          "useLimit": 0,
+          "nameKey": "FreezeAllyA",
+          "descriptionKey": "FreezeAllyA",
+          "spiritCost": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Ally",
+          "components": [
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "AllowMoreFreeze"
+              ],
+              "applyConditions": "IsWaterNotFrozen",
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "Freeze",
+                "Freeze",
+                "RemoveFrost",
+                "DenyMoreFreeze"
+              ],
+              "applyConditions": "IsWater"
+            }
+          ],
+          "friendlyEventType": "Hit",
+          "abilityEffect": "Frost1",
+          "flags": [
+            "Freeze",
+            "Purify"
+          ],
+          "recommendEffectWhenUsable": -1,
+          "immuneSuggestionCondition": "NotWater"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "friendlyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0,
+            0.3,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_ripplebluelow/batfx_ripplebluelow",
+            "batfx_castingblue1/batfx_castingblue1",
+            "batfx_castingblue2/batfx_castingblue2",
+            "batfx_ripplebluelow/batfx_ripplebluelow",
+            "batsfx_prefab/batsfx_frost1",
+            "batfx_frost1/batfx_frost1"
+          ],
+          "sortOrderOffset": [
+            2,
+            2,
+            -2,
+            2,
+            -2,
+            -2,
+            4
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            true,
+            true,
+            true,
+            false,
+            true,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "AllowMoreFreeze": {
+            "class": "Buff",
+            "stackName": "AllowMoreFreeze",
+            "duration": 1,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "DenyMoreFreeze": {
+            "class": "Buff",
+            "stackName": "DenyMoreFreeze",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "AllowMoreFreeze"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "Freeze": {
+            "class": "Buff",
+            "stackName": "Freeze",
+            "stackLimit": 2,
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "ModifyDamage",
+              "LoseTurn",
+              "Immunity",
+              "Immunity",
+              "BuffWhenMonsterHurt"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "percent": 0.1,
+                "cancelFromDamageFlags": [
+                  "Sneak",
+                  "IceBreak",
+                  "IgnoreArmor"
+                ]
+              },
+              {},
+              {
+                "stackNamesToBlock": [
+                  "ActiveStealthJustGained",
+                  "Sleep",
+                  "Poison",
+                  "Armor",
+                  "Burn",
+                  "BurnAfterTurn",
+                  "Stealth",
+                  "Stance",
+                  "SpiritLeaking",
+                  "SpiritLeakReady",
+                  "Condemn",
+                  "Slowed",
+                  "StunSkinStatus",
+                  "Frost1",
+                  "Frost2",
+                  "Decay"
+                ]
+              },
+              {
+                "stackNamesToBlock": [
+                  "Freeze"
+                ],
+                "activateCondition": "FrozenNotFreezing",
+                "dontShowText": true
+              },
+              {
+                "selfBuffs": [
+                  "RemoveFreezeCount1"
+                ],
+                "includeAllDamage": true
+              }
+            ],
+            "duration": 120,
+            "showAsTimer": true,
+            "tags": [
+              "Freeze",
+              "SleepImmune",
+              "BurnImmune",
+              "StatusImmune"
+            ],
+            "textKeyToShowWhenApplied": "FreezeNameKey",
+            "usesStackCountAndTUInDescription": true,
+            "iconSpriteName": "IconBlueIce01",
+            "canBePurified": true
+          },
+          "Frost1": {
+            "class": "Buff",
+            "stackName": "Frost1",
+            "duration": -1,
+            "showAsTimer": true,
+            "iconSpriteName": "IconSnowMark01"
+          },
+          "RemoveFrost": {
+            "class": "Buff",
+            "stackName": "RemoveFrost",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "Frost2"
+              },
+              {
+                "name": "Frost1"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "IsWater": {
+            "class": "MonsterConditions",
+            "elements": [
+              "Water"
+            ]
+          },
+          "IsWaterNotFrozen": {
+            "class": "MonsterConditions",
+            "elements": [
+              "Water"
+            ],
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "Freeze"
+              ]
+            }
+          },
+          "NotWater": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "elements": [
+                "Water"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "passives": {
+      "SpiritGainRevengeA": {
+        "id": "SpiritGainRevengeA",
+        "found": false
+      },
+      "HealFrozenAllyOnTurnA": {
+        "id": "HealFrozenAllyOnTurnA",
+        "found": false
+      },
+      "PlusAttackBoostLv3": {
+        "id": "PlusAttackBoostLv3",
+        "found": false
+      },
+      "AttackUpTargetEquippedGreatAxeLv3": {
+        "id": "AttackUpTargetEquippedGreatAxeLv3",
+        "found": false
+      },
+      "PlusHPBoostLv3": {
+        "id": "PlusHPBoostLv3",
+        "found": false
+      },
+      "AddWeaponPrefSword": {
+        "id": "AddWeaponPrefSword",
+        "found": false
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": {
+      "class": "MonsterConditions",
+      "elements": [
+        "Water"
+      ]
+    }
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "IceWitch01",
+    "family": "IceWitch",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "IceWitch01",
+    "family": "IceWitch",
+    "class": "Monster",
+    "leaderBuff": "AttackAndHPUp6Water",
+    "leaderBuffCondition": "IsWater",
+    "activeSkills": {
+      "0": "IcyTouchAIceWitch",
+      "1": "IceBreakerAWaterIceWitch",
+      "2": "FreezeAllyAIceWitch"
+    },
+    "passives": {
+      "0": "SpiritGainRevengeA",
+      "1": "HealFrozenAllyOnTurnA",
+      "2": "PlusAttackBoostLv3",
+      "3": "AttackUpTargetEquippedGreatAxeLv3",
+      "4": "PlusHPBoostLv3",
+      "5": "AddWeaponPrefSword"
+    },
+    "cost": 28,
+    "baseAttack": 1020,
+    "baseMaxHp": 5741,
+    "speed": 274,
+    "element": "Water",
+    "weaponPref": "Staff",
+    "weaponPivotIndex": 1,
+    "secure": 1,
+    "superEvolve1": "IceWitch02",
+    "aiTargetPickWeight": 1,
+    "stars": 5,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 0,
+    "battleOrbImageFlip": 1,
+    "attackType": "Weapon",
+    "visible": 1,
+    "formTwitterShare": 1,
+    "skillVoices": {
+      "0": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "1": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "2": [
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    "damageVoices": [
+      15,
+      16,
+      17,
+      18
+    ],
+    "deathVoices": [
+      19,
+      20,
+      21,
+      22
+    ],
+    "victoryVoices": [
+      23,
+      24
+    ],
+    "lineupVoices": [
+      25,
+      26,
+      27,
+      28,
+      29,
+      30
+    ],
+    "evolutionVoices": [
+      31
+    ],
+    "trainVoices": [
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41
+    ],
+    "titleVoices": [
+      42
+    ],
+    "gachaVoices": [
+      43
+    ],
+    "loginVoices": [
+      44
+    ],
+    "tapVoices": [
+      45,
+      46,
+      47
+    ],
+    "idleVoices": [
+      48
+    ]
+  },
+  "_build": {
+    "scriptVersion": "3-incremental-checkpoint",
+    "sourceHash": "aacd3eac74246a23361bfdbf1b18b292dc1a5495945a8ecc2130886a4daff459",
+    "dependencyHash": "34903dbe731168972eac0f13001ef96caa5408f82a876af19e793d9cdb89eb87",
+    "generatedAt": 1778013988
+  }
+}

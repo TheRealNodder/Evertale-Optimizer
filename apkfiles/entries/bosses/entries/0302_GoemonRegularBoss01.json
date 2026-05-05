@@ -1,0 +1,1202 @@
+{
+  "schemaVersion": 3,
+  "order": 302,
+  "id": "goemon-regular-boss-01",
+  "name": "GoemonRegularBoss01",
+  "category": "bosse",
+  "rarity": null,
+  "stars": 6,
+  "evolvedStars": 6,
+  "element": "Dark",
+  "weaponType": "Mace",
+  "stats": {
+    "atk": 1177,
+    "hp": 26777,
+    "spd": 777,
+    "cost": 999
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/GoemonRegular01.png",
+  "refs": {
+    "activeSkills": [
+      "GainAttackSingleStealthAGoemonRegularBoss",
+      "StealthStrikeAllyTurnAGoemonRegularBoss",
+      "IgnoreDeathAGoemonRegularBoss01"
+    ],
+    "passives": [
+      "GainNinjaTurnAGoemonRegularBoss",
+      "StunImmunity",
+      "SleepImmunity"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": null,
+    "leaderBuffCondition": null,
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "GainAttackSingleStealthAGoemonRegularBoss": {
+        "id": "GainAttackSingleStealthAGoemonRegularBoss",
+        "found": true,
+        "ability": {
+          "name": "GainAttackSingleStealthAGoemonRegularBoss",
+          "class": "Ability",
+          "abilityScalor": -0.33,
+          "config": "GainAttackSingleStealthAGoemonRegularBoss",
+          "tuCost": 70,
+          "useLimit": 0,
+          "nameKey": "GainAttackSingleStealthA",
+          "descriptionKey": "GainAttackSingleStealthA",
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "ActiveStealthJustGained",
+                "Stealth",
+                "BurnImmunityTempForRevenge"
+              ],
+              "applyToSourceOnly": true,
+              "showMissConditions": "ShowNoMiss",
+              "skipAbilityEffect": true
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "GoemonSwapFlash",
+          "flags": [
+            "Stealth"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.5,
+            0.5,
+            0,
+            0,
+            0.3,
+            0,
+            0.7
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_whoosh1",
+            "batfx_Goemon/batfx_ExplosionFlash1",
+            "batfx_common/batfx_empty",
+            "batsfx_prefab/batsfx_fire1",
+            "batfx_Goemon/batfx_GoemonFireworks1",
+            "batsfx_prefab/batsfx_bomb1",
+            "batfx_SnowWhiteMaid/batfx_whiteout3"
+          ],
+          "sortOrderOffset": [
+            1,
+            20,
+            2,
+            1,
+            30,
+            1,
+            50
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            false,
+            true,
+            true,
+            false,
+            true,
+            false,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            true,
+            true,
+            true,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            true,
+            false,
+            false,
+            true,
+            false,
+            true
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "ActiveStealthJustGained": {
+            "class": "Buff",
+            "stackName": "ActiveStealthJustGained",
+            "duration": 1,
+            "isHiddenFromPlayers": true,
+            "applyConditions": "IsNotStealth"
+          },
+          "BurnImmunityTempForRevenge": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Burn",
+                  "BurnAfterTurn",
+                  "BurnAtEndOfTurn"
+                ],
+                "dontShowText": true
+              },
+              {
+                "name": "BurnAfterTurn"
+              },
+              {
+                "name": "BurnSelfOnHit"
+              }
+            ],
+            "duration": 1,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "tags": [
+              "BurnImmune"
+            ],
+            "stackName": "BurnImmunityTempForRevenge",
+            "isHiddenFromPlayers": true
+          },
+          "Stealth": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "ManipulateTargeting",
+              "RemoveOnHurt",
+              "Immunity",
+              "Immunity"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "LockHideSkills"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "dodgeMultitarget": true,
+                "forceAllowAllEnemiesAChanceToManipulate": true,
+                "removeAfterTriggers": 1,
+                "abilityFlagsToIgnore": [
+                  "Stun",
+                  "NoDamage",
+                  "Sneak",
+                  "IgnoreStealth"
+                ]
+              },
+              {},
+              {
+                "stackNamesToBlock": [
+                  "Stealth"
+                ],
+                "dontShowText": true
+              },
+              {
+                "stackNamesToBlock": [
+                  "Placeholder"
+                ],
+                "dontShowText": true,
+                "activateCondition": "MissingStealthOrStealthShield"
+              }
+            ],
+            "tags": [
+              "Stealth"
+            ],
+            "duration": -1,
+            "showAsTimer": true,
+            "iconSpriteName": "IconBlackStealth01",
+            "stackName": "Stealth",
+            "useCount": 1
+          }
+        },
+        "attackScalors": {},
+        "conditions": {}
+      },
+      "StealthStrikeAllyTurnAGoemonRegularBoss": {
+        "id": "StealthStrikeAllyTurnAGoemonRegularBoss",
+        "found": true,
+        "ability": {
+          "name": "StealthStrikeAllyTurnAGoemonRegularBoss",
+          "class": "Ability",
+          "abilityScalor": 3,
+          "config": "StealthStrikeAllyTurnAGoemonRegularBoss",
+          "tuCost": 50,
+          "useLimit": 0,
+          "spiritCost": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "SkipRevengeDamage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "SneakAttackDamageBoost"
+              ],
+              "applyToTargetType": "Enemy",
+              "damageFlags": [
+                "IgnoreArmor",
+                "Sneak"
+              ]
+            },
+            {
+              "buffs": [
+                "StealthStrikeAllyGrantedExtraTurnBoss",
+                "GoemonRegularCooldown50Boss"
+              ],
+              "applyToTargetType": "Source",
+              "skipAbilityEffect": true
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "GoemonSlash",
+          "flags": [
+            "Sneak"
+          ],
+          "recommendEffectWhenUsable": 1,
+          "useCondition": "NotInstantCooldownAndHasStealth"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.7,
+            0,
+            0,
+            0.6,
+            0,
+            0.3,
+            0,
+            0.1,
+            0.6,
+            0
+          ],
+          "prefabs": [
+            "batfx_Goemon/batfx_GoemonSlash1",
+            "batfx_Goemon/batfx_GoemonSlash2",
+            "batsfx_prefab/batsfx_slash1",
+            "batfx_Goemon/batfx_kaijuslash4",
+            "batsfx_prefab/batsfx_whoosh1",
+            "batfx_slash5/batfx_slash5",
+            "batsfx_prefab/batsfx_slash1",
+            "batsfx_prefab/batsfx_slash1",
+            "batfx_Goemon/batfx_bluehelixSmoke",
+            "batsfx_prefab/batsfx_heal1"
+          ],
+          "sortOrderOffset": [
+            2,
+            2,
+            0,
+            100,
+            1,
+            1,
+            -2,
+            -2,
+            3,
+            3
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            true,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            false,
+            false,
+            false
+          ],
+          "isEnemyTargetEffect": [
+            true,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false
+          ],
+          "isFriendlyTargetEffect": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            true
+          ]
+        },
+        "components": {
+          "SkipRevengeDamage": {
+            "class": "DamageAbilityComponent",
+            "revengeEffectsToSkip": [
+              "AddJeanneDarkAngel02Next",
+              "AddJeanneDarkAngel01Next",
+              "CloneSourceToBackIfNotSummoned",
+              "MegaElixirEffect",
+              "HasteUp20Percent",
+              "Armor",
+              "200PercentDamageForRevenge",
+              "KeepBurningStuff",
+              "SleepAfterDelay",
+              "AttackPlus50Percent1TurnOnly",
+              "BurnAfterTurn",
+              "RemoveBuffsAfterDelay",
+              "HealAfterDelay",
+              "AddSkeletonToEnd",
+              "SpiritGainBContra",
+              "Stun200Revenge",
+              "Stun150Revenge",
+              "Stun100Revenge",
+              "Stun75Revenge",
+              "TUMinus50",
+              "TUMinus100",
+              "HealHalf",
+              "RemoveBuffs",
+              "SendToFrontOfReinforcements",
+              "SendToBackOfReinforcements",
+              "SpiritGainAContra",
+              "SpiritGainCContra",
+              "SpiritLossD",
+              "SpiritLossC",
+              "MegaPoison",
+              "Poison",
+              "Sleep",
+              "TUMinusRevengeA",
+              "TUMinusRevengeB",
+              "HealFull",
+              "Explosive",
+              "TUMinusAfterDelayA",
+              "HealFullAfterDelay",
+              "Add1DeathMinionToEndForRevenge",
+              "Add1FireMinionToEndForRevenge",
+              "Add1EarthMinionToEndForRevenge",
+              "Stealth",
+              "StealthAfterDelay",
+              "TUMinus300",
+              "CloneSourceToRandomIfNotSummoned",
+              "SpiritSiphonDContra",
+              "Burn",
+              "Heal800PercentAfterDelay"
+            ]
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "GoemonRegularCooldown50Boss": {
+            "class": "Buff",
+            "duration": 50,
+            "stackName": "InstantCooldown",
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "iconSpriteName": "IconBlueCountdownClock3"
+          },
+          "StealthStrikeAllyGrantedExtraTurnBoss": {
+            "class": "Buff",
+            "behaviors": [
+              "EnterBattleBuff"
+            ],
+            "behaviorOverrides": [
+              {
+                "randomAllyBuffs": [
+                  "GiveTurn",
+                  "OnExtraTurn",
+                  "JustGivenTurn"
+                ],
+                "numRandomToBuff": 1,
+                "spreadCondition": "IsSneakMarkedGoemonBoss"
+              }
+            ],
+            "duration": 0,
+            "noIconShownOnBattleStatus": true,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "NotInstantCooldownAndHasStealth": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "InstantCooldown"
+              ]
+            },
+            "and": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "Stealth"
+              ]
+            }
+          }
+        },
+        "localization": {
+          "name": "Stealth Flank",
+          "description": "400% damage to 1 enemy, and immediately gives 1 other random ally with a Stealth Strike type active skill the next turn by reducing their current TU to 0. Usable only if the user has the Stealth status effect. This attack ignores any enemy status effects, damage reduction effects, revenge passive skills, and skin passive skills. This skill becomes locked for 50TU after use.\n\nStealth Strike type active skills are any skills that are unlocked while their user has Stealth.",
+          "selected": "Damage 1 enemy, may grant other ally turn"
+        }
+      },
+      "IgnoreDeathAGoemonRegularBoss01": {
+        "id": "IgnoreDeathAGoemonRegularBoss01",
+        "found": true,
+        "ability": {
+          "name": "IgnoreDeathAGoemonRegularBoss01",
+          "class": "Ability",
+          "abilityScalor": 4,
+          "config": "IgnoreDeathAGoemonRegularBoss01",
+          "tuCost": 70,
+          "useLimit": 1,
+          "spiritGain": 0,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "applyToTargetType": "Enemy",
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "damageFlags": [
+                "HardIgnoreBlockDeath"
+              ]
+            },
+            {
+              "buffs": [
+                "IgnoreDeathAGoemonRegularLockBoss"
+              ],
+              "applyToTargetType": "Source",
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "LethalPoison",
+                "BurnImmunityTempForRevenge"
+              ],
+              "applyToTargetType": "Enemy",
+              "applyConditions": "IsNotBurning"
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "GoemonSpecial",
+          "recommendEffectWhenUsable": 1
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0.5,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0.1,
+            0.7,
+            0,
+            0,
+            0.3,
+            0,
+            0,
+            0,
+            0.1
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_purify1",
+            "batfx_Goemon/batfx_bgBlack",
+            "batfx_Goemon/batfx_CastingHardLightGoemon1",
+            "batfx_Goemon/batfx_CastingHardLightGoemon2",
+            "batfx_Goemon/batfx_ossiatransformCasting",
+            "batsfx_prefab/batsfx_KabukiClappersGoemon",
+            "batfx_Goemon/batfx_confetti",
+            "batfx_Goemon/batfx_GoemonSlash1",
+            "batfx_Goemon/batfx_GoemonSlash2",
+            "batfx_Goemon/batfx_CastingHardLightGoemon3",
+            "batfx_myshaidolgirl1/batfx_tailwindconfetti2",
+            "batsfx_prefab/batsfx_nagikoto2",
+            "batsfx_prefab/batsfx_slash1",
+            "batsfx_prefab/batsfx_ring1",
+            "batfx_LudmillaNew/batfx_Ludmillabigslash1",
+            "batsfx_prefab/batsfx_whoosh1",
+            "batfx_bluntimpact2/batfx_bluntimpact2",
+            "batfx_Goemon/batfx_confettiBig",
+            "batfx_Goemon/batfx_confetti",
+            "batsfx_prefab/batsfx_slash1",
+            "batfx_Goemon/batfx_CastingHardLightGoemon4"
+          ],
+          "sortOrderOffset": [
+            2,
+            -200,
+            -2,
+            2,
+            -2,
+            2,
+            1,
+            2,
+            2,
+            2,
+            50,
+            -2,
+            -2,
+            -2,
+            10,
+            1,
+            1,
+            50,
+            1,
+            -2,
+            -1
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "audiobundle1",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            true,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            false,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            true,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false
+          ],
+          "boneToAttachTo": [
+            "",
+            "",
+            "",
+            "katana2",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "BurnImmunityTempForRevenge": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Burn",
+                  "BurnAfterTurn",
+                  "BurnAtEndOfTurn"
+                ],
+                "dontShowText": true
+              },
+              {
+                "name": "BurnAfterTurn"
+              },
+              {
+                "name": "BurnSelfOnHit"
+              }
+            ],
+            "duration": 1,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "tags": [
+              "BurnImmune"
+            ],
+            "stackName": "BurnImmunityTempForRevenge",
+            "isHiddenFromPlayers": true
+          },
+          "IgnoreDeathAGoemonRegularLockBoss": {
+            "class": "Buff",
+            "stackName": "IgnoreDeathAGoemonRegularLockBoss",
+            "iconSpriteName": "IconRedEx01",
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "isHiddenFromPlayers": true,
+            "duration": -1
+          },
+          "LethalPoison": {
+            "class": "Buff",
+            "stackName": "Poison",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "DamageOverTime"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Poison",
+                  "SuperPoison",
+                  "MegaPoison",
+                  "PoisonDelay",
+                  "PoisonDelayedMegaPoisonChance",
+                  "Sleep",
+                  "SleepDelayed",
+                  "Armor",
+                  "Stance",
+                  "Decay",
+                  "SpiritLeaking",
+                  "SpiritLeakReady"
+                ],
+                "dontShowText": true
+              },
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "percentOfAttack": 0.005,
+                "damageColor": "Green",
+                "abilityEffect": "PoisonDamageRed",
+                "extraDamageFlag": "LethalPoison"
+              }
+            ],
+            "tags": [
+              "Poison",
+              "LethalPoison"
+            ],
+            "duration": 999,
+            "showAsTimer": false,
+            "statusEffect": "PoisonStatusRed",
+            "statusEffectOffset": 0.1,
+            "damageType": "Poison",
+            "noIconShownOnBattleStatus": true,
+            "iconSpriteName": "IconPurplePoison01",
+            "applyConditions": "IsNotBurningNotBoss"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "IsNotBurning": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "Burn"
+              ]
+            }
+          }
+        },
+        "localization": {
+          "name": "Assassin Strike",
+          "description": "500% damage to 1 enemy. Then, if that target is not burning, they are granted Lethal Poison for 999TU. This attack ignores any effects of non-boss enemies that would prevent the target from being defeated. Usable once per battle.\n\nLethal Poison will overwrite other status effects on that enemy, cannot be overwritten by status effects other than Burn or Stealth, and cannot be Purified. Lethal Poison deals 2 times the damage of normal Poison and ignores passive skills or effects of active skills that would prevent the target from being defeated, other than those which specifically prevent defeat from Poison or non-attack damage. Lethal Poison cannot apply to Burning units or Boss units.",
+          "selected": "600% damage, may Poison\n(Will overwrite other status effects)"
+        }
+      }
+    },
+    "passives": {
+      "GainNinjaTurnAGoemonRegularBoss": {
+        "id": "GainNinjaTurnAGoemonRegularBoss",
+        "found": false
+      },
+      "StunImmunity": {
+        "id": "StunImmunity",
+        "found": false
+      },
+      "SleepImmunity": {
+        "id": "SleepImmunity",
+        "found": false
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": null
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "GoemonRegularBoss01",
+    "family": "GoemonRegularBoss",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "GoemonRegularBoss01",
+    "class": "Monster",
+    "family": "GoemonRegularBoss",
+    "activeSkills": {
+      "0": "GainAttackSingleStealthAGoemonRegularBoss",
+      "1": "StealthStrikeAllyTurnAGoemonRegularBoss",
+      "2": "IgnoreDeathAGoemonRegularBoss01"
+    },
+    "passives": {
+      "0": "GainNinjaTurnAGoemonRegularBoss",
+      "1": "StunImmunity",
+      "2": "SleepImmunity"
+    },
+    "cost": 999,
+    "baseAttack": 1177,
+    "baseMaxHp": 26777,
+    "speed": 777,
+    "element": "Death",
+    "weaponPref": "Mace",
+    "weaponPivotIndex": 0,
+    "walkSound": "TestSound",
+    "secure": 1,
+    "aiTargetPickWeight": 1,
+    "stars": 6,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 1,
+    "battleOrbImageFlip": 0,
+    "skillVoices": {
+      "0": [
+        1,
+        2
+      ],
+      "1": [
+        5,
+        6
+      ],
+      "2": [
+        9,
+        10
+      ],
+      "3": [
+        13,
+        14
+      ]
+    },
+    "damageVoices": [
+      17,
+      18
+    ],
+    "deathVoices": [
+      21,
+      22
+    ]
+  },
+  "_build": {
+    "scriptVersion": "3-incremental-checkpoint",
+    "sourceHash": "1b5c9c18eb879d7cdf0a560ba7710f1ec31f14e880b6a65fe1d79062f283ef91",
+    "dependencyHash": "f9ac6ba97dbab4b1899debac92a08daa2abcd1cc634b6523ba66ca9b968e0390",
+    "generatedAt": 1778014038
+  }
+}

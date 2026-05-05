@@ -1,0 +1,907 @@
+{
+  "schemaVersion": 3,
+  "order": 344,
+  "id": "crescent-02",
+  "name": "Crescent02",
+  "category": "character",
+  "rarity": null,
+  "stars": 6,
+  "evolvedStars": 6,
+  "element": "Dark",
+  "weaponType": "Hammer",
+  "stats": {
+    "atk": 1371,
+    "hp": 7558,
+    "spd": 228,
+    "cost": 34
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/Crescent02.png",
+  "refs": {
+    "activeSkills": [
+      "GainAttackSingleACrescent",
+      "RecklessAttackBoostAllyACrescent",
+      "RetributionAttackDoubleACrescent",
+      "LifeFlipAllySpiritGainACrescent"
+    ],
+    "passives": [
+      "FudgeAugmentDrainIsAPassive",
+      "AttackPlus50Percent1TurnAllRevengeAForRetribution",
+      "PlusAttackBoostLv3",
+      "AttackUpTargetEquippedKatanaLv3",
+      "PlusHPBoostLv3",
+      "AddWeaponPrefGreatSword"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": "AttackAndHPUp6Death",
+    "leaderBuffCondition": "IsDeath",
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "GainAttackSingleACrescent": {
+        "id": "GainAttackSingleACrescent",
+        "found": true,
+        "ability": {
+          "name": "GainAttackSingleACrescent",
+          "class": "Ability",
+          "abilityScalor": 0,
+          "config": "GainAttackSingleACrescent",
+          "tuCost": 130,
+          "useLimit": 0,
+          "nameKey": "GainAttackSingleA",
+          "descriptionKey": "GainAttackSingleA",
+          "spiritGain": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "drainPercent": 1.0,
+              "drainEffect": "CrescentDrain1"
+            }
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "RangedMagic2"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.3,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_rangedmagic2/batfx_rangedmagic2",
+            "batfx_impactmagic2/batfx_impactmagic2",
+            "batsfx_prefab/batsfx_bluntimpact1",
+            "batfx_rippleredlow/batfx_rippleredlow"
+          ],
+          "sortOrderOffset": [
+            -2,
+            3,
+            1,
+            -2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            true,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {},
+        "conditions": {}
+      },
+      "RecklessAttackBoostAllyACrescent": {
+        "id": "RecklessAttackBoostAllyACrescent",
+        "found": true,
+        "ability": {
+          "name": "RecklessAttackBoostAllyACrescent",
+          "class": "Ability",
+          "config": "RecklessAttackBoostAllyACrescent",
+          "tuCost": 70,
+          "useLimit": 0,
+          "nameKey": "RecklessAttackBoostAllyA",
+          "descriptionKey": "RecklessAttackBoostAllyA",
+          "spiritCost": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Ally",
+          "components": [
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "RecklessAttackBoostImmunityTempForSource"
+              ],
+              "applyToSourceOnly": true
+            },
+            {
+              "buffs": [
+                "AttackPlus50Percent1TurnOnly",
+                "RecklessAttackBoostDamage",
+                "RemoveRecklessAttackBoostImmunity"
+              ],
+              "applyToTargetType": "Friendly",
+              "buffAppliedEffects": [
+                "EnrageCrescentAlly1"
+              ]
+            }
+          ],
+          "friendlyEventType": "Finish",
+          "sourceEventType": "Hit",
+          "abilityEffect": "EnrageCrescent1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "friendlyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.3,
+            0,
+            0,
+            0,
+            0.7,
+            0
+          ],
+          "prefabs": [
+            "batfx_CrescentEnrage1/batfx_CrescentEnrage1",
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_ripplebluelow/batfx_ripplebluelow",
+            "batfx_castingyellow2/batfx_castingyellow2",
+            "batfx_rippleyellowlow/batfx_rippleyellowlow",
+            "batsfx_prefab/batsfx_accelerate1"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -2,
+            -2,
+            2,
+            -2,
+            -2
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            false,
+            true
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "AttackPlus50Percent1TurnOnly": {
+            "class": "Buff",
+            "stackName": "AttackPlus50Percent",
+            "behaviors": [
+              "RemoveAfterTurnsBehavior",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "turnCount": 1,
+                "scalorStatBonuses": {
+                  "Attack": 0.5
+                }
+              },
+              {
+                "name": "AttackMinus25Percent"
+              }
+            ],
+            "iconSpriteName": "IconRedRage01",
+            "showAsTimer": true,
+            "duration": -1
+          },
+          "RecklessAttackBoostDamage": {
+            "class": "Buff",
+            "stackName": "RecklessAttackBoostDamage",
+            "behaviors": [
+              "InstantDamage"
+            ],
+            "behaviorOverrides": [
+              {
+                "percentAmount": 0.3,
+                "abilityEffect": "SmallHitEnrageBuff1",
+                "neverKill": true
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "RecklessAttackBoostImmunityTempForSource": {
+            "class": "Buff",
+            "stackName": "RecklessAttackBoostImmunityTempForSource",
+            "behaviors": [
+              "Immunity"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "RecklessAttackBoostDamage"
+                ],
+                "dontShowText": true
+              }
+            ],
+            "duration": 1,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "isHiddenFromPlayers": true
+          },
+          "RemoveRecklessAttackBoostImmunity": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "RecklessAttackBoostImmunityTempForSource"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {}
+      },
+      "RetributionAttackDoubleACrescent": {
+        "id": "RetributionAttackDoubleACrescent",
+        "found": true,
+        "ability": {
+          "name": "RetributionAttackDoubleACrescent",
+          "class": "Ability",
+          "abilityScalor": 2.5,
+          "config": "RetributionAttackDoubleACrescent",
+          "tuCost": 160,
+          "useLimit": 0,
+          "nameKey": "RetributionAttackDoubleA",
+          "descriptionKey": "RetributionAttackDoubleA",
+          "spiritCost": 3,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "applyToTargetType": "Enemy",
+              "damageBoosts": [
+                "RetributionDamageBoost"
+              ],
+              "drainPercent": 1.0,
+              "drainEffect": "CrescentDrain1"
+            },
+            {
+              "applyToSourceOnly": true,
+              "buffs": [
+                "RemoveRetributionEnabled"
+              ],
+              "skipAbilityEffect": true
+            }
+          ],
+          "flags": [
+            "StealthWorthy",
+            "Retribution"
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "RetributionCrescent1",
+          "useCondition": "CanUseRetributionSkills",
+          "recommendEffectWhenUsable": 1,
+          "killLockSkillIcon": "IconRedEx01",
+          "killLockUnlockedSkillIcon": "IconGreenCircle01",
+          "killLockUnlockedKey": "SkillReadyToUseKey",
+          "killLockLockedKey": "RetributionAttackALockLockedKey"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0.1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_dreamhunt1",
+            "batfx_tailwindspace3/batfx_tailwindspace3",
+            "batfx_chargefire6/batfx_chargefire6",
+            "batsfx_prefab/batsfx_charge1",
+            "batfx_throwparticle11/batfx_throwparticle11",
+            "batsfx_prefab/batsfx_fire4",
+            "batfx_bluntimpact4/batfx_bluntimpact4",
+            "batsfx_prefab/batsfx_bomb1"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -100,
+            20,
+            3,
+            3,
+            3,
+            2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            false,
+            true,
+            true,
+            false,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "isProjectileFX": [
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false
+          ],
+          "projectileFlightDuration": [
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0
+          ],
+          "projectileStartOffsetX": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "projectileStartOffsetY": [
+            0,
+            0,
+            0,
+            0,
+            150,
+            0,
+            0,
+            0
+          ],
+          "projectileShouldTargetTeamEffectPosition": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "boneToAttachTo": [
+            "",
+            "",
+            "effectbone",
+            "",
+            "effectbone",
+            "",
+            "",
+            ""
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "RemoveRetributionEnabled": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "RetributionEnabled"
+              }
+            ],
+            "duration": 0,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "CanUseRetributionSkills": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "RetributionEnabled"
+            ]
+          }
+        }
+      },
+      "LifeFlipAllySpiritGainACrescent": {
+        "id": "LifeFlipAllySpiritGainACrescent",
+        "found": true,
+        "ability": {
+          "name": "LifeFlipAllySpiritGainACrescent",
+          "class": "Ability",
+          "config": "LifeFlipAllySpiritGainACrescent",
+          "tuCost": 70,
+          "useLimit": 1,
+          "nameKey": "LifeFlipAllyA",
+          "descriptionKey": "LifeFlipAllyA",
+          "spiritGain": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Ally",
+          "components": [
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "LifeFlip"
+              ]
+            }
+          ],
+          "friendlyEventType": "Hit",
+          "abilityEffect": "CrescentLifeFlip1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "friendlyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0.2,
+            0,
+            0.3,
+            0,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_castinggreen1/batfx_castinggreen1",
+            "batfx_castinggreen2/batfx_castinggreen2",
+            "batfx_spiritcrest1/batfx_spiritcrest1",
+            "batsfx_prefab/batsfx_spiritgain1",
+            "batfx_ripplebluelow/batfx_ripplebluelow",
+            "batsfx_prefab/batsfx_heal1",
+            "batfx_healbottom1/batfx_healbottom1",
+            "batfx_healtop1/batfx_healtop1"
+          ],
+          "sortOrderOffset": [
+            2,
+            -2,
+            2,
+            2,
+            2,
+            -2,
+            -2,
+            -2,
+            2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "LifeFlip": {
+            "class": "Buff",
+            "behaviors": [
+              "AdjustHp"
+            ],
+            "behaviorOverrides": [
+              {
+                "lifeFlip": true,
+                "abilityEffect": "Blank"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {}
+      }
+    },
+    "passives": {
+      "FudgeAugmentDrainIsAPassive": {
+        "id": "FudgeAugmentDrainIsAPassive",
+        "found": false
+      },
+      "AttackPlus50Percent1TurnAllRevengeAForRetribution": {
+        "id": "AttackPlus50Percent1TurnAllRevengeAForRetribution",
+        "found": false
+      },
+      "PlusAttackBoostLv3": {
+        "id": "PlusAttackBoostLv3",
+        "found": false
+      },
+      "AttackUpTargetEquippedKatanaLv3": {
+        "id": "AttackUpTargetEquippedKatanaLv3",
+        "found": false
+      },
+      "PlusHPBoostLv3": {
+        "id": "PlusHPBoostLv3",
+        "found": false
+      },
+      "AddWeaponPrefGreatSword": {
+        "id": "AddWeaponPrefGreatSword",
+        "found": false
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": {
+      "class": "MonsterConditions",
+      "elements": [
+        "Death"
+      ]
+    }
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "Crescent02",
+    "family": "Crescent",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "Crescent02",
+    "family": "Crescent",
+    "class": "Monster",
+    "leaderBuff": "AttackAndHPUp6Death",
+    "leaderBuffCondition": "IsDeath",
+    "activeSkills": {
+      "0": "GainAttackSingleACrescent",
+      "1": "RecklessAttackBoostAllyACrescent",
+      "2": "RetributionAttackDoubleACrescent",
+      "3": "LifeFlipAllySpiritGainACrescent"
+    },
+    "passives": {
+      "0": "FudgeAugmentDrainIsAPassive",
+      "1": "AttackPlus50Percent1TurnAllRevengeAForRetribution",
+      "2": "PlusAttackBoostLv3",
+      "3": "AttackUpTargetEquippedKatanaLv3",
+      "4": "PlusHPBoostLv3",
+      "5": "AddWeaponPrefGreatSword"
+    },
+    "cost": 34,
+    "baseAttack": 1371,
+    "baseMaxHp": 7558,
+    "speed": 228,
+    "element": "Death",
+    "weaponPref": "Hammer",
+    "weaponPivotIndex": 0,
+    "secure": 1,
+    "evolveFrom": "Crescent01",
+    "aiTargetPickWeight": 1,
+    "stars": 6,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 0,
+    "battleOrbImageFlip": 0,
+    "attackType": "Claw",
+    "formTwitterShare": 2,
+    "cosmoName": "Crescent03",
+    "cosmoBattleOrbImageFlip": 1,
+    "skillVoices": {
+      "0": [
+        1,
+        2
+      ],
+      "1": [
+        3,
+        4
+      ],
+      "2": [
+        5,
+        6
+      ],
+      "3": [
+        7,
+        8
+      ]
+    },
+    "damageVoices": [
+      9,
+      10
+    ],
+    "deathVoices": [
+      11,
+      12
+    ],
+    "victoryVoices": [
+      13
+    ],
+    "lineupVoices": [
+      14,
+      15,
+      16
+    ],
+    "evolutionVoices": [
+      17
+    ],
+    "trainVoices": [
+      18,
+      19,
+      20,
+      21,
+      22
+    ],
+    "titleVoices": [
+      23
+    ],
+    "loginVoices": [
+      25
+    ],
+    "tapVoices": [
+      26,
+      27,
+      28
+    ],
+    "idleVoices": [
+      29
+    ]
+  },
+  "_build": {
+    "scriptVersion": "3-incremental-checkpoint",
+    "sourceHash": "2630accc075e7a26f738cbd848f1012ef597ba291853d34bd3b9e4e9376b0552",
+    "dependencyHash": "37c5618f21cf598b108afd75fa8da0b91798fcf99dfe7e31055f7c7e70949277",
+    "generatedAt": 1778013989
+  }
+}

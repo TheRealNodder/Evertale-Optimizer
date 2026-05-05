@@ -1,0 +1,1105 @@
+{
+  "schemaVersion": 3,
+  "order": 382,
+  "id": "yandere-maid-02",
+  "name": "YandereMaid02",
+  "category": "character",
+  "rarity": null,
+  "stars": 6,
+  "evolvedStars": 6,
+  "element": "Water",
+  "weaponType": "Sword",
+  "stats": {
+    "atk": 1401,
+    "hp": 7406,
+    "spd": 120,
+    "cost": 34
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/YandereMaid02.png",
+  "refs": {
+    "activeSkills": [
+      "GainAttackSingleStealthAYandere",
+      "SleepDoubleALockYandere",
+      "DreamBusterAYandere",
+      "SurvivorDoubleAYandere"
+    ],
+    "passives": [
+      "HoldGround",
+      "GetRegenerateFor300TU",
+      "PlusAttackBoostLv3",
+      "PlusHPBoostLv3",
+      "AttackUpTargetEquippedGreatAxeLv3",
+      "AddWeaponPrefMace"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": "HasteUp20PercentWater",
+    "leaderBuffCondition": "IsWater",
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "GainAttackSingleStealthAYandere": {
+        "id": "GainAttackSingleStealthAYandere",
+        "found": true,
+        "ability": {
+          "name": "GainAttackSingleStealthAYandere",
+          "class": "Ability",
+          "abilityScalor": -0.33,
+          "config": "GainAttackSingleStealthAYandere",
+          "tuCost": 70,
+          "useLimit": 0,
+          "nameKey": "GainAttackSingleStealthA",
+          "descriptionKey": "GainAttackSingleStealthA",
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "ActiveStealthJustGained",
+                "Stealth",
+                "BurnImmunityTempForRevenge"
+              ],
+              "applyToSourceOnly": true,
+              "showMissConditions": "ShowNoMiss",
+              "skipAbilityEffect": true
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "RangedStab1",
+          "flags": [
+            "Stealth"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.1,
+            0,
+            0,
+            0.2,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_rangedmagic2/batfx_rangedmagic2",
+            "batfx_rangedstab1/batfx_rangedstab1",
+            "batsfx_prefab/batsfx_slash1",
+            "batfx_rippleredlow/batfx_rippleredlow",
+            "batfx_stealth1/batfx_stealth1",
+            "batsfx_prefab/batsfx_stealth1"
+          ],
+          "sortOrderOffset": [
+            -2,
+            3,
+            1,
+            -2,
+            -2,
+            2,
+            0
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            true,
+            false,
+            true
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "ActiveStealthJustGained": {
+            "class": "Buff",
+            "stackName": "ActiveStealthJustGained",
+            "duration": 1,
+            "isHiddenFromPlayers": true,
+            "applyConditions": "IsNotStealth"
+          },
+          "BurnImmunityTempForRevenge": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Burn",
+                  "BurnAfterTurn",
+                  "BurnAtEndOfTurn"
+                ],
+                "dontShowText": true
+              },
+              {
+                "name": "BurnAfterTurn"
+              },
+              {
+                "name": "BurnSelfOnHit"
+              }
+            ],
+            "duration": 1,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "tags": [
+              "BurnImmune"
+            ],
+            "stackName": "BurnImmunityTempForRevenge",
+            "isHiddenFromPlayers": true
+          },
+          "Stealth": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "ManipulateTargeting",
+              "RemoveOnHurt",
+              "Immunity",
+              "Immunity"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "LockHideSkills"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "dodgeMultitarget": true,
+                "forceAllowAllEnemiesAChanceToManipulate": true,
+                "removeAfterTriggers": 1,
+                "abilityFlagsToIgnore": [
+                  "Stun",
+                  "NoDamage",
+                  "Sneak",
+                  "IgnoreStealth"
+                ]
+              },
+              {},
+              {
+                "stackNamesToBlock": [
+                  "Stealth"
+                ],
+                "dontShowText": true
+              },
+              {
+                "stackNamesToBlock": [
+                  "Placeholder"
+                ],
+                "dontShowText": true,
+                "activateCondition": "MissingStealthOrStealthShield"
+              }
+            ],
+            "tags": [
+              "Stealth"
+            ],
+            "duration": -1,
+            "showAsTimer": true,
+            "iconSpriteName": "IconBlackStealth01",
+            "stackName": "Stealth",
+            "useCount": 1
+          }
+        },
+        "attackScalors": {},
+        "conditions": {}
+      },
+      "SleepDoubleALockYandere": {
+        "id": "SleepDoubleALockYandere",
+        "found": true,
+        "ability": {
+          "name": "SleepDoubleALockYandere",
+          "class": "Ability",
+          "config": "SleepDoubleALockYandere",
+          "tuCost": 130,
+          "useLimit": 0,
+          "nameKey": "SleepDoubleALock",
+          "descriptionKey": "SleepDoubleALock",
+          "spiritCost": 5,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "Sleep",
+                "BurnImmunityTempForRevengeSleepAttack"
+              ],
+              "chance": 1.0,
+              "applyConditions": "HasNotSlept",
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "LockSkillUse"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "useCondition": "SkillNotLocked",
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "YandereSleep1",
+          "flags": [
+            "Sleep",
+            "NoDamage",
+            "StealthWorthy"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0.3,
+            0,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_yanderesleep1/batfx_yanderesleep1",
+            "batfx_yanderepetals1/batfx_yanderepetals2",
+            "batfx_sleep1/batfx_sleep1",
+            "batsfx_prefab/batsfx_sleep1",
+            "batfx_spotpurple/batfx_spotpurple",
+            "batfx_ripplepurplelow/batfx_ripplepurplelow"
+          ],
+          "sortOrderOffset": [
+            -2,
+            2,
+            2,
+            1,
+            -2,
+            -2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            false,
+            true,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "BurnImmunityTempForRevengeSleepAttack": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Burn",
+                  "BurnAfterTurn",
+                  "BurnAtEndOfTurn"
+                ],
+                "dontShowText": true
+              },
+              {
+                "name": "BurnAfterTurn"
+              },
+              {
+                "name": "BurnSelfOnHit"
+              }
+            ],
+            "duration": 1,
+            "showAsTimer": false,
+            "applyConditions": "IsNotAnySleepImmune",
+            "showAsPermanent": false,
+            "tags": [
+              "BurnImmune"
+            ],
+            "stackName": "BurnImmunityTempForRevenge",
+            "isHiddenFromPlayers": true
+          },
+          "LockSkillUse": {
+            "class": "Buff",
+            "stackName": "SkillLocked",
+            "duration": -1,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "isHiddenFromPlayers": true
+          },
+          "Sleep": {
+            "class": "Buff",
+            "stackName": "Sleep",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "LoseTurn",
+              "RemoveOnHurt"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "PurifyChain"
+              },
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "name": "AutoPurifyAfterTurnNoSleep"
+              },
+              {},
+              {
+                "ignoreIfHurtBySelf": true,
+                "cancelFromDamageFlags": [
+                  "DoNotWake"
+                ]
+              }
+            ],
+            "applyConditions": "HasNotSlept",
+            "duration": 200,
+            "showAsTimer": true,
+            "statusEffect": "SleepStatus",
+            "statusEffectOffset": 0.1,
+            "iconSpriteName": "IconWhiteSleepZs01",
+            "textKeyToShowWhenApplied": "SleepKey",
+            "canBePurified": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "HasNotSlept": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "properties": {
+                "hasSlept": 1
+              }
+            }
+          },
+          "SkillNotLocked": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "SkillLocked"
+              ]
+            }
+          }
+        }
+      },
+      "DreamBusterAYandere": {
+        "id": "DreamBusterAYandere",
+        "found": true,
+        "ability": {
+          "name": "DreamBusterAYandere",
+          "class": "Ability",
+          "abilityScalor": -2,
+          "conditionalAbilityScalors": [
+            5
+          ],
+          "config": "DreamBusterAYandere",
+          "tuCost": 130,
+          "useLimit": 0,
+          "nameKey": "DreamBusterA",
+          "descriptionKey": "DreamBusterA",
+          "spiritCost": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "AddSpirit"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "DreamhuntDamageBoost"
+              ],
+              "damageFlags": [
+                "DreamDamage",
+                "IgnoreArmor"
+              ]
+            },
+            {
+              "spiritCondition": "IsSleeping",
+              "spiritToAdd": 400
+            }
+          ],
+          "attackScalors": [
+            "GoodVsSleeping"
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "SmallHitRanged1",
+          "conditionedAbilityEffects": [
+            "DreamBusterYandereMaido1",
+            "DreamBusterYandereMaido1"
+          ],
+          "flags": [
+            "Dreamhunt",
+            "StealthWorthy"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.8,
+            0
+          ],
+          "prefabs": [
+            "batfx_bluntimpact1/batfx_bluntimpact1",
+            "batsfx_prefab/batsfx_impactsmall1"
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            true
+          ],
+          "scale": [
+            0.4,
+            1
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "AddSpirit": {
+            "class": "AddSpiritAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {
+          "GoodVsSleeping": {
+            "class": "AttackScalor",
+            "targetCondition": "IsSleeping"
+          }
+        },
+        "conditions": {
+          "IsSleeping": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "Sleep"
+            ]
+          }
+        }
+      },
+      "SurvivorDoubleAYandere": {
+        "id": "SurvivorDoubleAYandere",
+        "found": true,
+        "ability": {
+          "name": "SurvivorDoubleAYandere",
+          "class": "Ability",
+          "abilityScalor": 4,
+          "config": "SurvivorDoubleAYandere",
+          "tuCost": 130,
+          "useLimit": 0,
+          "nameKey": "SurvivorDoubleA",
+          "descriptionKey": "SurvivorDoubleA",
+          "spiritCost": 3,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "SurvivorDamageBoost"
+              ],
+              "applyToTargetType": "Enemy"
+            }
+          ],
+          "useCondition": "TimeInCombat300",
+          "bombSkillIcon": "IconBrownCountdownClock01",
+          "bombSkillIconDescriptionKey": "SurvivorDoubleACountdownKey",
+          "flags": [
+            "Survivor",
+            "Duration"
+          ],
+          "enemyEventType": "Hit",
+          "recommendEffectWhenUsable": 1,
+          "abilityEffect": "SurvivorYandereMaid1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.1,
+            0,
+            0.2,
+            0,
+            0,
+            0.3,
+            0,
+            0.2,
+            0.3
+          ],
+          "prefabs": [
+            "batfx_tailwindred/batfx_tailwindred",
+            "batsfx_prefab/batsfx_charge1",
+            "batfx_survivor1/batfx_survivor1",
+            "batsfx_prefab/batsfx_charge1",
+            "batfx_spikeflurry1/batfx_spikeflurry1",
+            "batsfx_prefab/batsfx_whoosh1",
+            "batsfx_prefab/batsfx_fire4",
+            "batfx_multiplestab1/batfx_multiplestab1",
+            "batsfx_prefab/batsfx_slash1",
+            "batsfx_prefab/batsfx_slash1",
+            "batsfx_prefab/batsfx_slash1"
+          ],
+          "sortOrderOffset": [
+            -100,
+            -2,
+            -2,
+            20,
+            -2,
+            3,
+            0,
+            3,
+            0,
+            0,
+            0
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "audiobundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "positionInBattlefieldCenter": [
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {
+          "TimeInCombat300": {
+            "class": "AttackScalor",
+            "sourceCondition": "TimeInCombat300"
+          }
+        },
+        "conditions": {
+          "TimeInCombat300": {
+            "class": "MonsterConditions",
+            "timeInCombat": 300
+          }
+        }
+      }
+    },
+    "passives": {
+      "HoldGround": {
+        "id": "HoldGround",
+        "found": false
+      },
+      "GetRegenerateFor300TU": {
+        "id": "GetRegenerateFor300TU",
+        "found": false
+      },
+      "PlusAttackBoostLv3": {
+        "id": "PlusAttackBoostLv3",
+        "found": false
+      },
+      "PlusHPBoostLv3": {
+        "id": "PlusHPBoostLv3",
+        "found": false
+      },
+      "AttackUpTargetEquippedGreatAxeLv3": {
+        "id": "AttackUpTargetEquippedGreatAxeLv3",
+        "found": false
+      },
+      "AddWeaponPrefMace": {
+        "id": "AddWeaponPrefMace",
+        "found": false
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": {
+      "class": "MonsterConditions",
+      "elements": [
+        "Water"
+      ]
+    }
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "YandereMaid02",
+    "family": "YandereMaid",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "YandereMaid02",
+    "family": "YandereMaid",
+    "class": "Monster",
+    "leaderBuff": "HasteUp20PercentWater",
+    "leaderBuffCondition": "IsWater",
+    "activeSkills": {
+      "0": "GainAttackSingleStealthAYandere",
+      "1": "SleepDoubleALockYandere",
+      "2": "DreamBusterAYandere",
+      "3": "SurvivorDoubleAYandere"
+    },
+    "passives": {
+      "0": "HoldGround",
+      "1": "GetRegenerateFor300TU",
+      "2": "PlusAttackBoostLv3",
+      "3": "PlusHPBoostLv3",
+      "4": "AttackUpTargetEquippedGreatAxeLv3",
+      "5": "AddWeaponPrefMace"
+    },
+    "cost": 34,
+    "baseAttack": 1401,
+    "baseMaxHp": 7406,
+    "speed": 120,
+    "element": "Water",
+    "weaponPref": "Sword",
+    "weaponPivotIndex": 0,
+    "secure": 1,
+    "evolveFrom": "YandereMaid01",
+    "aiTargetPickWeight": 1,
+    "stars": 6,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 0,
+    "battleOrbImageFlip": 0,
+    "attackType": "Weapon",
+    "formTwitterShare": 1,
+    "cosmoName": "YandereMaid03",
+    "cosmoBattleOrbImageFlip": 1,
+    "skillVoices": {
+      "0": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "1": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "2": [
+        9,
+        10,
+        11,
+        12
+      ],
+      "3": [
+        13,
+        14,
+        15,
+        16
+      ]
+    },
+    "damageVoices": [
+      17,
+      18,
+      19,
+      20
+    ],
+    "deathVoices": [
+      21,
+      22,
+      23,
+      24
+    ],
+    "victoryVoices": [
+      25,
+      26
+    ],
+    "lineupVoices": [
+      27,
+      28,
+      29,
+      30,
+      31,
+      32
+    ],
+    "evolutionVoices": [
+      33
+    ],
+    "trainVoices": [
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43
+    ],
+    "titleVoices": [
+      44
+    ],
+    "gachaVoices": [
+      45
+    ],
+    "loginVoices": [
+      46
+    ],
+    "tapVoices": [
+      47,
+      48,
+      49
+    ],
+    "idleVoices": [
+      50
+    ]
+  },
+  "_build": {
+    "scriptVersion": "3-incremental-checkpoint",
+    "sourceHash": "10165888100da60ec66b20418e2bea41c57d7fc38a6da4816cecf06e8760e5ba",
+    "dependencyHash": "d02ade3e1fcd90bf094ce94db064934435d46be7a325da29838e54f2b775c952",
+    "generatedAt": 1778013990
+  }
+}

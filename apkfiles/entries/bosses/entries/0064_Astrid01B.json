@@ -1,0 +1,821 @@
+{
+  "schemaVersion": 3,
+  "order": 64,
+  "id": "astrid-01-b",
+  "name": "Astrid01B",
+  "category": "bosse",
+  "rarity": null,
+  "stars": 6,
+  "evolvedStars": 6,
+  "element": "Fire",
+  "weaponType": "GreatSword",
+  "stats": {
+    "atk": 823,
+    "hp": 8580,
+    "spd": 500,
+    "cost": 999
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/Astrid01B.png",
+  "refs": {
+    "activeSkills": [
+      "RecklessAttackA",
+      "ProtectorKillerAAstridBoss",
+      "DesperateStrikeB2Boss",
+      "DesperateBiteDoubleA",
+      "RecklessHealA"
+    ],
+    "passives": [
+      "HoldGroundBoss",
+      "PoisonImmunity",
+      "BurnImmunity"
+    ],
+    "activeSkillsAI": {
+      "3": "DesperateBiteDoubleAAstridBoss_AI",
+      "4": "RecklessHealAAstridBoss_AI"
+    },
+    "aiSequence": null,
+    "leaderBuff": null,
+    "leaderBuffCondition": null,
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "RecklessAttackA": {
+        "id": "RecklessAttackA",
+        "found": true,
+        "ability": {
+          "name": "RecklessAttackA",
+          "class": "Ability",
+          "abilityScalor": 0.5,
+          "config": "RecklessAttackA",
+          "tuCost": 100,
+          "useLimit": 0,
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RecklessDamageBoost"
+              ],
+              "selfDamagePercent": 0.3,
+              "selfDamageEffect": "SelfDamageZealous"
+            }
+          ],
+          "flags": [
+            "Reckless"
+          ],
+          "enemyEventType": "Hit",
+          "axeAbilityEffect": "MidSlash1",
+          "greatSwordAbilityEffect": "MidSlash1",
+          "greatAxeAbilityEffect": "MidSlash1",
+          "hammerAbilityEffect": "MidBlunt1",
+          "katanaAbilityEffect": "MidSlash1",
+          "maceAbilityEffect": "MidBlunt1",
+          "spearAbilityEffect": "MidSpear1",
+          "staffAbilityEffect": "MidBlunt1",
+          "swordAbilityEffect": "MidSlash1",
+          "clawAbilityEffect": "MidClaw1",
+          "biteAbilityEffect": "SmallBite1",
+          "bashAbilityEffect": "MidBlunt1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": null,
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {},
+        "conditions": {},
+        "localization": {
+          "name": "Brash Strike",
+          "description": "150% damage to 1 enemy and allies gain 1 Spirit. Reflects 30% of the damage to the user.",
+          "selected": "150% damage and 1 Spirit, 30% damage reflection"
+        }
+      },
+      "ProtectorKillerAAstridBoss": {
+        "id": "ProtectorKillerAAstridBoss",
+        "found": true,
+        "ability": {
+          "name": "ProtectorKillerAAstridBoss",
+          "class": "Ability",
+          "abilityScalor": -2,
+          "conditionalAbilityScalors": [
+            4
+          ],
+          "config": "ProtectorKillerAAstridBoss",
+          "tuCost": 70,
+          "useLimit": 0,
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage"
+          ],
+          "attackScalors": [
+            "GoodVsProtector"
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "SmallHit1",
+          "conditionedAbilityEffects": [
+            "ProtectorKillerSpecial1NC",
+            "ProtectorKillerSpecial1NC"
+          ],
+          "flags": [
+            "ProtectorKiller"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.4,
+            0
+          ],
+          "prefabs": [
+            "batfx_bluntimpact1/batfx_bluntimpact1",
+            "batsfx_prefab/batsfx_impactsmall1"
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            true
+          ],
+          "scale": [
+            0.4,
+            1
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {
+          "GoodVsProtector": {
+            "class": "AttackScalor",
+            "targetCondition": "IsProtecting"
+          }
+        },
+        "conditions": {},
+        "localization": {
+          "name": "Guard Destroyer",
+          "description": "500% damage to 1 enemy if they are a Guardian.",
+          "selected": "500% damage against Guardians"
+        }
+      },
+      "DesperateStrikeB2Boss": {
+        "id": "DesperateStrikeB2Boss",
+        "found": true,
+        "ability": {
+          "name": "DesperateStrikeB2Boss",
+          "class": "Ability",
+          "abilityScalor": 3,
+          "conditionalAbilityScalors": [
+            4
+          ],
+          "config": "DesperateStrikeB2Boss",
+          "tuCost": 70,
+          "useLimit": 0,
+          "spiritCost": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "DesperateDamageBoost"
+              ]
+            }
+          ],
+          "useCondition": "HPBelow50Percent",
+          "flags": [
+            "Desperate"
+          ],
+          "ignoreEffectForSourceEvent": true,
+          "enemyEventType": "Hit",
+          "abilityEffect": "DesperateAstrid01Slash",
+          "attackScalors": [
+            "HPBelow25Percent"
+          ],
+          "conditionedAbilityEffects": [
+            "DesperateAstrid01Slash"
+          ],
+          "recommendEffectWhenUsable": 1
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.4,
+            0.35,
+            0,
+            0.6
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_timestrike1",
+            "batfx_desperatestrike2/batfx_desperatestrike2",
+            "batfx_jumpsmoke1/batfx_jumpsmoke1",
+            "batfx_slash4/batfx_slash4",
+            "batsfx_prefab/batsfx_slash1",
+            "batfx_jumpsmoke1/batfx_jumpsmoke1"
+          ],
+          "sortOrderOffset": [
+            2,
+            -2,
+            1,
+            1,
+            2,
+            1
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            false,
+            true,
+            true
+          ],
+          "hammerAbilityEffect": "DesperateAstrid01Blunt"
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {
+          "HPBelow25Percent": {
+            "class": "AttackScalor",
+            "sourceCondition": "HPBelow25Percent"
+          },
+          "HPBelow50Percent": {
+            "class": "AttackScalor",
+            "sourceCondition": "HPBelow50Percent"
+          }
+        },
+        "conditions": {
+          "HPBelow25Percent": {
+            "class": "MonsterConditions",
+            "hpLessThanPercent": 0.2500001
+          },
+          "HPBelow50Percent": {
+            "class": "MonsterConditions",
+            "hpLessThanPercent": 0.5000001
+          }
+        },
+        "localization": {
+          "name": "Desperate Strike",
+          "description": "400% damage to 1 enemy. Usable only if the user's HP is at 50% or less. 500% damage if the user's HP is at 25% or less.",
+          "selected": "400%+ damage, usable if user HP is 50% or less"
+        }
+      },
+      "DesperateBiteDoubleA": {
+        "id": "DesperateBiteDoubleA",
+        "found": true,
+        "ability": {
+          "name": "DesperateBiteDoubleA",
+          "class": "Ability",
+          "abilityScalor": 3,
+          "config": "DesperateBiteDoubleA",
+          "tuCost": 200,
+          "useLimit": 0,
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "applyToTargetType": "Enemy",
+              "damageBoosts": [
+                "DesperateDamageBoost"
+              ]
+            },
+            {
+              "applyToTargetType": "Enemy",
+              "buffs": [
+                "HealHalfStack"
+              ],
+              "buffBackMode": true,
+              "skipAbilityEffect": true,
+              "applyConditions": "IsNotStealth"
+            }
+          ],
+          "useCondition": "HPBelow25Percent",
+          "flags": [
+            "Desperate"
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Hit",
+          "abilityEffect": "DesperateBiteAbilityFinn",
+          "recommendEffectWhenUsable": 1,
+          "ignoreEffectForSourceEvent": true,
+          "hammerAbilityEffect": "DesperateBiteAbilityFinnBlunt"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0.2,
+            0,
+            0,
+            0,
+            0.2,
+            0.3,
+            0.25,
+            0,
+            0,
+            0.7,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_stealth1",
+            "batsfx_prefab/batsfx_swordring",
+            "batsfx_prefab/batsfx_timestrike1",
+            "batfx_tailwindblue/batfx_tailwindblue",
+            "batfx_FinnSwordChargeUp/batfx_FinnSwordChargeUp",
+            "batfx_desperatestrikeSSR/batfx_desperatestrikeSSR",
+            "batfx_jumpsmoke1/batfx_jumpsmoke1",
+            "batfx_impact3/batfx_impact3",
+            "batfx_groundimpact/batfx_groundimpact",
+            "batsfx_prefab/batsfx_slash1",
+            "batfx_healtop1/batfx_healtop1",
+            "batsfx_prefab/batsfx_heal1"
+          ],
+          "sortOrderOffset": [
+            1,
+            2,
+            2,
+            -100,
+            -1,
+            -2,
+            1,
+            1,
+            -2,
+            2,
+            1,
+            1
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "audiobundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            true,
+            true,
+            true
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "HealHalfStack": {
+            "class": "Buff",
+            "stackName": "Healing",
+            "behaviors": [
+              "AdjustHp"
+            ],
+            "behaviorOverrides": [
+              {
+                "percent": 0.5,
+                "abilityEffect": "SmallHeal1"
+              }
+            ],
+            "duration": 0,
+            "applyConditions": "IsNotHealing",
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {
+          "HPBelow25Percent": {
+            "class": "AttackScalor",
+            "sourceCondition": "HPBelow25Percent"
+          }
+        },
+        "conditions": {
+          "HPBelow25Percent": {
+            "class": "MonsterConditions",
+            "hpLessThanPercent": 0.2500001
+          },
+          "IsNotStealth": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "Stealth"
+              ]
+            }
+          }
+        },
+        "localization": {
+          "name": "Desperate Drain",
+          "description": "400% damage to 2 enemies, and the user recovers their HP by 50% of its own max if damage is dealt. This skill can only be used if the user's HP is at 25% or less.",
+          "selected": "400% damage, usable if user HP is 25% or less"
+        }
+      },
+      "RecklessHealA": {
+        "id": "RecklessHealA",
+        "found": true,
+        "ability": {
+          "name": "RecklessHealA",
+          "class": "Ability",
+          "config": "RecklessHealA",
+          "tuCost": 130,
+          "useLimit": 0,
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "oneAllyNotMe",
+          "components": [
+            "Heal",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "healthPerAttack": 4,
+              "applyToTargetType": "Friendly",
+              "abilityEffect": "HealAlly2"
+            },
+            {
+              "buffs": [
+                "40PercentHPDamage"
+              ],
+              "applyToSourceOnly": true
+            }
+          ],
+          "flags": [
+            "Pain",
+            "Reckless"
+          ],
+          "friendlyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "ignoreEffectForSourceEvent": true
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "friendlyTargets": 1,
+          "oneAllyNotMe": true
+        },
+        "abilityEffect": null,
+        "components": {
+          "Heal": {
+            "class": "HealAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "40PercentHPDamage": {
+            "class": "Buff",
+            "behaviors": [
+              "InstantDamage"
+            ],
+            "behaviorOverrides": [
+              {
+                "percentAmount": 0.4,
+                "abilityEffect": "SmallHit2NoVoice",
+                "ignoreHoldGround": true
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "Heal": {
+            "class": "Buff",
+            "behaviors": [
+              "AdjustHp"
+            ],
+            "behaviorOverrides": [
+              {
+                "percent": 0.3,
+                "abilityEffect": "Blank",
+                "hpboosts": [
+                  "HealBoost"
+                ]
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {},
+        "localization": {
+          "name": "Pain Heal",
+          "description": "Heals 1 ally for HP equal to 400% of the user's Attack, then reduces the user's current HP by 40% of max.",
+          "selected": "Heal HP of 1 ally, then user loses 40% HP"
+        }
+      }
+    },
+    "passives": {
+      "HoldGroundBoss": {
+        "id": "HoldGroundBoss",
+        "found": false
+      },
+      "PoisonImmunity": {
+        "id": "PoisonImmunity",
+        "found": false
+      },
+      "BurnImmunity": {
+        "id": "BurnImmunity",
+        "found": false
+      }
+    },
+    "activeSkillsAI": {
+      "3": {
+        "id": "DesperateBiteDoubleAAstridBoss_AI",
+        "found": true,
+        "ai": {
+          "class": "AbilityAI",
+          "baseAITargetingWeight": 5.1,
+          "aiTargetingSourceMonsterConditions": {
+            "4EnemiesStealthed": 0.25,
+            "AllEnemiesAlwaysDodging": 0,
+            "AllEnemiesNotProtectingDodging": 0
+          },
+          "aiTargetingMonsterConditions": {
+            "IsStealth": 0.75,
+            "IsAlwaysDodging": 0.4,
+            "NotProtectingDodging": 0.4,
+            "IsAloneAndStealth": 0
+          }
+        }
+      },
+      "4": {
+        "id": "RecklessHealAAstridBoss_AI",
+        "found": true,
+        "ai": {
+          "class": "AbilityAI",
+          "baseAITargetingWeight": 0.4,
+          "globalScalorsToIgnore": [
+            "CurrentTULessThan200",
+            "HPAbove1Percent",
+            "ElementWeakness",
+            "IsSleeper",
+            "ActiveStunAndAllyNoAbsorb",
+            "IsBurning",
+            "HasRevenge",
+            "HasNastyRevenge",
+            "HasSkin",
+            "IsActiveStun",
+            "HPBelow5Percent",
+            "0SpiritDamageReducerAt0Spirit"
+          ],
+          "aiTargetingSourceMonsterConditions": {
+            "HPBelow50Percent": 0
+          },
+          "aiTargetingMonsterConditions": {
+            "IsNotLutherOrAstrid": 0.9,
+            "HPBelow50Percent": 7,
+            "IsOrcanix": 0
+          }
+        }
+      }
+    },
+    "aiSequence": null,
+    "leaderCondition": null
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "Astrid01B",
+    "family": "AstridBoss",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": "Luther01"
+  },
+  "raw": {
+    "name": "Astrid01B",
+    "class": "Monster",
+    "family": "AstridBoss",
+    "activeSkills": {
+      "0": "RecklessAttackA",
+      "1": "ProtectorKillerAAstridBoss",
+      "2": "DesperateStrikeB2Boss",
+      "3": "DesperateBiteDoubleA",
+      "4": "RecklessHealA"
+    },
+    "passives": {
+      "0": "HoldGroundBoss",
+      "1": "PoisonImmunity",
+      "2": "BurnImmunity"
+    },
+    "activeSkillsAI": {
+      "3": "DesperateBiteDoubleAAstridBoss_AI",
+      "4": "RecklessHealAAstridBoss_AI"
+    },
+    "cost": 999,
+    "baseAttack": 823,
+    "baseMaxHp": 8580,
+    "speed": 500,
+    "element": "Fire",
+    "weaponPref": "GreatSword",
+    "weaponPivotIndex": 0,
+    "walkSound": "TestSound",
+    "secure": 1,
+    "aiTargetPickWeight": 1,
+    "stars": 6,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 1,
+    "battleOrbImageFlip": 0,
+    "treatAsDuplicateOf": "Luther01",
+    "skillVoices": {
+      "0": [
+        1,
+        2
+      ],
+      "1": [
+        3,
+        4
+      ],
+      "2": [
+        5,
+        6
+      ],
+      "3": [
+        7,
+        8
+      ],
+      "4": [
+        9,
+        10
+      ]
+    },
+    "damageVoices": [
+      11,
+      12
+    ],
+    "deathVoices": [
+      13
+    ]
+  },
+  "_build": {
+    "scriptVersion": "3-incremental-checkpoint",
+    "sourceHash": "2666f4e5b877c8f92bdabae5800e0f4f0c8f2a1c03c99f7425c35cfadb1b7450",
+    "dependencyHash": "671ce1db1582b7616d6c413a2a96ec58711616b75963560eb04e03bf539dbb2b",
+    "generatedAt": 1778014030
+  }
+}

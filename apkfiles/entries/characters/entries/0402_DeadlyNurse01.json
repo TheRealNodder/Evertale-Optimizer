@@ -1,0 +1,1082 @@
+{
+  "schemaVersion": 3,
+  "order": 402,
+  "id": "deadly-nurse-01",
+  "name": "DeadlyNurse01",
+  "category": "character",
+  "rarity": null,
+  "stars": 5,
+  "evolvedStars": 6,
+  "element": "Earth",
+  "weaponType": "Axe",
+  "stats": {
+    "atk": 1166,
+    "hp": 5380,
+    "spd": 493,
+    "cost": 28
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/DeadlyNurse01.png",
+  "refs": {
+    "activeSkills": [
+      "InstantPoisonTouchRandomADeadlyNurse",
+      "PoisonDrainSingleADeadlyNurse",
+      "GrantStunAbsorbADeadlyNurse",
+      "HighTUAllyBombDoubleADeadlyNurse"
+    ],
+    "passives": [
+      "DamageReduceWhenAtMaxHP",
+      "PlusAttackBoostLv3",
+      "AttackUpTargetEquippedHammerLv3",
+      "PlusHPBoostLv3",
+      "AddWeaponPrefStaff"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": "HasteUp20PercentEarth",
+    "leaderBuffCondition": "IsEarth",
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "InstantPoisonTouchRandomADeadlyNurse": {
+        "id": "InstantPoisonTouchRandomADeadlyNurse",
+        "found": true,
+        "ability": {
+          "name": "InstantPoisonTouchRandomADeadlyNurse",
+          "class": "Ability",
+          "config": "InstantPoisonTouchRandomADeadlyNurse",
+          "tuCost": 50,
+          "useLimit": 0,
+          "nameKey": "InstantPoisonTouchRandomA",
+          "descriptionKey": "InstantPoisonTouchRandomA",
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "RandomEnemy",
+          "components": [
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "Poison",
+                "BurnImmunityTempForRevenge"
+              ]
+            }
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "DeadlyNurseSyringe1",
+          "flags": [
+            "Poisoner",
+            "NoDamage"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "randomEnemy": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.1,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_slash1",
+            "batfx_swoosh3/batfx_swoosh3",
+            "batfx_deadlynursethrow1/batfx_deadlynursethrow1",
+            "batfx_singlestab1/batfx_singlestab1",
+            "batfx_impactpoison1/batfx_impactpoison1"
+          ],
+          "sortOrderOffset": [
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "BurnImmunityTempForRevenge": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Burn",
+                  "BurnAfterTurn",
+                  "BurnAtEndOfTurn"
+                ],
+                "dontShowText": true
+              },
+              {
+                "name": "BurnAfterTurn"
+              },
+              {
+                "name": "BurnSelfOnHit"
+              }
+            ],
+            "duration": 1,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "tags": [
+              "BurnImmune"
+            ],
+            "stackName": "BurnImmunityTempForRevenge",
+            "isHiddenFromPlayers": true
+          },
+          "Poison": {
+            "class": "Buff",
+            "stackName": "Poison",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "DamageOverTime"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "percentOfAttack": 0.0025,
+                "damageColor": "Green",
+                "abilityEffect": "PoisonDamage",
+                "extraDamageFlag": "Poison"
+              }
+            ],
+            "tags": [
+              "Poison"
+            ],
+            "canBePurified": true,
+            "duration": -1,
+            "applyConditions": "NotSuperOrMegaPoisoned",
+            "showAsTimer": false,
+            "statusEffect": "PoisonStatus",
+            "statusEffectOffset": 0.1,
+            "damageType": "Poison",
+            "noIconShownOnBattleStatus": true,
+            "iconSpriteName": "IconPurplePoison01"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {}
+      },
+      "PoisonDrainSingleADeadlyNurse": {
+        "id": "PoisonDrainSingleADeadlyNurse",
+        "found": true,
+        "ability": {
+          "name": "PoisonDrainSingleADeadlyNurse",
+          "class": "Ability",
+          "abilityScalor": -2,
+          "conditionalAbilityScalors": [
+            3
+          ],
+          "config": "PoisonDrainSingleADeadlyNurse",
+          "tuCost": 100,
+          "useLimit": 0,
+          "nameKey": "PoisonDrainSingleA",
+          "descriptionKey": "PoisonDrainSingleA",
+          "spiritCost": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "ApplyBuff",
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "HealHalfStack"
+              ],
+              "buffBackMode": true,
+              "applyConditions": "IsPoisoned",
+              "applyToTargetOnly": true,
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss"
+            },
+            {
+              "damageBoosts": [
+                "PoisonEaterDamageBoost"
+              ],
+              "applyToTargetType": "Enemy"
+            }
+          ],
+          "attackScalors": [
+            "GoodVsPoisoned"
+          ],
+          "enemyEventType": "Finish",
+          "sourceEventType": "Hit",
+          "abilityEffect": "SmallHitRanged1",
+          "conditionedAbilityEffects": [
+            "PoisonDrainDeadlyNurse1",
+            "PoisonDrainDeadlyNurse1"
+          ],
+          "flags": [
+            "PoisonEater",
+            "StealthWorthy"
+          ],
+          "ignoreEffectForSourceEvent": true
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.8,
+            0
+          ],
+          "prefabs": [
+            "batfx_bluntimpact1/batfx_bluntimpact1",
+            "batsfx_prefab/batsfx_impactsmall1"
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            true
+          ],
+          "scale": [
+            0.4,
+            1
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          },
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {
+          "HealHalfStack": {
+            "class": "Buff",
+            "stackName": "Healing",
+            "behaviors": [
+              "AdjustHp"
+            ],
+            "behaviorOverrides": [
+              {
+                "percent": 0.5,
+                "abilityEffect": "SmallHeal1"
+              }
+            ],
+            "duration": 0,
+            "applyConditions": "IsNotHealing",
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {
+          "GoodVsPoisoned": {
+            "class": "AttackScalor",
+            "targetCondition": "IsPoisoned"
+          }
+        },
+        "conditions": {
+          "IsPoisoned": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "Poison"
+            ]
+          }
+        }
+      },
+      "GrantStunAbsorbADeadlyNurse": {
+        "id": "GrantStunAbsorbADeadlyNurse",
+        "found": true,
+        "ability": {
+          "name": "GrantStunAbsorbADeadlyNurse",
+          "class": "Ability",
+          "config": "GrantStunAbsorbADeadlyNurse",
+          "tuCost": 50,
+          "useLimit": 0,
+          "nameKey": "GrantStunAbsorbA",
+          "descriptionKey": "GrantStunAbsorbA",
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "oneAllyNotMe",
+          "components": [
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "StunAbsorberGranted"
+              ],
+              "applyConditions": "StunAbsorbAllowed"
+            }
+          ],
+          "friendlyEventType": "Hit",
+          "immuneSuggestionCondition": "StunAbsorbNotAllowed",
+          "abilityEffect": "SmallStun1",
+          "useCondition": "NoStunAbsorberInTeam"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "friendlyTargets": 1,
+          "oneAllyNotMe": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.3,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting2",
+            "batfx_casting3/batfx_casting3",
+            "batfx_stun1/batfx_stun1",
+            "batsfx_prefab/batsfx_stun1",
+            "batfx_ripplebluelow/batfx_ripplebluelow"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -2,
+            1,
+            -2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            true,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "StunAbsorberGranted": {
+            "class": "Buff",
+            "stackName": "StunAbsorber",
+            "behaviors": [
+              "ManipulateTargeting",
+              "ModifyBuffTarget"
+            ],
+            "behaviorOverrides": [
+              {
+                "abilityFlags": [
+                  "Stun"
+                ],
+                "redirectAlways": true,
+                "redirectToMe": true,
+                "consumeRedirectCountEvenOnSelf": true,
+                "allowMultipleRedirects": true,
+                "chanceToBlock": 1.0,
+                "ignoreProtectorMultiAttackRule": true
+              },
+              {
+                "tags": [
+                  "Stun"
+                ]
+              }
+            ],
+            "duration": -1,
+            "showAsTimer": true,
+            "showAsPermanent": true,
+            "iconSpriteName": "IconWhiteTargetStunLightning01"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "NoStunAbsorberInTeam": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "myTeamMonsterConditionMatchesNeeded": {
+                "IsStunAbsorber": 1
+              }
+            }
+          },
+          "StunAbsorbAllowed": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "monsterTags": [
+                "StunImmune"
+              ],
+              "or": {
+                "class": "MonsterConditions",
+                "monsterTags": [
+                  "StunImmuneIfBurn"
+                ],
+                "or": {
+                  "class": "MonsterConditions",
+                  "monsterTags": [
+                    "StunImmuneIfSpiritLowFire"
+                  ],
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "StunResistance"
+                    ],
+                    "or": {
+                      "class": "MonsterConditions",
+                      "monsterTags": [
+                        "HoldGroundPlus"
+                      ],
+                      "or": {
+                        "class": "MonsterConditions",
+                        "buffStackNames": [
+                          "RegenerateOnMyTurnGetTurnSkin"
+                        ],
+                        "or": {
+                          "class": "MonsterConditions",
+                          "monsterTags": [
+                            "ProtectorBlockDeathUntilNextTurn"
+                          ],
+                          "or": {
+                            "class": "MonsterConditions",
+                            "monsterTags": [
+                              "GainsStunImmunity"
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "StunAbsorbNotAllowed": {
+            "class": "MonsterConditions",
+            "monsterTags": [
+              "StunImmune"
+            ],
+            "or": {
+              "class": "MonsterConditions",
+              "monsterTags": [
+                "StunImmuneIfBurn"
+              ],
+              "or": {
+                "class": "MonsterConditions",
+                "monsterTags": [
+                  "StunImmuneIfSpiritLowFire"
+                ],
+                "or": {
+                  "class": "MonsterConditions",
+                  "monsterTags": [
+                    "StunResistance"
+                  ],
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "HoldGroundPlus"
+                    ],
+                    "or": {
+                      "class": "MonsterConditions",
+                      "buffStackNames": [
+                        "GetTurnSkin"
+                      ],
+                      "or": {
+                        "class": "MonsterConditions",
+                        "buffStackNames": [
+                          "RegenerateOnMyTurnGetTurnSkin"
+                        ],
+                        "or": {
+                          "class": "MonsterConditions",
+                          "monsterTags": [
+                            "ProtectorBlockDeathUntilNextTurn"
+                          ],
+                          "or": {
+                            "class": "MonsterConditions",
+                            "monsterTags": [
+                              "GainsStunImmunity"
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "HighTUAllyBombDoubleADeadlyNurse": {
+        "id": "HighTUAllyBombDoubleADeadlyNurse",
+        "found": true,
+        "ability": {
+          "name": "HighTUAllyBombDoubleADeadlyNurse",
+          "class": "Ability",
+          "abilityScalor": 5,
+          "config": "HighTUAllyBombDoubleADeadlyNurse",
+          "tuCost": 130,
+          "useLimit": 1,
+          "nameKey": "HighTUAllyBombDoubleA",
+          "descriptionKey": "HighTUAllyBombDoubleA",
+          "spiritCost": 0,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 1
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2EnemyAndHighestTUOtherAlly",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "InstantDeath"
+              ],
+              "applyToTargetType": "Friendly"
+            }
+          ],
+          "flags": [
+            "Duration"
+          ],
+          "bombSkillIcon": "IconBrownCountdownClock01",
+          "bombSkillIconDescriptionKey": "HighTUAllyBombDoubleACountdownKey",
+          "useCondition": "TimeInCombat150",
+          "enemyEventType": "Finish",
+          "friendlyEventType": "Hit",
+          "recommendEffectWhenUsable": 1,
+          "abilityEffect": "AllyBomb1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2,
+          "randomAllyNotMe": true,
+          "monsterRanker": "ActingLatest"
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            1,
+            0.35,
+            0,
+            0.7,
+            0,
+            0.1,
+            0,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting2",
+            "batfx_deadlynursesiren1/batfx_deadlynursesiren1",
+            "batfx_jumpsmoke1/batfx_jumpsmoke1",
+            "batfx_impactcuts1/batfx_impactcuts1",
+            "batsfx_prefab/batsfx_multislash1",
+            "batfx_rangedstab2/batfx_rangedstab2",
+            "batsfx_prefab/batsfx_slash1",
+            "batfx_deadlynursemonitor2/batfx_deadlynursemonitor2",
+            "batsfx_prefab/batsfx_nopulse1",
+            "batfx_bomb/batfx_bomb1",
+            "batsfx_prefab/batsfx_impactsmall1"
+          ],
+          "sortOrderOffset": [
+            0,
+            0,
+            -1,
+            100,
+            1,
+            1,
+            1,
+            50,
+            1,
+            1,
+            1
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false
+          ],
+          "isEnemyTargetEffect": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "isFriendlyTargetEffect": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            true,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            true,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "InstantDeath": {
+            "class": "Buff",
+            "stackName": "InstantDeath",
+            "behaviors": [
+              "InstantDeath"
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {
+          "TimeInCombat150": {
+            "class": "AttackScalor",
+            "sourceCondition": "TimeInCombat150"
+          }
+        },
+        "conditions": {
+          "TimeInCombat150": {
+            "class": "MonsterConditions",
+            "timeInCombat": 150
+          }
+        }
+      }
+    },
+    "passives": {
+      "DamageReduceWhenAtMaxHP": {
+        "id": "DamageReduceWhenAtMaxHP",
+        "found": false
+      },
+      "PlusAttackBoostLv3": {
+        "id": "PlusAttackBoostLv3",
+        "found": false
+      },
+      "AttackUpTargetEquippedHammerLv3": {
+        "id": "AttackUpTargetEquippedHammerLv3",
+        "found": false
+      },
+      "PlusHPBoostLv3": {
+        "id": "PlusHPBoostLv3",
+        "found": false
+      },
+      "AddWeaponPrefStaff": {
+        "id": "AddWeaponPrefStaff",
+        "found": false
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": {
+      "class": "MonsterConditions",
+      "elements": [
+        "Earth"
+      ]
+    }
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "DeadlyNurse01",
+    "family": "DeadlyNurse",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "DeadlyNurse01",
+    "family": "DeadlyNurse",
+    "class": "Monster",
+    "leaderBuff": "HasteUp20PercentEarth",
+    "leaderBuffCondition": "IsEarth",
+    "activeSkills": {
+      "0": "InstantPoisonTouchRandomADeadlyNurse",
+      "1": "PoisonDrainSingleADeadlyNurse",
+      "2": "GrantStunAbsorbADeadlyNurse",
+      "3": "HighTUAllyBombDoubleADeadlyNurse"
+    },
+    "passives": {
+      "0": "DamageReduceWhenAtMaxHP",
+      "2": "PlusAttackBoostLv3",
+      "3": "AttackUpTargetEquippedHammerLv3",
+      "4": "PlusHPBoostLv3",
+      "5": "AddWeaponPrefStaff"
+    },
+    "cost": 28,
+    "baseAttack": 1166,
+    "baseMaxHp": 5380,
+    "speed": 493,
+    "element": "Earth",
+    "weaponPref": "Axe",
+    "weaponPivotIndex": 0,
+    "secure": 1,
+    "superEvolve1": "DeadlyNurse02",
+    "aiTargetPickWeight": 1,
+    "stars": 5,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 0,
+    "battleOrbImageFlip": 0,
+    "attackType": "Weapon",
+    "visible": 1,
+    "formTwitterShare": 1,
+    "skillVoices": {
+      "0": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "1": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "2": [
+        9,
+        10,
+        11,
+        12
+      ],
+      "3": [
+        13,
+        14,
+        15,
+        16
+      ]
+    },
+    "damageVoices": [
+      17,
+      18,
+      19,
+      20
+    ],
+    "deathVoices": [
+      21,
+      22,
+      23,
+      24
+    ],
+    "victoryVoices": [
+      25,
+      26
+    ],
+    "lineupVoices": [
+      27,
+      28,
+      29,
+      30,
+      31,
+      32
+    ],
+    "evolutionVoices": [
+      33
+    ],
+    "trainVoices": [
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43
+    ],
+    "titleVoices": [
+      44
+    ],
+    "gachaVoices": [
+      45
+    ],
+    "loginVoices": [
+      46
+    ],
+    "tapVoices": [
+      47,
+      48,
+      49
+    ],
+    "idleVoices": [
+      50
+    ]
+  },
+  "_build": {
+    "scriptVersion": "3-incremental-checkpoint",
+    "sourceHash": "ec137f022dfc42ca9ebb4ae66c7e04a1acfd8c60ff49a4481aed0e4c51531fbc",
+    "dependencyHash": "970321300051dd95af1a6a99417a71cc13a05b9d56e9d113e59c967d700975d1",
+    "generatedAt": 1778013991
+  }
+}

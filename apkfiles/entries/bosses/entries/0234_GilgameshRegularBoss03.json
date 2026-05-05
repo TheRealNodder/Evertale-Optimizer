@@ -1,0 +1,893 @@
+{
+  "schemaVersion": 3,
+  "order": 234,
+  "id": "gilgamesh-regular-boss-03",
+  "name": "GilgameshRegularBoss03",
+  "category": "bosse",
+  "rarity": null,
+  "stars": 6,
+  "evolvedStars": 6,
+  "element": "Fire",
+  "weaponType": "GreatSword",
+  "stats": {
+    "atk": 2600,
+    "hp": 150000,
+    "spd": 500,
+    "cost": 999
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/GilgameshRegular03.png",
+  "refs": {
+    "activeSkills": [
+      "GainAttackDoubleAGilgameshRegularBoss",
+      "KillInstantPurifyHealAllyAGilgameshRegularBoss",
+      "KillBusterDoubleAGilgameshRegularBoss",
+      "PoisonEaterDoubleAGilgameshRegularBoss"
+    ],
+    "passives": [
+      "KillSendAllyBackBoss",
+      "HoldGround",
+      "StunImmunity",
+      "SleepImmunity",
+      "KnockbackImmunity"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": null,
+    "leaderBuffCondition": null,
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "GainAttackDoubleAGilgameshRegularBoss": {
+        "id": "GainAttackDoubleAGilgameshRegularBoss",
+        "found": true,
+        "ability": {
+          "name": "GainAttackDoubleAGilgameshRegularBoss",
+          "class": "Ability",
+          "abilityScalor": 0,
+          "config": "GainAttackDoubleAGilgameshRegularBoss",
+          "tuCost": 70,
+          "useLimit": 0,
+          "nameKey": "GainAttackDoubleBoss1Death",
+          "descriptionKey": "GainAttackDoubleBoss1Death",
+          "spiritGain": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ]
+            }
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "GilgameshAttack1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.7,
+            0,
+            0.1,
+            0.05,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_gilgamesh1/batfx_castspear1",
+            "batsfx_prefab/batsfx_bluntimpact1",
+            "batfx_gilgamesh1/batfx_spear1",
+            "batfx_gilgamesh1/batfx_basicfire2",
+            "batfx_myshadark1/batfx_fireimpact2",
+            "batsfx_prefab/batsfx_bomb1"
+          ],
+          "sortOrderOffset": [
+            -2,
+            4,
+            0,
+            1,
+            1,
+            2,
+            2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            false,
+            false,
+            false,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {},
+        "conditions": {}
+      },
+      "KillInstantPurifyHealAllyAGilgameshRegularBoss": {
+        "id": "KillInstantPurifyHealAllyAGilgameshRegularBoss",
+        "found": true,
+        "ability": {
+          "name": "KillInstantPurifyHealAllyAGilgameshRegularBoss",
+          "class": "Ability",
+          "config": "KillInstantPurifyHealAllyAGilgameshRegularBoss",
+          "tuCost": 1,
+          "useLimit": 0,
+          "spiritGain": 0,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "AllAlly",
+          "components": [
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "RemoveBuffs",
+                "Heal300Percent"
+              ],
+              "applyToTargetType": "Friendly"
+            },
+            {
+              "buffs": [
+                "RemoveKillOkToUse1"
+              ],
+              "applyToTargetType": "Source",
+              "chance": 1.0
+            }
+          ],
+          "flags": [
+            "Purify",
+            "Healer"
+          ],
+          "friendlyEventType": "Finish",
+          "sourceEventType": "Hit",
+          "abilityEffect": "GilgameshAbility2",
+          "useCondition": "KillOkToUse1",
+          "killLockSkillIcon": "IconRedEx01"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "allFriends": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0.3,
+            0.8,
+            0.2,
+            0.65,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_fire2",
+            "batfx_gilgamesh1/batfx_burnall1",
+            "batfx_gilgamesh1/batfx_chargefire1",
+            "batsfx_prefab/batsfx_fire2",
+            "batfx_burnspiral/batfx_burnspiral",
+            "batsfx_prefab/batsfx_fire4",
+            "batsfx_prefab/batsfx_bomb1"
+          ],
+          "sortOrderOffset": [
+            1,
+            -2,
+            2,
+            0,
+            2,
+            -2,
+            1
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            true
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "Heal300Percent": {
+            "class": "Buff",
+            "behaviors": [
+              "AdjustHp"
+            ],
+            "behaviorOverrides": [
+              {
+                "percentOfSourceAttack": 3.0,
+                "hpboosts": [
+                  "HealBoost"
+                ]
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "KillOkToUse1": {
+            "class": "Buff",
+            "stackName": "KillOkToUse1",
+            "duration": -1,
+            "showAsTimer": true,
+            "isHiddenFromPlayers": false,
+            "iconSpriteName": "IconGreenCircle01"
+          },
+          "RemoveBuffs": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "RemoveKillOkToUse1": {
+            "class": "Buff",
+            "stackName": "RemoveKillOkToUse1",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "KillOkToUse1"
+              }
+            ],
+            "duration": -1,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "noIconShownOnBattleStatus": true,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "KillOkToUse1": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "KillOkToUse1"
+            ]
+          }
+        },
+        "localization": {
+          "name": "Deadly Restoration",
+          "description": "Removes negative status effects like sleep, burn or poison from all allies, and heals them each for HP equal to 300% of the user's Attack. Unlocked each time the user defeats another unit with an attack. This skill is locked again after each use or if the user leaves the battlefield.",
+          "selected": "Removes bad effects and heals targets"
+        }
+      },
+      "KillBusterDoubleAGilgameshRegularBoss": {
+        "id": "KillBusterDoubleAGilgameshRegularBoss",
+        "found": true,
+        "ability": {
+          "name": "KillBusterDoubleAGilgameshRegularBoss",
+          "class": "Ability",
+          "abilityScalor": 5,
+          "config": "KillBusterDoubleAGilgameshRegularBoss",
+          "tuCost": 50,
+          "useLimit": 0,
+          "spiritCost": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "SkipRevengeDamage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageFlags": [
+                "IgnoreArmor",
+                "IgnoreHoldGround",
+                "IgnoreSkin"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "RemoveKillOkToUse2"
+              ],
+              "applyToSourceOnly": true,
+              "showMissConditions": "ShowNoMiss",
+              "skipAbilityEffect": true
+            }
+          ],
+          "useCondition": "KillOkToUse2",
+          "flags": [
+            "IgnoreStealth"
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "recommendEffectWhenUsable": 1,
+          "abilityEffect": "GilgameshAbility1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.55,
+            0.3,
+            0.05,
+            0.1,
+            0.1,
+            0,
+            0,
+            0.75,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_gilgamesh1/batfx_castspear1",
+            "batsfx_prefab/batsfx_multislash2",
+            "batfx_gilgamesh1/batfx_firespotlight1",
+            "batfx_gilgamesh1/batfx_spear2",
+            "batfx_gilgamesh1/batfx_multifireimpact1",
+            "batfx_myshadark1/batfx_fireimpact2",
+            "batsfx_prefab/batsfx_bomb1",
+            "batfx_astridnew1/batfx_dragonnuke1",
+            "batfx_common/batfx_whiteout1",
+            "batsfx_prefab/batsfx_bomb1",
+            "batfx_common/batfx_empty"
+          ],
+          "sortOrderOffset": [
+            -2,
+            4,
+            0,
+            20,
+            1,
+            1,
+            2,
+            2,
+            2,
+            50,
+            0,
+            0
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            true,
+            true
+          ]
+        },
+        "components": {
+          "SkipRevengeDamage": {
+            "class": "DamageAbilityComponent",
+            "revengeEffectsToSkip": [
+              "AddJeanneDarkAngel02Next",
+              "AddJeanneDarkAngel01Next",
+              "CloneSourceToBackIfNotSummoned",
+              "MegaElixirEffect",
+              "HasteUp20Percent",
+              "Armor",
+              "200PercentDamageForRevenge",
+              "KeepBurningStuff",
+              "SleepAfterDelay",
+              "AttackPlus50Percent1TurnOnly",
+              "BurnAfterTurn",
+              "RemoveBuffsAfterDelay",
+              "HealAfterDelay",
+              "AddSkeletonToEnd",
+              "SpiritGainBContra",
+              "Stun200Revenge",
+              "Stun150Revenge",
+              "Stun100Revenge",
+              "Stun75Revenge",
+              "TUMinus50",
+              "TUMinus100",
+              "HealHalf",
+              "RemoveBuffs",
+              "SendToFrontOfReinforcements",
+              "SendToBackOfReinforcements",
+              "SpiritGainAContra",
+              "SpiritGainCContra",
+              "SpiritLossD",
+              "SpiritLossC",
+              "MegaPoison",
+              "Poison",
+              "Sleep",
+              "TUMinusRevengeA",
+              "TUMinusRevengeB",
+              "HealFull",
+              "Explosive",
+              "TUMinusAfterDelayA",
+              "HealFullAfterDelay",
+              "Add1DeathMinionToEndForRevenge",
+              "Add1FireMinionToEndForRevenge",
+              "Add1EarthMinionToEndForRevenge",
+              "Stealth",
+              "StealthAfterDelay",
+              "TUMinus300",
+              "CloneSourceToRandomIfNotSummoned",
+              "SpiritSiphonDContra",
+              "Burn",
+              "Heal800PercentAfterDelay"
+            ]
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "IgnoreHoldGround": {
+            "class": "Buff",
+            "behaviors": [
+              "DamageFlagContributor"
+            ],
+            "behaviorOverrides": [
+              {
+                "flags": [
+                  "IgnoreHoldGround"
+                ]
+              }
+            ],
+            "duration": -1,
+            "showAsTimer": false,
+            "iconSpriteName": null,
+            "isHiddenFromPlayers": true
+          },
+          "KillOkToUse2": {
+            "class": "Buff",
+            "stackName": "KillOkToUse2",
+            "duration": -1,
+            "showAsTimer": true,
+            "isHiddenFromPlayers": false,
+            "iconSpriteName": "IconGreenCircle01"
+          },
+          "RemoveKillOkToUse2": {
+            "class": "Buff",
+            "stackName": "RemoveKillOkToUse2",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "KillOkToUse2"
+              }
+            ],
+            "duration": -1,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "noIconShownOnBattleStatus": true,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "KillOkToUse2": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "KillOkToUse2"
+            ]
+          }
+        },
+        "localization": {
+          "name": "Deadly Blast",
+          "description": "600% damage to 2 enemies. Unlocked each time the user defeats another unit with an attack. This skill is locked again after each use or if the user leaves the battlefield. This attack ignores any damage reduction effects, revenge passive skills, Counter Stance status effects, skin passive skills and ignores passives skill effects that would prevent units from being defeated.",
+          "selected": "600% damage, ignores armor, skins & counter"
+        }
+      },
+      "PoisonEaterDoubleAGilgameshRegularBoss": {
+        "id": "PoisonEaterDoubleAGilgameshRegularBoss",
+        "found": true,
+        "ability": {
+          "name": "PoisonEaterDoubleAGilgameshRegularBoss",
+          "class": "Ability",
+          "abilityScalor": -2,
+          "conditionalAbilityScalors": [
+            4
+          ],
+          "config": "PoisonEaterDoubleAGilgameshRegularBoss",
+          "tuCost": 70,
+          "useLimit": 0,
+          "nameKey": "PoisonEaterDoubleBoss1",
+          "descriptionKey": "PoisonEaterDoubleBoss1",
+          "spiritCost": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "PoisonEaterDamageBoost"
+              ]
+            }
+          ],
+          "attackScalors": [
+            "GoodVsPoisoned"
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "SmallHitRanged1",
+          "conditionedAbilityEffects": [
+            "PoisonEaterAbilityButterflyLady"
+          ],
+          "flags": [
+            "PoisonEater",
+            "StealthWorthy",
+            "PoisonEaterDoubleAlt"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.8,
+            0
+          ],
+          "prefabs": [
+            "batfx_bluntimpact1/batfx_bluntimpact1",
+            "batsfx_prefab/batsfx_impactsmall1"
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            true
+          ],
+          "scale": [
+            0.4,
+            1
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {
+          "GoodVsPoisoned": {
+            "class": "AttackScalor",
+            "targetCondition": "IsPoisoned"
+          }
+        },
+        "conditions": {}
+      }
+    },
+    "passives": {
+      "KillSendAllyBackBoss": {
+        "id": "KillSendAllyBackBoss",
+        "found": false
+      },
+      "HoldGround": {
+        "id": "HoldGround",
+        "found": false
+      },
+      "StunImmunity": {
+        "id": "StunImmunity",
+        "found": false
+      },
+      "SleepImmunity": {
+        "id": "SleepImmunity",
+        "found": false
+      },
+      "KnockbackImmunity": {
+        "id": "KnockbackImmunity",
+        "found": false
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": null
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "GilgameshRegularBoss03",
+    "family": "GilgameshRegularBoss",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "GilgameshRegularBoss03",
+    "class": "Monster",
+    "family": "GilgameshRegularBoss",
+    "activeSkills": {
+      "0": "GainAttackDoubleAGilgameshRegularBoss",
+      "1": "KillInstantPurifyHealAllyAGilgameshRegularBoss",
+      "2": "KillBusterDoubleAGilgameshRegularBoss",
+      "3": "PoisonEaterDoubleAGilgameshRegularBoss"
+    },
+    "passives": {
+      "0": "KillSendAllyBackBoss",
+      "1": "HoldGround",
+      "2": "StunImmunity",
+      "3": "SleepImmunity",
+      "4": "KnockbackImmunity"
+    },
+    "cost": 999,
+    "baseAttack": 2600,
+    "baseMaxHp": 150000,
+    "speed": 500,
+    "element": "Fire",
+    "weaponPref": "GreatSword",
+    "weaponPivotIndex": 0,
+    "walkSound": "TestSound",
+    "secure": 1,
+    "aiTargetPickWeight": 1,
+    "stars": 6,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 1,
+    "battleOrbImageFlip": 0,
+    "skillVoices": {
+      "0": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "1": [
+        10,
+        11
+      ],
+      "2": [
+        6,
+        13,
+        14,
+        15,
+        16
+      ],
+      "3": [
+        5,
+        7,
+        8
+      ]
+    },
+    "damageVoices": [
+      17,
+      18,
+      19,
+      20
+    ],
+    "deathVoices": [
+      21,
+      22,
+      23,
+      24
+    ]
+  },
+  "_build": {
+    "scriptVersion": "3-incremental-checkpoint",
+    "sourceHash": "c4eef02ea51115726d924355ffcf3e58c8085f8b558ece447e3b89c14b2a6996",
+    "dependencyHash": "ee77030a8f562c96e4f6e97f01c22bf4211e11c956e955e7d4a9efa535a86922",
+    "generatedAt": 1778014036
+  }
+}

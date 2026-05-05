@@ -1,0 +1,342 @@
+{
+  "schemaVersion": 3,
+  "order": 290,
+  "id": "shadow-elmina-01",
+  "name": "ShadowElmina01",
+  "category": "character",
+  "rarity": null,
+  "stars": 0,
+  "evolvedStars": 0,
+  "element": "Dark",
+  "weaponType": "Spear",
+  "stats": {
+    "atk": 208,
+    "hp": 1099,
+    "spd": 84,
+    "cost": 0
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/ShadowElmina01.png",
+  "refs": {
+    "activeSkills": [
+      "StealthAllySacA"
+    ],
+    "passives": [
+      "AutoProtect"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": null,
+    "leaderBuffCondition": null,
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "StealthAllySacA": {
+        "id": "StealthAllySacA",
+        "found": true,
+        "ability": {
+          "name": "StealthAllySacA",
+          "class": "Ability",
+          "config": "StealthAllySacA",
+          "useLimit": 0,
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "oneAllyNotMe",
+          "components": [
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "ActiveStealthJustGained",
+                "Stealth"
+              ],
+              "applyToTargetType": "Friendly",
+              "chance": 1.0
+            },
+            {
+              "buffs": [
+                "InstantDeath"
+              ],
+              "applyToTargetType": "Source",
+              "chance": 1.0
+            }
+          ],
+          "immuneSuggestionCondition": "IsStatusImmune",
+          "flags": [
+            "Sacrifice",
+            "Stealth"
+          ],
+          "friendlyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "Stealth1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "friendlyTargets": 1,
+          "oneAllyNotMe": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.3,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_casting7/batfx_casting7",
+            "batfx_stealth1/batfx_stealth1",
+            "batsfx_prefab/batsfx_stealth1"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -2,
+            2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            true
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "ActiveStealthJustGained": {
+            "class": "Buff",
+            "stackName": "ActiveStealthJustGained",
+            "duration": 1,
+            "isHiddenFromPlayers": true,
+            "applyConditions": "IsNotStealth"
+          },
+          "InstantDeath": {
+            "class": "Buff",
+            "stackName": "InstantDeath",
+            "behaviors": [
+              "InstantDeath"
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "Stealth": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "ManipulateTargeting",
+              "RemoveOnHurt",
+              "Immunity",
+              "Immunity"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "LockHideSkills"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "dodgeMultitarget": true,
+                "forceAllowAllEnemiesAChanceToManipulate": true,
+                "removeAfterTriggers": 1,
+                "abilityFlagsToIgnore": [
+                  "Stun",
+                  "NoDamage",
+                  "Sneak",
+                  "IgnoreStealth"
+                ]
+              },
+              {},
+              {
+                "stackNamesToBlock": [
+                  "Stealth"
+                ],
+                "dontShowText": true
+              },
+              {
+                "stackNamesToBlock": [
+                  "Placeholder"
+                ],
+                "dontShowText": true,
+                "activateCondition": "MissingStealthOrStealthShield"
+              }
+            ],
+            "tags": [
+              "Stealth"
+            ],
+            "duration": -1,
+            "showAsTimer": true,
+            "iconSpriteName": "IconBlackStealth01",
+            "stackName": "Stealth",
+            "useCount": 1
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "IsStatusImmune": {
+            "class": "MonsterConditions",
+            "monsterTags": [
+              "StatusImmune"
+            ],
+            "or": {
+              "class": "MonsterConditions",
+              "monsterTags": [
+                "LethalPoison"
+              ]
+            }
+          }
+        },
+        "localization": {
+          "name": "Smoke Screen",
+          "description": "Sacrifices the user to grant the Stealth status effect to 1 ally. This will overwrite other status effects on that unit. Stealthed units ignore the next enemy attack that would damage more than 1 target. Any damage will remove stealth.",
+          "selected": "Grants stealth to target\n(Will overwrite other status effects)"
+        }
+      }
+    },
+    "passives": {
+      "AutoProtect": {
+        "id": "AutoProtect",
+        "found": false
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": null
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "ShadowElmina01",
+    "family": "ShadowElmina",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "ShadowElmina01",
+    "family": "ShadowElmina",
+    "class": "Monster",
+    "activeSkills": {
+      "0": "StealthAllySacA"
+    },
+    "passives": {
+      "0": "AutoProtect"
+    },
+    "cost": 0,
+    "baseAttack": 208,
+    "baseMaxHp": 1099,
+    "speed": 84,
+    "element": "Death",
+    "weaponPref": "Spear",
+    "weaponPivotIndex": 1,
+    "secure": 1,
+    "aiTargetPickWeight": 1,
+    "stars": 0,
+    "evolvedStars": 0,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 0,
+    "battleOrbImageFlip": 1,
+    "attackType": "Weapon",
+    "skillVoices": {
+      "0": [
+        1,
+        3
+      ]
+    },
+    "damageVoices": [
+      15,
+      16,
+      17,
+      18
+    ],
+    "deathVoices": [
+      21
+    ],
+    "victoryVoices": [
+      23,
+      24
+    ]
+  },
+  "_build": {
+    "scriptVersion": "3-incremental-checkpoint",
+    "sourceHash": "6f484b7602882defe87958c72bde05b7955bf7e51374c1fa314b24251f3b1533",
+    "dependencyHash": "9a4563e1dd8142717ac5ad6c5e2c71f3001090a8076e5912e13aa0cd4035d427",
+    "generatedAt": 1778013988
+  }
+}

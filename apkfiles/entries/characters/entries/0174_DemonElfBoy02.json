@@ -1,0 +1,877 @@
+{
+  "schemaVersion": 3,
+  "order": 174,
+  "id": "demon-elf-boy-02",
+  "name": "DemonElfBoy02",
+  "category": "character",
+  "rarity": null,
+  "stars": 6,
+  "evolvedStars": 6,
+  "element": "Dark",
+  "weaponType": "Hammer",
+  "stats": {
+    "atk": 1455,
+    "hp": 7140,
+    "spd": 182,
+    "cost": 34
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/DemonElfBoy02.png",
+  "refs": {
+    "activeSkills": [
+      "PoisonTouchADemonElfBoy",
+      "BasicAttackAllADeath",
+      "ThrowDoubleADemonElfBoy",
+      "PoisonEaterADemonElfBoy"
+    ],
+    "passives": [
+      "Summon2MinionsEntranceDeath",
+      "KatanaMinusDamageLv3",
+      "PlusHPBoostLv3",
+      "PlusAttackBoostLv3",
+      "AddWeaponPrefGreatSword"
+    ],
+    "activeSkillsAI": {
+      "1": "SmarterAttackAll_AI"
+    },
+    "aiSequence": null,
+    "leaderBuff": "AttackAndHPUp6Death",
+    "leaderBuffCondition": "IsDeath",
+    "summonableMonsters": [
+      "DeathMinion01"
+    ]
+  },
+  "resolved": {
+    "activeSkills": {
+      "PoisonTouchADemonElfBoy": {
+        "id": "PoisonTouchADemonElfBoy",
+        "found": true,
+        "ability": {
+          "name": "PoisonTouchADemonElfBoy",
+          "class": "Ability",
+          "config": "PoisonTouchADemonElfBoy",
+          "tuCost": 100,
+          "useLimit": 0,
+          "nameKey": "PoisonTouchA",
+          "descriptionKey": "PoisonTouchA",
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "Poison",
+                "BurnImmunityTempForRevenge"
+              ]
+            }
+          ],
+          "immuneSuggestionCondition": "AnyPoisonImmunity",
+          "enemyEventType": "Hit",
+          "abilityEffect": "SmallPoison1",
+          "flags": [
+            "Poisoner",
+            "NoDamage"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.3,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_castinggreen1/batfx_castinggreen1",
+            "batfx_poisonsmall1/batfx_poisonsmall1",
+            "batsfx_prefab/batsfx_poison1"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -2,
+            1,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            true,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            true
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "BurnImmunityTempForRevenge": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Burn",
+                  "BurnAfterTurn",
+                  "BurnAtEndOfTurn"
+                ],
+                "dontShowText": true
+              },
+              {
+                "name": "BurnAfterTurn"
+              },
+              {
+                "name": "BurnSelfOnHit"
+              }
+            ],
+            "duration": 1,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "tags": [
+              "BurnImmune"
+            ],
+            "stackName": "BurnImmunityTempForRevenge",
+            "isHiddenFromPlayers": true
+          },
+          "Poison": {
+            "class": "Buff",
+            "stackName": "Poison",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "DamageOverTime"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "percentOfAttack": 0.0025,
+                "damageColor": "Green",
+                "abilityEffect": "PoisonDamage",
+                "extraDamageFlag": "Poison"
+              }
+            ],
+            "tags": [
+              "Poison"
+            ],
+            "canBePurified": true,
+            "duration": -1,
+            "applyConditions": "NotSuperOrMegaPoisoned",
+            "showAsTimer": false,
+            "statusEffect": "PoisonStatus",
+            "statusEffectOffset": 0.1,
+            "damageType": "Poison",
+            "noIconShownOnBattleStatus": true,
+            "iconSpriteName": "IconPurplePoison01"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "AnyPoisonImmunity": {
+            "class": "MonsterConditions",
+            "monsterTags": [
+              "PoisonImmuneWhenStealth"
+            ],
+            "buffStackNames": [
+              "Stealth"
+            ],
+            "or": {
+              "class": "MonsterConditions",
+              "monsterTags": [
+                "PoisonImmune"
+              ],
+              "or": {
+                "class": "MonsterConditions",
+                "buffStackNames": [
+                  "PoisonImmunity"
+                ],
+                "or": {
+                  "class": "MonsterConditions",
+                  "buffStackNames": [
+                    "PoisonImmunityOnce"
+                  ],
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "LethalPoison"
+                    ],
+                    "or": {
+                      "class": "MonsterConditions",
+                      "monsterTags": [
+                        "NegativeStatusImmunityFromThorns"
+                      ],
+                      "buffStackNames": [
+                        "SleepThorns"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "BasicAttackAllADeath": {
+        "id": "BasicAttackAllADeath",
+        "found": true,
+        "ability": {
+          "name": "BasicAttackAllADeath",
+          "class": "Ability",
+          "abilityScalor": 0,
+          "config": "BasicAttackAllADeath",
+          "tuCost": 250,
+          "useLimit": 0,
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "AllEnemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ]
+            }
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "MidDeath1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "allEnemies": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.3,
+            0.35,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_casting7/batfx_casting7",
+            "batfx_deathmid1/batfx_deathmid1",
+            "batsfx_prefab/batsfx_death1",
+            "batfx_ripplepurplelow/batfx_ripplepurplelow"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -2,
+            1,
+            -2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            true
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            true
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            true,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {},
+        "conditions": {},
+        "localization": {
+          "name": "Attack All",
+          "description": "Damage to all enemies.",
+          "selected": "Damage to all enemies"
+        }
+      },
+      "ThrowDoubleADemonElfBoy": {
+        "id": "ThrowDoubleADemonElfBoy",
+        "found": true,
+        "ability": {
+          "name": "ThrowDoubleADemonElfBoy",
+          "class": "Ability",
+          "abilityScalor": 1.5,
+          "config": "ThrowDoubleADemonElfBoy",
+          "tuCost": 130,
+          "useLimit": 0,
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 1
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "Sacrifice",
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "applyToTargetType": "Source",
+              "overrideAbilityEffect": "ThrowBloodCrest1"
+            },
+            {
+              "applyToTargetType": "Enemy",
+              "damageBoosts": [
+                "ThrowDamageBoost"
+              ]
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "flags": [
+            "Devour",
+            "StealthWorthy"
+          ],
+          "abilityEffect": "ThrowBloodDemonElfBoy",
+          "conditionedAbilityEffects": [
+            "ThrowA",
+            "ThrowA"
+          ],
+          "useCondition": "AllyHasReinforcements",
+          "requiredReplacementMonsterMustBeLast": true
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0.4,
+            0.2,
+            0.5,
+            0.0
+          ],
+          "sortOrderOffset": [
+            -2,
+            -100,
+            2,
+            2,
+            1
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_stealth1",
+            "batfx_tailwindspirit/batfx_tailwindspirit",
+            "batfx_throwparticle1/batfx_throwparticle1",
+            "batfx_bluntimpact3/batfx_bluntimpact3",
+            "batsfx_prefab/batsfx_bomb1"
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "isDeckParticleFX": [
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            true,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Sacrifice": {
+            "class": "SacrificeAbilityComponent"
+          },
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {},
+        "conditions": {
+          "AllyHasReinforcements": {
+            "class": "MonsterConditions",
+            "allyReinforcements": 1
+          }
+        },
+        "localization": {
+          "name": "Blood Nova",
+          "description": "Sacrifices the last unit in the allied reinforcements for 250% damage to 2 enemies. Usable only if there are 1 or more allied reinforcements left.",
+          "selected": "Sacrifices 1 ally to deal 250% damage"
+        }
+      },
+      "PoisonEaterADemonElfBoy": {
+        "id": "PoisonEaterADemonElfBoy",
+        "found": true,
+        "ability": {
+          "name": "PoisonEaterADemonElfBoy",
+          "class": "Ability",
+          "abilityScalor": -2,
+          "conditionalAbilityScalors": [
+            3
+          ],
+          "config": "PoisonEaterADemonElfBoy",
+          "tuCost": 130,
+          "useLimit": 0,
+          "nameKey": "PoisonEaterA",
+          "descriptionKey": "PoisonEaterA",
+          "spiritCost": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "PoisonEaterDamageBoost"
+              ]
+            }
+          ],
+          "attackScalors": [
+            "GoodVsPoisoned"
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "SmallHitRanged1",
+          "conditionedAbilityEffects": [
+            "PoisonEaterAbility2R",
+            "PoisonEaterAbility2R"
+          ],
+          "flags": [
+            "PoisonEater",
+            "StealthWorthy"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.8,
+            0
+          ],
+          "prefabs": [
+            "batfx_bluntimpact1/batfx_bluntimpact1",
+            "batsfx_prefab/batsfx_impactsmall1"
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            true
+          ],
+          "scale": [
+            0.4,
+            1
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {
+          "GoodVsPoisoned": {
+            "class": "AttackScalor",
+            "targetCondition": "IsPoisoned"
+          }
+        },
+        "conditions": {}
+      }
+    },
+    "passives": {
+      "Summon2MinionsEntranceDeath": {
+        "id": "Summon2MinionsEntranceDeath",
+        "found": false
+      },
+      "KatanaMinusDamageLv3": {
+        "id": "KatanaMinusDamageLv3",
+        "found": false
+      },
+      "PlusHPBoostLv3": {
+        "id": "PlusHPBoostLv3",
+        "found": false
+      },
+      "PlusAttackBoostLv3": {
+        "id": "PlusAttackBoostLv3",
+        "found": false
+      },
+      "AddWeaponPrefGreatSword": {
+        "id": "AddWeaponPrefGreatSword",
+        "found": false
+      }
+    },
+    "activeSkillsAI": {
+      "1": {
+        "id": "SmarterAttackAll_AI",
+        "found": true,
+        "ai": {
+          "class": "AbilityAI",
+          "baseAITargetingWeight": 0.75,
+          "globalScalorsToIgnore": [
+            "HPAbove1Percent",
+            "HPBelow5Percent"
+          ],
+          "aiTargetingSourceMonsterConditions": {
+            "EnemyHasTimestrikerNoProtector": 0.5,
+            "EnemyHas2OrMoreTokens": 3,
+            "2EnemiesLessHPThanActiveMonsterAttackNotStealth": 2,
+            "3EnemiesLessHPThanActiveMonsterAttackNotStealth": 3,
+            "4EnemiesLessHPThanActiveMonsterAttackNotStealth": 1.1
+          },
+          "aiTargetingMonsterConditions": {
+            "HasProtectorAndLowHPAlly": 3,
+            "IsAlone": 0.25,
+            "IsStealth": 0.75,
+            "IsAloneAndStealth": 0
+          }
+        }
+      }
+    },
+    "aiSequence": null,
+    "leaderCondition": {
+      "class": "MonsterConditions",
+      "elements": [
+        "Death"
+      ]
+    }
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "DemonElfBoy02",
+    "family": "DemonElfBoy",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "DemonElfBoy02",
+    "family": "DemonElfBoy",
+    "class": "Monster",
+    "leaderBuff": "AttackAndHPUp6Death",
+    "leaderBuffCondition": "IsDeath",
+    "activeSkills": {
+      "0": "PoisonTouchADemonElfBoy",
+      "1": "BasicAttackAllADeath",
+      "2": "ThrowDoubleADemonElfBoy",
+      "3": "PoisonEaterADemonElfBoy"
+    },
+    "passives": {
+      "0": "Summon2MinionsEntranceDeath",
+      "2": "KatanaMinusDamageLv3",
+      "3": "PlusHPBoostLv3",
+      "4": "PlusAttackBoostLv3",
+      "5": "AddWeaponPrefGreatSword"
+    },
+    "cost": 34,
+    "baseAttack": 1455,
+    "baseMaxHp": 7140,
+    "speed": 182,
+    "element": "Death",
+    "weaponPref": "Hammer",
+    "weaponPivotIndex": 0,
+    "secure": 1,
+    "evolveFrom": "DemonElfBoy01",
+    "aiTargetPickWeight": 1,
+    "stars": 6,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 0,
+    "battleOrbImageFlip": 0,
+    "attackType": "Weapon",
+    "formTwitterShare": 1,
+    "cosmoName": "DemonElfBoy03",
+    "cosmoBattleOrbImageFlip": 0,
+    "activeSkillsAI": {
+      "1": "SmarterAttackAll_AI"
+    },
+    "summonableMonsters": [
+      "DeathMinion01"
+    ],
+    "summonableMatchSource": [
+      false
+    ],
+    "skillVoices": {
+      "0": [
+        1,
+        3
+      ],
+      "1": [
+        5,
+        7
+      ],
+      "2": [
+        9,
+        11
+      ]
+    },
+    "damageVoices": [
+      15,
+      17
+    ],
+    "deathVoices": [
+      19,
+      21
+    ],
+    "victoryVoices": [
+      23
+    ],
+    "lineupVoices": [
+      25,
+      27,
+      29
+    ],
+    "evolutionVoices": [
+      31
+    ],
+    "trainVoices": [
+      32,
+      34,
+      36,
+      38,
+      40
+    ],
+    "titleVoices": [
+      42
+    ],
+    "gachaVoices": [
+      43
+    ],
+    "loginVoices": [
+      44
+    ],
+    "tapVoices": [
+      45,
+      46,
+      47
+    ],
+    "idleVoices": [
+      48
+    ],
+    "cosmoSkillVoices": {
+      "0": [
+        2,
+        4
+      ],
+      "1": [
+        10,
+        12
+      ],
+      "2": [
+        13,
+        14
+      ],
+      "3": [
+        2,
+        4
+      ]
+    },
+    "cosmoDamageVoices": [
+      16,
+      18
+    ],
+    "cosmoDeathVoices": [
+      20,
+      22
+    ],
+    "cosmoVictoryVoices": [
+      24
+    ],
+    "cosmoLineupVoices": [
+      26,
+      28,
+      30
+    ],
+    "cosmoEvolutionVoices": [
+      31
+    ],
+    "cosmoTrainVoices": [
+      33,
+      35,
+      37,
+      39,
+      41
+    ]
+  },
+  "_build": {
+    "scriptVersion": "3-incremental-checkpoint",
+    "sourceHash": "efc2a9e6c2a2332a6b47604507a5084c2ff8cc304df981481847605bcd63a5af",
+    "dependencyHash": "7378b32a3e49e5e5c9a798b5e04b29c1f4ec845600ae5851d7830fffaf7f031a",
+    "generatedAt": 1778013984
+  }
+}

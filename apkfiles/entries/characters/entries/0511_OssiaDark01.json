@@ -1,0 +1,1415 @@
+{
+  "schemaVersion": 3,
+  "order": 511,
+  "id": "ossia-dark-01",
+  "name": "OssiaDark01",
+  "category": "character",
+  "rarity": null,
+  "stars": 5,
+  "evolvedStars": 6,
+  "element": "Earth",
+  "weaponType": "Staff",
+  "stats": {
+    "atk": 1210,
+    "hp": 5160,
+    "spd": 630,
+    "cost": 28
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/OssiaDark01.png",
+  "refs": {
+    "activeSkills": [
+      "GainAttackSingleStanceFastAOssiaDark",
+      "MomentumBusterLowHPDrainDoubleAOssiaDark",
+      "SneakStanceAttackDrainDoubleAOssiaDark",
+      "LimitBreakSleepDoubleAOssiaDark"
+    ],
+    "passives": [
+      "RageStealthSpiritPoisonChanceOnHP50PercentOssiaDark",
+      "PlusHPBoostLv3",
+      "AttackUpTargetEquippedSwordLv3",
+      "PlusAttackBoostLv3",
+      "AddWeaponPrefSword"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": "AttackUpEarthD",
+    "leaderBuffCondition": "IsEarth",
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "GainAttackSingleStanceFastAOssiaDark": {
+        "id": "GainAttackSingleStanceFastAOssiaDark",
+        "found": true,
+        "ability": {
+          "name": "GainAttackSingleStanceFastAOssiaDark",
+          "class": "Ability",
+          "abilityScalor": -0.33,
+          "config": "GainAttackSingleStanceFastAOssiaDark",
+          "tuCost": 70,
+          "useLimit": 0,
+          "nameKey": "GainAttackSingleStanceFastA",
+          "descriptionKey": "GainAttackSingleStanceFastA",
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "Overwatch",
+                "BurnImmunityTempForRevenge"
+              ],
+              "applyConditions": "IsNotOverwatchOrAlreadyOverwatched",
+              "applyToSourceOnly": true,
+              "showMissConditions": "ShowNoMiss",
+              "skipAbilityEffect": true
+            },
+            {
+              "applyToTargetType": "Enemy",
+              "buffs": [
+                "MomentumReady"
+              ],
+              "buffBackMode": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "OssiaDarkSyringe1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            1,
+            0.05,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batfx_swoosh3/batfx_swoosh3",
+            "batfx_ossiadark1/batfx_ossiathrow1",
+            "batfx_impactpoison1/batfx_impactpoison1",
+            "batsfx_prefab/batsfx_slash1"
+          ],
+          "sortOrderOffset": [
+            2,
+            2,
+            2,
+            0
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            true,
+            false,
+            false
+          ],
+          "isAbilityUserEffect": [
+            true,
+            false,
+            false,
+            true
+          ],
+          "forceHitReactions": [
+            false,
+            true,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "BurnImmunityTempForRevenge": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Burn",
+                  "BurnAfterTurn",
+                  "BurnAtEndOfTurn"
+                ],
+                "dontShowText": true
+              },
+              {
+                "name": "BurnAfterTurn"
+              },
+              {
+                "name": "BurnSelfOnHit"
+              }
+            ],
+            "duration": 1,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "tags": [
+              "BurnImmune"
+            ],
+            "stackName": "BurnImmunityTempForRevenge",
+            "isHiddenFromPlayers": true
+          },
+          "MomentumReady": {
+            "class": "Buff",
+            "stackName": "MomentumReady",
+            "duration": -1,
+            "isHiddenFromPlayers": true,
+            "applyConditions": "UsesMomentumReady"
+          },
+          "Overwatch": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "BuffWhenMonsterHurt",
+              "RemoveOnHurt"
+            ],
+            "stackName": "Stance",
+            "behaviorOverrides": [
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "selfBuffs": [
+                  "GiveTurnOverwatch",
+                  "AlreadyOverwatched"
+                ],
+                "cancelFromDamageTypes": [
+                  "BuffDamage"
+                ],
+                "cancelFromDamageFlags": [
+                  "IgnoreSkin",
+                  "Sneak",
+                  "RemoveStatus"
+                ]
+              },
+              {
+                "cancelFromDamageTypes": [
+                  "BuffDamage"
+                ],
+                "cancelFromDamageFlags": [
+                  "IgnoreSkin",
+                  "Sneak",
+                  "RemoveStatus"
+                ]
+              }
+            ],
+            "applyConditions": "IsNotOverwatch",
+            "duration": 150,
+            "showAsTimer": true,
+            "iconSpriteName": "IconOverwatch01"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "IsNotOverwatchOrAlreadyOverwatched": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "Stance"
+              ],
+              "or": {
+                "class": "MonsterConditions",
+                "buffStackNames": [
+                  "AlreadyInStance"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "MomentumBusterLowHPDrainDoubleAOssiaDark": {
+        "id": "MomentumBusterLowHPDrainDoubleAOssiaDark",
+        "found": true,
+        "ability": {
+          "name": "MomentumBusterLowHPDrainDoubleAOssiaDark",
+          "class": "Ability",
+          "abilityScalor": 2,
+          "config": "MomentumBusterLowHPDrainDoubleAOssiaDark",
+          "tuCost": 100,
+          "useLimit": 0,
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "MomentumDamageBoost"
+              ],
+              "applyToTargetType": "Enemy",
+              "damageFlags": [
+                "IgnoreArmor"
+              ]
+            },
+            {
+              "buffs": [
+                "MomentumUsed"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "HealHalfStackIfBelowHalf"
+              ],
+              "buffBackMode": true,
+              "applyToTargetType": "Enemy",
+              "applyConditions": "IsNotStealth",
+              "skipAbilityEffect": true
+            }
+          ],
+          "useCondition": "HasDamagedWithAttack",
+          "flags": [
+            "Momentum",
+            "MomentumReadyUser"
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Hit",
+          "abilityEffect": "OssiaDarkBubble1",
+          "recommendEffectWhenUsable": 1,
+          "killLockSkillIcon": "IconRedEx01",
+          "killLockUnlockedSkillIcon": "IconGreenCircle01",
+          "killLockUnlockedKey": "SkillReadyToUseKey",
+          "killLockLockedKey": "MomentumBusterLowHPDrainDoubleAOssiaDarkLockLockedKey"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.2,
+            0.9,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_castinggreen1/batfx_castinggreen1",
+            "batfx_ossiadark1/batfx_poisonbubble1",
+            "batfx_poisondamage/batfx_poisondamage",
+            "batsfx_prefab/batsfx_poison1"
+          ],
+          "sortOrderOffset": [
+            -2,
+            2,
+            2,
+            2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            false,
+            true
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "HealHalfStackIfBelowHalf": {
+            "class": "Buff",
+            "stackName": "Healing",
+            "behaviors": [
+              "AdjustHp"
+            ],
+            "behaviorOverrides": [
+              {
+                "percent": 0.5,
+                "abilityEffect": "SmallHeal1"
+              }
+            ],
+            "duration": 0,
+            "applyConditions": "IsNotHealingCurrentHPBelow50Percent",
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "MomentumUsed": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "MomentumReady"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "HasDamagedWithAttack": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "MomentumReady"
+            ]
+          },
+          "IsNotStealth": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "Stealth"
+              ]
+            }
+          }
+        },
+        "localization": {
+          "name": "Combo Reaper",
+          "description": "300% damage to 2 enemies. This attack ignores enemy damage reduction effects. Heals the user for 50% of max HP if the user is below 50% of max HP and damage is dealt. Unlocked each time the user damages an enemy with another attack. This skill is locked again after each use or if the user leaves the battlefield.",
+          "selected": "300% damage, can heal self when HP is low"
+        }
+      },
+      "SneakStanceAttackDrainDoubleAOssiaDark": {
+        "id": "SneakStanceAttackDrainDoubleAOssiaDark",
+        "found": true,
+        "ability": {
+          "name": "SneakStanceAttackDrainDoubleAOssiaDark",
+          "class": "Ability",
+          "abilityScalor": 2,
+          "config": "SneakStanceAttackDrainDoubleAOssiaDark",
+          "tuCost": 130,
+          "useLimit": 0,
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "SkipRevengeDamage",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "SneakAttackDamageBoost"
+              ],
+              "applyToTargetType": "Enemy",
+              "damageFlags": [
+                "Sneak"
+              ]
+            },
+            {
+              "buffs": [
+                "HealHalfStack"
+              ],
+              "buffBackMode": true,
+              "applyToTargetOnly": true,
+              "skipAbilityEffect": true
+            },
+            {
+              "applyToTargetType": "Enemy",
+              "buffs": [
+                "MomentumReady"
+              ],
+              "buffBackMode": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "useCondition": "IsStealthOrCounterStance",
+          "flags": [
+            "Sneak"
+          ],
+          "recommendEffectWhenUsable": 1,
+          "abilityEffect": "OssiaDarkBall1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0.1,
+            0,
+            0,
+            1.2,
+            0.4,
+            1.8,
+            0.35,
+            0.2,
+            0,
+            0.2,
+            0.2,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_gravityball",
+            "batfx_tailwindashes4/batfx_tailwindashes4",
+            "batfx_ossiadark1/batfx_darkball1",
+            "batsfx_prefab/batsfx_charge1",
+            "batsfx_prefab/batsfx_gravityball",
+            "batsfx_prefab/batsfx_accelerate1",
+            "batfx_ossiadark1/batfx_skybeams1",
+            "batfx_ossiadark1/batfx_bluntimpactpurple1",
+            "batfx_ossiadark1/batfx_bluntimpactpurple2",
+            "batsfx_prefab/batsfx_bomb1",
+            "batfx_ossiadark1/batfx_bluntimpactpurple1",
+            "batfx_ossiadark1/batfx_bluntimpactpurple2",
+            "batsfx_prefab/batsfx_bomb1"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -100,
+            20,
+            3,
+            0,
+            0,
+            2,
+            2,
+            2,
+            0,
+            2,
+            2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "audiobundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            false,
+            true,
+            true,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "SkipRevengeDamage": {
+            "class": "DamageAbilityComponent",
+            "revengeEffectsToSkip": [
+              "AddJeanneDarkAngel02Next",
+              "AddJeanneDarkAngel01Next",
+              "CloneSourceToBackIfNotSummoned",
+              "MegaElixirEffect",
+              "HasteUp20Percent",
+              "Armor",
+              "200PercentDamageForRevenge",
+              "KeepBurningStuff",
+              "SleepAfterDelay",
+              "AttackPlus50Percent1TurnOnly",
+              "BurnAfterTurn",
+              "RemoveBuffsAfterDelay",
+              "HealAfterDelay",
+              "AddSkeletonToEnd",
+              "SpiritGainBContra",
+              "Stun200Revenge",
+              "Stun150Revenge",
+              "Stun100Revenge",
+              "Stun75Revenge",
+              "TUMinus50",
+              "TUMinus100",
+              "HealHalf",
+              "RemoveBuffs",
+              "SendToFrontOfReinforcements",
+              "SendToBackOfReinforcements",
+              "SpiritGainAContra",
+              "SpiritGainCContra",
+              "SpiritLossD",
+              "SpiritLossC",
+              "MegaPoison",
+              "Poison",
+              "Sleep",
+              "TUMinusRevengeA",
+              "TUMinusRevengeB",
+              "HealFull",
+              "Explosive",
+              "TUMinusAfterDelayA",
+              "HealFullAfterDelay",
+              "Add1DeathMinionToEndForRevenge",
+              "Add1FireMinionToEndForRevenge",
+              "Add1EarthMinionToEndForRevenge",
+              "Stealth",
+              "StealthAfterDelay",
+              "TUMinus300",
+              "CloneSourceToRandomIfNotSummoned",
+              "SpiritSiphonDContra",
+              "Burn",
+              "Heal800PercentAfterDelay"
+            ]
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "HealHalfStack": {
+            "class": "Buff",
+            "stackName": "Healing",
+            "behaviors": [
+              "AdjustHp"
+            ],
+            "behaviorOverrides": [
+              {
+                "percent": 0.5,
+                "abilityEffect": "SmallHeal1"
+              }
+            ],
+            "duration": 0,
+            "applyConditions": "IsNotHealing",
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "MomentumReady": {
+            "class": "Buff",
+            "stackName": "MomentumReady",
+            "duration": -1,
+            "isHiddenFromPlayers": true,
+            "applyConditions": "UsesMomentumReady"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "IsStealthOrCounterStance": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "Stealth"
+            ],
+            "or": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "Stance"
+              ]
+            }
+          }
+        },
+        "localization": {
+          "name": "Aeon Bane",
+          "description": "300% damage to 2 enemies and heals the user for 50% of max HP if damage is dealt. Usable only if the user has the Stealth or Counter Stance status effect. This attack ignores any enemy status effects (including Stealth), damage reduction effects, revenge passive skills, and skin passive skills.",
+          "selected": "300% damage, heals, needs Stealth/Counter Stance"
+        }
+      },
+      "LimitBreakSleepDoubleAOssiaDark": {
+        "id": "LimitBreakSleepDoubleAOssiaDark",
+        "found": true,
+        "ability": {
+          "name": "LimitBreakSleepDoubleAOssiaDark",
+          "class": "Ability",
+          "config": "LimitBreakSleepDoubleAOssiaDark",
+          "tuCost": 50,
+          "useLimit": 1,
+          "spiritGain": 6,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "SleepForced300TUPoisonImmune",
+                "BurnImmunityTempForRevengeSleepAttack"
+              ],
+              "chance": 1.0
+            }
+          ],
+          "flags": [
+            "LimitBreak",
+            "Sleep",
+            "NoDamage",
+            "StealthWorthy"
+          ],
+          "immuneSuggestionCondition": "IsSleepImmune",
+          "useCondition": "AllySpirit1Or0",
+          "enemyEventType": "Hit",
+          "abilityEffect": "OssiaDarkBigShot1",
+          "recommendEffectWhenUsable": 1
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0.6,
+            0.1,
+            1.2,
+            0
+          ],
+          "prefabs": [
+            "batfx_ossiadark1/batfx_tailwindblock1",
+            "batsfx_prefab/batsfx_casting1",
+            "batsfx_prefab/batsfx_timestrike1",
+            "batfx_ossiadark1/batfx_purplebase1",
+            "batfx_ossiadark1/batfx_bigshot1",
+            "batfx_ossiadark1/batfx_sleep2",
+            "batsfx_prefab/batsfx_dreamhunt1"
+          ],
+          "sortOrderOffset": [
+            -50,
+            2,
+            0,
+            2,
+            -20,
+            2,
+            0
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            true
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "useTeamEffectPosition": [
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "positionInBattlefieldCenter": [
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "BurnImmunityTempForRevengeSleepAttack": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Burn",
+                  "BurnAfterTurn",
+                  "BurnAtEndOfTurn"
+                ],
+                "dontShowText": true
+              },
+              {
+                "name": "BurnAfterTurn"
+              },
+              {
+                "name": "BurnSelfOnHit"
+              }
+            ],
+            "duration": 1,
+            "showAsTimer": false,
+            "applyConditions": "IsNotAnySleepImmune",
+            "showAsPermanent": false,
+            "tags": [
+              "BurnImmune"
+            ],
+            "stackName": "BurnImmunityTempForRevenge",
+            "isHiddenFromPlayers": true
+          },
+          "Sleep": {
+            "class": "Buff",
+            "stackName": "Sleep",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "LoseTurn",
+              "RemoveOnHurt"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "PurifyChain"
+              },
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "name": "AutoPurifyAfterTurnNoSleep"
+              },
+              {},
+              {
+                "ignoreIfHurtBySelf": true,
+                "cancelFromDamageFlags": [
+                  "DoNotWake"
+                ]
+              }
+            ],
+            "applyConditions": "HasNotSlept",
+            "duration": 200,
+            "showAsTimer": true,
+            "statusEffect": "SleepStatus",
+            "statusEffectOffset": 0.1,
+            "iconSpriteName": "IconWhiteSleepZs01",
+            "textKeyToShowWhenApplied": "SleepKey",
+            "canBePurified": true
+          },
+          "SleepForced300TUPoisonImmune": {
+            "class": "Buff",
+            "stackName": "Sleep",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "LoseTurn",
+              "RemoveOnHurt"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Poison"
+                ]
+              },
+              {
+                "name": "PurifyChain"
+              },
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "name": "AutoPurifyAfterTurnNoSleep"
+              },
+              {},
+              {
+                "ignoreIfHurtBySelf": true,
+                "cancelFromDamageFlags": [
+                  "DoNotWake"
+                ]
+              }
+            ],
+            "duration": 300,
+            "showAsTimer": true,
+            "statusEffect": "SleepStatus",
+            "statusEffectOffset": 0.1,
+            "iconSpriteName": "IconWhiteSleepZs01",
+            "textKeyToShowWhenApplied": "SleepKey",
+            "canBePurified": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "AllySpirit1Or0": {
+            "class": "MonsterConditions",
+            "teamSpiritLessThan": 200
+          },
+          "IsSleepImmune": {
+            "class": "MonsterConditions",
+            "monsterTags": [
+              "SleepImmune"
+            ],
+            "or": {
+              "class": "MonsterConditions",
+              "monsterTags": [
+                "LethalPoison"
+              ],
+              "or": {
+                "class": "MonsterConditions",
+                "monsterTags": [
+                  "SleepImmuneVsWater"
+                ],
+                "checkEnemyTeamOfMonster": true,
+                "enemyTeamMonsterConditionMatchesNeeded": {
+                  "IsWater": 1
+                },
+                "or": {
+                  "class": "MonsterConditions",
+                  "monsterTags": [
+                    "NegativeStatusImmunityFromThorns"
+                  ],
+                  "buffStackNames": [
+                    "SleepThorns"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "localization": {
+          "name": "Sleeping Death Mk2",
+          "description": "Grants 2 enemies the Sleep status effect for 300TU, even if they have already slept while on the battlefield. This sleep cannot be overwritten by Poison. This will overwrite other status effects on those units. Usable only if the user's party has 1 or less Spirit, and only once per battle.",
+          "selected": "Forces the targets to sleep for 300TU\n(Will overwrite other status effects)"
+        }
+      }
+    },
+    "passives": {
+      "RageStealthSpiritPoisonChanceOnHP50PercentOssiaDark": {
+        "id": "RageStealthSpiritPoisonChanceOnHP50PercentOssiaDark",
+        "found": false
+      },
+      "PlusHPBoostLv3": {
+        "id": "PlusHPBoostLv3",
+        "found": false
+      },
+      "AttackUpTargetEquippedSwordLv3": {
+        "id": "AttackUpTargetEquippedSwordLv3",
+        "found": false
+      },
+      "PlusAttackBoostLv3": {
+        "id": "PlusAttackBoostLv3",
+        "found": false
+      },
+      "AddWeaponPrefSword": {
+        "id": "AddWeaponPrefSword",
+        "found": false
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": {
+      "class": "MonsterConditions",
+      "elements": [
+        "Earth"
+      ]
+    }
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "OssiaDark01",
+    "family": "OssiaDark",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "OssiaDark01",
+    "family": "OssiaDark",
+    "class": "Monster",
+    "leaderBuff": "AttackUpEarthD",
+    "leaderBuffCondition": "IsEarth",
+    "activeSkills": {
+      "0": "GainAttackSingleStanceFastAOssiaDark",
+      "1": "MomentumBusterLowHPDrainDoubleAOssiaDark",
+      "2": "SneakStanceAttackDrainDoubleAOssiaDark",
+      "3": "LimitBreakSleepDoubleAOssiaDark"
+    },
+    "passives": {
+      "0": "RageStealthSpiritPoisonChanceOnHP50PercentOssiaDark",
+      "2": "PlusHPBoostLv3",
+      "3": "AttackUpTargetEquippedSwordLv3",
+      "4": "PlusAttackBoostLv3",
+      "5": "AddWeaponPrefSword"
+    },
+    "cost": 28,
+    "baseAttack": 1210,
+    "baseMaxHp": 5160,
+    "speed": 630,
+    "element": "Earth",
+    "weaponPref": "Staff",
+    "weaponPivotIndex": 0,
+    "secure": 1,
+    "superEvolve1": "OssiaDark02",
+    "aiTargetPickWeight": 1,
+    "stars": 5,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 0,
+    "battleOrbImageFlip": 1,
+    "attackType": "Bash",
+    "visible": 1,
+    "formTwitterShare": 1,
+    "skillVoices": {
+      "0": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "1": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "2": [
+        9,
+        10,
+        11,
+        12
+      ],
+      "3": [
+        13,
+        14,
+        15,
+        16
+      ]
+    },
+    "damageVoices": [
+      17,
+      18,
+      19,
+      20
+    ],
+    "deathVoices": [
+      21,
+      22,
+      23,
+      24
+    ],
+    "victoryVoices": [
+      25,
+      26
+    ],
+    "lineupVoices": [
+      27,
+      28,
+      29,
+      30,
+      31,
+      32
+    ],
+    "evolutionVoices": [
+      133
+    ],
+    "trainVoices": [
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42
+    ],
+    "titleVoices": [
+      43
+    ],
+    "gachaVoices": [
+      44
+    ],
+    "loginVoices": [
+      45
+    ],
+    "tapVoices": [
+      46,
+      47,
+      48
+    ],
+    "idleVoices": [
+      49
+    ]
+  },
+  "_build": {
+    "scriptVersion": "3-incremental-checkpoint",
+    "sourceHash": "1d6eba7f77bca9253980357899172e8df33027eff5bb23719cc40b74fd7d28a5",
+    "dependencyHash": "66a6654bd314c7a593b33a92552f853959cb2c7763045fb7945e57fc0273814e",
+    "generatedAt": 1778013994
+  }
+}

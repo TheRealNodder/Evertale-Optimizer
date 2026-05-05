@@ -1,0 +1,770 @@
+{
+  "schemaVersion": 3,
+  "order": 97,
+  "id": "metal-dragon-demon-01",
+  "name": "MetalDragonDemon01",
+  "category": "bosse",
+  "rarity": null,
+  "stars": 6,
+  "evolvedStars": 6,
+  "element": "Dark",
+  "weaponType": "GreatAxe",
+  "stats": {
+    "atk": 1000,
+    "hp": 30000,
+    "spd": 144,
+    "cost": 999
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/MetalDragonDemon01.png",
+  "refs": {
+    "activeSkills": [
+      "SpitfireA",
+      "DecayTouchA",
+      "DecayDrainA",
+      "SurvivorDoubleAMDDemon"
+    ],
+    "passives": [
+      "SleepImmunity",
+      "StunImmunity",
+      "HoldGroundBoss"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": "MetalDemon01Seq",
+    "leaderBuff": null,
+    "leaderBuffCondition": null,
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "SpitfireA": {
+        "id": "SpitfireA",
+        "found": true,
+        "ability": {
+          "name": "SpitfireA",
+          "class": "Ability",
+          "abilityScalor": 0.5,
+          "config": "SpitfireA",
+          "tuCost": 50,
+          "useLimit": 0,
+          "nameKey": "SpitfireA",
+          "descriptionKey": "SpitfireA",
+          "spiritGain": 1,
+          "blockTargetManipulation": 1,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "Spitfire"
+              ],
+              "applyToTargetType": "Source",
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "GiveTurn"
+              ],
+              "applyToTargetType": "Source",
+              "skipAbilityEffect": true,
+              "applyConditions": "SpitfireCountNot3",
+              "showMissConditions": "ShowNoMiss"
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "LudaFire1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.3,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_fire4",
+            "batfx_burnsnap1/batfx_burnsnap1",
+            "batfx_impactmagic2/batfx_impactmagic2",
+            "batsfx_prefab/batsfx_fire2",
+            "batfx_rippleredlow/batfx_rippleredlow"
+          ],
+          "sortOrderOffset": [
+            -2,
+            3,
+            1,
+            -2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            true,
+            false
+          ],
+          "boneToAttachTo": [
+            "",
+            "bone37",
+            "",
+            "",
+            ""
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "GiveTurn": {
+            "class": "Buff",
+            "behaviors": [
+              "GiveTurn"
+            ],
+            "behaviorOverrides": [
+              {}
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "textKeyToShowWhenApplied": "TurnGivenKey",
+            "isHiddenFromPlayers": true
+          },
+          "Spitfire": {
+            "class": "Buff",
+            "stackLimit": 3,
+            "duration": 1,
+            "showAsTimer": false,
+            "stackName": "SpitfireCount",
+            "noIconShownOnBattleStatus": true,
+            "usesStackCountDescription": true,
+            "iconSpriteName": "IconPinkCharge01"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "SpitfireCountNot3": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "SpitfireCount"
+              ],
+              "buffStackCounts": [
+                2
+              ]
+            }
+          }
+        },
+        "localization": {
+          "name": "Triple Strike",
+          "description": "150% damage to 1 enemy. This skill activates 3 times in succession before its TU cost is applied. This attack ignores guardians.",
+          "selected": "150% damage ignoring guardians, activates 3 times"
+        }
+      },
+      "DecayTouchA": {
+        "id": "DecayTouchA",
+        "found": true,
+        "ability": {
+          "name": "DecayTouchA",
+          "class": "Ability",
+          "config": "DecayTouchA",
+          "tuCost": 70,
+          "useLimit": 0,
+          "nameKey": "DecayTouchA",
+          "descriptionKey": "DecayTouchA",
+          "spiritCost": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "Decay"
+              ]
+            }
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "MidDeath1",
+          "flags": [
+            "Decay",
+            "NoDamage"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.3,
+            0.35,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_casting7/batfx_casting7",
+            "batfx_deathmid1/batfx_deathmid1",
+            "batsfx_prefab/batsfx_death1",
+            "batfx_ripplepurplelow/batfx_ripplepurplelow"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -2,
+            1,
+            -2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            true
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            true
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            true,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "Decay": {
+            "class": "Buff",
+            "stackName": "Decay",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "LoseTurn",
+              "BuffOnMonsterTurn"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Sleep"
+              },
+              {},
+              {
+                "selfBuffs": [
+                  "40PercentHPDamageForDecay"
+                ]
+              }
+            ],
+            "duration": -1,
+            "showAsTimer": true,
+            "statusEffectOffset": 0.1,
+            "statusEffect": "DecayStatus",
+            "iconSpriteName": "IconBlackDegenerationHeart01",
+            "textKeyToShowWhenApplied": "SleepKey",
+            "canBePurified": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {},
+        "localization": {
+          "name": "Dread",
+          "description": "Grants the Dread status effect to 1 enemy. This will overwrite other status effects on that unit. Units affected by dread cannot act, instead taking 40% of their max HP in damage when they would get the turn.",
+          "selected": "Grants 1 enemy Dread\n(Will overwrite other status effects)"
+        }
+      },
+      "DecayDrainA": {
+        "id": "DecayDrainA",
+        "found": true,
+        "ability": {
+          "name": "DecayDrainA",
+          "class": "Ability",
+          "config": "DecayDrainA",
+          "tuCost": 50,
+          "useLimit": 0,
+          "nameKey": "DecayDrainA",
+          "descriptionKey": "DecayDrainA",
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "GiveTurnForDecayDrain"
+              ],
+              "applyConditions": "IsDecay",
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "DecentHeal"
+              ],
+              "applyConditions": "IsDecay",
+              "buffBackMode": true,
+              "applyToTargetOnly": true
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "EternalDeath2",
+          "flags": [
+            "NoDamage"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.3,
+            0.35,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_bluehalocenter1/batfx_bluehalocenter1",
+            "batfx_spiritleak1/batfx_spiritleak1",
+            "batsfx_prefab/batsfx_death1",
+            "batfx_ripplepurplelow/batfx_ripplepurplelow"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -2,
+            1,
+            -2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            true,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "DecentHeal": {
+            "class": "Buff",
+            "behaviors": [
+              "AdjustHp"
+            ],
+            "behaviorOverrides": [
+              {
+                "percent": 0.15,
+                "abilityEffect": "SmallHeal1",
+                "hpboosts": [
+                  "HealBoost"
+                ]
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "GiveTurnForDecayDrain": {
+            "class": "Buff",
+            "behaviors": [
+              "GiveTurn"
+            ],
+            "behaviorOverrides": [
+              {}
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "IsDecay": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "Decay"
+            ]
+          }
+        },
+        "localization": {
+          "name": "Dread Drain",
+          "description": "Gives an enemy with the Dread status effect the turn by reducing their TU to 0, then heals the user for 15% of max HP.",
+          "selected": "Gives turn to enemy with Dread and heals user"
+        }
+      },
+      "SurvivorDoubleAMDDemon": {
+        "id": "SurvivorDoubleAMDDemon",
+        "found": true,
+        "ability": {
+          "name": "SurvivorDoubleAMDDemon",
+          "class": "Ability",
+          "abilityScalor": 4,
+          "config": "SurvivorDoubleA",
+          "tuCost": 1,
+          "useLimit": 0,
+          "nameKey": "SurvivorDoubleA",
+          "descriptionKey": "SurvivorDoubleA",
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "SurvivorDamageBoost"
+              ]
+            }
+          ],
+          "useCondition": "TimeInCombat300",
+          "bombSkillIcon": "IconBrownCountdownClock01",
+          "bombSkillIconDescriptionKey": "SurvivorDoubleACountdownKey",
+          "flags": [
+            "Survivor",
+            "Duration"
+          ],
+          "enemyEventType": "Hit",
+          "recommendEffectWhenUsable": 1,
+          "axeAbilityEffect": "SurvivorSpecial1",
+          "greatAxeAbilityEffect": "SurvivorSpecial1",
+          "greatSwordAbilityEffect": "SurvivorSpecial1",
+          "swordAbilityEffect": "SurvivorSpecial1",
+          "spearAbilityEffect": "SurvivorSpecial1Spear",
+          "katanaAbilityEffect": "SurvivorSpecial1",
+          "hammerAbilityEffect": "SurvivorSpecial1Blunt",
+          "staffAbilityEffect": "SurvivorSpecial1Blunt",
+          "maceAbilityEffect": "SurvivorSpecial1Blunt",
+          "biteAbilityEffect": "SurvivorSpecial1Bite",
+          "bashAbilityEffect": "SurvivorSpecial1Blunt",
+          "clawAbilityEffect": "SurvivorSpecial1Claw"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": null,
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {
+          "TimeInCombat300": {
+            "class": "AttackScalor",
+            "sourceCondition": "TimeInCombat300"
+          }
+        },
+        "conditions": {
+          "TimeInCombat300": {
+            "class": "MonsterConditions",
+            "timeInCombat": 300
+          }
+        }
+      }
+    },
+    "passives": {
+      "SleepImmunity": {
+        "id": "SleepImmunity",
+        "found": false
+      },
+      "StunImmunity": {
+        "id": "StunImmunity",
+        "found": false
+      },
+      "HoldGroundBoss": {
+        "id": "HoldGroundBoss",
+        "found": false
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": {
+      "id": "MetalDemon01Seq",
+      "found": true,
+      "sequence": {
+        "class": "AbilityAISequence",
+        "sequence": [
+          [
+            "0",
+            "2",
+            "3"
+          ],
+          [
+            "0",
+            "1",
+            "2"
+          ]
+        ]
+      }
+    },
+    "leaderCondition": null
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "MetalDragonDemon01",
+    "family": "MetalDragonDemon",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "MetalDragonDemon01",
+    "class": "Monster",
+    "family": "MetalDragonDemon",
+    "activeSkills": {
+      "0": "SpitfireA",
+      "1": "DecayTouchA",
+      "2": "DecayDrainA",
+      "3": "SurvivorDoubleAMDDemon"
+    },
+    "passives": {
+      "0": "SleepImmunity",
+      "1": "StunImmunity",
+      "2": "HoldGroundBoss"
+    },
+    "aiSequence": "MetalDemon01Seq",
+    "cost": 999,
+    "baseAttack": 1000,
+    "baseMaxHp": 30000,
+    "speed": 144,
+    "element": "Death",
+    "weaponPref": "GreatAxe",
+    "weaponPivotIndex": 0,
+    "walkSound": "TestSound",
+    "secure": 1,
+    "aiTargetPickWeight": 1,
+    "stars": 6,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 1,
+    "battleOrbImageFlip": 0,
+    "skillVoices": {
+      "0": [
+        1
+      ],
+      "1": [
+        1,
+        3
+      ],
+      "2": [
+        1,
+        3
+      ],
+      "3": [
+        1,
+        3
+      ]
+    },
+    "damageVoices": [
+      19
+    ],
+    "deathVoices": [
+      22
+    ]
+  },
+  "_build": {
+    "scriptVersion": "3-incremental-checkpoint",
+    "sourceHash": "14428ab25821e1e7b558a133868831a8ddda7c4ee1f9913402c600020f2c2ab2",
+    "dependencyHash": "6d5143e604baf74cd5dc343536004aee367e56900640d45b72232d71332140a0",
+    "generatedAt": 1778014031
+  }
+}

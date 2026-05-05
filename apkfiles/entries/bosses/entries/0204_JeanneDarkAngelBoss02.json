@@ -1,0 +1,704 @@
+{
+  "schemaVersion": 3,
+  "order": 204,
+  "id": "jeanne-dark-angel-boss-02",
+  "name": "JeanneDarkAngelBoss02",
+  "category": "bosse",
+  "rarity": null,
+  "stars": 6,
+  "evolvedStars": 0,
+  "element": "Dark",
+  "weaponType": "GreatSword",
+  "stats": {
+    "atk": 2000,
+    "hp": 60000,
+    "spd": 900,
+    "cost": 999
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/JeanneDarkAngel02.png",
+  "refs": {
+    "activeSkills": [
+      "GainAttackSingleStealthB",
+      "SneakAttackSingleSJeanneDarkAngelBoss",
+      "ProtectorKillerDoubleAJeanneDarkAngelBoss"
+    ],
+    "passives": [
+      "TUMinusRevengeA",
+      "BlockDeathByBuffDamage"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": null,
+    "leaderBuffCondition": null,
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "GainAttackSingleStealthB": {
+        "id": "GainAttackSingleStealthB",
+        "found": true,
+        "ability": {
+          "name": "GainAttackSingleStealthB",
+          "class": "Ability",
+          "abilityScalor": 0,
+          "config": "GainAttackSingleStealthB",
+          "tuCost": 100,
+          "useLimit": 0,
+          "spiritGain": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "ActiveStealthJustGained",
+                "Stealth",
+                "BurnImmunityTempForRevenge"
+              ],
+              "applyToSourceOnly": true,
+              "showMissConditions": "ShowNoMiss",
+              "skipAbilityEffect": true
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "MidWater1",
+          "flags": [
+            "Stealth"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.3,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_casting4/batfx_casting4",
+            "batfx_waterlarge2/batfx_waterlarge2",
+            "batsfx_prefab/batsfx_water1",
+            "batfx_ripplebluelow/batfx_ripplebluelow"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -2,
+            1,
+            -2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            true,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "ActiveStealthJustGained": {
+            "class": "Buff",
+            "stackName": "ActiveStealthJustGained",
+            "duration": 1,
+            "isHiddenFromPlayers": true,
+            "applyConditions": "IsNotStealth"
+          },
+          "BurnImmunityTempForRevenge": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Burn",
+                  "BurnAfterTurn",
+                  "BurnAtEndOfTurn"
+                ],
+                "dontShowText": true
+              },
+              {
+                "name": "BurnAfterTurn"
+              },
+              {
+                "name": "BurnSelfOnHit"
+              }
+            ],
+            "duration": 1,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "tags": [
+              "BurnImmune"
+            ],
+            "stackName": "BurnImmunityTempForRevenge",
+            "isHiddenFromPlayers": true
+          },
+          "Stealth": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "ManipulateTargeting",
+              "RemoveOnHurt",
+              "Immunity",
+              "Immunity"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "LockHideSkills"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "dodgeMultitarget": true,
+                "forceAllowAllEnemiesAChanceToManipulate": true,
+                "removeAfterTriggers": 1,
+                "abilityFlagsToIgnore": [
+                  "Stun",
+                  "NoDamage",
+                  "Sneak",
+                  "IgnoreStealth"
+                ]
+              },
+              {},
+              {
+                "stackNamesToBlock": [
+                  "Stealth"
+                ],
+                "dontShowText": true
+              },
+              {
+                "stackNamesToBlock": [
+                  "Placeholder"
+                ],
+                "dontShowText": true,
+                "activateCondition": "MissingStealthOrStealthShield"
+              }
+            ],
+            "tags": [
+              "Stealth"
+            ],
+            "duration": -1,
+            "showAsTimer": true,
+            "iconSpriteName": "IconBlackStealth01",
+            "stackName": "Stealth",
+            "useCount": 1
+          }
+        },
+        "attackScalors": {},
+        "conditions": {},
+        "localization": {
+          "name": "Attack & Stealth",
+          "description": "Damage to 1 enemy. The user is also granted the Stealth status effect. This will overwrite other status effects on the user. Stealthed units ignore the next enemy attack that would damage more than 1 target. Any damage will remove stealth.",
+          "selected": "Damage to 1 enemy and gain Stealth\n(Will overwrite other status effects)"
+        }
+      },
+      "SneakAttackSingleSJeanneDarkAngelBoss": {
+        "id": "SneakAttackSingleSJeanneDarkAngelBoss",
+        "found": true,
+        "ability": {
+          "name": "SneakAttackSingleSJeanneDarkAngelBoss",
+          "class": "Ability",
+          "abilityScalor": 4,
+          "config": "SneakAttackSingleSJeanneDarkAngelBoss",
+          "tuCost": 70,
+          "useLimit": 0,
+          "nameKey": "SneakAttackC",
+          "descriptionKey": "SneakAttackC",
+          "spiritCost": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "SkipRevengeDamage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "SneakAttackDamageBoost"
+              ],
+              "damageFlags": [
+                "Sneak"
+              ]
+            }
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "FreeThrowADarkJeanneAngel1",
+          "useCondition": "IsStealth",
+          "flags": [
+            "Sneak"
+          ],
+          "recommendEffectWhenUsable": 1
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0.2,
+            0.5,
+            0,
+            0,
+            0.2,
+            0
+          ],
+          "sortOrderOffset": [
+            2,
+            5,
+            0,
+            2,
+            100,
+            4,
+            0,
+            2,
+            0
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false
+          ],
+          "prefabs": [
+            "batfx_castingpurple2/batfx_castingpurple2",
+            "batfx_fauxAreaLightPurple1/batfx_fauxAreaLightPurple1",
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_darkjeanneangel1/batfx_darkjeanneangel1",
+            "batfx_darkjeanneangel2/batfx_darkjeanneangel2",
+            "batfx_feathertrail2/batfx_feathertrail2",
+            "batsfx_prefab/batsfx_bluntimpact1",
+            "batfx_healtop1/batfx_healtop1",
+            "batsfx_prefab/batsfx_heal1"
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "isDeckParticleFX": [
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            true
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "components": {
+          "SkipRevengeDamage": {
+            "class": "DamageAbilityComponent",
+            "revengeEffectsToSkip": [
+              "AddJeanneDarkAngel02Next",
+              "AddJeanneDarkAngel01Next",
+              "CloneSourceToBackIfNotSummoned",
+              "MegaElixirEffect",
+              "HasteUp20Percent",
+              "Armor",
+              "200PercentDamageForRevenge",
+              "KeepBurningStuff",
+              "SleepAfterDelay",
+              "AttackPlus50Percent1TurnOnly",
+              "BurnAfterTurn",
+              "RemoveBuffsAfterDelay",
+              "HealAfterDelay",
+              "AddSkeletonToEnd",
+              "SpiritGainBContra",
+              "Stun200Revenge",
+              "Stun150Revenge",
+              "Stun100Revenge",
+              "Stun75Revenge",
+              "TUMinus50",
+              "TUMinus100",
+              "HealHalf",
+              "RemoveBuffs",
+              "SendToFrontOfReinforcements",
+              "SendToBackOfReinforcements",
+              "SpiritGainAContra",
+              "SpiritGainCContra",
+              "SpiritLossD",
+              "SpiritLossC",
+              "MegaPoison",
+              "Poison",
+              "Sleep",
+              "TUMinusRevengeA",
+              "TUMinusRevengeB",
+              "HealFull",
+              "Explosive",
+              "TUMinusAfterDelayA",
+              "HealFullAfterDelay",
+              "Add1DeathMinionToEndForRevenge",
+              "Add1FireMinionToEndForRevenge",
+              "Add1EarthMinionToEndForRevenge",
+              "Stealth",
+              "StealthAfterDelay",
+              "TUMinus300",
+              "CloneSourceToRandomIfNotSummoned",
+              "SpiritSiphonDContra",
+              "Burn",
+              "Heal800PercentAfterDelay"
+            ]
+          }
+        },
+        "buffs": {},
+        "attackScalors": {},
+        "conditions": {
+          "IsStealth": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "Stealth"
+            ]
+          }
+        }
+      },
+      "ProtectorKillerDoubleAJeanneDarkAngelBoss": {
+        "id": "ProtectorKillerDoubleAJeanneDarkAngelBoss",
+        "found": true,
+        "ability": {
+          "name": "ProtectorKillerDoubleAJeanneDarkAngelBoss",
+          "class": "Ability",
+          "abilityScalor": -2,
+          "conditionalAbilityScalors": [
+            3,
+            5
+          ],
+          "config": "ProtectorKillerDoubleAJeanneDarkAngelBoss",
+          "tuCost": 100,
+          "useLimit": 0,
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "Damage"
+          ],
+          "attackScalors": [
+            "GoodVsProtected",
+            "GoodVsProtector"
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "SmallHit1",
+          "conditionedAbilityEffects": [
+            "FreeThrowADarkJeanneAngel1",
+            "FreeThrowADarkJeanneAngel1"
+          ],
+          "flags": [
+            "ProtectorKiller"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.4,
+            0
+          ],
+          "prefabs": [
+            "batfx_bluntimpact1/batfx_bluntimpact1",
+            "batsfx_prefab/batsfx_impactsmall1"
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            true
+          ],
+          "scale": [
+            0.4,
+            1
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {
+          "GoodVsProtected": {
+            "class": "AttackScalor",
+            "targetCondition": "IsProtected"
+          },
+          "GoodVsProtector": {
+            "class": "AttackScalor",
+            "targetCondition": "IsProtecting"
+          }
+        },
+        "conditions": {},
+        "localization": {
+          "name": "Guard Cleaver",
+          "description": "Targets 2 enemies. 600% damage if they are a Guardian. 400% damage if they are protected by a Guardian.",
+          "selected": "400% damage to Guarded units, 600% to Guardians"
+        }
+      }
+    },
+    "passives": {
+      "TUMinusRevengeA": {
+        "id": "TUMinusRevengeA",
+        "found": false
+      },
+      "BlockDeathByBuffDamage": {
+        "id": "BlockDeathByBuffDamage",
+        "found": false
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": null
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "JeanneDarkAngelBoss02",
+    "family": "JeanneDarkAngelBoss",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "JeanneDarkAngelBoss02",
+    "class": "Monster",
+    "family": "JeanneDarkAngelBoss",
+    "activeSkills": {
+      "0": "GainAttackSingleStealthB",
+      "1": "SneakAttackSingleSJeanneDarkAngelBoss",
+      "2": "ProtectorKillerDoubleAJeanneDarkAngelBoss"
+    },
+    "passives": {
+      "0": "TUMinusRevengeA",
+      "1": "BlockDeathByBuffDamage"
+    },
+    "cost": 999,
+    "baseAttack": 2000,
+    "baseMaxHp": 60000,
+    "speed": 900,
+    "element": "Death",
+    "weaponPref": "GreatSword",
+    "weaponPivotIndex": 0,
+    "walkSound": "TestSound",
+    "secure": 1,
+    "aiTargetPickWeight": 1,
+    "stars": 6,
+    "evolvedStars": 0,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 1,
+    "battleOrbImageFlip": 0,
+    "skillVoices": {
+      "0": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "1": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "2": [
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "damageVoices": [
+      17,
+      18,
+      19,
+      20
+    ],
+    "deathVoices": [
+      21,
+      22,
+      23,
+      24
+    ]
+  },
+  "_build": {
+    "scriptVersion": "3-incremental-checkpoint",
+    "sourceHash": "3e255726e79768d98c950e08434c6ad5c8a330af2b5d72de4fcc0e5e51a06ec5",
+    "dependencyHash": "0422a850d002f62650f1a1b79d4234ec670a01bb6d1e130faa06586dbe5ab485",
+    "generatedAt": 1778014035
+  }
+}

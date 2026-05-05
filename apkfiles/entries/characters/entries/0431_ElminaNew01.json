@@ -1,0 +1,992 @@
+{
+  "schemaVersion": 3,
+  "order": 431,
+  "id": "elmina-new-01",
+  "name": "ElminaNew01",
+  "category": "character",
+  "rarity": null,
+  "stars": 5,
+  "evolvedStars": 6,
+  "element": "Storm",
+  "weaponType": "Spear",
+  "stats": {
+    "atk": 1078,
+    "hp": 5820,
+    "spd": 383,
+    "cost": 28
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/ElminaNew01.png",
+  "refs": {
+    "activeSkills": [
+      "BusterAttackAElminaNew",
+      "StealthSelfHealAElminaNew",
+      "SneakAttackFastAElminaNew",
+      "SurvivorBusterAElminaNew"
+    ],
+    "passives": [
+      "AttackUpStealth",
+      "PlusAttackBoostLv3",
+      "PlusHPBoostLv3",
+      "WaterMinusDamageLv3",
+      "AddWeaponPrefGreatAxe"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": "AttackUpAirD",
+    "leaderBuffCondition": "IsAir",
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "BusterAttackAElminaNew": {
+        "id": "BusterAttackAElminaNew",
+        "found": true,
+        "ability": {
+          "name": "BusterAttackAElminaNew",
+          "class": "Ability",
+          "abilityScalor": 0,
+          "config": "BusterAttackAElminaNew",
+          "tuCost": 100,
+          "useLimit": 0,
+          "nameKey": "BusterAttackA",
+          "descriptionKey": "BusterAttackA",
+          "spiritGain": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "damageFlags": [
+                "IgnoreArmor"
+              ]
+            }
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "ElminaNewStab1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            1,
+            0,
+            0.45,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_rangedmagic2/batfx_rangedmagic2",
+            "batfx_pierce1/batfx_pierce1",
+            "batsfx_prefab/batsfx_arrow1",
+            "batfx_rangedstab3/batfx_rangedstab3",
+            "batsfx_prefab/batsfx_slash1",
+            "batfx_impactashes3/batfx_impactashes3"
+          ],
+          "sortOrderOffset": [
+            -2,
+            3,
+            3,
+            3,
+            1,
+            10,
+            2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            false,
+            false,
+            true
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {},
+        "conditions": {}
+      },
+      "StealthSelfHealAElminaNew": {
+        "id": "StealthSelfHealAElminaNew",
+        "found": true,
+        "ability": {
+          "name": "StealthSelfHealAElminaNew",
+          "class": "Ability",
+          "config": "StealthSelfHealAElminaNew",
+          "tuCost": 50,
+          "useLimit": 0,
+          "nameKey": "StealthSelfHealA",
+          "descriptionKey": "StealthSelfHealA",
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "SelfOnly",
+          "components": [
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "ActiveStealthJustGained",
+                "Stealth",
+                "HealHalfStack"
+              ]
+            }
+          ],
+          "sourceEventType": "Finish",
+          "abilityEffect": "StealthHeal1",
+          "useCondition": "IsNotStealth",
+          "flags": [
+            "Stealth",
+            "ApplyStatusToSelf"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "selfOnly": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.3,
+            0,
+            0.2,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_powerupred/batfx_powerupred",
+            "batfx_stealth1/batfx_stealth1",
+            "batsfx_prefab/batsfx_stealth1",
+            "batfx_healtop1/batfx_healtop1",
+            "batfx_healbottom1/batfx_healbottom1",
+            "batsfx_prefab/batsfx_heal1"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -2,
+            2,
+            -2,
+            2,
+            -2,
+            0
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "ActiveStealthJustGained": {
+            "class": "Buff",
+            "stackName": "ActiveStealthJustGained",
+            "duration": 1,
+            "isHiddenFromPlayers": true,
+            "applyConditions": "IsNotStealth"
+          },
+          "HealHalfStack": {
+            "class": "Buff",
+            "stackName": "Healing",
+            "behaviors": [
+              "AdjustHp"
+            ],
+            "behaviorOverrides": [
+              {
+                "percent": 0.5,
+                "abilityEffect": "SmallHeal1"
+              }
+            ],
+            "duration": 0,
+            "applyConditions": "IsNotHealing",
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "Stealth": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "ManipulateTargeting",
+              "RemoveOnHurt",
+              "Immunity",
+              "Immunity"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "LockHideSkills"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "dodgeMultitarget": true,
+                "forceAllowAllEnemiesAChanceToManipulate": true,
+                "removeAfterTriggers": 1,
+                "abilityFlagsToIgnore": [
+                  "Stun",
+                  "NoDamage",
+                  "Sneak",
+                  "IgnoreStealth"
+                ]
+              },
+              {},
+              {
+                "stackNamesToBlock": [
+                  "Stealth"
+                ],
+                "dontShowText": true
+              },
+              {
+                "stackNamesToBlock": [
+                  "Placeholder"
+                ],
+                "dontShowText": true,
+                "activateCondition": "MissingStealthOrStealthShield"
+              }
+            ],
+            "tags": [
+              "Stealth"
+            ],
+            "duration": -1,
+            "showAsTimer": true,
+            "iconSpriteName": "IconBlackStealth01",
+            "stackName": "Stealth",
+            "useCount": 1
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "IsNotStealth": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "Stealth"
+              ]
+            }
+          }
+        }
+      },
+      "SneakAttackFastAElminaNew": {
+        "id": "SneakAttackFastAElminaNew",
+        "found": true,
+        "ability": {
+          "name": "SneakAttackFastAElminaNew",
+          "class": "Ability",
+          "abilityScalor": 2,
+          "config": "SneakAttackFastAElminaNew",
+          "tuCost": 100,
+          "useLimit": 0,
+          "nameKey": "SneakAttackFastA",
+          "descriptionKey": "SneakAttackFastA",
+          "spiritCost": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "SkipRevengeDamage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "SneakAttackDamageBoost"
+              ],
+              "damageFlags": [
+                "Sneak"
+              ]
+            }
+          ],
+          "enemyEventType": "Hit",
+          "useCondition": "IsStealth",
+          "flags": [
+            "Sneak"
+          ],
+          "recommendEffectWhenUsable": 1,
+          "abilityEffect": "SneakFastElminaNew1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            1,
+            0.15,
+            0.35,
+            0,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting2",
+            "batfx_elminanewprep1/batfx_elminanewprep1",
+            "batfx_tailwindpurple/batfx_tailwindpurple",
+            "batfx_ElminaNewVanish1/batfx_ElminaNewVanish1",
+            "batsfx_prefab/batsfx_whoosh1",
+            "batfx_slashthunder1/batfx_slashthunder2",
+            "batfx_slashthunder1/batfx_slashthunder1",
+            "batfx_impactashes4/batfx_impactashes4",
+            "batsfx_prefab/batsfx_slash1"
+          ],
+          "sortOrderOffset": [
+            2,
+            -2,
+            -2,
+            9,
+            1,
+            1,
+            1,
+            1,
+            2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            false,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "SkipRevengeDamage": {
+            "class": "DamageAbilityComponent",
+            "revengeEffectsToSkip": [
+              "AddJeanneDarkAngel02Next",
+              "AddJeanneDarkAngel01Next",
+              "CloneSourceToBackIfNotSummoned",
+              "MegaElixirEffect",
+              "HasteUp20Percent",
+              "Armor",
+              "200PercentDamageForRevenge",
+              "KeepBurningStuff",
+              "SleepAfterDelay",
+              "AttackPlus50Percent1TurnOnly",
+              "BurnAfterTurn",
+              "RemoveBuffsAfterDelay",
+              "HealAfterDelay",
+              "AddSkeletonToEnd",
+              "SpiritGainBContra",
+              "Stun200Revenge",
+              "Stun150Revenge",
+              "Stun100Revenge",
+              "Stun75Revenge",
+              "TUMinus50",
+              "TUMinus100",
+              "HealHalf",
+              "RemoveBuffs",
+              "SendToFrontOfReinforcements",
+              "SendToBackOfReinforcements",
+              "SpiritGainAContra",
+              "SpiritGainCContra",
+              "SpiritLossD",
+              "SpiritLossC",
+              "MegaPoison",
+              "Poison",
+              "Sleep",
+              "TUMinusRevengeA",
+              "TUMinusRevengeB",
+              "HealFull",
+              "Explosive",
+              "TUMinusAfterDelayA",
+              "HealFullAfterDelay",
+              "Add1DeathMinionToEndForRevenge",
+              "Add1FireMinionToEndForRevenge",
+              "Add1EarthMinionToEndForRevenge",
+              "Stealth",
+              "StealthAfterDelay",
+              "TUMinus300",
+              "CloneSourceToRandomIfNotSummoned",
+              "SpiritSiphonDContra",
+              "Burn",
+              "Heal800PercentAfterDelay"
+            ]
+          }
+        },
+        "buffs": {},
+        "attackScalors": {},
+        "conditions": {
+          "IsStealth": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "Stealth"
+            ]
+          }
+        }
+      },
+      "SurvivorBusterAElminaNew": {
+        "id": "SurvivorBusterAElminaNew",
+        "found": true,
+        "ability": {
+          "name": "SurvivorBusterAElminaNew",
+          "class": "Ability",
+          "abilityScalor": 3,
+          "config": "SurvivorBusterAElminaNew",
+          "tuCost": 100,
+          "useLimit": 0,
+          "nameKey": "SurvivorBusterA",
+          "descriptionKey": "SurvivorBusterA",
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "SurvivorDamageBoost"
+              ],
+              "damageFlags": [
+                "IgnoreArmor"
+              ]
+            }
+          ],
+          "useCondition": "TimeInCombat300",
+          "bombSkillIcon": "IconBrownCountdownClock01",
+          "bombSkillIconDescriptionKey": "SurvivorBusterACountdownKey",
+          "flags": [
+            "Survivor",
+            "Duration"
+          ],
+          "enemyEventType": "Hit",
+          "recommendEffectWhenUsable": 1,
+          "abilityEffect": "SurvivorElminaNew1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.1,
+            0,
+            0.2,
+            0,
+            0.55,
+            0.7,
+            0.15,
+            0
+          ],
+          "prefabs": [
+            "batfx_tailwindred/batfx_tailwindred",
+            "batsfx_prefab/batsfx_whoosh1",
+            "batfx_jumpsmoke1/batfx_jumpsmoke1",
+            "batsfx_prefab/batsfx_multislash2",
+            "batfx_spikeflurry2/batfx_spikeflurry2",
+            "batsfx_prefab/batsfx_whoosh1",
+            "batfx_spikeflurry2/batfx_spikeflurry2",
+            "batfx_finishblow1/batfx_finishblow1",
+            "batfx_bighorizontalred2/batfx_bighorizontalred2",
+            "batsfx_prefab/batsfx_slash1"
+          ],
+          "sortOrderOffset": [
+            -100,
+            -2,
+            -2,
+            20,
+            20,
+            0,
+            20,
+            5,
+            0,
+            0
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0.5,
+            0,
+            0,
+            0,
+            0.5,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "positionInBattlefieldCenter": [
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {
+          "TimeInCombat300": {
+            "class": "AttackScalor",
+            "sourceCondition": "TimeInCombat300"
+          }
+        },
+        "conditions": {
+          "TimeInCombat300": {
+            "class": "MonsterConditions",
+            "timeInCombat": 300
+          }
+        }
+      }
+    },
+    "passives": {
+      "AttackUpStealth": {
+        "id": "AttackUpStealth",
+        "found": false
+      },
+      "PlusAttackBoostLv3": {
+        "id": "PlusAttackBoostLv3",
+        "found": false
+      },
+      "PlusHPBoostLv3": {
+        "id": "PlusHPBoostLv3",
+        "found": false
+      },
+      "WaterMinusDamageLv3": {
+        "id": "WaterMinusDamageLv3",
+        "found": false
+      },
+      "AddWeaponPrefGreatAxe": {
+        "id": "AddWeaponPrefGreatAxe",
+        "found": false
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": {
+      "class": "MonsterConditions",
+      "elements": [
+        "Air"
+      ]
+    }
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "ElminaNew01",
+    "family": "ElminaNew",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "ElminaNew01",
+    "family": "ElminaNew",
+    "class": "Monster",
+    "leaderBuff": "AttackUpAirD",
+    "leaderBuffCondition": "IsAir",
+    "activeSkills": {
+      "0": "BusterAttackAElminaNew",
+      "1": "StealthSelfHealAElminaNew",
+      "2": "SneakAttackFastAElminaNew",
+      "3": "SurvivorBusterAElminaNew"
+    },
+    "passives": {
+      "0": "AttackUpStealth",
+      "2": "PlusAttackBoostLv3",
+      "3": "PlusHPBoostLv3",
+      "4": "WaterMinusDamageLv3",
+      "5": "AddWeaponPrefGreatAxe"
+    },
+    "cost": 28,
+    "baseAttack": 1078,
+    "baseMaxHp": 5820,
+    "speed": 383,
+    "element": "Air",
+    "weaponPref": "Spear",
+    "weaponPivotIndex": 0,
+    "secure": 1,
+    "superEvolve1": "ElminaNew02",
+    "aiTargetPickWeight": 1,
+    "stars": 5,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 0,
+    "battleOrbImageFlip": 1,
+    "attackType": "Weapon",
+    "visible": 1,
+    "formTwitterShare": 1,
+    "skillVoices": {
+      "0": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "1": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "2": [
+        9,
+        10,
+        11,
+        12
+      ],
+      "3": [
+        13,
+        14,
+        15,
+        16
+      ]
+    },
+    "damageVoices": [
+      17,
+      18,
+      19,
+      20
+    ],
+    "deathVoices": [
+      21,
+      22,
+      23,
+      24
+    ],
+    "victoryVoices": [
+      25,
+      26
+    ],
+    "lineupVoices": [
+      27,
+      28,
+      29,
+      30,
+      31,
+      32
+    ],
+    "evolutionVoices": [
+      33
+    ],
+    "trainVoices": [
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43
+    ],
+    "titleVoices": [
+      44
+    ],
+    "gachaVoices": [
+      45
+    ],
+    "loginVoices": [
+      46
+    ],
+    "tapVoices": [
+      47,
+      48,
+      49
+    ],
+    "idleVoices": [
+      50
+    ]
+  },
+  "_build": {
+    "scriptVersion": "3-incremental-checkpoint",
+    "sourceHash": "edd71b49b052ba37a91696bec21b834661880d2024121c444ec4672af2b8427b",
+    "dependencyHash": "a57522410f3577c5f2c9e7a24041bd4abb277c10625c853f91f586e0caf3eb95",
+    "generatedAt": 1778013992
+  }
+}

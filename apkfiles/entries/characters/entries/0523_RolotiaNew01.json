@@ -1,0 +1,1337 @@
+{
+  "schemaVersion": 3,
+  "order": 523,
+  "id": "rolotia-new-01",
+  "name": "RolotiaNew01",
+  "category": "character",
+  "rarity": null,
+  "stars": 5,
+  "evolvedStars": 6,
+  "element": "Storm",
+  "weaponType": "Katana",
+  "stats": {
+    "atk": 1202,
+    "hp": 5200,
+    "spd": 1,
+    "cost": 28
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/RolotiaNew01.png",
+  "refs": {
+    "activeSkills": [
+      "PoisonTouchStun50ARolotiaNew",
+      "StunAllButSelfARolotiaNew",
+      "TimeStrikeAllPlusARolotiaNew",
+      "BloodfuryPullbackSelfARolotiaNew"
+    ],
+    "passives": [
+      "Stun2RandomHealSelfEntranceA",
+      "PlusAttackBoostLv3",
+      "AttackUpTargetEquippedMaceLv3",
+      "PlusHPBoostLv3",
+      "AddWeaponPrefGreatSword"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": "AttackAndHPUp6Air",
+    "leaderBuffCondition": "IsAir",
+    "summonableMonsters": [
+      "AirMinion01"
+    ]
+  },
+  "resolved": {
+    "activeSkills": {
+      "PoisonTouchStun50ARolotiaNew": {
+        "id": "PoisonTouchStun50ARolotiaNew",
+        "found": true,
+        "ability": {
+          "name": "PoisonTouchStun50ARolotiaNew",
+          "class": "Ability",
+          "config": "PoisonTouchStun50ARolotiaNew",
+          "tuCost": 100,
+          "useLimit": 0,
+          "spiritGain": 3,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "Poison",
+                "Stun50",
+                "BurnImmunityTempForRevenge"
+              ]
+            }
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "RolotiaNewAbility2",
+          "flags": [
+            "Poisoner",
+            "Stun"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            1.05,
+            0,
+            0.1,
+            0.6,
+            0,
+            0.2
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_timestrike1",
+            "batfx_common/batfx_chargeparticles1",
+            "batsfx_prefab/batsfx_arrow1",
+            "batfx_rolotianew1/batfx_rolock1b",
+            "batfx_rolotianew1/batfx_poisonslash1",
+            "batfx_common/batfx_empty",
+            "batfx_rolotianew1/batfx_rolock3b",
+            "batfx_rolotianew1/batfx_stormslash1",
+            "batsfx_prefab/batsfx_bomb1"
+          ],
+          "sortOrderOffset": [
+            2,
+            -2,
+            -2,
+            1,
+            3,
+            2,
+            2,
+            3,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "BurnImmunityTempForRevenge": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Burn",
+                  "BurnAfterTurn",
+                  "BurnAtEndOfTurn"
+                ],
+                "dontShowText": true
+              },
+              {
+                "name": "BurnAfterTurn"
+              },
+              {
+                "name": "BurnSelfOnHit"
+              }
+            ],
+            "duration": 1,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "tags": [
+              "BurnImmune"
+            ],
+            "stackName": "BurnImmunityTempForRevenge",
+            "isHiddenFromPlayers": true
+          },
+          "Poison": {
+            "class": "Buff",
+            "stackName": "Poison",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "DamageOverTime"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "percentOfAttack": 0.0025,
+                "damageColor": "Green",
+                "abilityEffect": "PoisonDamage",
+                "extraDamageFlag": "Poison"
+              }
+            ],
+            "tags": [
+              "Poison"
+            ],
+            "canBePurified": true,
+            "duration": -1,
+            "applyConditions": "NotSuperOrMegaPoisoned",
+            "showAsTimer": false,
+            "statusEffect": "PoisonStatus",
+            "statusEffectOffset": 0.1,
+            "damageType": "Poison",
+            "noIconShownOnBattleStatus": true,
+            "iconSpriteName": "IconPurplePoison01"
+          },
+          "Stun50": {
+            "class": "Buff",
+            "stackName": "Stun",
+            "behaviors": [
+              "Stun"
+            ],
+            "behaviorOverrides": [
+              {
+                "stunTU": 50,
+                "abilityEffect": "StunStatus1"
+              }
+            ],
+            "tags": [
+              "Stun"
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {},
+        "localization": {
+          "name": "Poison Shock",
+          "description": "Grants the Poison status effect to 1 enemy and Stuns them for 50TU. Poison will overwrite other status effects on that unit. This skill can be redirected by enemy Stun Absorbers.",
+          "selected": "Poisons 1 Enemy and Stuns them for 50TU\n(Will overwrite other status effects)"
+        }
+      },
+      "StunAllButSelfARolotiaNew": {
+        "id": "StunAllButSelfARolotiaNew",
+        "found": true,
+        "ability": {
+          "name": "StunAllButSelfARolotiaNew",
+          "class": "Ability",
+          "config": "StunAllButSelfARolotiaNew",
+          "tuCost": 1,
+          "useLimit": 0,
+          "spiritCost": 3,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "AllButSelf",
+          "components": [
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "Stun150"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "Stun100StunAll",
+                "RemoveBuffs",
+                "SleepImmunityOnce",
+                "HasteUp30Percent"
+              ],
+              "applyToTargetType": "Friendly",
+              "applyConditions": "NoStunAbsorberInEnemyTeam",
+              "showMissConditions": "ShowNoMiss"
+            },
+            {
+              "buffs": [
+                "LockSkillUse"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss",
+              "applyConditions": "NoStunAbsorberInEnemyTeam"
+            }
+          ],
+          "flags": [
+            "Stun",
+            "StealthWorthy",
+            "Purify"
+          ],
+          "useCondition": "SkillNotLocked",
+          "enemyEventType": "Hit",
+          "friendlyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "RolotiaStunAll1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "allButSelf": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0.5,
+            0,
+            0.1,
+            1,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batfx_rolotianew1/batfx_distortion1",
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_castingyellow2/batfx_castingyellow2",
+            "batfx_rolotianew1/batfx_stuncast1",
+            "batsfx_prefab/batsfx_slash1",
+            "batfx_merlinregular1/batfx_merlinstun1",
+            "batfx_stun2/batfx_stun2"
+          ],
+          "sortOrderOffset": [
+            -2,
+            2,
+            -2,
+            -2,
+            2,
+            2,
+            2
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "HasteUp30Percent": {
+            "class": "Buff",
+            "behaviors": [
+              "StatOnly"
+            ],
+            "behaviorOverrides": [
+              {
+                "flatStatBonuses": {
+                  "Haste": -429
+                }
+              }
+            ],
+            "duration": -1,
+            "showAsTimer": false,
+            "stackName": "Accelerated",
+            "tags": [
+              "Accelerated30Percent"
+            ],
+            "noIconShownOnBattleStatus": true,
+            "iconSpriteName": "IconBrownSpeedUpClock01"
+          },
+          "LockSkillUse": {
+            "class": "Buff",
+            "stackName": "SkillLocked",
+            "duration": -1,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "isHiddenFromPlayers": true
+          },
+          "RemoveBuffs": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "SleepImmunityOnce": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity"
+            ],
+            "stackName": "SleepImmunityOnce",
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Sleep"
+                ],
+                "useLimit": 1
+              }
+            ],
+            "duration": -1,
+            "showAsTimer": true,
+            "tags": [
+              "SleepImmuneTemp"
+            ],
+            "iconSpriteName": "IconRedSleepInvalidZs01"
+          },
+          "Stun100StunAll": {
+            "class": "Buff",
+            "stackName": "HardStun",
+            "behaviors": [
+              "Stun"
+            ],
+            "behaviorOverrides": [
+              {
+                "stunTU": 100,
+                "abilityEffect": "StunStatus1"
+              }
+            ],
+            "tags": [
+              "HardStun",
+              "Stun100StunAll"
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "Stun150": {
+            "class": "Buff",
+            "stackName": "Stun",
+            "behaviors": [
+              "Stun"
+            ],
+            "behaviorOverrides": [
+              {
+                "stunTU": 150,
+                "abilityEffect": "StunStatus1"
+              }
+            ],
+            "duration": 0,
+            "tags": [
+              "Stun"
+            ],
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "NoStunAbsorberInEnemyTeam": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "checkEnemyTeamOfMonster": true,
+              "enemyTeamMonsterConditionMatchesNeeded": {
+                "IsStunAbsorber": 1
+              }
+            }
+          },
+          "SkillNotLocked": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "SkillLocked"
+              ]
+            }
+          }
+        },
+        "localization": {
+          "name": "Chrono Chaos",
+          "description": "Stuns all enemies for 150TU. Then if there is no enemy Stun Absorber, all other allies are Purified, granted Sleep Wards, Quickened by 30%, Stunned for 100TU, and then this skill becomes locked while this unit remains on the battlefield.\n\n-This Quicken will overwrite the effects of previous quicken skills on those allies.\n-Any ally Stun immunities and ally Wards are ignored, and ally Stun Absorbers do not redirect this Stun.\n-Sleep Ward prevents Sleep from being applied once, then is removed. Sleep Wards cannot stack.",
+          "selected": "Stuns all, can Purify, Quicken, Stun & Ward allies"
+        }
+      },
+      "TimeStrikeAllPlusARolotiaNew": {
+        "id": "TimeStrikeAllPlusARolotiaNew",
+        "found": true,
+        "ability": {
+          "name": "TimeStrikeAllPlusARolotiaNew",
+          "class": "Ability",
+          "abilityScalor": -2,
+          "conditionalAbilityScalors": [
+            4
+          ],
+          "config": "TimeStrikeAllPlusARolotiaNew",
+          "tuCost": 130,
+          "useLimit": 0,
+          "spiritCost": 0,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "AllEnemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "TimestrikeDamageBoost"
+              ],
+              "damageFlags": [
+                "IgnoreSkin"
+              ]
+            },
+            {
+              "buffs": [
+                "StunAllCooldown",
+                "SpiritLossF"
+              ],
+              "applyConditions": "CurrentTUGreaterThan100",
+              "showMissConditions": "ShowNoMiss",
+              "buffBackMode": true,
+              "skipAbilityEffect": true,
+              "applyToTargetOnly": true
+            }
+          ],
+          "attackScalors": [
+            "GoodVs100Tu"
+          ],
+          "enemyEventType": "Hit",
+          "useCondition": "NotSpiritDebtCooldown",
+          "abilityEffect": "SmallMissRolotia1",
+          "conditionedAbilityEffects": [
+            "RolotiaNewGiant1"
+          ],
+          "flags": [
+            "Timestrike",
+            "StealthWorthy"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "allEnemies": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            3.9,
+            0
+          ],
+          "prefabs": [
+            "batfx_bluntimpact1/batfx_bluntimpact1",
+            "batsfx_prefab/batsfx_impactsmall1"
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            true
+          ],
+          "scale": [
+            0.4,
+            1
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "SpiritLossF": {
+            "class": "Buff",
+            "behaviors": [
+              "AddSpirit"
+            ],
+            "behaviorOverrides": [
+              {
+                "percentOfMax": -0.1
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "StunAllCooldown": {
+            "class": "Buff",
+            "stackName": "SpiritDebtCooldown",
+            "duration": 200,
+            "applyConditions": "AllySpirit0",
+            "isHiddenFromPlayers": false,
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "iconSpriteName": "IconBlueCountdownClock3"
+          }
+        },
+        "attackScalors": {
+          "GoodVs100Tu": {
+            "class": "AttackScalor",
+            "targetCondition": "CurrentTUGreaterThan100"
+          }
+        },
+        "conditions": {
+          "CurrentTUGreaterThan100": {
+            "class": "MonsterConditions",
+            "currentTUGreaterThan": 100
+          },
+          "NotSpiritDebtCooldown": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "SpiritDebtCooldown"
+              ]
+            }
+          }
+        },
+        "localization": {
+          "name": "Giga Time Strike",
+          "description": "500% damage to all enemies if they have 100TU or more in the turn order. This attack ignores the Counter Stance status effect and the effects of Skin passive skills. Allies lose 1 Spirit for each enemy at 100TU or more hit by this attack. This skill becomes locked for 200TU after use if Allies would lose more Spirit than they have in this way. Other effects that would cause Allies to lose Spirit may apply before Spirit lost by this skill.",
+          "selected": "500% damage against targets with 100+ TU"
+        }
+      },
+      "BloodfuryPullbackSelfARolotiaNew": {
+        "id": "BloodfuryPullbackSelfARolotiaNew",
+        "found": true,
+        "ability": {
+          "name": "BloodfuryPullbackSelfARolotiaNew",
+          "class": "Ability",
+          "config": "BloodfuryPullbackSelfARolotiaNew",
+          "tuCost": 0,
+          "useLimit": 0,
+          "spiritGain": 3,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "SelfOnly",
+          "components": [
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "SendToFrontOfReinforcements",
+                "RemoveBuffs"
+              ],
+              "applyConditions": "AllyHasReinforcements",
+              "showMissConditions": "ShowNoMiss"
+            },
+            {
+              "buffs": [
+                "Add4AirMinionNext"
+              ],
+              "applyConditions": "IsAlone",
+              "showMissConditions": "ShowNoMiss",
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "Add3AirMinionNext"
+              ],
+              "applyConditions": "2AlliesLeftNot3",
+              "showMissConditions": "ShowNoMiss",
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "Add2AirMinionNext"
+              ],
+              "applyConditions": "3AlliesLeftNot4",
+              "showMissConditions": "ShowNoMiss",
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "Add1AirMinionNext"
+              ],
+              "applyConditions": "4AlliesLeftNoReinforcements",
+              "showMissConditions": "ShowNoMiss",
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "SendToBackOfReinforcements",
+                "RemoveBuffs"
+              ]
+            }
+          ],
+          "useCondition": "Kills1",
+          "sourceEventType": "Finish",
+          "abilityEffect": "RolotiaNewPullBack1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "selfOnly": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.4,
+            0,
+            0,
+            0.2,
+            0,
+            0,
+            0.3,
+            0.4,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batsfx_prefab/batsfx_whoosh2",
+            "batfx_rolotianew1/batfx_rolotiaclock7",
+            "batfx_ripplebluelow/batfx_ripplebluelow",
+            "batsfx_prefab/batsfx_life2",
+            "batfx_rolotianew1/batfx_roloback1",
+            "batfx_castingblue2/batfx_castingblue2",
+            "batsfx_prefab/batsfx_summon1",
+            "batsfx_prefab/batsfx_timestrike1",
+            "batfx_ripplebluelow/batfx_ripplebluelow",
+            "batsfx_prefab/batsfx_heal1",
+            "batfx_magicnuke3/batfx_magicnuke3"
+          ],
+          "sortOrderOffset": [
+            2,
+            2,
+            -2,
+            2,
+            2,
+            -2,
+            2,
+            2,
+            2,
+            -2,
+            -2,
+            4
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            false
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "Add1AirMinionNext": {
+            "class": "Buff",
+            "behaviors": [
+              "SummonMonster"
+            ],
+            "behaviorOverrides": [
+              {
+                "monsterType": "AirMinion01",
+                "frontOfLineup": true
+              }
+            ],
+            "applyConditions": "NotKnockbackImmune",
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "Add2AirMinionNext": {
+            "class": "Buff",
+            "behaviors": [
+              "SummonMonster",
+              "SummonMonster"
+            ],
+            "behaviorOverrides": [
+              {
+                "monsterType": "AirMinion01",
+                "frontOfLineup": true
+              },
+              {
+                "monsterType": "AirMinion01",
+                "frontOfLineup": true
+              }
+            ],
+            "applyConditions": "NotKnockbackImmune",
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "Add3AirMinionNext": {
+            "class": "Buff",
+            "behaviors": [
+              "SummonMonster",
+              "SummonMonster",
+              "SummonMonster"
+            ],
+            "behaviorOverrides": [
+              {
+                "monsterType": "AirMinion01",
+                "frontOfLineup": true
+              },
+              {
+                "monsterType": "AirMinion01",
+                "frontOfLineup": true
+              },
+              {
+                "monsterType": "AirMinion01",
+                "frontOfLineup": true
+              }
+            ],
+            "applyConditions": "NotKnockbackImmune",
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "Add4AirMinionNext": {
+            "class": "Buff",
+            "behaviors": [
+              "SummonMonster",
+              "SummonMonster",
+              "SummonMonster",
+              "SummonMonster"
+            ],
+            "behaviorOverrides": [
+              {
+                "monsterType": "AirMinion01",
+                "frontOfLineup": true
+              },
+              {
+                "monsterType": "AirMinion01",
+                "frontOfLineup": true
+              },
+              {
+                "monsterType": "AirMinion01",
+                "frontOfLineup": true
+              },
+              {
+                "monsterType": "AirMinion01",
+                "frontOfLineup": true
+              }
+            ],
+            "applyConditions": "NotKnockbackImmune",
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "RemoveBuffs": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "SendToBackOfReinforcements": {
+            "class": "Buff",
+            "stackName": "Knockback",
+            "behaviors": [
+              "SendToReinforcements"
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "SendToFrontOfReinforcements": {
+            "class": "Buff",
+            "stackName": "Pushback",
+            "behaviors": [
+              "SendToReinforcements"
+            ],
+            "behaviorOverrides": [
+              {
+                "frontOfLineup": true
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "2AlliesLeftNot3": {
+            "class": "MonsterConditions",
+            "allyTeamSize": 2,
+            "not": {
+              "class": "MonsterConditions",
+              "allyTeamSize": 3
+            }
+          },
+          "3AlliesLeftNot4": {
+            "class": "MonsterConditions",
+            "allyTeamSize": 3,
+            "not": {
+              "class": "MonsterConditions",
+              "allyTeamSize": 4
+            }
+          },
+          "4AlliesLeftNoReinforcements": {
+            "class": "MonsterConditions",
+            "allyTeamSize": 4,
+            "not": {
+              "class": "MonsterConditions",
+              "allyReinforcements": 1
+            }
+          },
+          "AllyHasReinforcements": {
+            "class": "MonsterConditions",
+            "allyReinforcements": 1
+          },
+          "IsAlone": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "allyTeamSize": 2
+            }
+          },
+          "Kills1": {
+            "class": "MonsterConditions",
+            "killsMade": 1
+          }
+        },
+        "localization": {
+          "name": "Savage Step Back",
+          "description": "Pulls the user away from the battlefield to be next in line of your reinforcements. If there are no ally reinforcements, adds enough Denmoris to the ally team to still pull the user away to reinforcements (max 4 if the user is alone on the battlefield). Usable if the user has defeated 1+ units with attacks while on the battlefield.",
+          "selected": "Sends user to be next in reinforcements"
+        }
+      }
+    },
+    "passives": {
+      "Stun2RandomHealSelfEntranceA": {
+        "id": "Stun2RandomHealSelfEntranceA",
+        "found": false
+      },
+      "PlusAttackBoostLv3": {
+        "id": "PlusAttackBoostLv3",
+        "found": false
+      },
+      "AttackUpTargetEquippedMaceLv3": {
+        "id": "AttackUpTargetEquippedMaceLv3",
+        "found": false
+      },
+      "PlusHPBoostLv3": {
+        "id": "PlusHPBoostLv3",
+        "found": false
+      },
+      "AddWeaponPrefGreatSword": {
+        "id": "AddWeaponPrefGreatSword",
+        "found": false
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": {
+      "class": "MonsterConditions",
+      "elements": [
+        "Air"
+      ]
+    }
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "RolotiaNew01",
+    "family": "RolotiaNew",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "RolotiaNew01",
+    "family": "RolotiaNew",
+    "class": "Monster",
+    "leaderBuff": "AttackAndHPUp6Air",
+    "leaderBuffCondition": "IsAir",
+    "activeSkills": {
+      "0": "PoisonTouchStun50ARolotiaNew",
+      "1": "StunAllButSelfARolotiaNew",
+      "2": "TimeStrikeAllPlusARolotiaNew",
+      "3": "BloodfuryPullbackSelfARolotiaNew"
+    },
+    "passives": {
+      "0": "Stun2RandomHealSelfEntranceA",
+      "2": "PlusAttackBoostLv3",
+      "3": "AttackUpTargetEquippedMaceLv3",
+      "4": "PlusHPBoostLv3",
+      "5": "AddWeaponPrefGreatSword"
+    },
+    "cost": 28,
+    "baseAttack": 1202,
+    "baseMaxHp": 5200,
+    "speed": 1,
+    "element": "Air",
+    "weaponPref": "Katana",
+    "weaponPivotIndex": 0,
+    "secure": 1,
+    "superEvolve1": "RolotiaNew02",
+    "aiTargetPickWeight": 1,
+    "stars": 5,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 0,
+    "battleOrbImageFlip": 0,
+    "attackType": "Bash",
+    "visible": 1,
+    "formTwitterShare": 1,
+    "summonableMonsters": [
+      "AirMinion01"
+    ],
+    "summonableMatchSource": [
+      false
+    ],
+    "skillVoices": {
+      "0": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "1": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "2": [
+        9,
+        10,
+        11,
+        12
+      ],
+      "3": [
+        13,
+        14,
+        15,
+        16
+      ]
+    },
+    "damageVoices": [
+      17,
+      18,
+      19,
+      20
+    ],
+    "deathVoices": [
+      21,
+      22,
+      23,
+      24
+    ],
+    "victoryVoices": [
+      25,
+      26
+    ],
+    "lineupVoices": [
+      27,
+      28,
+      29,
+      30,
+      31,
+      32
+    ],
+    "evolutionVoices": [
+      133
+    ],
+    "trainVoices": [
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42
+    ],
+    "titleVoices": [
+      43
+    ],
+    "gachaVoices": [
+      44
+    ],
+    "loginVoices": [
+      45
+    ],
+    "tapVoices": [
+      46,
+      47,
+      48
+    ],
+    "idleVoices": [
+      49
+    ]
+  },
+  "_build": {
+    "scriptVersion": "3-incremental-checkpoint",
+    "sourceHash": "3d696269e7e21262916b93497131d788b97368a6d859c6c35f65bbe24d9cd35a",
+    "dependencyHash": "2b547c742dd281f0756855d37c8423dfb55001cad47501e2bccb3ef7a15b2a22",
+    "generatedAt": 1778013995
+  }
+}
