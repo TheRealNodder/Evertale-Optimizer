@@ -1,0 +1,621 @@
+{
+  "schemaVersion": 3,
+  "order": 77,
+  "id": "caped-skeleton-01",
+  "name": "CapedSkeletonB01",
+  "category": "bosse",
+  "rarity": null,
+  "stars": 4,
+  "evolvedStars": 4,
+  "element": "Dark",
+  "weaponType": "Axe",
+  "stats": {
+    "atk": 580,
+    "hp": 3530,
+    "spd": 411,
+    "cost": 999
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/CapedSkeletonB01.png",
+  "refs": {
+    "activeSkills": [
+      "PoisonAttackA",
+      "PoisonEaterA",
+      "LifeFlipAllyA"
+    ],
+    "passives": [
+      "HoldGround"
+    ],
+    "activeSkillsAI": {
+      "2": "LifeFlipAllyANPC_AI"
+    },
+    "aiSequence": null,
+    "leaderBuff": null,
+    "leaderBuffCondition": null,
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "PoisonAttackA": {
+        "id": "PoisonAttackA",
+        "found": true,
+        "ability": {
+          "name": "PoisonAttackA",
+          "class": "Ability",
+          "abilityScalor": 0,
+          "config": "PoisonAttackA",
+          "tuCost": 130,
+          "useLimit": 0,
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {},
+            {
+              "buffs": [
+                "Poison",
+                "BurnImmunityTempForRevenge"
+              ]
+            }
+          ],
+          "immuneSuggestionCondition": "PoisonImmunityNotFromStealth",
+          "enemyEventType": "Hit",
+          "abilityEffect": "PoisonAttackMeleeBasic"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.3,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batfx_slash6/batfx_slash6",
+            "batfx_slashtrail1/batfx_slashtrail1",
+            "batsfx_prefab/batsfx_slash1"
+          ],
+          "sortOrderOffset": [
+            2,
+            2,
+            -2
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            true,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "BurnImmunityTempForRevenge": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Burn",
+                  "BurnAfterTurn",
+                  "BurnAtEndOfTurn"
+                ],
+                "dontShowText": true
+              },
+              {
+                "name": "BurnAfterTurn"
+              },
+              {
+                "name": "BurnSelfOnHit"
+              }
+            ],
+            "duration": 1,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "tags": [
+              "BurnImmune"
+            ],
+            "stackName": "BurnImmunityTempForRevenge",
+            "isHiddenFromPlayers": true
+          },
+          "Poison": {
+            "class": "Buff",
+            "stackName": "Poison",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "DamageOverTime"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "percentOfAttack": 0.0025,
+                "damageColor": "Green",
+                "abilityEffect": "PoisonDamage",
+                "extraDamageFlag": "Poison"
+              }
+            ],
+            "tags": [
+              "Poison"
+            ],
+            "canBePurified": true,
+            "duration": -1,
+            "applyConditions": "NotSuperOrMegaPoisoned",
+            "showAsTimer": false,
+            "statusEffect": "PoisonStatus",
+            "statusEffectOffset": 0.1,
+            "damageType": "Poison",
+            "noIconShownOnBattleStatus": true,
+            "iconSpriteName": "IconPurplePoison01"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "PoisonImmunityNotFromStealth": {
+            "class": "MonsterConditions",
+            "monsterTags": [
+              "PoisonImmune"
+            ],
+            "or": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "PoisonImmunity"
+              ],
+              "or": {
+                "class": "MonsterConditions",
+                "monsterTags": [
+                  "LethalPoison"
+                ]
+              }
+            }
+          }
+        },
+        "localization": {
+          "name": "Poison Attack",
+          "description": "Damages 1 enemy and then poisons them.",
+          "selected": "Damage and poisons target\n(Will overwrite other status effects)"
+        }
+      },
+      "PoisonEaterA": {
+        "id": "PoisonEaterA",
+        "found": true,
+        "ability": {
+          "name": "PoisonEaterA",
+          "class": "Ability",
+          "abilityScalor": -2,
+          "conditionalAbilityScalors": [
+            3
+          ],
+          "config": "PoisonEaterA",
+          "tuCost": 200,
+          "useLimit": 0,
+          "spiritCost": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "PoisonEaterDamageBoost"
+              ]
+            }
+          ],
+          "attackScalors": [
+            "GoodVsPoisoned"
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "SmallHitRanged1",
+          "conditionedAbilityEffects": [
+            "PoisonEaterAbility2R",
+            "PoisonEaterAbility2R"
+          ],
+          "flags": [
+            "PoisonEater",
+            "StealthWorthy"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.8,
+            0
+          ],
+          "prefabs": [
+            "batfx_bluntimpact1/batfx_bluntimpact1",
+            "batsfx_prefab/batsfx_impactsmall1"
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            true
+          ],
+          "scale": [
+            0.4,
+            1
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {
+          "GoodVsPoisoned": {
+            "class": "AttackScalor",
+            "targetCondition": "IsPoisoned"
+          }
+        },
+        "conditions": {},
+        "localization": {
+          "name": "Poison Devour",
+          "description": "400% damage to 1 enemy if they are poisoned.",
+          "selected": "400% damage to poisoned target"
+        }
+      },
+      "LifeFlipAllyA": {
+        "id": "LifeFlipAllyA",
+        "found": true,
+        "ability": {
+          "name": "LifeFlipAllyA",
+          "class": "Ability",
+          "config": "LifeFlipAllyA",
+          "tuCost": 130,
+          "useLimit": 1,
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Ally",
+          "components": [
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "LifeFlip"
+              ]
+            }
+          ],
+          "friendlyEventType": "Hit",
+          "abilityEffect": "HealAlly1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "friendlyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0.3,
+            0,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_castinggreen1/batfx_castinggreen1",
+            "batfx_castinggreen2/batfx_castinggreen2",
+            "batfx_ripplebluelow/batfx_ripplebluelow",
+            "batsfx_prefab/batsfx_heal1",
+            "batfx_healbottom1/batfx_healbottom1",
+            "batfx_healtop1/batfx_healtop1"
+          ],
+          "sortOrderOffset": [
+            2,
+            -2,
+            2,
+            -2,
+            -2,
+            -2,
+            2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            false,
+            true,
+            false,
+            false
+          ],
+          "noHitReactionVoice": true
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "LifeFlip": {
+            "class": "Buff",
+            "behaviors": [
+              "AdjustHp"
+            ],
+            "behaviorOverrides": [
+              {
+                "lifeFlip": true,
+                "abilityEffect": "Blank"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {},
+        "localization": {
+          "name": "Life Flip Ally",
+          "description": "Exchanges 1 ally's current HP with the amount of HP they have currently lost. Usable once per battle.",
+          "selected": "Exchanges 1 ally's current HP with HP lost"
+        }
+      }
+    },
+    "passives": {
+      "HoldGround": {
+        "id": "HoldGround",
+        "found": false
+      }
+    },
+    "activeSkillsAI": {
+      "2": {
+        "id": "LifeFlipAllyANPC_AI",
+        "found": true,
+        "ai": {
+          "class": "AbilityAI",
+          "baseAITargetingWeight": 0.5,
+          "globalScalorsToIgnore": [
+            "CurrentTULessThan200",
+            "HPAbove1Percent",
+            "ElementWeakness",
+            "IsSleeper",
+            "ActiveStunAndAllyNoAbsorb",
+            "IsBurning",
+            "HasRevenge",
+            "HasNastyRevenge",
+            "HasSkin",
+            "IsActiveStun",
+            "HPBelow5Percent",
+            "0SpiritDamageReducerAt0Spirit"
+          ],
+          "aiTargetingMonsterConditions": {
+            "HPBelow30Percent": 30,
+            "IsProtecting": 1.5,
+            "IsDuration": 1.4,
+            "RarityGreaterThan3": 1.1,
+            "RarityGreaterThan4": 1.1,
+            "RarityGreaterThan5": 1.1,
+            "IsDesperate": 0.25,
+            "IsOrcanix": 0
+          }
+        }
+      }
+    },
+    "aiSequence": null,
+    "leaderCondition": null
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "CapedSkeletonB01",
+    "family": "CapedSkeletonB",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "CapedSkeletonB01",
+    "class": "Monster",
+    "family": "CapedSkeletonB",
+    "activeSkills": {
+      "0": "PoisonAttackA",
+      "1": "PoisonEaterA",
+      "2": "LifeFlipAllyA"
+    },
+    "passives": {
+      "0": "HoldGround"
+    },
+    "activeSkillsAI": {
+      "2": "LifeFlipAllyANPC_AI"
+    },
+    "cost": 999,
+    "baseAttack": 580,
+    "baseMaxHp": 3530,
+    "speed": 411,
+    "element": "Death",
+    "weaponPref": "Axe",
+    "weaponPivotIndex": 0,
+    "walkSound": "TestSound",
+    "secure": 1,
+    "aiTargetPickWeight": 1,
+    "stars": 4,
+    "evolvedStars": 4,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 1,
+    "battleOrbImageFlip": 0,
+    "skillVoices": {
+      "0": [
+        1
+      ],
+      "1": [
+        3
+      ],
+      "2": [
+        5
+      ]
+    },
+    "damageVoices": [
+      7
+    ],
+    "deathVoices": [
+      9
+    ],
+    "victoryVoices": [
+      10
+    ]
+  },
+  "_build": {
+    "scriptVersion": "3-incremental-checkpoint",
+    "sourceHash": "a6ce60918b4d8a743f49f0ff769f916510c59e49b4af09cab57e97d05ac1eca8",
+    "dependencyHash": "092b2e54ea396375d116ac79f65ea336ea5a24883022d317be7b6d8db664e6d7",
+    "generatedAt": 1778014031
+  }
+}

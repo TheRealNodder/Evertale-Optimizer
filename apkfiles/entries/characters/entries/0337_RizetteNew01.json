@@ -1,0 +1,888 @@
+{
+  "schemaVersion": 3,
+  "order": 337,
+  "id": "rizette-new-01",
+  "name": "RizetteNew01",
+  "category": "character",
+  "rarity": null,
+  "stars": 5,
+  "evolvedStars": 6,
+  "element": "Light",
+  "weaponType": "Sword",
+  "stats": {
+    "atk": 991,
+    "hp": 6250,
+    "spd": 168,
+    "cost": 28
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/RizetteNew01.png",
+  "refs": {
+    "activeSkills": [
+      "DrainAttackDoubleARizetteNew",
+      "BasicAttackAllACooldownRizetteNew",
+      "DesperateStrikeDoubleARizetteNew"
+    ],
+    "passives": [
+      "HoldGroundRizetteNew",
+      "AttackPlusSurvivor",
+      "PlusHPBoostLv3",
+      "Stun20TUMinus",
+      "PlusAttackBoostLv3",
+      "AddWeaponPrefMace"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": "BonusSpiritStartB",
+    "leaderBuffCondition": "AlwaysTrue",
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "DrainAttackDoubleARizetteNew": {
+        "id": "DrainAttackDoubleARizetteNew",
+        "found": true,
+        "ability": {
+          "name": "DrainAttackDoubleARizetteNew",
+          "class": "Ability",
+          "abilityScalor": 0,
+          "config": "DrainAttackDoubleARizetteNew",
+          "tuCost": 160,
+          "useLimit": 0,
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "drainPercent": 1.0,
+              "drainEffect": "SmallHeal1"
+            }
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "RizetteShock1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.3,
+            0.5,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_RizetteCast1/batfx_RizetteCast1",
+            "batfx_RizetteShock1/batfx_RizetteShock1",
+            "batfx_bluntimpact1/batfx_bluntimpact1",
+            "batsfx_prefab/batsfx_bluntimpact1"
+          ],
+          "sortOrderOffset": [
+            -2,
+            3,
+            3,
+            1,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {},
+        "conditions": {},
+        "localization": {
+          "name": "Drain Shock",
+          "description": "Damage to 2 enemies, and heals the user for 100% of total damage dealt. Enemies damaged by this attack are stunned for 50TU.",
+          "selected": "Damage & stun 2 enemies, heal user"
+        }
+      },
+      "BasicAttackAllACooldownRizetteNew": {
+        "id": "BasicAttackAllACooldownRizetteNew",
+        "found": true,
+        "ability": {
+          "name": "BasicAttackAllACooldownRizetteNew",
+          "class": "Ability",
+          "abilityScalor": 0,
+          "config": "BasicAttackAllACooldownRizetteNew",
+          "tuCost": 200,
+          "useLimit": 0,
+          "spiritCost": 3,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "AllEnemy",
+          "components": [
+            "Damage",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "AttackAllCooldownRizetteNew"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "Overwatch",
+                "BurnImmunityTempForRevenge"
+              ],
+              "applyConditions": "IsNotOverwatchOrAlreadyOverwatched",
+              "applyToSourceOnly": true,
+              "showMissConditions": "ShowNoMiss",
+              "skipAbilityEffect": true
+            }
+          ],
+          "useCondition": "AttackAllCooledDown",
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "RizetteShock1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "allEnemies": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.3,
+            0.5,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_RizetteCast1/batfx_RizetteCast1",
+            "batfx_RizetteShock1/batfx_RizetteShock1",
+            "batfx_bluntimpact1/batfx_bluntimpact1",
+            "batsfx_prefab/batsfx_bluntimpact1"
+          ],
+          "sortOrderOffset": [
+            -2,
+            3,
+            3,
+            1,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "AttackAllCooldownRizetteNew": {
+            "class": "Buff",
+            "stackName": "AttackAllCooldown",
+            "duration": 200,
+            "isHiddenFromPlayers": false,
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "iconSpriteName": "IconBlueCountdownClock3"
+          },
+          "BurnImmunityTempForRevenge": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Burn",
+                  "BurnAfterTurn",
+                  "BurnAtEndOfTurn"
+                ],
+                "dontShowText": true
+              },
+              {
+                "name": "BurnAfterTurn"
+              },
+              {
+                "name": "BurnSelfOnHit"
+              }
+            ],
+            "duration": 1,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "tags": [
+              "BurnImmune"
+            ],
+            "stackName": "BurnImmunityTempForRevenge",
+            "isHiddenFromPlayers": true
+          },
+          "Overwatch": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "BuffWhenMonsterHurt",
+              "RemoveOnHurt"
+            ],
+            "stackName": "Stance",
+            "behaviorOverrides": [
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "selfBuffs": [
+                  "GiveTurnOverwatch",
+                  "AlreadyOverwatched"
+                ],
+                "cancelFromDamageTypes": [
+                  "BuffDamage"
+                ],
+                "cancelFromDamageFlags": [
+                  "IgnoreSkin",
+                  "Sneak",
+                  "RemoveStatus"
+                ]
+              },
+              {
+                "cancelFromDamageTypes": [
+                  "BuffDamage"
+                ],
+                "cancelFromDamageFlags": [
+                  "IgnoreSkin",
+                  "Sneak",
+                  "RemoveStatus"
+                ]
+              }
+            ],
+            "applyConditions": "IsNotOverwatch",
+            "duration": 150,
+            "showAsTimer": true,
+            "iconSpriteName": "IconOverwatch01"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "AttackAllCooledDown": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "AttackAllCooldown"
+              ]
+            }
+          },
+          "IsNotOverwatchOrAlreadyOverwatched": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "Stance"
+              ],
+              "or": {
+                "class": "MonsterConditions",
+                "buffStackNames": [
+                  "AlreadyInStance"
+                ]
+              }
+            }
+          }
+        },
+        "localization": {
+          "name": "Counter Shock",
+          "description": "Damage to all enemies. Enemies damaged by this attack are stunned for 50TU. The user is also granted the Counter Stance status effect. This will overwrite other status effects on the user. For 150TU, the next time the unit with counter stance takes damage from an enemy attack, it will become their turn. Counter stance cannot be gained if the user already has the Counter Stance status effect or has gotten the current turn from Counter Stance. This skill becomes locked for 200TU after use.",
+          "selected": "Damage & 50TU stun, user gains counter stance\n(Will overwrite other status effects)"
+        }
+      },
+      "DesperateStrikeDoubleARizetteNew": {
+        "id": "DesperateStrikeDoubleARizetteNew",
+        "found": true,
+        "ability": {
+          "name": "DesperateStrikeDoubleARizetteNew",
+          "class": "Ability",
+          "abilityScalor": 2,
+          "conditionalAbilityScalors": [
+            3
+          ],
+          "config": "DesperateStrikeDoubleARizetteNew",
+          "tuCost": 160,
+          "useLimit": 0,
+          "spiritCost": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "DesperateDamageBoost"
+              ]
+            }
+          ],
+          "useCondition": "HPBelow50Percent",
+          "flags": [
+            "Desperate"
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "DesperateDoubleNewRizette",
+          "attackScalors": [
+            "HPBelow25Percent"
+          ],
+          "conditionedAbilityEffects": [
+            "DesperateDoubleNewRizette"
+          ],
+          "recommendEffectWhenUsable": 1
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.6,
+            0.5,
+            0,
+            0.1,
+            0.2,
+            0.5,
+            0.5,
+            0.15,
+            0.9,
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_timestrike1",
+            "batfx_desperatestrikeSSR/batfx_desperatestrikeSSR",
+            "batfx_jumpsmoke1/batfx_jumpsmoke1",
+            "batfx_rizettenuke1/batfx_rizettenuke1",
+            "batfx_tailwindblue2/batfx_tailwindblue2",
+            "batfx_rizettequick/batfx_rizettequick1",
+            "batfx_rizettequick/batfx_rizettequick2",
+            "batfx_rizettequick/batfx_rizettequick1",
+            "batfx_rizettequick/batfx_rizettequick2",
+            "batsfx_prefab/batsfx_slashsheen",
+            "batfx_impact3/batfx_impact3",
+            "batfx_slashtrail2/batfx_slashtrail2",
+            "batfx_spotred/batfx_spotred",
+            "batfx_groundimpact/batfx_groundimpact",
+            "batsfx_prefab/batsfx_bluntimpact1",
+            "batfx_jumpsmoke1/batfx_jumpsmoke1"
+          ],
+          "sortOrderOffset": [
+            2,
+            -2,
+            2,
+            2,
+            100,
+            100,
+            100,
+            100,
+            100,
+            1,
+            200,
+            200,
+            -2,
+            -2,
+            2,
+            2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            false,
+            false,
+            true,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            false,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {
+          "HPBelow25Percent": {
+            "class": "AttackScalor",
+            "sourceCondition": "HPBelow25Percent"
+          },
+          "HPBelow50Percent": {
+            "class": "AttackScalor",
+            "sourceCondition": "HPBelow50Percent"
+          }
+        },
+        "conditions": {
+          "HPBelow25Percent": {
+            "class": "MonsterConditions",
+            "hpLessThanPercent": 0.2500001
+          },
+          "HPBelow50Percent": {
+            "class": "MonsterConditions",
+            "hpLessThanPercent": 0.5000001
+          }
+        },
+        "localization": {
+          "name": "Desperate Surge",
+          "description": "300% damage to 2 enemies. Usable only if the user's HP is at 50% or less. 400% damage if the user's HP is at 25% or less. Enemies damaged by this attack are stunned for 50TU.",
+          "selected": "300%+ damage & stun, usable at 50% or less HP"
+        }
+      }
+    },
+    "passives": {
+      "HoldGroundRizetteNew": {
+        "id": "HoldGroundRizetteNew",
+        "found": false
+      },
+      "AttackPlusSurvivor": {
+        "id": "AttackPlusSurvivor",
+        "found": false
+      },
+      "PlusHPBoostLv3": {
+        "id": "PlusHPBoostLv3",
+        "found": false
+      },
+      "Stun20TUMinus": {
+        "id": "Stun20TUMinus",
+        "found": false
+      },
+      "PlusAttackBoostLv3": {
+        "id": "PlusAttackBoostLv3",
+        "found": false
+      },
+      "AddWeaponPrefMace": {
+        "id": "AddWeaponPrefMace",
+        "found": false
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": {
+      "class": "MonsterConditions"
+    }
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "RizetteNew01",
+    "family": "RizetteNew",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "RizetteNew01",
+    "family": "RizetteNew",
+    "class": "Monster",
+    "leaderBuff": "BonusSpiritStartB",
+    "leaderBuffCondition": "AlwaysTrue",
+    "activeSkills": {
+      "0": "DrainAttackDoubleARizetteNew",
+      "1": "BasicAttackAllACooldownRizetteNew",
+      "2": "DesperateStrikeDoubleARizetteNew"
+    },
+    "passives": {
+      "0": "HoldGroundRizetteNew",
+      "1": "AttackPlusSurvivor",
+      "2": "PlusHPBoostLv3",
+      "3": "Stun20TUMinus",
+      "4": "PlusAttackBoostLv3",
+      "5": "AddWeaponPrefMace"
+    },
+    "cost": 28,
+    "baseAttack": 991,
+    "baseMaxHp": 6250,
+    "speed": 168,
+    "element": "Life",
+    "weaponPref": "Sword",
+    "weaponPivotIndex": 0,
+    "secure": 1,
+    "superEvolve1": "RizetteNew02",
+    "aiTargetPickWeight": 1,
+    "stars": 5,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 0,
+    "battleOrbImageFlip": 0,
+    "attackType": "Weapon",
+    "visible": 1,
+    "formTwitterShare": 1,
+    "leaderStartSpiritGain": 2,
+    "skillVoices": {
+      "0": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "1": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "2": [
+        9,
+        10,
+        11,
+        12
+      ],
+      "3": [
+        13,
+        14,
+        15,
+        16
+      ]
+    },
+    "damageVoices": [
+      17,
+      18,
+      19,
+      20
+    ],
+    "deathVoices": [
+      21,
+      22,
+      23,
+      24
+    ],
+    "victoryVoices": [
+      25,
+      26
+    ],
+    "lineupVoices": [
+      27,
+      28,
+      29,
+      30,
+      31,
+      32
+    ],
+    "evolutionVoices": [
+      33
+    ],
+    "trainVoices": [
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43
+    ],
+    "titleVoices": [
+      44
+    ],
+    "gachaVoices": [
+      45
+    ],
+    "loginVoices": [
+      46
+    ],
+    "tapVoices": [
+      47,
+      48,
+      49
+    ],
+    "idleVoices": [
+      50
+    ]
+  },
+  "_build": {
+    "scriptVersion": "3-incremental-checkpoint",
+    "sourceHash": "1fcd957119d069011cbbf0b5ba74ea0fe090d4878a681b0ca10a624c851b113f",
+    "dependencyHash": "f227f23716ef933ae4b79d31da6513687bb806b07722ceaf8dc7b33ceba10268",
+    "generatedAt": 1778013989
+  }
+}

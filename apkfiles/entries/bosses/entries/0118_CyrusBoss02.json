@@ -1,0 +1,688 @@
+{
+  "schemaVersion": 3,
+  "order": 118,
+  "id": "cyrus-boss-02",
+  "name": "CyrusBoss02",
+  "category": "bosse",
+  "rarity": null,
+  "stars": 6,
+  "evolvedStars": 6,
+  "element": "Dark",
+  "weaponType": "Mace",
+  "stats": {
+    "atk": 3000,
+    "hp": 50000,
+    "spd": 500,
+    "cost": 999
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/Cyrus02.png",
+  "refs": {
+    "activeSkills": [
+      "BraveRecklessAttackACyrus",
+      "DespairTouchACyrusBoss",
+      "BraveSlayerbaneDoubleACyrus",
+      "GrantProtectTeammatesACyrusBoss"
+    ],
+    "passives": [
+      "DamageReduceAllNotProtected",
+      "BurnImmunity",
+      "Stun100TUMinus"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": null,
+    "leaderBuffCondition": null,
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "BraveRecklessAttackACyrus": {
+        "id": "BraveRecklessAttackACyrus",
+        "found": true,
+        "ability": {
+          "name": "BraveRecklessAttackACyrus",
+          "class": "Ability",
+          "abilityScalor": 0.5,
+          "conditionalAbilityScalors": [
+            2
+          ],
+          "config": "BraveRecklessAttackACyrus",
+          "tuCost": 100,
+          "useLimit": 0,
+          "nameKey": "BraveRecklessAttackA",
+          "descriptionKey": "BraveRecklessAttackA",
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "selfDamagePercent": 0.15,
+              "selfDamageEffect": "SelfDamageZealous",
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ]
+            }
+          ],
+          "recommendEffectWhenUsable": -2,
+          "enemyEventType": "Hit",
+          "attackScalors": [
+            "GoodIfBrave"
+          ],
+          "abilityEffect": "PoisonAttackCyrus",
+          "conditionedAbilityEffects": [
+            "PoisonAttackCyrus",
+            "PoisonAttackCyrus"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.3,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batfx_impactmagic5/batfx_impactmagic5",
+            "batfx_cyrus2/batfx_cyrus2",
+            "batsfx_prefab/batsfx_slash1"
+          ],
+          "sortOrderOffset": [
+            2,
+            2,
+            -2
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            true,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {
+          "GoodIfBrave": {
+            "class": "AttackScalor",
+            "sourceCondition": "AllyHasNoReinforcements"
+          }
+        },
+        "conditions": {}
+      },
+      "DespairTouchACyrusBoss": {
+        "id": "DespairTouchACyrusBoss",
+        "found": true,
+        "ability": {
+          "name": "DespairTouchACyrusBoss",
+          "class": "Ability",
+          "config": "DespairTouchACyrusBoss",
+          "tuCost": 70,
+          "useLimit": 0,
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "randomBuffFromList": [
+                "SpiritLeak"
+              ],
+              "randomBuffListEffects": [
+                "MidDespairCyrus"
+              ],
+              "checkBuffConditionBeforeApply": true
+            }
+          ],
+          "immuneSuggestionCondition": "IsStatusImmune",
+          "enemyEventType": "Hit",
+          "abilityEffect": "RandomDebuff1",
+          "flags": [
+            "NoDamage"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0.2,
+            0.4,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_gravityball",
+            "batfx_cyrus1/batfx_cyrus1",
+            "batfx_cyrus3/batfx_cyrus3",
+            "batsfx_prefab/batsfx_blaster1"
+          ],
+          "sortOrderOffset": [
+            -5,
+            100,
+            100,
+            0
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            true,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "SpiritLeak": {
+            "class": "Buff",
+            "stackName": "SpiritLeaking",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "BuffOnMonsterTurnEnd"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "selfBuffs": [
+                  "SpiritLossA",
+                  "SpiritLeakRemove"
+                ]
+              }
+            ],
+            "duration": -1,
+            "showAsTimer": true,
+            "iconSpriteName": "IconSpiritLeak01",
+            "canBePurified": true,
+            "textKeyToShowWhenApplied": "SpiritLeakAppliedKey"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "IsStatusImmune": {
+            "class": "MonsterConditions",
+            "monsterTags": [
+              "StatusImmune"
+            ],
+            "or": {
+              "class": "MonsterConditions",
+              "monsterTags": [
+                "LethalPoison"
+              ]
+            }
+          }
+        },
+        "localization": {
+          "name": "Despair",
+          "description": "Grants the Despair status effect to 1 enemy. This will overwrite other status effects on that unit. Despaired units lose 3 Spirit at the end of their next turn.",
+          "selected": "Grants Despair\n(Will overwrite other status effects)"
+        }
+      },
+      "BraveSlayerbaneDoubleACyrus": {
+        "id": "BraveSlayerbaneDoubleACyrus",
+        "found": true,
+        "ability": {
+          "name": "BraveSlayerbaneDoubleACyrus",
+          "class": "Ability",
+          "abilityScalor": -2,
+          "conditionalAbilityScalors": [
+            2,
+            5
+          ],
+          "config": "BraveSlayerbaneDoubleACyrus",
+          "tuCost": 130,
+          "useLimit": 0,
+          "nameKey": "BraveSlayerbaneDoubleA",
+          "descriptionKey": "BraveSlayerbaneDoubleA",
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "SlayerbaneDamageBoost"
+              ]
+            }
+          ],
+          "attackScalors": [
+            "GoodVsKiller1",
+            "BraveVsKiller1"
+          ],
+          "flags": [
+            "Slayerbane",
+            "SlayerbaneDouble"
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "SmallMiss1",
+          "conditionedAbilityEffects": [
+            "CyrusSlayerbane1",
+            "CyrusSlayerbane1"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.85,
+            0
+          ],
+          "prefabs": [
+            "batfx_bluntimpact1/batfx_bluntimpact1",
+            "batsfx_prefab/batsfx_impactsmall1"
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            true
+          ],
+          "scale": [
+            0.4,
+            1
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {
+          "BraveVsKiller1": {
+            "class": "AttackScalor",
+            "targetCondition": "Kills1EnemyHasNoReinforcements"
+          },
+          "GoodVsKiller1": {
+            "class": "AttackScalor",
+            "targetCondition": "Kills1"
+          }
+        },
+        "conditions": {}
+      },
+      "GrantProtectTeammatesACyrusBoss": {
+        "id": "GrantProtectTeammatesACyrusBoss",
+        "found": true,
+        "ability": {
+          "name": "GrantProtectTeammatesACyrusBoss",
+          "class": "Ability",
+          "config": "GrantProtectTeammatesACyrusBoss",
+          "tuCost": 1,
+          "useLimit": 0,
+          "nameKey": "GrantProtectTeammatesA",
+          "descriptionKey": "GrantProtectTeammatesA",
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Ally",
+          "components": [
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "ProtectSourceDamageRemove"
+              ]
+            }
+          ],
+          "friendlyEventType": "Hit",
+          "abilityEffect": "ProtectAlliesCyrus1",
+          "flags": [
+            "Protect"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "friendlyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0.2,
+            0.85,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_gravityball",
+            "batfx_cyrus5/batfx_cyrus5",
+            "batfx_grantprotect1/batfx_grantprotect1",
+            "batsfx_prefab/batsfx_blaster1"
+          ],
+          "sortOrderOffset": [
+            -5,
+            100,
+            100,
+            0
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "ProtectSourceDamageRemove": {
+            "class": "Buff",
+            "behaviors": [
+              "ManipulateTargeting",
+              "RemoveBuffs",
+              "Immunity"
+            ],
+            "behaviorOverrides": [
+              {
+                "redirectToMe": true,
+                "redirectAlways": true,
+                "chanceToBlock": 1.0,
+                "consumeRedirectCountEvenOnSelf": true,
+                "failOnAllSkills": true,
+                "abilityFlagsToIgnore": [
+                  "Stun",
+                  "NoDamage"
+                ],
+                "removeAfterTriggers": 1
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "stackNamesToBlock": [
+                  "Stance"
+                ]
+              }
+            ],
+            "stackName": "Protector",
+            "duration": -1,
+            "applyConditions": "ProtectSourceDamageRemoveNotDenied",
+            "showAsTimer": true,
+            "iconSpriteName": "IconGreenDefenseShield01"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {}
+      }
+    },
+    "passives": {
+      "DamageReduceAllNotProtected": {
+        "id": "DamageReduceAllNotProtected",
+        "found": false
+      },
+      "BurnImmunity": {
+        "id": "BurnImmunity",
+        "found": false
+      },
+      "Stun100TUMinus": {
+        "id": "Stun100TUMinus",
+        "found": false
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": null
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "CyrusBoss02",
+    "family": "CyrusBoss",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "CyrusBoss02",
+    "class": "Monster",
+    "family": "CyrusBoss",
+    "activeSkills": {
+      "0": "BraveRecklessAttackACyrus",
+      "1": "DespairTouchACyrusBoss",
+      "2": "BraveSlayerbaneDoubleACyrus",
+      "3": "GrantProtectTeammatesACyrusBoss"
+    },
+    "passives": {
+      "0": "DamageReduceAllNotProtected",
+      "1": "BurnImmunity",
+      "2": "Stun100TUMinus"
+    },
+    "cost": 999,
+    "baseAttack": 3000,
+    "baseMaxHp": 50000,
+    "speed": 500,
+    "element": "Death",
+    "weaponPref": "Mace",
+    "weaponPivotIndex": 0,
+    "walkSound": "TestSound",
+    "secure": 1,
+    "aiTargetPickWeight": 1,
+    "stars": 6,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 1,
+    "battleOrbImageFlip": 0,
+    "skillVoices": {
+      "0": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "1": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "2": [
+        9,
+        10,
+        11,
+        12
+      ],
+      "3": [
+        13,
+        14,
+        15,
+        16
+      ]
+    },
+    "damageVoices": [
+      17,
+      18,
+      19,
+      20
+    ],
+    "deathVoices": [
+      22,
+      24
+    ]
+  },
+  "_build": {
+    "scriptVersion": "3-incremental-checkpoint",
+    "sourceHash": "4a23823c09b9dbcc5f72c366c1394ca184ae546f54fc102f0f991c3ff4bd7ab0",
+    "dependencyHash": "f0ea74385b758406a543f3fe31ce9b63b92788a6980b4ecaf5fe1e7db4331eac",
+    "generatedAt": 1778014032
+  }
+}

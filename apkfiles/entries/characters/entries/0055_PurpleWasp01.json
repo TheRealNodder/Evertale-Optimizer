@@ -1,0 +1,482 @@
+{
+  "schemaVersion": 3,
+  "order": 55,
+  "id": "purple-wasp-01",
+  "name": "PurpleWasp01",
+  "category": "character",
+  "rarity": null,
+  "stars": 1,
+  "evolvedStars": 1,
+  "element": "Storm",
+  "weaponType": "Mace",
+  "stats": {
+    "atk": 299,
+    "hp": 1114,
+    "spd": 140,
+    "cost": 8
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/PurpleWasp01.png",
+  "refs": {
+    "activeSkills": [
+      "PoisonTouchA",
+      "PoisonEaterC"
+    ],
+    "passives": [],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": null,
+    "leaderBuffCondition": null,
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "PoisonTouchA": {
+        "id": "PoisonTouchA",
+        "found": true,
+        "ability": {
+          "name": "PoisonTouchA",
+          "class": "Ability",
+          "config": "PoisonTouchA",
+          "tuCost": 100,
+          "useLimit": 0,
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "Poison",
+                "BurnImmunityTempForRevenge"
+              ]
+            }
+          ],
+          "immuneSuggestionCondition": "AnyPoisonImmunity",
+          "enemyEventType": "Hit",
+          "abilityEffect": "SmallPoison1",
+          "flags": [
+            "Poisoner",
+            "NoDamage"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.3,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_castinggreen1/batfx_castinggreen1",
+            "batfx_poisonsmall1/batfx_poisonsmall1",
+            "batsfx_prefab/batsfx_poison1"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -2,
+            1,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            true,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            true
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "BurnImmunityTempForRevenge": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Burn",
+                  "BurnAfterTurn",
+                  "BurnAtEndOfTurn"
+                ],
+                "dontShowText": true
+              },
+              {
+                "name": "BurnAfterTurn"
+              },
+              {
+                "name": "BurnSelfOnHit"
+              }
+            ],
+            "duration": 1,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "tags": [
+              "BurnImmune"
+            ],
+            "stackName": "BurnImmunityTempForRevenge",
+            "isHiddenFromPlayers": true
+          },
+          "Poison": {
+            "class": "Buff",
+            "stackName": "Poison",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "DamageOverTime"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "percentOfAttack": 0.0025,
+                "damageColor": "Green",
+                "abilityEffect": "PoisonDamage",
+                "extraDamageFlag": "Poison"
+              }
+            ],
+            "tags": [
+              "Poison"
+            ],
+            "canBePurified": true,
+            "duration": -1,
+            "applyConditions": "NotSuperOrMegaPoisoned",
+            "showAsTimer": false,
+            "statusEffect": "PoisonStatus",
+            "statusEffectOffset": 0.1,
+            "damageType": "Poison",
+            "noIconShownOnBattleStatus": true,
+            "iconSpriteName": "IconPurplePoison01"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "AnyPoisonImmunity": {
+            "class": "MonsterConditions",
+            "monsterTags": [
+              "PoisonImmuneWhenStealth"
+            ],
+            "buffStackNames": [
+              "Stealth"
+            ],
+            "or": {
+              "class": "MonsterConditions",
+              "monsterTags": [
+                "PoisonImmune"
+              ],
+              "or": {
+                "class": "MonsterConditions",
+                "buffStackNames": [
+                  "PoisonImmunity"
+                ],
+                "or": {
+                  "class": "MonsterConditions",
+                  "buffStackNames": [
+                    "PoisonImmunityOnce"
+                  ],
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "LethalPoison"
+                    ],
+                    "or": {
+                      "class": "MonsterConditions",
+                      "monsterTags": [
+                        "NegativeStatusImmunityFromThorns"
+                      ],
+                      "buffStackNames": [
+                        "SleepThorns"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "localization": {
+          "name": "Poison",
+          "description": "Grants the Poison status effect to 1 enemy. Allies gain 1 Spirit. This will overwrite other status effects on that unit.",
+          "selected": "Gains 1 Spirit and poisons target\n(Will overwrite other status effects)"
+        }
+      },
+      "PoisonEaterC": {
+        "id": "PoisonEaterC",
+        "found": true,
+        "ability": {
+          "name": "PoisonEaterC",
+          "class": "Ability",
+          "abilityScalor": -2,
+          "conditionalAbilityScalors": [
+            2
+          ],
+          "config": "PoisonEaterC",
+          "tuCost": 200,
+          "useLimit": 0,
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "PoisonEaterDamageBoost"
+              ]
+            }
+          ],
+          "attackScalors": [
+            "GoodVsPoisoned"
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "SmallHit1",
+          "conditionedAbilityEffects": [
+            "PoisonEaterSpecial1N",
+            "PoisonEaterSpecial1N"
+          ],
+          "flags": [
+            "PoisonEater",
+            "StealthWorthy"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.4,
+            0
+          ],
+          "prefabs": [
+            "batfx_bluntimpact1/batfx_bluntimpact1",
+            "batsfx_prefab/batsfx_impactsmall1"
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            true
+          ],
+          "scale": [
+            0.4,
+            1
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {
+          "GoodVsPoisoned": {
+            "class": "AttackScalor",
+            "targetCondition": "IsPoisoned"
+          }
+        },
+        "conditions": {},
+        "localization": {
+          "name": "Poison Eater",
+          "description": "300% damage to 1 enemy if they are poisoned.",
+          "selected": "300% damage to poisoned target"
+        }
+      }
+    },
+    "passives": {},
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": null
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "PurpleWasp01",
+    "family": "PurpleWasp",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "PurpleWasp01",
+    "family": "PurpleWasp",
+    "class": "Monster",
+    "activeSkills": {
+      "0": "PoisonTouchA",
+      "1": "PoisonEaterC"
+    },
+    "cost": 8,
+    "baseAttack": 299,
+    "baseMaxHp": 1114,
+    "speed": 140,
+    "element": "Air",
+    "weaponPref": "Mace",
+    "weaponPivotIndex": 0,
+    "secure": 0,
+    "aiTargetPickWeight": 1,
+    "stars": 1,
+    "evolvedStars": 1,
+    "goldMultiplier": 0,
+    "consolationMultiplier": 0,
+    "battleOrbImageFlip": 1,
+    "attackType": "Claw",
+    "visible": 1,
+    "formTwitterShare": 1,
+    "skillVoices": {
+      "0": [
+        1,
+        2
+      ],
+      "1": [
+        1,
+        2
+      ]
+    },
+    "damageVoices": [
+      3
+    ],
+    "deathVoices": [
+      4
+    ],
+    "victoryVoices": [
+      5,
+      6
+    ],
+    "lineupVoices": [
+      5,
+      6
+    ],
+    "evolutionVoices": [
+      5,
+      6
+    ],
+    "trainVoices": [
+      5,
+      6
+    ]
+  },
+  "_build": {
+    "scriptVersion": "3-incremental-checkpoint",
+    "sourceHash": "9d2cd4062397567f773889ff713e16d5434b318dca66e618fc7c66d2549f8a65",
+    "dependencyHash": "2137462557503039dc2c6d7fedf55054424a92bd77de7b2bd387c07839490131",
+    "generatedAt": 1778013980
+  }
+}

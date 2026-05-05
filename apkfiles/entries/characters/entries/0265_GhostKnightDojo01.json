@@ -1,0 +1,285 @@
+{
+  "schemaVersion": 3,
+  "order": 265,
+  "id": "ghost-knight-dojo-01",
+  "name": "GhostKnightDojo01",
+  "category": "character",
+  "rarity": null,
+  "stars": 1,
+  "evolvedStars": 1,
+  "element": "Dark",
+  "weaponType": "GreatAxe",
+  "stats": {
+    "atk": 297,
+    "hp": 1122,
+    "spd": 240,
+    "cost": 8
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/GhostKnightDojo01.png",
+  "refs": {
+    "activeSkills": [
+      "GainAttackSingleBDojo",
+      "DreamHuntBDojo"
+    ],
+    "passives": [
+      "SpiritGainRevengeB"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": null,
+    "leaderBuffCondition": null,
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "GainAttackSingleBDojo": {
+        "id": "GainAttackSingleBDojo",
+        "found": true,
+        "ability": {
+          "name": "GainAttackSingleBDojo",
+          "class": "Ability",
+          "abilityScalor": 0,
+          "config": "GainAttackSingleBDojo",
+          "tuCost": 100,
+          "useLimit": 0,
+          "nameKey": "GainAttackSingleB",
+          "descriptionKey": "GainAttackSingleB",
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ]
+            }
+          ],
+          "enemyEventType": "Hit",
+          "axeAbilityEffect": "SmallSlash1",
+          "greatSwordAbilityEffect": "SmallSlash1",
+          "greatAxeAbilityEffect": "SmallSlash1",
+          "hammerAbilityEffect": "SmallBlunt1",
+          "katanaAbilityEffect": "SmallSlash1",
+          "maceAbilityEffect": "SmallBlunt1",
+          "spearAbilityEffect": "SmallSpear1",
+          "staffAbilityEffect": "SmallBlunt1",
+          "swordAbilityEffect": "SmallSlash1",
+          "clawAbilityEffect": "SmallClaw1",
+          "biteAbilityEffect": "SmallBite1",
+          "bashAbilityEffect": "SmallBlunt1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": null,
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {},
+        "conditions": {}
+      },
+      "DreamHuntBDojo": {
+        "id": "DreamHuntBDojo",
+        "found": true,
+        "ability": {
+          "name": "DreamHuntBDojo",
+          "class": "Ability",
+          "abilityScalor": -2,
+          "conditionalAbilityScalors": [
+            4
+          ],
+          "config": "DreamHuntBDojo",
+          "tuCost": 200,
+          "useLimit": 0,
+          "nameKey": "DreamHuntB",
+          "descriptionKey": "DreamHuntB",
+          "spiritCost": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "AddSpirit"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "DreamhuntDamageBoost"
+              ],
+              "damageFlags": [
+                "DreamDamage"
+              ]
+            },
+            {
+              "spiritCondition": "IsSleeping",
+              "spiritToAdd": 300
+            }
+          ],
+          "attackScalors": [
+            "GoodVsSleeping"
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "SmallMiss1",
+          "conditionedAbilityEffects": [
+            "DreamHuntAbility2N",
+            "DreamHuntAbility2N"
+          ],
+          "flags": [
+            "Dreamhunt",
+            "StealthWorthy"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.85,
+            0
+          ],
+          "prefabs": [
+            "batfx_bluntimpact1/batfx_bluntimpact1",
+            "batsfx_prefab/batsfx_impactsmall1"
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            true
+          ],
+          "scale": [
+            0.4,
+            1
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "AddSpirit": {
+            "class": "AddSpiritAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {
+          "GoodVsSleeping": {
+            "class": "AttackScalor",
+            "targetCondition": "IsSleeping"
+          }
+        },
+        "conditions": {
+          "IsSleeping": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "Sleep"
+            ]
+          }
+        }
+      }
+    },
+    "passives": {
+      "SpiritGainRevengeB": {
+        "id": "SpiritGainRevengeB",
+        "found": false
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": null
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "GhostKnightDojo01",
+    "family": "GhostKnightDojo",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "GhostKnightDojo01",
+    "family": "GhostKnightDojo",
+    "class": "Monster",
+    "activeSkills": {
+      "0": "GainAttackSingleBDojo",
+      "1": "DreamHuntBDojo"
+    },
+    "passives": {
+      "0": "SpiritGainRevengeB"
+    },
+    "cost": 8,
+    "baseAttack": 297,
+    "baseMaxHp": 1122,
+    "speed": 240,
+    "element": "Death",
+    "weaponPref": "GreatAxe",
+    "weaponPivotIndex": 0,
+    "secure": 0,
+    "aiTargetPickWeight": 1,
+    "stars": 1,
+    "evolvedStars": 1,
+    "goldMultiplier": 0,
+    "consolationMultiplier": 0,
+    "battleOrbImageFlip": 1,
+    "attackType": "Weapon",
+    "skillVoices": {
+      "0": [
+        1
+      ],
+      "1": [
+        2
+      ],
+      "2": [
+        3
+      ],
+      "3": [
+        4
+      ]
+    },
+    "damageVoices": [
+      9,
+      10
+    ],
+    "deathVoices": [
+      10
+    ],
+    "victoryVoices": [
+      11
+    ]
+  },
+  "_build": {
+    "scriptVersion": "3-incremental-checkpoint",
+    "sourceHash": "e8c965cbf999c22c21da6a731cf79a819db830ae1735c9d396aba275d62f7e68",
+    "dependencyHash": "66e98f3af679a5d586b48e5414e78c31e548a5dbf7ae4215681a6de25d170fab",
+    "generatedAt": 1778013987
+  }
+}

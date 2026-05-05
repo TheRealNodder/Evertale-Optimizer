@@ -1,0 +1,844 @@
+{
+  "schemaVersion": 3,
+  "order": 363,
+  "id": "dancing-assassin-swimsuit-01",
+  "name": "DancingAssassinSwimsuit01",
+  "category": "character",
+  "rarity": null,
+  "stars": 5,
+  "evolvedStars": 6,
+  "element": "Earth",
+  "weaponType": "Hammer",
+  "stats": {
+    "atk": 723,
+    "hp": 10514,
+    "spd": 372,
+    "cost": 28
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/DancingAssassinSwimsuit01.png",
+  "refs": {
+    "activeSkills": [
+      "GainAttackSingleStanceAEarthDASwimsuit",
+      "PurifySingleADASwimsuit",
+      "DesperateBiteDoubleADASwimsuit"
+    ],
+    "passives": [
+      "AutoProtect",
+      "SummonRevengeAAEarth",
+      "PlusHPBoostLv3",
+      "KatanaMinusDamageLv3",
+      "PlusAttackBoostLv3",
+      "AddWeaponPrefSpear"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": "HPUpEarthD",
+    "leaderBuffCondition": "IsEarth",
+    "summonableMonsters": [
+      "EarthMinion01"
+    ]
+  },
+  "resolved": {
+    "activeSkills": {
+      "GainAttackSingleStanceAEarthDASwimsuit": {
+        "id": "GainAttackSingleStanceAEarthDASwimsuit",
+        "found": true,
+        "ability": {
+          "name": "GainAttackSingleStanceAEarthDASwimsuit",
+          "class": "Ability",
+          "abilityScalor": 0,
+          "config": "GainAttackSingleStanceAEarthDASwimsuit",
+          "tuCost": 100,
+          "useLimit": 0,
+          "nameKey": "GainAttackSingleStanceAAir",
+          "descriptionKey": "GainAttackSingleStanceAAir",
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "Overwatch",
+                "BurnImmunityTempForRevenge"
+              ],
+              "applyConditions": "IsNotOverwatchOrAlreadyOverwatched",
+              "applyToSourceOnly": true,
+              "showMissConditions": "ShowNoMiss",
+              "skipAbilityEffect": true
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "DASKill2"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.55,
+            0,
+            0.1,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_toonstars4/batfx_toonstars4",
+            "batsfx_prefab/batsfx_bluntimpact1",
+            "batfx_tropicalf1/batfx_tropicalf3",
+            "batfx_bluntimpact4/batfx_bluntimpact4",
+            "batsfx_prefab/batsfx_bomb1"
+          ],
+          "sortOrderOffset": [
+            -2,
+            4,
+            0,
+            1,
+            1,
+            2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            false,
+            false,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "BurnImmunityTempForRevenge": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Burn",
+                  "BurnAfterTurn",
+                  "BurnAtEndOfTurn"
+                ],
+                "dontShowText": true
+              },
+              {
+                "name": "BurnAfterTurn"
+              },
+              {
+                "name": "BurnSelfOnHit"
+              }
+            ],
+            "duration": 1,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "tags": [
+              "BurnImmune"
+            ],
+            "stackName": "BurnImmunityTempForRevenge",
+            "isHiddenFromPlayers": true
+          },
+          "Overwatch": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "BuffWhenMonsterHurt",
+              "RemoveOnHurt"
+            ],
+            "stackName": "Stance",
+            "behaviorOverrides": [
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "selfBuffs": [
+                  "GiveTurnOverwatch",
+                  "AlreadyOverwatched"
+                ],
+                "cancelFromDamageTypes": [
+                  "BuffDamage"
+                ],
+                "cancelFromDamageFlags": [
+                  "IgnoreSkin",
+                  "Sneak",
+                  "RemoveStatus"
+                ]
+              },
+              {
+                "cancelFromDamageTypes": [
+                  "BuffDamage"
+                ],
+                "cancelFromDamageFlags": [
+                  "IgnoreSkin",
+                  "Sneak",
+                  "RemoveStatus"
+                ]
+              }
+            ],
+            "applyConditions": "IsNotOverwatch",
+            "duration": 150,
+            "showAsTimer": true,
+            "iconSpriteName": "IconOverwatch01"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "IsNotOverwatchOrAlreadyOverwatched": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "Stance"
+              ],
+              "or": {
+                "class": "MonsterConditions",
+                "buffStackNames": [
+                  "AlreadyInStance"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "PurifySingleADASwimsuit": {
+        "id": "PurifySingleADASwimsuit",
+        "found": true,
+        "ability": {
+          "name": "PurifySingleADASwimsuit",
+          "class": "Ability",
+          "config": "PurifySingleADASwimsuit",
+          "tuCost": 70,
+          "useLimit": 0,
+          "nameKey": "PurifySingleA",
+          "descriptionKey": "PurifySingleA",
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Ally",
+          "components": [
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "RemoveBuffs"
+              ]
+            }
+          ],
+          "friendlyEventType": "Hit",
+          "abilityEffect": "Purify1",
+          "flags": [
+            "Purify"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "friendlyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0,
+            0.3,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_ripplebluelow/batfx_ripplebluelow",
+            "batfx_castinggreen1/batfx_castinggreen1",
+            "batfx_castinggreen2/batfx_castinggreen2",
+            "batfx_ripplebluelow/batfx_ripplebluelow",
+            "batsfx_prefab/batsfx_heal1",
+            "batfx_purify1/batfx_purify1"
+          ],
+          "sortOrderOffset": [
+            2,
+            2,
+            -2,
+            2,
+            -2,
+            -2,
+            2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "RemoveBuffs": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {}
+      },
+      "DesperateBiteDoubleADASwimsuit": {
+        "id": "DesperateBiteDoubleADASwimsuit",
+        "found": true,
+        "ability": {
+          "name": "DesperateBiteDoubleADASwimsuit",
+          "class": "Ability",
+          "abilityScalor": 3,
+          "config": "DesperateBiteDoubleADASwimsuit",
+          "tuCost": 200,
+          "useLimit": 0,
+          "nameKey": "DesperateBiteDoubleA",
+          "descriptionKey": "DesperateBiteDoubleA",
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "applyToTargetType": "Enemy",
+              "damageBoosts": [
+                "DesperateDamageBoost"
+              ]
+            },
+            {
+              "applyToTargetType": "Enemy",
+              "buffs": [
+                "HealHalfStack"
+              ],
+              "buffBackMode": true,
+              "skipAbilityEffect": true,
+              "applyConditions": "IsNotStealth"
+            }
+          ],
+          "useCondition": "HPBelow25Percent",
+          "flags": [
+            "Desperate"
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Hit",
+          "abilityEffect": "DASKill1",
+          "recommendEffectWhenUsable": 1,
+          "ignoreEffectForSourceEvent": true
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0.1,
+            0,
+            0,
+            0,
+            1,
+            0.1,
+            0,
+            0.2,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_timestrike1",
+            "batsfx_prefab/batsfx_aliratropic1",
+            "batfx_tailwindlove2/batfx_tailwindlove2",
+            "batfx_tropicalfradail1/batfx_tropicalfradail1",
+            "batfx_desperatestrike2/batfx_desperatestrike2",
+            "batfx_tropicalf1/batfx_tropicalf2",
+            "batfx_bluntimpact4/batfx_bluntimpact4",
+            "batsfx_prefab/batsfx_bomb1",
+            "batfx_healtop1/batfx_healtop1",
+            "batsfx_prefab/batsfx_heal1"
+          ],
+          "sortOrderOffset": [
+            -2,
+            2,
+            -100,
+            -2,
+            -2,
+            1,
+            1,
+            2,
+            3,
+            0
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            true,
+            true,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "HealHalfStack": {
+            "class": "Buff",
+            "stackName": "Healing",
+            "behaviors": [
+              "AdjustHp"
+            ],
+            "behaviorOverrides": [
+              {
+                "percent": 0.5,
+                "abilityEffect": "SmallHeal1"
+              }
+            ],
+            "duration": 0,
+            "applyConditions": "IsNotHealing",
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {
+          "HPBelow25Percent": {
+            "class": "AttackScalor",
+            "sourceCondition": "HPBelow25Percent"
+          }
+        },
+        "conditions": {
+          "HPBelow25Percent": {
+            "class": "MonsterConditions",
+            "hpLessThanPercent": 0.2500001
+          },
+          "IsNotStealth": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "Stealth"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "passives": {
+      "AutoProtect": {
+        "id": "AutoProtect",
+        "found": false
+      },
+      "SummonRevengeAAEarth": {
+        "id": "SummonRevengeAAEarth",
+        "found": false
+      },
+      "PlusHPBoostLv3": {
+        "id": "PlusHPBoostLv3",
+        "found": false
+      },
+      "KatanaMinusDamageLv3": {
+        "id": "KatanaMinusDamageLv3",
+        "found": false
+      },
+      "PlusAttackBoostLv3": {
+        "id": "PlusAttackBoostLv3",
+        "found": false
+      },
+      "AddWeaponPrefSpear": {
+        "id": "AddWeaponPrefSpear",
+        "found": false
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": {
+      "class": "MonsterConditions",
+      "elements": [
+        "Earth"
+      ]
+    }
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "DancingAssassinSwimsuit01",
+    "family": "DancingAssassinSwimsuit",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "DancingAssassinSwimsuit01",
+    "family": "DancingAssassinSwimsuit",
+    "class": "Monster",
+    "leaderBuff": "HPUpEarthD",
+    "leaderBuffCondition": "IsEarth",
+    "activeSkills": {
+      "0": "GainAttackSingleStanceAEarthDASwimsuit",
+      "1": "PurifySingleADASwimsuit",
+      "2": "DesperateBiteDoubleADASwimsuit"
+    },
+    "passives": {
+      "0": "AutoProtect",
+      "1": "SummonRevengeAAEarth",
+      "2": "PlusHPBoostLv3",
+      "3": "KatanaMinusDamageLv3",
+      "4": "PlusAttackBoostLv3",
+      "5": "AddWeaponPrefSpear"
+    },
+    "cost": 28,
+    "baseAttack": 723,
+    "baseMaxHp": 10514,
+    "speed": 372,
+    "element": "Earth",
+    "weaponPref": "Hammer",
+    "weaponPivotIndex": 0,
+    "secure": 1,
+    "superEvolve1": "DancingAssassinSwimsuit02",
+    "aiTargetPickWeight": 1,
+    "stars": 5,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 0,
+    "battleOrbImageFlip": 0,
+    "attackType": "Weapon",
+    "visible": 1,
+    "formTwitterShare": 1,
+    "summonableMonsters": [
+      "EarthMinion01"
+    ],
+    "summonableMatchSource": [
+      false
+    ],
+    "skillVoices": {
+      "0": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "1": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "2": [
+        9,
+        10,
+        11,
+        12
+      ],
+      "3": [
+        13,
+        14,
+        15,
+        16
+      ]
+    },
+    "damageVoices": [
+      17,
+      18,
+      19,
+      20
+    ],
+    "deathVoices": [
+      21,
+      22,
+      23,
+      24
+    ],
+    "victoryVoices": [
+      25,
+      26
+    ],
+    "lineupVoices": [
+      27,
+      28,
+      29,
+      30,
+      31,
+      32
+    ],
+    "evolutionVoices": [
+      33
+    ],
+    "trainVoices": [
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43
+    ],
+    "titleVoices": [
+      44
+    ],
+    "gachaVoices": [
+      45
+    ],
+    "loginVoices": [
+      46
+    ],
+    "tapVoices": [
+      47,
+      48,
+      49
+    ],
+    "idleVoices": [
+      50
+    ]
+  },
+  "_build": {
+    "scriptVersion": "3-incremental-checkpoint",
+    "sourceHash": "c23f57c03235a64f8bcc254d5715dbd4cf391229538f07f1f79d6fe893ceb1ae",
+    "dependencyHash": "903180bd2c0ef1036e1adb0db63a273a284c62822101d4dbb27075a8c36b10ba",
+    "generatedAt": 1778013990
+  }
+}

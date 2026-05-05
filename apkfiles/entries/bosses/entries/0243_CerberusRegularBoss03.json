@@ -1,0 +1,1266 @@
+{
+  "schemaVersion": 3,
+  "order": 243,
+  "id": "cerberus-regular-boss-03",
+  "name": "CerberusRegularBoss03",
+  "category": "bosse",
+  "rarity": null,
+  "stars": 6,
+  "evolvedStars": 6,
+  "element": "Fire",
+  "weaponType": "Axe",
+  "stats": {
+    "atk": 2500,
+    "hp": 70000,
+    "spd": 459,
+    "cost": 999
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/CerberusRegular03.png",
+  "refs": {
+    "activeSkills": [
+      "IgnitionAttackSpiritACerberusRegularBoss",
+      "BurnBlastACerberusRegularBoss",
+      "LastStandBurnBlastAllHurtCerberusRegularBoss"
+    ],
+    "passives": [
+      "NoStunToughBurnGuardCerberusRegularBoss",
+      "HoldGroundGoodBurnCerberusRegularBoss",
+      "Sleep50TUMinus",
+      "KnockbackImmunity",
+      "SleepImmuneWhenAloneOrHPAbove50Percent"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": null,
+    "leaderBuffCondition": null,
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "IgnitionAttackSpiritACerberusRegularBoss": {
+        "id": "IgnitionAttackSpiritACerberusRegularBoss",
+        "found": true,
+        "ability": {
+          "name": "IgnitionAttackSpiritACerberusRegularBoss",
+          "class": "Ability",
+          "abilityScalor": 0,
+          "config": "IgnitionAttackSpiritACerberusRegularBoss",
+          "tuCost": 50,
+          "useLimit": 0,
+          "spiritGain": 0,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "applyToTargetType": "Enemy",
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "damageFlags": [
+                "AttackerIgnition"
+              ]
+            },
+            {
+              "buffs": [
+                "HealingBurnCerberusRegularBoss",
+                "AddSpiritEqualToBurning"
+              ],
+              "applyToSourceOnly": true
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "flags": [
+            "Burn",
+            "ApplyStatusToSelf"
+          ],
+          "abilityEffect": "LargeFire1",
+          "ignoreEffectForSourceEvent": true
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.3,
+            0,
+            0.2,
+            0,
+            0.3,
+            0,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting2",
+            "batfx_casting5/batfx_casting5",
+            "batfx_firemid2/batfx_firemid2",
+            "batsfx_prefab/batsfx_fire2",
+            "batfx_firemid1/batfx_firemid1",
+            "batsfx_prefab/batsfx_fire2",
+            "batfx_firelarge2/batfx_firelarge2",
+            "batsfx_prefab/batsfx_fire2",
+            "batfx_spotred/batfx_spotred",
+            "batfx_rippleredlow/batfx_rippleredlow"
+          ],
+          "sortOrderOffset": [
+            -2,
+            2,
+            1,
+            1,
+            1,
+            1,
+            1,
+            -2,
+            -2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            true,
+            false,
+            true,
+            false,
+            true,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            true,
+            false,
+            true,
+            false,
+            true,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            true,
+            false,
+            true,
+            false,
+            true,
+            false,
+            false
+          ],
+          "scale": [
+            0,
+            0,
+            0,
+            3,
+            0,
+            5,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "AddSpiritEqualToBurning": {
+            "class": "Buff",
+            "behaviors": [
+              "BuffOnMonsterTurnEnd",
+              "BuffOnMonsterTurnEnd"
+            ],
+            "behaviorOverrides": [
+              {
+                "allyBuffs": [
+                  "SpiritGainD"
+                ],
+                "selfBuffs": [
+                  "SpiritGainD"
+                ],
+                "spreadCondition": "IsBurning"
+              },
+              {
+                "enemyBuffs": [
+                  "SpiritGainDContra"
+                ],
+                "spreadCondition": "IsBurning"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "Burn": {
+            "class": "Buff",
+            "stackName": "Burn",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "DamageOverTime",
+              "BuffChanceOnHit",
+              "BuffWhenMonsterHurt"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "LockHasBurnedSkills"
+              },
+              {
+                "name": "SleepThorns"
+              },
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "percentOfTargetHp": 0.001,
+                "damageColor": "Red",
+                "abilityEffect": "BurnDamage1",
+                "bossDamageCap": 500,
+                "extraDamageFlag": "Burn"
+              },
+              {
+                "contextBuffs": [
+                  "BurnAfterTurn"
+                ],
+                "chance": 1.0
+              },
+              {
+                "contextBuffs": [
+                  "BurnAfterTurn",
+                  "RemovePoison"
+                ],
+                "spreadCondition": "IsNotBurnImmune",
+                "cancelFromDamageFlags": [
+                  "Sneak",
+                  "RemoveStatus"
+                ],
+                "cancelFromDamageTypes": [
+                  "BuffDamage"
+                ]
+              }
+            ],
+            "tags": [
+              "Burn"
+            ],
+            "canBePurified": true,
+            "duration": 300,
+            "statusEffect": "BurnStatus",
+            "statusEffectOffset": 0.1,
+            "damageType": "Burn",
+            "noIconShownOnBattleStatus": false,
+            "applyConditions": "IsNotBurning",
+            "showAsTimer": true,
+            "iconSpriteName": "IconRedBurn01"
+          },
+          "HealingBurnCerberusRegularBoss": {
+            "class": "Buff",
+            "stackName": "Burn",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "Regen",
+              "BuffChanceOnHit",
+              "BuffWhenMonsterHurt",
+              "RemoveBuffs",
+              "BuffAfterTime"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "LockHasBurnedSkills"
+              },
+              {
+                "name": "SleepThorns"
+              },
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "percent": 0.001
+              },
+              {
+                "contextBuffs": [
+                  "BurnAfterTurn"
+                ],
+                "chance": 1.0
+              },
+              {
+                "contextBuffs": [
+                  "BurnAfterTurn",
+                  "RemovePoison"
+                ],
+                "spreadCondition": "IsNotBurnImmune",
+                "cancelFromDamageFlags": [
+                  "Sneak",
+                  "RemoveStatus"
+                ],
+                "cancelFromDamageTypes": [
+                  "BuffDamage",
+                  "RemoveStatus"
+                ]
+              },
+              {
+                "name": "ConditionedProtector"
+              },
+              {
+                "fuse": 300,
+                "selfBuffs": [
+                  "ExpireCerberusRegularBossProtector"
+                ]
+              }
+            ],
+            "tags": [
+              "Burn",
+              "HealingBurn"
+            ],
+            "duration": 300,
+            "statusEffect": "BurnHealStatus2",
+            "statusEffectOffset": 0.1,
+            "noIconShownOnBattleStatus": false,
+            "showAsTimer": true,
+            "iconSpriteName": "IconPurpleBurn01"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {},
+        "localization": {
+          "name": "Scorching Spirit",
+          "description": "Damage to 1 Enemy. The user is then granted the Healing Burn status effect for 300TU. Allies gain Spirit equal to the number of burning units on the battlefield after this attack.\n\nA unit with Healing Burn will heal after each turn at the same rate as Burn would deal damage instead of taking damage from Burn. Healing Burn will overwrite other status effects on the user and can replace the Burn status effect, but cannot be replaced by Burn. Any unit that deals damage to or is dealt damage by a unit with Healing Burn will gain the Burn status effect. Healing Burn will not be removed by Purify skills.",
+          "selected": "Damages an enemy, burns user, adds Spirit\n(Will overwrite other status effects)"
+        }
+      },
+      "BurnBlastACerberusRegularBoss": {
+        "id": "BurnBlastACerberusRegularBoss",
+        "found": true,
+        "ability": {
+          "name": "BurnBlastACerberusRegularBoss",
+          "class": "Ability",
+          "abilityScalor": 4,
+          "config": "BurnBlastACerberusRegularBoss",
+          "tuCost": 50,
+          "useLimit": 0,
+          "spiritGain": 0,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "applyToTargetType": "Enemy",
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ]
+            }
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "CerberusAttack1",
+          "flags": [
+            "Burn"
+          ],
+          "useCondition": "IsBurning"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0.4,
+            0.9,
+            0,
+            0,
+            0.6
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_timestrike1",
+            "batfx_burnedgirl1/batfx_tailwindfirenoBG",
+            "batfx_burncrest1/batfx_burncrest1",
+            "batfx_jumpsmoke1/batfx_jumpsmoke1",
+            "batfx_cerberus1/batfx_cerberusclaw1",
+            "batfx_groundimpact/batfx_groundimpact",
+            "batsfx_prefab/batsfx_slash1",
+            "batfx_jumpsmoke1/batfx_jumpsmoke1"
+          ],
+          "sortOrderOffset": [
+            2,
+            -2,
+            -2,
+            1,
+            1,
+            -2,
+            2,
+            1
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            true,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {
+          "Burn": {
+            "class": "Buff",
+            "stackName": "Burn",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "DamageOverTime",
+              "BuffChanceOnHit",
+              "BuffWhenMonsterHurt"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "LockHasBurnedSkills"
+              },
+              {
+                "name": "SleepThorns"
+              },
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "percentOfTargetHp": 0.001,
+                "damageColor": "Red",
+                "abilityEffect": "BurnDamage1",
+                "bossDamageCap": 500,
+                "extraDamageFlag": "Burn"
+              },
+              {
+                "contextBuffs": [
+                  "BurnAfterTurn"
+                ],
+                "chance": 1.0
+              },
+              {
+                "contextBuffs": [
+                  "BurnAfterTurn",
+                  "RemovePoison"
+                ],
+                "spreadCondition": "IsNotBurnImmune",
+                "cancelFromDamageFlags": [
+                  "Sneak",
+                  "RemoveStatus"
+                ],
+                "cancelFromDamageTypes": [
+                  "BuffDamage"
+                ]
+              }
+            ],
+            "tags": [
+              "Burn"
+            ],
+            "canBePurified": true,
+            "duration": 300,
+            "statusEffect": "BurnStatus",
+            "statusEffectOffset": 0.1,
+            "damageType": "Burn",
+            "noIconShownOnBattleStatus": false,
+            "applyConditions": "IsNotBurning",
+            "showAsTimer": true,
+            "iconSpriteName": "IconRedBurn01"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "IsBurning": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "Burn"
+            ]
+          }
+        },
+        "localization": {
+          "name": "Burning Claw",
+          "description": "400% damage to 1 enemy and Burns all other Allies. Burn will overwrite other status effects on those allies. Usable if the user has the Burn status effect.",
+          "selected": "400% damage, burns all allies"
+        }
+      },
+      "LastStandBurnBlastAllHurtCerberusRegularBoss": {
+        "id": "LastStandBurnBlastAllHurtCerberusRegularBoss",
+        "found": true,
+        "ability": {
+          "name": "LastStandBurnBlastAllHurtCerberusRegularBoss",
+          "class": "Ability",
+          "abilityScalor": 2,
+          "conditionalAbilityScalors": [
+            7
+          ],
+          "config": "LastStandBurnBlastAllHurtCerberusRegularBoss",
+          "tuCost": 50,
+          "useLimit": 0,
+          "spiritCost": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "AllFriendsAndEnemies",
+          "components": [
+            "ApplyBuff",
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "Stun100"
+              ],
+              "chance": 0.5,
+              "showMissConditions": "ShowNoMiss",
+              "applyConditions": "IsNotBoss"
+            },
+            {
+              "damageFlags": [
+                "IgnoreArmor"
+              ],
+              "applyToTargetType": "Enemy"
+            }
+          ],
+          "attackScalors": [
+            "GoodIfAlone"
+          ],
+          "conditionedAbilityEffects": [
+            "CerberusAbility2"
+          ],
+          "useCondition": "IsBurning",
+          "enemyEventType": "Hit",
+          "friendlyEventType": "Finish",
+          "sourceEventType": "Finish",
+          "abilityEffect": "CerberusAbility2"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "all": true,
+          "allEnemies": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0,
+            0.4,
+            0.9,
+            0,
+            0.6,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_timestrike1",
+            "batfx_cerberus1/batfx_cerberushand1",
+            "batfx_cerberus1/batfx_cerberushand2",
+            "batfx_cerberus1/batfx_healburnprep1",
+            "batfx_jumpsmoke1/batfx_jumpsmoke1",
+            "batfx_cerberus1/batfx_cerbcombo1",
+            "batsfx_prefab/batsfx_multislash2",
+            "batfx_common/batfx_finalslash1",
+            "batsfx_prefab/batsfx_slash1"
+          ],
+          "sortOrderOffset": [
+            2,
+            -2,
+            2,
+            -2,
+            1,
+            1,
+            2,
+            1,
+            0
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            true,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            false,
+            true
+          ],
+          "isEnemyTargetEffect": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            true,
+            false
+          ],
+          "isFriendlyTargetEffect": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          },
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {
+          "Stun100": {
+            "class": "Buff",
+            "stackName": "Stun",
+            "behaviors": [
+              "Stun"
+            ],
+            "behaviorOverrides": [
+              {
+                "stunTU": 100,
+                "abilityEffect": "StunStatus1"
+              }
+            ],
+            "tags": [
+              "Stun"
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {
+          "GoodIfAlone": {
+            "class": "AttackScalor",
+            "sourceCondition": "IsAlone"
+          }
+        },
+        "conditions": {
+          "IsBurning": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "Burn"
+            ]
+          },
+          "IsNotBoss": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "families": [
+                "Mibone",
+                "RedMinotaur",
+                "Eternal",
+                "Norza",
+                "Gyurelle",
+                "Druke",
+                "Luther",
+                "Cetus",
+                "GyurelleInDisguise",
+                "FloatingMageBoss",
+                "MetalDragonBoss",
+                "MaskViola",
+                "DrukeSmall",
+                "FireDragonBoss",
+                "FireLizardLancer",
+                "Gyurelle0",
+                "GyurelleInDisguise0",
+                "AstridBoss",
+                "DeathKnightBoss",
+                "TaotieBoss",
+                "AirCloakKnight",
+                "UndeadMinotaur",
+                "Darna",
+                "NorzaRegularBoss",
+                "GolemBoss",
+                "MechanicalTitan",
+                "DarkRizetteBoss",
+                "FireLich",
+                "NovaBlastDragonBoss",
+                "EarthKaijuBoss",
+                "WindDragonBoss",
+                "BabyDarkDragonBoss",
+                "MetalDragonDemon",
+                "MaskElfWarrior",
+                "DarkLudmillaBoss",
+                "LifeEyeballEX",
+                "GoldAngelEX",
+                "DarkAstridBoss",
+                "LudmillaRegularBoss",
+                "YandereMaidBoss",
+                "BunnySamuraiBoss",
+                "SchoolGirlWarriorBoss",
+                "OniSchoolGirlBoss",
+                "Orcanix",
+                "DarkFinnBoss",
+                "CyrusBoss",
+                "BahamutBoss",
+                "RoundTableKnightBoss",
+                "CrossSwordKnightBoss",
+                "MerlinRegularBoss",
+                "GyurelleRegularBoss",
+                "OssiaDarkBoss",
+                "AstridNewBoss",
+                "IbarahimeRegularBoss",
+                "CinderellaRegularBoss",
+                "SnowWhiteBoss",
+                "DarkRizetteSwimsuitBoss",
+                "LudmillaSchoolGirlBoss",
+                "RolotiaNewBoss",
+                "SnowWhiteBrideBoss",
+                "SnowBlackBrideBoss",
+                "NobunagaRegularBoss",
+                "BurnedGirlRegularBoss",
+                "DeerGirlBoss",
+                "KingArthurRegularBoss",
+                "YandereMaidRaceQueenBoss",
+                "LudmillaRacequeenBoss",
+                "LifeMinionBoss",
+                "JeanneDarkSwimsuitBoss",
+                "JeanneDarkBoss",
+                "JeanneDarkAngelBoss",
+                "HimikoRegularBoss",
+                "KaguyahimeRegularBoss",
+                "OdinRegularBoss",
+                "OdinRavenBoss",
+                "LokiRegularBoss",
+                "FreyaRegularBoss",
+                "AstridBrideBoss",
+                "MechaSisterBrideBoss",
+                "HorseIdolGirlBoss",
+                "AntaresModernBoss",
+                "CatIdolGirlBoss",
+                "MyshaIdolGirlBoss",
+                "CleopatraRegularBoss",
+                "GilgameshRegularBoss",
+                "GokuDarkBoss",
+                "GokuDarkBossClone",
+                "OtohimeRegularBoss",
+                "CinderellaDarkBoss",
+                "CerberusRegularBoss",
+                "LudmillaYukataBoss",
+                "PercivalRegularBoss",
+                "MordredRegularBoss",
+                "IbarahimeSwimsuitBoss",
+                "RapunzelRegularBoss",
+                "LuBuRegularBoss",
+                "MusashiRegularBoss",
+                "KingArthurSwimsuitBoss",
+                "FrankensteinRegularBoss",
+                "FrankensteinRegularDollBoss",
+                "GenieRegularBoss",
+                "CinderellaSwimsuitBoss",
+                "CthulhuGirlRegularBoss",
+                "NapoleonRegularBoss",
+                "CleopatraDarkBoss",
+                "HijikataRegularBoss",
+                "OkitaRegularBoss",
+                "KaguyahimeSwimsuitBoss",
+                "ExcaliburRegularBoss",
+                "TristanRegularBoss",
+                "RoundTableKnightDarkBoss",
+                "LuciferRegularBoss",
+                "CrossSwordKnightDarkBoss",
+                "SnowWhiteMaidBoss",
+                "MurasakiRegularBoss",
+                "MermaidRegularBoss",
+                "GokuBrideBoss",
+                "GoemonRegularBoss",
+                "KojiroRegularBoss",
+                "DaVinciRegularBoss",
+                "SatanRegularBoss",
+                "DragonGirlRegularBoss",
+                "HokusaiRegularBoss",
+                "MechaSisterNewBoss",
+                "YamatoRegularBoss",
+                "ZoroRegularBoss",
+                "KaguyahimeDarkBoss",
+                "KirinGirlRegularBoss",
+                "LudmillaDarkNewBoss",
+                "ElizabethRegularBoss",
+                "YandereMaidDarkBoss",
+                "NikeRegularBoss",
+                "ChronosRegularBoss",
+                "RolotiaDarkBoss",
+                "RizKouhaiRegularBoss",
+                "KongmingRegularBoss",
+                "PinocchioRegularBoss",
+                "MasamuneRegularBoss",
+                "RyomaRegularBoss",
+                "PerryRegularBoss",
+                "OniSchoolDarkBoss",
+                "ElminaModernBoss",
+                "PeachGirlRegularBoss",
+                "KingArthurEvilBoss",
+                "DonQuixoteRegularBoss",
+                "AnastasiaRegularBoss",
+                "BahamutGirlRegularBoss",
+                "ElmKouhaiRegularBoss",
+                "SiegfriedRegularBoss",
+                "ZeusRegularBoss",
+                "RizetteBraveBoss",
+                "VenusRegularBoss",
+                "MusashiDarkBoss",
+                "KenshinRegularBoss",
+                "MyshaKnightBoss",
+                "ThorRegularBoss",
+                "CalKouhaiRegularBoss",
+                "FreyaNewBoss",
+                "MechaSisterBandBoss",
+                "ChopinRegularBoss",
+                "WashingtonRegularBoss"
+              ]
+            }
+          }
+        },
+        "localization": {
+          "name": "Hell Claw",
+          "description": "300% damage to all enemies, 500% if the user has no allies on the battlefield.\n\nEach unit on the battlefield has a 50% chance of being stunned for 100TU. This attack ignores enemy damage reduction effects. Usable if the user has the Burn status effect.",
+          "selected": "300%+ damage to enemies, may Stun other units"
+        }
+      }
+    },
+    "passives": {
+      "NoStunToughBurnGuardCerberusRegularBoss": {
+        "id": "NoStunToughBurnGuardCerberusRegularBoss",
+        "found": false
+      },
+      "HoldGroundGoodBurnCerberusRegularBoss": {
+        "id": "HoldGroundGoodBurnCerberusRegularBoss",
+        "found": false
+      },
+      "Sleep50TUMinus": {
+        "id": "Sleep50TUMinus",
+        "found": false
+      },
+      "KnockbackImmunity": {
+        "id": "KnockbackImmunity",
+        "found": false
+      },
+      "SleepImmuneWhenAloneOrHPAbove50Percent": {
+        "id": "SleepImmuneWhenAloneOrHPAbove50Percent",
+        "found": false
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": null
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "CerberusRegularBoss03",
+    "family": "CerberusRegularBoss",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "CerberusRegularBoss03",
+    "class": "Monster",
+    "family": "CerberusRegularBoss",
+    "activeSkills": {
+      "0": "IgnitionAttackSpiritACerberusRegularBoss",
+      "1": "BurnBlastACerberusRegularBoss",
+      "2": "LastStandBurnBlastAllHurtCerberusRegularBoss"
+    },
+    "passives": {
+      "0": "NoStunToughBurnGuardCerberusRegularBoss",
+      "1": "HoldGroundGoodBurnCerberusRegularBoss",
+      "2": "Sleep50TUMinus",
+      "3": "KnockbackImmunity",
+      "4": "SleepImmuneWhenAloneOrHPAbove50Percent"
+    },
+    "cost": 999,
+    "baseAttack": 2500,
+    "baseMaxHp": 70000,
+    "speed": 459,
+    "element": "Fire",
+    "weaponPref": "Axe",
+    "weaponPivotIndex": 0,
+    "walkSound": "TestSound",
+    "secure": 1,
+    "aiTargetPickWeight": 1,
+    "stars": 6,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 1,
+    "battleOrbImageFlip": 0,
+    "skillVoices": {
+      "0": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "1": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "2": [
+        13,
+        14,
+        15,
+        16
+      ]
+    },
+    "damageVoices": [
+      17,
+      18,
+      19,
+      20
+    ],
+    "deathVoices": [
+      21,
+      22,
+      23,
+      24
+    ]
+  },
+  "_build": {
+    "scriptVersion": "3-incremental-checkpoint",
+    "sourceHash": "ff58b633f0120a6b7482c29545588c61dbf5928e9f66285464c4905d9838fdc7",
+    "dependencyHash": "f97b784ec471ef0b5733d017f40b6ccce5385ad4b2318ae6e7ba0cb084823858",
+    "generatedAt": 1778014036
+  }
+}

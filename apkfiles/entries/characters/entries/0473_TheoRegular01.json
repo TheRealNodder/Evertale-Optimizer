@@ -1,0 +1,932 @@
+{
+  "schemaVersion": 3,
+  "order": 473,
+  "id": "theo-regular-01",
+  "name": "TheoRegular01",
+  "category": "character",
+  "rarity": null,
+  "stars": 5,
+  "evolvedStars": 6,
+  "element": "Earth",
+  "weaponType": "Staff",
+  "stats": {
+    "atk": 832,
+    "hp": 7050,
+    "spd": 320,
+    "cost": 28
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/TheoRegular01.png",
+  "refs": {
+    "activeSkills": [
+      "NullStrikeDrainATheoRegular",
+      "HealSingleSuperATheoRegular",
+      "PurifySingleATheoRegular",
+      "VicariousBloodfuryDrainATheoRegular"
+    ],
+    "passives": [
+      "OtherAllyRegenerationOnMyTurnForVicarious",
+      "PlusHPBoostLv3",
+      "PlusAttackBoostLv3",
+      "FireMinusDamageLv3",
+      "AddWeaponPrefSword"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": "AttackAndHPUp6Earth",
+    "leaderBuffCondition": "IsEarth",
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "NullStrikeDrainATheoRegular": {
+        "id": "NullStrikeDrainATheoRegular",
+        "found": true,
+        "ability": {
+          "name": "NullStrikeDrainATheoRegular",
+          "class": "Ability",
+          "abilityScalor": 0,
+          "config": "NullStrikeDrainATheoRegular",
+          "tuCost": 100,
+          "useLimit": 0,
+          "nameKey": "NullStrikeDrainA",
+          "descriptionKey": "NullStrikeDrainA",
+          "spiritGain": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "ApplyBuff",
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "RemoveBuffs",
+                "RemoveStealth",
+                "RemoveArmor",
+                "RemoveStance",
+                "RemoveHealingBurn",
+                "BurnRemoved"
+              ]
+            },
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "drainPercent": 1.0,
+              "damageFlags": [
+                "IgnoreSkin",
+                "RemoveStatus",
+                "IgnoreArmor"
+              ],
+              "drainEffect": "CrescentDrain1"
+            }
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "TheoNullStrike1",
+          "flags": [
+            "Purify"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0.3,
+            0,
+            0.15,
+            0.25,
+            0.2,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_theo1/batfx_weaponupgreen1",
+            "batsfx_prefab/batsfx_heal1",
+            "batfx_statdrain1/batfx_statdrain1",
+            "batfx_theo1/batfx_weaponupgreen2",
+            "batfx_impactmagic3/batfx_impactmagic3",
+            "batsfx_prefab/batsfx_slash1"
+          ],
+          "sortOrderOffset": [
+            2,
+            2,
+            0,
+            2,
+            2,
+            2,
+            0
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            false,
+            true,
+            false,
+            true
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          },
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {
+          "BurnRemoved": {
+            "class": "Buff",
+            "duration": 1,
+            "stackName": "BurnRemoved",
+            "showAsTimer": false,
+            "showAsPermanent": false
+          },
+          "RemoveArmor": {
+            "class": "Buff",
+            "stackName": "RemoveArmor",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "Armor"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "RemoveBuffs": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "RemoveHealingBurn": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "Burn"
+              }
+            ],
+            "duration": 0,
+            "applyConditions": "HasHealingBurn",
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "RemoveStance": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "Stance"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "RemoveStealth": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {}
+      },
+      "HealSingleSuperATheoRegular": {
+        "id": "HealSingleSuperATheoRegular",
+        "found": true,
+        "ability": {
+          "name": "HealSingleSuperATheoRegular",
+          "class": "Ability",
+          "config": "HealSingleSuperATheoRegular",
+          "tuCost": 100,
+          "useLimit": 0,
+          "nameKey": "HealSingleSuperA",
+          "descriptionKey": "HealSingleSuperA",
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Ally",
+          "components": [
+            "Heal"
+          ],
+          "componentOverrides": [
+            {
+              "healthPerAttack": 6,
+              "abilityEffect": "TheoSuperHeal1"
+            }
+          ],
+          "flags": [
+            "Healer",
+            "StealthWorthy"
+          ],
+          "friendlyEventType": "Hit"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "friendlyTargets": 1
+        },
+        "abilityEffect": null,
+        "components": {
+          "Heal": {
+            "class": "HealAbilityComponent"
+          }
+        },
+        "buffs": {
+          "Heal": {
+            "class": "Buff",
+            "behaviors": [
+              "AdjustHp"
+            ],
+            "behaviorOverrides": [
+              {
+                "percent": 0.3,
+                "abilityEffect": "Blank",
+                "hpboosts": [
+                  "HealBoost"
+                ]
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {}
+      },
+      "PurifySingleATheoRegular": {
+        "id": "PurifySingleATheoRegular",
+        "found": true,
+        "ability": {
+          "name": "PurifySingleATheoRegular",
+          "class": "Ability",
+          "config": "PurifySingleATheoRegular",
+          "tuCost": 50,
+          "useLimit": 0,
+          "nameKey": "PurifySingleA",
+          "descriptionKey": "PurifySingleA",
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Ally",
+          "components": [
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "RemoveBuffs"
+              ]
+            }
+          ],
+          "friendlyEventType": "Hit",
+          "abilityEffect": "TheoPurify1",
+          "flags": [
+            "Purify"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "friendlyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0.3,
+            0,
+            0.15,
+            0.25,
+            0.2
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_theo1/batfx_weaponupblue1",
+            "batsfx_prefab/batsfx_heal1",
+            "batfx_theo1/batfx_targetbuffblue1",
+            "batfx_theo1/batfx_weaponupblue2",
+            "batfx_purify1/batfx_purify1"
+          ],
+          "sortOrderOffset": [
+            2,
+            2,
+            0,
+            -2,
+            2,
+            2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "RemoveBuffs": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {}
+      },
+      "VicariousBloodfuryDrainATheoRegular": {
+        "id": "VicariousBloodfuryDrainATheoRegular",
+        "found": true,
+        "ability": {
+          "name": "VicariousBloodfuryDrainATheoRegular",
+          "class": "Ability",
+          "abilityScalor": 4,
+          "config": "VicariousBloodfuryDrainATheoRegular",
+          "tuCost": 100,
+          "useLimit": 0,
+          "nameKey": "VicariousBloodfuryDrainA",
+          "descriptionKey": "VicariousBloodfuryDrainA",
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "ApplyBuff",
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "applyToSourceOnly": true,
+              "buffs": [
+                "RemoveVicariousEnabled"
+              ],
+              "skipAbilityEffect": true
+            },
+            {
+              "applyToTargetType": "Enemy",
+              "drainPercent": 1.0,
+              "damageBoosts": [
+                "VicariousDamageBoost"
+              ],
+              "drainEffect": "TheoDrain1",
+              "damageFlags": [
+                "DontRemoveBuffs"
+              ]
+            }
+          ],
+          "useCondition": "CanUseVicariousSkills",
+          "flags": [
+            "Vicarious"
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Hit",
+          "killLockLockedKey": "VicariousBloodfuryDrainALockLockedKey",
+          "killLockUnlockedKey": "SkillReadyToUseKey",
+          "killLockSkillIcon": "IconRedEx01",
+          "killLockUnlockedSkillIcon": "IconGreenCircle01",
+          "abilityEffect": "TheoBloodFury1",
+          "recommendEffectWhenUsable": 1
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0.85,
+            0,
+            1,
+            0,
+            1,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_timestrike1",
+            "batfx_theo1/batfx_theobuff2",
+            "batfx_theo1/batfx_colorfulcast1",
+            "batfx_theo1/batfx_magiccircleback1",
+            "batfx_theo1/batfx_magiccirclefront1",
+            "batfx_theo1/batfx_bookseal1",
+            "batfx_theo1/batfx_bookseal2",
+            "batsfx_prefab/batsfx_charge1",
+            "batfx_theo1/batfx_throwparticleslow2",
+            "batfx_bombblue3/batfx_bombblue3",
+            "batsfx_prefab/batsfx_bluntimpact1"
+          ],
+          "sortOrderOffset": [
+            0,
+            -2,
+            2,
+            -2,
+            2,
+            -2,
+            2,
+            0,
+            2,
+            2,
+            0
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            false,
+            true
+          ],
+          "boneToAttachTo": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "effectBone",
+            "effectBone",
+            "",
+            "",
+            "",
+            ""
+          ],
+          "isProjectileFX": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "projectileFlightDuration": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "projectileStartOffsetY": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            160,
+            0,
+            0
+          ],
+          "projectileStartOffsetX": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            -50,
+            0,
+            0
+          ],
+          "rotateSingleOrientationProjectile": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "projectileShouldTargetTeamEffectPosition": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          },
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {
+          "RemoveVicariousEnabled": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "VicariousEnabled"
+              }
+            ],
+            "duration": 0,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "CanUseVicariousSkills": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "VicariousEnabled"
+            ]
+          }
+        }
+      }
+    },
+    "passives": {
+      "OtherAllyRegenerationOnMyTurnForVicarious": {
+        "id": "OtherAllyRegenerationOnMyTurnForVicarious",
+        "found": false
+      },
+      "PlusHPBoostLv3": {
+        "id": "PlusHPBoostLv3",
+        "found": false
+      },
+      "PlusAttackBoostLv3": {
+        "id": "PlusAttackBoostLv3",
+        "found": false
+      },
+      "FireMinusDamageLv3": {
+        "id": "FireMinusDamageLv3",
+        "found": false
+      },
+      "AddWeaponPrefSword": {
+        "id": "AddWeaponPrefSword",
+        "found": false
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": {
+      "class": "MonsterConditions",
+      "elements": [
+        "Earth"
+      ]
+    }
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "TheoRegular01",
+    "family": "TheoRegular",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "TheoRegular01",
+    "family": "TheoRegular",
+    "class": "Monster",
+    "leaderBuff": "AttackAndHPUp6Earth",
+    "leaderBuffCondition": "IsEarth",
+    "activeSkills": {
+      "0": "NullStrikeDrainATheoRegular",
+      "1": "HealSingleSuperATheoRegular",
+      "2": "PurifySingleATheoRegular",
+      "3": "VicariousBloodfuryDrainATheoRegular"
+    },
+    "passives": {
+      "0": "OtherAllyRegenerationOnMyTurnForVicarious",
+      "2": "PlusHPBoostLv3",
+      "3": "PlusAttackBoostLv3",
+      "4": "FireMinusDamageLv3",
+      "5": "AddWeaponPrefSword"
+    },
+    "cost": 28,
+    "baseAttack": 832,
+    "baseMaxHp": 7050,
+    "speed": 320,
+    "element": "Earth",
+    "weaponPref": "Staff",
+    "weaponPivotIndex": 1,
+    "secure": 1,
+    "superEvolve1": "TheoRegular02",
+    "aiTargetPickWeight": 1,
+    "stars": 5,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 0,
+    "battleOrbImageFlip": 1,
+    "attackType": "Bash",
+    "visible": 1,
+    "formTwitterShare": 1,
+    "skillVoices": {
+      "0": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "1": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "2": [
+        9,
+        10,
+        11,
+        12
+      ],
+      "3": [
+        13,
+        14,
+        15,
+        16
+      ]
+    },
+    "damageVoices": [
+      17,
+      18,
+      19,
+      20
+    ],
+    "deathVoices": [
+      21,
+      22,
+      23,
+      24
+    ],
+    "victoryVoices": [
+      25,
+      26
+    ],
+    "lineupVoices": [
+      27,
+      28,
+      29,
+      30,
+      31,
+      32
+    ],
+    "evolutionVoices": [
+      33
+    ],
+    "trainVoices": [
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43
+    ],
+    "titleVoices": [
+      44
+    ],
+    "gachaVoices": [
+      45
+    ],
+    "loginVoices": [
+      46
+    ],
+    "tapVoices": [
+      47,
+      48,
+      49
+    ],
+    "idleVoices": [
+      50
+    ]
+  },
+  "_build": {
+    "scriptVersion": "3-incremental-checkpoint",
+    "sourceHash": "66436f12be1a383f4c9874f0681e595ed9f79d8f2d3b03ec79301673c31c7387",
+    "dependencyHash": "edba72c7c1e48f571af6812e5119fefd06d0f25765ca0ebdcad24ba7df6f30e2",
+    "generatedAt": 1778013993
+  }
+}

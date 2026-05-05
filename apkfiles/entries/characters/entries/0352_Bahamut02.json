@@ -1,0 +1,1167 @@
+{
+  "schemaVersion": 3,
+  "order": 352,
+  "id": "bahamut-02",
+  "name": "Bahamut02",
+  "category": "character",
+  "rarity": null,
+  "stars": 6,
+  "evolvedStars": 6,
+  "element": "Earth",
+  "weaponType": "Axe",
+  "stats": {
+    "atk": 1409,
+    "hp": 7370,
+    "spd": 137,
+    "cost": 34
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/Bahamut02.png",
+  "refs": {
+    "activeSkills": [
+      "PoisonAttackABahamut",
+      "PoisonTouchRandomDoubleABahamut",
+      "PoisonChargeABahamut",
+      "LimitBreakEnergyBlastDoubleABahamut"
+    ],
+    "passives": [
+      "FudgeSuperPoisonIsAPassive",
+      "HoldGround",
+      "PlusAttackBoostLv3",
+      "PlusHPBoostLv3",
+      "AirMinusDamageLv3",
+      "AddWeaponPrefSword"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": "AttackAndHPUp6Earth",
+    "leaderBuffCondition": "IsEarth",
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "PoisonAttackABahamut": {
+        "id": "PoisonAttackABahamut",
+        "found": true,
+        "ability": {
+          "name": "PoisonAttackABahamut",
+          "class": "Ability",
+          "abilityScalor": 0,
+          "config": "PoisonAttackABahamut",
+          "tuCost": 130,
+          "useLimit": 0,
+          "nameKey": "PoisonAttackA",
+          "descriptionKey": "PoisonAttackA",
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {},
+            {
+              "buffs": [
+                "SuperPoison",
+                "BurnImmunityTempForRevenge"
+              ]
+            }
+          ],
+          "immuneSuggestionCondition": "PoisonImmunityNotFromStealth",
+          "enemyEventType": "Hit",
+          "abilityEffect": "PoisonAttackBahamut"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.3,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_charge1",
+            "batfx_chargefire8/batfx_chargefire8",
+            "batfx_impactmagic5/batfx_impactmagic5",
+            "batfx_slashtrail1/batfx_slashtrail1",
+            "batsfx_prefab/batsfx_slash1"
+          ],
+          "sortOrderOffset": [
+            0,
+            2,
+            2,
+            2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            false,
+            false
+          ],
+          "boneToAttachTo": [
+            "",
+            "effectbone",
+            "",
+            "",
+            ""
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "BurnImmunityTempForRevenge": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Burn",
+                  "BurnAfterTurn",
+                  "BurnAtEndOfTurn"
+                ],
+                "dontShowText": true
+              },
+              {
+                "name": "BurnAfterTurn"
+              },
+              {
+                "name": "BurnSelfOnHit"
+              }
+            ],
+            "duration": 1,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "tags": [
+              "BurnImmune"
+            ],
+            "stackName": "BurnImmunityTempForRevenge",
+            "isHiddenFromPlayers": true
+          },
+          "SuperPoison": {
+            "class": "Buff",
+            "stackName": "Poison",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "DamageOverTime"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "percentOfAttack": 0.01,
+                "damageColor": "Green",
+                "abilityEffect": "SuperPoisonDamage",
+                "extraDamageFlag": "SuperPoison"
+              }
+            ],
+            "tags": [
+              "Poison",
+              "SuperPoison"
+            ],
+            "canBePurified": true,
+            "duration": -1,
+            "showAsTimer": false,
+            "statusEffect": "SuperPoisonStatus",
+            "applyConditions": "NotMegaPoisoned",
+            "statusEffectOffset": 0.1,
+            "damageType": "Poison",
+            "noIconShownOnBattleStatus": true,
+            "iconSpriteName": "IconPurplePoison01"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "PoisonImmunityNotFromStealth": {
+            "class": "MonsterConditions",
+            "monsterTags": [
+              "PoisonImmune"
+            ],
+            "or": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "PoisonImmunity"
+              ],
+              "or": {
+                "class": "MonsterConditions",
+                "monsterTags": [
+                  "LethalPoison"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "PoisonTouchRandomDoubleABahamut": {
+        "id": "PoisonTouchRandomDoubleABahamut",
+        "found": true,
+        "ability": {
+          "name": "PoisonTouchRandomDoubleABahamut",
+          "class": "Ability",
+          "config": "PoisonTouchRandomDoubleABahamut",
+          "tuCost": 100,
+          "useLimit": 0,
+          "nameKey": "PoisonTouchRandomDoubleA",
+          "descriptionKey": "PoisonTouchRandomDoubleA",
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2RandomEnemy",
+          "components": [
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "SuperPoison",
+                "BurnImmunityTempForRevenge"
+              ]
+            }
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "SmallPoisonDarkRizette1",
+          "flags": [
+            "Poisoner",
+            "NoDamage"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "twoRandomEnemy": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.3,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_castingpurple2/batfx_castingpurple2",
+            "batfx_poisondamagesuper/batfx_poisondamage",
+            "batsfx_prefab/batsfx_poison1"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -2,
+            1,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            true,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            true
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "BurnImmunityTempForRevenge": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Burn",
+                  "BurnAfterTurn",
+                  "BurnAtEndOfTurn"
+                ],
+                "dontShowText": true
+              },
+              {
+                "name": "BurnAfterTurn"
+              },
+              {
+                "name": "BurnSelfOnHit"
+              }
+            ],
+            "duration": 1,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "tags": [
+              "BurnImmune"
+            ],
+            "stackName": "BurnImmunityTempForRevenge",
+            "isHiddenFromPlayers": true
+          },
+          "SuperPoison": {
+            "class": "Buff",
+            "stackName": "Poison",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "DamageOverTime"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "percentOfAttack": 0.01,
+                "damageColor": "Green",
+                "abilityEffect": "SuperPoisonDamage",
+                "extraDamageFlag": "SuperPoison"
+              }
+            ],
+            "tags": [
+              "Poison",
+              "SuperPoison"
+            ],
+            "canBePurified": true,
+            "duration": -1,
+            "showAsTimer": false,
+            "statusEffect": "SuperPoisonStatus",
+            "applyConditions": "NotMegaPoisoned",
+            "statusEffectOffset": 0.1,
+            "damageType": "Poison",
+            "noIconShownOnBattleStatus": true,
+            "iconSpriteName": "IconPurplePoison01"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {}
+      },
+      "PoisonChargeABahamut": {
+        "id": "PoisonChargeABahamut",
+        "found": true,
+        "ability": {
+          "name": "PoisonChargeABahamut",
+          "class": "Ability",
+          "config": "PoisonChargeABahamut",
+          "tuCost": 50,
+          "useLimit": 0,
+          "nameKey": "PoisonChargeA",
+          "descriptionKey": "PoisonChargeA",
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "AllEnemy",
+          "components": [
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "applyConditions": "IsPoisoned",
+              "buffs": [
+                "FXOnly"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffBackMode": true,
+              "applyConditions": "IsPoisoned",
+              "buffs": [
+                "StoreEnergy",
+                "QuarterHealNoFx"
+              ],
+              "applyToTargetOnly": true,
+              "buffAppliedEffects": [
+                "Bahabuff2"
+              ]
+            }
+          ],
+          "abilityEffect": "Bahabuff1",
+          "hideTargetingInfo": true,
+          "enemyEventType": "Hit",
+          "sourceEventType": "Hit",
+          "flags": [
+            "NoDamage"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "allEnemies": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.2,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_timestrike1",
+            "batfx_bluehalocenter1/batfx_bluehalocenter1",
+            "batfx_bahabuff1/batfx_bahabuff1",
+            "batsfx_prefab/batsfx_charge1"
+          ],
+          "sortOrderOffset": [
+            2,
+            -2,
+            2,
+            2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "FXOnly": {
+            "class": "Buff",
+            "duration": 1,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "QuarterHealNoFx": {
+            "class": "Buff",
+            "behaviors": [
+              "AdjustHp"
+            ],
+            "behaviorOverrides": [
+              {
+                "percent": 0.25,
+                "hpboosts": [
+                  "HealBoost"
+                ]
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "StoreEnergy": {
+            "class": "Buff",
+            "stackLimit": 3,
+            "duration": -1,
+            "showAsTimer": false,
+            "stackName": "StoreEnergy",
+            "noIconShownOnBattleStatus": true,
+            "usesStackCountDescription": true,
+            "iconSpriteName": "IconPinkCharge01"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "IsPoisoned": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "Poison"
+            ]
+          }
+        }
+      },
+      "LimitBreakEnergyBlastDoubleABahamut": {
+        "id": "LimitBreakEnergyBlastDoubleABahamut",
+        "found": true,
+        "ability": {
+          "name": "LimitBreakEnergyBlastDoubleABahamut",
+          "class": "Ability",
+          "abilityScalor": 0,
+          "conditionalAbilityScalors": [
+            2,
+            3.5,
+            5
+          ],
+          "config": "LimitBreakEnergyBlastDoubleABahamut",
+          "tuCost": 130,
+          "useLimit": 0,
+          "nameKey": "LimitBreakEnergyBlastDoubleA",
+          "descriptionKey": "LimitBreakEnergyBlastDoubleA",
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "EnergyBlast"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "RemoveEnergy"
+              ],
+              "applyToTargetType": "Source",
+              "skipAbilityEffect": true
+            }
+          ],
+          "flags": [
+            "EnergyBlast"
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "useCondition": "IsChargedAtAll",
+          "abilityEffect": "LimitBreakLegendFireDragon1",
+          "attackScalors": [
+            "GoodIfCharged1",
+            "GoodIfCharged2",
+            "GoodIfCharged3"
+          ],
+          "conditionedAbilityEffects": [
+            "LimitBreakBahamut1",
+            "LimitBreakBahamut1",
+            "LimitBreakBahamut1"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0.1,
+            0,
+            0,
+            0.7,
+            0,
+            0,
+            0,
+            0.2,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_fire2",
+            "batfx_tailwindfire1/batfx_tailwindfire1",
+            "batfx_chargefire/batfx_chargefire",
+            "batsfx_prefab/batsfx_charge1",
+            "batfx_throwparticle5/batfx_throwparticle5",
+            "batsfx_prefab/batsfx_fire4",
+            "batfx_wings1/batfx_wings1",
+            "batfx_wings1/batfx_wings1",
+            "batfx_bluntimpact2/batfx_bluntimpact2",
+            "batsfx_prefab/batsfx_bomb1"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -100,
+            20,
+            3,
+            3,
+            3,
+            3,
+            3,
+            2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            false,
+            true,
+            true,
+            true,
+            true,
+            false,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "isProjectileFX": [
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "projectileFlightDuration": [
+            0,
+            0,
+            0,
+            0,
+            0.2,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "projectileStartOffsetX": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "projectileStartOffsetY": [
+            0,
+            0,
+            0,
+            0,
+            150,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "projectileShouldTargetTeamEffectPosition": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "boneToAttachTo": [
+            "",
+            "",
+            "effectbone",
+            "",
+            "effectbone",
+            "",
+            "leftwingeffect",
+            "rightwingeffect",
+            "",
+            ""
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "RemoveEnergy": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "StoreEnergy"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {
+          "GoodIfCharged1": {
+            "class": "AttackScalor",
+            "sourceCondition": "IsCharged1"
+          },
+          "GoodIfCharged2": {
+            "class": "AttackScalor",
+            "sourceCondition": "IsCharged2"
+          },
+          "GoodIfCharged3": {
+            "class": "AttackScalor",
+            "sourceCondition": "IsCharged3"
+          }
+        },
+        "conditions": {
+          "IsChargedAtAll": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "StoreEnergy"
+            ]
+          }
+        }
+      }
+    },
+    "passives": {
+      "FudgeSuperPoisonIsAPassive": {
+        "id": "FudgeSuperPoisonIsAPassive",
+        "found": false
+      },
+      "HoldGround": {
+        "id": "HoldGround",
+        "found": false
+      },
+      "PlusAttackBoostLv3": {
+        "id": "PlusAttackBoostLv3",
+        "found": false
+      },
+      "PlusHPBoostLv3": {
+        "id": "PlusHPBoostLv3",
+        "found": false
+      },
+      "AirMinusDamageLv3": {
+        "id": "AirMinusDamageLv3",
+        "found": false
+      },
+      "AddWeaponPrefSword": {
+        "id": "AddWeaponPrefSword",
+        "found": false
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": {
+      "class": "MonsterConditions",
+      "elements": [
+        "Earth"
+      ]
+    }
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "Bahamut02",
+    "family": "Bahamut",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "Bahamut02",
+    "family": "Bahamut",
+    "class": "Monster",
+    "leaderBuff": "AttackAndHPUp6Earth",
+    "leaderBuffCondition": "IsEarth",
+    "activeSkills": {
+      "0": "PoisonAttackABahamut",
+      "1": "PoisonTouchRandomDoubleABahamut",
+      "2": "PoisonChargeABahamut",
+      "3": "LimitBreakEnergyBlastDoubleABahamut"
+    },
+    "passives": {
+      "0": "FudgeSuperPoisonIsAPassive",
+      "1": "HoldGround",
+      "2": "PlusAttackBoostLv3",
+      "3": "PlusHPBoostLv3",
+      "4": "AirMinusDamageLv3",
+      "5": "AddWeaponPrefSword"
+    },
+    "cost": 34,
+    "baseAttack": 1409,
+    "baseMaxHp": 7370,
+    "speed": 137,
+    "element": "Earth",
+    "weaponPref": "Axe",
+    "weaponPivotIndex": 0,
+    "secure": 1,
+    "evolveFrom": "Bahamut01",
+    "aiTargetPickWeight": 1,
+    "stars": 6,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 0,
+    "battleOrbImageFlip": 0,
+    "attackType": "Weapon",
+    "formTwitterShare": 1,
+    "cosmoName": "Bahamut03",
+    "cosmoBattleOrbImageFlip": 1,
+    "skillVoices": {
+      "0": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "1": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "2": [
+        9,
+        10,
+        11,
+        12
+      ],
+      "3": [
+        13,
+        14,
+        15,
+        16
+      ]
+    },
+    "damageVoices": [
+      17,
+      18,
+      19,
+      20
+    ],
+    "deathVoices": [
+      21,
+      22,
+      23,
+      24
+    ],
+    "victoryVoices": [
+      25,
+      26
+    ],
+    "lineupVoices": [
+      27,
+      28,
+      29,
+      30,
+      31,
+      32
+    ],
+    "evolutionVoices": [
+      33
+    ],
+    "trainVoices": [
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43
+    ],
+    "titleVoices": [
+      44
+    ],
+    "gachaVoices": [
+      45
+    ],
+    "loginVoices": [
+      46
+    ],
+    "tapVoices": [
+      47,
+      48,
+      49
+    ],
+    "idleVoices": [
+      50
+    ]
+  },
+  "_build": {
+    "scriptVersion": "3-incremental-checkpoint",
+    "sourceHash": "8649d99b009875bf6c738a0383af611bb5b9285ad8730381ced7d80dbee8b9cf",
+    "dependencyHash": "04c20286ad45a81372464fdc3bc055554f7f55bfa4ae5916437fbb8085c55781",
+    "generatedAt": 1778013990
+  }
+}
