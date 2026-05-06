@@ -1,5 +1,6 @@
 (function(){
-  const DATA_FILES = {
+  const ENTRY_BASE = './apkfiles/entries';
+  const LEGACY_DATA_FILES = {
     characters: './data/characters.json',
     tags: './data/character_tags.json',
     actives: './data/character_actives.json',
@@ -48,6 +49,7 @@
     if (e === 'dark' || e === 'death' || e === 'shadow') return 'dark';
     return e || String(value || '');
   }
+
   function normalizeElementTag(tag) {
     const raw = String(tag || '');
     if (!raw.startsWith('elem_')) return raw;
@@ -59,12 +61,117 @@
     return passives.map(p => typeof p === 'string' ? p : String(p?.name ?? '')).filter(Boolean);
   }
 
-  async function loadCharactersMerged() {
+  function titleFromInternalId(sourceId) {
+    return String(sourceId || '')
+      .replace(/Boss(?=\d+$)/, '')
+      .replace(/\d+$/, '')
+      .replace(/([a-z])([A-Z])/g, '$1 $2')
+      .replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2')
+      .trim();
+  }
+
+  function normalizeEntryForOldSite(entry, category) {
+    const sourceId = String(entry?.internal?.sourceId || entry?.name || entry?.id || '').trim();
+    const id = entry?.id || sourceId.toLowerCase();
+    const element = normalizeElementValue(entry?.element);
+    const stats = entry?.stats || {};
+    const raw = entry?.raw || {};
+    const resolved = entry?.resolved || {};
+    const activeSkills = [];
+    const passiveSkills = [];
+
+    if (resolved.activeSkills && typeof resolved.activeSkills === 'object') {
+      for (const [skillId, detail] of Object.entries(resolved.activeSkills)) {
+        const loc = detail?.localization || {};
+        activeSkills.push({
+          id: skillId,
+          name: loc.name || skillId,
+          description: loc.description || '',
+          raw: detail,
+        });
+      }
+    } else if (Array.isArray(entry?.refs?.activeSkills)) {
+      for (const skillId of entry.refs.activeSkills) activeSkills.push({ id: skillId, name: skillId, description: '' });
+    }
+
+    if (resolved.passives && typeof resolved.passives === 'object') {
+      for (const [skillId, detail] of Object.entries(resolved.passives)) {
+        const loc = detail?.localization || {};
+        passiveSkills.push({
+          id: skillId,
+          name: loc.name || skillId,
+          description: loc.description || '',
+          raw: detail,
+        });
+      }
+    } else if (Array.isArray(entry?.refs?.passives)) {
+      for (const skillId of entry.refs.passives) passiveSkills.push({ id: skillId, name: skillId, description: '' });
+    }
+
+    const out = {
+      ...entry,
+      id,
+      sourceId,
+      name: entry?.name || titleFromInternalId(sourceId),
+      title: entry?.title || '',
+      type: category,
+      category,
+      element,
+      image: entry?.image || '',
+      stats: {
+        atk: stats.atk ?? raw.baseAttack ?? raw.attack ?? '',
+        hp: stats.hp ?? raw.baseMaxHp ?? raw.hp ?? '',
+        spd: stats.spd ?? raw.speed ?? '',
+        cost: stats.cost ?? raw.cost ?? '',
+      },
+      activeSkills,
+      passiveSkills: passiveSkills.map(p => p.name || p.id),
+      passiveSkillDetails: passiveSkills,
+      derivedTags: Array.isArray(entry?.derivedTags) ? entry.derivedTags.map(normalizeElementTag) : [],
+      leaderSkill: entry?.leaderSkill || {
+        internalId: entry?.refs?.leaderBuff || raw.leaderBuff || '',
+        condition: entry?.refs?.leaderBuffCondition || raw.leaderBuffCondition || '',
+      },
+      _entryBased: true,
+    };
+
+    return out;
+  }
+
+  async function loadEntryCategory(category, optional = false) {
+    const index = await fetchJson(`${ENTRY_BASE}/${category}/index.json`, optional);
+    if (!index || !Array.isArray(index.entries)) return [];
+
+    const rows = [];
+    for (const row of index.entries) {
+      const file = String(row.file || '').replace(/^\.\//, '');
+      if (!file) continue;
+      try {
+        const entry = await fetchJson(`${ENTRY_BASE}/${category}/${file}`, false);
+        rows.push(normalizeEntryForOldSite(entry, category));
+      } catch (err) {
+        console.warn('[EvertaleData] Skipping broken entry:', category, file, err);
+      }
+    }
+    return rows;
+  }
+
+  async function loadAllEntries() {
+    const [characters, weapons, accessories, bosses] = await Promise.all([
+      loadEntryCategory('characters', false),
+      loadEntryCategory('weapons', true),
+      loadEntryCategory('accessories', true),
+      loadEntryCategory('bosses', true),
+    ]);
+    return { characters, weapons, accessories, bosses };
+  }
+
+  async function loadCharactersMergedLegacy() {
     const [baseJson, tagJson, activeJson, passiveJson] = await Promise.all([
-      fetchJson(DATA_FILES.characters, false),
-      fetchJson(DATA_FILES.tags, true),
-      fetchJson(DATA_FILES.actives, true),
-      fetchJson(DATA_FILES.passives, true),
+      fetchJson(LEGACY_DATA_FILES.characters, false),
+      fetchJson(LEGACY_DATA_FILES.tags, true),
+      fetchJson(LEGACY_DATA_FILES.actives, true),
+      fetchJson(LEGACY_DATA_FILES.passives, true),
     ]);
 
     const baseRows = dedupeById(toArray(baseJson, 'characters')).map(row => ({ ...row }));
@@ -89,12 +196,21 @@
       if (!Array.isArray(passiveRow.passiveSkills)) continue;
       const passives = [...passiveRow.passiveSkills];
       target.passiveSkills = passiveNamesFromArray(passives);
-      if (passives.some(p => p && typeof p === 'object')) {
-        target.passiveSkillDetails = passives;
-      }
+      if (passives.some(p => p && typeof p === 'object')) target.passiveSkillDetails = passives;
     }
 
     return Array.from(byId.values());
+  }
+
+  async function loadCharactersMerged() {
+    try {
+      const entries = await loadEntryCategory('characters', false);
+      if (entries.length) return entries;
+      console.warn('[EvertaleData] Entry characters empty. Falling back to legacy data.');
+    } catch (err) {
+      console.warn('[EvertaleData] Entry characters failed. Falling back to legacy data.', err);
+    }
+    return loadCharactersMergedLegacy();
   }
 
   window.EvertaleData = {
@@ -103,5 +219,8 @@
     normalizeElementValue,
     normalizeElementTag,
     loadCharactersMerged,
+    loadCharactersMergedLegacy,
+    loadEntryCategory,
+    loadAllEntries,
   };
 })();
