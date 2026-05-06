@@ -2,14 +2,18 @@
 """
 Extract Localizable_English.txt into grouped, searchable runtime maps.
 
-Purpose:
-- Do NOT rebuild all APK entries.
-- Read only Localizable_English.txt.
-- Group keys by internal data prefix.
-- Detect likely category by matching known entry indexes.
-- Write grouped localization files that can be joined into weapons/accessories/bosses/characters later.
+Universal behavior:
+- Can be run from repo root, tools/new_structure, apkfiles, or any subfolder.
+- Auto-detects repo root.
+- Auto-detects apkfiles folder.
+- Auto-detects apkfiles/entries folder when present.
+- Reads only Localizable_English.txt.
+- Does not rebuild existing entry files.
 
-Run from repo root:
+Run from anywhere inside the repo:
+  python tools/new_structure/extract_localizable_groups.py
+
+Optional explicit paths:
   python tools/new_structure/extract_localizable_groups.py --input apkfiles --entries apkfiles/entries --output apkfiles/entries/localization
 
 Outputs:
@@ -50,6 +54,52 @@ def read_text(path: Path) -> str:
 def write_json(path: Path, data: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
+
+
+def find_repo_root(start: Optional[Path] = None) -> Path:
+    cur = (start or Path.cwd()).resolve()
+    candidates = [cur, *cur.parents]
+    for path in candidates:
+        if (path / ".git").exists() or (path / "apkfiles").exists():
+            return path
+    return cur
+
+
+def resolve_path(path_text: Optional[str], repo_root: Path, default_rel: str) -> Path:
+    raw = Path(path_text) if path_text else Path(default_rel)
+    if raw.is_absolute():
+        return raw.resolve()
+    cwd_candidate = (Path.cwd() / raw).resolve()
+    if cwd_candidate.exists():
+        return cwd_candidate
+    return (repo_root / raw).resolve()
+
+
+def find_apkfiles(repo_root: Path, explicit: Optional[str]) -> Path:
+    if explicit:
+        path = resolve_path(explicit, repo_root, explicit)
+        if path.exists():
+            return path
+    candidates = [repo_root / "apkfiles", Path.cwd() / "apkfiles"]
+    for path in candidates:
+        if path.exists() and path.is_dir():
+            return path.resolve()
+    for path in repo_root.rglob("apkfiles"):
+        if path.is_dir():
+            return path.resolve()
+    raise FileNotFoundError("Could not auto-detect apkfiles folder. Pass --input path/to/apkfiles")
+
+
+def find_entries(repo_root: Path, apkfiles: Path, explicit: Optional[str]) -> Path:
+    if explicit:
+        path = resolve_path(explicit, repo_root, explicit)
+        if path.exists():
+            return path
+    candidates = [apkfiles / "entries", repo_root / "apkfiles" / "entries", Path.cwd() / "entries"]
+    for path in candidates:
+        if path.exists() and path.is_dir():
+            return path.resolve()
+    return (apkfiles / "entries").resolve()
 
 
 def find_localizable(input_dir: Path) -> Path:
@@ -130,7 +180,7 @@ def category_from_base(base: str, known: Dict[str, Set[str]]) -> str:
         return "bosses"
     if re.search(r"(Sword|Axe|Staff|Mace|Spear|Lance|Bow|Gun|Dagger|Katana|Greatsword|Hammer)", base):
         return "weapons"
-    if re.search(r"(Ring|Charm|Armor|Amulet|Pendant|Earring|Crown|Helm|Boot|Bracelet|Necklace|Accessory)", base):
+    if re.search(r"(Ring|Charm|Armor|Amulet|Pendant|Earring|Crown|Helm|Boot|Bracelet|Necklace|Accessory|Equipment)", base):
         return "accessories"
     return "unknown"
 
@@ -141,6 +191,7 @@ def group_rows(rows: Dict[str, str], known: Dict[str, Set[str]]) -> Dict[str, Di
         base, suffix = split_key(key)
         group = grouped.setdefault(base, {
             "base": base,
+            "family": re.sub(r"\d+$", "", base),
             "category": category_from_base(base, known),
             "keys": {},
             "rawKeys": [],
@@ -162,14 +213,16 @@ def group_rows(rows: Dict[str, str], known: Dict[str, Set[str]]) -> Dict[str, Di
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--input", default="apkfiles")
-    parser.add_argument("--entries", default="apkfiles/entries")
-    parser.add_argument("--output", default="apkfiles/entries/localization")
+    parser.add_argument("--input", default=None, help="Path to apkfiles. Auto-detected when omitted.")
+    parser.add_argument("--entries", default=None, help="Path to apkfiles/entries. Auto-detected when omitted.")
+    parser.add_argument("--output", default=None, help="Output folder. Defaults to apkfiles/entries/localization.")
     args = parser.parse_args()
 
-    input_dir = Path(args.input).resolve()
-    entries_root = Path(args.entries).resolve()
-    output_dir = Path(args.output).resolve()
+    repo_root = find_repo_root()
+    input_dir = find_apkfiles(repo_root, args.input)
+    entries_root = find_entries(repo_root, input_dir, args.entries)
+    output_dir = resolve_path(args.output, repo_root, str(entries_root / "localization")) if args.output else (entries_root / "localization").resolve()
+
     loc_path = find_localizable(input_dir)
     rows = parse_localizable(loc_path)
     known = {cat: load_index_source_ids(entries_root, cat) for cat in ["characters", "weapons", "accessories", "bosses"]}
@@ -183,6 +236,10 @@ def main() -> int:
     report = {
         "schemaVersion": 1,
         "generatedAt": int(time.time()),
+        "repoRoot": str(repo_root),
+        "input": str(input_dir),
+        "entriesRoot": str(entries_root),
+        "output": str(output_dir),
         "source": str(loc_path),
         "totalLocalizedKeys": len(rows),
         "totalGroups": len(grouped),
