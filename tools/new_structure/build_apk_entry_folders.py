@@ -21,7 +21,7 @@ import time
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Set
 
-SCRIPT_VERSION = "5-second-name-localization"
+SCRIPT_VERSION = "6-character-family-states"
 IMAGEKIT_BASE = "https://ik.imagekit.io/r8fsa98s9"
 
 OLD_WEBSITE_FILES = {
@@ -220,6 +220,11 @@ def get_internal_id(item: Dict[str, Any]) -> str:
 
 def family_from_internal_id(internal_id: str) -> str:
     return re.sub(r"\d+$", "", internal_id or "")
+
+
+def form_number_from_internal_id(internal_id: str) -> Optional[int]:
+    match = re.search(r"(\d+)$", internal_id or "")
+    return int(match.group(1)) if match else None
 
 
 def slugify(value: str) -> str:
@@ -430,6 +435,109 @@ def normalize_entry(item: Dict[str, Any], category: str, order_index: int, displ
     }
 
 
+def infer_family_rarity(forms: List[Dict[str, Any]]) -> str:
+    max_stars = 0
+    for item in forms:
+        try:
+            max_stars = max(max_stars, int(item.get("stars") or 0), int(item.get("evolvedStars") or 0))
+        except Exception:
+            pass
+    if max_stars >= 5:
+        return "SSR"
+    if max_stars >= 3:
+        return "SR"
+    if max_stars >= 2:
+        return "R"
+    return "N"
+
+
+def state_specs_for_rarity(rarity: str) -> List[Tuple[str, int, int]]:
+    if rarity == "SSR":
+        return [("base", 1, 5), ("evolved", 2, 6), ("final", 3, 6)]
+    if rarity == "SR":
+        return [("base", 1, 3), ("evolved", 2, 4)]
+    return [("base", 1, 1)]
+
+
+def nearest_form_for_state(forms_by_num: Dict[int, Dict[str, Any]], form_num: int) -> Optional[Dict[str, Any]]:
+    if form_num in forms_by_num:
+        return forms_by_num[form_num]
+    if not forms_by_num:
+        return None
+    keys = sorted(forms_by_num.keys())
+    lower = [k for k in keys if k <= form_num]
+    if lower:
+        return forms_by_num[lower[-1]]
+    return forms_by_num[keys[0]]
+
+
+def build_character_family_files(output_dir: Path, ordered: List[Tuple[str, Optional[str]]], by_id: Dict[str, Dict[str, Any]], resolvers: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
+    localizable = resolvers["Localizable"]
+    families_dir = output_dir / "characters" / "families"
+    family_order: List[str] = []
+    grouped: Dict[str, List[Dict[str, Any]]] = {}
+    display_overrides: Dict[str, str] = {}
+
+    for internal_id, display_name in ordered:
+        family = family_from_internal_id(internal_id)
+        if not family:
+            continue
+        if family not in family_order:
+            family_order.append(family)
+        if display_name and family not in display_overrides:
+            display_overrides[family] = display_name
+        item = by_id.get(internal_id)
+        if item is not None:
+            grouped.setdefault(family, []).append(item)
+
+    index_entries = []
+    written = 0
+    for order_index, family in enumerate(family_order, start=1):
+        forms = grouped.get(family, [])
+        forms_by_num = {form_number_from_internal_id(get_internal_id(item)) or 1: item for item in forms}
+        rarity = infer_family_rarity(forms)
+        first_form = nearest_form_for_state(forms_by_num, 1) or (forms[0] if forms else {})
+        first_loc = localize_character(localizable, f"{family}01", display_overrides.get(family) or str(first_form.get("name") or family))
+        fallback_name = display_overrides.get(family) or first_loc.get("name") or str(first_form.get("name") or family)
+        fallback_title = first_loc.get("title") or ""
+        states = []
+        for state_name, form_num, stars in state_specs_for_rarity(rarity):
+            state_source_id = f"{family}{form_num:02d}"
+            loc = localize_character(localizable, state_source_id, fallback_name)
+            nearest = nearest_form_for_state(forms_by_num, form_num) or {}
+            nearest_id = get_internal_id(nearest) if nearest else None
+            states.append({
+                "state": state_name,
+                "stars": stars,
+                "sourceId": state_source_id,
+                "dataSourceId": nearest_id,
+                "image": image_url("characters", state_source_id),
+                "name": loc.get("name") or fallback_name,
+                "title": loc.get("title") or fallback_title,
+                "description": loc.get("description") or "",
+                "hasRawForm": state_source_id in by_id,
+            })
+        family_entry = {
+            "schemaVersion": 1,
+            "family": family,
+            "order": order_index,
+            "name": states[0]["name"] if states else fallback_name,
+            "title": next((s["title"] for s in states if s.get("title")), fallback_title),
+            "rarity": rarity,
+            "image": states[0]["image"] if states else image_url("characters", f"{family}01"),
+            "states": states,
+            "rawFormSourceIds": [get_internal_id(item) for item in forms],
+            "_build": {"scriptVersion": SCRIPT_VERSION, "generatedAt": now_int(), "sourceHash": sha256_data({"family": family, "forms": forms, "states": states})},
+        }
+        filename = f"{slugify(family)}.json"
+        write_json_if_changed(families_dir / filename, family_entry)
+        index_entries.append({"order": order_index, "family": family, "name": family_entry["name"], "title": family_entry["title"], "rarity": rarity, "file": f"families/{filename}", "states": len(states)})
+        written += 1
+
+    write_json_if_changed(output_dir / "characters" / "families" / "index.json", {"schemaVersion": 1, "count": len(index_entries), "entries": index_entries})
+    return {"familiesWritten": written, "familiesTotal": len(index_entries), "output": str(families_dir)}
+
+
 def update_checkpoint(output_dir: Path, checkpoint: Dict[str, Any]) -> None:
     write_json_if_changed(output_dir / "reports" / "build_checkpoint.json", checkpoint)
 
@@ -493,9 +601,10 @@ def build_category(input_dir: Path, output_dir: Path, category: str, resolvers: 
         update_checkpoint(output_dir, checkpoint)
         index_entries.append({"order": order_index, "sourceId": internal_id, "name": entry_name, "file": f"entries/{filename}", "placeholder": is_placeholder, "image": image})
     write_json_if_changed(category_dir / "index.json", {"schemaVersion": 3, "category": category, "sourceFile": str(raw_path.relative_to(input_dir)), "count": len(index_entries), "placeholders": placeholders, "entries": index_entries})
+    family_report = build_character_family_files(output_dir, ordered, by_id, resolvers) if category == "characters" else None
     checkpoint.update({"status": "complete", "completedAt": now_int()})
     update_checkpoint(output_dir, checkpoint)
-    return {"category": category, "status": "ok", "rawFile": str(raw_path), "rawEntries": len(items), "totalEntries": len(ordered), "entriesWritten": written, "entriesSkipped": skipped, "processedThisRun": processed_this_run, "placeholdersWritten": placeholders, "output": str(category_dir)}
+    return {"category": category, "status": "ok", "rawFile": str(raw_path), "rawEntries": len(items), "totalEntries": len(ordered), "entriesWritten": written, "entriesSkipped": skipped, "processedThisRun": processed_this_run, "placeholdersWritten": placeholders, "familyReport": family_report, "output": str(category_dir)}
 
 
 def write_resolver_indexes(output_dir: Path, resolvers: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
