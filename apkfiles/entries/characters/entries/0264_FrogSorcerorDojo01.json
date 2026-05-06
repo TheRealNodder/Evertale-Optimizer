@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 264,
-  "id": "frog-sorceror-dojo-01",
-  "name": "FrogSorcerorDojo01",
+  "id": "jin",
+  "name": "Jin",
+  "title": "",
   "category": "character",
   "rarity": null,
   "stars": 4,
@@ -40,6 +41,10 @@
       "GainAttackSingleAWaterDojo": {
         "id": "GainAttackSingleAWaterDojo",
         "found": true,
+        "localization": {
+          "name": "GainAttackSingleAWaterDojo",
+          "description": ""
+        },
         "ability": {
           "name": "GainAttackSingleAWaterDojo",
           "class": "Ability",
@@ -151,6 +156,10 @@
       "BasicAttackAllAWaterDojo": {
         "id": "BasicAttackAllAWaterDojo",
         "found": true,
+        "localization": {
+          "name": "BasicAttackAllAWaterDojo",
+          "description": ""
+        },
         "ability": {
           "name": "BasicAttackAllAWaterDojo",
           "class": "Ability",
@@ -262,6 +271,10 @@
       "DreamHuntA2Dojo": {
         "id": "DreamHuntA2Dojo",
         "found": true,
+        "localization": {
+          "name": "DreamHuntA2Dojo",
+          "description": ""
+        },
         "ability": {
           "name": "DreamHuntA2Dojo",
           "class": "Ability",
@@ -379,6 +392,10 @@
       "SleepSingleADojo": {
         "id": "SleepSingleADojo",
         "found": true,
+        "localization": {
+          "name": "SleepSingleADojo",
+          "description": ""
+        },
         "ability": {
           "name": "SleepSingleADojo",
           "class": "Ability",
@@ -657,20 +674,37 @@
               "or": {
                 "class": "MonsterConditions",
                 "monsterTags": [
-                  "SleepImmuneVsWater"
+                  "SleepImmuneIfBeastAlly"
                 ],
-                "checkEnemyTeamOfMonster": true,
-                "enemyTeamMonsterConditionMatchesNeeded": {
-                  "IsWater": 1
+                "checkReinforcementsForTeamConditionMatches": true,
+                "myTeamMonsterConditionMatchesNeeded": {
+                  "IsBeastRegular": 1
                 },
                 "or": {
                   "class": "MonsterConditions",
                   "monsterTags": [
-                    "NegativeStatusImmunityFromThorns"
+                    "SleepImmuneVsWater"
                   ],
-                  "buffStackNames": [
-                    "SleepThorns"
-                  ]
+                  "checkEnemyTeamOfMonster": true,
+                  "enemyTeamMonsterConditionMatchesNeeded": {
+                    "IsWater": 1
+                  },
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "SleepImmuneVs2Enemies"
+                    ],
+                    "enemyTeamSize": 2,
+                    "or": {
+                      "class": "MonsterConditions",
+                      "monsterTags": [
+                        "NegativeStatusImmunityFromThorns"
+                      ],
+                      "buffStackNames": [
+                        "SleepThorns"
+                      ]
+                    }
+                  }
                 }
               }
             }
@@ -681,19 +715,35 @@
     "passives": {
       "AttackUpTargetEquippedKatanaLv2": {
         "id": "AttackUpTargetEquippedKatanaLv2",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Katana Hunter Lv2",
+          "description": "7% bonus to attacks against units equipped with Katanas."
+        }
       },
       "PlusHPBoostLv2": {
         "id": "PlusHPBoostLv2",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv2",
+          "description": "Adds 800 to this unit's max HP."
+        }
       },
       "PlusAttackBoostLv2": {
         "id": "PlusAttackBoostLv2",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv2",
+          "description": "Adds 200 to this unit's Attack."
+        }
       },
       "AddWeaponPrefMace": {
         "id": "AddWeaponPrefMace",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Mace Mastery",
+          "description": "Can use weapon skills of Maces in addition to their original preferred weapon type."
+        }
       }
     },
     "activeSkillsAI": {},
@@ -790,9 +840,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "d41a2fafb042afd1b92563e82154c9a51992603a2bdf4bffc6f27eaf5cf3feb6",
-    "dependencyHash": "1fd2405f28abba1252a5a11e1f481d23c1891fc3b6accb618014498d9323386a",
-    "generatedAt": 1778013987
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "ba9136140d53ed0c7689119e6df3176d47eb8c8090feb5d9283d4a746f9fb726",
+    "dependencyHash": "9034300d29c952979af3e4203c69c0fe8af04050b403eb9e83f99b71e2cea369",
+    "generatedAt": 1778081727
   }
 }

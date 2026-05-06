@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 123,
-  "id": "water-construct-01",
-  "name": "WaterConstruct01",
+  "id": "large-water-golem",
+  "name": "Large Water Golem",
+  "title": "",
   "category": "bosse",
   "rarity": null,
   "stars": 6,
@@ -39,6 +40,11 @@
       "GainAttackSingleStealthA": {
         "id": "GainAttackSingleStealthA",
         "found": true,
+        "localization": {
+          "name": "Swift Stealth",
+          "description": "75% damage to 1 enemy. The user is also granted the Stealth status effect. This will overwrite other status effects on the user. Stealthed units ignore the next enemy attack that would damage more than 1 target. Any damage will remove stealth.",
+          "selected": "75% damage and gain Stealth\n(Will overwrite other status effects)"
+        },
         "ability": {
           "name": "GainAttackSingleStealthA",
           "class": "Ability",
@@ -294,16 +300,16 @@
           }
         },
         "attackScalors": {},
-        "conditions": {},
-        "localization": {
-          "name": "Swift Stealth",
-          "description": "75% damage to 1 enemy. The user is also granted the Stealth status effect. This will overwrite other status effects on the user. Stealthed units ignore the next enemy attack that would damage more than 1 target. Any damage will remove stealth.",
-          "selected": "75% damage and gain Stealth\n(Will overwrite other status effects)"
-        }
+        "conditions": {}
       },
       "SleepSingleA": {
         "id": "SleepSingleA",
         "found": true,
+        "localization": {
+          "name": "Sleep",
+          "description": "Grants 1 enemy the Sleep status effect for 200TU. This will overwrite other status effects on that unit. Sleep cannot be applied to a unit that Has Slept while on the battlefield.",
+          "selected": "Puts the target to sleep\n(Will overwrite other status effects)"
+        },
         "ability": {
           "name": "SleepSingleA",
           "class": "Ability",
@@ -580,34 +586,51 @@
               "or": {
                 "class": "MonsterConditions",
                 "monsterTags": [
-                  "SleepImmuneVsWater"
+                  "SleepImmuneIfBeastAlly"
                 ],
-                "checkEnemyTeamOfMonster": true,
-                "enemyTeamMonsterConditionMatchesNeeded": {
-                  "IsWater": 1
+                "checkReinforcementsForTeamConditionMatches": true,
+                "myTeamMonsterConditionMatchesNeeded": {
+                  "IsBeastRegular": 1
                 },
                 "or": {
                   "class": "MonsterConditions",
                   "monsterTags": [
-                    "NegativeStatusImmunityFromThorns"
+                    "SleepImmuneVsWater"
                   ],
-                  "buffStackNames": [
-                    "SleepThorns"
-                  ]
+                  "checkEnemyTeamOfMonster": true,
+                  "enemyTeamMonsterConditionMatchesNeeded": {
+                    "IsWater": 1
+                  },
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "SleepImmuneVs2Enemies"
+                    ],
+                    "enemyTeamSize": 2,
+                    "or": {
+                      "class": "MonsterConditions",
+                      "monsterTags": [
+                        "NegativeStatusImmunityFromThorns"
+                      ],
+                      "buffStackNames": [
+                        "SleepThorns"
+                      ]
+                    }
+                  }
                 }
               }
             }
           }
-        },
-        "localization": {
-          "name": "Sleep",
-          "description": "Grants 1 enemy the Sleep status effect for 200TU. This will overwrite other status effects on that unit. Sleep cannot be applied to a unit that Has Slept while on the battlefield.",
-          "selected": "Puts the target to sleep\n(Will overwrite other status effects)"
         }
       },
       "DreamHuntAllA": {
         "id": "DreamHuntAllA",
         "found": true,
+        "localization": {
+          "name": "Dream Hunter",
+          "description": "600% damage to all enemies if they are sleeping. Allies gain 3 Spirit for each sleeping target.",
+          "selected": "600% damage & gain 3 Spirit per sleeping target"
+        },
         "ability": {
           "name": "DreamHuntAllA",
           "class": "Ability",
@@ -739,16 +762,16 @@
               "Sleep"
             ]
           }
-        },
-        "localization": {
-          "name": "Dream Hunter",
-          "description": "600% damage to all enemies if they are sleeping. Allies gain 3 Spirit for each sleeping target.",
-          "selected": "600% damage & gain 3 Spirit per sleeping target"
         }
       },
       "DesperateSleepBombDoubleA": {
         "id": "DesperateSleepBombDoubleA",
         "found": true,
+        "localization": {
+          "name": "Last Resort Sleep",
+          "description": "Sacrifices the user to grant 2 enemies the Sleep status effect for 200TU. This will overwrite other status effects on those units. Usable only if the user's HP is at 25% or less. Sleep cannot be applied to a unit that Has Slept while on the battlefield.",
+          "selected": "Sacrifices the user to Sleep 2 targets for 200TU\n(Will overwrite other status effects)"
+        },
         "ability": {
           "name": "DesperateSleepBombDoubleA",
           "class": "Ability",
@@ -1045,44 +1068,68 @@
               "or": {
                 "class": "MonsterConditions",
                 "monsterTags": [
-                  "SleepImmuneVsWater"
+                  "SleepImmuneIfBeastAlly"
                 ],
-                "checkEnemyTeamOfMonster": true,
-                "enemyTeamMonsterConditionMatchesNeeded": {
-                  "IsWater": 1
+                "checkReinforcementsForTeamConditionMatches": true,
+                "myTeamMonsterConditionMatchesNeeded": {
+                  "IsBeastRegular": 1
                 },
                 "or": {
                   "class": "MonsterConditions",
                   "monsterTags": [
-                    "NegativeStatusImmunityFromThorns"
+                    "SleepImmuneVsWater"
                   ],
-                  "buffStackNames": [
-                    "SleepThorns"
-                  ]
+                  "checkEnemyTeamOfMonster": true,
+                  "enemyTeamMonsterConditionMatchesNeeded": {
+                    "IsWater": 1
+                  },
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "SleepImmuneVs2Enemies"
+                    ],
+                    "enemyTeamSize": 2,
+                    "or": {
+                      "class": "MonsterConditions",
+                      "monsterTags": [
+                        "NegativeStatusImmunityFromThorns"
+                      ],
+                      "buffStackNames": [
+                        "SleepThorns"
+                      ]
+                    }
+                  }
                 }
               }
             }
           }
-        },
-        "localization": {
-          "name": "Last Resort Sleep",
-          "description": "Sacrifices the user to grant 2 enemies the Sleep status effect for 200TU. This will overwrite other status effects on those units. Usable only if the user's HP is at 25% or less. Sleep cannot be applied to a unit that Has Slept while on the battlefield.",
-          "selected": "Sacrifices the user to Sleep 2 targets for 200TU\n(Will overwrite other status effects)"
         }
       }
     },
     "passives": {
       "VulnerableWhileSleepingSource": {
         "id": "VulnerableWhileSleepingSource",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Sleep Catalyst",
+          "description": "Damage to sleeping units is increased by 50% while this unit is on the battlefield."
+        }
       },
       "HoldGround": {
         "id": "HoldGround",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Hold Ground",
+          "description": "If this unit would be defeated by an enemy attack or a status effect while having more than 1 HP, it instead survives with 1 HP."
+        }
       },
       "PoisonImmunity": {
         "id": "PoisonImmunity",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Poison Immunity",
+          "description": "Poison cannot be applied to this unit."
+        }
       }
     },
     "activeSkillsAI": {},
@@ -1153,9 +1200,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "7782bfab55308672343d34b7aa0510b47f001c0c6734dac4c2d25405c3d01af4",
-    "dependencyHash": "b00704925b6f1b38d15e9b01f393924e9a7a06a9f3c96c7fc3dc7e4dfd568383",
-    "generatedAt": 1778014032
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "d16d750505c4194c94e0c889aefd26271d276879270d9a096106e76e36fc90c4",
+    "dependencyHash": "cd027f41650f308945dec4009c4f37f71d383bf3e87fef08f2d9ac2d9ad6aee4",
+    "generatedAt": 1778081774
   }
 }

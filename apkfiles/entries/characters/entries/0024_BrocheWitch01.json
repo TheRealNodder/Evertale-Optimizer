@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 24,
-  "id": "broche-witch-01",
-  "name": "BrocheWitch01",
+  "id": "wantonwitch",
+  "name": "Wantonwitch",
+  "title": "",
   "category": "character",
   "rarity": null,
   "stars": 3,
@@ -39,6 +40,11 @@
       "GainAttackSingleAFire": {
         "id": "GainAttackSingleAFire",
         "found": true,
+        "localization": {
+          "name": "Attack",
+          "description": "Damage to 1 enemy and allies gain 2 Spirit.",
+          "selected": "Damage to 1 enemy and gains 2 Spirit"
+        },
         "ability": {
           "name": "GainAttackSingleAFire",
           "class": "Ability",
@@ -143,16 +149,16 @@
         },
         "buffs": {},
         "attackScalors": {},
-        "conditions": {},
-        "localization": {
-          "name": "Attack",
-          "description": "Damage to 1 enemy and allies gain 2 Spirit.",
-          "selected": "Damage to 1 enemy and gains 2 Spirit"
-        }
+        "conditions": {}
       },
       "SleepSingleA": {
         "id": "SleepSingleA",
         "found": true,
+        "localization": {
+          "name": "Sleep",
+          "description": "Grants 1 enemy the Sleep status effect for 200TU. This will overwrite other status effects on that unit. Sleep cannot be applied to a unit that Has Slept while on the battlefield.",
+          "selected": "Puts the target to sleep\n(Will overwrite other status effects)"
+        },
         "ability": {
           "name": "SleepSingleA",
           "class": "Ability",
@@ -429,34 +435,51 @@
               "or": {
                 "class": "MonsterConditions",
                 "monsterTags": [
-                  "SleepImmuneVsWater"
+                  "SleepImmuneIfBeastAlly"
                 ],
-                "checkEnemyTeamOfMonster": true,
-                "enemyTeamMonsterConditionMatchesNeeded": {
-                  "IsWater": 1
+                "checkReinforcementsForTeamConditionMatches": true,
+                "myTeamMonsterConditionMatchesNeeded": {
+                  "IsBeastRegular": 1
                 },
                 "or": {
                   "class": "MonsterConditions",
                   "monsterTags": [
-                    "NegativeStatusImmunityFromThorns"
+                    "SleepImmuneVsWater"
                   ],
-                  "buffStackNames": [
-                    "SleepThorns"
-                  ]
+                  "checkEnemyTeamOfMonster": true,
+                  "enemyTeamMonsterConditionMatchesNeeded": {
+                    "IsWater": 1
+                  },
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "SleepImmuneVs2Enemies"
+                    ],
+                    "enemyTeamSize": 2,
+                    "or": {
+                      "class": "MonsterConditions",
+                      "monsterTags": [
+                        "NegativeStatusImmunityFromThorns"
+                      ],
+                      "buffStackNames": [
+                        "SleepThorns"
+                      ]
+                    }
+                  }
                 }
               }
             }
           }
-        },
-        "localization": {
-          "name": "Sleep",
-          "description": "Grants 1 enemy the Sleep status effect for 200TU. This will overwrite other status effects on that unit. Sleep cannot be applied to a unit that Has Slept while on the battlefield.",
-          "selected": "Puts the target to sleep\n(Will overwrite other status effects)"
         }
       },
       "AccelerateSelfA": {
         "id": "AccelerateSelfA",
         "found": true,
+        "localization": {
+          "name": "Quicken",
+          "description": "User's TU costs for all of their skills are reduced by 20%. This will overwrite the effect of previous Quicken skills.",
+          "selected": "Reduces the TU costs of target's skills"
+        },
         "ability": {
           "name": "AccelerateSelfA",
           "class": "Ability",
@@ -599,30 +622,41 @@
           }
         },
         "attackScalors": {},
-        "conditions": {},
-        "localization": {
-          "name": "Quicken",
-          "description": "User's TU costs for all of their skills are reduced by 20%. This will overwrite the effect of previous Quicken skills.",
-          "selected": "Reduces the TU costs of target's skills"
-        }
+        "conditions": {}
       }
     },
     "passives": {
       "PlusAttackBoostLv1": {
         "id": "PlusAttackBoostLv1",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv1",
+          "description": "Adds 150 to this unit's Attack."
+        }
       },
       "MaceMinusDamageLv1": {
         "id": "MaceMinusDamageLv1",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Mace Resist Lv1",
+          "description": "5% less damage from attacks by units equipped with Maces."
+        }
       },
       "PlusHPBoostLv1": {
         "id": "PlusHPBoostLv1",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv1",
+          "description": "Adds 600 to this unit's max HP."
+        }
       },
       "AddWeaponPrefMace": {
         "id": "AddWeaponPrefMace",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Mace Mastery",
+          "description": "Can use weapon skills of Maces in addition to their original preferred weapon type."
+        }
       }
     },
     "activeSkillsAI": {},
@@ -708,9 +742,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "c16368d8b3a59b7ede90118fe09bfa2510d13da72b2e600dc9d564dc4d8ec3d3",
-    "dependencyHash": "41bc025243da0202d371a2818461e349a01116144019e50453094d95ae026e9a",
-    "generatedAt": 1778013979
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "62d897507e14a86ebe417be2986ec4dab74148436c341ad96f31096fc600ea55",
+    "dependencyHash": "2bc7a40d598d7918464d20ecf4a0beb71d6d2d5af2269df994c497e2076d4e2a",
+    "generatedAt": 1778081720
   }
 }

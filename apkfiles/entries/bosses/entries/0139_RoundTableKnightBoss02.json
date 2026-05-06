@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 139,
-  "id": "round-table-knight-boss-02",
-  "name": "RoundTableKnightBoss02",
+  "id": "mega-lancelot",
+  "name": "Mega Lancelot",
+  "title": "",
   "category": "bosse",
   "rarity": null,
   "stars": 6,
@@ -38,6 +39,10 @@
       "GainAttackSingleStealthARoundTableKnightBoss": {
         "id": "GainAttackSingleStealthARoundTableKnightBoss",
         "found": true,
+        "localization": {
+          "name": "GainAttackSingleStealthARoundTableKnightBoss",
+          "description": ""
+        },
         "ability": {
           "name": "GainAttackSingleStealthARoundTableKnightBoss",
           "class": "Ability",
@@ -301,6 +306,11 @@
       "TimeBusterPlusStealthARoundTableKnightBoss": {
         "id": "TimeBusterPlusStealthARoundTableKnightBoss",
         "found": true,
+        "localization": {
+          "name": "Royal Swiftslash",
+          "description": "400% damage to 1 enemy if they have 100+ TU. 500% damage if the target has 130TU or more. 600% damage if the target has 200TU or more. This attack ignores enemy damage reduction effects. The user also gains the Stealth status effect if the target has 100TU or more. This will overwrite other status effects on the user. Stealthed units ignore the next enemy attack that would damage more than 1 target. Any damage will remove stealth.",
+          "selected": "400%+ damage against 100+ TU and gains Stealth\n(Will overwrite other status effects)"
+        },
         "ability": {
           "name": "TimeBusterPlusStealthARoundTableKnightBoss",
           "class": "Ability",
@@ -563,16 +573,16 @@
             "class": "MonsterConditions",
             "currentTUGreaterThan": 100
           }
-        },
-        "localization": {
-          "name": "Royal Swiftslash",
-          "description": "400% damage to 1 enemy if they have 100+ TU. 500% damage if the target has 130TU or more. 600% damage if the target has 200TU or more. This attack ignores enemy damage reduction effects. The user also gains the Stealth status effect if the target has 100TU or more. This will overwrite other status effects on the user. Stealthed units ignore the next enemy attack that would damage more than 1 target. Any damage will remove stealth.",
-          "selected": "400%+ damage against 100+ TU and gains Stealth\n(Will overwrite other status effects)"
         }
       },
       "SneakAttackFastARoundTableKnightBoss": {
         "id": "SneakAttackFastARoundTableKnightBoss",
         "found": true,
+        "localization": {
+          "name": "Stealth Raid",
+          "description": "500% damage to 1 enemy. Usable if the user has the Stealth status effect. This attack ignores any enemy status effects, damage reduction effects, revenge passive skills, and skin passive skills.",
+          "selected": "500% damage, usable while stealthed"
+        },
         "ability": {
           "name": "SneakAttackFastARoundTableKnightBoss",
           "class": "Ability",
@@ -779,16 +789,16 @@
               "Stealth"
             ]
           }
-        },
-        "localization": {
-          "name": "Stealth Raid",
-          "description": "500% damage to 1 enemy. Usable if the user has the Stealth status effect. This attack ignores any enemy status effects, damage reduction effects, revenge passive skills, and skin passive skills.",
-          "selected": "500% damage, usable while stealthed"
         }
       },
       "InstantStun200ARoundTableKnightBoss": {
         "id": "InstantStun200ARoundTableKnightBoss",
         "found": true,
+        "localization": {
+          "name": "Instant Stun",
+          "description": "Stuns 1 enemy for 200TU. This skill becomes locked for 200TU after use.",
+          "selected": "Stuns target for 200TU"
+        },
         "ability": {
           "name": "InstantStun200ARoundTableKnightBoss",
           "class": "Ability",
@@ -994,61 +1004,71 @@
                     "or": {
                       "class": "MonsterConditions",
                       "monsterTags": [
-                        "StunImmuneIfAnyBurningAllies"
+                        "StunImmuneIfBeastAlly"
                       ],
+                      "checkReinforcementsForTeamConditionMatches": true,
                       "myTeamMonsterConditionMatchesNeeded": {
-                        "IsBurning": 1
+                        "IsBeastRegular": 1
                       },
                       "or": {
                         "class": "MonsterConditions",
                         "monsterTags": [
-                          "StunImmuneIfEnemyIsFireBurnBlastOrForce"
+                          "StunImmuneIfAnyBurningAllies"
                         ],
-                        "checkEnemyTeamOfMonster": true,
-                        "enemyTeamMonsterConditionMatchesNeeded": {
-                          "IsBurnBlastOrForceOrFire": 1
+                        "myTeamMonsterConditionMatchesNeeded": {
+                          "IsBurning": 1
                         },
                         "or": {
                           "class": "MonsterConditions",
                           "monsterTags": [
-                            "StunImmuneIfAllyIsFireBurnBlastOrForce"
+                            "StunImmuneIfEnemyIsFireBurnBlastOrForce"
                           ],
-                          "myTeamMonsterConditionMatchesNeeded": {
+                          "checkEnemyTeamOfMonster": true,
+                          "enemyTeamMonsterConditionMatchesNeeded": {
                             "IsBurnBlastOrForceOrFire": 1
                           },
                           "or": {
                             "class": "MonsterConditions",
                             "monsterTags": [
-                              "StunImmuneIfPoisonedEnemy"
+                              "StunImmuneIfAllyIsFireBurnBlastOrForce"
                             ],
-                            "checkEnemyTeamOfMonster": true,
-                            "enemyTeamMonsterConditionMatchesNeeded": {
-                              "IsPoisoned": 1
+                            "myTeamMonsterConditionMatchesNeeded": {
+                              "IsBurnBlastOrForceOrFire": 1
                             },
                             "or": {
                               "class": "MonsterConditions",
                               "monsterTags": [
-                                "StunImmunityIfNotBurning"
+                                "StunImmuneIfPoisonedEnemy"
                               ],
-                              "not": {
-                                "class": "MonsterConditions",
-                                "buffStackNames": [
-                                  "Burn"
-                                ]
+                              "checkEnemyTeamOfMonster": true,
+                              "enemyTeamMonsterConditionMatchesNeeded": {
+                                "IsPoisoned": 1
                               },
                               "or": {
                                 "class": "MonsterConditions",
                                 "monsterTags": [
-                                  "StunImmuneIfHoldGroundPlusTriggered"
-                                ],
-                                "buffStackNames": [
-                                  "BlockDeathUntilNextTurn"
+                                  "StunImmunityIfNotBurning"
                                 ],
                                 "not": {
                                   "class": "MonsterConditions",
                                   "buffStackNames": [
-                                    "HoldGroundOnceForHoldGroundPlus"
+                                    "Burn"
                                   ]
+                                },
+                                "or": {
+                                  "class": "MonsterConditions",
+                                  "monsterTags": [
+                                    "StunImmuneIfHoldGroundPlusTriggered"
+                                  ],
+                                  "buffStackNames": [
+                                    "BlockDeathUntilNextTurn"
+                                  ],
+                                  "not": {
+                                    "class": "MonsterConditions",
+                                    "buffStackNames": [
+                                      "HoldGroundOnceForHoldGroundPlus"
+                                    ]
+                                  }
                                 }
                               }
                             }
@@ -1070,22 +1090,25 @@
               ]
             }
           }
-        },
-        "localization": {
-          "name": "Instant Stun",
-          "description": "Stuns 1 enemy for 200TU. This skill becomes locked for 200TU after use.",
-          "selected": "Stuns target for 200TU"
         }
       }
     },
     "passives": {
       "DoubleTurnOnKillABossSummonMerlinBossHidden": {
         "id": "DoubleTurnOnKillABossSummonMerlinBossHidden",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Battle Momentum",
+          "description": "Each time this unit defeats an enemy with an attack, this unit will get another turn. Effects that influence TU order may interrupt the extra turn (e.g. Stuns targeting the lowest TU target)."
+        }
       },
       "GetTurnSkinAPlus": {
         "id": "GetTurnSkinAPlus",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Counter Skin+",
+          "description": "When this unit takes damage from an attack, they will immediately get the next turn. Stealth Strike type active skills will not ignore this skill. This cannot trigger again until TU advances. This unit cannot become a Guardian or Stun Absorber."
+        }
       }
     },
     "activeSkillsAI": {},
@@ -1166,9 +1189,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "cb33b2f452e6694642c255900d07c59999376314acdf302fe299e0ecdf436bfa",
-    "dependencyHash": "77aaf2ddc9ef677cd969540aff4def4a07440d07c1b3721167badd67ccbdca50",
-    "generatedAt": 1778014033
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "4256d85fdb9b962428c09dcb19c7a1440f0f6bde78a5f056bb175b0255f84bc6",
+    "dependencyHash": "31de547d656c2dac478472bc3dde5439b90f6438e383516cf540177bfad54c49",
+    "generatedAt": 1778081775
   }
 }

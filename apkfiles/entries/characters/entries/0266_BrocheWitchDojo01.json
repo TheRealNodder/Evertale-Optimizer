@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 266,
-  "id": "broche-witch-dojo-01",
-  "name": "BrocheWitchDojo01",
+  "id": "wantonwitch",
+  "name": "Wantonwitch",
+  "title": "",
   "category": "character",
   "rarity": null,
   "stars": 3,
@@ -39,6 +40,10 @@
       "GainAttackSingleAFireDojo": {
         "id": "GainAttackSingleAFireDojo",
         "found": true,
+        "localization": {
+          "name": "GainAttackSingleAFireDojo",
+          "description": ""
+        },
         "ability": {
           "name": "GainAttackSingleAFireDojo",
           "class": "Ability",
@@ -150,6 +155,10 @@
       "SleepSingleADojo": {
         "id": "SleepSingleADojo",
         "found": true,
+        "localization": {
+          "name": "SleepSingleADojo",
+          "description": ""
+        },
         "ability": {
           "name": "SleepSingleADojo",
           "class": "Ability",
@@ -428,20 +437,37 @@
               "or": {
                 "class": "MonsterConditions",
                 "monsterTags": [
-                  "SleepImmuneVsWater"
+                  "SleepImmuneIfBeastAlly"
                 ],
-                "checkEnemyTeamOfMonster": true,
-                "enemyTeamMonsterConditionMatchesNeeded": {
-                  "IsWater": 1
+                "checkReinforcementsForTeamConditionMatches": true,
+                "myTeamMonsterConditionMatchesNeeded": {
+                  "IsBeastRegular": 1
                 },
                 "or": {
                   "class": "MonsterConditions",
                   "monsterTags": [
-                    "NegativeStatusImmunityFromThorns"
+                    "SleepImmuneVsWater"
                   ],
-                  "buffStackNames": [
-                    "SleepThorns"
-                  ]
+                  "checkEnemyTeamOfMonster": true,
+                  "enemyTeamMonsterConditionMatchesNeeded": {
+                    "IsWater": 1
+                  },
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "SleepImmuneVs2Enemies"
+                    ],
+                    "enemyTeamSize": 2,
+                    "or": {
+                      "class": "MonsterConditions",
+                      "monsterTags": [
+                        "NegativeStatusImmunityFromThorns"
+                      ],
+                      "buffStackNames": [
+                        "SleepThorns"
+                      ]
+                    }
+                  }
                 }
               }
             }
@@ -451,6 +477,10 @@
       "AccelerateSelfADojo": {
         "id": "AccelerateSelfADojo",
         "found": true,
+        "localization": {
+          "name": "AccelerateSelfADojo",
+          "description": ""
+        },
         "ability": {
           "name": "AccelerateSelfADojo",
           "class": "Ability",
@@ -601,19 +631,35 @@
     "passives": {
       "PlusAttackBoostLv1": {
         "id": "PlusAttackBoostLv1",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv1",
+          "description": "Adds 150 to this unit's Attack."
+        }
       },
       "MaceMinusDamageLv1": {
         "id": "MaceMinusDamageLv1",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Mace Resist Lv1",
+          "description": "5% less damage from attacks by units equipped with Maces."
+        }
       },
       "PlusHPBoostLv1": {
         "id": "PlusHPBoostLv1",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv1",
+          "description": "Adds 600 to this unit's max HP."
+        }
       },
       "AddWeaponPrefSpear": {
         "id": "AddWeaponPrefSpear",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Spear Mastery",
+          "description": "Can use weapon skills of Spears in addition to their original preferred weapon type."
+        }
       }
     },
     "activeSkillsAI": {},
@@ -689,9 +735,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "c3411455b629560736857367460c9bfc8b1820442d48938f69c8dff935e94f41",
-    "dependencyHash": "54afec0d0fb18205ab13c7013a84a0d768d52e599f29c254a544c40b9624be83",
-    "generatedAt": 1778013987
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "3d24feeaf896ab0d08594585a8da5cb438722f97341c3a1f7b9c83fa8396ae31",
+    "dependencyHash": "122b54a58cf66cf417484ebbfc48faea4448caad7dded104b53163437f0754c4",
+    "generatedAt": 1778081728
   }
 }

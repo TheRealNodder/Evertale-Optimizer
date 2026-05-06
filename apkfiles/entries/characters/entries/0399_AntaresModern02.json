@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 399,
-  "id": "antares-modern-02",
-  "name": "AntaresModern02",
+  "id": "antares",
+  "name": "Antares",
+  "title": "",
   "category": "character",
   "rarity": null,
   "stars": 6,
@@ -42,6 +43,10 @@
       "GainAttackSingleStanceAAirAntares": {
         "id": "GainAttackSingleStanceAAirAntares",
         "found": true,
+        "localization": {
+          "name": "GainAttackSingleStanceAAirAntares",
+          "description": ""
+        },
         "ability": {
           "name": "GainAttackSingleStanceAAirAntares",
           "class": "Ability",
@@ -312,6 +317,10 @@
       "TimeStrikeAAntares": {
         "id": "TimeStrikeAAntares",
         "found": true,
+        "localization": {
+          "name": "TimeStrikeAAntares",
+          "description": ""
+        },
         "ability": {
           "name": "TimeStrikeAAntares",
           "class": "Ability",
@@ -417,6 +426,10 @@
       "SurvivorDoubleAAntares": {
         "id": "SurvivorDoubleAAntares",
         "found": true,
+        "localization": {
+          "name": "SurvivorDoubleAAntares",
+          "description": ""
+        },
         "ability": {
           "name": "SurvivorDoubleAAntares",
           "class": "Ability",
@@ -618,6 +631,10 @@
       "DesperateStunDrainAAntares": {
         "id": "DesperateStunDrainAAntares",
         "found": true,
+        "localization": {
+          "name": "DesperateStunDrainAAntares",
+          "description": ""
+        },
         "ability": {
           "name": "DesperateStunDrainAAntares",
           "class": "Ability",
@@ -837,61 +854,71 @@
                     "or": {
                       "class": "MonsterConditions",
                       "monsterTags": [
-                        "StunImmuneIfAnyBurningAllies"
+                        "StunImmuneIfBeastAlly"
                       ],
+                      "checkReinforcementsForTeamConditionMatches": true,
                       "myTeamMonsterConditionMatchesNeeded": {
-                        "IsBurning": 1
+                        "IsBeastRegular": 1
                       },
                       "or": {
                         "class": "MonsterConditions",
                         "monsterTags": [
-                          "StunImmuneIfEnemyIsFireBurnBlastOrForce"
+                          "StunImmuneIfAnyBurningAllies"
                         ],
-                        "checkEnemyTeamOfMonster": true,
-                        "enemyTeamMonsterConditionMatchesNeeded": {
-                          "IsBurnBlastOrForceOrFire": 1
+                        "myTeamMonsterConditionMatchesNeeded": {
+                          "IsBurning": 1
                         },
                         "or": {
                           "class": "MonsterConditions",
                           "monsterTags": [
-                            "StunImmuneIfAllyIsFireBurnBlastOrForce"
+                            "StunImmuneIfEnemyIsFireBurnBlastOrForce"
                           ],
-                          "myTeamMonsterConditionMatchesNeeded": {
+                          "checkEnemyTeamOfMonster": true,
+                          "enemyTeamMonsterConditionMatchesNeeded": {
                             "IsBurnBlastOrForceOrFire": 1
                           },
                           "or": {
                             "class": "MonsterConditions",
                             "monsterTags": [
-                              "StunImmuneIfPoisonedEnemy"
+                              "StunImmuneIfAllyIsFireBurnBlastOrForce"
                             ],
-                            "checkEnemyTeamOfMonster": true,
-                            "enemyTeamMonsterConditionMatchesNeeded": {
-                              "IsPoisoned": 1
+                            "myTeamMonsterConditionMatchesNeeded": {
+                              "IsBurnBlastOrForceOrFire": 1
                             },
                             "or": {
                               "class": "MonsterConditions",
                               "monsterTags": [
-                                "StunImmunityIfNotBurning"
+                                "StunImmuneIfPoisonedEnemy"
                               ],
-                              "not": {
-                                "class": "MonsterConditions",
-                                "buffStackNames": [
-                                  "Burn"
-                                ]
+                              "checkEnemyTeamOfMonster": true,
+                              "enemyTeamMonsterConditionMatchesNeeded": {
+                                "IsPoisoned": 1
                               },
                               "or": {
                                 "class": "MonsterConditions",
                                 "monsterTags": [
-                                  "StunImmuneIfHoldGroundPlusTriggered"
-                                ],
-                                "buffStackNames": [
-                                  "BlockDeathUntilNextTurn"
+                                  "StunImmunityIfNotBurning"
                                 ],
                                 "not": {
                                   "class": "MonsterConditions",
                                   "buffStackNames": [
-                                    "HoldGroundOnceForHoldGroundPlus"
+                                    "Burn"
                                   ]
+                                },
+                                "or": {
+                                  "class": "MonsterConditions",
+                                  "monsterTags": [
+                                    "StunImmuneIfHoldGroundPlusTriggered"
+                                  ],
+                                  "buffStackNames": [
+                                    "BlockDeathUntilNextTurn"
+                                  ],
+                                  "not": {
+                                    "class": "MonsterConditions",
+                                    "buffStackNames": [
+                                      "HoldGroundOnceForHoldGroundPlus"
+                                    ]
+                                  }
                                 }
                               }
                             }
@@ -914,27 +941,51 @@
     "passives": {
       "HoldGround": {
         "id": "HoldGround",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Hold Ground",
+          "description": "If this unit would be defeated by an enemy attack or a status effect while having more than 1 HP, it instead survives with 1 HP."
+        }
       },
       "GetSurvivalStunSkinAllA": {
         "id": "GetSurvivalStunSkinAllA",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Survival Storm Skin",
+          "description": "All enemy units get stunned for 50TU whenever this unit is damaged by an enemy attack, unless Survivor's Fury is unlocked by this unit."
+        }
       },
       "PlusAttackBoostLv3": {
         "id": "PlusAttackBoostLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv3",
+          "description": "Adds 300 to this unit's Attack."
+        }
       },
       "Sleep20TUMinus": {
         "id": "Sleep20TUMinus",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Sleep Resist Lv3",
+          "description": "Reduces the duration of any enemy sleep effects on this unit by 20TU."
+        }
       },
       "PlusHPBoostLv3": {
         "id": "PlusHPBoostLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv3",
+          "description": "Adds 1200 to this unit's max HP."
+        }
       },
       "AddWeaponPrefSpear": {
         "id": "AddWeaponPrefSpear",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Spear Mastery",
+          "description": "Can use weapon skills of Spears in addition to their original preferred weapon type."
+        }
       }
     },
     "activeSkillsAI": {},
@@ -1077,9 +1128,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "afc8d6384e139c30aa41ae23910f321ab49d8d19dc48c6e3dc1c3b3a59391cd1",
-    "dependencyHash": "1db2eaceb4b25f3b28e0eb31c0db3eb6f4b5ae802e7dac495a3f9d6f9c6f7fda",
-    "generatedAt": 1778013991
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "7d8b5fb182f7c830cc4429e968ac17c70fc396d2848326f68ffc54c969e09b9e",
+    "dependencyHash": "ea4362e9a50ac77995695b91f8e129e76bbe222ac06fd4d9cf83012b464d05c3",
+    "generatedAt": 1778081732
   }
 }

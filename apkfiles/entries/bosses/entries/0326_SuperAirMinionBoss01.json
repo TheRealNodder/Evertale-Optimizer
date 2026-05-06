@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 326,
-  "id": "super-air-minion-boss-01",
-  "name": "SuperAirMinionBoss01",
+  "id": "super-denmori",
+  "name": "Super Denmori",
+  "title": "",
   "category": "bosse",
   "rarity": null,
   "stars": 0,
@@ -36,6 +37,11 @@
       "GainAttackSingleBAir": {
         "id": "GainAttackSingleBAir",
         "found": true,
+        "localization": {
+          "name": "Attack",
+          "description": "Damage to 1 enemy and allies gain 1 Spirit.",
+          "selected": "Damage to 1 enemy and gains 1 Spirit"
+        },
         "ability": {
           "name": "GainAttackSingleBAir",
           "class": "Ability",
@@ -140,16 +146,16 @@
         },
         "buffs": {},
         "attackScalors": {},
-        "conditions": {},
-        "localization": {
-          "name": "Attack",
-          "description": "Damage to 1 enemy and allies gain 1 Spirit.",
-          "selected": "Damage to 1 enemy and gains 1 Spirit"
-        }
+        "conditions": {}
       },
       "StunBombDoubleA": {
         "id": "StunBombDoubleA",
         "found": true,
+        "localization": {
+          "name": "Stun Bomb",
+          "description": "Sacrifices the user to stun 2 enemies for 200TU. Locked for 100TU after user enters the battlefield.",
+          "selected": "Stuns targets for 200TU"
+        },
         "ability": {
           "name": "StunBombDoubleA",
           "class": "Ability",
@@ -343,61 +349,71 @@
                     "or": {
                       "class": "MonsterConditions",
                       "monsterTags": [
-                        "StunImmuneIfAnyBurningAllies"
+                        "StunImmuneIfBeastAlly"
                       ],
+                      "checkReinforcementsForTeamConditionMatches": true,
                       "myTeamMonsterConditionMatchesNeeded": {
-                        "IsBurning": 1
+                        "IsBeastRegular": 1
                       },
                       "or": {
                         "class": "MonsterConditions",
                         "monsterTags": [
-                          "StunImmuneIfEnemyIsFireBurnBlastOrForce"
+                          "StunImmuneIfAnyBurningAllies"
                         ],
-                        "checkEnemyTeamOfMonster": true,
-                        "enemyTeamMonsterConditionMatchesNeeded": {
-                          "IsBurnBlastOrForceOrFire": 1
+                        "myTeamMonsterConditionMatchesNeeded": {
+                          "IsBurning": 1
                         },
                         "or": {
                           "class": "MonsterConditions",
                           "monsterTags": [
-                            "StunImmuneIfAllyIsFireBurnBlastOrForce"
+                            "StunImmuneIfEnemyIsFireBurnBlastOrForce"
                           ],
-                          "myTeamMonsterConditionMatchesNeeded": {
+                          "checkEnemyTeamOfMonster": true,
+                          "enemyTeamMonsterConditionMatchesNeeded": {
                             "IsBurnBlastOrForceOrFire": 1
                           },
                           "or": {
                             "class": "MonsterConditions",
                             "monsterTags": [
-                              "StunImmuneIfPoisonedEnemy"
+                              "StunImmuneIfAllyIsFireBurnBlastOrForce"
                             ],
-                            "checkEnemyTeamOfMonster": true,
-                            "enemyTeamMonsterConditionMatchesNeeded": {
-                              "IsPoisoned": 1
+                            "myTeamMonsterConditionMatchesNeeded": {
+                              "IsBurnBlastOrForceOrFire": 1
                             },
                             "or": {
                               "class": "MonsterConditions",
                               "monsterTags": [
-                                "StunImmunityIfNotBurning"
+                                "StunImmuneIfPoisonedEnemy"
                               ],
-                              "not": {
-                                "class": "MonsterConditions",
-                                "buffStackNames": [
-                                  "Burn"
-                                ]
+                              "checkEnemyTeamOfMonster": true,
+                              "enemyTeamMonsterConditionMatchesNeeded": {
+                                "IsPoisoned": 1
                               },
                               "or": {
                                 "class": "MonsterConditions",
                                 "monsterTags": [
-                                  "StunImmuneIfHoldGroundPlusTriggered"
-                                ],
-                                "buffStackNames": [
-                                  "BlockDeathUntilNextTurn"
+                                  "StunImmunityIfNotBurning"
                                 ],
                                 "not": {
                                   "class": "MonsterConditions",
                                   "buffStackNames": [
-                                    "HoldGroundOnceForHoldGroundPlus"
+                                    "Burn"
                                   ]
+                                },
+                                "or": {
+                                  "class": "MonsterConditions",
+                                  "monsterTags": [
+                                    "StunImmuneIfHoldGroundPlusTriggered"
+                                  ],
+                                  "buffStackNames": [
+                                    "BlockDeathUntilNextTurn"
+                                  ],
+                                  "not": {
+                                    "class": "MonsterConditions",
+                                    "buffStackNames": [
+                                      "HoldGroundOnceForHoldGroundPlus"
+                                    ]
+                                  }
                                 }
                               }
                             }
@@ -414,22 +430,25 @@
             "class": "MonsterConditions",
             "timeInCombat": 100
           }
-        },
-        "localization": {
-          "name": "Stun Bomb",
-          "description": "Sacrifices the user to stun 2 enemies for 200TU. Locked for 100TU after user enters the battlefield.",
-          "selected": "Stuns targets for 200TU"
         }
       }
     },
     "passives": {
       "AutoProtectSourcePlusAndStunAbsorberBossEBB": {
         "id": "AutoProtectSourcePlusAndStunAbsorberBossEBB",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Lightning Rod",
+          "description": "This unit is a Guardian. For any enemy attack that would hit 1 or 2 other allies, this unit has a 100% chance to redirect 1 hit to itself instead. This unit will not redirect skills that don't deal damage.\n\nThis unit is a Stun Absorber. Whenever any ally would be affected by stun, this unit takes the stun instead."
+        }
       },
       "MirageMonster": {
         "id": "MirageMonster",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Ephemeral",
+          "description": "This unit is never considered to be defeated by attacks and does not trigger any skills of other units whenever it is defeated or sacrificed by any source while on the battlefield.\n\nThis unit will be fully healed after each turn if it takes damage but is not defeated. This unit will be defeated after any ally or enemy turn if this unit has any of the Burn, Super Poison, or Mega Poison status effects.\n\nDamage dealt to this unit is increased to 2.5 times the normal amount."
+        }
       }
     },
     "activeSkillsAI": {},
@@ -489,9 +508,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "8d5fbf778466758153815cef794ee46420ddbdf6bc6b9a172f0f4d1544ba2bea",
-    "dependencyHash": "7568320974ccd5e72526e0a5ce2a6437c402d5035db5f8ec534baacecb086106",
-    "generatedAt": 1778014039
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "386e301f8592eada5e3c3528aaf9a3509e0181454f76d38ee4414729fcda7b7c",
+    "dependencyHash": "60479a31b516d3fb183ea68fb48a6557a22861a6a0f6bb29be34e7ca398387c3",
+    "generatedAt": 1778081781
   }
 }

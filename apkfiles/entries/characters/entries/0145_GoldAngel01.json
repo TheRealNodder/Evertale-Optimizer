@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 145,
-  "id": "gold-angel-01",
-  "name": "GoldAngel01",
+  "id": "en-soldier",
+  "name": "En Soldier",
+  "title": "",
   "category": "character",
   "rarity": null,
   "stars": 4,
@@ -42,6 +43,11 @@
       "GainAttackSingleA": {
         "id": "GainAttackSingleA",
         "found": true,
+        "localization": {
+          "name": "Attack",
+          "description": "Damage to 1 enemy and allies gain 2 Spirit.",
+          "selected": "Damage to 1 enemy and gains 2 Spirit"
+        },
         "ability": {
           "name": "GainAttackSingleA",
           "class": "Ability",
@@ -92,16 +98,16 @@
         },
         "buffs": {},
         "attackScalors": {},
-        "conditions": {},
-        "localization": {
-          "name": "Attack",
-          "description": "Damage to 1 enemy and allies gain 2 Spirit.",
-          "selected": "Damage to 1 enemy and gains 2 Spirit"
-        }
+        "conditions": {}
       },
       "BasicAttackAllALife": {
         "id": "BasicAttackAllALife",
         "found": true,
+        "localization": {
+          "name": "Attack All",
+          "description": "Damage to all enemies.",
+          "selected": "Damage to all enemies"
+        },
         "ability": {
           "name": "BasicAttackAllALife",
           "class": "Ability",
@@ -206,16 +212,16 @@
         },
         "buffs": {},
         "attackScalors": {},
-        "conditions": {},
-        "localization": {
-          "name": "Attack All",
-          "description": "Damage to all enemies.",
-          "selected": "Damage to all enemies"
-        }
+        "conditions": {}
       },
       "StunDouble50A": {
         "id": "StunDouble50A",
         "found": true,
+        "localization": {
+          "name": "Stun Spark",
+          "description": "Stuns 2 enemies for 50TU.",
+          "selected": "Stuns targets for 50TU"
+        },
         "ability": {
           "name": "StunDouble50A",
           "class": "Ability",
@@ -383,61 +389,71 @@
                     "or": {
                       "class": "MonsterConditions",
                       "monsterTags": [
-                        "StunImmuneIfAnyBurningAllies"
+                        "StunImmuneIfBeastAlly"
                       ],
+                      "checkReinforcementsForTeamConditionMatches": true,
                       "myTeamMonsterConditionMatchesNeeded": {
-                        "IsBurning": 1
+                        "IsBeastRegular": 1
                       },
                       "or": {
                         "class": "MonsterConditions",
                         "monsterTags": [
-                          "StunImmuneIfEnemyIsFireBurnBlastOrForce"
+                          "StunImmuneIfAnyBurningAllies"
                         ],
-                        "checkEnemyTeamOfMonster": true,
-                        "enemyTeamMonsterConditionMatchesNeeded": {
-                          "IsBurnBlastOrForceOrFire": 1
+                        "myTeamMonsterConditionMatchesNeeded": {
+                          "IsBurning": 1
                         },
                         "or": {
                           "class": "MonsterConditions",
                           "monsterTags": [
-                            "StunImmuneIfAllyIsFireBurnBlastOrForce"
+                            "StunImmuneIfEnemyIsFireBurnBlastOrForce"
                           ],
-                          "myTeamMonsterConditionMatchesNeeded": {
+                          "checkEnemyTeamOfMonster": true,
+                          "enemyTeamMonsterConditionMatchesNeeded": {
                             "IsBurnBlastOrForceOrFire": 1
                           },
                           "or": {
                             "class": "MonsterConditions",
                             "monsterTags": [
-                              "StunImmuneIfPoisonedEnemy"
+                              "StunImmuneIfAllyIsFireBurnBlastOrForce"
                             ],
-                            "checkEnemyTeamOfMonster": true,
-                            "enemyTeamMonsterConditionMatchesNeeded": {
-                              "IsPoisoned": 1
+                            "myTeamMonsterConditionMatchesNeeded": {
+                              "IsBurnBlastOrForceOrFire": 1
                             },
                             "or": {
                               "class": "MonsterConditions",
                               "monsterTags": [
-                                "StunImmunityIfNotBurning"
+                                "StunImmuneIfPoisonedEnemy"
                               ],
-                              "not": {
-                                "class": "MonsterConditions",
-                                "buffStackNames": [
-                                  "Burn"
-                                ]
+                              "checkEnemyTeamOfMonster": true,
+                              "enemyTeamMonsterConditionMatchesNeeded": {
+                                "IsPoisoned": 1
                               },
                               "or": {
                                 "class": "MonsterConditions",
                                 "monsterTags": [
-                                  "StunImmuneIfHoldGroundPlusTriggered"
-                                ],
-                                "buffStackNames": [
-                                  "BlockDeathUntilNextTurn"
+                                  "StunImmunityIfNotBurning"
                                 ],
                                 "not": {
                                   "class": "MonsterConditions",
                                   "buffStackNames": [
-                                    "HoldGroundOnceForHoldGroundPlus"
+                                    "Burn"
                                   ]
+                                },
+                                "or": {
+                                  "class": "MonsterConditions",
+                                  "monsterTags": [
+                                    "StunImmuneIfHoldGroundPlusTriggered"
+                                  ],
+                                  "buffStackNames": [
+                                    "BlockDeathUntilNextTurn"
+                                  ],
+                                  "not": {
+                                    "class": "MonsterConditions",
+                                    "buffStackNames": [
+                                      "HoldGroundOnceForHoldGroundPlus"
+                                    ]
+                                  }
                                 }
                               }
                             }
@@ -450,16 +466,16 @@
               }
             }
           }
-        },
-        "localization": {
-          "name": "Stun Spark",
-          "description": "Stuns 2 enemies for 50TU.",
-          "selected": "Stuns targets for 50TU"
         }
       },
       "SurvivorA": {
         "id": "SurvivorA",
         "found": true,
+        "localization": {
+          "name": "Survivor's Fury",
+          "description": "500% damage to 1 enemy. Locked for 300TU after the user has entered the battlefield.",
+          "selected": "500% damage, usable if user survived 300TU"
+        },
         "ability": {
           "name": "SurvivorA",
           "class": "Ability",
@@ -528,30 +544,41 @@
             "class": "MonsterConditions",
             "timeInCombat": 300
           }
-        },
-        "localization": {
-          "name": "Survivor's Fury",
-          "description": "500% damage to 1 enemy. Locked for 300TU after the user has entered the battlefield.",
-          "selected": "500% damage, usable if user survived 300TU"
         }
       }
     },
     "passives": {
       "PlusAttackBoostLv2": {
         "id": "PlusAttackBoostLv2",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv2",
+          "description": "Adds 200 to this unit's Attack."
+        }
       },
       "KatanaMinusDamageLv2": {
         "id": "KatanaMinusDamageLv2",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Katana Resist Lv2",
+          "description": "7% less damage from attacks by units equipped with Katanas."
+        }
       },
       "PlusHPBoostLv2": {
         "id": "PlusHPBoostLv2",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv2",
+          "description": "Adds 800 to this unit's max HP."
+        }
       },
       "AddWeaponPrefSpear": {
         "id": "AddWeaponPrefSpear",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Spear Mastery",
+          "description": "Can use weapon skills of Spears in addition to their original preferred weapon type."
+        }
       }
     },
     "activeSkillsAI": {
@@ -705,9 +732,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "d531fa743008e9e8e805813c396e0e086b78cec22eb3c4f5a05f8bf23c4ff85d",
-    "dependencyHash": "5aa88411e91eebca63f9c4ea2446541c900e1b0cfdf0aad969956f84f730e84f",
-    "generatedAt": 1778013983
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "618e971b545d7a8a05874817950f45a082a5a0c79a0fa6402cf3933e1967e984",
+    "dependencyHash": "24b29d967ebbfdb8cb4a7bce34807efe2e221dd527fb6d477b28c7e10a7ad44d",
+    "generatedAt": 1778081724
   }
 }

@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 428,
-  "id": "jeanne-dark-angel-02",
-  "name": "JeanneDarkAngel02",
+  "id": "dark-mikaela",
+  "name": "Dark Mikaela",
+  "title": "",
   "category": "character",
   "rarity": null,
   "stars": 6,
@@ -45,6 +46,10 @@
       "GainAttackSingleAJeanneDarkAngel": {
         "id": "GainAttackSingleAJeanneDarkAngel",
         "found": true,
+        "localization": {
+          "name": "GainAttackSingleAJeanneDarkAngel",
+          "description": ""
+        },
         "ability": {
           "name": "GainAttackSingleAJeanneDarkAngel",
           "class": "Ability",
@@ -156,6 +161,10 @@
       "ThrowDrainAJeanneDarkAngel": {
         "id": "ThrowDrainAJeanneDarkAngel",
         "found": true,
+        "localization": {
+          "name": "ThrowDrainAJeanneDarkAngel",
+          "description": ""
+        },
         "ability": {
           "name": "ThrowDrainAJeanneDarkAngel",
           "class": "Ability",
@@ -358,6 +367,10 @@
       "SleepSingleAJeanneDarkAngel": {
         "id": "SleepSingleAJeanneDarkAngel",
         "found": true,
+        "localization": {
+          "name": "SleepSingleAJeanneDarkAngel",
+          "description": ""
+        },
         "ability": {
           "name": "SleepSingleAJeanneDarkAngel",
           "class": "Ability",
@@ -636,20 +649,37 @@
               "or": {
                 "class": "MonsterConditions",
                 "monsterTags": [
-                  "SleepImmuneVsWater"
+                  "SleepImmuneIfBeastAlly"
                 ],
-                "checkEnemyTeamOfMonster": true,
-                "enemyTeamMonsterConditionMatchesNeeded": {
-                  "IsWater": 1
+                "checkReinforcementsForTeamConditionMatches": true,
+                "myTeamMonsterConditionMatchesNeeded": {
+                  "IsBeastRegular": 1
                 },
                 "or": {
                   "class": "MonsterConditions",
                   "monsterTags": [
-                    "NegativeStatusImmunityFromThorns"
+                    "SleepImmuneVsWater"
                   ],
-                  "buffStackNames": [
-                    "SleepThorns"
-                  ]
+                  "checkEnemyTeamOfMonster": true,
+                  "enemyTeamMonsterConditionMatchesNeeded": {
+                    "IsWater": 1
+                  },
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "SleepImmuneVs2Enemies"
+                    ],
+                    "enemyTeamSize": 2,
+                    "or": {
+                      "class": "MonsterConditions",
+                      "monsterTags": [
+                        "NegativeStatusImmunityFromThorns"
+                      ],
+                      "buffStackNames": [
+                        "SleepThorns"
+                      ]
+                    }
+                  }
                 }
               }
             }
@@ -659,6 +689,11 @@
       "SummonJeanneDarkSacA": {
         "id": "SummonJeanneDarkSacA",
         "found": true,
+        "localization": {
+          "name": "Unholy Revival",
+          "description": "Sacrifices the user to revive the Dark Jeanne that conjured the user to the battlefield with full HP. Locked for 200TU after the user has entered the battlefield. The revived Dark Jeanne will be considered a conjured unit.",
+          "selected": "Sacrifices the user to revive Dark Jeanne"
+        },
         "ability": {
           "name": "SummonJeanneDarkSacA",
           "class": "Ability",
@@ -842,38 +877,57 @@
             "class": "MonsterConditions",
             "timeInCombat": 200
           }
-        },
-        "localization": {
-          "name": "Unholy Revival",
-          "description": "Sacrifices the user to revive the Dark Jeanne that conjured the user to the battlefield with full HP. Locked for 200TU after the user has entered the battlefield. The revived Dark Jeanne will be considered a conjured unit.",
-          "selected": "Sacrifices the user to revive Dark Jeanne"
         }
       }
     },
     "passives": {
       "Summon2MinionsEntranceDeathJeanneDarkAngel": {
         "id": "Summon2MinionsEntranceDeathJeanneDarkAngel",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Summon Entry",
+          "description": "Adds 2 Kuromoris to the very end of this unit's team. Triggered when this unit enters the battlefield from the allied reinforcements."
+        }
       },
       "StunLowestTUEntranceA": {
         "id": "StunLowestTUEntranceA",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Shocking Entry",
+          "description": "Stuns the enemy with the lowest current TU for 150TU. Triggered when this unit enters the battlefield from reinforcements."
+        }
       },
       "PlusHPBoostLv3": {
         "id": "PlusHPBoostLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv3",
+          "description": "Adds 1200 to this unit's max HP."
+        }
       },
       "LifeMinusDamageLv3": {
         "id": "LifeMinusDamageLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Light Resist Lv3",
+          "description": "10% less damage from attacks by Light units."
+        }
       },
       "PlusAttackBoostLv3": {
         "id": "PlusAttackBoostLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv3",
+          "description": "Adds 300 to this unit's Attack."
+        }
       },
       "AddWeaponPrefSpear": {
         "id": "AddWeaponPrefSpear",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Spear Mastery",
+          "description": "Can use weapon skills of Spears in addition to their original preferred weapon type."
+        }
       }
     },
     "activeSkillsAI": {},
@@ -979,9 +1033,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "2fb4915145ab8e3628d8d980b2226afefbad0548c055ef915786e59f15e1b377",
-    "dependencyHash": "7d5c73f80f2b760bebe3edd52eaf6693afc8d695ccc421fc41b0a3fbef89ed6b",
-    "generatedAt": 1778013992
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "f8ed6ed5c2769af185205747473de3fb80319657eaf2d85ad327a40416b9ef30",
+    "dependencyHash": "f30abf86fa07df87b4a9b55336e50f41f10857a7a0f1356b43344e281924fc23",
+    "generatedAt": 1778081732
   }
 }

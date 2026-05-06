@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 231,
-  "id": "purple-elf-knight-02",
-  "name": "PurpleElfKnight02",
+  "id": "zeshua",
+  "name": "Zeshua",
+  "title": "",
   "category": "character",
   "rarity": null,
   "stars": 5,
@@ -41,6 +42,11 @@
       "GainAttackSingleA": {
         "id": "GainAttackSingleA",
         "found": true,
+        "localization": {
+          "name": "Attack",
+          "description": "Damage to 1 enemy and allies gain 2 Spirit.",
+          "selected": "Damage to 1 enemy and gains 2 Spirit"
+        },
         "ability": {
           "name": "GainAttackSingleA",
           "class": "Ability",
@@ -91,16 +97,16 @@
         },
         "buffs": {},
         "attackScalors": {},
-        "conditions": {},
-        "localization": {
-          "name": "Attack",
-          "description": "Damage to 1 enemy and allies gain 2 Spirit.",
-          "selected": "Damage to 1 enemy and gains 2 Spirit"
-        }
+        "conditions": {}
       },
       "ProtectTeammatesA": {
         "id": "ProtectTeammatesA",
         "found": true,
+        "localization": {
+          "name": "Guard Allies",
+          "description": "The user becomes a Guardian. For any enemy attack that would hit 1 or 2 other allies, 1 of the hits is instead redirected to this unit. This unit will not redirect skills that don't deal damage. Usable only if this unit is not already a Guardian.",
+          "selected": "User becomes a Guardian and protects allies"
+        },
         "ability": {
           "name": "ProtectTeammatesA",
           "class": "Ability",
@@ -275,16 +281,16 @@
               }
             }
           }
-        },
-        "localization": {
-          "name": "Guard Allies",
-          "description": "The user becomes a Guardian. For any enemy attack that would hit 1 or 2 other allies, 1 of the hits is instead redirected to this unit. This unit will not redirect skills that don't deal damage. Usable only if this unit is not already a Guardian.",
-          "selected": "User becomes a Guardian and protects allies"
         }
       },
       "SleepSingleC": {
         "id": "SleepSingleC",
         "found": true,
+        "localization": {
+          "name": "Sleep",
+          "description": "Grants 1 enemy the Sleep status effect for 200TU. Usable once per battle. This will overwrite other status effects on that unit. Sleep cannot be applied to a unit that Has Slept while on the battlefield.",
+          "selected": "Puts the target to sleep\n(Will overwrite other status effects)"
+        },
         "ability": {
           "name": "SleepSingleC",
           "class": "Ability",
@@ -561,34 +567,51 @@
               "or": {
                 "class": "MonsterConditions",
                 "monsterTags": [
-                  "SleepImmuneVsWater"
+                  "SleepImmuneIfBeastAlly"
                 ],
-                "checkEnemyTeamOfMonster": true,
-                "enemyTeamMonsterConditionMatchesNeeded": {
-                  "IsWater": 1
+                "checkReinforcementsForTeamConditionMatches": true,
+                "myTeamMonsterConditionMatchesNeeded": {
+                  "IsBeastRegular": 1
                 },
                 "or": {
                   "class": "MonsterConditions",
                   "monsterTags": [
-                    "NegativeStatusImmunityFromThorns"
+                    "SleepImmuneVsWater"
                   ],
-                  "buffStackNames": [
-                    "SleepThorns"
-                  ]
+                  "checkEnemyTeamOfMonster": true,
+                  "enemyTeamMonsterConditionMatchesNeeded": {
+                    "IsWater": 1
+                  },
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "SleepImmuneVs2Enemies"
+                    ],
+                    "enemyTeamSize": 2,
+                    "or": {
+                      "class": "MonsterConditions",
+                      "monsterTags": [
+                        "NegativeStatusImmunityFromThorns"
+                      ],
+                      "buffStackNames": [
+                        "SleepThorns"
+                      ]
+                    }
+                  }
                 }
               }
             }
           }
-        },
-        "localization": {
-          "name": "Sleep",
-          "description": "Grants 1 enemy the Sleep status effect for 200TU. Usable once per battle. This will overwrite other status effects on that unit. Sleep cannot be applied to a unit that Has Slept while on the battlefield.",
-          "selected": "Puts the target to sleep\n(Will overwrite other status effects)"
         }
       },
       "DreamHuntDrainA": {
         "id": "DreamHuntDrainA",
         "found": true,
+        "localization": {
+          "name": "Dream Drain",
+          "description": "600% damage to 1 enemy if they are sleeping. If the target is asleep, the user recovers HP by 50% of its own max.",
+          "selected": "600% damage against sleeping target & heal user HP"
+        },
         "ability": {
           "name": "DreamHuntDrainA",
           "class": "Ability",
@@ -723,34 +746,49 @@
               "Sleep"
             ]
           }
-        },
-        "localization": {
-          "name": "Dream Drain",
-          "description": "600% damage to 1 enemy if they are sleeping. If the target is asleep, the user recovers HP by 50% of its own max.",
-          "selected": "600% damage against sleeping target & heal user HP"
         }
       }
     },
     "passives": {
       "HoldGround": {
         "id": "HoldGround",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Hold Ground",
+          "description": "If this unit would be defeated by an enemy attack or a status effect while having more than 1 HP, it instead survives with 1 HP."
+        }
       },
       "PlusAttackBoostLv2": {
         "id": "PlusAttackBoostLv2",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv2",
+          "description": "Adds 200 to this unit's Attack."
+        }
       },
       "HammerMinusDamageLv2": {
         "id": "HammerMinusDamageLv2",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Hammer Resist Lv2",
+          "description": "7% less damage from attacks by units equipped with Hammers."
+        }
       },
       "PlusHPBoostLv2": {
         "id": "PlusHPBoostLv2",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv2",
+          "description": "Adds 800 to this unit's max HP."
+        }
       },
       "AddWeaponPrefGreatSword": {
         "id": "AddWeaponPrefGreatSword",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Greatsword Mastery",
+          "description": "Can use weapon skills of Greatswords in addition to their original preferred weapon type."
+        }
       }
     },
     "activeSkillsAI": {},
@@ -872,9 +910,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "102c46347cc029076e7ec0f24ee572d1ebcbae1c839ccc468f1c4ff28ff51c37",
-    "dependencyHash": "308690c8be62cf82e2edba53a1b393512266d1dde784bbed9499b62be3f21a6f",
-    "generatedAt": 1778013986
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "0dfe69b63a1e1cf8030b270deb43e2a9838767062141b16120caaaf39c4100b3",
+    "dependencyHash": "b898790e8c512bdc24d0c92bd0d47dd989ec035d998670a33b4f76dd6383e95a",
+    "generatedAt": 1778081726
   }
 }

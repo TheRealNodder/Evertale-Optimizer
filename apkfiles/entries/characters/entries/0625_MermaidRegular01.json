@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 625,
-  "id": "mermaid-regular-01",
-  "name": "MermaidRegular01",
+  "id": "little-mermaid",
+  "name": "Little Mermaid",
+  "title": "",
   "category": "character",
   "rarity": null,
   "stars": 5,
@@ -43,6 +44,11 @@
       "TidalWaveAMermaidRegular": {
         "id": "TidalWaveAMermaidRegular",
         "found": true,
+        "localization": {
+          "name": "Ocean Sweep",
+          "description": "100% damage to all enemies, plus 100% for each sleeping enemy (500% max). This attack ignores damage reduction effects and removes any Burn status effects (including Mega Healing Burn) from all hit targets.",
+          "selected": "100%+ damage to all enemies, may remove burn"
+        },
         "ability": {
           "name": "TidalWaveAMermaidRegular",
           "class": "Ability",
@@ -254,16 +260,16 @@
             "targetCondition": "HasSleepingInTeam"
           }
         },
-        "conditions": {},
-        "localization": {
-          "name": "Ocean Sweep",
-          "description": "100% damage to all enemies, plus 100% for each sleeping enemy (500% max). This attack ignores damage reduction effects and removes any Burn status effects (including Mega Healing Burn) from all hit targets.",
-          "selected": "100%+ damage to all enemies, may remove burn"
-        }
+        "conditions": {}
       },
       "SleepWaveAMermaidRegular": {
         "id": "SleepWaveAMermaidRegular",
         "found": true,
+        "localization": {
+          "name": "Pacifying Wave",
+          "description": "Targets 2 enemies. Removes any Burn status effects (including Mega Healing Burn) from them, then grants them Burn Wards and the Sleep status effect for 200TU, even if they have already slept while on the battlefield. Sleep will overwrite other status effects on those units. This skill becomes locked for 50TU after use.\n\nBurn Wards prevent Burn from being applied once, then are removed. Burn Wards cannot stack.",
+          "selected": "Puts targets to sleep even if they have already slept\n(Will overwrite other status effects)"
+        },
         "ability": {
           "name": "SleepWaveAMermaidRegular",
           "class": "Ability",
@@ -661,20 +667,37 @@
               "or": {
                 "class": "MonsterConditions",
                 "monsterTags": [
-                  "SleepImmuneVsWater"
+                  "SleepImmuneIfBeastAlly"
                 ],
-                "checkEnemyTeamOfMonster": true,
-                "enemyTeamMonsterConditionMatchesNeeded": {
-                  "IsWater": 1
+                "checkReinforcementsForTeamConditionMatches": true,
+                "myTeamMonsterConditionMatchesNeeded": {
+                  "IsBeastRegular": 1
                 },
                 "or": {
                   "class": "MonsterConditions",
                   "monsterTags": [
-                    "NegativeStatusImmunityFromThorns"
+                    "SleepImmuneVsWater"
                   ],
-                  "buffStackNames": [
-                    "SleepThorns"
-                  ]
+                  "checkEnemyTeamOfMonster": true,
+                  "enemyTeamMonsterConditionMatchesNeeded": {
+                    "IsWater": 1
+                  },
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "SleepImmuneVs2Enemies"
+                    ],
+                    "enemyTeamSize": 2,
+                    "or": {
+                      "class": "MonsterConditions",
+                      "monsterTags": [
+                        "NegativeStatusImmunityFromThorns"
+                      ],
+                      "buffStackNames": [
+                        "SleepThorns"
+                      ]
+                    }
+                  }
                 }
               }
             }
@@ -688,16 +711,16 @@
               ]
             }
           }
-        },
-        "localization": {
-          "name": "Pacifying Wave",
-          "description": "Targets 2 enemies. Removes any Burn status effects (including Mega Healing Burn) from them, then grants them Burn Wards and the Sleep status effect for 200TU, even if they have already slept while on the battlefield. Sleep will overwrite other status effects on those units. This skill becomes locked for 50TU after use.\n\nBurn Wards prevent Burn from being applied once, then are removed. Burn Wards cannot stack.",
-          "selected": "Puts targets to sleep even if they have already slept\n(Will overwrite other status effects)"
         }
       },
       "DreamAssassinAMermaidRegular": {
         "id": "DreamAssassinAMermaidRegular",
         "found": true,
+        "localization": {
+          "name": "Endless Nightmare",
+          "description": "600% damage to 2 enemies if they are sleeping. This attack ignores enemy damage reduction effects. All enemies hit are then granted the Sleep status effect for 200TU, even if they have already slept while on the battlefield.",
+          "selected": "600% damage to sleeping enemies, ignores armor"
+        },
         "ability": {
           "name": "DreamAssassinAMermaidRegular",
           "class": "Ability",
@@ -1016,16 +1039,16 @@
             "targetCondition": "IsSleeping"
           }
         },
-        "conditions": {},
-        "localization": {
-          "name": "Endless Nightmare",
-          "description": "600% damage to 2 enemies if they are sleeping. This attack ignores enemy damage reduction effects. All enemies hit are then granted the Sleep status effect for 200TU, even if they have already slept while on the battlefield.",
-          "selected": "600% damage to sleeping enemies, ignores armor"
-        }
+        "conditions": {}
       },
       "FinishingWaveAMermaidRegular": {
         "id": "FinishingWaveAMermaidRegular",
         "found": true,
+        "localization": {
+          "name": "Royal Trident",
+          "description": "600% damage to 1 enemy and adds 1 Super Suimori to the very front of the allied reinforcements. This attack ignores any effects of non-boss enemies that would prevent the target from being defeated. Removes any Sleep Wards from the target.\n\nThis skill becomes locked after use until an ally Suimori gets the turn, or until there are no Suimoris in the ally team.",
+          "selected": "600% damage, adds a Mori to allies"
+        },
         "ability": {
           "name": "FinishingWaveAMermaidRegular",
           "class": "Ability",
@@ -1336,34 +1359,49 @@
               ]
             }
           }
-        },
-        "localization": {
-          "name": "Royal Trident",
-          "description": "600% damage to 1 enemy and adds 1 Super Suimori to the very front of the allied reinforcements. This attack ignores any effects of non-boss enemies that would prevent the target from being defeated. Removes any Sleep Wards from the target.\n\nThis skill becomes locked after use until an ally Suimori gets the turn, or until there are no Suimoris in the ally team.",
-          "selected": "600% damage, adds a Mori to allies"
         }
       }
     },
     "passives": {
       "SleepSquadronPassiveAMermaidRegular": {
         "id": "SleepSquadronPassiveAMermaidRegular",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Song of the Sea",
+          "description": "This unit cannot be burned or sent to the reinforcements from the battlefield. This unit's attacks will not wake sleeping enemies.\n\nAt the end of this unit's turn, send 1 random sleeping ally that is not immovable to the front of allied reinforcements. Allies must have reinforcements for this to trigger.\n\nWhenever another Water ally enters the battlefield from reinforcements:\n- Removes the Sleep status effect from this unit.\n- Grants 1 non-sleeping enemy with the lowest TU the Sleep status effect for 200TU, even if they have already slept while on the battlefield. This will overwrite other status effects on that unit."
+        }
       },
       "PlusAttackBoostLv3": {
         "id": "PlusAttackBoostLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv3",
+          "description": "Adds 300 to this unit's Attack."
+        }
       },
       "PlusHPBoostLv3": {
         "id": "PlusHPBoostLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv3",
+          "description": "Adds 1200 to this unit's max HP."
+        }
       },
       "Sleep20TUMinus": {
         "id": "Sleep20TUMinus",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Sleep Resist Lv3",
+          "description": "Reduces the duration of any enemy sleep effects on this unit by 20TU."
+        }
       },
       "AddWeaponPrefGreatSword": {
         "id": "AddWeaponPrefGreatSword",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Greatsword Mastery",
+          "description": "Can use weapon skills of Greatswords in addition to their original preferred weapon type."
+        }
       }
     },
     "activeSkillsAI": {},
@@ -1489,9 +1527,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "98395ecc7d9e0ebb1240ab07e161c58e3c34d46b888540f1177bebf80c2d4987",
-    "dependencyHash": "68100fa98d0a0b18d44700966237df2f0bf79438b783795e131641d35114138a",
-    "generatedAt": 1778013998
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "69a9c0b7565b4ff3a6c3d0253fa0e75d755402a5c9b8c6219014543c02a7e5ce",
+    "dependencyHash": "f67c5d18cbc24abe84ba661bfbd7e4bfc37d4aece9c49c27abdd638bc4ae2bf7",
+    "generatedAt": 1778081738
   }
 }

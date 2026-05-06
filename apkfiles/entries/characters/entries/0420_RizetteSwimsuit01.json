@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 420,
-  "id": "rizette-swimsuit-01",
-  "name": "RizetteSwimsuit01",
+  "id": "rizette",
+  "name": "Rizette",
+  "title": "",
   "category": "character",
   "rarity": null,
   "stars": 5,
@@ -41,6 +42,10 @@
       "SleepAttackARizetteSwimsuit": {
         "id": "SleepAttackARizetteSwimsuit",
         "found": true,
+        "localization": {
+          "name": "SleepAttackARizetteSwimsuit",
+          "description": ""
+        },
         "ability": {
           "name": "SleepAttackARizetteSwimsuit",
           "class": "Ability",
@@ -327,6 +332,10 @@
       "ForceSleepARizetteSwimsuit": {
         "id": "ForceSleepARizetteSwimsuit",
         "found": true,
+        "localization": {
+          "name": "ForceSleepARizetteSwimsuit",
+          "description": ""
+        },
         "ability": {
           "name": "ForceSleepARizetteSwimsuit",
           "class": "Ability",
@@ -694,20 +703,37 @@
               "or": {
                 "class": "MonsterConditions",
                 "monsterTags": [
-                  "SleepImmuneVsWater"
+                  "SleepImmuneIfBeastAlly"
                 ],
-                "checkEnemyTeamOfMonster": true,
-                "enemyTeamMonsterConditionMatchesNeeded": {
-                  "IsWater": 1
+                "checkReinforcementsForTeamConditionMatches": true,
+                "myTeamMonsterConditionMatchesNeeded": {
+                  "IsBeastRegular": 1
                 },
                 "or": {
                   "class": "MonsterConditions",
                   "monsterTags": [
-                    "NegativeStatusImmunityFromThorns"
+                    "SleepImmuneVsWater"
                   ],
-                  "buffStackNames": [
-                    "SleepThorns"
-                  ]
+                  "checkEnemyTeamOfMonster": true,
+                  "enemyTeamMonsterConditionMatchesNeeded": {
+                    "IsWater": 1
+                  },
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "SleepImmuneVs2Enemies"
+                    ],
+                    "enemyTeamSize": 2,
+                    "or": {
+                      "class": "MonsterConditions",
+                      "monsterTags": [
+                        "NegativeStatusImmunityFromThorns"
+                      ],
+                      "buffStackNames": [
+                        "SleepThorns"
+                      ]
+                    }
+                  }
                 }
               }
             }
@@ -717,6 +743,10 @@
       "HasSleptDrainARizetteSwimsuit": {
         "id": "HasSleptDrainARizetteSwimsuit",
         "found": true,
+        "localization": {
+          "name": "HasSleptDrainARizetteSwimsuit",
+          "description": ""
+        },
         "ability": {
           "name": "HasSleptDrainARizetteSwimsuit",
           "class": "Ability",
@@ -863,6 +893,10 @@
       "DreamHuntDoubleARizetteSwimsuit": {
         "id": "DreamHuntDoubleARizetteSwimsuit",
         "found": true,
+        "localization": {
+          "name": "DreamHuntDoubleARizetteSwimsuit",
+          "description": ""
+        },
         "ability": {
           "name": "DreamHuntDoubleARizetteSwimsuit",
           "class": "Ability",
@@ -1004,23 +1038,43 @@
     "passives": {
       "HoldGround": {
         "id": "HoldGround",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Hold Ground",
+          "description": "If this unit would be defeated by an enemy attack or a status effect while having more than 1 HP, it instead survives with 1 HP."
+        }
       },
       "PlusAttackBoostLv3": {
         "id": "PlusAttackBoostLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv3",
+          "description": "Adds 300 to this unit's Attack."
+        }
       },
       "AttackUpTargetEquippedStaffLv3": {
         "id": "AttackUpTargetEquippedStaffLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Staff Hunter Lv3",
+          "description": "10% bonus to attacks against units equipped with Staffs."
+        }
       },
       "PlusHPBoostLv3": {
         "id": "PlusHPBoostLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv3",
+          "description": "Adds 1200 to this unit's max HP."
+        }
       },
       "AddWeaponPrefAxe": {
         "id": "AddWeaponPrefAxe",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Axe Mastery",
+          "description": "Can use weapon skills of Axes in addition to their original preferred weapon type."
+        }
       }
     },
     "activeSkillsAI": {},
@@ -1158,9 +1212,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "e728848fa16b7b205a50dda343293629de8e657945a507be292e6b954c753d17",
-    "dependencyHash": "20c83dacbf9c7af3f6d7a05ab5380dd9ea4b4295406c5fa87051301e833c180d",
-    "generatedAt": 1778013992
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "9666e24e83f8ef0f452e6afd65eeeb66d9b7c05ae385b9e14870fbb6593f9de3",
+    "dependencyHash": "62a89fc093bb26023f37d5865ca94166deca098f8fcf64475b7269bdda42e63d",
+    "generatedAt": 1778081732
   }
 }

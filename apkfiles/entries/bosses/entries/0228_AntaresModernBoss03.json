@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 228,
-  "id": "antares-modern-boss-03",
-  "name": "AntaresModernBoss03",
+  "id": "mega-antares",
+  "name": "Mega Antares",
+  "title": "",
   "category": "bosse",
   "rarity": null,
   "stars": 6,
@@ -39,6 +40,11 @@
       "Stun150AAntaresModernBoss": {
         "id": "Stun150AAntaresModernBoss",
         "found": true,
+        "localization": {
+          "name": "Stun Bolt",
+          "description": "Stuns 1 enemy for 150TU.",
+          "selected": "Stuns 1 enemy for 150TU."
+        },
         "ability": {
           "name": "Stun150AAntaresModernBoss",
           "class": "Ability",
@@ -239,61 +245,71 @@
                     "or": {
                       "class": "MonsterConditions",
                       "monsterTags": [
-                        "StunImmuneIfAnyBurningAllies"
+                        "StunImmuneIfBeastAlly"
                       ],
+                      "checkReinforcementsForTeamConditionMatches": true,
                       "myTeamMonsterConditionMatchesNeeded": {
-                        "IsBurning": 1
+                        "IsBeastRegular": 1
                       },
                       "or": {
                         "class": "MonsterConditions",
                         "monsterTags": [
-                          "StunImmuneIfEnemyIsFireBurnBlastOrForce"
+                          "StunImmuneIfAnyBurningAllies"
                         ],
-                        "checkEnemyTeamOfMonster": true,
-                        "enemyTeamMonsterConditionMatchesNeeded": {
-                          "IsBurnBlastOrForceOrFire": 1
+                        "myTeamMonsterConditionMatchesNeeded": {
+                          "IsBurning": 1
                         },
                         "or": {
                           "class": "MonsterConditions",
                           "monsterTags": [
-                            "StunImmuneIfAllyIsFireBurnBlastOrForce"
+                            "StunImmuneIfEnemyIsFireBurnBlastOrForce"
                           ],
-                          "myTeamMonsterConditionMatchesNeeded": {
+                          "checkEnemyTeamOfMonster": true,
+                          "enemyTeamMonsterConditionMatchesNeeded": {
                             "IsBurnBlastOrForceOrFire": 1
                           },
                           "or": {
                             "class": "MonsterConditions",
                             "monsterTags": [
-                              "StunImmuneIfPoisonedEnemy"
+                              "StunImmuneIfAllyIsFireBurnBlastOrForce"
                             ],
-                            "checkEnemyTeamOfMonster": true,
-                            "enemyTeamMonsterConditionMatchesNeeded": {
-                              "IsPoisoned": 1
+                            "myTeamMonsterConditionMatchesNeeded": {
+                              "IsBurnBlastOrForceOrFire": 1
                             },
                             "or": {
                               "class": "MonsterConditions",
                               "monsterTags": [
-                                "StunImmunityIfNotBurning"
+                                "StunImmuneIfPoisonedEnemy"
                               ],
-                              "not": {
-                                "class": "MonsterConditions",
-                                "buffStackNames": [
-                                  "Burn"
-                                ]
+                              "checkEnemyTeamOfMonster": true,
+                              "enemyTeamMonsterConditionMatchesNeeded": {
+                                "IsPoisoned": 1
                               },
                               "or": {
                                 "class": "MonsterConditions",
                                 "monsterTags": [
-                                  "StunImmuneIfHoldGroundPlusTriggered"
-                                ],
-                                "buffStackNames": [
-                                  "BlockDeathUntilNextTurn"
+                                  "StunImmunityIfNotBurning"
                                 ],
                                 "not": {
                                   "class": "MonsterConditions",
                                   "buffStackNames": [
-                                    "HoldGroundOnceForHoldGroundPlus"
+                                    "Burn"
                                   ]
+                                },
+                                "or": {
+                                  "class": "MonsterConditions",
+                                  "monsterTags": [
+                                    "StunImmuneIfHoldGroundPlusTriggered"
+                                  ],
+                                  "buffStackNames": [
+                                    "BlockDeathUntilNextTurn"
+                                  ],
+                                  "not": {
+                                    "class": "MonsterConditions",
+                                    "buffStackNames": [
+                                      "HoldGroundOnceForHoldGroundPlus"
+                                    ]
+                                  }
                                 }
                               }
                             }
@@ -306,16 +322,16 @@
               }
             }
           }
-        },
-        "localization": {
-          "name": "Stun Bolt",
-          "description": "Stuns 1 enemy for 150TU.",
-          "selected": "Stuns 1 enemy for 150TU."
         }
       },
       "TimeBusterDoubleAAntaresModernBoss": {
         "id": "TimeBusterDoubleAAntaresModernBoss",
         "found": true,
+        "localization": {
+          "name": "Time Assassin",
+          "description": "500% damage to 2 enemies if they have 100TU or more in the turn order. 600% damage if the target has 130TU or more. This attack ignores enemy damage reduction effects. ",
+          "selected": "500%+ damage against targets with 100+ TU"
+        },
         "ability": {
           "name": "TimeBusterDoubleAAntaresModernBoss",
           "class": "Ability",
@@ -542,16 +558,16 @@
             "targetCondition": "CurrentTUGreaterThan130"
           }
         },
-        "conditions": {},
-        "localization": {
-          "name": "Time Assassin",
-          "description": "500% damage to 2 enemies if they have 100TU or more in the turn order. 600% damage if the target has 130TU or more. This attack ignores enemy damage reduction effects. ",
-          "selected": "500%+ damage against targets with 100+ TU"
-        }
+        "conditions": {}
       },
       "SendbackSelfABoss": {
         "id": "SendbackSelfABoss",
         "found": true,
+        "localization": {
+          "name": "Fall Back",
+          "description": "Sends user away from the battlefield to the very end of allied reinforcements.",
+          "selected": "Sends user to rear of reinforcements"
+        },
         "ability": {
           "name": "SendbackSelfABoss",
           "class": "Ability",
@@ -682,30 +698,41 @@
             "class": "MonsterConditions",
             "allyReinforcements": 1
           }
-        },
-        "localization": {
-          "name": "Fall Back",
-          "description": "Sends user away from the battlefield to the very end of allied reinforcements.",
-          "selected": "Sends user to rear of reinforcements"
         }
       }
     },
     "passives": {
       "TUMinusEntranceA": {
         "id": "TUMinusEntranceA",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Clock Entry",
+          "description": "One random other ally has its current TU reduced by 100TU. Triggered when this unit enters the battlefield from reinforcements."
+        }
       },
       "HoldGround": {
         "id": "HoldGround",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Hold Ground",
+          "description": "If this unit would be defeated by an enemy attack or a status effect while having more than 1 HP, it instead survives with 1 HP."
+        }
       },
       "HealSelf10PercentEntranceBoss": {
         "id": "HealSelf10PercentEntranceBoss",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Healing Entry",
+          "description": "Whenever this unit enters the battlefield it heals for 10% of max HP."
+        }
       },
       "StunImmunity": {
         "id": "StunImmunity",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Stun Immunity",
+          "description": "This unit is not affected by stun effects."
+        }
       }
     },
     "activeSkillsAI": {},
@@ -784,9 +811,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "56da31f3bc8ba4b453d17257d863880413ba3e4030c4ba0cb7b1203ae7a403d5",
-    "dependencyHash": "c107722fe53fc223caf8bc3b47fba9a657818d84c455e7d5aaa2e39fd93e3c8f",
-    "generatedAt": 1778014036
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "629e8ac057458ff6a06245731eb3d6264f276b83e0bdb97517814eeb906da57a",
+    "dependencyHash": "0bb3584d5a1c748b222aa0ddc95b8c25af98eca2935dbb11d852b52b16a2318b",
+    "generatedAt": 1778081777
   }
 }

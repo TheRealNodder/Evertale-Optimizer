@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 267,
-  "id": "cinderella-swimsuit-boss-01",
-  "name": "CinderellaSwimsuitBoss01",
+  "id": "berserk-cinderella",
+  "name": "Berserk Cinderella",
+  "title": "",
   "category": "bosse",
   "rarity": null,
   "stars": 6,
@@ -41,6 +42,11 @@
       "StealthBlastACinderellaSwimsuitBoss": {
         "id": "StealthBlastACinderellaSwimsuitBoss",
         "found": true,
+        "localization": {
+          "name": "Stealth Blast",
+          "description": "50% damage to 1 enemy. 300% damage instead every second time this skill is activated while on the battlefield. The user is granted Stealth, and a Stealth Shield. This attack ignores the Counter Stance Status Effect, and the effects of Skin passive skills.\n\nStealth will overwrite other Status effects on the user. Stealth Shields prevent the next non-stealth status effect a unit would gain while Stealthed from applying. Stealthed units ignore the next enemy attack that would damage more than 1 target. Any damage will remove stealth.",
+          "selected": "50%+ damage, user gains Shielded Stealth\n(Will overwrite other status effects)"
+        },
         "ability": {
           "name": "StealthBlastACinderellaSwimsuitBoss",
           "class": "Ability",
@@ -394,16 +400,16 @@
             "sourceCondition": "HasDamagedWithAttack"
           }
         },
-        "conditions": {},
-        "localization": {
-          "name": "Stealth Blast",
-          "description": "50% damage to 1 enemy. 300% damage instead every second time this skill is activated while on the battlefield. The user is granted Stealth, and a Stealth Shield. This attack ignores the Counter Stance Status Effect, and the effects of Skin passive skills.\n\nStealth will overwrite other Status effects on the user. Stealth Shields prevent the next non-stealth status effect a unit would gain while Stealthed from applying. Stealthed units ignore the next enemy attack that would damage more than 1 target. Any damage will remove stealth.",
-          "selected": "50%+ damage, user gains Shielded Stealth\n(Will overwrite other status effects)"
-        }
+        "conditions": {}
       },
       "ComboSleepACinderellaSwimsuitBoss": {
         "id": "ComboSleepACinderellaSwimsuitBoss",
         "found": true,
+        "localization": {
+          "name": "Waves of Sleep",
+          "description": "Grants 2 enemies the Sleep status effect for 200TU, even if they have already slept while on the battlefield, and the user is granted Stealth, and a Stealth Shield. This will overwrite other status effects on those units. Unlocked each time the user damages an enemy with an attack. This skill is locked again after each use or if the user leaves the battlefield. This is not considered a Combo Burst type active skill.",
+          "selected": "Puts targets to sleep even if they have already slept\n(Will overwrite other status effects)"
+        },
         "ability": {
           "name": "ComboSleepACinderellaSwimsuitBoss",
           "class": "Ability",
@@ -896,20 +902,37 @@
               "or": {
                 "class": "MonsterConditions",
                 "monsterTags": [
-                  "SleepImmuneVsWater"
+                  "SleepImmuneIfBeastAlly"
                 ],
-                "checkEnemyTeamOfMonster": true,
-                "enemyTeamMonsterConditionMatchesNeeded": {
-                  "IsWater": 1
+                "checkReinforcementsForTeamConditionMatches": true,
+                "myTeamMonsterConditionMatchesNeeded": {
+                  "IsBeastRegular": 1
                 },
                 "or": {
                   "class": "MonsterConditions",
                   "monsterTags": [
-                    "NegativeStatusImmunityFromThorns"
+                    "SleepImmuneVsWater"
                   ],
-                  "buffStackNames": [
-                    "SleepThorns"
-                  ]
+                  "checkEnemyTeamOfMonster": true,
+                  "enemyTeamMonsterConditionMatchesNeeded": {
+                    "IsWater": 1
+                  },
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "SleepImmuneVs2Enemies"
+                    ],
+                    "enemyTeamSize": 2,
+                    "or": {
+                      "class": "MonsterConditions",
+                      "monsterTags": [
+                        "NegativeStatusImmunityFromThorns"
+                      ],
+                      "buffStackNames": [
+                        "SleepThorns"
+                      ]
+                    }
+                  }
                 }
               }
             }
@@ -923,16 +946,16 @@
               ]
             }
           }
-        },
-        "localization": {
-          "name": "Waves of Sleep",
-          "description": "Grants 2 enemies the Sleep status effect for 200TU, even if they have already slept while on the battlefield, and the user is granted Stealth, and a Stealth Shield. This will overwrite other status effects on those units. Unlocked each time the user damages an enemy with an attack. This skill is locked again after each use or if the user leaves the battlefield. This is not considered a Combo Burst type active skill.",
-          "selected": "Puts targets to sleep even if they have already slept\n(Will overwrite other status effects)"
         }
       },
       "LowHPKnockoutACinderellaSwimsuitBoss": {
         "id": "LowHPKnockoutACinderellaSwimsuitBoss",
         "found": true,
+        "localization": {
+          "name": "Knockout Storm",
+          "description": "500% damage to 1 enemy, and then grants that enemy the Sleep status effect for 200TU, even if they have already slept while on the battlefield if they are left with below 50% of max HP. This attack ignores damage reduction effects. Sleep will overwrite other status effects on that enemy.\n\nThis skill becomes locked for 50TU after use. Usable if the user has the Stealth status effect or at the cost of consuming 1 charge if the user has no stealth. This is considered a Stealth Strike type skill.",
+          "selected": "500% damage, may grant sleep\n(Will overwrite other status effects)"
+        },
         "ability": {
           "name": "LowHPKnockoutACinderellaSwimsuitBoss",
           "class": "Ability",
@@ -1434,16 +1457,16 @@
               }
             }
           }
-        },
-        "localization": {
-          "name": "Knockout Storm",
-          "description": "500% damage to 1 enemy, and then grants that enemy the Sleep status effect for 200TU, even if they have already slept while on the battlefield if they are left with below 50% of max HP. This attack ignores damage reduction effects. Sleep will overwrite other status effects on that enemy.\n\nThis skill becomes locked for 50TU after use. Usable if the user has the Stealth status effect or at the cost of consuming 1 charge if the user has no stealth. This is considered a Stealth Strike type skill.",
-          "selected": "500% damage, may grant sleep\n(Will overwrite other status effects)"
         }
       },
       "SleepExtenderACinderellaSwimsuitBoss": {
         "id": "SleepExtenderACinderellaSwimsuitBoss",
         "found": true,
+        "localization": {
+          "name": "Unending Nightmare",
+          "description": "Targets 1 enemy. If the target is sleeping, deals 600% damage, grants them the Sleep status effect for 200TU, even though they have already slept while on the battlefield, and allies gain 4 Spirit.",
+          "selected": "600% damage & gain 4 Spirit against sleeping target\n(Will overwrite other status effects)"
+        },
         "ability": {
           "name": "SleepExtenderACinderellaSwimsuitBoss",
           "class": "Ability",
@@ -1807,34 +1830,49 @@
               "Sleep"
             ]
           }
-        },
-        "localization": {
-          "name": "Unending Nightmare",
-          "description": "Targets 1 enemy. If the target is sleeping, deals 600% damage, grants them the Sleep status effect for 200TU, even though they have already slept while on the battlefield, and allies gain 4 Spirit.",
-          "selected": "600% damage & gain 4 Spirit against sleeping target\n(Will overwrite other status effects)"
         }
       }
     },
     "passives": {
       "MistShieldACinderellaSwimsuitBoss": {
         "id": "MistShieldACinderellaSwimsuitBoss",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Cinderella's Will",
+          "description": "This unit cannot be burned.\n\nThis unit enters battle with Stealth, a Stealth Shield, and 3 Charges. Certain skills are affected by and may consume charges. A unit can store a maximum of 3 charges, and all charges are removed from a unit that leaves the battlefield.\n\nIf this unit would be defeated while it has any charges, this unit will consume 1 charge to survive with 1HP remaining instead. Whenever a sleeping enemy gets the turn or this unit damages a sleeping enemy with an attack, this unit gains 1 charge."
+        }
       },
       "KnockbackImmunity": {
         "id": "KnockbackImmunity",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Immovable",
+          "description": "This unit cannot be sent to the reinforcements from the battlefield."
+        }
       },
       "SleepImmunity": {
         "id": "SleepImmunity",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Sleep Immunity",
+          "description": "This unit is not affected by sleep effects."
+        }
       },
       "StunImmunity": {
         "id": "StunImmunity",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Stun Immunity",
+          "description": "This unit is not affected by stun effects."
+        }
       },
       "BurnImmunity": {
         "id": "BurnImmunity",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Burn Immunity",
+          "description": "This unit is not affected by burn."
+        }
       }
     },
     "activeSkillsAI": {},
@@ -1909,9 +1947,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "0c86cdb4fb32b12e2ad157447edc0dcaf96bd3c56af537b1635bb40759115be1",
-    "dependencyHash": "f12ede4284bd52ec0654e5318073c5133d871ba7e1ff5ab453846fb6b2997db9",
-    "generatedAt": 1778014037
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "05aa3c42a63f203dc9c7959d14b71e32230a8faf882976703164b3cc8ba15f20",
+    "dependencyHash": "769242a0923cfe34f737079c4cbb2a206bb4ec857af873116c712a47ff01da36",
+    "generatedAt": 1778081779
   }
 }

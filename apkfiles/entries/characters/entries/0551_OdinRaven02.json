@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 551,
-  "id": "odin-raven-02",
-  "name": "OdinRaven02",
+  "id": "winged-shade",
+  "name": "Winged Shade",
+  "title": "",
   "category": "character",
   "rarity": null,
   "stars": 6,
@@ -39,6 +40,11 @@
       "BlindStrikeARaven": {
         "id": "BlindStrikeARaven",
         "found": true,
+        "localization": {
+          "name": "Go for the Eyes!",
+          "description": "50% damage to 1 enemy and Weakens them (reduces their Attack to 0.75x until the end of their next turn). This attack cannot be redirected by enemy Guardians. This will overwrite any existing Weak or Enrage effects on the target and can be overwritten by Enrage effects. The effect of Weakening may be diminished if the affected unit's Attack is increased by other effects.",
+          "selected": "50% damage to 1 enemy and Weaken them"
+        },
         "ability": {
           "name": "BlindStrikeARaven",
           "class": "Ability",
@@ -192,16 +198,16 @@
           }
         },
         "attackScalors": {},
-        "conditions": {},
-        "localization": {
-          "name": "Go for the Eyes!",
-          "description": "50% damage to 1 enemy and Weakens them (reduces their Attack to 0.75x until the end of their next turn). This attack cannot be redirected by enemy Guardians. This will overwrite any existing Weak or Enrage effects on the target and can be overwritten by Enrage effects. The effect of Weakening may be diminished if the affected unit's Attack is increased by other effects.",
-          "selected": "50% damage to 1 enemy and Weaken them"
-        }
+        "conditions": {}
       },
       "Stun100ARaven": {
         "id": "Stun100ARaven",
         "found": true,
+        "localization": {
+          "name": "Stun Bolt",
+          "description": "Stuns 1 enemy for 100TU. Usable once per battle and only if there is an ally \"Odin, Goddess of All Laws\" on the battlefield.",
+          "selected": "Stuns target for 100TU"
+        },
         "ability": {
           "name": "Stun100ARaven",
           "class": "Ability",
@@ -370,61 +376,71 @@
                     "or": {
                       "class": "MonsterConditions",
                       "monsterTags": [
-                        "StunImmuneIfAnyBurningAllies"
+                        "StunImmuneIfBeastAlly"
                       ],
+                      "checkReinforcementsForTeamConditionMatches": true,
                       "myTeamMonsterConditionMatchesNeeded": {
-                        "IsBurning": 1
+                        "IsBeastRegular": 1
                       },
                       "or": {
                         "class": "MonsterConditions",
                         "monsterTags": [
-                          "StunImmuneIfEnemyIsFireBurnBlastOrForce"
+                          "StunImmuneIfAnyBurningAllies"
                         ],
-                        "checkEnemyTeamOfMonster": true,
-                        "enemyTeamMonsterConditionMatchesNeeded": {
-                          "IsBurnBlastOrForceOrFire": 1
+                        "myTeamMonsterConditionMatchesNeeded": {
+                          "IsBurning": 1
                         },
                         "or": {
                           "class": "MonsterConditions",
                           "monsterTags": [
-                            "StunImmuneIfAllyIsFireBurnBlastOrForce"
+                            "StunImmuneIfEnemyIsFireBurnBlastOrForce"
                           ],
-                          "myTeamMonsterConditionMatchesNeeded": {
+                          "checkEnemyTeamOfMonster": true,
+                          "enemyTeamMonsterConditionMatchesNeeded": {
                             "IsBurnBlastOrForceOrFire": 1
                           },
                           "or": {
                             "class": "MonsterConditions",
                             "monsterTags": [
-                              "StunImmuneIfPoisonedEnemy"
+                              "StunImmuneIfAllyIsFireBurnBlastOrForce"
                             ],
-                            "checkEnemyTeamOfMonster": true,
-                            "enemyTeamMonsterConditionMatchesNeeded": {
-                              "IsPoisoned": 1
+                            "myTeamMonsterConditionMatchesNeeded": {
+                              "IsBurnBlastOrForceOrFire": 1
                             },
                             "or": {
                               "class": "MonsterConditions",
                               "monsterTags": [
-                                "StunImmunityIfNotBurning"
+                                "StunImmuneIfPoisonedEnemy"
                               ],
-                              "not": {
-                                "class": "MonsterConditions",
-                                "buffStackNames": [
-                                  "Burn"
-                                ]
+                              "checkEnemyTeamOfMonster": true,
+                              "enemyTeamMonsterConditionMatchesNeeded": {
+                                "IsPoisoned": 1
                               },
                               "or": {
                                 "class": "MonsterConditions",
                                 "monsterTags": [
-                                  "StunImmuneIfHoldGroundPlusTriggered"
-                                ],
-                                "buffStackNames": [
-                                  "BlockDeathUntilNextTurn"
+                                  "StunImmunityIfNotBurning"
                                 ],
                                 "not": {
                                   "class": "MonsterConditions",
                                   "buffStackNames": [
-                                    "HoldGroundOnceForHoldGroundPlus"
+                                    "Burn"
                                   ]
+                                },
+                                "or": {
+                                  "class": "MonsterConditions",
+                                  "monsterTags": [
+                                    "StunImmuneIfHoldGroundPlusTriggered"
+                                  ],
+                                  "buffStackNames": [
+                                    "BlockDeathUntilNextTurn"
+                                  ],
+                                  "not": {
+                                    "class": "MonsterConditions",
+                                    "buffStackNames": [
+                                      "HoldGroundOnceForHoldGroundPlus"
+                                    ]
+                                  }
                                 }
                               }
                             }
@@ -443,16 +459,16 @@
               "IsOdinRegular": 1
             }
           }
-        },
-        "localization": {
-          "name": "Stun Bolt",
-          "description": "Stuns 1 enemy for 100TU. Usable once per battle and only if there is an ally \"Odin, Goddess of All Laws\" on the battlefield.",
-          "selected": "Stuns target for 100TU"
         }
       },
       "ReviveOdinRegularA": {
         "id": "ReviveOdinRegularA",
         "found": true,
+        "localization": {
+          "name": "Supreme Revival",
+          "description": "Sacrifices the user to revive the Odin that conjured the user to the battlefield with full HP. Usable if there is not already an ally \"Odin, Goddess of All Laws\" on the battlefield or in allied reinforcements. The revived Odin will be considered a conjured unit and will have use limits on active skills reset.",
+          "selected": "Sacrifices the user to revive Odin"
+        },
         "ability": {
           "name": "ReviveOdinRegularA",
           "class": "Ability",
@@ -633,22 +649,25 @@
               }
             }
           }
-        },
-        "localization": {
-          "name": "Supreme Revival",
-          "description": "Sacrifices the user to revive the Odin that conjured the user to the battlefield with full HP. Usable if there is not already an ally \"Odin, Goddess of All Laws\" on the battlefield or in allied reinforcements. The revived Odin will be considered a conjured unit and will have use limits on active skills reset.",
-          "selected": "Sacrifices the user to revive Odin"
         }
       }
     },
     "passives": {
       "MirageMonster": {
         "id": "MirageMonster",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Ephemeral",
+          "description": "This unit is never considered to be defeated by attacks and does not trigger any skills of other units whenever it is defeated or sacrificed by any source while on the battlefield.\n\nThis unit will be fully healed after each turn if it takes damage but is not defeated. This unit will be defeated after any ally or enemy turn if this unit has any of the Burn, Super Poison, or Mega Poison status effects.\n\nDamage dealt to this unit is increased to 2.5 times the normal amount."
+        }
       },
       "SpiritThiefEntranceD": {
         "id": "SpiritThiefEntranceD",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Bad Omen",
+          "description": "Steals 1 Spirit from the enemy team. Triggered when this unit enters the battlefield from reinforcements."
+        }
       }
     },
     "activeSkillsAI": {},
@@ -723,9 +742,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "0c8111accae0ede2273caaa451518d52a8889be4618663d93e44c64948890d30",
-    "dependencyHash": "afd7eaf687ae78e30c09d3664292a463cc1471f353a5b4b1a6c6eeaf6aca52a1",
-    "generatedAt": 1778013996
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "9d74f2520fadf4d1f2945c6c4ea010c4cd96ef8b8659d14629d051fc3a2b764f",
+    "dependencyHash": "3b133a60ad1e80cb54bfc204019b00fa3f3343bb396599b95d9b299ace75d460",
+    "generatedAt": 1778081736
   }
 }

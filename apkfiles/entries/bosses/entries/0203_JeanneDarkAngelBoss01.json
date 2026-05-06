@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 203,
-  "id": "jeanne-dark-angel-boss-01",
-  "name": "JeanneDarkAngelBoss01",
+  "id": "mega-dark-mikaela",
+  "name": "Mega Dark Mikaela",
+  "title": "",
   "category": "bosse",
   "rarity": null,
   "stars": 6,
@@ -44,6 +45,11 @@
       "GainAttackSingleStealthB": {
         "id": "GainAttackSingleStealthB",
         "found": true,
+        "localization": {
+          "name": "Attack & Stealth",
+          "description": "Damage to 1 enemy. The user is also granted the Stealth status effect. This will overwrite other status effects on the user. Stealthed units ignore the next enemy attack that would damage more than 1 target. Any damage will remove stealth.",
+          "selected": "Damage to 1 enemy and gain Stealth\n(Will overwrite other status effects)"
+        },
         "ability": {
           "name": "GainAttackSingleStealthB",
           "class": "Ability",
@@ -299,16 +305,15 @@
           }
         },
         "attackScalors": {},
-        "conditions": {},
-        "localization": {
-          "name": "Attack & Stealth",
-          "description": "Damage to 1 enemy. The user is also granted the Stealth status effect. This will overwrite other status effects on the user. Stealthed units ignore the next enemy attack that would damage more than 1 target. Any damage will remove stealth.",
-          "selected": "Damage to 1 enemy and gain Stealth\n(Will overwrite other status effects)"
-        }
+        "conditions": {}
       },
       "StunSingleAJeanneDarkAngelBoss": {
         "id": "StunSingleAJeanneDarkAngelBoss",
         "found": true,
+        "localization": {
+          "name": "StunSingleAJeanneDarkAngelBoss",
+          "description": ""
+        },
         "ability": {
           "name": "StunSingleAJeanneDarkAngelBoss",
           "class": "Ability",
@@ -488,61 +493,71 @@
                     "or": {
                       "class": "MonsterConditions",
                       "monsterTags": [
-                        "StunImmuneIfAnyBurningAllies"
+                        "StunImmuneIfBeastAlly"
                       ],
+                      "checkReinforcementsForTeamConditionMatches": true,
                       "myTeamMonsterConditionMatchesNeeded": {
-                        "IsBurning": 1
+                        "IsBeastRegular": 1
                       },
                       "or": {
                         "class": "MonsterConditions",
                         "monsterTags": [
-                          "StunImmuneIfEnemyIsFireBurnBlastOrForce"
+                          "StunImmuneIfAnyBurningAllies"
                         ],
-                        "checkEnemyTeamOfMonster": true,
-                        "enemyTeamMonsterConditionMatchesNeeded": {
-                          "IsBurnBlastOrForceOrFire": 1
+                        "myTeamMonsterConditionMatchesNeeded": {
+                          "IsBurning": 1
                         },
                         "or": {
                           "class": "MonsterConditions",
                           "monsterTags": [
-                            "StunImmuneIfAllyIsFireBurnBlastOrForce"
+                            "StunImmuneIfEnemyIsFireBurnBlastOrForce"
                           ],
-                          "myTeamMonsterConditionMatchesNeeded": {
+                          "checkEnemyTeamOfMonster": true,
+                          "enemyTeamMonsterConditionMatchesNeeded": {
                             "IsBurnBlastOrForceOrFire": 1
                           },
                           "or": {
                             "class": "MonsterConditions",
                             "monsterTags": [
-                              "StunImmuneIfPoisonedEnemy"
+                              "StunImmuneIfAllyIsFireBurnBlastOrForce"
                             ],
-                            "checkEnemyTeamOfMonster": true,
-                            "enemyTeamMonsterConditionMatchesNeeded": {
-                              "IsPoisoned": 1
+                            "myTeamMonsterConditionMatchesNeeded": {
+                              "IsBurnBlastOrForceOrFire": 1
                             },
                             "or": {
                               "class": "MonsterConditions",
                               "monsterTags": [
-                                "StunImmunityIfNotBurning"
+                                "StunImmuneIfPoisonedEnemy"
                               ],
-                              "not": {
-                                "class": "MonsterConditions",
-                                "buffStackNames": [
-                                  "Burn"
-                                ]
+                              "checkEnemyTeamOfMonster": true,
+                              "enemyTeamMonsterConditionMatchesNeeded": {
+                                "IsPoisoned": 1
                               },
                               "or": {
                                 "class": "MonsterConditions",
                                 "monsterTags": [
-                                  "StunImmuneIfHoldGroundPlusTriggered"
-                                ],
-                                "buffStackNames": [
-                                  "BlockDeathUntilNextTurn"
+                                  "StunImmunityIfNotBurning"
                                 ],
                                 "not": {
                                   "class": "MonsterConditions",
                                   "buffStackNames": [
-                                    "HoldGroundOnceForHoldGroundPlus"
+                                    "Burn"
                                   ]
+                                },
+                                "or": {
+                                  "class": "MonsterConditions",
+                                  "monsterTags": [
+                                    "StunImmuneIfHoldGroundPlusTriggered"
+                                  ],
+                                  "buffStackNames": [
+                                    "BlockDeathUntilNextTurn"
+                                  ],
+                                  "not": {
+                                    "class": "MonsterConditions",
+                                    "buffStackNames": [
+                                      "HoldGroundOnceForHoldGroundPlus"
+                                    ]
+                                  }
                                 }
                               }
                             }
@@ -560,6 +575,10 @@
       "ForceSleepDoubleAJeanneDarkAngelBoss": {
         "id": "ForceSleepDoubleAJeanneDarkAngelBoss",
         "found": true,
+        "localization": {
+          "name": "ForceSleepDoubleAJeanneDarkAngelBoss",
+          "description": ""
+        },
         "ability": {
           "name": "ForceSleepDoubleAJeanneDarkAngelBoss",
           "class": "Ability",
@@ -927,20 +946,37 @@
               "or": {
                 "class": "MonsterConditions",
                 "monsterTags": [
-                  "SleepImmuneVsWater"
+                  "SleepImmuneIfBeastAlly"
                 ],
-                "checkEnemyTeamOfMonster": true,
-                "enemyTeamMonsterConditionMatchesNeeded": {
-                  "IsWater": 1
+                "checkReinforcementsForTeamConditionMatches": true,
+                "myTeamMonsterConditionMatchesNeeded": {
+                  "IsBeastRegular": 1
                 },
                 "or": {
                   "class": "MonsterConditions",
                   "monsterTags": [
-                    "NegativeStatusImmunityFromThorns"
+                    "SleepImmuneVsWater"
                   ],
-                  "buffStackNames": [
-                    "SleepThorns"
-                  ]
+                  "checkEnemyTeamOfMonster": true,
+                  "enemyTeamMonsterConditionMatchesNeeded": {
+                    "IsWater": 1
+                  },
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "SleepImmuneVs2Enemies"
+                    ],
+                    "enemyTeamSize": 2,
+                    "or": {
+                      "class": "MonsterConditions",
+                      "monsterTags": [
+                        "NegativeStatusImmunityFromThorns"
+                      ],
+                      "buffStackNames": [
+                        "SleepThorns"
+                      ]
+                    }
+                  }
                 }
               }
             }
@@ -950,6 +986,11 @@
       "SummonJeanneDarkBossSacA": {
         "id": "SummonJeanneDarkBossSacA",
         "found": true,
+        "localization": {
+          "name": "Unholy Revival",
+          "description": "Sacrifices the user to revive the Mega Dark Jeanne that conjured the user to the battlefield with full HP. Locked for 200TU after the user has entered the battlefield. The revived Mega Dark Jeanne will be considered a conjured unit.",
+          "selected": "Sacrifices the user to revive Mega Dark Jeanne"
+        },
         "ability": {
           "name": "SummonJeanneDarkBossSacA",
           "class": "Ability",
@@ -1135,38 +1176,57 @@
             "class": "MonsterConditions",
             "timeInCombat": 200
           }
-        },
-        "localization": {
-          "name": "Unholy Revival",
-          "description": "Sacrifices the user to revive the Mega Dark Jeanne that conjured the user to the battlefield with full HP. Locked for 200TU after the user has entered the battlefield. The revived Mega Dark Jeanne will be considered a conjured unit.",
-          "selected": "Sacrifices the user to revive Mega Dark Jeanne"
         }
       }
     },
     "passives": {
       "Stun2RandomEntranceA": {
         "id": "Stun2RandomEntranceA",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Stun Entry",
+          "description": "Stuns 2 random enemies for 200TU. Triggered when this unit enters the battlefield from reinforcements."
+        }
       },
       "PurifySelfOnMyTurn": {
         "id": "PurifySelfOnMyTurn",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Auto Nullify",
+          "description": "When this unit gets the turn, all status effects and other effects removable by Purify are removed from this unit."
+        }
       },
       "GetTurnOnEnterBoss": {
         "id": "GetTurnOnEnterBoss",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Lightspeed Arrival",
+          "description": "This unit will immediately get the turn by having its TU reduced to 0 whenever it enters the battlefield."
+        }
       },
       "BlockDeathByBuffDamagSummonJeanneDarkSwimsuitBoss03RevengeHidden": {
         "id": "BlockDeathByBuffDamagSummonJeanneDarkSwimsuitBoss03RevengeHidden",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Unflinching",
+          "description": "This unit cannot be defeated by damage from the Poison or Burn status effects."
+        }
       },
       "KnockbackImmunity": {
         "id": "KnockbackImmunity",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Immovable",
+          "description": "This unit cannot be sent to the reinforcements from the battlefield."
+        }
       },
       "StunImmunity": {
         "id": "StunImmunity",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Stun Immunity",
+          "description": "This unit is not affected by stun effects."
+        }
       }
     },
     "activeSkillsAI": {
@@ -1274,9 +1334,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "6dcff74cbc5e9ee037121c6dbdf49a49a72db5ac662c90815c19ce870ce73923",
-    "dependencyHash": "13e600cb1eb845cfab020789155128371d63e5b838782d1ec837720fd23628b7",
-    "generatedAt": 1778014035
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "8a11dfae7686a083839ffa4105d9a83b50a8c46a2d437f6995ba3332320915d9",
+    "dependencyHash": "02d32737539d45c2b261eadfa2cf27b891df164059d174bfbf785f5a40f7178a",
+    "generatedAt": 1778081777
   }
 }

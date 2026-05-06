@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 95,
-  "id": "water-elf-warrior-01",
-  "name": "WaterElfWarrior01",
+  "id": "eves",
+  "name": "Eves",
+  "title": "",
   "category": "character",
   "rarity": null,
   "stars": 3,
@@ -40,6 +41,11 @@
       "GainAttackSingleA": {
         "id": "GainAttackSingleA",
         "found": true,
+        "localization": {
+          "name": "Attack",
+          "description": "Damage to 1 enemy and allies gain 2 Spirit.",
+          "selected": "Damage to 1 enemy and gains 2 Spirit"
+        },
         "ability": {
           "name": "GainAttackSingleA",
           "class": "Ability",
@@ -90,16 +96,16 @@
         },
         "buffs": {},
         "attackScalors": {},
-        "conditions": {},
-        "localization": {
-          "name": "Attack",
-          "description": "Damage to 1 enemy and allies gain 2 Spirit.",
-          "selected": "Damage to 1 enemy and gains 2 Spirit"
-        }
+        "conditions": {}
       },
       "SleepSingleC": {
         "id": "SleepSingleC",
         "found": true,
+        "localization": {
+          "name": "Sleep",
+          "description": "Grants 1 enemy the Sleep status effect for 200TU. Usable once per battle. This will overwrite other status effects on that unit. Sleep cannot be applied to a unit that Has Slept while on the battlefield.",
+          "selected": "Puts the target to sleep\n(Will overwrite other status effects)"
+        },
         "ability": {
           "name": "SleepSingleC",
           "class": "Ability",
@@ -376,34 +382,51 @@
               "or": {
                 "class": "MonsterConditions",
                 "monsterTags": [
-                  "SleepImmuneVsWater"
+                  "SleepImmuneIfBeastAlly"
                 ],
-                "checkEnemyTeamOfMonster": true,
-                "enemyTeamMonsterConditionMatchesNeeded": {
-                  "IsWater": 1
+                "checkReinforcementsForTeamConditionMatches": true,
+                "myTeamMonsterConditionMatchesNeeded": {
+                  "IsBeastRegular": 1
                 },
                 "or": {
                   "class": "MonsterConditions",
                   "monsterTags": [
-                    "NegativeStatusImmunityFromThorns"
+                    "SleepImmuneVsWater"
                   ],
-                  "buffStackNames": [
-                    "SleepThorns"
-                  ]
+                  "checkEnemyTeamOfMonster": true,
+                  "enemyTeamMonsterConditionMatchesNeeded": {
+                    "IsWater": 1
+                  },
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "SleepImmuneVs2Enemies"
+                    ],
+                    "enemyTeamSize": 2,
+                    "or": {
+                      "class": "MonsterConditions",
+                      "monsterTags": [
+                        "NegativeStatusImmunityFromThorns"
+                      ],
+                      "buffStackNames": [
+                        "SleepThorns"
+                      ]
+                    }
+                  }
                 }
               }
             }
           }
-        },
-        "localization": {
-          "name": "Sleep",
-          "description": "Grants 1 enemy the Sleep status effect for 200TU. Usable once per battle. This will overwrite other status effects on that unit. Sleep cannot be applied to a unit that Has Slept while on the battlefield.",
-          "selected": "Puts the target to sleep\n(Will overwrite other status effects)"
         }
       },
       "SurvivorA": {
         "id": "SurvivorA",
         "found": true,
+        "localization": {
+          "name": "Survivor's Fury",
+          "description": "500% damage to 1 enemy. Locked for 300TU after the user has entered the battlefield.",
+          "selected": "500% damage, usable if user survived 300TU"
+        },
         "ability": {
           "name": "SurvivorA",
           "class": "Ability",
@@ -472,34 +495,49 @@
             "class": "MonsterConditions",
             "timeInCombat": 300
           }
-        },
-        "localization": {
-          "name": "Survivor's Fury",
-          "description": "500% damage to 1 enemy. Locked for 300TU after the user has entered the battlefield.",
-          "selected": "500% damage, usable if user survived 300TU"
         }
       }
     },
     "passives": {
       "StunAbsorber": {
         "id": "StunAbsorber",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Stun Absorb",
+          "description": "Whenever any ally would be affected by stun, this unit takes the stun instead."
+        }
       },
       "AirMinusDamageLv1": {
         "id": "AirMinusDamageLv1",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Storm Resist Lv1",
+          "description": "5% less damage from attacks by Storm units."
+        }
       },
       "PlusHPBoostLv1": {
         "id": "PlusHPBoostLv1",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv1",
+          "description": "Adds 600 to this unit's max HP."
+        }
       },
       "PlusAttackBoostLv1": {
         "id": "PlusAttackBoostLv1",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv1",
+          "description": "Adds 150 to this unit's Attack."
+        }
       },
       "AddWeaponPrefHammer": {
         "id": "AddWeaponPrefHammer",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Hammer Mastery",
+          "description": "Can use weapon skills of Hammers in addition to their original preferred weapon type."
+        }
       }
     },
     "activeSkillsAI": {},
@@ -604,9 +642,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "49cb8fa5201e0e44c1a4541c3c101d999221a72eec99044d0724dd6aafee6aa8",
-    "dependencyHash": "3376d6a551cb871c4e5a0a67a9a00cdf2a7b54a92d0a667e0a07765664bfd33b",
-    "generatedAt": 1778013981
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "4b98b990ffb346202c9b54407e84455bba2278f9eb1fb50e74436595cf5c891b",
+    "dependencyHash": "0efdc32def1bd866027a5ed94a6ec40d9de32be49dc4a32b09a3e2aa70ee29e8",
+    "generatedAt": 1778081722
   }
 }

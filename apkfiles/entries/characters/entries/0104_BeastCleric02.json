@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 104,
-  "id": "beast-cleric-02",
-  "name": "BeastCleric02",
+  "id": "sherry",
+  "name": "Sherry",
+  "title": "",
   "category": "character",
   "rarity": null,
   "stars": 4,
@@ -41,6 +42,11 @@
       "GainAttackSingleALife": {
         "id": "GainAttackSingleALife",
         "found": true,
+        "localization": {
+          "name": "Attack",
+          "description": "Damage to 1 enemy and allies gain 2 Spirit.",
+          "selected": "Damage to 1 enemy and gains 2 Spirit"
+        },
         "ability": {
           "name": "GainAttackSingleALife",
           "class": "Ability",
@@ -145,16 +151,16 @@
         },
         "buffs": {},
         "attackScalors": {},
-        "conditions": {},
-        "localization": {
-          "name": "Attack",
-          "description": "Damage to 1 enemy and allies gain 2 Spirit.",
-          "selected": "Damage to 1 enemy and gains 2 Spirit"
-        }
+        "conditions": {}
       },
       "SleepSingleA": {
         "id": "SleepSingleA",
         "found": true,
+        "localization": {
+          "name": "Sleep",
+          "description": "Grants 1 enemy the Sleep status effect for 200TU. This will overwrite other status effects on that unit. Sleep cannot be applied to a unit that Has Slept while on the battlefield.",
+          "selected": "Puts the target to sleep\n(Will overwrite other status effects)"
+        },
         "ability": {
           "name": "SleepSingleA",
           "class": "Ability",
@@ -431,34 +437,51 @@
               "or": {
                 "class": "MonsterConditions",
                 "monsterTags": [
-                  "SleepImmuneVsWater"
+                  "SleepImmuneIfBeastAlly"
                 ],
-                "checkEnemyTeamOfMonster": true,
-                "enemyTeamMonsterConditionMatchesNeeded": {
-                  "IsWater": 1
+                "checkReinforcementsForTeamConditionMatches": true,
+                "myTeamMonsterConditionMatchesNeeded": {
+                  "IsBeastRegular": 1
                 },
                 "or": {
                   "class": "MonsterConditions",
                   "monsterTags": [
-                    "NegativeStatusImmunityFromThorns"
+                    "SleepImmuneVsWater"
                   ],
-                  "buffStackNames": [
-                    "SleepThorns"
-                  ]
+                  "checkEnemyTeamOfMonster": true,
+                  "enemyTeamMonsterConditionMatchesNeeded": {
+                    "IsWater": 1
+                  },
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "SleepImmuneVs2Enemies"
+                    ],
+                    "enemyTeamSize": 2,
+                    "or": {
+                      "class": "MonsterConditions",
+                      "monsterTags": [
+                        "NegativeStatusImmunityFromThorns"
+                      ],
+                      "buffStackNames": [
+                        "SleepThorns"
+                      ]
+                    }
+                  }
                 }
               }
             }
           }
-        },
-        "localization": {
-          "name": "Sleep",
-          "description": "Grants 1 enemy the Sleep status effect for 200TU. This will overwrite other status effects on that unit. Sleep cannot be applied to a unit that Has Slept while on the battlefield.",
-          "selected": "Puts the target to sleep\n(Will overwrite other status effects)"
         }
       },
       "PurifyDoubleA": {
         "id": "PurifyDoubleA",
         "found": true,
+        "localization": {
+          "name": "Purify",
+          "description": "Removes negative status effects like sleep, burn or poison from 2 allies.",
+          "selected": "Removes bad effects from targets"
+        },
         "ability": {
           "name": "PurifyDoubleA",
           "class": "Ability",
@@ -584,16 +607,16 @@
           }
         },
         "attackScalors": {},
-        "conditions": {},
-        "localization": {
-          "name": "Purify",
-          "description": "Removes negative status effects like sleep, burn or poison from 2 allies.",
-          "selected": "Removes bad effects from targets"
-        }
+        "conditions": {}
       },
       "GiveTurnA": {
         "id": "GiveTurnA",
         "found": true,
+        "localization": {
+          "name": "Give Turn",
+          "description": "Immediately give 1 other ally the next turn by reducing their current TU to 0. Active skills that grant turns cannot be used on turns given by this skill.",
+          "selected": "Reduce TU of 1 ally to 0"
+        },
         "ability": {
           "name": "GiveTurnA",
           "class": "Ability",
@@ -749,34 +772,49 @@
               "OnExtraTurn"
             ]
           }
-        },
-        "localization": {
-          "name": "Give Turn",
-          "description": "Immediately give 1 other ally the next turn by reducing their current TU to 0. Active skills that grant turns cannot be used on turns given by this skill.",
-          "selected": "Reduce TU of 1 ally to 0"
         }
       }
     },
     "passives": {
       "StunRevengeC": {
         "id": "StunRevengeC",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Stun Revenge",
+          "description": "When this unit is defeated by an enemy, that enemy is stunned for 150TU."
+        }
       },
       "PlusAttackBoostLv1": {
         "id": "PlusAttackBoostLv1",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv1",
+          "description": "Adds 150 to this unit's Attack."
+        }
       },
       "DeathMinusDamageLv1": {
         "id": "DeathMinusDamageLv1",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Dark Resist Lv1",
+          "description": "5% less damage from attacks by Dark units."
+        }
       },
       "PlusHPBoostLv1": {
         "id": "PlusHPBoostLv1",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv1",
+          "description": "Adds 600 to this unit's max HP."
+        }
       },
       "AddWeaponPrefStaff": {
         "id": "AddWeaponPrefStaff",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Staff Mastery",
+          "description": "Can use weapon skills of Staffs in addition to their original preferred weapon type."
+        }
       }
     },
     "activeSkillsAI": {},
@@ -878,9 +916,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "535a81e72cf557aae0d0cd98fd89c9080dbeda92ab0f701fab60256a6a569ff8",
-    "dependencyHash": "9c09a4f6e5b99593730474b92f168590e7e044d8d9e94a8a4b2edaad4d89280c",
-    "generatedAt": 1778013981
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "26c67a2c629c160773080003b8c17f8baf13ac21d8388c22710a4151f84b1d0a",
+    "dependencyHash": "e3bb5f9385366ff9d6221d4da662ab47e227af2333ed374991295060897f73f4",
+    "generatedAt": 1778081723
   }
 }

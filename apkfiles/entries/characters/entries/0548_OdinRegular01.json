@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 548,
-  "id": "odin-regular-01",
-  "name": "OdinRegular01",
+  "id": "odin",
+  "name": "Odin",
+  "title": "",
   "category": "character",
   "rarity": null,
   "stars": 5,
@@ -43,6 +44,11 @@
       "TimeSapperAOdinRegular": {
         "id": "TimeSapperAOdinRegular",
         "found": true,
+        "localization": {
+          "name": "Time Blaster",
+          "description": "Targets 1 enemy and deals 100% damage minimum. If the target has 50+ TU, deals 300% damage and steals 1 Spirit from enemies. 500% damage and 2 Spirit stolen instead if the target has 100+ TU.",
+          "selected": "Up to 500% damage and steals up to 2 Spirit"
+        },
         "ability": {
           "name": "TimeSapperAOdinRegular",
           "class": "Ability",
@@ -238,16 +244,16 @@
             "teamSpiritGreaterThan": 0,
             "currentTUGreaterThan": 50
           }
-        },
-        "localization": {
-          "name": "Time Blaster",
-          "description": "Targets 1 enemy and deals 100% damage minimum. If the target has 50+ TU, deals 300% damage and steals 1 Spirit from enemies. 500% damage and 2 Spirit stolen instead if the target has 100+ TU.",
-          "selected": "Up to 500% damage and steals up to 2 Spirit"
         }
       },
       "Stun500AOdinRegular": {
         "id": "Stun500AOdinRegular",
         "found": true,
+        "localization": {
+          "name": "Supreme Stun",
+          "description": "Stuns 1 enemy for 500TU. The user is fully healed and purified (any negative status effects such as Sleep, Burn, or Poison are removed from the user). Usable once per battle.",
+          "selected": "Stuns for 500TU, heals and purifies the user"
+        },
         "ability": {
           "name": "Stun500AOdinRegular",
           "class": "Ability",
@@ -460,61 +466,71 @@
                     "or": {
                       "class": "MonsterConditions",
                       "monsterTags": [
-                        "StunImmuneIfAnyBurningAllies"
+                        "StunImmuneIfBeastAlly"
                       ],
+                      "checkReinforcementsForTeamConditionMatches": true,
                       "myTeamMonsterConditionMatchesNeeded": {
-                        "IsBurning": 1
+                        "IsBeastRegular": 1
                       },
                       "or": {
                         "class": "MonsterConditions",
                         "monsterTags": [
-                          "StunImmuneIfEnemyIsFireBurnBlastOrForce"
+                          "StunImmuneIfAnyBurningAllies"
                         ],
-                        "checkEnemyTeamOfMonster": true,
-                        "enemyTeamMonsterConditionMatchesNeeded": {
-                          "IsBurnBlastOrForceOrFire": 1
+                        "myTeamMonsterConditionMatchesNeeded": {
+                          "IsBurning": 1
                         },
                         "or": {
                           "class": "MonsterConditions",
                           "monsterTags": [
-                            "StunImmuneIfAllyIsFireBurnBlastOrForce"
+                            "StunImmuneIfEnemyIsFireBurnBlastOrForce"
                           ],
-                          "myTeamMonsterConditionMatchesNeeded": {
+                          "checkEnemyTeamOfMonster": true,
+                          "enemyTeamMonsterConditionMatchesNeeded": {
                             "IsBurnBlastOrForceOrFire": 1
                           },
                           "or": {
                             "class": "MonsterConditions",
                             "monsterTags": [
-                              "StunImmuneIfPoisonedEnemy"
+                              "StunImmuneIfAllyIsFireBurnBlastOrForce"
                             ],
-                            "checkEnemyTeamOfMonster": true,
-                            "enemyTeamMonsterConditionMatchesNeeded": {
-                              "IsPoisoned": 1
+                            "myTeamMonsterConditionMatchesNeeded": {
+                              "IsBurnBlastOrForceOrFire": 1
                             },
                             "or": {
                               "class": "MonsterConditions",
                               "monsterTags": [
-                                "StunImmunityIfNotBurning"
+                                "StunImmuneIfPoisonedEnemy"
                               ],
-                              "not": {
-                                "class": "MonsterConditions",
-                                "buffStackNames": [
-                                  "Burn"
-                                ]
+                              "checkEnemyTeamOfMonster": true,
+                              "enemyTeamMonsterConditionMatchesNeeded": {
+                                "IsPoisoned": 1
                               },
                               "or": {
                                 "class": "MonsterConditions",
                                 "monsterTags": [
-                                  "StunImmuneIfHoldGroundPlusTriggered"
-                                ],
-                                "buffStackNames": [
-                                  "BlockDeathUntilNextTurn"
+                                  "StunImmunityIfNotBurning"
                                 ],
                                 "not": {
                                   "class": "MonsterConditions",
                                   "buffStackNames": [
-                                    "HoldGroundOnceForHoldGroundPlus"
+                                    "Burn"
                                   ]
+                                },
+                                "or": {
+                                  "class": "MonsterConditions",
+                                  "monsterTags": [
+                                    "StunImmuneIfHoldGroundPlusTriggered"
+                                  ],
+                                  "buffStackNames": [
+                                    "BlockDeathUntilNextTurn"
+                                  ],
+                                  "not": {
+                                    "class": "MonsterConditions",
+                                    "buffStackNames": [
+                                      "HoldGroundOnceForHoldGroundPlus"
+                                    ]
+                                  }
                                 }
                               }
                             }
@@ -527,16 +543,15 @@
               }
             }
           }
-        },
-        "localization": {
-          "name": "Supreme Stun",
-          "description": "Stuns 1 enemy for 500TU. The user is fully healed and purified (any negative status effects such as Sleep, Burn, or Poison are removed from the user). Usable once per battle.",
-          "selected": "Stuns for 500TU, heals and purifies the user"
         }
       },
       "BirdSplitterAOdinRegular01": {
         "id": "BirdSplitterAOdinRegular01",
         "found": true,
+        "localization": {
+          "name": "BirdSplitterAOdinRegular01",
+          "description": ""
+        },
         "ability": {
           "name": "BirdSplitterAOdinRegular01",
           "class": "Ability",
@@ -727,6 +742,10 @@
       "MegaBirdBombAOdinRegular01": {
         "id": "MegaBirdBombAOdinRegular01",
         "found": true,
+        "localization": {
+          "name": "MegaBirdBombAOdinRegular01",
+          "description": ""
+        },
         "ability": {
           "name": "MegaBirdBombAOdinRegular01",
           "class": "Ability",
@@ -1034,23 +1053,43 @@
     "passives": {
       "BirdSwarmingOdin01": {
         "id": "BirdSwarmingOdin01",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Eyes of Odin",
+          "description": "Add a number of Winged Shades to random places in ally reinforcements equal to the number of Awakenings this unit has plus 1, up to 5 max when fully awakened. Triggered when this unit enters battle (whether at the start of battle or from reinforcements), so long as this unit is not conjured and there are at least 5 non-conjured units in the ally team (including reinforcements). The number of Winged Shades added by this effect will be doubled if there are at least 10 non-conjured units in the ally team, up to 10 max when fully awakened.\n\nIf this unit is not conjured, this unit cannot be sent to the reinforcements from the battlefield.\n\nEvery Winged Shade conjured by this unit will have its Level, Limit Breaks, Awakenings, Boosts, Potential, Mastery, Weapon, and Accessory match this unit."
+        }
       },
       "PlusAttackBoostLv3": {
         "id": "PlusAttackBoostLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv3",
+          "description": "Adds 300 to this unit's Attack."
+        }
       },
       "AirMinusDamageLv3": {
         "id": "AirMinusDamageLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Storm Resist Lv3",
+          "description": "10% less damage from attacks by Storm units."
+        }
       },
       "PlusHPBoostLv3": {
         "id": "PlusHPBoostLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv3",
+          "description": "Adds 1200 to this unit's max HP."
+        }
       },
       "AddWeaponPrefGreatSword": {
         "id": "AddWeaponPrefGreatSword",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Greatsword Mastery",
+          "description": "Can use weapon skills of Greatswords in addition to their original preferred weapon type."
+        }
       }
     },
     "activeSkillsAI": {},
@@ -1193,9 +1232,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "0ee5bb1fba6470dc4c1c12a17bba8889a59cc91f4e900fda01cc2c15eea76537",
-    "dependencyHash": "1fccdf00925e65cb4f6e35fd157c3ec62d6e4206ebf661b101e6c38bc4991f17",
-    "generatedAt": 1778013996
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "d437eb6bbcdd4df4cec14887ed59295538597f8638babd381c7ac742273ad349",
+    "dependencyHash": "6c32cc8dd9570b5bf14b688ea235845cc28b2e765b9e40cc8d2cacefee5e4932",
+    "generatedAt": 1778081736
   }
 }

@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 25,
-  "id": "broche-witch-02",
-  "name": "BrocheWitch02",
+  "id": "wantonwitch",
+  "name": "Wantonwitch",
+  "title": "",
   "category": "character",
   "rarity": null,
   "stars": 4,
@@ -40,6 +41,11 @@
       "GainAttackSingleAFire": {
         "id": "GainAttackSingleAFire",
         "found": true,
+        "localization": {
+          "name": "Attack",
+          "description": "Damage to 1 enemy and allies gain 2 Spirit.",
+          "selected": "Damage to 1 enemy and gains 2 Spirit"
+        },
         "ability": {
           "name": "GainAttackSingleAFire",
           "class": "Ability",
@@ -144,16 +150,16 @@
         },
         "buffs": {},
         "attackScalors": {},
-        "conditions": {},
-        "localization": {
-          "name": "Attack",
-          "description": "Damage to 1 enemy and allies gain 2 Spirit.",
-          "selected": "Damage to 1 enemy and gains 2 Spirit"
-        }
+        "conditions": {}
       },
       "SleepSingleA": {
         "id": "SleepSingleA",
         "found": true,
+        "localization": {
+          "name": "Sleep",
+          "description": "Grants 1 enemy the Sleep status effect for 200TU. This will overwrite other status effects on that unit. Sleep cannot be applied to a unit that Has Slept while on the battlefield.",
+          "selected": "Puts the target to sleep\n(Will overwrite other status effects)"
+        },
         "ability": {
           "name": "SleepSingleA",
           "class": "Ability",
@@ -430,34 +436,51 @@
               "or": {
                 "class": "MonsterConditions",
                 "monsterTags": [
-                  "SleepImmuneVsWater"
+                  "SleepImmuneIfBeastAlly"
                 ],
-                "checkEnemyTeamOfMonster": true,
-                "enemyTeamMonsterConditionMatchesNeeded": {
-                  "IsWater": 1
+                "checkReinforcementsForTeamConditionMatches": true,
+                "myTeamMonsterConditionMatchesNeeded": {
+                  "IsBeastRegular": 1
                 },
                 "or": {
                   "class": "MonsterConditions",
                   "monsterTags": [
-                    "NegativeStatusImmunityFromThorns"
+                    "SleepImmuneVsWater"
                   ],
-                  "buffStackNames": [
-                    "SleepThorns"
-                  ]
+                  "checkEnemyTeamOfMonster": true,
+                  "enemyTeamMonsterConditionMatchesNeeded": {
+                    "IsWater": 1
+                  },
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "SleepImmuneVs2Enemies"
+                    ],
+                    "enemyTeamSize": 2,
+                    "or": {
+                      "class": "MonsterConditions",
+                      "monsterTags": [
+                        "NegativeStatusImmunityFromThorns"
+                      ],
+                      "buffStackNames": [
+                        "SleepThorns"
+                      ]
+                    }
+                  }
                 }
               }
             }
           }
-        },
-        "localization": {
-          "name": "Sleep",
-          "description": "Grants 1 enemy the Sleep status effect for 200TU. This will overwrite other status effects on that unit. Sleep cannot be applied to a unit that Has Slept while on the battlefield.",
-          "selected": "Puts the target to sleep\n(Will overwrite other status effects)"
         }
       },
       "AccelerateSelfA": {
         "id": "AccelerateSelfA",
         "found": true,
+        "localization": {
+          "name": "Quicken",
+          "description": "User's TU costs for all of their skills are reduced by 20%. This will overwrite the effect of previous Quicken skills.",
+          "selected": "Reduces the TU costs of target's skills"
+        },
         "ability": {
           "name": "AccelerateSelfA",
           "class": "Ability",
@@ -600,16 +623,16 @@
           }
         },
         "attackScalors": {},
-        "conditions": {},
-        "localization": {
-          "name": "Quicken",
-          "description": "User's TU costs for all of their skills are reduced by 20%. This will overwrite the effect of previous Quicken skills.",
-          "selected": "Reduces the TU costs of target's skills"
-        }
+        "conditions": {}
       },
       "PushbackA": {
         "id": "PushbackA",
         "found": true,
+        "localization": {
+          "name": "Push Back",
+          "description": "Pushes 1 enemy away from the battlefield to be next in line of the enemy reinforcements. This skill can only be used if there are 1 or more enemy reinforcements left.",
+          "selected": "Sends target to be next in reinforcements"
+        },
         "ability": {
           "name": "PushbackA",
           "class": "Ability",
@@ -757,30 +780,41 @@
               "KnockbackImmune"
             ]
           }
-        },
-        "localization": {
-          "name": "Push Back",
-          "description": "Pushes 1 enemy away from the battlefield to be next in line of the enemy reinforcements. This skill can only be used if there are 1 or more enemy reinforcements left.",
-          "selected": "Sends target to be next in reinforcements"
         }
       }
     },
     "passives": {
       "PlusAttackBoostLv1": {
         "id": "PlusAttackBoostLv1",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv1",
+          "description": "Adds 150 to this unit's Attack."
+        }
       },
       "MaceMinusDamageLv1": {
         "id": "MaceMinusDamageLv1",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Mace Resist Lv1",
+          "description": "5% less damage from attacks by units equipped with Maces."
+        }
       },
       "PlusHPBoostLv1": {
         "id": "PlusHPBoostLv1",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv1",
+          "description": "Adds 600 to this unit's max HP."
+        }
       },
       "AddWeaponPrefMace": {
         "id": "AddWeaponPrefMace",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Mace Mastery",
+          "description": "Can use weapon skills of Maces in addition to their original preferred weapon type."
+        }
       }
     },
     "activeSkillsAI": {},
@@ -866,9 +900,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "bab1f95a4fdca49b76448f3c336945788b6cbf0802ec68a037671b52ffae515b",
-    "dependencyHash": "1c41ebce7b1fd0d3c898243b07fe9b9e74f1e66ec5ff7f242a3aed27197e7f7c",
-    "generatedAt": 1778013979
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "239aec41353eeaaa51a78a362eea8884d0b8a91a6cd80285e6e8dd64f1b293be",
+    "dependencyHash": "01a72095d9c2be3cff9cc50cf92e07de28f628215c5e55c7fe84ab7cfe4bea52",
+    "generatedAt": 1778081720
   }
 }

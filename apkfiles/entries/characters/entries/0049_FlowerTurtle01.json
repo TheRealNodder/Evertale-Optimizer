@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 49,
-  "id": "flower-turtle-01",
-  "name": "FlowerTurtle01",
+  "id": "flittle",
+  "name": "Flittle",
+  "title": "",
   "category": "character",
   "rarity": null,
   "stars": 1,
@@ -33,6 +34,11 @@
       "GainAttackSingleBEarth": {
         "id": "GainAttackSingleBEarth",
         "found": true,
+        "localization": {
+          "name": "Attack",
+          "description": "Damage to 1 enemy and allies gain 1 Spirit.",
+          "selected": "Damage to 1 enemy and gains 1 Spirit"
+        },
         "ability": {
           "name": "GainAttackSingleBEarth",
           "class": "Ability",
@@ -137,16 +143,16 @@
         },
         "buffs": {},
         "attackScalors": {},
-        "conditions": {},
-        "localization": {
-          "name": "Attack",
-          "description": "Damage to 1 enemy and allies gain 1 Spirit.",
-          "selected": "Damage to 1 enemy and gains 1 Spirit"
-        }
+        "conditions": {}
       },
       "SleepBombDoubleA": {
         "id": "SleepBombDoubleA",
         "found": true,
+        "localization": {
+          "name": "Sleep Bomb",
+          "description": "Sacrifices the user to grant 2 enemies the Sleep status effect for 200TU. Locked for 200TU after user enters the battlefield. This will overwrite other status effects on these units. Sleep cannot be applied to a unit that Has Slept while on the battlefield.",
+          "selected": "Puts the targets to sleep, user is sacrificed\n(Will overwrite other status effects)"
+        },
         "ability": {
           "name": "SleepBombDoubleA",
           "class": "Ability",
@@ -441,20 +447,37 @@
               "or": {
                 "class": "MonsterConditions",
                 "monsterTags": [
-                  "SleepImmuneVsWater"
+                  "SleepImmuneIfBeastAlly"
                 ],
-                "checkEnemyTeamOfMonster": true,
-                "enemyTeamMonsterConditionMatchesNeeded": {
-                  "IsWater": 1
+                "checkReinforcementsForTeamConditionMatches": true,
+                "myTeamMonsterConditionMatchesNeeded": {
+                  "IsBeastRegular": 1
                 },
                 "or": {
                   "class": "MonsterConditions",
                   "monsterTags": [
-                    "NegativeStatusImmunityFromThorns"
+                    "SleepImmuneVsWater"
                   ],
-                  "buffStackNames": [
-                    "SleepThorns"
-                  ]
+                  "checkEnemyTeamOfMonster": true,
+                  "enemyTeamMonsterConditionMatchesNeeded": {
+                    "IsWater": 1
+                  },
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "SleepImmuneVs2Enemies"
+                    ],
+                    "enemyTeamSize": 2,
+                    "or": {
+                      "class": "MonsterConditions",
+                      "monsterTags": [
+                        "NegativeStatusImmunityFromThorns"
+                      ],
+                      "buffStackNames": [
+                        "SleepThorns"
+                      ]
+                    }
+                  }
                 }
               }
             }
@@ -463,11 +486,6 @@
             "class": "MonsterConditions",
             "timeInCombat": 200
           }
-        },
-        "localization": {
-          "name": "Sleep Bomb",
-          "description": "Sacrifices the user to grant 2 enemies the Sleep status effect for 200TU. Locked for 200TU after user enters the battlefield. This will overwrite other status effects on these units. Sleep cannot be applied to a unit that Has Slept while on the battlefield.",
-          "selected": "Puts the targets to sleep, user is sacrificed\n(Will overwrite other status effects)"
         }
       }
     },
@@ -539,9 +557,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "0fae6f22d75b6845005de4fa16aa01c6c85f2abb166fa1f540b179f5545383d8",
-    "dependencyHash": "8d8d3f9cd793f42595bd8b0b78cbef5e5cc3d9925f9eb0ec189716c1ef0488da",
-    "generatedAt": 1778013980
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "80c358f75a76a208200ee3c76c1e513ddb12832f3954c0a796fd4a7257908224",
+    "dependencyHash": "d5475d792b60f9b57538b19c0d415345450e6dcedfe9ecd1b100ef3b28dfd693",
+    "generatedAt": 1778081721
   }
 }

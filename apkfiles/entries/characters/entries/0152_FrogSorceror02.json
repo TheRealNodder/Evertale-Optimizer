@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 152,
-  "id": "frog-sorceror-02",
-  "name": "FrogSorceror02",
+  "id": "jin",
+  "name": "Jin",
+  "title": "",
   "category": "character",
   "rarity": null,
   "stars": 5,
@@ -43,6 +44,11 @@
       "GainAttackSingleAWater": {
         "id": "GainAttackSingleAWater",
         "found": true,
+        "localization": {
+          "name": "Attack",
+          "description": "Damage to 1 enemy and allies gain 2 Spirit.",
+          "selected": "Damage to 1 enemy and gains 2 Spirit"
+        },
         "ability": {
           "name": "GainAttackSingleAWater",
           "class": "Ability",
@@ -147,16 +153,16 @@
         },
         "buffs": {},
         "attackScalors": {},
-        "conditions": {},
-        "localization": {
-          "name": "Attack",
-          "description": "Damage to 1 enemy and allies gain 2 Spirit.",
-          "selected": "Damage to 1 enemy and gains 2 Spirit"
-        }
+        "conditions": {}
       },
       "BasicAttackAllAWater": {
         "id": "BasicAttackAllAWater",
         "found": true,
+        "localization": {
+          "name": "Attack All",
+          "description": "Damage to all enemies.",
+          "selected": "Damage to all enemies"
+        },
         "ability": {
           "name": "BasicAttackAllAWater",
           "class": "Ability",
@@ -261,16 +267,16 @@
         },
         "buffs": {},
         "attackScalors": {},
-        "conditions": {},
-        "localization": {
-          "name": "Attack All",
-          "description": "Damage to all enemies.",
-          "selected": "Damage to all enemies"
-        }
+        "conditions": {}
       },
       "DreamHuntA2": {
         "id": "DreamHuntA2",
         "found": true,
+        "localization": {
+          "name": "Dream Hunter",
+          "description": "600% damage to 1 enemy if they are sleeping. Allies gain 4 Spirit if the target is asleep.",
+          "selected": "600% damage & gain 4 Spirit against sleeping target"
+        },
         "ability": {
           "name": "DreamHuntA2",
           "class": "Ability",
@@ -381,16 +387,16 @@
               "Sleep"
             ]
           }
-        },
-        "localization": {
-          "name": "Dream Hunter",
-          "description": "600% damage to 1 enemy if they are sleeping. Allies gain 4 Spirit if the target is asleep.",
-          "selected": "600% damage & gain 4 Spirit against sleeping target"
         }
       },
       "SleepSingleA": {
         "id": "SleepSingleA",
         "found": true,
+        "localization": {
+          "name": "Sleep",
+          "description": "Grants 1 enemy the Sleep status effect for 200TU. This will overwrite other status effects on that unit. Sleep cannot be applied to a unit that Has Slept while on the battlefield.",
+          "selected": "Puts the target to sleep\n(Will overwrite other status effects)"
+        },
         "ability": {
           "name": "SleepSingleA",
           "class": "Ability",
@@ -667,52 +673,84 @@
               "or": {
                 "class": "MonsterConditions",
                 "monsterTags": [
-                  "SleepImmuneVsWater"
+                  "SleepImmuneIfBeastAlly"
                 ],
-                "checkEnemyTeamOfMonster": true,
-                "enemyTeamMonsterConditionMatchesNeeded": {
-                  "IsWater": 1
+                "checkReinforcementsForTeamConditionMatches": true,
+                "myTeamMonsterConditionMatchesNeeded": {
+                  "IsBeastRegular": 1
                 },
                 "or": {
                   "class": "MonsterConditions",
                   "monsterTags": [
-                    "NegativeStatusImmunityFromThorns"
+                    "SleepImmuneVsWater"
                   ],
-                  "buffStackNames": [
-                    "SleepThorns"
-                  ]
+                  "checkEnemyTeamOfMonster": true,
+                  "enemyTeamMonsterConditionMatchesNeeded": {
+                    "IsWater": 1
+                  },
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "SleepImmuneVs2Enemies"
+                    ],
+                    "enemyTeamSize": 2,
+                    "or": {
+                      "class": "MonsterConditions",
+                      "monsterTags": [
+                        "NegativeStatusImmunityFromThorns"
+                      ],
+                      "buffStackNames": [
+                        "SleepThorns"
+                      ]
+                    }
+                  }
                 }
               }
             }
           }
-        },
-        "localization": {
-          "name": "Sleep",
-          "description": "Grants 1 enemy the Sleep status effect for 200TU. This will overwrite other status effects on that unit. Sleep cannot be applied to a unit that Has Slept while on the battlefield.",
-          "selected": "Puts the target to sleep\n(Will overwrite other status effects)"
         }
       }
     },
     "passives": {
       "SpiritGainRevengeA": {
         "id": "SpiritGainRevengeA",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Spirit+ Revenge",
+          "description": "Whenever this unit is defeated by an enemy, allies gain 3 Spirit."
+        }
       },
       "AttackUpTargetEquippedKatanaLv2": {
         "id": "AttackUpTargetEquippedKatanaLv2",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Katana Hunter Lv2",
+          "description": "7% bonus to attacks against units equipped with Katanas."
+        }
       },
       "PlusHPBoostLv2": {
         "id": "PlusHPBoostLv2",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv2",
+          "description": "Adds 800 to this unit's max HP."
+        }
       },
       "PlusAttackBoostLv2": {
         "id": "PlusAttackBoostLv2",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv2",
+          "description": "Adds 200 to this unit's Attack."
+        }
       },
       "AddWeaponPrefMace": {
         "id": "AddWeaponPrefMace",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Mace Mastery",
+          "description": "Can use weapon skills of Maces in addition to their original preferred weapon type."
+        }
       }
     },
     "activeSkillsAI": {
@@ -863,9 +901,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "92860fb400a96ef98ccb18464041368a62cc56609a3d73f7a8d70769bf3cc4cf",
-    "dependencyHash": "1794b360f462869762672b05a4ca843ad3546542301b0c13e64e274f1a15bba7",
-    "generatedAt": 1778013983
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "59409d2398b2f3301d4267f375982f087a1ed4ab151c841a0f1d257f2db4090b",
+    "dependencyHash": "bb296c1954576a211cf53cef3fcb2c2f1cd239ff8e7c7f4d2103d1ff7d5426c6",
+    "generatedAt": 1778081724
   }
 }

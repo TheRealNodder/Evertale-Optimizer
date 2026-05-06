@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 167,
-  "id": "silver-hair-berserker-01",
-  "name": "SilverHairBerserker01",
+  "id": "imran",
+  "name": "Imran",
+  "title": "",
   "category": "character",
   "rarity": null,
   "stars": 5,
@@ -44,6 +45,11 @@
       "RecklessAttackC": {
         "id": "RecklessAttackC",
         "found": true,
+        "localization": {
+          "name": "Brash Strike",
+          "description": "135% damage to 1 enemy and allies gain 2 Spirit. Reflects 25% of the damage to the user.",
+          "selected": "135% damage and 2 Spirit, 25% damage reflection"
+        },
         "ability": {
           "name": "RecklessAttackC",
           "class": "Ability",
@@ -99,16 +105,16 @@
         },
         "buffs": {},
         "attackScalors": {},
-        "conditions": {},
-        "localization": {
-          "name": "Brash Strike",
-          "description": "135% damage to 1 enemy and allies gain 2 Spirit. Reflects 25% of the damage to the user.",
-          "selected": "135% damage and 2 Spirit, 25% damage reflection"
-        }
+        "conditions": {}
       },
       "BasicAttackAllAAir": {
         "id": "BasicAttackAllAAir",
         "found": true,
+        "localization": {
+          "name": "Attack All",
+          "description": "Damage to all enemies.",
+          "selected": "Damage to all enemies"
+        },
         "ability": {
           "name": "BasicAttackAllAAir",
           "class": "Ability",
@@ -213,16 +219,16 @@
         },
         "buffs": {},
         "attackScalors": {},
-        "conditions": {},
-        "localization": {
-          "name": "Attack All",
-          "description": "Damage to all enemies.",
-          "selected": "Damage to all enemies"
-        }
+        "conditions": {}
       },
       "KillStunSingle200ASilverHairBerserker": {
         "id": "KillStunSingle200ASilverHairBerserker",
         "found": true,
+        "localization": {
+          "name": "Triumph Stun",
+          "description": "Stuns 1 enemy for 200TU. Unlocked each time the user defeats another unit with an attack. This skill is locked again after each use or if the user leaves the battlefield.",
+          "selected": "Stuns target for 200TU"
+        },
         "ability": {
           "name": "KillStunSingle200ASilverHairBerserker",
           "class": "Ability",
@@ -443,61 +449,71 @@
                     "or": {
                       "class": "MonsterConditions",
                       "monsterTags": [
-                        "StunImmuneIfAnyBurningAllies"
+                        "StunImmuneIfBeastAlly"
                       ],
+                      "checkReinforcementsForTeamConditionMatches": true,
                       "myTeamMonsterConditionMatchesNeeded": {
-                        "IsBurning": 1
+                        "IsBeastRegular": 1
                       },
                       "or": {
                         "class": "MonsterConditions",
                         "monsterTags": [
-                          "StunImmuneIfEnemyIsFireBurnBlastOrForce"
+                          "StunImmuneIfAnyBurningAllies"
                         ],
-                        "checkEnemyTeamOfMonster": true,
-                        "enemyTeamMonsterConditionMatchesNeeded": {
-                          "IsBurnBlastOrForceOrFire": 1
+                        "myTeamMonsterConditionMatchesNeeded": {
+                          "IsBurning": 1
                         },
                         "or": {
                           "class": "MonsterConditions",
                           "monsterTags": [
-                            "StunImmuneIfAllyIsFireBurnBlastOrForce"
+                            "StunImmuneIfEnemyIsFireBurnBlastOrForce"
                           ],
-                          "myTeamMonsterConditionMatchesNeeded": {
+                          "checkEnemyTeamOfMonster": true,
+                          "enemyTeamMonsterConditionMatchesNeeded": {
                             "IsBurnBlastOrForceOrFire": 1
                           },
                           "or": {
                             "class": "MonsterConditions",
                             "monsterTags": [
-                              "StunImmuneIfPoisonedEnemy"
+                              "StunImmuneIfAllyIsFireBurnBlastOrForce"
                             ],
-                            "checkEnemyTeamOfMonster": true,
-                            "enemyTeamMonsterConditionMatchesNeeded": {
-                              "IsPoisoned": 1
+                            "myTeamMonsterConditionMatchesNeeded": {
+                              "IsBurnBlastOrForceOrFire": 1
                             },
                             "or": {
                               "class": "MonsterConditions",
                               "monsterTags": [
-                                "StunImmunityIfNotBurning"
+                                "StunImmuneIfPoisonedEnemy"
                               ],
-                              "not": {
-                                "class": "MonsterConditions",
-                                "buffStackNames": [
-                                  "Burn"
-                                ]
+                              "checkEnemyTeamOfMonster": true,
+                              "enemyTeamMonsterConditionMatchesNeeded": {
+                                "IsPoisoned": 1
                               },
                               "or": {
                                 "class": "MonsterConditions",
                                 "monsterTags": [
-                                  "StunImmuneIfHoldGroundPlusTriggered"
-                                ],
-                                "buffStackNames": [
-                                  "BlockDeathUntilNextTurn"
+                                  "StunImmunityIfNotBurning"
                                 ],
                                 "not": {
                                   "class": "MonsterConditions",
                                   "buffStackNames": [
-                                    "HoldGroundOnceForHoldGroundPlus"
+                                    "Burn"
                                   ]
+                                },
+                                "or": {
+                                  "class": "MonsterConditions",
+                                  "monsterTags": [
+                                    "StunImmuneIfHoldGroundPlusTriggered"
+                                  ],
+                                  "buffStackNames": [
+                                    "BlockDeathUntilNextTurn"
+                                  ],
+                                  "not": {
+                                    "class": "MonsterConditions",
+                                    "buffStackNames": [
+                                      "HoldGroundOnceForHoldGroundPlus"
+                                    ]
+                                  }
                                 }
                               }
                             }
@@ -516,16 +532,16 @@
             "fieldToCompareToProperty": "killsMade",
             "propertyFieldCompareStyle": "LessThan"
           }
-        },
-        "localization": {
-          "name": "Triumph Stun",
-          "description": "Stuns 1 enemy for 200TU. Unlocked each time the user defeats another unit with an attack. This skill is locked again after each use or if the user leaves the battlefield.",
-          "selected": "Stuns target for 200TU"
         }
       },
       "TimeStrikeA": {
         "id": "TimeStrikeA",
         "found": true,
+        "localization": {
+          "name": "Time Strike",
+          "description": "500% damage to 1 enemy if they have 130TU or more in the turn order. 600% damage if the target has 200TU or more.",
+          "selected": "500%+ damage against target with 130+ TU"
+        },
         "ability": {
           "name": "TimeStrikeA",
           "class": "Ability",
@@ -624,34 +640,49 @@
             "targetCondition": "CurrentTUGreaterThan200"
           }
         },
-        "conditions": {},
-        "localization": {
-          "name": "Time Strike",
-          "description": "500% damage to 1 enemy if they have 130TU or more in the turn order. 600% damage if the target has 200TU or more.",
-          "selected": "500%+ damage against target with 130+ TU"
-        }
+        "conditions": {}
       }
     },
     "passives": {
       "StunSkinA": {
         "id": "StunSkinA",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Stun Skin",
+          "description": "Enemy units that deal damage to this unit get stunned for 50TU."
+        }
       },
       "AttackUpTargetEquippedMaceLv3": {
         "id": "AttackUpTargetEquippedMaceLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Mace Hunter Lv3",
+          "description": "10% bonus to attacks against units equipped with Maces."
+        }
       },
       "PlusHPBoostLv3": {
         "id": "PlusHPBoostLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv3",
+          "description": "Adds 1200 to this unit's max HP."
+        }
       },
       "PlusAttackBoostLv3": {
         "id": "PlusAttackBoostLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv3",
+          "description": "Adds 300 to this unit's Attack."
+        }
       },
       "AddWeaponPrefSpear": {
         "id": "AddWeaponPrefSpear",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Spear Mastery",
+          "description": "Can use weapon skills of Spears in addition to their original preferred weapon type."
+        }
       }
     },
     "activeSkillsAI": {
@@ -836,9 +867,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "f8024ee862c2226d7a67ec0c79b01bbc4d4efad741e074ebd7d667102afe7166",
-    "dependencyHash": "b0299b28ed7e37e687a9ad4433732095d8a05eafff69c3b741d38ee8d1bbc902",
-    "generatedAt": 1778013984
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "c63b73a5b0cfecfd75c44410ec1836d1205a4d001a24edf18dd8f020b80b8977",
+    "dependencyHash": "b8e64fc0b3d237ff79589d91dde6e11853f1ae5dcedae1245d641fe3bff584d4",
+    "generatedAt": 1778081725
   }
 }

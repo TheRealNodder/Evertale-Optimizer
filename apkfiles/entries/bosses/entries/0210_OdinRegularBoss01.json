@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 210,
-  "id": "odin-regular-boss-01",
-  "name": "OdinRegularBoss01",
+  "id": "berserk-odin",
+  "name": "Berserk Odin",
+  "title": "",
   "category": "bosse",
   "rarity": null,
   "stars": 6,
@@ -36,6 +37,11 @@
       "TimeSapperAOdinRegularBoss": {
         "id": "TimeSapperAOdinRegularBoss",
         "found": true,
+        "localization": {
+          "name": "Time Blaster",
+          "description": "Targets 1 enemy and deals 100% damage minimum. If the target has 50+ TU, deals 300% damage and steals 1 Spirit from enemies. 500% damage and 2 Spirit stolen instead if the target has 100+ TU.",
+          "selected": "Up to 500% damage and steals up to 2 Spirit"
+        },
         "ability": {
           "name": "TimeSapperAOdinRegularBoss",
           "class": "Ability",
@@ -231,16 +237,16 @@
             "teamSpiritGreaterThan": 0,
             "currentTUGreaterThan": 50
           }
-        },
-        "localization": {
-          "name": "Time Blaster",
-          "description": "Targets 1 enemy and deals 100% damage minimum. If the target has 50+ TU, deals 300% damage and steals 1 Spirit from enemies. 500% damage and 2 Spirit stolen instead if the target has 100+ TU.",
-          "selected": "Up to 500% damage and steals up to 2 Spirit"
         }
       },
       "Stun500AOdinRegularBoss": {
         "id": "Stun500AOdinRegularBoss",
         "found": true,
+        "localization": {
+          "name": "Supreme Stun",
+          "description": "Stuns 1 enemy for 500TU. The user is fully healed and purified (any negative status effects such as Sleep, Burn, or Poison are removed from the user). Usable once per battle.",
+          "selected": "Stuns for 500TU, heals and purifies the user"
+        },
         "ability": {
           "name": "Stun500AOdinRegularBoss",
           "class": "Ability",
@@ -453,61 +459,71 @@
                     "or": {
                       "class": "MonsterConditions",
                       "monsterTags": [
-                        "StunImmuneIfAnyBurningAllies"
+                        "StunImmuneIfBeastAlly"
                       ],
+                      "checkReinforcementsForTeamConditionMatches": true,
                       "myTeamMonsterConditionMatchesNeeded": {
-                        "IsBurning": 1
+                        "IsBeastRegular": 1
                       },
                       "or": {
                         "class": "MonsterConditions",
                         "monsterTags": [
-                          "StunImmuneIfEnemyIsFireBurnBlastOrForce"
+                          "StunImmuneIfAnyBurningAllies"
                         ],
-                        "checkEnemyTeamOfMonster": true,
-                        "enemyTeamMonsterConditionMatchesNeeded": {
-                          "IsBurnBlastOrForceOrFire": 1
+                        "myTeamMonsterConditionMatchesNeeded": {
+                          "IsBurning": 1
                         },
                         "or": {
                           "class": "MonsterConditions",
                           "monsterTags": [
-                            "StunImmuneIfAllyIsFireBurnBlastOrForce"
+                            "StunImmuneIfEnemyIsFireBurnBlastOrForce"
                           ],
-                          "myTeamMonsterConditionMatchesNeeded": {
+                          "checkEnemyTeamOfMonster": true,
+                          "enemyTeamMonsterConditionMatchesNeeded": {
                             "IsBurnBlastOrForceOrFire": 1
                           },
                           "or": {
                             "class": "MonsterConditions",
                             "monsterTags": [
-                              "StunImmuneIfPoisonedEnemy"
+                              "StunImmuneIfAllyIsFireBurnBlastOrForce"
                             ],
-                            "checkEnemyTeamOfMonster": true,
-                            "enemyTeamMonsterConditionMatchesNeeded": {
-                              "IsPoisoned": 1
+                            "myTeamMonsterConditionMatchesNeeded": {
+                              "IsBurnBlastOrForceOrFire": 1
                             },
                             "or": {
                               "class": "MonsterConditions",
                               "monsterTags": [
-                                "StunImmunityIfNotBurning"
+                                "StunImmuneIfPoisonedEnemy"
                               ],
-                              "not": {
-                                "class": "MonsterConditions",
-                                "buffStackNames": [
-                                  "Burn"
-                                ]
+                              "checkEnemyTeamOfMonster": true,
+                              "enemyTeamMonsterConditionMatchesNeeded": {
+                                "IsPoisoned": 1
                               },
                               "or": {
                                 "class": "MonsterConditions",
                                 "monsterTags": [
-                                  "StunImmuneIfHoldGroundPlusTriggered"
-                                ],
-                                "buffStackNames": [
-                                  "BlockDeathUntilNextTurn"
+                                  "StunImmunityIfNotBurning"
                                 ],
                                 "not": {
                                   "class": "MonsterConditions",
                                   "buffStackNames": [
-                                    "HoldGroundOnceForHoldGroundPlus"
+                                    "Burn"
                                   ]
+                                },
+                                "or": {
+                                  "class": "MonsterConditions",
+                                  "monsterTags": [
+                                    "StunImmuneIfHoldGroundPlusTriggered"
+                                  ],
+                                  "buffStackNames": [
+                                    "BlockDeathUntilNextTurn"
+                                  ],
+                                  "not": {
+                                    "class": "MonsterConditions",
+                                    "buffStackNames": [
+                                      "HoldGroundOnceForHoldGroundPlus"
+                                    ]
+                                  }
                                 }
                               }
                             }
@@ -520,16 +536,16 @@
               }
             }
           }
-        },
-        "localization": {
-          "name": "Supreme Stun",
-          "description": "Stuns 1 enemy for 500TU. The user is fully healed and purified (any negative status effects such as Sleep, Burn, or Poison are removed from the user). Usable once per battle.",
-          "selected": "Stuns for 500TU, heals and purifies the user"
         }
       },
       "BirdSplitterAOdinRegularBoss01": {
         "id": "BirdSplitterAOdinRegularBoss01",
         "found": true,
+        "localization": {
+          "name": "God Spear",
+          "description": "Sacrifices the ally Berserk Winged Shade on the battlefield with the highest current TU for 600% damage to 1 enemy, then adds 2 Berserk Winged Shades to random places in ally reinforcements. The user is healed for 10% of max HP and is purified. This does not prevent new status effects from applying to the user. Usable only if there is an ally Berserk Winged Shade on the battlefield.",
+          "selected": "600% damage, sacrifices a raven to make 2 more"
+        },
         "ability": {
           "name": "BirdSplitterAOdinRegularBoss01",
           "class": "Ability",
@@ -716,18 +732,17 @@
               "IsOdinRavenBoss": 1
             }
           }
-        },
-        "localization": {
-          "name": "God Spear",
-          "description": "Sacrifices the ally Berserk Winged Shade on the battlefield with the highest current TU for 600% damage to 1 enemy, then adds 2 Berserk Winged Shades to random places in ally reinforcements. The user is healed for 10% of max HP and is purified. This does not prevent new status effects from applying to the user. Usable only if there is an ally Berserk Winged Shade on the battlefield.",
-          "selected": "600% damage, sacrifices a raven to make 2 more"
         }
       }
     },
     "passives": {
       "StunImmunityOdinBoss": {
         "id": "StunImmunityOdinBoss",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Stun Immunity",
+          "description": "This unit is not affected by stun effects."
+        }
       }
     },
     "activeSkillsAI": {},
@@ -800,9 +815,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "57747a8446ae9524cab78125bf499f4156166a7183d013bfb82e93d85a48b6aa",
-    "dependencyHash": "07d6a424e7c4df8708ee277550c369c42f3d290d0c1ca74bf760344736d32d28",
-    "generatedAt": 1778014035
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "8f7a5023be7138103692af60fe2a73a380f00a4d75bbb39501b1beec56aebbe2",
+    "dependencyHash": "187879c79d1881324f87ad58b0c127c6d148f2578d80568cfbd5b25672b21f48",
+    "generatedAt": 1778081777
   }
 }

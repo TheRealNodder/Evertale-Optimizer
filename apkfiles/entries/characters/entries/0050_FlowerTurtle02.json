@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 50,
-  "id": "flower-turtle-02",
-  "name": "FlowerTurtle02",
+  "id": "flortuga",
+  "name": "Flortuga",
+  "title": "",
   "category": "character",
   "rarity": null,
   "stars": 2,
@@ -35,6 +36,11 @@
       "GainAttackSingleBEarth": {
         "id": "GainAttackSingleBEarth",
         "found": true,
+        "localization": {
+          "name": "Attack",
+          "description": "Damage to 1 enemy and allies gain 1 Spirit.",
+          "selected": "Damage to 1 enemy and gains 1 Spirit"
+        },
         "ability": {
           "name": "GainAttackSingleBEarth",
           "class": "Ability",
@@ -139,16 +145,16 @@
         },
         "buffs": {},
         "attackScalors": {},
-        "conditions": {},
-        "localization": {
-          "name": "Attack",
-          "description": "Damage to 1 enemy and allies gain 1 Spirit.",
-          "selected": "Damage to 1 enemy and gains 1 Spirit"
-        }
+        "conditions": {}
       },
       "SleepBombDoubleA": {
         "id": "SleepBombDoubleA",
         "found": true,
+        "localization": {
+          "name": "Sleep Bomb",
+          "description": "Sacrifices the user to grant 2 enemies the Sleep status effect for 200TU. Locked for 200TU after user enters the battlefield. This will overwrite other status effects on these units. Sleep cannot be applied to a unit that Has Slept while on the battlefield.",
+          "selected": "Puts the targets to sleep, user is sacrificed\n(Will overwrite other status effects)"
+        },
         "ability": {
           "name": "SleepBombDoubleA",
           "class": "Ability",
@@ -443,20 +449,37 @@
               "or": {
                 "class": "MonsterConditions",
                 "monsterTags": [
-                  "SleepImmuneVsWater"
+                  "SleepImmuneIfBeastAlly"
                 ],
-                "checkEnemyTeamOfMonster": true,
-                "enemyTeamMonsterConditionMatchesNeeded": {
-                  "IsWater": 1
+                "checkReinforcementsForTeamConditionMatches": true,
+                "myTeamMonsterConditionMatchesNeeded": {
+                  "IsBeastRegular": 1
                 },
                 "or": {
                   "class": "MonsterConditions",
                   "monsterTags": [
-                    "NegativeStatusImmunityFromThorns"
+                    "SleepImmuneVsWater"
                   ],
-                  "buffStackNames": [
-                    "SleepThorns"
-                  ]
+                  "checkEnemyTeamOfMonster": true,
+                  "enemyTeamMonsterConditionMatchesNeeded": {
+                    "IsWater": 1
+                  },
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "SleepImmuneVs2Enemies"
+                    ],
+                    "enemyTeamSize": 2,
+                    "or": {
+                      "class": "MonsterConditions",
+                      "monsterTags": [
+                        "NegativeStatusImmunityFromThorns"
+                      ],
+                      "buffStackNames": [
+                        "SleepThorns"
+                      ]
+                    }
+                  }
                 }
               }
             }
@@ -465,18 +488,17 @@
             "class": "MonsterConditions",
             "timeInCombat": 200
           }
-        },
-        "localization": {
-          "name": "Sleep Bomb",
-          "description": "Sacrifices the user to grant 2 enemies the Sleep status effect for 200TU. Locked for 200TU after user enters the battlefield. This will overwrite other status effects on these units. Sleep cannot be applied to a unit that Has Slept while on the battlefield.",
-          "selected": "Puts the targets to sleep, user is sacrificed\n(Will overwrite other status effects)"
         }
       }
     },
     "passives": {
       "HoldGround": {
         "id": "HoldGround",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Hold Ground",
+          "description": "If this unit would be defeated by an enemy attack or a status effect while having more than 1 HP, it instead survives with 1 HP."
+        }
       }
     },
     "activeSkillsAI": {},
@@ -547,9 +569,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "e1b8966b1ac9626e7cdd488334dbde7c7ff1c3b239ac29bd7a79e715299da077",
-    "dependencyHash": "c2bfc4ea1df3620e13e6851d54c5c5e671414165d06163fc7d203270eba03c18",
-    "generatedAt": 1778013980
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "7757c4ac8a34e1a719786da80cb97702c12d0bf0ce75b3ad5b05a112f61d88d1",
+    "dependencyHash": "6520a6c8ea03a00573b60e652c8992d9ef2cf02b68fb4f12f0212126ecf4a7c2",
+    "generatedAt": 1778081721
   }
 }

@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 180,
-  "id": "snow-white-bride-boss-01",
-  "name": "SnowWhiteBrideBoss01",
+  "id": "berserk-snow-white",
+  "name": "Berserk Snow White",
+  "title": "",
   "category": "bosse",
   "rarity": null,
   "stars": 6,
@@ -42,6 +43,11 @@
       "SleepAttackASnowWhiteBrideBoss": {
         "id": "SleepAttackASnowWhiteBrideBoss",
         "found": true,
+        "localization": {
+          "name": "Sleep Attack",
+          "description": "Damage to 1 enemy, with a 100% chance of granting that enemy the Sleep status effect for 200TU. If applied, this will overwrite other status effects on that enemy. Sleep cannot be applied to a unit that Has Slept while on the battlefield. Damage from this attack does not wake up sleeping enemies.",
+          "selected": "Damage to 1 enemy and apply Sleep to them\n(Can overwrite other status effects)"
+        },
         "ability": {
           "name": "SleepAttackASnowWhiteBrideBoss",
           "class": "Ability",
@@ -320,16 +326,16 @@
               "SnowBrideBossSummonLocked"
             ]
           }
-        },
-        "localization": {
-          "name": "Sleep Attack",
-          "description": "Damage to 1 enemy, with a 100% chance of granting that enemy the Sleep status effect for 200TU. If applied, this will overwrite other status effects on that enemy. Sleep cannot be applied to a unit that Has Slept while on the battlefield. Damage from this attack does not wake up sleeping enemies.",
-          "selected": "Damage to 1 enemy and apply Sleep to them\n(Can overwrite other status effects)"
         }
       },
       "DreamBusterPlusASnowWhiteBrideBoss": {
         "id": "DreamBusterPlusASnowWhiteBrideBoss",
         "found": true,
+        "localization": {
+          "name": "Nightmare Assassin",
+          "description": "600% damage to 1 enemy if they are sleeping. 300% damage instead if they are awake after having fallen asleep while on the battlefield. A random enemy that has not slept while on the battlefield is granted the Sleep status effect for 200TU. This attack ignores enemy damage reduction effects.",
+          "selected": "Up to 600% to Sleeping/Has Slept, spreads Sleep\n(Will overwrite other status effects)"
+        },
         "ability": {
           "name": "DreamBusterPlusASnowWhiteBrideBoss",
           "class": "Ability",
@@ -476,16 +482,16 @@
               "SnowBrideBossSummonLocked"
             ]
           }
-        },
-        "localization": {
-          "name": "Nightmare Assassin",
-          "description": "600% damage to 1 enemy if they are sleeping. 300% damage instead if they are awake after having fallen asleep while on the battlefield. A random enemy that has not slept while on the battlefield is granted the Sleep status effect for 200TU. This attack ignores enemy damage reduction effects.",
-          "selected": "Up to 600% to Sleeping/Has Slept, spreads Sleep\n(Will overwrite other status effects)"
         }
       },
       "ForceSleepDoubleASnowWhiteBrideBoss": {
         "id": "ForceSleepDoubleASnowWhiteBrideBoss",
         "found": true,
+        "localization": {
+          "name": "Sleep Echo",
+          "description": "Grants 2 enemies the Sleep status effect for 200TU, even if they have already slept while on the battlefield. This will overwrite other status effects on those units. Usable if all enemies have already slept while on the battlefield.",
+          "selected": "Puts targets to sleep even if they have already slept\n(Will overwrite other status effects)"
+        },
         "ability": {
           "name": "ForceSleepDoubleASnowWhiteBrideBoss",
           "class": "Ability",
@@ -822,20 +828,37 @@
               "or": {
                 "class": "MonsterConditions",
                 "monsterTags": [
-                  "SleepImmuneVsWater"
+                  "SleepImmuneIfBeastAlly"
                 ],
-                "checkEnemyTeamOfMonster": true,
-                "enemyTeamMonsterConditionMatchesNeeded": {
-                  "IsWater": 1
+                "checkReinforcementsForTeamConditionMatches": true,
+                "myTeamMonsterConditionMatchesNeeded": {
+                  "IsBeastRegular": 1
                 },
                 "or": {
                   "class": "MonsterConditions",
                   "monsterTags": [
-                    "NegativeStatusImmunityFromThorns"
+                    "SleepImmuneVsWater"
                   ],
-                  "buffStackNames": [
-                    "SleepThorns"
-                  ]
+                  "checkEnemyTeamOfMonster": true,
+                  "enemyTeamMonsterConditionMatchesNeeded": {
+                    "IsWater": 1
+                  },
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "SleepImmuneVs2Enemies"
+                    ],
+                    "enemyTeamSize": 2,
+                    "or": {
+                      "class": "MonsterConditions",
+                      "monsterTags": [
+                        "NegativeStatusImmunityFromThorns"
+                      ],
+                      "buffStackNames": [
+                        "SleepThorns"
+                      ]
+                    }
+                  }
                 }
               }
             }
@@ -844,16 +867,16 @@
             "class": "MonsterConditions",
             "abilityConfigFlag": "IsSnowWhiteBrideBoss01"
           }
-        },
-        "localization": {
-          "name": "Sleep Echo",
-          "description": "Grants 2 enemies the Sleep status effect for 200TU, even if they have already slept while on the battlefield. This will overwrite other status effects on those units. Usable if all enemies have already slept while on the battlefield.",
-          "selected": "Puts targets to sleep even if they have already slept\n(Will overwrite other status effects)"
         }
       },
       "SummonSnowBlackBrideBossSacA01": {
         "id": "SummonSnowBlackBrideBossSacA01",
         "found": true,
+        "localization": {
+          "name": "Dark Transformation",
+          "description": "The user transforms into Berserk Snow Black. Berserk Snow Black's Level, Limit Breaks, Awakenings, Boosts, Potential, Mastery, Weapon, Accessory and remaining HP will match the user. Berserk Snow Black will be treated as a new conjured unit, and is considered to have entered the battlefield upon transformation.\n\nLocked until a non-conjured enemy on the battlefield is defeated or sacrificed by any source. Berserk Snow White cannot activate any other active skills while this skill is unlocked. When a unit transforms, it is not considered to have been defeated or sacrificed.",
+          "selected": "Transforms into Berserk Snow Black"
+        },
         "ability": {
           "name": "SummonSnowBlackBrideBossSacA01",
           "class": "Ability",
@@ -1036,38 +1059,57 @@
               "SnowBrideBossSummonUnlocked"
             ]
           }
-        },
-        "localization": {
-          "name": "Dark Transformation",
-          "description": "The user transforms into Berserk Snow Black. Berserk Snow Black's Level, Limit Breaks, Awakenings, Boosts, Potential, Mastery, Weapon, Accessory and remaining HP will match the user. Berserk Snow Black will be treated as a new conjured unit, and is considered to have entered the battlefield upon transformation.\n\nLocked until a non-conjured enemy on the battlefield is defeated or sacrificed by any source. Berserk Snow White cannot activate any other active skills while this skill is unlocked. When a unit transforms, it is not considered to have been defeated or sacrificed.",
-          "selected": "Transforms into Berserk Snow Black"
         }
       }
     },
     "passives": {
       "GainSpiritGetTurnOnEnterSnowWhiteBrideBoss": {
         "id": "GainSpiritGetTurnOnEnterSnowWhiteBrideBoss",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Brightest Light",
+          "description": "When this unit enters battle (including at the start of battle or from transformation), Ally Spirit is doubled. If Ally Spirit is at 0, gain 1 Spirit instead.\n\nThis unit will immediately get the turn by having its TU reduced to 0 whenever it enters the battlefield from reinforcements or transformation."
+        }
       },
       "DoubleTurnOnKillABoss": {
         "id": "DoubleTurnOnKillABoss",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Battle Momentum",
+          "description": "Each time this unit defeats an enemy with an attack, this unit will get another turn. Effects that influence TU order may interrupt the extra turn (e.g. Stuns targeting the lowest TU target)."
+        }
       },
       "AttackUpIfEnemyHasSlept": {
         "id": "AttackUpIfEnemyHasSlept",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Sleep Drive",
+          "description": "This unit's Attack is increased to 1.15x if an enemy has already slept while on the battlefield. This increases by 0.15 for each enemy that has already slept beyond the first, up to a maximum of 1.6x if 4 enemies have slept while on the battlefield."
+        }
       },
       "PurifySelfOnMyTurn": {
         "id": "PurifySelfOnMyTurn",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Auto Nullify",
+          "description": "When this unit gets the turn, all status effects and other effects removable by Purify are removed from this unit."
+        }
       },
       "KnockbackImmunity": {
         "id": "KnockbackImmunity",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Immovable",
+          "description": "This unit cannot be sent to the reinforcements from the battlefield."
+        }
       },
       "StunImmunity": {
         "id": "StunImmunity",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Stun Immunity",
+          "description": "This unit is not affected by stun effects."
+        }
       }
     },
     "activeSkillsAI": {},
@@ -1151,9 +1193,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "bbb80581bf8c5ded6ece07e40f39643766a679be0bc80ca897b783d21f0f751e",
-    "dependencyHash": "55d7cc3dfdb099d7b7642100deaf50b9425b54604e6d9a8721e47655c190f693",
-    "generatedAt": 1778014034
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "a8aaa8cb0df43cdb10961c5db63a02023e2802b4237348e021bc7f75193565b4",
+    "dependencyHash": "7c3ccee7d66c3117ce579f0b57f6daff63464ba33e1c66c84eded7c31c4f867d",
+    "generatedAt": 1778081776
   }
 }

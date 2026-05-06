@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 467,
-  "id": "callen-bride-01",
-  "name": "CallenBride01",
+  "id": "callen",
+  "name": "Callen",
+  "title": "",
   "category": "character",
   "rarity": null,
   "stars": 5,
@@ -43,6 +44,10 @@
       "ArmorAttackACallenBride": {
         "id": "ArmorAttackACallenBride",
         "found": true,
+        "localization": {
+          "name": "ArmorAttackACallenBride",
+          "description": ""
+        },
         "ability": {
           "name": "ArmorAttackACallenBride",
           "class": "Ability",
@@ -292,6 +297,11 @@
       "StepBackSleepEnterLimitACallenBride": {
         "id": "StepBackSleepEnterLimitACallenBride",
         "found": true,
+        "localization": {
+          "name": "Sleep Swap",
+          "description": "Grants 1 enemy the Sleep status effect for 200TU and exchanges the user with 1 Shiromori. This will overwrite other status effects on that enemy. The user is sent to the next in line of allied reinforcements. Cannot be used if there are 3 or fewer allies left, and is locked if the user enters the battlefield from reinforcements until the user activates another active skill. Sleep cannot be applied to a unit that Has Slept while on the battlefield.",
+          "selected": "Puts target to sleep, exchanges user for Shiromori\n(Will overwrite other status effects)"
+        },
         "ability": {
           "name": "StepBackSleepEnterLimitACallenBride",
           "class": "Ability",
@@ -665,34 +675,50 @@
               "or": {
                 "class": "MonsterConditions",
                 "monsterTags": [
-                  "SleepImmuneVsWater"
+                  "SleepImmuneIfBeastAlly"
                 ],
-                "checkEnemyTeamOfMonster": true,
-                "enemyTeamMonsterConditionMatchesNeeded": {
-                  "IsWater": 1
+                "checkReinforcementsForTeamConditionMatches": true,
+                "myTeamMonsterConditionMatchesNeeded": {
+                  "IsBeastRegular": 1
                 },
                 "or": {
                   "class": "MonsterConditions",
                   "monsterTags": [
-                    "NegativeStatusImmunityFromThorns"
+                    "SleepImmuneVsWater"
                   ],
-                  "buffStackNames": [
-                    "SleepThorns"
-                  ]
+                  "checkEnemyTeamOfMonster": true,
+                  "enemyTeamMonsterConditionMatchesNeeded": {
+                    "IsWater": 1
+                  },
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "SleepImmuneVs2Enemies"
+                    ],
+                    "enemyTeamSize": 2,
+                    "or": {
+                      "class": "MonsterConditions",
+                      "monsterTags": [
+                        "NegativeStatusImmunityFromThorns"
+                      ],
+                      "buffStackNames": [
+                        "SleepThorns"
+                      ]
+                    }
+                  }
                 }
               }
             }
           }
-        },
-        "localization": {
-          "name": "Sleep Swap",
-          "description": "Grants 1 enemy the Sleep status effect for 200TU and exchanges the user with 1 Shiromori. This will overwrite other status effects on that enemy. The user is sent to the next in line of allied reinforcements. Cannot be used if there are 3 or fewer allies left, and is locked if the user enters the battlefield from reinforcements until the user activates another active skill. Sleep cannot be applied to a unit that Has Slept while on the battlefield.",
-          "selected": "Puts target to sleep, exchanges user for Shiromori\n(Will overwrite other status effects)"
         }
       },
       "DreamBusterBCallenBride": {
         "id": "DreamBusterBCallenBride",
         "found": true,
+        "localization": {
+          "name": "DreamBusterBCallenBride",
+          "description": ""
+        },
         "ability": {
           "name": "DreamBusterBCallenBride",
           "class": "Ability",
@@ -819,6 +845,10 @@
       "ProtectorKillerSleepACallenBride": {
         "id": "ProtectorKillerSleepACallenBride",
         "found": true,
+        "localization": {
+          "name": "ProtectorKillerSleepACallenBride",
+          "description": ""
+        },
         "ability": {
           "name": "ProtectorKillerSleepACallenBride",
           "class": "Ability",
@@ -1223,20 +1253,37 @@
               "or": {
                 "class": "MonsterConditions",
                 "monsterTags": [
-                  "SleepImmuneVsWater"
+                  "SleepImmuneIfBeastAlly"
                 ],
-                "checkEnemyTeamOfMonster": true,
-                "enemyTeamMonsterConditionMatchesNeeded": {
-                  "IsWater": 1
+                "checkReinforcementsForTeamConditionMatches": true,
+                "myTeamMonsterConditionMatchesNeeded": {
+                  "IsBeastRegular": 1
                 },
                 "or": {
                   "class": "MonsterConditions",
                   "monsterTags": [
-                    "NegativeStatusImmunityFromThorns"
+                    "SleepImmuneVsWater"
                   ],
-                  "buffStackNames": [
-                    "SleepThorns"
-                  ]
+                  "checkEnemyTeamOfMonster": true,
+                  "enemyTeamMonsterConditionMatchesNeeded": {
+                    "IsWater": 1
+                  },
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "SleepImmuneVs2Enemies"
+                    ],
+                    "enemyTeamSize": 2,
+                    "or": {
+                      "class": "MonsterConditions",
+                      "monsterTags": [
+                        "NegativeStatusImmunityFromThorns"
+                      ],
+                      "buffStackNames": [
+                        "SleepThorns"
+                      ]
+                    }
+                  }
                 }
               }
             }
@@ -1247,23 +1294,43 @@
     "passives": {
       "HealWhenHurtForEnterLimit": {
         "id": "HealWhenHurtForEnterLimit",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Divine Healing",
+          "description": "If this unit takes damage from an attack and survives until after the end of the turn, this unit will heal for 25% of max HP."
+        }
       },
       "PlusAttackBoostLv3": {
         "id": "PlusAttackBoostLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv3",
+          "description": "Adds 300 to this unit's Attack."
+        }
       },
       "AttackUpTargetEquippedSwordLv3": {
         "id": "AttackUpTargetEquippedSwordLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Sword Hunter Lv3",
+          "description": "10% bonus to attacks against units equipped with Swords."
+        }
       },
       "PlusHPBoostLv3": {
         "id": "PlusHPBoostLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv3",
+          "description": "Adds 1200 to this unit's max HP."
+        }
       },
       "AddWeaponPrefGreatSword": {
         "id": "AddWeaponPrefGreatSword",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Greatsword Mastery",
+          "description": "Can use weapon skills of Greatswords in addition to their original preferred weapon type."
+        }
       }
     },
     "activeSkillsAI": {},
@@ -1389,9 +1456,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "b8cd0145d41961b6ce060696b2872d986ae3d04691c022e8e45b8e22109c7e17",
-    "dependencyHash": "3742a9d640cfa3f0bdc86ccd2f743e65e76e6b80c62f15810a3371098cb12e0a",
-    "generatedAt": 1778013993
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "984a1c25bf5c6a4884033470240de7cca84b7bfb73258c4d97a200f18ab46a5d",
+    "dependencyHash": "068a36f52dff961ebcd8486bb31a81f0fadb3bd590f3fbc6f4c230e7b6c2104c",
+    "generatedAt": 1778081734
   }
 }

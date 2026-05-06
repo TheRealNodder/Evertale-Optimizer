@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 240,
-  "id": "otohime-regular-boss-03",
-  "name": "OtohimeRegularBoss03",
+  "id": "mega-otohime",
+  "name": "Mega Otohime",
+  "title": "",
   "category": "bosse",
   "rarity": null,
   "stars": 6,
@@ -40,6 +41,11 @@
       "ForceSleepAttackAOtohimeBoss": {
         "id": "ForceSleepAttackAOtohimeBoss",
         "found": true,
+        "localization": {
+          "name": "Knockout Wave",
+          "description": "100% damage to 1 enemy. If the user has a Power Charge, it will be consumed to deal 400% damage instead. If no enemies are sleeping, grants the target the Sleep status effect for 200TU, even if they have already slept while on the battlefield. This will overwrite other status effects on that unit. Damage from this attack does not wake up sleeping enemies.",
+          "selected": "100%+ damage, can apply sleep\n(Will overwrite other status effects)"
+        },
         "ability": {
           "name": "ForceSleepAttackAOtohimeBoss",
           "class": "Ability",
@@ -455,16 +461,16 @@
               }
             }
           }
-        },
-        "localization": {
-          "name": "Knockout Wave",
-          "description": "100% damage to 1 enemy. If the user has a Power Charge, it will be consumed to deal 400% damage instead. If no enemies are sleeping, grants the target the Sleep status effect for 200TU, even if they have already slept while on the battlefield. This will overwrite other status effects on that unit. Damage from this attack does not wake up sleeping enemies.",
-          "selected": "100%+ damage, can apply sleep\n(Will overwrite other status effects)"
         }
       },
       "HighSpiritOnslaughtAOtohimeBoss": {
         "id": "HighSpiritOnslaughtAOtohimeBoss",
         "found": true,
+        "localization": {
+          "name": "Rapid Blossom",
+          "description": "400% damage to 1 enemy, this damage will not wake up the enemy. Usable if the user's party has 6 or more Spirit or if 2 or more enemies are sleeping. This attack ignores skin passive skills, and the Counter Stance status effect. This skill activates 3 times in succession before its TU cost is applied. User gains a power charge every third time this skill is activated while on the battlefield. Power Charges cannot stack and will be removed when the user leaves the battlefield.",
+          "selected": "400% damage to 1 enemy"
+        },
         "ability": {
           "name": "HighSpiritOnslaughtAOtohimeBoss",
           "class": "Ability",
@@ -673,16 +679,16 @@
               ]
             }
           }
-        },
-        "localization": {
-          "name": "Rapid Blossom",
-          "description": "400% damage to 1 enemy, this damage will not wake up the enemy. Usable if the user's party has 6 or more Spirit or if 2 or more enemies are sleeping. This attack ignores skin passive skills, and the Counter Stance status effect. This skill activates 3 times in succession before its TU cost is applied. User gains a power charge every third time this skill is activated while on the battlefield. Power Charges cannot stack and will be removed when the user leaves the battlefield.",
-          "selected": "400% damage to 1 enemy"
         }
       },
       "NightmareHuntDoubleAOtohimeBoss": {
         "id": "NightmareHuntDoubleAOtohimeBoss",
         "found": true,
+        "localization": {
+          "name": "Nightmare Dragon",
+          "description": "600% damage to 2 enemies if they are sleeping, this damage will not wake up sleeping enemies. Allies gain 3 Spirit for each sleeping target hit. This attack ignores enemy damage reduction effects.",
+          "selected": "600% damage to sleeping enemies, ignores armor"
+        },
         "ability": {
           "name": "NightmareHuntDoubleAOtohimeBoss",
           "class": "Ability",
@@ -816,16 +822,16 @@
               "Sleep"
             ]
           }
-        },
-        "localization": {
-          "name": "Nightmare Dragon",
-          "description": "600% damage to 2 enemies if they are sleeping, this damage will not wake up sleeping enemies. Allies gain 3 Spirit for each sleeping target hit. This attack ignores enemy damage reduction effects.",
-          "selected": "600% damage to sleeping enemies, ignores armor"
         }
       },
       "KillSleepDoubleAOtohimeBoss": {
         "id": "KillSleepDoubleAOtohimeBoss",
         "found": true,
+        "localization": {
+          "name": "Triumph Sleep",
+          "description": "Grants 2 enemies the Sleep status effect for 200TU, even if they have already slept while on the battlefield. This will overwrite other status effects on those units. Unlocked each time the user defeats another unit with an attack. This skill is locked again after each use or if the user leaves the battlefield.",
+          "selected": "Forces the targets to sleep for 200TU\n(Will overwrite other status effects)"
+        },
         "ability": {
           "name": "KillSleepDoubleAOtohimeBoss",
           "class": "Ability",
@@ -1244,20 +1250,37 @@
               "or": {
                 "class": "MonsterConditions",
                 "monsterTags": [
-                  "SleepImmuneVsWater"
+                  "SleepImmuneIfBeastAlly"
                 ],
-                "checkEnemyTeamOfMonster": true,
-                "enemyTeamMonsterConditionMatchesNeeded": {
-                  "IsWater": 1
+                "checkReinforcementsForTeamConditionMatches": true,
+                "myTeamMonsterConditionMatchesNeeded": {
+                  "IsBeastRegular": 1
                 },
                 "or": {
                   "class": "MonsterConditions",
                   "monsterTags": [
-                    "NegativeStatusImmunityFromThorns"
+                    "SleepImmuneVsWater"
                   ],
-                  "buffStackNames": [
-                    "SleepThorns"
-                  ]
+                  "checkEnemyTeamOfMonster": true,
+                  "enemyTeamMonsterConditionMatchesNeeded": {
+                    "IsWater": 1
+                  },
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "SleepImmuneVs2Enemies"
+                    ],
+                    "enemyTeamSize": 2,
+                    "or": {
+                      "class": "MonsterConditions",
+                      "monsterTags": [
+                        "NegativeStatusImmunityFromThorns"
+                      ],
+                      "buffStackNames": [
+                        "SleepThorns"
+                      ]
+                    }
+                  }
                 }
               }
             }
@@ -1268,30 +1291,41 @@
             "fieldToCompareToProperty": "killsMade",
             "propertyFieldCompareStyle": "LessThan"
           }
-        },
-        "localization": {
-          "name": "Triumph Sleep",
-          "description": "Grants 2 enemies the Sleep status effect for 200TU, even if they have already slept while on the battlefield. This will overwrite other status effects on those units. Unlocked each time the user defeats another unit with an attack. This skill is locked again after each use or if the user leaves the battlefield.",
-          "selected": "Forces the targets to sleep for 200TU\n(Will overwrite other status effects)"
         }
       }
     },
     "passives": {
       "KnockbackImmunity": {
         "id": "KnockbackImmunity",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Immovable",
+          "description": "This unit cannot be sent to the reinforcements from the battlefield."
+        }
       },
       "SuperStealthReincarnationOtohimeBoss": {
         "id": "SuperStealthReincarnationOtohimeBoss",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Deadly Revival",
+          "description": "If this unit has defeated an enemy with an attack while on the battlefield, revive this unit to the very front of allied reinforcements with full HP when this unit is defeated by an enemy attack. The revived unit will be considered a conjured unit and cannot be revived again. Use limits on active skills will be reset for the revived unit. This is not a Revenge passive skill.\n\nIf this unit is conjured, its attacks will ignore any effects of non-boss enemies that would prevent the target from being defeated, until it defeats an enemy that isn't a Mori or Imposter with an attack.\n\nThis unit will ignore attacks that would damage exactly 2 targets (attacks that target All allies will not be ignored). If this unit gains the Stealth status effect, it will not be lost when ignoring attacks in this way."
+        }
       },
       "StunImmunity": {
         "id": "StunImmunity",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Stun Immunity",
+          "description": "This unit is not affected by stun effects."
+        }
       },
       "SleepImmunity": {
         "id": "SleepImmunity",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Sleep Immunity",
+          "description": "This unit is not affected by sleep effects."
+        }
       }
     },
     "activeSkillsAI": {},
@@ -1373,9 +1407,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "a06bdb2bee7ef3780434d4afe3ff04dc9f970b2516322fbf66929d457685e6ce",
-    "dependencyHash": "7d6fa65c4eec22f77f995dd8590bd555d1f4480e364863d0ad5f4b2bf4ba9183",
-    "generatedAt": 1778014036
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "5bbfb205fc46a94438969f7094f0be42fa4aecae7e4d5ae619c86295e71fd618",
+    "dependencyHash": "a7066811466d3d803f8345d9b6d8b4f03afc9d517ffd41f7d98a13334560e5d6",
+    "generatedAt": 1778081778
   }
 }

@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 554,
-  "id": "mecha-sister-bride-01",
-  "name": "MechaSisterBride01",
+  "id": "anya",
+  "name": "Anya",
+  "title": "",
   "category": "character",
   "rarity": null,
   "stars": 5,
@@ -41,6 +42,11 @@
       "DawnStrikeSingleAMechaBride": {
         "id": "DawnStrikeSingleAMechaBride",
         "found": true,
+        "localization": {
+          "name": "Dream Weaver",
+          "description": "500% damage to 1 enemy if there is a sleeping enemy (even if the target is not sleeping). If there are no sleeping enemies, 50% damage instead and allies gain an additional 2 Spirit. This attack ignores enemy damage reduction effects and is considered a Dream Hunter type Active Skill.",
+          "selected": "Up to 500% damage if there is a Sleeping enemy"
+        },
         "ability": {
           "name": "DawnStrikeSingleAMechaBride",
           "class": "Ability",
@@ -232,16 +238,16 @@
               }
             }
           }
-        },
-        "localization": {
-          "name": "Dream Weaver",
-          "description": "500% damage to 1 enemy if there is a sleeping enemy (even if the target is not sleeping). If there are no sleeping enemies, 50% damage instead and allies gain an additional 2 Spirit. This attack ignores enemy damage reduction effects and is considered a Dream Hunter type Active Skill.",
-          "selected": "Up to 500% damage if there is a Sleeping enemy"
         }
       },
       "ForceSleepDoubleAMechaBride": {
         "id": "ForceSleepDoubleAMechaBride",
         "found": true,
+        "localization": {
+          "name": "Lights Out",
+          "description": "Grants 2 enemies the Sleep status effect for 200TU, even if they have already slept while on the battlefield. This will overwrite other status effects on those units. For each targeted enemy that does not fall asleep (e.g. due to a Sleep Ward), allies gain 2 Spirit. Usable only if no enemies are sleeping.",
+          "selected": "Puts targets to sleep even if they have already slept\n(Will overwrite other status effects)"
+        },
         "ability": {
           "name": "ForceSleepDoubleAMechaBride",
           "class": "Ability",
@@ -622,34 +628,51 @@
               "or": {
                 "class": "MonsterConditions",
                 "monsterTags": [
-                  "SleepImmuneVsWater"
+                  "SleepImmuneIfBeastAlly"
                 ],
-                "checkEnemyTeamOfMonster": true,
-                "enemyTeamMonsterConditionMatchesNeeded": {
-                  "IsWater": 1
+                "checkReinforcementsForTeamConditionMatches": true,
+                "myTeamMonsterConditionMatchesNeeded": {
+                  "IsBeastRegular": 1
                 },
                 "or": {
                   "class": "MonsterConditions",
                   "monsterTags": [
-                    "NegativeStatusImmunityFromThorns"
+                    "SleepImmuneVsWater"
                   ],
-                  "buffStackNames": [
-                    "SleepThorns"
-                  ]
+                  "checkEnemyTeamOfMonster": true,
+                  "enemyTeamMonsterConditionMatchesNeeded": {
+                    "IsWater": 1
+                  },
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "SleepImmuneVs2Enemies"
+                    ],
+                    "enemyTeamSize": 2,
+                    "or": {
+                      "class": "MonsterConditions",
+                      "monsterTags": [
+                        "NegativeStatusImmunityFromThorns"
+                      ],
+                      "buffStackNames": [
+                        "SleepThorns"
+                      ]
+                    }
+                  }
                 }
               }
             }
           }
-        },
-        "localization": {
-          "name": "Lights Out",
-          "description": "Grants 2 enemies the Sleep status effect for 200TU, even if they have already slept while on the battlefield. This will overwrite other status effects on those units. For each targeted enemy that does not fall asleep (e.g. due to a Sleep Ward), allies gain 2 Spirit. Usable only if no enemies are sleeping.",
-          "selected": "Puts targets to sleep even if they have already slept\n(Will overwrite other status effects)"
         }
       },
       "PowerBlastDoubleAMechaBride": {
         "id": "PowerBlastDoubleAMechaBride",
         "found": true,
+        "localization": {
+          "name": "Demolition Raid",
+          "description": "Consumes a Power Charge for 600% damage to 2 enemies. This attack ignores enemy damage reduction effects. Usable only if the user has a Power Charge.",
+          "selected": "600% damage to 2 enemies using a Power Charge"
+        },
         "ability": {
           "name": "PowerBlastDoubleAMechaBride",
           "class": "Ability",
@@ -925,16 +948,16 @@
               ]
             }
           }
-        },
-        "localization": {
-          "name": "Demolition Raid",
-          "description": "Consumes a Power Charge for 600% damage to 2 enemies. This attack ignores enemy damage reduction effects. Usable only if the user has a Power Charge.",
-          "selected": "600% damage to 2 enemies using a Power Charge"
         }
       },
       "BarrierBurstAMechaBride": {
         "id": "BarrierBurstAMechaBride",
         "found": true,
+        "localization": {
+          "name": "Aegis Overload",
+          "description": "300% damage to all enemies and heals all allies for 800% of the user's Attack. All allies will become Enraged and all enemies hit by this attack will become Weakened, this will overwrite any existing Weak or Enrage effects on those units. This attack ignores Skin passive skills and the Counter Stance status effect.\n\nThe user will also have their Power Barrier passive skill reactivated and gain a Power Charge. Usable only if the user's Power Barrier passive skill is deactivated and becomes locked for 100TU after use.\n\n- Enraged units have their Attack increased to 1.5x until the end of their next turn.\n- Weakened units have their Attack reduced to 0.75x until the end of their next turn. The effect of Weakening may be diminished if the affected unit's Attack is increased by other effects and it can be overwritten by Enrage effects.\n- Power Charges cannot stack and will be removed when the user leaves the battlefield.",
+          "selected": "300% damage, heals allies, reactivates Barrier\nEnemies are weakened and allies are enraged"
+        },
         "ability": {
           "name": "BarrierBurstAMechaBride",
           "class": "Ability",
@@ -1353,34 +1376,49 @@
               }
             }
           }
-        },
-        "localization": {
-          "name": "Aegis Overload",
-          "description": "300% damage to all enemies and heals all allies for 800% of the user's Attack. All allies will become Enraged and all enemies hit by this attack will become Weakened, this will overwrite any existing Weak or Enrage effects on those units. This attack ignores Skin passive skills and the Counter Stance status effect.\n\nThe user will also have their Power Barrier passive skill reactivated and gain a Power Charge. Usable only if the user's Power Barrier passive skill is deactivated and becomes locked for 100TU after use.\n\n- Enraged units have their Attack increased to 1.5x until the end of their next turn.\n- Weakened units have their Attack reduced to 0.75x until the end of their next turn. The effect of Weakening may be diminished if the affected unit's Attack is increased by other effects and it can be overwritten by Enrage effects.\n- Power Charges cannot stack and will be removed when the user leaves the battlefield.",
-          "selected": "300% damage, heals allies, reactivates Barrier\nEnemies are weakened and allies are enraged"
         }
       }
     },
     "passives": {
       "OnEnterBarrierWithRecoveryOnEnd": {
         "id": "OnEnterBarrierWithRecoveryOnEnd",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Power Barrier",
+          "description": "This Barrier will be activated whenever this unit enters battle.\n\nWhile this unit is on the battlefield and this Barrier is activated:\n- Allies gain 35% damage reduction from attacks. This effect can stack with other damage reduction effects such as Armor, but will not stack with itself or other ally Barrier type skills.\n- This unit cannot be defeated by non-attack damage.\n- If this unit takes damage from an attack and survives until after the end of the turn, this unit will heal for 25% of max HP.\n-If this unit would be defeated by an attack, this Barrier will be deactivated and this unit will be Purified and healed for 100% of max HP.\n\nIf this unit's Barrier is deactivated and it would be defeated by an enemy attack or a status effect while having more than 1 HP, it instead survives with 1 HP."
+        }
       },
       "PlusAttackBoostLv3": {
         "id": "PlusAttackBoostLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv3",
+          "description": "Adds 300 to this unit's Attack."
+        }
       },
       "PlusHPBoostLv3": {
         "id": "PlusHPBoostLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv3",
+          "description": "Adds 1200 to this unit's max HP."
+        }
       },
       "AttackUpTargetEquippedGreatSwordLv3": {
         "id": "AttackUpTargetEquippedGreatSwordLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "G.sword Hunter Lv3",
+          "description": "10% bonus to attacks against units equipped with Greatswords."
+        }
       },
       "AddWeaponPrefAxe": {
         "id": "AddWeaponPrefAxe",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Axe Mastery",
+          "description": "Can use weapon skills of Axes in addition to their original preferred weapon type."
+        }
       }
     },
     "activeSkillsAI": {},
@@ -1511,9 +1549,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "c763ae2c84745e2c7f2c09989467753e50dd8bed87576758a28f2105a708f3a9",
-    "dependencyHash": "2f912b57e9d8874c87ec21a703da71c0344aa66979cbeb9bab2c43ab4639603e",
-    "generatedAt": 1778013996
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "0bb58ee39d5501d0a56287624f9e4d8efa4d0b5c2f4911d218db333724008b10",
+    "dependencyHash": "d5826c354d1bc0f3bb75b44a0577a7757217fd7a9dfb5c9763406f74f11792de",
+    "generatedAt": 1778081736
   }
 }

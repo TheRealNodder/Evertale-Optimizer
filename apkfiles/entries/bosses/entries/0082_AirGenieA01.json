@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 82,
-  "id": "air-genie-01",
-  "name": "AirGenieA01",
+  "id": "endless-wraith",
+  "name": "Endless Wraith",
+  "title": "",
   "category": "bosse",
   "rarity": null,
   "stars": 4,
@@ -38,6 +39,10 @@
       "RecklessAttackC2": {
         "id": "RecklessAttackC2",
         "found": true,
+        "localization": {
+          "name": "RecklessAttackC2",
+          "description": ""
+        },
         "ability": {
           "name": "RecklessAttackC2",
           "class": "Ability",
@@ -154,6 +159,11 @@
       "StunGrenade200A": {
         "id": "StunGrenade200A",
         "found": true,
+        "localization": {
+          "name": "Blood Stun",
+          "description": "Sacrifices the last unit in the allied reinforcements to stun 1 enemy for 200TU. Usable only if there are 1 or more allied reinforcements left.",
+          "selected": "Sacrifices 1 ally to stun target for 200TU"
+        },
         "ability": {
           "name": "StunGrenade200A",
           "class": "Ability",
@@ -337,61 +347,71 @@
                     "or": {
                       "class": "MonsterConditions",
                       "monsterTags": [
-                        "StunImmuneIfAnyBurningAllies"
+                        "StunImmuneIfBeastAlly"
                       ],
+                      "checkReinforcementsForTeamConditionMatches": true,
                       "myTeamMonsterConditionMatchesNeeded": {
-                        "IsBurning": 1
+                        "IsBeastRegular": 1
                       },
                       "or": {
                         "class": "MonsterConditions",
                         "monsterTags": [
-                          "StunImmuneIfEnemyIsFireBurnBlastOrForce"
+                          "StunImmuneIfAnyBurningAllies"
                         ],
-                        "checkEnemyTeamOfMonster": true,
-                        "enemyTeamMonsterConditionMatchesNeeded": {
-                          "IsBurnBlastOrForceOrFire": 1
+                        "myTeamMonsterConditionMatchesNeeded": {
+                          "IsBurning": 1
                         },
                         "or": {
                           "class": "MonsterConditions",
                           "monsterTags": [
-                            "StunImmuneIfAllyIsFireBurnBlastOrForce"
+                            "StunImmuneIfEnemyIsFireBurnBlastOrForce"
                           ],
-                          "myTeamMonsterConditionMatchesNeeded": {
+                          "checkEnemyTeamOfMonster": true,
+                          "enemyTeamMonsterConditionMatchesNeeded": {
                             "IsBurnBlastOrForceOrFire": 1
                           },
                           "or": {
                             "class": "MonsterConditions",
                             "monsterTags": [
-                              "StunImmuneIfPoisonedEnemy"
+                              "StunImmuneIfAllyIsFireBurnBlastOrForce"
                             ],
-                            "checkEnemyTeamOfMonster": true,
-                            "enemyTeamMonsterConditionMatchesNeeded": {
-                              "IsPoisoned": 1
+                            "myTeamMonsterConditionMatchesNeeded": {
+                              "IsBurnBlastOrForceOrFire": 1
                             },
                             "or": {
                               "class": "MonsterConditions",
                               "monsterTags": [
-                                "StunImmunityIfNotBurning"
+                                "StunImmuneIfPoisonedEnemy"
                               ],
-                              "not": {
-                                "class": "MonsterConditions",
-                                "buffStackNames": [
-                                  "Burn"
-                                ]
+                              "checkEnemyTeamOfMonster": true,
+                              "enemyTeamMonsterConditionMatchesNeeded": {
+                                "IsPoisoned": 1
                               },
                               "or": {
                                 "class": "MonsterConditions",
                                 "monsterTags": [
-                                  "StunImmuneIfHoldGroundPlusTriggered"
-                                ],
-                                "buffStackNames": [
-                                  "BlockDeathUntilNextTurn"
+                                  "StunImmunityIfNotBurning"
                                 ],
                                 "not": {
                                   "class": "MonsterConditions",
                                   "buffStackNames": [
-                                    "HoldGroundOnceForHoldGroundPlus"
+                                    "Burn"
                                   ]
+                                },
+                                "or": {
+                                  "class": "MonsterConditions",
+                                  "monsterTags": [
+                                    "StunImmuneIfHoldGroundPlusTriggered"
+                                  ],
+                                  "buffStackNames": [
+                                    "BlockDeathUntilNextTurn"
+                                  ],
+                                  "not": {
+                                    "class": "MonsterConditions",
+                                    "buffStackNames": [
+                                      "HoldGroundOnceForHoldGroundPlus"
+                                    ]
+                                  }
                                 }
                               }
                             }
@@ -404,16 +424,16 @@
               }
             }
           }
-        },
-        "localization": {
-          "name": "Blood Stun",
-          "description": "Sacrifices the last unit in the allied reinforcements to stun 1 enemy for 200TU. Usable only if there are 1 or more allied reinforcements left.",
-          "selected": "Sacrifices 1 ally to stun target for 200TU"
         }
       },
       "RecklessGainSpiritA": {
         "id": "RecklessGainSpiritA",
         "found": true,
+        "localization": {
+          "name": "Pain Spirit",
+          "description": "Reduces the user's current HP by 30% of max and allies are granted 3 Spirit.",
+          "selected": "Gain 3 Spirit, then user loses 30% HP"
+        },
         "ability": {
           "name": "RecklessGainSpiritA",
           "class": "Ability",
@@ -525,18 +545,17 @@
           }
         },
         "attackScalors": {},
-        "conditions": {},
-        "localization": {
-          "name": "Pain Spirit",
-          "description": "Reduces the user's current HP by 30% of max and allies are granted 3 Spirit.",
-          "selected": "Gain 3 Spirit, then user loses 30% HP"
-        }
+        "conditions": {}
       }
     },
     "passives": {
       "SpiritLossRevengeA": {
         "id": "SpiritLossRevengeA",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Spirit- Revenge",
+          "description": "Whenever this unit is defeated by an enemy, the enemy party loses 2 Spirit."
+        }
       }
     },
     "activeSkillsAI": {
@@ -637,9 +656,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "49608f27300ddb0d872c419593539119312490d0d5e06eefeb9e744bafb1b297",
-    "dependencyHash": "269941fdcffe1c4139af693acd94e48e1f089c24dee0fbd6c967757bdb67da91",
-    "generatedAt": 1778014031
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "edf0299820cb9aaeae3dc4f200b3ff7efbde7b53f18189d12db557c5386ab5cd",
+    "dependencyHash": "3ee285e918c5dd1b788d61d9d4d470f2b035525b78481efdd7d9ca67ef660f2d",
+    "generatedAt": 1778081773
   }
 }

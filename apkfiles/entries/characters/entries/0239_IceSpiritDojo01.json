@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 239,
-  "id": "ice-spirit-dojo-01",
-  "name": "IceSpiritDojo01",
+  "id": "frozen-soul",
+  "name": "Frozen Soul",
+  "title": "",
   "category": "character",
   "rarity": null,
   "stars": 2,
@@ -35,6 +36,10 @@
       "GainAttackSingleBIceDojo": {
         "id": "GainAttackSingleBIceDojo",
         "found": true,
+        "localization": {
+          "name": "GainAttackSingleBIceDojo",
+          "description": ""
+        },
         "ability": {
           "name": "GainAttackSingleBIceDojo",
           "class": "Ability",
@@ -164,6 +169,10 @@
       "SleepBombDoubleA2Dojo": {
         "id": "SleepBombDoubleA2Dojo",
         "found": true,
+        "localization": {
+          "name": "SleepBombDoubleA2Dojo",
+          "description": ""
+        },
         "ability": {
           "name": "SleepBombDoubleA2Dojo",
           "class": "Ability",
@@ -460,20 +469,37 @@
               "or": {
                 "class": "MonsterConditions",
                 "monsterTags": [
-                  "SleepImmuneVsWater"
+                  "SleepImmuneIfBeastAlly"
                 ],
-                "checkEnemyTeamOfMonster": true,
-                "enemyTeamMonsterConditionMatchesNeeded": {
-                  "IsWater": 1
+                "checkReinforcementsForTeamConditionMatches": true,
+                "myTeamMonsterConditionMatchesNeeded": {
+                  "IsBeastRegular": 1
                 },
                 "or": {
                   "class": "MonsterConditions",
                   "monsterTags": [
-                    "NegativeStatusImmunityFromThorns"
+                    "SleepImmuneVsWater"
                   ],
-                  "buffStackNames": [
-                    "SleepThorns"
-                  ]
+                  "checkEnemyTeamOfMonster": true,
+                  "enemyTeamMonsterConditionMatchesNeeded": {
+                    "IsWater": 1
+                  },
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "SleepImmuneVs2Enemies"
+                    ],
+                    "enemyTeamSize": 2,
+                    "or": {
+                      "class": "MonsterConditions",
+                      "monsterTags": [
+                        "NegativeStatusImmunityFromThorns"
+                      ],
+                      "buffStackNames": [
+                        "SleepThorns"
+                      ]
+                    }
+                  }
                 }
               }
             }
@@ -488,7 +514,11 @@
     "passives": {
       "HoldGround": {
         "id": "HoldGround",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Hold Ground",
+          "description": "If this unit would be defeated by an enemy attack or a status effect while having more than 1 HP, it instead survives with 1 HP."
+        }
       }
     },
     "activeSkillsAI": {},
@@ -548,9 +578,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "3566bdb3f64a3bbb5c4decbb21f5d6289188a159f0edb4f3d870cf48ba27f700",
-    "dependencyHash": "ba3dae28bc329a253222a3ecae1e87de091fd31c85e7270571f86279ca9fa123",
-    "generatedAt": 1778013986
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "a580808f30af831a3d86b62751329398e30e07cd0a355d1db61bd484c5e15305",
+    "dependencyHash": "248cfdccbf7f6194899be9770a0e2bedb649e3273a1116f0aac9351a71826b38",
+    "generatedAt": 1778081727
   }
 }

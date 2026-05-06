@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 202,
-  "id": "air-dragon-02",
-  "name": "AirDragon02",
+  "id": "orzachron",
+  "name": "Orzachron",
+  "title": "",
   "category": "character",
   "rarity": null,
   "stars": 6,
@@ -41,6 +42,11 @@
       "GainAttackSingleA": {
         "id": "GainAttackSingleA",
         "found": true,
+        "localization": {
+          "name": "Attack",
+          "description": "Damage to 1 enemy and allies gain 2 Spirit.",
+          "selected": "Damage to 1 enemy and gains 2 Spirit"
+        },
         "ability": {
           "name": "GainAttackSingleA",
           "class": "Ability",
@@ -91,16 +97,16 @@
         },
         "buffs": {},
         "attackScalors": {},
-        "conditions": {},
-        "localization": {
-          "name": "Attack",
-          "description": "Damage to 1 enemy and allies gain 2 Spirit.",
-          "selected": "Damage to 1 enemy and gains 2 Spirit"
-        }
+        "conditions": {}
       },
       "TimeStrikeDoubleAAirDragon": {
         "id": "TimeStrikeDoubleAAirDragon",
         "found": true,
+        "localization": {
+          "name": "Time Strike",
+          "description": "500% damage to 2 enemies if they have 130TU or more in the turn order. 600% damage if the target has 200TU or more.",
+          "selected": "500%+ damage against targets with 130+ TU"
+        },
         "ability": {
           "name": "TimeStrikeDoubleAAirDragon",
           "class": "Ability",
@@ -199,16 +205,16 @@
             "targetCondition": "CurrentTUGreaterThan200"
           }
         },
-        "conditions": {},
-        "localization": {
-          "name": "Time Strike",
-          "description": "500% damage to 2 enemies if they have 130TU or more in the turn order. 600% damage if the target has 200TU or more.",
-          "selected": "500%+ damage against targets with 130+ TU"
-        }
+        "conditions": {}
       },
       "StunSingle200B": {
         "id": "StunSingle200B",
         "found": true,
+        "localization": {
+          "name": "Stun Bolt",
+          "description": "Stuns 1 enemy for 200TU. Usable once per battle.",
+          "selected": "Stuns target for 200TU"
+        },
         "ability": {
           "name": "StunSingle200B",
           "class": "Ability",
@@ -413,61 +419,71 @@
                     "or": {
                       "class": "MonsterConditions",
                       "monsterTags": [
-                        "StunImmuneIfAnyBurningAllies"
+                        "StunImmuneIfBeastAlly"
                       ],
+                      "checkReinforcementsForTeamConditionMatches": true,
                       "myTeamMonsterConditionMatchesNeeded": {
-                        "IsBurning": 1
+                        "IsBeastRegular": 1
                       },
                       "or": {
                         "class": "MonsterConditions",
                         "monsterTags": [
-                          "StunImmuneIfEnemyIsFireBurnBlastOrForce"
+                          "StunImmuneIfAnyBurningAllies"
                         ],
-                        "checkEnemyTeamOfMonster": true,
-                        "enemyTeamMonsterConditionMatchesNeeded": {
-                          "IsBurnBlastOrForceOrFire": 1
+                        "myTeamMonsterConditionMatchesNeeded": {
+                          "IsBurning": 1
                         },
                         "or": {
                           "class": "MonsterConditions",
                           "monsterTags": [
-                            "StunImmuneIfAllyIsFireBurnBlastOrForce"
+                            "StunImmuneIfEnemyIsFireBurnBlastOrForce"
                           ],
-                          "myTeamMonsterConditionMatchesNeeded": {
+                          "checkEnemyTeamOfMonster": true,
+                          "enemyTeamMonsterConditionMatchesNeeded": {
                             "IsBurnBlastOrForceOrFire": 1
                           },
                           "or": {
                             "class": "MonsterConditions",
                             "monsterTags": [
-                              "StunImmuneIfPoisonedEnemy"
+                              "StunImmuneIfAllyIsFireBurnBlastOrForce"
                             ],
-                            "checkEnemyTeamOfMonster": true,
-                            "enemyTeamMonsterConditionMatchesNeeded": {
-                              "IsPoisoned": 1
+                            "myTeamMonsterConditionMatchesNeeded": {
+                              "IsBurnBlastOrForceOrFire": 1
                             },
                             "or": {
                               "class": "MonsterConditions",
                               "monsterTags": [
-                                "StunImmunityIfNotBurning"
+                                "StunImmuneIfPoisonedEnemy"
                               ],
-                              "not": {
-                                "class": "MonsterConditions",
-                                "buffStackNames": [
-                                  "Burn"
-                                ]
+                              "checkEnemyTeamOfMonster": true,
+                              "enemyTeamMonsterConditionMatchesNeeded": {
+                                "IsPoisoned": 1
                               },
                               "or": {
                                 "class": "MonsterConditions",
                                 "monsterTags": [
-                                  "StunImmuneIfHoldGroundPlusTriggered"
-                                ],
-                                "buffStackNames": [
-                                  "BlockDeathUntilNextTurn"
+                                  "StunImmunityIfNotBurning"
                                 ],
                                 "not": {
                                   "class": "MonsterConditions",
                                   "buffStackNames": [
-                                    "HoldGroundOnceForHoldGroundPlus"
+                                    "Burn"
                                   ]
+                                },
+                                "or": {
+                                  "class": "MonsterConditions",
+                                  "monsterTags": [
+                                    "StunImmuneIfHoldGroundPlusTriggered"
+                                  ],
+                                  "buffStackNames": [
+                                    "BlockDeathUntilNextTurn"
+                                  ],
+                                  "not": {
+                                    "class": "MonsterConditions",
+                                    "buffStackNames": [
+                                      "HoldGroundOnceForHoldGroundPlus"
+                                    ]
+                                  }
                                 }
                               }
                             }
@@ -480,16 +496,16 @@
               }
             }
           }
-        },
-        "localization": {
-          "name": "Stun Bolt",
-          "description": "Stuns 1 enemy for 200TU. Usable once per battle.",
-          "selected": "Stuns target for 200TU"
         }
       },
       "BloodthirstA": {
         "id": "BloodthirstA",
         "found": true,
+        "localization": {
+          "name": "Frenzy Force",
+          "description": "500% damage to 1 enemy. Usable if the user has defeated 2+ units with attacks while on the battlefield.",
+          "selected": "500% damage, usable after defeating 2+ units"
+        },
         "ability": {
           "name": "BloodthirstA",
           "class": "Ability",
@@ -608,34 +624,49 @@
             "class": "MonsterConditions",
             "killsMade": 2
           }
-        },
-        "localization": {
-          "name": "Frenzy Force",
-          "description": "500% damage to 1 enemy. Usable if the user has defeated 2+ units with attacks while on the battlefield.",
-          "selected": "500% damage, usable after defeating 2+ units"
         }
       }
     },
     "passives": {
       "StunHighestTUEntranceB": {
         "id": "StunHighestTUEntranceB",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Thundering Entry",
+          "description": "Stuns the enemy with the highest current TU for 250TU. Triggered when this unit enters the battlefield from reinforcements."
+        }
       },
       "WaterMinusDamageLv3": {
         "id": "WaterMinusDamageLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Water Resist Lv3",
+          "description": "10% less damage from attacks by Water units."
+        }
       },
       "PlusHPBoostLv3": {
         "id": "PlusHPBoostLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv3",
+          "description": "Adds 1200 to this unit's max HP."
+        }
       },
       "PlusAttackBoostLv3": {
         "id": "PlusAttackBoostLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv3",
+          "description": "Adds 300 to this unit's Attack."
+        }
       },
       "AddWeaponPrefSpear": {
         "id": "AddWeaponPrefSpear",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Spear Mastery",
+          "description": "Can use weapon skills of Spears in addition to their original preferred weapon type."
+        }
       }
     },
     "activeSkillsAI": {},
@@ -741,9 +772,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "672e5f6330de14ac57ff6151c208a8a0c294ef9abeb1dd27695cded679c172fe",
-    "dependencyHash": "ff455708c1fcf382ad20dddbf6dafca6357de0749574070243b20fabb509a68b",
-    "generatedAt": 1778013985
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "bd2af0c8d4d53a0c33f6f604f59a35be8a84d5b9c487dd9a2f6ae06b6b898685",
+    "dependencyHash": "187ec85bc78539245139c936a2f458ccdfb14aa385ea60e708b4809215f9c27b",
+    "generatedAt": 1778081726
   }
 }

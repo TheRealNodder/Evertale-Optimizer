@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 208,
-  "id": "rei-regular-01",
-  "name": "ReiRegular01",
+  "id": "rei",
+  "name": "Rei",
+  "title": "",
   "category": "character",
   "rarity": null,
   "stars": 5,
@@ -41,6 +42,11 @@
       "GainAttackSingleAReiRegular": {
         "id": "GainAttackSingleAReiRegular",
         "found": true,
+        "localization": {
+          "name": "Attack",
+          "description": "Damage to 1 enemy and allies gain 2 Spirit.",
+          "selected": "Damage to 1 enemy and gains 2 Spirit"
+        },
         "ability": {
           "name": "GainAttackSingleAReiRegular",
           "class": "Ability",
@@ -145,16 +151,16 @@
         },
         "buffs": {},
         "attackScalors": {},
-        "conditions": {},
-        "localization": {
-          "name": "Attack",
-          "description": "Damage to 1 enemy and allies gain 2 Spirit.",
-          "selected": "Damage to 1 enemy and gains 2 Spirit"
-        }
+        "conditions": {}
       },
       "SleepSingleAReiRegular": {
         "id": "SleepSingleAReiRegular",
         "found": true,
+        "localization": {
+          "name": "Sleep",
+          "description": "Grants 1 enemy the Sleep status effect for 200TU. This will overwrite other status effects on that unit. Sleep cannot be applied to a unit that Has Slept while on the battlefield.",
+          "selected": "Puts the target to sleep\n(Will overwrite other status effects)"
+        },
         "ability": {
           "name": "SleepSingleAReiRegular",
           "class": "Ability",
@@ -431,34 +437,51 @@
               "or": {
                 "class": "MonsterConditions",
                 "monsterTags": [
-                  "SleepImmuneVsWater"
+                  "SleepImmuneIfBeastAlly"
                 ],
-                "checkEnemyTeamOfMonster": true,
-                "enemyTeamMonsterConditionMatchesNeeded": {
-                  "IsWater": 1
+                "checkReinforcementsForTeamConditionMatches": true,
+                "myTeamMonsterConditionMatchesNeeded": {
+                  "IsBeastRegular": 1
                 },
                 "or": {
                   "class": "MonsterConditions",
                   "monsterTags": [
-                    "NegativeStatusImmunityFromThorns"
+                    "SleepImmuneVsWater"
                   ],
-                  "buffStackNames": [
-                    "SleepThorns"
-                  ]
+                  "checkEnemyTeamOfMonster": true,
+                  "enemyTeamMonsterConditionMatchesNeeded": {
+                    "IsWater": 1
+                  },
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "SleepImmuneVs2Enemies"
+                    ],
+                    "enemyTeamSize": 2,
+                    "or": {
+                      "class": "MonsterConditions",
+                      "monsterTags": [
+                        "NegativeStatusImmunityFromThorns"
+                      ],
+                      "buffStackNames": [
+                        "SleepThorns"
+                      ]
+                    }
+                  }
                 }
               }
             }
           }
-        },
-        "localization": {
-          "name": "Sleep",
-          "description": "Grants 1 enemy the Sleep status effect for 200TU. This will overwrite other status effects on that unit. Sleep cannot be applied to a unit that Has Slept while on the battlefield.",
-          "selected": "Puts the target to sleep\n(Will overwrite other status effects)"
         }
       },
       "DreamHuntAReiRegular": {
         "id": "DreamHuntAReiRegular",
         "found": true,
+        "localization": {
+          "name": "Dream Hunter",
+          "description": "600% damage to 1 enemy if they are sleeping. Allies gain 4 Spirit if the target is asleep.",
+          "selected": "600% damage & gain 4 Spirit against sleeping target"
+        },
         "ability": {
           "name": "DreamHuntAReiRegular",
           "class": "Ability",
@@ -569,38 +592,57 @@
               "Sleep"
             ]
           }
-        },
-        "localization": {
-          "name": "Dream Hunter",
-          "description": "600% damage to 1 enemy if they are sleeping. Allies gain 4 Spirit if the target is asleep.",
-          "selected": "600% damage & gain 4 Spirit against sleeping target"
         }
       }
     },
     "passives": {
       "SleepLowestTUEntranceA": {
         "id": "SleepLowestTUEntranceA",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Dreamy Entry",
+          "description": "Grants the Sleep status effect to the enemy with the lowest TU for 200TU. Triggered when this unit enters the battlefield from reinforcements. Sleep cannot be applied to a unit that Has Slept while on the battlefield."
+        }
       },
       "RegenerationOnMyTurnSleep": {
         "id": "RegenerationOnMyTurnSleep",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Sleep Regeneration",
+          "description": "When there is at least 1 enemy with the Sleep status effect and this unit gets the turn, this unit heals 30% of its max HP."
+        }
       },
       "FireMinusDamageLv3": {
         "id": "FireMinusDamageLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Fire Resist Lv3",
+          "description": "10% less damage from attacks by Fire units."
+        }
       },
       "PlusHPBoostLv3": {
         "id": "PlusHPBoostLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv3",
+          "description": "Adds 1200 to this unit's max HP."
+        }
       },
       "PlusAttackBoostLv3": {
         "id": "PlusAttackBoostLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv3",
+          "description": "Adds 300 to this unit's Attack."
+        }
       },
       "AddWeaponPrefSword": {
         "id": "AddWeaponPrefSword",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Sword Mastery",
+          "description": "Can use weapon skills of Swords in addition to their original preferred weapon type."
+        }
       }
     },
     "activeSkillsAI": {},
@@ -741,9 +783,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "a8801ff07a34d5d8be8987f3b415bfbe46ecad5fd6a4669a00a5a98c65663227",
-    "dependencyHash": "59d15301b130bc77b251a5da288c43e46bd5a413bf3417a9a76beefb8fea652b",
-    "generatedAt": 1778013985
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "3f46dd34c0f451c5852ab48fc154db499480bcbfc937dbba1e9a916c15375176",
+    "dependencyHash": "cbd696dd0d968265cad4e038e98dd61af9040a9de9fde109c08e12ed8e397954",
+    "generatedAt": 1778081726
   }
 }

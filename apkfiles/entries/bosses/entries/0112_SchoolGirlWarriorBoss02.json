@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 112,
-  "id": "school-girl-warrior-boss-02",
-  "name": "SchoolGirlWarriorBoss02",
+  "id": "saya",
+  "name": "Saya",
+  "title": "",
   "category": "bosse",
   "rarity": null,
   "stars": 6,
@@ -39,6 +40,11 @@
       "MaxAnnihilatorSGWarriorBoss": {
         "id": "MaxAnnihilatorSGWarriorBoss",
         "found": true,
+        "localization": {
+          "name": "Max Rend",
+          "description": "800% damage to all enemies. Ignores the Stealth status effect and Hold Ground. Usable only if the user's party has exactly 10 Spirit.",
+          "selected": "800% damage to all enemies when at 10 Spirit"
+        },
         "ability": {
           "name": "MaxAnnihilatorSGWarriorBoss",
           "class": "Ability",
@@ -248,16 +254,16 @@
             "class": "MonsterConditions",
             "teamSpiritGreaterThan": 900
           }
-        },
-        "localization": {
-          "name": "Max Rend",
-          "description": "800% damage to all enemies. Ignores the Stealth status effect and Hold Ground. Usable only if the user's party has exactly 10 Spirit.",
-          "selected": "800% damage to all enemies when at 10 Spirit"
         }
       },
       "RecklessAttackASGWarriorBoss": {
         "id": "RecklessAttackASGWarriorBoss",
         "found": true,
+        "localization": {
+          "name": "Brash Strike",
+          "description": "150% damage to 1 enemy. Reflects 30% of the damage to the user.",
+          "selected": "150% damage, 30% damage reflection"
+        },
         "ability": {
           "name": "RecklessAttackASGWarriorBoss",
           "class": "Ability",
@@ -367,16 +373,16 @@
         },
         "buffs": {},
         "attackScalors": {},
-        "conditions": {},
-        "localization": {
-          "name": "Brash Strike",
-          "description": "150% damage to 1 enemy. Reflects 30% of the damage to the user.",
-          "selected": "150% damage, 30% damage reflection"
-        }
+        "conditions": {}
       },
       "StealthStunSingleASGWarriorBoss": {
         "id": "StealthStunSingleASGWarriorBoss",
         "found": true,
+        "localization": {
+          "name": "Stealth Shock",
+          "description": "Stuns 1 enemy for 200TU. Usable if the user has the Stealth status effect.",
+          "selected": "Stuns target for 200TU"
+        },
         "ability": {
           "name": "StealthStunSingleASGWarriorBoss",
           "class": "Ability",
@@ -554,61 +560,71 @@
                     "or": {
                       "class": "MonsterConditions",
                       "monsterTags": [
-                        "StunImmuneIfAnyBurningAllies"
+                        "StunImmuneIfBeastAlly"
                       ],
+                      "checkReinforcementsForTeamConditionMatches": true,
                       "myTeamMonsterConditionMatchesNeeded": {
-                        "IsBurning": 1
+                        "IsBeastRegular": 1
                       },
                       "or": {
                         "class": "MonsterConditions",
                         "monsterTags": [
-                          "StunImmuneIfEnemyIsFireBurnBlastOrForce"
+                          "StunImmuneIfAnyBurningAllies"
                         ],
-                        "checkEnemyTeamOfMonster": true,
-                        "enemyTeamMonsterConditionMatchesNeeded": {
-                          "IsBurnBlastOrForceOrFire": 1
+                        "myTeamMonsterConditionMatchesNeeded": {
+                          "IsBurning": 1
                         },
                         "or": {
                           "class": "MonsterConditions",
                           "monsterTags": [
-                            "StunImmuneIfAllyIsFireBurnBlastOrForce"
+                            "StunImmuneIfEnemyIsFireBurnBlastOrForce"
                           ],
-                          "myTeamMonsterConditionMatchesNeeded": {
+                          "checkEnemyTeamOfMonster": true,
+                          "enemyTeamMonsterConditionMatchesNeeded": {
                             "IsBurnBlastOrForceOrFire": 1
                           },
                           "or": {
                             "class": "MonsterConditions",
                             "monsterTags": [
-                              "StunImmuneIfPoisonedEnemy"
+                              "StunImmuneIfAllyIsFireBurnBlastOrForce"
                             ],
-                            "checkEnemyTeamOfMonster": true,
-                            "enemyTeamMonsterConditionMatchesNeeded": {
-                              "IsPoisoned": 1
+                            "myTeamMonsterConditionMatchesNeeded": {
+                              "IsBurnBlastOrForceOrFire": 1
                             },
                             "or": {
                               "class": "MonsterConditions",
                               "monsterTags": [
-                                "StunImmunityIfNotBurning"
+                                "StunImmuneIfPoisonedEnemy"
                               ],
-                              "not": {
-                                "class": "MonsterConditions",
-                                "buffStackNames": [
-                                  "Burn"
-                                ]
+                              "checkEnemyTeamOfMonster": true,
+                              "enemyTeamMonsterConditionMatchesNeeded": {
+                                "IsPoisoned": 1
                               },
                               "or": {
                                 "class": "MonsterConditions",
                                 "monsterTags": [
-                                  "StunImmuneIfHoldGroundPlusTriggered"
-                                ],
-                                "buffStackNames": [
-                                  "BlockDeathUntilNextTurn"
+                                  "StunImmunityIfNotBurning"
                                 ],
                                 "not": {
                                   "class": "MonsterConditions",
                                   "buffStackNames": [
-                                    "HoldGroundOnceForHoldGroundPlus"
+                                    "Burn"
                                   ]
+                                },
+                                "or": {
+                                  "class": "MonsterConditions",
+                                  "monsterTags": [
+                                    "StunImmuneIfHoldGroundPlusTriggered"
+                                  ],
+                                  "buffStackNames": [
+                                    "BlockDeathUntilNextTurn"
+                                  ],
+                                  "not": {
+                                    "class": "MonsterConditions",
+                                    "buffStackNames": [
+                                      "HoldGroundOnceForHoldGroundPlus"
+                                    ]
+                                  }
                                 }
                               }
                             }
@@ -627,16 +643,16 @@
               "Stealth"
             ]
           }
-        },
-        "localization": {
-          "name": "Stealth Shock",
-          "description": "Stuns 1 enemy for 200TU. Usable if the user has the Stealth status effect.",
-          "selected": "Stuns target for 200TU"
         }
       },
       "CounterStrikeAllASGWarriorBoss": {
         "id": "CounterStrikeAllASGWarriorBoss",
         "found": true,
+        "localization": {
+          "name": "Counter Strike",
+          "description": "200% damage to all enemies. Usable only if the user has gained the turn from the Counter Stance status effect.",
+          "selected": "200% damage to all enemies after countering"
+        },
         "ability": {
           "name": "CounterStrikeAllASGWarriorBoss",
           "class": "Ability",
@@ -783,16 +799,15 @@
               "AlreadyInStance"
             ]
           }
-        },
-        "localization": {
-          "name": "Counter Strike",
-          "description": "200% damage to all enemies. Usable only if the user has gained the turn from the Counter Stance status effect.",
-          "selected": "200% damage to all enemies after countering"
         }
       },
       "BurnBlastDoubleASGWarriorBoss": {
         "id": "BurnBlastDoubleASGWarriorBoss",
         "found": true,
+        "localization": {
+          "name": "BurnBlastDoubleASGWarriorBoss",
+          "description": ""
+        },
         "ability": {
           "name": "BurnBlastDoubleASGWarriorBoss",
           "class": "Ability",
@@ -964,6 +979,10 @@
       "SurvivorASGWarriorBoss": {
         "id": "SurvivorASGWarriorBoss",
         "found": true,
+        "localization": {
+          "name": "SurvivorASGWarriorBoss",
+          "description": ""
+        },
         "ability": {
           "name": "SurvivorASGWarriorBoss",
           "class": "Ability",
@@ -1141,7 +1160,11 @@
     "passives": {
       "DamageReduceWhenAllySpiritHighLifeKnockbackImmunitySilent": {
         "id": "DamageReduceWhenAllySpiritHighLifeKnockbackImmunitySilent",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Spirit Armor",
+          "description": "50% damage reduction from attacks while allies have 7 or more spirit."
+        }
       }
     },
     "activeSkillsAI": {},
@@ -1245,9 +1268,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "7e8c0eee42b9e01c39acef9f1d1ce454f66febc5ddaab08295cb7057c829564c",
-    "dependencyHash": "cdef48a699269be3d6a422ecfaa8332922fa6dc8a6442f3c7160d69be8e58219",
-    "generatedAt": 1778014032
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "0e39e026324a8b3eea2f67d481c6cb85c93bb967ddc92e76e235ae4f5ab9caaa",
+    "dependencyHash": "c50f093d6c91f6da9ebe1e9c29239f1407a88f9bc206ad851622d3a11e02c16b",
+    "generatedAt": 1778081774
   }
 }

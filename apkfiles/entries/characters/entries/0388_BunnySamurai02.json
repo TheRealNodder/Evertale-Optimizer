@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 388,
-  "id": "bunny-samurai-02",
-  "name": "BunnySamurai02",
+  "id": "nanami",
+  "name": "Nanami",
+  "title": "",
   "category": "character",
   "rarity": null,
   "stars": 5,
@@ -44,6 +45,11 @@
       "GainAttackSingleA": {
         "id": "GainAttackSingleA",
         "found": true,
+        "localization": {
+          "name": "Attack",
+          "description": "Damage to 1 enemy and allies gain 2 Spirit.",
+          "selected": "Damage to 1 enemy and gains 2 Spirit"
+        },
         "ability": {
           "name": "GainAttackSingleA",
           "class": "Ability",
@@ -94,16 +100,16 @@
         },
         "buffs": {},
         "attackScalors": {},
-        "conditions": {},
-        "localization": {
-          "name": "Attack",
-          "description": "Damage to 1 enemy and allies gain 2 Spirit.",
-          "selected": "Damage to 1 enemy and gains 2 Spirit"
-        }
+        "conditions": {}
       },
       "TimeStrikeA": {
         "id": "TimeStrikeA",
         "found": true,
+        "localization": {
+          "name": "Time Strike",
+          "description": "500% damage to 1 enemy if they have 130TU or more in the turn order. 600% damage if the target has 200TU or more.",
+          "selected": "500%+ damage against target with 130+ TU"
+        },
         "ability": {
           "name": "TimeStrikeA",
           "class": "Ability",
@@ -202,16 +208,16 @@
             "targetCondition": "CurrentTUGreaterThan200"
           }
         },
-        "conditions": {},
-        "localization": {
-          "name": "Time Strike",
-          "description": "500% damage to 1 enemy if they have 130TU or more in the turn order. 600% damage if the target has 200TU or more.",
-          "selected": "500%+ damage against target with 130+ TU"
-        }
+        "conditions": {}
       },
       "SurvivorA": {
         "id": "SurvivorA",
         "found": true,
+        "localization": {
+          "name": "Survivor's Fury",
+          "description": "500% damage to 1 enemy. Locked for 300TU after the user has entered the battlefield.",
+          "selected": "500% damage, usable if user survived 300TU"
+        },
         "ability": {
           "name": "SurvivorA",
           "class": "Ability",
@@ -280,16 +286,16 @@
             "class": "MonsterConditions",
             "timeInCombat": 300
           }
-        },
-        "localization": {
-          "name": "Survivor's Fury",
-          "description": "500% damage to 1 enemy. Locked for 300TU after the user has entered the battlefield.",
-          "selected": "500% damage, usable if user survived 300TU"
         }
       },
       "StunSmallSingleA": {
         "id": "StunSmallSingleA",
         "found": true,
+        "localization": {
+          "name": "StunSmallSingleA",
+          "description": "Stuns 1 enemy for 150TU.",
+          "selected": "Stuns target for 150TU"
+        },
         "ability": {
           "name": "StunSmallSingleA",
           "class": "Ability",
@@ -458,61 +464,71 @@
                     "or": {
                       "class": "MonsterConditions",
                       "monsterTags": [
-                        "StunImmuneIfAnyBurningAllies"
+                        "StunImmuneIfBeastAlly"
                       ],
+                      "checkReinforcementsForTeamConditionMatches": true,
                       "myTeamMonsterConditionMatchesNeeded": {
-                        "IsBurning": 1
+                        "IsBeastRegular": 1
                       },
                       "or": {
                         "class": "MonsterConditions",
                         "monsterTags": [
-                          "StunImmuneIfEnemyIsFireBurnBlastOrForce"
+                          "StunImmuneIfAnyBurningAllies"
                         ],
-                        "checkEnemyTeamOfMonster": true,
-                        "enemyTeamMonsterConditionMatchesNeeded": {
-                          "IsBurnBlastOrForceOrFire": 1
+                        "myTeamMonsterConditionMatchesNeeded": {
+                          "IsBurning": 1
                         },
                         "or": {
                           "class": "MonsterConditions",
                           "monsterTags": [
-                            "StunImmuneIfAllyIsFireBurnBlastOrForce"
+                            "StunImmuneIfEnemyIsFireBurnBlastOrForce"
                           ],
-                          "myTeamMonsterConditionMatchesNeeded": {
+                          "checkEnemyTeamOfMonster": true,
+                          "enemyTeamMonsterConditionMatchesNeeded": {
                             "IsBurnBlastOrForceOrFire": 1
                           },
                           "or": {
                             "class": "MonsterConditions",
                             "monsterTags": [
-                              "StunImmuneIfPoisonedEnemy"
+                              "StunImmuneIfAllyIsFireBurnBlastOrForce"
                             ],
-                            "checkEnemyTeamOfMonster": true,
-                            "enemyTeamMonsterConditionMatchesNeeded": {
-                              "IsPoisoned": 1
+                            "myTeamMonsterConditionMatchesNeeded": {
+                              "IsBurnBlastOrForceOrFire": 1
                             },
                             "or": {
                               "class": "MonsterConditions",
                               "monsterTags": [
-                                "StunImmunityIfNotBurning"
+                                "StunImmuneIfPoisonedEnemy"
                               ],
-                              "not": {
-                                "class": "MonsterConditions",
-                                "buffStackNames": [
-                                  "Burn"
-                                ]
+                              "checkEnemyTeamOfMonster": true,
+                              "enemyTeamMonsterConditionMatchesNeeded": {
+                                "IsPoisoned": 1
                               },
                               "or": {
                                 "class": "MonsterConditions",
                                 "monsterTags": [
-                                  "StunImmuneIfHoldGroundPlusTriggered"
-                                ],
-                                "buffStackNames": [
-                                  "BlockDeathUntilNextTurn"
+                                  "StunImmunityIfNotBurning"
                                 ],
                                 "not": {
                                   "class": "MonsterConditions",
                                   "buffStackNames": [
-                                    "HoldGroundOnceForHoldGroundPlus"
+                                    "Burn"
                                   ]
+                                },
+                                "or": {
+                                  "class": "MonsterConditions",
+                                  "monsterTags": [
+                                    "StunImmuneIfHoldGroundPlusTriggered"
+                                  ],
+                                  "buffStackNames": [
+                                    "BlockDeathUntilNextTurn"
+                                  ],
+                                  "not": {
+                                    "class": "MonsterConditions",
+                                    "buffStackNames": [
+                                      "HoldGroundOnceForHoldGroundPlus"
+                                    ]
+                                  }
                                 }
                               }
                             }
@@ -525,37 +541,57 @@
               }
             }
           }
-        },
-        "localization": {
-          "description": "Stuns 1 enemy for 150TU.",
-          "selected": "Stuns target for 150TU"
         }
       }
     },
     "passives": {
       "DamageReduceWhenAtMaxHP": {
         "id": "DamageReduceWhenAtMaxHP",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Vigor Armor",
+          "description": "50% less attack damage taken by the user while at max HP."
+        }
       },
       "StunRevengeA": {
         "id": "StunRevengeA",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Stun Revenge",
+          "description": "When this unit is defeated by an enemy, that enemy is stunned for 200TU."
+        }
       },
       "PlusHPBoostLv2": {
         "id": "PlusHPBoostLv2",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv2",
+          "description": "Adds 800 to this unit's max HP."
+        }
       },
       "Stun15TUMinus": {
         "id": "Stun15TUMinus",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Stun Resist Lv2",
+          "description": "Reduces the amount of any stun effects against this unit by 15TU."
+        }
       },
       "PlusAttackBoostLv2": {
         "id": "PlusAttackBoostLv2",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv2",
+          "description": "Adds 200 to this unit's Attack."
+        }
       },
       "AddWeaponPrefGreatSword": {
         "id": "AddWeaponPrefGreatSword",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Greatsword Mastery",
+          "description": "Can use weapon skills of Greatswords in addition to their original preferred weapon type."
+        }
       }
     },
     "activeSkillsAI": {
@@ -694,9 +730,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "ef2f770777524b4a82c47e8e3cae8218f67ef07ae07fcb609d92f6f115e8acdb",
-    "dependencyHash": "92de23d972691d756c6fbe0406f113cf025e5511eb479f0fccc1782be595d174",
-    "generatedAt": 1778013991
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "ce87d2aaeb61faa7a617c954f77a70314904035a0391180da2158569848f21b1",
+    "dependencyHash": "4797fd347dcca604111eb749f00c93e651cda487b91919eb1895d9fdabb261fe",
+    "generatedAt": 1778081731
   }
 }

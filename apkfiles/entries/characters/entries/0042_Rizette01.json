@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 42,
-  "id": "rizette-01",
-  "name": "Rizette01",
+  "id": "rizette",
+  "name": "Rizette",
+  "title": "",
   "category": "character",
   "rarity": null,
   "stars": 3,
@@ -34,6 +35,11 @@
       "GainAttackSingleBRizette01": {
         "id": "GainAttackSingleBRizette01",
         "found": true,
+        "localization": {
+          "name": "Attack",
+          "description": "Damage to 1 enemy and allies gain 1 Spirit.",
+          "selected": "Damage to 1 enemy and gains 1 Spirit"
+        },
         "ability": {
           "name": "GainAttackSingleBRizette01",
           "class": "Ability",
@@ -84,16 +90,16 @@
         },
         "buffs": {},
         "attackScalors": {},
-        "conditions": {},
-        "localization": {
-          "name": "Attack",
-          "description": "Damage to 1 enemy and allies gain 1 Spirit.",
-          "selected": "Damage to 1 enemy and gains 1 Spirit"
-        }
+        "conditions": {}
       },
       "StunSingle100B": {
         "id": "StunSingle100B",
         "found": true,
+        "localization": {
+          "name": "Stun Bolt",
+          "description": "Stuns 1 enemy for 150TU. Usable once per battle.",
+          "selected": "Stuns target for 150TU"
+        },
         "ability": {
           "name": "StunSingle100B",
           "class": "Ability",
@@ -261,61 +267,71 @@
                     "or": {
                       "class": "MonsterConditions",
                       "monsterTags": [
-                        "StunImmuneIfAnyBurningAllies"
+                        "StunImmuneIfBeastAlly"
                       ],
+                      "checkReinforcementsForTeamConditionMatches": true,
                       "myTeamMonsterConditionMatchesNeeded": {
-                        "IsBurning": 1
+                        "IsBeastRegular": 1
                       },
                       "or": {
                         "class": "MonsterConditions",
                         "monsterTags": [
-                          "StunImmuneIfEnemyIsFireBurnBlastOrForce"
+                          "StunImmuneIfAnyBurningAllies"
                         ],
-                        "checkEnemyTeamOfMonster": true,
-                        "enemyTeamMonsterConditionMatchesNeeded": {
-                          "IsBurnBlastOrForceOrFire": 1
+                        "myTeamMonsterConditionMatchesNeeded": {
+                          "IsBurning": 1
                         },
                         "or": {
                           "class": "MonsterConditions",
                           "monsterTags": [
-                            "StunImmuneIfAllyIsFireBurnBlastOrForce"
+                            "StunImmuneIfEnemyIsFireBurnBlastOrForce"
                           ],
-                          "myTeamMonsterConditionMatchesNeeded": {
+                          "checkEnemyTeamOfMonster": true,
+                          "enemyTeamMonsterConditionMatchesNeeded": {
                             "IsBurnBlastOrForceOrFire": 1
                           },
                           "or": {
                             "class": "MonsterConditions",
                             "monsterTags": [
-                              "StunImmuneIfPoisonedEnemy"
+                              "StunImmuneIfAllyIsFireBurnBlastOrForce"
                             ],
-                            "checkEnemyTeamOfMonster": true,
-                            "enemyTeamMonsterConditionMatchesNeeded": {
-                              "IsPoisoned": 1
+                            "myTeamMonsterConditionMatchesNeeded": {
+                              "IsBurnBlastOrForceOrFire": 1
                             },
                             "or": {
                               "class": "MonsterConditions",
                               "monsterTags": [
-                                "StunImmunityIfNotBurning"
+                                "StunImmuneIfPoisonedEnemy"
                               ],
-                              "not": {
-                                "class": "MonsterConditions",
-                                "buffStackNames": [
-                                  "Burn"
-                                ]
+                              "checkEnemyTeamOfMonster": true,
+                              "enemyTeamMonsterConditionMatchesNeeded": {
+                                "IsPoisoned": 1
                               },
                               "or": {
                                 "class": "MonsterConditions",
                                 "monsterTags": [
-                                  "StunImmuneIfHoldGroundPlusTriggered"
-                                ],
-                                "buffStackNames": [
-                                  "BlockDeathUntilNextTurn"
+                                  "StunImmunityIfNotBurning"
                                 ],
                                 "not": {
                                   "class": "MonsterConditions",
                                   "buffStackNames": [
-                                    "HoldGroundOnceForHoldGroundPlus"
+                                    "Burn"
                                   ]
+                                },
+                                "or": {
+                                  "class": "MonsterConditions",
+                                  "monsterTags": [
+                                    "StunImmuneIfHoldGroundPlusTriggered"
+                                  ],
+                                  "buffStackNames": [
+                                    "BlockDeathUntilNextTurn"
+                                  ],
+                                  "not": {
+                                    "class": "MonsterConditions",
+                                    "buffStackNames": [
+                                      "HoldGroundOnceForHoldGroundPlus"
+                                    ]
+                                  }
                                 }
                               }
                             }
@@ -328,16 +344,16 @@
               }
             }
           }
-        },
-        "localization": {
-          "name": "Stun Bolt",
-          "description": "Stuns 1 enemy for 150TU. Usable once per battle.",
-          "selected": "Stuns target for 150TU"
         }
       },
       "SurvivorB2": {
         "id": "SurvivorB2",
         "found": true,
+        "localization": {
+          "name": "Survivor's Rage",
+          "description": "400% damage to 1 enemy. Locked for 300TU after the user has entered the battlefield.",
+          "selected": "400% damage, usable if user survived 300TU"
+        },
         "ability": {
           "name": "SurvivorB2",
           "class": "Ability",
@@ -463,11 +479,6 @@
             "class": "MonsterConditions",
             "timeInCombat": 300
           }
-        },
-        "localization": {
-          "name": "Survivor's Rage",
-          "description": "400% damage to 1 enemy. Locked for 300TU after the user has entered the battlefield.",
-          "selected": "400% damage, usable if user survived 300TU"
         }
       }
     },
@@ -561,9 +572,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "4b99dac871a3bf1c60373b565297222de3606f1ef1efd5a73b76cae2204de36e",
-    "dependencyHash": "5633180a38d8571ae18e42ac93a58677371abf724723c4bfb4bcd89cc74f3b28",
-    "generatedAt": 1778013980
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "448cfa77a17f4a3170531032c7645d857bae8de9a32c1878a3b7ae06c4e993e4",
+    "dependencyHash": "47977b13a8e1d1387862319b1d2273770849b26be89a08dea103224825cba558",
+    "generatedAt": 1778081721
   }
 }

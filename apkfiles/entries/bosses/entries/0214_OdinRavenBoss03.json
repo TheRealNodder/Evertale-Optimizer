@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 214,
-  "id": "odin-raven-boss-03",
-  "name": "OdinRavenBoss03",
+  "id": "mega-winged-shade",
+  "name": "Mega Winged Shade",
+  "title": "",
   "category": "bosse",
   "rarity": null,
   "stars": 6,
@@ -39,6 +40,11 @@
       "BlindStrikeARavenBoss": {
         "id": "BlindStrikeARavenBoss",
         "found": true,
+        "localization": {
+          "name": "Go for the Eyes!",
+          "description": "50% damage to 1 enemy Weakens them (reduces their Attack to 0.75x until the end of their next turn). This attack cannot be redirected by enemy Guardians. This will overwrite any existing Weak or Enrage effects on the target and can be overwritten by Enrage effects. The effect of Weakening may be diminished if the affected unit's Attack is increased by other effects.",
+          "selected": "50% damage to 1 enemy and Weaken them"
+        },
         "ability": {
           "name": "BlindStrikeARavenBoss",
           "class": "Ability",
@@ -192,16 +198,16 @@
           }
         },
         "attackScalors": {},
-        "conditions": {},
-        "localization": {
-          "name": "Go for the Eyes!",
-          "description": "50% damage to 1 enemy Weakens them (reduces their Attack to 0.75x until the end of their next turn). This attack cannot be redirected by enemy Guardians. This will overwrite any existing Weak or Enrage effects on the target and can be overwritten by Enrage effects. The effect of Weakening may be diminished if the affected unit's Attack is increased by other effects.",
-          "selected": "50% damage to 1 enemy and Weaken them"
-        }
+        "conditions": {}
       },
       "Stun100ARavenBoss": {
         "id": "Stun100ARavenBoss",
         "found": true,
+        "localization": {
+          "name": "Stun Bolt",
+          "description": "Stuns 1 enemy for 100TU. Usable once per battle and only if there is an ally Mega Odin on the battlefield.",
+          "selected": "Stuns target for 100TU"
+        },
         "ability": {
           "name": "Stun100ARavenBoss",
           "class": "Ability",
@@ -370,61 +376,71 @@
                     "or": {
                       "class": "MonsterConditions",
                       "monsterTags": [
-                        "StunImmuneIfAnyBurningAllies"
+                        "StunImmuneIfBeastAlly"
                       ],
+                      "checkReinforcementsForTeamConditionMatches": true,
                       "myTeamMonsterConditionMatchesNeeded": {
-                        "IsBurning": 1
+                        "IsBeastRegular": 1
                       },
                       "or": {
                         "class": "MonsterConditions",
                         "monsterTags": [
-                          "StunImmuneIfEnemyIsFireBurnBlastOrForce"
+                          "StunImmuneIfAnyBurningAllies"
                         ],
-                        "checkEnemyTeamOfMonster": true,
-                        "enemyTeamMonsterConditionMatchesNeeded": {
-                          "IsBurnBlastOrForceOrFire": 1
+                        "myTeamMonsterConditionMatchesNeeded": {
+                          "IsBurning": 1
                         },
                         "or": {
                           "class": "MonsterConditions",
                           "monsterTags": [
-                            "StunImmuneIfAllyIsFireBurnBlastOrForce"
+                            "StunImmuneIfEnemyIsFireBurnBlastOrForce"
                           ],
-                          "myTeamMonsterConditionMatchesNeeded": {
+                          "checkEnemyTeamOfMonster": true,
+                          "enemyTeamMonsterConditionMatchesNeeded": {
                             "IsBurnBlastOrForceOrFire": 1
                           },
                           "or": {
                             "class": "MonsterConditions",
                             "monsterTags": [
-                              "StunImmuneIfPoisonedEnemy"
+                              "StunImmuneIfAllyIsFireBurnBlastOrForce"
                             ],
-                            "checkEnemyTeamOfMonster": true,
-                            "enemyTeamMonsterConditionMatchesNeeded": {
-                              "IsPoisoned": 1
+                            "myTeamMonsterConditionMatchesNeeded": {
+                              "IsBurnBlastOrForceOrFire": 1
                             },
                             "or": {
                               "class": "MonsterConditions",
                               "monsterTags": [
-                                "StunImmunityIfNotBurning"
+                                "StunImmuneIfPoisonedEnemy"
                               ],
-                              "not": {
-                                "class": "MonsterConditions",
-                                "buffStackNames": [
-                                  "Burn"
-                                ]
+                              "checkEnemyTeamOfMonster": true,
+                              "enemyTeamMonsterConditionMatchesNeeded": {
+                                "IsPoisoned": 1
                               },
                               "or": {
                                 "class": "MonsterConditions",
                                 "monsterTags": [
-                                  "StunImmuneIfHoldGroundPlusTriggered"
-                                ],
-                                "buffStackNames": [
-                                  "BlockDeathUntilNextTurn"
+                                  "StunImmunityIfNotBurning"
                                 ],
                                 "not": {
                                   "class": "MonsterConditions",
                                   "buffStackNames": [
-                                    "HoldGroundOnceForHoldGroundPlus"
+                                    "Burn"
                                   ]
+                                },
+                                "or": {
+                                  "class": "MonsterConditions",
+                                  "monsterTags": [
+                                    "StunImmuneIfHoldGroundPlusTriggered"
+                                  ],
+                                  "buffStackNames": [
+                                    "BlockDeathUntilNextTurn"
+                                  ],
+                                  "not": {
+                                    "class": "MonsterConditions",
+                                    "buffStackNames": [
+                                      "HoldGroundOnceForHoldGroundPlus"
+                                    ]
+                                  }
                                 }
                               }
                             }
@@ -443,16 +459,16 @@
               "IsOdinRegularBoss": 1
             }
           }
-        },
-        "localization": {
-          "name": "Stun Bolt",
-          "description": "Stuns 1 enemy for 100TU. Usable once per battle and only if there is an ally Mega Odin on the battlefield.",
-          "selected": "Stuns target for 100TU"
         }
       },
       "ReviveOdinRegularBossA": {
         "id": "ReviveOdinRegularBossA",
         "found": true,
+        "localization": {
+          "name": "Revive Odin",
+          "description": "Sacrifices the user to revive the Mega Odin that conjured the user to the battlefield with full HP. Usable if there is not already an ally Mega Odin on the battlefield or in allied reinforcements. The revived Mega Odin will be considered a conjured unit and will have use limits on active skills reset.",
+          "selected": "Sacrifices the user to revive Mega Odin"
+        },
         "ability": {
           "name": "ReviveOdinRegularBossA",
           "class": "Ability",
@@ -634,30 +650,41 @@
               }
             }
           }
-        },
-        "localization": {
-          "name": "Revive Odin",
-          "description": "Sacrifices the user to revive the Mega Odin that conjured the user to the battlefield with full HP. Usable if there is not already an ally Mega Odin on the battlefield or in allied reinforcements. The revived Mega Odin will be considered a conjured unit and will have use limits on active skills reset.",
-          "selected": "Sacrifices the user to revive Mega Odin"
         }
       }
     },
     "passives": {
       "MirageMonster": {
         "id": "MirageMonster",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Ephemeral",
+          "description": "This unit is never considered to be defeated by attacks and does not trigger any skills of other units whenever it is defeated or sacrificed by any source while on the battlefield.\n\nThis unit will be fully healed after each turn if it takes damage but is not defeated. This unit will be defeated after any ally or enemy turn if this unit has any of the Burn, Super Poison, or Mega Poison status effects.\n\nDamage dealt to this unit is increased to 2.5 times the normal amount."
+        }
       },
       "SpiritThiefEntranceDRavenBoss": {
         "id": "SpiritThiefEntranceDRavenBoss",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Bad Omen",
+          "description": "Steals 1 Spirit from the enemy team. Triggered when this unit enters the battlefield from reinforcements."
+        }
       },
       "StunImmunity": {
         "id": "StunImmunity",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Stun Immunity",
+          "description": "This unit is not affected by stun effects."
+        }
       },
       "SleepImmunity": {
         "id": "SleepImmunity",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Sleep Immunity",
+          "description": "This unit is not affected by sleep effects."
+        }
       }
     },
     "activeSkillsAI": {},
@@ -721,9 +748,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "f773444a40510628f00c6f9e18f1ef6f5f541f7684d232610faf3f08224b1e88",
-    "dependencyHash": "9dbc192bcb28218fc0565226ca47dddd67b53007e6782209a3581bf98ae076eb",
-    "generatedAt": 1778014035
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "5d18fd97d8179cfaed7c145c42afce7f5cb50ddbe4fb3d214e0883b2e4d10c43",
+    "dependencyHash": "ff9a07aff05dd287c2933a4d93556d940add68bea0310734bcb1db81bceeeb15",
+    "generatedAt": 1778081777
   }
 }
