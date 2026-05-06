@@ -21,7 +21,7 @@ import time
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Set
 
-SCRIPT_VERSION = "4-passive-localization"
+SCRIPT_VERSION = "5-second-name-localization"
 IMAGEKIT_BASE = "https://ik.imagekit.io/r8fsa98s9"
 
 OLD_WEBSITE_FILES = {
@@ -218,6 +218,10 @@ def get_internal_id(item: Dict[str, Any]) -> str:
     return "unknown"
 
 
+def family_from_internal_id(internal_id: str) -> str:
+    return re.sub(r"\d+$", "", internal_id or "")
+
+
 def slugify(value: str) -> str:
     value = re.sub(r"[^A-Za-z0-9_-]+", "-", value.strip())
     return re.sub(r"-+", "-", value).strip("-") or "unknown"
@@ -259,10 +263,22 @@ def ordered_values(value: Any) -> List[Any]:
 def localized(localizable: Dict[str, str], base: str) -> Dict[str, Optional[str]]:
     keys = [
         ("name", f"{base}NameKey"),
+        ("secondName", f"{base}SecondNameKey"),
+        ("title", f"{base}TitleKey"),
         ("description", f"{base}DescriptionKey"),
         ("selected", f"{base}SelectedKey"),
     ]
     return {field: localizable.get(key) for field, key in keys if key in localizable}
+
+
+def localize_character(localizable: Dict[str, str], internal_id: str, fallback_name: str = "") -> Dict[str, str]:
+    family = family_from_internal_id(internal_id)
+    loc = localized(localizable, internal_id)
+    family_loc = localized(localizable, family) if family and family != internal_id else {}
+    name = loc.get("name") or family_loc.get("name") or fallback_name or internal_id
+    title = loc.get("secondName") or loc.get("title") or family_loc.get("secondName") or family_loc.get("title") or ""
+    description = loc.get("description") or family_loc.get("description") or ""
+    return {"name": name, "title": title, "description": description}
 
 
 def localize_ability_like(localizable: Dict[str, str], ability_id: str) -> Dict[str, Any]:
@@ -318,6 +334,7 @@ def build_source_marker(item: Optional[Dict[str, Any]], category: str, internal_
     passive_ids = [x for x in ordered_values(item.get("passives", item.get("passiveSkills", []))) if isinstance(x, str)]
     dependency_material = {
         "abilities": {x: dependency_fingerprint_for_ability(x, resolvers) for x in active_ids + passive_ids},
+        "characterLocalization": localize_character(resolvers["Localizable"], internal_id, str(item.get("name") or internal_id)) if category == "characters" else None,
         "leaderCondition": resolvers["MonsterConditions"].get(item.get("leaderBuffCondition")) if isinstance(item.get("leaderBuffCondition"), str) else None,
     }
     source_material = {"category": category, "internalId": internal_id, "order": order_index, "displayName": display_name, "raw": item, "scriptVersion": SCRIPT_VERSION}
@@ -375,8 +392,10 @@ def make_placeholder(category: str, internal_id: str, display_name: Optional[str
 def normalize_entry(item: Dict[str, Any], category: str, order_index: int, display_name_override: Optional[str], resolvers: Dict[str, Dict[str, Any]], marker: Dict[str, Any]) -> Dict[str, Any]:
     internal_id = get_internal_id(item)
     localizable = resolvers["Localizable"]
-    display_name = display_name_override or localizable.get(f"{internal_id}NameKey") or item.get("displayName") or item.get("title") or item.get("name") or internal_id
-    title = localizable.get(f"{internal_id}TitleKey") or localizable.get(f"{internal_id}ProfileKey") or item.get("title") or ""
+    char_loc = localize_character(localizable, internal_id, str(item.get("displayName") or item.get("name") or internal_id)) if category == "characters" else {}
+    display_name = display_name_override or char_loc.get("name") or localizable.get(f"{internal_id}NameKey") or item.get("displayName") or item.get("title") or item.get("name") or internal_id
+    title = char_loc.get("title") or localizable.get(f"{internal_id}SecondNameKey") or localizable.get(f"{internal_id}TitleKey") or localizable.get(f"{internal_id}ProfileKey") or item.get("title") or ""
+    description = char_loc.get("description") or localizable.get(f"{internal_id}DescriptionKey") or item.get("description") or ""
     active_ids = [x for x in ordered_values(item.get("activeSkills", [])) if isinstance(x, str)]
     passive_ids = [x for x in ordered_values(item.get("passives", item.get("passiveSkills", []))) if isinstance(x, str)]
     active_ai = item.get("activeSkillsAI", {}) if isinstance(item.get("activeSkillsAI"), dict) else {}
@@ -386,6 +405,7 @@ def normalize_entry(item: Dict[str, Any], category: str, order_index: int, displ
         "id": kebab_name(str(display_name)),
         "name": display_name,
         "title": title,
+        "description": description,
         "category": category[:-1] if category.endswith("s") else category,
         "rarity": item.get("rarity"),
         "stars": item.get("stars"),
@@ -404,7 +424,7 @@ def normalize_entry(item: Dict[str, Any], category: str, order_index: int, displ
         },
         "effect": item.get("effect") if category in ("weapons", "accessories") else None,
         "profile": item.get("profile") if category in ("weapons", "accessories") else None,
-        "internal": {"sourceId": internal_id, "family": item.get("family"), "source": "apk_extract", "treatAsDuplicateOf": item.get("treatAsDuplicateOf")},
+        "internal": {"sourceId": internal_id, "family": item.get("family") or family_from_internal_id(internal_id), "source": "apk_extract", "treatAsDuplicateOf": item.get("treatAsDuplicateOf")},
         "raw": item,
         "_build": {**marker, "generatedAt": now_int()},
     }
