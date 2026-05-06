@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>New Data Loader Test</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+}
+pre {
+    background: #f0f0f0;
+    padding: 10px;
+    overflow: auto;
+}
+.success {
+    color: green;
+}
+.error {
+    color: red;
+}
+</style>
+</head>
+<body>
+
+<h1>New Data Loader Test</h1>
+
+<button id="runTest">Run Loader Test</button>
+
+<pre id="output"></pre>
+
+<script type="module">
+import { loadAllData } from '../../../js/new-data-loader.js';
+
+const output = document.getElementById('output');
+
+document.getElementById('runTest').addEventListener('click', async () => {
+    output.textContent = 'Loading...';
+
+    try {
+        const data = await loadAllData();
+
+        const result = {
+            characters: data.characters.length,
+            weapons: data.weapons.length,
+            accessories: data.accessories.length,
+            bosses: data.bosses.length
+        };
+
+        output.textContent =
+            'SUCCESS\n\n' +
+            JSON.stringify(result, null, 2);
+
+        output.className = 'success';
+
+    } catch (err) {
+        output.textContent =
+            'ERROR\n\n' + err;
+
+        output.className = 'error';
+    }
+});
+</script>
+
+</body>
+</html>
