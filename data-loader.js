@@ -6,6 +6,13 @@
     actives: './data/character_actives.json',
     passives: './data/character_passives.json',
   };
+  const CATEGORY_LIMITS = {
+    characters: 260,
+    weapons: 260,
+    accessories: 140,
+    bosses: 260,
+  };
+  const CONCURRENCY = 24;
 
   function toArray(json, key) {
     if (Array.isArray(json)) return json;
@@ -15,7 +22,7 @@
 
   async function fetchJson(url, optional = false) {
     try {
-      const res = await fetch(url, { cache: 'no-store' });
+      const res = await fetch(url, { cache: 'force-cache' });
       if (!res.ok) {
         if (optional) return null;
         throw new Error(`Failed to fetch ${url}: ${res.status}`);
@@ -83,12 +90,7 @@
     if (resolved.activeSkills && typeof resolved.activeSkills === 'object') {
       for (const [skillId, detail] of Object.entries(resolved.activeSkills)) {
         const loc = detail?.localization || {};
-        activeSkills.push({
-          id: skillId,
-          name: loc.name || skillId,
-          description: loc.description || '',
-          raw: detail,
-        });
+        activeSkills.push({ id: skillId, name: loc.name || skillId, description: loc.description || '' });
       }
     } else if (Array.isArray(entry?.refs?.activeSkills)) {
       for (const skillId of entry.refs.activeSkills) activeSkills.push({ id: skillId, name: skillId, description: '' });
@@ -97,19 +99,13 @@
     if (resolved.passives && typeof resolved.passives === 'object') {
       for (const [skillId, detail] of Object.entries(resolved.passives)) {
         const loc = detail?.localization || {};
-        passiveSkills.push({
-          id: skillId,
-          name: loc.name || skillId,
-          description: loc.description || '',
-          raw: detail,
-        });
+        passiveSkills.push({ id: skillId, name: loc.name || skillId, description: loc.description || '' });
       }
     } else if (Array.isArray(entry?.refs?.passives)) {
       for (const skillId of entry.refs.passives) passiveSkills.push({ id: skillId, name: skillId, description: '' });
     }
 
-    const out = {
-      ...entry,
+    return {
       id,
       sourceId,
       name: entry?.name || titleFromInternalId(sourceId),
@@ -124,36 +120,58 @@
         spd: stats.spd ?? raw.speed ?? '',
         cost: stats.cost ?? raw.cost ?? '',
       },
+      rarity: entry?.rarity,
+      stars: entry?.stars,
+      evolvedStars: entry?.evolvedStars,
+      weaponType: entry?.weaponType,
       activeSkills,
       passiveSkills: passiveSkills.map(p => p.name || p.id),
       passiveSkillDetails: passiveSkills,
       derivedTags: Array.isArray(entry?.derivedTags) ? entry.derivedTags.map(normalizeElementTag) : [],
-      leaderSkill: entry?.leaderSkill || {
-        internalId: entry?.refs?.leaderBuff || raw.leaderBuff || '',
-        condition: entry?.refs?.leaderBuffCondition || raw.leaderBuffCondition || '',
-      },
+      leaderSkill: entry?.leaderSkill || { internalId: entry?.refs?.leaderBuff || raw.leaderBuff || '', condition: entry?.refs?.leaderBuffCondition || raw.leaderBuffCondition || '' },
+      raw,
+      refs: entry?.refs || {},
+      internal: entry?.internal || {},
       _entryBased: true,
     };
+  }
 
-    return out;
+  async function mapLimit(items, limit, worker) {
+    const results = new Array(items.length);
+    let index = 0;
+    const workers = Array.from({ length: Math.min(limit, items.length) }, async () => {
+      while (index < items.length) {
+        const current = index++;
+        results[current] = await worker(items[current], current);
+      }
+    });
+    await Promise.all(workers);
+    return results;
+  }
+
+  function entryRowsForCategory(index, category) {
+    const rows = Array.isArray(index?.entries) ? index.entries : [];
+    const limit = CATEGORY_LIMITS[category];
+    return limit ? rows.slice(0, limit) : rows;
   }
 
   async function loadEntryCategory(category, optional = false) {
     const index = await fetchJson(`${ENTRY_BASE}/${category}/index.json`, optional);
     if (!index || !Array.isArray(index.entries)) return [];
 
-    const rows = [];
-    for (const row of index.entries) {
+    const rowsToLoad = entryRowsForCategory(index, category);
+    const loaded = await mapLimit(rowsToLoad, CONCURRENCY, async (row) => {
       const file = String(row.file || '').replace(/^\.\//, '');
-      if (!file) continue;
+      if (!file) return null;
       try {
         const entry = await fetchJson(`${ENTRY_BASE}/${category}/${file}`, false);
-        rows.push(normalizeEntryForOldSite(entry, category));
+        return normalizeEntryForOldSite(entry, category);
       } catch (err) {
         console.warn('[EvertaleData] Skipping broken entry:', category, file, err);
+        return null;
       }
-    }
-    return rows;
+    });
+    return loaded.filter(Boolean);
   }
 
   async function loadAllEntries() {
@@ -213,14 +231,5 @@
     return loadCharactersMergedLegacy();
   }
 
-  window.EvertaleData = {
-    fetchJson,
-    toArray,
-    normalizeElementValue,
-    normalizeElementTag,
-    loadCharactersMerged,
-    loadCharactersMergedLegacy,
-    loadEntryCategory,
-    loadAllEntries,
-  };
+  window.EvertaleData = { fetchJson, toArray, normalizeElementValue, normalizeElementTag, loadCharactersMerged, loadCharactersMergedLegacy, loadEntryCategory, loadAllEntries };
 })();
