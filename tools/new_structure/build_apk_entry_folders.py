@@ -10,12 +10,6 @@ Incremental design:
 
 Run from repo root:
   python tools/new_structure/build_apk_entry_folders.py --input apkfiles --output apkfiles/generated_entries
-
-Useful options:
-  --force              rebuild everything
-  --category bosses    only build one category
-  --limit 50           process only 50 entries this run
-  --start-after ID     resume after a specific sourceId
 """
 from __future__ import annotations
 
@@ -27,7 +21,7 @@ import time
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Set
 
-SCRIPT_VERSION = "3-incremental-checkpoint"
+SCRIPT_VERSION = "4-passive-localization"
 IMAGEKIT_BASE = "https://ik.imagekit.io/r8fsa98s9"
 
 OLD_WEBSITE_FILES = {
@@ -160,7 +154,7 @@ def load_resolvers(input_dir: Path) -> Dict[str, Dict[str, Any]]:
             continue
         raw = load_json(path)
         resolvers[root_key] = key_by_name(unwrap(raw, root_key))
-    resolvers["Localizable"] = parse_localizable(find_file(input_dir, ["Localizable_English.txt"]))
+    resolvers["Localizable"] = parse_localizable(find_file(input_dir, ["Localizable_English.txt", "Localizable_English"]))
     return resolvers
 
 
@@ -271,6 +265,19 @@ def localized(localizable: Dict[str, str], base: str) -> Dict[str, Optional[str]
     return {field: localizable.get(key) for field, key in keys if key in localizable}
 
 
+def localize_ability_like(localizable: Dict[str, str], ability_id: str) -> Dict[str, Any]:
+    loc = localized(localizable, ability_id)
+    return {
+        "id": ability_id,
+        "found": bool(loc),
+        "localization": {
+            "name": loc.get("name") or ability_id,
+            "description": loc.get("description") or "",
+            **({"selected": loc["selected"]} if loc.get("selected") else {}),
+        },
+    }
+
+
 def strings_in(value: Any) -> Set[str]:
     found: Set[str] = set()
     if isinstance(value, str):
@@ -286,10 +293,9 @@ def strings_in(value: Any) -> Set[str]:
 
 def dependency_fingerprint_for_ability(ability_id: str, resolvers: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
     ability = resolvers["Ability"].get(ability_id)
-    fp: Dict[str, Any] = {"abilityId": ability_id, "ability": ability}
+    fp: Dict[str, Any] = {"abilityId": ability_id, "ability": ability, "localization": localized(resolvers["Localizable"], ability_id)}
     if not isinstance(ability, dict):
         return fp
-
     config_id = ability.get("config")
     config = resolvers["AbilityConfig"].get(config_id) if isinstance(config_id, str) else None
     fp["config"] = config
@@ -301,7 +307,6 @@ def dependency_fingerprint_for_ability(ability_id: str, resolvers: Dict[str, Dic
         fp["buffs"] = {x: resolvers["Buff"].get(x) for x in sorted(refs) if x in resolvers["Buff"]}
         fp["attackScalors"] = {x: resolvers["AttackScalor"].get(x) for x in sorted(refs) if x in resolvers["AttackScalor"]}
         fp["conditions"] = {x: resolvers["MonsterConditions"].get(x) for x in sorted(refs) if x in resolvers["MonsterConditions"]}
-    fp["localization"] = localized(resolvers["Localizable"], ability_id)
     return fp
 
 
@@ -309,22 +314,14 @@ def build_source_marker(item: Optional[Dict[str, Any]], category: str, internal_
     if item is None:
         material = {"placeholder": True, "category": category, "internalId": internal_id, "order": order_index, "displayName": display_name, "scriptVersion": SCRIPT_VERSION}
         return {"scriptVersion": SCRIPT_VERSION, "sourceHash": sha256_data(material), "dependencyHash": None}
-
     active_ids = [x for x in ordered_values(item.get("activeSkills", [])) if isinstance(x, str)]
     passive_ids = [x for x in ordered_values(item.get("passives", item.get("passiveSkills", []))) if isinstance(x, str)]
-    active_ai = item.get("activeSkillsAI", {}) if isinstance(item.get("activeSkillsAI"), dict) else {}
     dependency_material = {
         "abilities": {x: dependency_fingerprint_for_ability(x, resolvers) for x in active_ids + passive_ids},
-        "ai": {k: resolvers["AbilityAI"].get(v) for k, v in active_ai.items() if isinstance(v, str)},
-        "aiSequence": resolvers["AbilityAISequence"].get(item.get("aiSequence")) if isinstance(item.get("aiSequence"), str) else None,
         "leaderCondition": resolvers["MonsterConditions"].get(item.get("leaderBuffCondition")) if isinstance(item.get("leaderBuffCondition"), str) else None,
     }
     source_material = {"category": category, "internalId": internal_id, "order": order_index, "displayName": display_name, "raw": item, "scriptVersion": SCRIPT_VERSION}
-    return {
-        "scriptVersion": SCRIPT_VERSION,
-        "sourceHash": sha256_data(source_material),
-        "dependencyHash": sha256_data(dependency_material),
-    }
+    return {"scriptVersion": SCRIPT_VERSION, "sourceHash": sha256_data(source_material), "dependencyHash": sha256_data(dependency_material)}
 
 
 def existing_marker_matches(path: Path, marker: Dict[str, Any], force: bool) -> bool:
@@ -336,18 +333,15 @@ def existing_marker_matches(path: Path, marker: Dict[str, Any], force: bool) -> 
     old = existing.get("_build")
     if not isinstance(old, dict):
         return False
-    return (
-        old.get("scriptVersion") == marker.get("scriptVersion") and
-        old.get("sourceHash") == marker.get("sourceHash") and
-        old.get("dependencyHash") == marker.get("dependencyHash")
-    )
+    return old.get("scriptVersion") == marker.get("scriptVersion") and old.get("sourceHash") == marker.get("sourceHash") and old.get("dependencyHash") == marker.get("dependencyHash")
 
 
 def resolve_ability(ability_id: str, resolvers: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
     ability = resolvers["Ability"].get(ability_id)
-    result: Dict[str, Any] = {"id": ability_id, "found": bool(ability)}
+    result: Dict[str, Any] = localize_ability_like(resolvers["Localizable"], ability_id)
     if not isinstance(ability, dict):
         return result
+    result["found"] = True
     result["ability"] = ability
     config_id = ability.get("config")
     config = resolvers["AbilityConfig"].get(config_id) if isinstance(config_id, str) else None
@@ -360,9 +354,6 @@ def resolve_ability(ability_id: str, resolvers: Dict[str, Dict[str, Any]]) -> Di
         result["buffs"] = {x: resolvers["Buff"].get(x) for x in sorted(refs) if x in resolvers["Buff"]}
         result["attackScalors"] = {x: resolvers["AttackScalor"].get(x) for x in sorted(refs) if x in resolvers["AttackScalor"]}
         result["conditions"] = {x: resolvers["MonsterConditions"].get(x) for x in sorted(refs) if x in resolvers["MonsterConditions"]}
-    loc = localized(resolvers["Localizable"], ability_id)
-    if loc:
-        result["localization"] = loc
     return result
 
 
@@ -378,22 +369,14 @@ def resolve_sequence(seq_id: str, resolvers: Dict[str, Dict[str, Any]]) -> Dict[
 
 def make_placeholder(category: str, internal_id: str, display_name: Optional[str], order_index: int, marker: Dict[str, Any]) -> Dict[str, Any]:
     name = display_name or internal_id
-    return {
-        "schemaVersion": 3,
-        "order": order_index,
-        "id": kebab_name(name),
-        "name": name,
-        "category": category[:-1] if category.endswith("s") else category,
-        "image": image_url(category, internal_id),
-        "placeholder": True,
-        "internal": {"sourceId": internal_id, "source": "missing_from_raw_placeholder"},
-        "_build": {**marker, "generatedAt": now_int()},
-    }
+    return {"schemaVersion": 3, "order": order_index, "id": kebab_name(name), "name": name, "category": category[:-1] if category.endswith("s") else category, "image": image_url(category, internal_id), "placeholder": True, "internal": {"sourceId": internal_id, "source": "missing_from_raw_placeholder"}, "_build": {**marker, "generatedAt": now_int()}}
 
 
 def normalize_entry(item: Dict[str, Any], category: str, order_index: int, display_name_override: Optional[str], resolvers: Dict[str, Dict[str, Any]], marker: Dict[str, Any]) -> Dict[str, Any]:
     internal_id = get_internal_id(item)
-    display_name = display_name_override or item.get("displayName") or item.get("title") or item.get("name") or internal_id
+    localizable = resolvers["Localizable"]
+    display_name = display_name_override or localizable.get(f"{internal_id}NameKey") or item.get("displayName") or item.get("title") or item.get("name") or internal_id
+    title = localizable.get(f"{internal_id}TitleKey") or localizable.get(f"{internal_id}ProfileKey") or item.get("title") or ""
     active_ids = [x for x in ordered_values(item.get("activeSkills", [])) if isinstance(x, str)]
     passive_ids = [x for x in ordered_values(item.get("passives", item.get("passiveSkills", []))) if isinstance(x, str)]
     active_ai = item.get("activeSkillsAI", {}) if isinstance(item.get("activeSkillsAI"), dict) else {}
@@ -402,6 +385,7 @@ def normalize_entry(item: Dict[str, Any], category: str, order_index: int, displ
         "order": order_index,
         "id": kebab_name(str(display_name)),
         "name": display_name,
+        "title": title,
         "category": category[:-1] if category.endswith("s") else category,
         "rarity": item.get("rarity"),
         "stars": item.get("stars"),
@@ -434,13 +418,11 @@ def build_category(input_dir: Path, output_dir: Path, category: str, resolvers: 
     raw_path = find_file(input_dir, CATEGORY_FILES[category])
     if not raw_path:
         return {"category": category, "status": "missing_raw_file", "entriesWritten": 0, "entriesSkipped": 0, "placeholdersWritten": 0}
-
     raw = load_json(raw_path)
     items = extract_list(raw, category)
     by_id = {get_internal_id(item): item for item in items}
     ordered: List[Tuple[str, Optional[str]]] = []
     seen: Set[str] = set()
-
     for internal_id, display_name in load_order(input_dir, category):
         if internal_id not in seen:
             ordered.append((internal_id, display_name)); seen.add(internal_id)
@@ -448,34 +430,27 @@ def build_category(input_dir: Path, output_dir: Path, category: str, resolvers: 
         internal_id = get_internal_id(item)
         if internal_id not in seen:
             ordered.append((internal_id, None)); seen.add(internal_id)
-
     category_dir = output_dir / category
     entries_dir = category_dir / "entries"
     entries_dir.mkdir(parents=True, exist_ok=True)
-
     index_entries = []
     written = skipped = placeholders = processed_this_run = 0
     start_allowed = start_after is None
-
     checkpoint = {"scriptVersion": SCRIPT_VERSION, "category": category, "status": "running", "startedAt": now_int(), "lastCompletedSourceId": None, "lastCompletedOrder": None}
     update_checkpoint(output_dir, checkpoint)
-
     for order_index, (internal_id, display_name) in enumerate(ordered, start=1):
         filename = f"{order_index:04d}_{slugify(internal_id)}.json"
         entry_path = entries_dir / filename
         item = by_id.get(internal_id)
         marker = build_source_marker(item, category, internal_id, order_index, display_name, resolvers)
-
         if not start_allowed:
             if internal_id == start_after:
                 start_allowed = True
             index_entries.append({"order": order_index, "sourceId": internal_id, "name": display_name or internal_id, "file": f"entries/{filename}", "placeholder": item is None, "image": image_url(category, internal_id)})
             continue
-
         if limit is not None and processed_this_run >= limit:
             index_entries.append({"order": order_index, "sourceId": internal_id, "name": display_name or internal_id, "file": f"entries/{filename}", "placeholder": item is None, "image": image_url(category, internal_id)})
             continue
-
         if existing_marker_matches(entry_path, marker, force):
             skipped += 1
             existing = try_load_json(entry_path) or {}
@@ -493,17 +468,13 @@ def build_category(input_dir: Path, output_dir: Path, category: str, resolvers: 
             entry_name = entry.get("name")
             is_placeholder = bool(entry.get("placeholder"))
             image = entry.get("image")
-
         processed_this_run += 1
         checkpoint.update({"lastCompletedSourceId": internal_id, "lastCompletedOrder": order_index, "updatedAt": now_int(), "written": written, "skipped": skipped})
         update_checkpoint(output_dir, checkpoint)
-
         index_entries.append({"order": order_index, "sourceId": internal_id, "name": entry_name, "file": f"entries/{filename}", "placeholder": is_placeholder, "image": image})
-
     write_json_if_changed(category_dir / "index.json", {"schemaVersion": 3, "category": category, "sourceFile": str(raw_path.relative_to(input_dir)), "count": len(index_entries), "placeholders": placeholders, "entries": index_entries})
     checkpoint.update({"status": "complete", "completedAt": now_int()})
     update_checkpoint(output_dir, checkpoint)
-
     return {"category": category, "status": "ok", "rawFile": str(raw_path), "rawEntries": len(items), "totalEntries": len(ordered), "entriesWritten": written, "entriesSkipped": skipped, "processedThisRun": processed_this_run, "placeholdersWritten": placeholders, "output": str(category_dir)}
 
 
@@ -525,22 +496,17 @@ def main() -> int:
     parser.add_argument("--limit", type=int, default=None)
     parser.add_argument("--start-after", default=None)
     args = parser.parse_args()
-
     input_dir = Path(args.input).resolve()
     output_dir = Path(args.output).resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
-
     resolvers = load_resolvers(input_dir)
     resolver_summary = write_resolver_indexes(output_dir, resolvers)
-
     categories = [args.category] if args.category else ["characters", "weapons", "accessories", "bosses"]
     reports = [build_category(input_dir, output_dir, c, resolvers, args.force, args.limit, args.start_after) for c in categories]
-
     report = {"schemaVersion": 3, "scriptVersion": SCRIPT_VERSION, "input": str(input_dir), "output": str(output_dir), "resolverCounts": resolver_summary, "categories": reports}
     write_json_if_changed(output_dir / "reports" / "build_report.json", report)
     print(json.dumps(report, ensure_ascii=False, indent=2))
     return 0
-
 
 if __name__ == "__main__":
     raise SystemExit(main())
