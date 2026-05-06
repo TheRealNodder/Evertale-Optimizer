@@ -1,6 +1,6 @@
 {
 	"Version": 23,
-	"Time": 1775107867,
+	"Time": 1777345296,
 	"AbilityConfig": {
 		"StunSingle200A": {
 			"class": "AbilityConfig",
@@ -44644,6 +44644,609 @@
 			"sourceEventType": "Finish",
 			"abilityEffect": "WashingtonSpecial",
 			"useCondition": "IsNotActive4LOCKWashingtonRegular"
+		},
+		"SingleAttackASnowWhiteNewBoss": {
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage","ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"applyToTargetType": "Enemy",
+				"damageFlags": ["IgnoreArmor","IgnoreSkin","HardIgnoreBlockDeath"]
+			},{
+				"buffs": ["RemoveBurn","RemoveSleep","BurnImmunityTempForRevenge","LethalPoison"],
+				"chance": 1.0,
+				"applyToTargetType": "Enemy",
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["Add1DeathMinionToRandomReinforcementsEOT"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss",
+				"applyConditions": "IsEnemyHasReinforcementsCheck"
+			},{
+				"buffs": ["RemoveActive3LOCKSnowWhiteNewBoss"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"attackScalors":["TimeInCombat100","TimeInCombat200"],
+			"conditionedAbilityEffects": ["SnowWhiteNewAttack1","SnowWhiteNewAttack1"],
+			"flags": ["Summon","Poisoner"],
+			"recommendEffectWhenUsable": -2,
+			"abilityEffect": "SnowWhiteNewAttack1"
+		},
+		"BloodyBuffASnowWhiteNewBoss": {
+			"class": "AbilityConfig",
+			"targetingData": "AllAlly",
+			"components": ["ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"buffs": ["EmptyPlaceholder"],
+				"applyToTargetType": "Friendly",
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"randomBuffFromList": ["Add1ExcaliburTokenToEndBoss","Add1SuperLifeBossMinionToEnd"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss",
+				"applyConditions": "NoTokenLastInReinforcements"
+			},{
+				"randomBuffFromList": ["Add1ExcaliburTokenToEndBoss","Add1SuperLifeBossMinionToEnd"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss",
+				"applyConditions": "NoTokenLastInReinforcements"
+			},{
+				"randomBuffFromList": ["Add1ExcaliburTokenToEndBoss","Add1SuperLifeBossMinionToEnd"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss",
+				"applyConditions": "NoTokenLastInReinforcements"		
+			},{
+				"buffs": ["TokenElementCheckSnowWhiteNew","SacLastReinforcement"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss",
+				"applyConditions": "AllyHasReinforcementsTokenInBack"
+			},{
+				"buffs": ["SnowWhiteNewBossActive2Cooldown50","RemoveActive3LOCKSnowWhiteNewBoss"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			}],
+			"friendlyEventType": "Finish",
+			"sourceEventType": "Finish",
+			"abilityEffect": "SnowWhiteNewMori",
+			"flags": ["Devour","Summon","SleepChance","NoDamage"],
+			"useCondition": "NotInstantCooldown"
+		},
+		"AllyBuffASnowWhiteNewBoss": {
+			"class": "AbilityConfig",
+			"targetingData": "All",
+			"components": ["ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"buffs": ["EmptyPlaceholder"],
+				"applyToTargetType": "Friendly",
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs": ["Active3LOCKSnowWhiteNewBoss","KillRandomEnemyEOTAndCreditKillSnowWhiteNewBossLV4","KillRandomEnemyEOTAndCreditKillSnowWhiteNewBossLV3","KillRandomEnemyEOTAndCreditKillSnowWhiteNewBossLV2","KillRandomEnemyEOTAndCreditKillSnowWhiteNewBossLV1","UsedAbilityCounter"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"	
+			}],
+			"enemyEventType": "Hit",
+			"friendlyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "SnowWhiteNewWhiteSnow",
+			"flags": ["NoDamage"],
+			"useCondition": "IsNotActive3LOCKSnowWhiteNew"
+		},
+		"SpecialAttackASnowWhiteNewBoss": {
+			"class": "AbilityConfig",
+			"targetingData": "2RandomEnemy",
+			"components": ["Damage","ApplyBuff"],
+			"componentOverrides": [{
+				"damageFlags": ["IgnoreArmor","HardIgnoreBlockDeath"],
+				"applyToTargetType": "Enemy"
+			},{
+				"buffs": ["RemoveActive3LOCKSnowWhiteNewBoss"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			}],
+			"enemyEventType": "Hit",
+			"friendlyEventType": "Finish",
+			"sourceEventType": "Finish",
+			"abilityEffect": "SnowWhiteNewSpecial",
+			"useCondition": "IsWorldDeathCounter5"
+		},
+		"HealBombSingleAlly25PercentHealABoss": {
+			"class": "AbilityConfig",
+			"targetingData": "oneAllyNotMe",
+			"components": ["ApplyBuff", "ChanceToDie"],
+			"componentOverrides": [{
+				"buffs": ["QuarterHeal"],
+				"applyToTargetType": "Friendly",
+				"showMissConditions": "ShowNoMiss"
+			}, {
+				"chance": 1.0
+			}],
+			"friendlyEventType": "Finish",
+			"sourceEventType": "Hit",
+			"flags": ["Healer"],
+			"recommendEffectWhenUsable": 1,
+			"abilityEffect": "MidLife1",
+			"killsUser": true,
+			"ignoreEffectForSourceEvent": true
+		},
+		"SingleAttackABeautyRegularBoss": {
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage", "ApplyBuff"],
+			"componentOverrides": [{
+				"applyToTargetType": "Enemy",
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"damageFlags": ["RemoveBeautyExtraDefeat","IgnoreSkin","IgnoreArmor"]
+			},{
+				"randomBuffFromList": ["LethalPoison","MegaPoison"],
+				"buffs": ["BurnImmunityTempForRevenge"],
+				"applyToTargetType": "Enemy",
+				"showMissConditions": "ShowNoMiss",
+				"skipAbilityEffect": true
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "BeautyAttack",
+			"attackScalors": ["GoodWithPoisonEnemy"],
+			"conditionedAbilityEffects": ["BeautyAttack","BeautyAttack"],
+			"recommendEffectWhenUsable": -1
+		},
+		"BuffABeautyRegularBoss": {
+			"class": "AbilityConfig",
+			"targetingData": "All",
+			"components": ["ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"buffs": ["EmptyPlaceholder"],
+				"applyToTargetType": "Friendly",
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs": ["AttackPlus50Percent1TurnOnly"],
+				"applyToTargetType": "Friendly",
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss",
+				"applyConditions": "IsNotBurning"
+			},{
+				"buffs": ["HasteUp30Percent"],
+				"applyToTargetType": "Friendly",
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss",
+				"applyConditions": "2EnemiesPoisoned"
+			},{
+				"randomBuffFromList": ["LethalPoison","MegaPoison"],
+				"buffs": ["BurnImmunityTempForRevenge"],
+				"applyToTargetType": "Enemy",
+				"showMissConditions": "ShowNoMiss",
+				"applyConditions": "LessThan2AlliesPoisoned"
+			},{
+				"buffs": ["BeautyRegularBossActive2Cooldown50"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			}],
+			"friendlyEventType": "Finish",
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"flags": ["NoDamage","PoisonChance"],
+			"abilityEffect": "BeautyBuffVersion2",
+			"useCondition": "NotInstantCooldown"
+		},
+		"BigSingleAttackABeautyRegularBoss01": {
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage","ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"damageFlags": ["RemoveBeautyExtraDefeat","IgnoreArmor"],
+				"applyToTargetType": "Enemy"
+			},{
+				"buffs": ["BurnImmunityTempForRevenge","LethalPoison","MegaPoison"],
+				"applyToTargetType": "Enemy",
+				"showMissConditions": "ShowNoMiss",
+				"skipAbilityEffect": true	
+			},{
+				"buffs": ["HijikataCounter","HijikataCounterFuseAfterTime"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["BeautyRegularBossActive3Cooldown25"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"applyConditions": "IsHijikataCharged2",
+				"showMissConditions": "ShowNoMiss"	
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "BeautyMultiSlash",
+			"flags": ["IsTheBeautyRegular01"],
+			"recommendEffectWhenUsable": -1,
+			"useCondition": "BeastRegularAllyAndNotInstantCooldown2"
+		},
+		"BigSingleAttackABeautyRegularBoss02": {
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage","ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"damageFlags": ["RemoveBeautyExtraDefeat","IgnoreArmor"],
+				"applyToTargetType": "Enemy"
+			},{
+				"buffs": ["BurnImmunityTempForRevenge","LethalPoison","MegaPoison"],
+				"applyToTargetType": "Enemy",
+				"showMissConditions": "ShowNoMiss",
+				"skipAbilityEffect": true	
+			},{
+				"buffs": ["HijikataCounter","HijikataCounterFuseAfterTime"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["BeautyRegularBossActive3Cooldown25"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"applyConditions": "IsHijikataCharged2",
+				"showMissConditions": "ShowNoMiss"	
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "BeautyMultiSlash",
+			"flags": ["IsTheBeautyRegular02"],
+			"recommendEffectWhenUsable": -1,
+			"useCondition": "BeastRegularAllyAndNotInstantCooldown2"
+		},
+		"SpecialSingleAttackABeautyRegularBoss": {
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage"],
+			"componentOverrides": [{
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"applyToTargetType": "Enemy",
+				"damageFlags": ["HardIgnoreBlockDeath","IgnoreArmor","IgnoreSkin"]
+			}],
+			"enemyEventType": "Hit",
+			"attackScalors":["GoodVsMegaPoisoned","GoodVsLethalPoison"],
+			"conditionedAbilityEffects": ["BeautySpecial","BeautySpecial"],
+			"abilityEffect": "BeautySpecial",
+			"recommendEffectWhenUsable": -2,
+			"useCondition": "1AllyIsKills1"
+		},
+		"SingleAttackABeastRegularBoss": {
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage", "ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"applyToTargetType": "Enemy",
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"damageFlags": ["IgnoreArmor","IgnoreSkin","HardIgnoreBlockDeath"]
+			},{
+				"buffs": ["RemoveBurn","BurnImmunityTempForRevenge"],
+				"chance": 1.0,
+				"applyToTargetType": "Enemy",
+				"skipAbilityEffect": true
+			},{
+				"randomBuffFromList": ["MegaPoison","LethalPoison"],
+				"applyToTargetType": "Enemy",
+				"skipAbilityEffect": true
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "BeastAttack1",
+			"attackScalors": ["GoodVs1NotPoisonedEnemy","GoodVs2NotPoisonedEnemies","GoodVs3NotPoisonedEnemies","GoodVs4NotPoisonedEnemies"],
+			"conditionedAbilityEffects": ["BeastAttack1","BeastAttack1","BeastAttack1","BeastAttack1"],
+			"flags": ["Poisoner"],
+			"recommendEffectWhenUsable": -1
+		},
+		"AllAttackABeastRegularBoss": {
+			"class": "AbilityConfig",
+			"targetingData": "AllEnemy",
+			"components": ["Damage","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"damageFlags": ["IgnoreArmor", "IgnoreSkin"],
+				"applyToTargetType": "Enemy"
+			},{
+				"randomBuffFromList": ["MegaPoison","LethalPoison"],
+				"buffs": ["BurnImmunityTempForRevenge"],
+				"applyToTargetType": "Enemy",
+				"skipAbilityEffect": true	
+			},{
+				"buffs": ["BeastRegularBossActive2Cooldown30"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "BeastRoseAttack1",
+			"useCondition": "LessThan2EnemiesPoisonedAndNotInstantCooldown"
+		},
+		"RevivalBuffABeastRegularBoss": {
+			"class": "AbilityConfig",
+			"targetingData": "oneAllyNotMe",
+			"components": ["ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"buffs": ["AddTheBeautyRegularBoss03Next"],
+				"applyToTargetOnly": true,
+				"buffBackMode": true,
+				"skipAbilityEffect": true,
+				"applyConditions": "AtLeast4AlliesLeft",
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs": ["SendToFrontOfReinforcements", "RemoveBuffs"],
+				"applyToTargetOnly": true,
+				"skipAbilityEffect": true,
+				"buffAppliedEffects": ["StepBackEffect"],
+				"applyConditions": "AtLeast4AlliesLeftNotKnockbackImmune",
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs": ["AddTheBeautyRegularBoss03Next"],
+				"applyConditions": "3OrFewerAlliesLeft",
+				"applyToTargetOnly": true,
+				"skipAbilityEffect": true,
+				"buffBackMode": true,
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs": ["Empty"],
+				"applyToSourceOnly": true
+			}],
+			"friendlyEventType": "Finish",
+			"sourceEventType": "Hit",
+			"recommendEffectWhenUsable":-1,
+			"useCondition": "NoTheBeautyRegularInTeam",
+			"abilityEffect": "BeastRevive",
+			"flags": ["Summon", "NoDamage"]
+		},
+		"SingleAttackAKintaroRegularBoss":{
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"damageBoosts": ["GenericDamageBoost"],
+				"damageFlags": ["IgnoreArmor","IgnoreSkin","DoNotWake"],
+				"applyToTargetType": "Enemy"
+			},{
+				"buffs": ["InstantKillAndCreditSource"],
+				"applyConditions": "On1HPIsNotBossAndNotMirage",
+				"applyToTargetType": "Enemy",
+				"showMissConditions": "ShowNoMiss",
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["MegaPoison","BurnImmunityTempForRevenge"],
+				"applyToTargetType": "Enemy",
+				"showMissConditions": "ShowNoMiss",
+				"skipAbilityEffect": true,
+				"applyConditions": "IsNotSleeping"
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "KintaroAttack1",
+			"attackScalors": ["GoodWith1BadHealthAlly","GoodWith2BadHealthAllies","GoodWith3BadHealthAllies","GoodWith4BadHealthAllies"],
+			"conditionedAbilityEffects": ["KintaroAttack1","KintaroAttack1","KintaroAttack1","KintaroAttack1"],
+			"recommendEffectWhenUsable": 1
+		},
+		"IntimidateBuffAKintaroRegularBoss":{
+			"class": "AbilityConfig",
+			"targetingData": "AllEnemy",
+			"components": ["ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides":[{
+				"buffs": ["RemoveStealth","AttackMinus25Percent1TurnOnly"],
+				"applyToTargetType": "Enemy",
+				"buffAppliedEffects": ["Weak1"]
+			},{
+				"buffs": ["AttackPlus50Percent1TurnOnly","KintaroRegularBossActive2Cooldown50"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs": ["SpiritLossEContra"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"applyConditions": "EnemySpiritLower",
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs": ["SpiritGainI","SpiritGainI"],
+				"buffBackMode": true,
+				"applyConditions": "EnemySpiritLower",
+				"applyToTargetOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			}],
+			"enemyEventType": "Finish",
+			"sourceEventType": "Finish",
+			"flags": ["NoDamage"],
+			"abilityEffect": "KintaroHorror",
+			"useCondition": "NotInstantCooldown"
+		},
+		"BigBuffAKintaroRegularBoss":{
+			"class": "AbilityConfig",
+			"targetingData": "AllAlly",
+			"components": ["ApplyBuff","ApplyBuff"],
+			"componentOverrides":[{
+				"buffs": ["Active3LOCKKintaroRegularBoss","StoreEnergy","StoreEnergy","StoreEnergy"],
+				"applyToTargetType": "Source"
+			},{
+				"buffs": ["SleepThorns"],
+				"applyToTargetType": "Friendly",
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			}],
+			"friendlyEventType": "Finish",
+			"sourceEventType": "Finish",
+			"flags": ["NoDamage"],
+			"abilityEffect": "KintaroBuff",
+			"useCondition": "IsNotActive3LOCKKintaroRegular"
+		},
+		"MultiAttackAKintaroRegularBoss":{
+			"class": "AbilityConfig",
+			"targetingData": "2Enemy",
+			"components": ["Damage","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"damageBoosts": ["GenericDamageBoost"],
+				"applyToTargetType": "Enemy",
+				"damageFlags": ["HardIgnoreBlockDeath","IgnoreArmor","DoNotWake"]
+			},{
+				"buffs": ["MegaPoison","BurnImmunityTempForRevenge"],
+				"applyToTargetType": "Enemy",
+				"showMissConditions": "ShowNoMiss",
+				"skipAbilityEffect": true,
+				"applyConditions": "IsNotSleeping"	
+			},{
+				"buffs":["Active4LOCKKintaroRegularBoss"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Hit",
+			"abilityEffect": "KintaroSpecial",
+			"attackScalors": ["GoodVsNotBurning"],
+			"conditionedAbilityEffects": ["KintaroSpecial","KintaroSpecial"],
+			"useCondition": "IsNotActive4LOCKKintaroRegular"
+		},
+		"SingleAttackASnowWhiteNew": {
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage","ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"applyToTargetType": "Enemy",
+				"damageFlags": ["IgnoreArmor","IgnoreSkin","HardIgnoreBlockDeath"]
+			},{
+				"buffs": ["RemoveBurn","RemoveSleep","BurnImmunityTempForRevenge","LethalPoison"],
+				"chance": 1.0,
+				"applyToTargetType": "Enemy",
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["Add1DeathMinionToRandomReinforcementsEOT"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss",
+				"applyConditions": "IsEnemyHasReinforcementsCheck"
+			},{
+				"buffs": ["RemoveActive3LOCKSnowWhiteNew"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"attackScalors":["TimeInCombat100","TimeInCombat200"],
+			"conditionedAbilityEffects": ["SnowWhiteNewAttack1","SnowWhiteNewAttack1"],
+			"flags": ["Summon","Poisoner"],
+			"recommendEffectWhenUsable": -2,
+			"abilityEffect": "SnowWhiteNewAttack1"
+		},
+		"BloodyBuffASnowWhiteNew": {
+			"class": "AbilityConfig",
+			"targetingData": "AllAlly",
+			"components": ["ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"buffs": ["EmptyPlaceholder"],
+				"applyToTargetType": "Friendly",
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"randomBuffFromList": ["Add1ExcaliburTokenToEnd","Add1SuperLifeMinionToEnd"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss",
+				"applyConditions": "NoTokenLastInReinforcements"
+			},{
+				"randomBuffFromList": ["Add1ExcaliburTokenToEnd","Add1SuperLifeMinionToEnd"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss",
+				"applyConditions": "NoTokenLastInReinforcements"
+			},{
+				"randomBuffFromList": ["Add1ExcaliburTokenToEnd","Add1SuperLifeMinionToEnd"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss",
+				"applyConditions": "NoTokenLastInReinforcements"		
+			},{
+				"buffs": ["TokenElementCheckSnowWhiteNew","SacLastReinforcement"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss",
+				"applyConditions": "AllyHasReinforcementsTokenInBack"
+			},{
+				"buffs": ["SnowWhiteNewActive2Cooldown50","RemoveActive3LOCKSnowWhiteNew"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			}],
+			"friendlyEventType": "Finish",
+			"sourceEventType": "Finish",
+			"abilityEffect": "SnowWhiteNewMori",
+			"flags": ["Devour","Summon","SleepChance","NoDamage"],
+			"useCondition": "NotInstantCooldown"
+		},
+		"AllyBuffASnowWhiteNew": {
+			"class": "AbilityConfig",
+			"targetingData": "All",
+			"components": ["ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"buffs": ["RemoveSleep","RemovePoison","Heal500Percent"],
+				"applyToTargetType": "Friendly",
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs": ["Active3LOCKSnowWhiteNew","KillRandomEnemyEOTAndCreditKillSnowWhiteNewLV4","KillRandomEnemyEOTAndCreditKillSnowWhiteNewLV3","KillRandomEnemyEOTAndCreditKillSnowWhiteNewLV2","KillRandomEnemyEOTAndCreditKillSnowWhiteNewLV1","UsedAbilityCounter"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"	
+			}],
+			"enemyEventType": "Hit",
+			"friendlyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "SnowWhiteNewWhiteSnow",
+			"flags": ["NoDamage","Healer"],
+			"useCondition": "IsNotActive3LOCKSnowWhiteNew"
+		},
+		"SpecialAttackASnowWhiteNew": {
+			"class": "AbilityConfig",
+			"targetingData": "2RandomEnemy",
+			"components": ["Damage","ApplyBuff"],
+			"componentOverrides": [{
+				"damageFlags": ["IgnoreArmor","HardIgnoreBlockDeath"],
+				"applyToTargetType": "Enemy"
+			},{
+				"buffs": ["RemoveActive3LOCKSnowWhiteNew"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			}],
+			"enemyEventType": "Hit",
+			"friendlyEventType": "Finish",
+			"sourceEventType": "Finish",
+			"abilityEffect": "SnowWhiteNewSpecial",
+			"useCondition": "IsWorldDeathCounter5"
+		},
+		"HealBombSingleAllyA": {
+			"class": "AbilityConfig",
+			"targetingData": "oneAllyNotMe",
+			"components": ["ApplyBuff", "ChanceToDie"],
+			"componentOverrides": [{
+				"buffs": ["HealFull"],
+				"applyToTargetType": "Friendly",
+				"showMissConditions": "ShowNoMiss"
+			}, {
+				"chance": 1.0
+			}],
+			"friendlyEventType": "Finish",
+			"sourceEventType": "Hit",
+			"flags": ["Healer"],
+			"recommendEffectWhenUsable": 1,
+			"abilityEffect": "MidLife1",
+			"killsUser": true,
+			"ignoreEffectForSourceEvent": true
 		}
 	}
 }
