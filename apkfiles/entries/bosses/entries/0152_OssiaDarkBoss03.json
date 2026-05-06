@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 152,
-  "id": "ossia-dark-boss-03",
-  "name": "OssiaDarkBoss03",
+  "id": "mega-ossia",
+  "name": "Mega Ossia",
+  "title": "",
   "category": "bosse",
   "rarity": null,
   "stars": 6,
@@ -47,6 +48,10 @@
       "GainAttackSingleStealthAOssiaDarkBoss": {
         "id": "GainAttackSingleStealthAOssiaDarkBoss",
         "found": true,
+        "localization": {
+          "name": "GainAttackSingleStealthAOssiaDarkBoss",
+          "description": ""
+        },
         "ability": {
           "name": "GainAttackSingleStealthAOssiaDarkBoss",
           "class": "Ability",
@@ -316,6 +321,11 @@
       "MomentumBusterDoubleAOssiaDarkBoss": {
         "id": "MomentumBusterDoubleAOssiaDarkBoss",
         "found": true,
+        "localization": {
+          "name": "Combo Raid",
+          "description": "300% damage to 2 enemies. This attack ignores enemy damage reduction effects. Unlocked each time the user damages an enemy with another attack. This skill is locked again after each use or if the user leaves the battlefield.",
+          "selected": "300% damage, usable after another attack"
+        },
         "ability": {
           "name": "MomentumBusterDoubleAOssiaDarkBoss",
           "class": "Ability",
@@ -468,16 +478,16 @@
               "MomentumReady"
             ]
           }
-        },
-        "localization": {
-          "name": "Combo Raid",
-          "description": "300% damage to 2 enemies. This attack ignores enemy damage reduction effects. Unlocked each time the user damages an enemy with another attack. This skill is locked again after each use or if the user leaves the battlefield.",
-          "selected": "300% damage, usable after another attack"
         }
       },
       "SneakAttackDrainDoubleAOssiaDarkBoss": {
         "id": "SneakAttackDrainDoubleAOssiaDarkBoss",
         "found": true,
+        "localization": {
+          "name": "Stealth Drain",
+          "description": "300% damage to 2 enemies and heals the user for 10% of max HP if damage is dealt. Usable only if the user has the Stealth status effect. This attack ignores any enemy status effects (including Stealth), damage reduction effects, revenge passive skills, and skin passive skills.",
+          "selected": "300% damage, heals self, usable while stealthed"
+        },
         "ability": {
           "name": "SneakAttackDrainDoubleAOssiaDarkBoss",
           "class": "Ability",
@@ -785,16 +795,16 @@
               "Stealth"
             ]
           }
-        },
-        "localization": {
-          "name": "Stealth Drain",
-          "description": "300% damage to 2 enemies and heals the user for 10% of max HP if damage is dealt. Usable only if the user has the Stealth status effect. This attack ignores any enemy status effects (including Stealth), damage reduction effects, revenge passive skills, and skin passive skills.",
-          "selected": "300% damage, heals self, usable while stealthed"
         }
       },
       "SleepAllAOssiaDarkBoss": {
         "id": "SleepAllAOssiaDarkBoss",
         "found": true,
+        "localization": {
+          "name": "Sleep All",
+          "description": "Grants all enemies the Sleep status effect for 300TU, even if they have already slept while on the battlefield. This will overwrite other status effects on those units. Locked for 300TU after use.",
+          "selected": "Forces all enemies to sleep for 300TU"
+        },
         "ability": {
           "name": "SleepAllAOssiaDarkBoss",
           "class": "Ability",
@@ -1188,20 +1198,37 @@
               "or": {
                 "class": "MonsterConditions",
                 "monsterTags": [
-                  "SleepImmuneVsWater"
+                  "SleepImmuneIfBeastAlly"
                 ],
-                "checkEnemyTeamOfMonster": true,
-                "enemyTeamMonsterConditionMatchesNeeded": {
-                  "IsWater": 1
+                "checkReinforcementsForTeamConditionMatches": true,
+                "myTeamMonsterConditionMatchesNeeded": {
+                  "IsBeastRegular": 1
                 },
                 "or": {
                   "class": "MonsterConditions",
                   "monsterTags": [
-                    "NegativeStatusImmunityFromThorns"
+                    "SleepImmuneVsWater"
                   ],
-                  "buffStackNames": [
-                    "SleepThorns"
-                  ]
+                  "checkEnemyTeamOfMonster": true,
+                  "enemyTeamMonsterConditionMatchesNeeded": {
+                    "IsWater": 1
+                  },
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "SleepImmuneVs2Enemies"
+                    ],
+                    "enemyTeamSize": 2,
+                    "or": {
+                      "class": "MonsterConditions",
+                      "monsterTags": [
+                        "NegativeStatusImmunityFromThorns"
+                      ],
+                      "buffStackNames": [
+                        "SleepThorns"
+                      ]
+                    }
+                  }
                 }
               }
             }
@@ -1215,16 +1242,16 @@
               }
             }
           }
-        },
-        "localization": {
-          "name": "Sleep All",
-          "description": "Grants all enemies the Sleep status effect for 300TU, even if they have already slept while on the battlefield. This will overwrite other status effects on those units. Locked for 300TU after use.",
-          "selected": "Forces all enemies to sleep for 300TU"
         }
       },
       "DreamHuntDoubleOssiaDarkBoss": {
         "id": "DreamHuntDoubleOssiaDarkBoss",
         "found": true,
+        "localization": {
+          "name": "Dream Hunter",
+          "description": "600% damage to 2 enemies if they are sleeping. Allies gain 3 Spirit for each sleeping target.",
+          "selected": "600% damage & gain 3 Spirit per sleeping target"
+        },
         "ability": {
           "name": "DreamHuntDoubleOssiaDarkBoss",
           "class": "Ability",
@@ -1373,16 +1400,16 @@
               "Sleep"
             ]
           }
-        },
-        "localization": {
-          "name": "Dream Hunter",
-          "description": "600% damage to 2 enemies if they are sleeping. Allies gain 3 Spirit for each sleeping target.",
-          "selected": "600% damage & gain 3 Spirit per sleeping target"
         }
       },
       "PoisonAllAOssiaDarkBoss": {
         "id": "PoisonAllAOssiaDarkBoss",
         "found": true,
+        "localization": {
+          "name": "Poison Cloud",
+          "description": "Grants the Poison status effect to all enemies. This will overwrite other status effects on these units.",
+          "selected": "Poisons all enemies.\n(Will overwrite other status effects)"
+        },
         "ability": {
           "name": "PoisonAllAOssiaDarkBoss",
           "class": "Ability",
@@ -1657,16 +1684,16 @@
               }
             }
           }
-        },
-        "localization": {
-          "name": "Poison Cloud",
-          "description": "Grants the Poison status effect to all enemies. This will overwrite other status effects on these units.",
-          "selected": "Poisons all enemies.\n(Will overwrite other status effects)"
         }
       },
       "GrantProtectOtherAlliesA": {
         "id": "GrantProtectOtherAlliesA",
         "found": true,
+        "localization": {
+          "name": "Aeon Aegis",
+          "description": "All other allies become Guardians and gain 50% damage reduction from attacks. For enemy attacks that target 1 or 2 allies, each Guardian ally will redirect 1 hit that does not target a Guardian. This will not redirect skills that don't deal damage.",
+          "selected": "Other allies become Guardians"
+        },
         "ability": {
           "name": "GrantProtectOtherAlliesA",
           "class": "Ability",
@@ -1798,38 +1825,57 @@
           }
         },
         "attackScalors": {},
-        "conditions": {},
-        "localization": {
-          "name": "Aeon Aegis",
-          "description": "All other allies become Guardians and gain 50% damage reduction from attacks. For enemy attacks that target 1 or 2 allies, each Guardian ally will redirect 1 hit that does not target a Guardian. This will not redirect skills that don't deal damage.",
-          "selected": "Other allies become Guardians"
-        }
+        "conditions": {}
       }
     },
     "passives": {
       "RageStealthSpiritPoisonChanceOnHP50Percent": {
         "id": "RageStealthSpiritPoisonChanceOnHP50Percent",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Aeon Plaguebearer",
+          "description": "Whenever damage reduces this unit's HP to below 50% and it survives until after the end of the turn, each enemy that is not Sleeping or Burning has a 75% chance to become Poisoned. This will overwrite other status effects on those units. This unit will also gain the Stealth status effect, become Enraged (its Attack is increased to 1.5x until the end of its next turn) and Allies will gain 3 Spirit. This skill cannot trigger again until this unit recovers to above 50% of max HP."
+        }
       },
       "BlockDeathByBuffDamage": {
         "id": "BlockDeathByBuffDamage",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Unflinching",
+          "description": "This unit cannot be defeated by damage from the Poison or Burn status effects."
+        }
       },
       "GetTurnOnEnterBoss": {
         "id": "GetTurnOnEnterBoss",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Lightspeed Arrival",
+          "description": "This unit will immediately get the turn by having its TU reduced to 0 whenever it enters the battlefield."
+        }
       },
       "KnockbackImmunity": {
         "id": "KnockbackImmunity",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Immovable",
+          "description": "This unit cannot be sent to the reinforcements from the battlefield."
+        }
       },
       "StunImmunity": {
         "id": "StunImmunity",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Stun Immunity",
+          "description": "This unit is not affected by stun effects."
+        }
       },
       "SleepImmunity": {
         "id": "SleepImmunity",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Sleep Immunity",
+          "description": "This unit is not affected by sleep effects."
+        }
       }
     },
     "activeSkillsAI": {
@@ -1932,9 +1978,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "61f791eb531d45a9bfe20b2bd5ac9244793677fe540df5ef899d0acf7a9a3428",
-    "dependencyHash": "9e08384c7a40df968079495717e05fa4401d132b7875c6988e8a9d2e90c469fa",
-    "generatedAt": 1778014033
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "575e9c2fb942bf5e829634cb4fe95665e496c262b97b46e4714941cc39425aa1",
+    "dependencyHash": "cdb225bb6e705a30aa8353b28fa1813d865f5ccceb5be96c99a4b03ef6ea5b34",
+    "generatedAt": 1778081775
   }
 }

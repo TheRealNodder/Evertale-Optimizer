@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 357,
-  "id": "axe-angel-01",
-  "name": "AxeAngel01",
+  "id": "eveline",
+  "name": "Eveline",
+  "title": "",
   "category": "character",
   "rarity": null,
   "stars": 4,
@@ -41,6 +42,11 @@
       "GainAttackSingleALife": {
         "id": "GainAttackSingleALife",
         "found": true,
+        "localization": {
+          "name": "Attack",
+          "description": "Damage to 1 enemy and allies gain 2 Spirit.",
+          "selected": "Damage to 1 enemy and gains 2 Spirit"
+        },
         "ability": {
           "name": "GainAttackSingleALife",
           "class": "Ability",
@@ -145,16 +151,16 @@
         },
         "buffs": {},
         "attackScalors": {},
-        "conditions": {},
-        "localization": {
-          "name": "Attack",
-          "description": "Damage to 1 enemy and allies gain 2 Spirit.",
-          "selected": "Damage to 1 enemy and gains 2 Spirit"
-        }
+        "conditions": {}
       },
       "SleepSingleA": {
         "id": "SleepSingleA",
         "found": true,
+        "localization": {
+          "name": "Sleep",
+          "description": "Grants 1 enemy the Sleep status effect for 200TU. This will overwrite other status effects on that unit. Sleep cannot be applied to a unit that Has Slept while on the battlefield.",
+          "selected": "Puts the target to sleep\n(Will overwrite other status effects)"
+        },
         "ability": {
           "name": "SleepSingleA",
           "class": "Ability",
@@ -431,34 +437,51 @@
               "or": {
                 "class": "MonsterConditions",
                 "monsterTags": [
-                  "SleepImmuneVsWater"
+                  "SleepImmuneIfBeastAlly"
                 ],
-                "checkEnemyTeamOfMonster": true,
-                "enemyTeamMonsterConditionMatchesNeeded": {
-                  "IsWater": 1
+                "checkReinforcementsForTeamConditionMatches": true,
+                "myTeamMonsterConditionMatchesNeeded": {
+                  "IsBeastRegular": 1
                 },
                 "or": {
                   "class": "MonsterConditions",
                   "monsterTags": [
-                    "NegativeStatusImmunityFromThorns"
+                    "SleepImmuneVsWater"
                   ],
-                  "buffStackNames": [
-                    "SleepThorns"
-                  ]
+                  "checkEnemyTeamOfMonster": true,
+                  "enemyTeamMonsterConditionMatchesNeeded": {
+                    "IsWater": 1
+                  },
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "SleepImmuneVs2Enemies"
+                    ],
+                    "enemyTeamSize": 2,
+                    "or": {
+                      "class": "MonsterConditions",
+                      "monsterTags": [
+                        "NegativeStatusImmunityFromThorns"
+                      ],
+                      "buffStackNames": [
+                        "SleepThorns"
+                      ]
+                    }
+                  }
                 }
               }
             }
           }
-        },
-        "localization": {
-          "name": "Sleep",
-          "description": "Grants 1 enemy the Sleep status effect for 200TU. This will overwrite other status effects on that unit. Sleep cannot be applied to a unit that Has Slept while on the battlefield.",
-          "selected": "Puts the target to sleep\n(Will overwrite other status effects)"
         }
       },
       "DreamHuntA2": {
         "id": "DreamHuntA2",
         "found": true,
+        "localization": {
+          "name": "Dream Hunter",
+          "description": "600% damage to 1 enemy if they are sleeping. Allies gain 4 Spirit if the target is asleep.",
+          "selected": "600% damage & gain 4 Spirit against sleeping target"
+        },
         "ability": {
           "name": "DreamHuntA2",
           "class": "Ability",
@@ -569,16 +592,15 @@
               "Sleep"
             ]
           }
-        },
-        "localization": {
-          "name": "Dream Hunter",
-          "description": "600% damage to 1 enemy if they are sleeping. Allies gain 4 Spirit if the target is asleep.",
-          "selected": "600% damage & gain 4 Spirit against sleeping target"
         }
       },
       "HighSpiritAttackAS1": {
         "id": "HighSpiritAttackAS1",
         "found": true,
+        "localization": {
+          "name": "HighSpiritAttackAS1",
+          "description": ""
+        },
         "ability": {
           "name": "HighSpiritAttackAS1",
           "class": "Ability",
@@ -641,23 +663,43 @@
     "passives": {
       "DamageReduceWhenAllySpiritHighLife": {
         "id": "DamageReduceWhenAllySpiritHighLife",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Spirit Armor",
+          "description": "50% damage reduction from attacks while allies have 7 or more spirit."
+        }
       },
       "PlusAttackBoostLv2": {
         "id": "PlusAttackBoostLv2",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv2",
+          "description": "Adds 200 to this unit's Attack."
+        }
       },
       "AttackUpTargetEquippedStaffLv2": {
         "id": "AttackUpTargetEquippedStaffLv2",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Staff Hunter Lv2",
+          "description": "7% bonus to attacks against units equipped with Staffs."
+        }
       },
       "PlusHPBoostLv2": {
         "id": "PlusHPBoostLv2",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv2",
+          "description": "Adds 800 to this unit's max HP."
+        }
       },
       "AddWeaponPrefSpear": {
         "id": "AddWeaponPrefSpear",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Spear Mastery",
+          "description": "Can use weapon skills of Spears in addition to their original preferred weapon type."
+        }
       }
     },
     "activeSkillsAI": {},
@@ -783,9 +825,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "28b945d11917b46b3b857b30a5371704910467fa12824872720def1371b03bbb",
-    "dependencyHash": "81e3a843ed61bae379e795fcaca84b35b39286746587bb455f5e2123f985fe0e",
-    "generatedAt": 1778013990
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "2abfe14a759d3b8ced0bf5bf4bfdfbd86c4910f88060830815d62679962d1281",
+    "dependencyHash": "5716151cdf55c65d9c890ca0eaa1cc9f29a7a9af1784a3bd9d35312932e21d0f",
+    "generatedAt": 1778081730
   }
 }

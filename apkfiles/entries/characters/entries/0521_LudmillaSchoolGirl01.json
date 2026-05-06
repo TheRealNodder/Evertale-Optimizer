@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 521,
-  "id": "ludmilla-school-girl-01",
-  "name": "LudmillaSchoolGirl01",
+  "id": "ludmilla-clarice",
+  "name": "Ludmilla & Clarice",
+  "title": "",
   "category": "character",
   "rarity": null,
   "stars": 5,
@@ -41,6 +42,11 @@
       "SleepAttackALudmillaSchool": {
         "id": "SleepAttackALudmillaSchool",
         "found": true,
+        "localization": {
+          "name": "Knockout Strike",
+          "description": "Damage to 1 enemy. 35% chance of forcing that enemy to Sleep for 200TU, even if it has already slept or is sleeping. If Sleep is applied, it will overwrite other status effects on that enemy. Damage from this attack does not wake up sleeping enemies.",
+          "selected": "Damage to 1 enemy, chance of forcing Sleep\n(Can overwrite other status effects)"
+        },
         "ability": {
           "name": "SleepAttackALudmillaSchool",
           "class": "Ability",
@@ -300,16 +306,16 @@
           }
         },
         "attackScalors": {},
-        "conditions": {},
-        "localization": {
-          "name": "Knockout Strike",
-          "description": "Damage to 1 enemy. 35% chance of forcing that enemy to Sleep for 200TU, even if it has already slept or is sleeping. If Sleep is applied, it will overwrite other status effects on that enemy. Damage from this attack does not wake up sleeping enemies.",
-          "selected": "Damage to 1 enemy, chance of forcing Sleep\n(Can overwrite other status effects)"
-        }
+        "conditions": {}
       },
       "DreamHuntDrainInstantALudmillaSchool": {
         "id": "DreamHuntDrainInstantALudmillaSchool",
         "found": true,
+        "localization": {
+          "name": "Instant Nightmare",
+          "description": "600% damage to 1 enemy if they are sleeping, this damage will not wake up the enemy. If damage is dealt to a sleeping target, the user recovers HP to 100% of its own max. This skill becomes locked for 100TU after use.",
+          "selected": "600% damage to sleeping target, does not wake"
+        },
         "ability": {
           "name": "DreamHuntDrainInstantALudmillaSchool",
           "class": "Ability",
@@ -472,16 +478,15 @@
               ]
             }
           }
-        },
-        "localization": {
-          "name": "Instant Nightmare",
-          "description": "600% damage to 1 enemy if they are sleeping, this damage will not wake up the enemy. If damage is dealt to a sleeping target, the user recovers HP to 100% of its own max. This skill becomes locked for 100TU after use.",
-          "selected": "600% damage to sleeping target, does not wake"
         }
       },
       "ForceSleepALudmillaSchool": {
         "id": "ForceSleepALudmillaSchool",
         "found": true,
+        "localization": {
+          "name": "ForceSleepALudmillaSchool",
+          "description": ""
+        },
         "ability": {
           "name": "ForceSleepALudmillaSchool",
           "class": "Ability",
@@ -878,20 +883,37 @@
               "or": {
                 "class": "MonsterConditions",
                 "monsterTags": [
-                  "SleepImmuneVsWater"
+                  "SleepImmuneIfBeastAlly"
                 ],
-                "checkEnemyTeamOfMonster": true,
-                "enemyTeamMonsterConditionMatchesNeeded": {
-                  "IsWater": 1
+                "checkReinforcementsForTeamConditionMatches": true,
+                "myTeamMonsterConditionMatchesNeeded": {
+                  "IsBeastRegular": 1
                 },
                 "or": {
                   "class": "MonsterConditions",
                   "monsterTags": [
-                    "NegativeStatusImmunityFromThorns"
+                    "SleepImmuneVsWater"
                   ],
-                  "buffStackNames": [
-                    "SleepThorns"
-                  ]
+                  "checkEnemyTeamOfMonster": true,
+                  "enemyTeamMonsterConditionMatchesNeeded": {
+                    "IsWater": 1
+                  },
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "SleepImmuneVs2Enemies"
+                    ],
+                    "enemyTeamSize": 2,
+                    "or": {
+                      "class": "MonsterConditions",
+                      "monsterTags": [
+                        "NegativeStatusImmunityFromThorns"
+                      ],
+                      "buffStackNames": [
+                        "SleepThorns"
+                      ]
+                    }
+                  }
                 }
               }
             }
@@ -901,6 +923,11 @@
       "BloodfuryBusterDoubleSLudmillaSchool": {
         "id": "BloodfuryBusterDoubleSLudmillaSchool",
         "found": true,
+        "localization": {
+          "name": "Savage Knockout",
+          "description": "500% damage to 2 enemies. Forces those enemies to Sleep for 200TU if they are left with 25% or less of max HP and are not already sleeping, even if they have already slept while on the battlefield. This attack ignores enemy damage reduction effects and the Stealth status effect. Damage from this attack does not wake up sleeping enemies. Sleep will overwrite other status effects on those enemies. Usable if the user has defeated 1+ units with attacks while on the battlefield.",
+          "selected": "500% damage to 2 enemies, can force them to Sleep\n(Will overwrite other status effects)"
+        },
         "ability": {
           "name": "BloodfuryBusterDoubleSLudmillaSchool",
           "class": "Ability",
@@ -1200,34 +1227,49 @@
             "class": "MonsterConditions",
             "killsMade": 1
           }
-        },
-        "localization": {
-          "name": "Savage Knockout",
-          "description": "500% damage to 2 enemies. Forces those enemies to Sleep for 200TU if they are left with 25% or less of max HP and are not already sleeping, even if they have already slept while on the battlefield. This attack ignores enemy damage reduction effects and the Stealth status effect. Damage from this attack does not wake up sleeping enemies. Sleep will overwrite other status effects on those enemies. Usable if the user has defeated 1+ units with attacks while on the battlefield.",
-          "selected": "500% damage to 2 enemies, can force them to Sleep\n(Will overwrite other status effects)"
         }
       }
     },
     "passives": {
       "KillGuardMode": {
         "id": "KillGuardMode",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Deadly Guard",
+          "description": "When this unit defeats an enemy unit with an attack while it is not a Guardian, it will become a Guardian. While this unit is a Guardian, it cannot be defeated by non-attack damage. If this unit would be defeated by an attack while it is a Guardian, this unit will stop being a Guardian and be healed for 100% of max HP.\n\nFor any enemy attack that would hit 1 or 2 other allies while this unit is a Guardian, 1 of the hits is instead redirected to this unit. This unit will not redirect skills that don't deal damage.\n\nThis unit cannot become a Guardian from other skills."
+        }
       },
       "PlusHPBoostLv3": {
         "id": "PlusHPBoostLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv3",
+          "description": "Adds 1200 to this unit's max HP."
+        }
       },
       "PlusAttackBoostLv3": {
         "id": "PlusAttackBoostLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv3",
+          "description": "Adds 300 to this unit's Attack."
+        }
       },
       "AttackUpTargetEquippedSpearLv3": {
         "id": "AttackUpTargetEquippedSpearLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Spear Hunter Lv3",
+          "description": "10% bonus to attacks against units equipped with Spears."
+        }
       },
       "AddWeaponPrefSpear": {
         "id": "AddWeaponPrefSpear",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Spear Mastery",
+          "description": "Can use weapon skills of Spears in addition to their original preferred weapon type."
+        }
       }
     },
     "activeSkillsAI": {},
@@ -1408,9 +1450,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "cfe4ecf7738a3378995bd97c0b5ee3ef5bebc85d2a16862fe2a65a6c4ec58f69",
-    "dependencyHash": "697782a13493a0c1c83d1fecd5bb9d517749c1101e8d57072cb8bdb86665f0d9",
-    "generatedAt": 1778013995
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "257ab66d5514618384444da2ea361f45352e6bb36f68398e8926f1d2eb780d5f",
+    "dependencyHash": "fa8724c6677093de39eff2ea2c66f5df67a0f3fcf096b06b95d8c59b53c04e78",
+    "generatedAt": 1778081735
   }
 }

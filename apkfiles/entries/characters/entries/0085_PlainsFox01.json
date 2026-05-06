@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 85,
-  "id": "plains-fox-01",
-  "name": "PlainsFox01",
+  "id": "erish",
+  "name": "Erish",
+  "title": "",
   "category": "character",
   "rarity": null,
   "stars": 4,
@@ -40,6 +41,11 @@
       "GainAttackSingleAEarth": {
         "id": "GainAttackSingleAEarth",
         "found": true,
+        "localization": {
+          "name": "Attack",
+          "description": "Damage to 1 enemy and allies gain 2 Spirit.",
+          "selected": "Damage to 1 enemy and gains 2 Spirit"
+        },
         "ability": {
           "name": "GainAttackSingleAEarth",
           "class": "Ability",
@@ -144,16 +150,16 @@
         },
         "buffs": {},
         "attackScalors": {},
-        "conditions": {},
-        "localization": {
-          "name": "Attack",
-          "description": "Damage to 1 enemy and allies gain 2 Spirit.",
-          "selected": "Damage to 1 enemy and gains 2 Spirit"
-        }
+        "conditions": {}
       },
       "SleepSingleA": {
         "id": "SleepSingleA",
         "found": true,
+        "localization": {
+          "name": "Sleep",
+          "description": "Grants 1 enemy the Sleep status effect for 200TU. This will overwrite other status effects on that unit. Sleep cannot be applied to a unit that Has Slept while on the battlefield.",
+          "selected": "Puts the target to sleep\n(Will overwrite other status effects)"
+        },
         "ability": {
           "name": "SleepSingleA",
           "class": "Ability",
@@ -430,34 +436,51 @@
               "or": {
                 "class": "MonsterConditions",
                 "monsterTags": [
-                  "SleepImmuneVsWater"
+                  "SleepImmuneIfBeastAlly"
                 ],
-                "checkEnemyTeamOfMonster": true,
-                "enemyTeamMonsterConditionMatchesNeeded": {
-                  "IsWater": 1
+                "checkReinforcementsForTeamConditionMatches": true,
+                "myTeamMonsterConditionMatchesNeeded": {
+                  "IsBeastRegular": 1
                 },
                 "or": {
                   "class": "MonsterConditions",
                   "monsterTags": [
-                    "NegativeStatusImmunityFromThorns"
+                    "SleepImmuneVsWater"
                   ],
-                  "buffStackNames": [
-                    "SleepThorns"
-                  ]
+                  "checkEnemyTeamOfMonster": true,
+                  "enemyTeamMonsterConditionMatchesNeeded": {
+                    "IsWater": 1
+                  },
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "SleepImmuneVs2Enemies"
+                    ],
+                    "enemyTeamSize": 2,
+                    "or": {
+                      "class": "MonsterConditions",
+                      "monsterTags": [
+                        "NegativeStatusImmunityFromThorns"
+                      ],
+                      "buffStackNames": [
+                        "SleepThorns"
+                      ]
+                    }
+                  }
                 }
               }
             }
           }
-        },
-        "localization": {
-          "name": "Sleep",
-          "description": "Grants 1 enemy the Sleep status effect for 200TU. This will overwrite other status effects on that unit. Sleep cannot be applied to a unit that Has Slept while on the battlefield.",
-          "selected": "Puts the target to sleep\n(Will overwrite other status effects)"
         }
       },
       "AccelerateSelfA": {
         "id": "AccelerateSelfA",
         "found": true,
+        "localization": {
+          "name": "Quicken",
+          "description": "User's TU costs for all of their skills are reduced by 20%. This will overwrite the effect of previous Quicken skills.",
+          "selected": "Reduces the TU costs of target's skills"
+        },
         "ability": {
           "name": "AccelerateSelfA",
           "class": "Ability",
@@ -600,16 +623,16 @@
           }
         },
         "attackScalors": {},
-        "conditions": {},
-        "localization": {
-          "name": "Quicken",
-          "description": "User's TU costs for all of their skills are reduced by 20%. This will overwrite the effect of previous Quicken skills.",
-          "selected": "Reduces the TU costs of target's skills"
-        }
+        "conditions": {}
       },
       "PushbackA": {
         "id": "PushbackA",
         "found": true,
+        "localization": {
+          "name": "Push Back",
+          "description": "Pushes 1 enemy away from the battlefield to be next in line of the enemy reinforcements. This skill can only be used if there are 1 or more enemy reinforcements left.",
+          "selected": "Sends target to be next in reinforcements"
+        },
         "ability": {
           "name": "PushbackA",
           "class": "Ability",
@@ -757,30 +780,41 @@
               "KnockbackImmune"
             ]
           }
-        },
-        "localization": {
-          "name": "Push Back",
-          "description": "Pushes 1 enemy away from the battlefield to be next in line of the enemy reinforcements. This skill can only be used if there are 1 or more enemy reinforcements left.",
-          "selected": "Sends target to be next in reinforcements"
         }
       }
     },
     "passives": {
       "PlusAttackBoostLv1": {
         "id": "PlusAttackBoostLv1",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv1",
+          "description": "Adds 150 to this unit's Attack."
+        }
       },
       "GreatSwordMinusDamageLv1": {
         "id": "GreatSwordMinusDamageLv1",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "G.sword Resist Lv1",
+          "description": "5% less damage from attacks by units equipped with Greatswords."
+        }
       },
       "PlusHPBoostLv1": {
         "id": "PlusHPBoostLv1",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv1",
+          "description": "Adds 600 to this unit's max HP."
+        }
       },
       "AddWeaponPrefSpear": {
         "id": "AddWeaponPrefSpear",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Spear Mastery",
+          "description": "Can use weapon skills of Spears in addition to their original preferred weapon type."
+        }
       }
     },
     "activeSkillsAI": {},
@@ -856,9 +890,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "d1e431bbf14c109b79765b02f8842f62a440aaa24337b0b62e7fd2f3da79b953",
-    "dependencyHash": "a32e98d3757c0332b67517208eff0caa8b0afb16df353c1942c0ccb94dd7d5c4",
-    "generatedAt": 1778013981
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "da33d20f5b8f49deefe4132dfb87a36fdf521d02db0aafa52f3874b3bc864e2c",
+    "dependencyHash": "4ef7d7d4ef834f310e4afa1f0d0d4006bbc562c21ac3aae8cf44b6bd542dcb17",
+    "generatedAt": 1778081722
   }
 }

@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 512,
-  "id": "ossia-dark-02",
-  "name": "OssiaDark02",
+  "id": "ossia",
+  "name": "Ossia",
+  "title": "",
   "category": "character",
   "rarity": null,
   "stars": 6,
@@ -42,6 +43,10 @@
       "GainAttackSingleStanceFastAOssiaDark": {
         "id": "GainAttackSingleStanceFastAOssiaDark",
         "found": true,
+        "localization": {
+          "name": "GainAttackSingleStanceFastAOssiaDark",
+          "description": ""
+        },
         "ability": {
           "name": "GainAttackSingleStanceFastAOssiaDark",
           "class": "Ability",
@@ -319,6 +324,11 @@
       "MomentumBusterLowHPDrainDoubleAOssiaDark": {
         "id": "MomentumBusterLowHPDrainDoubleAOssiaDark",
         "found": true,
+        "localization": {
+          "name": "Combo Reaper",
+          "description": "300% damage to 2 enemies. This attack ignores enemy damage reduction effects. Heals the user for 50% of max HP if the user is below 50% of max HP and damage is dealt. Unlocked each time the user damages an enemy with another attack. This skill is locked again after each use or if the user leaves the battlefield.",
+          "selected": "300% damage, can heal self when HP is low"
+        },
         "ability": {
           "name": "MomentumBusterLowHPDrainDoubleAOssiaDark",
           "class": "Ability",
@@ -507,16 +517,16 @@
               ]
             }
           }
-        },
-        "localization": {
-          "name": "Combo Reaper",
-          "description": "300% damage to 2 enemies. This attack ignores enemy damage reduction effects. Heals the user for 50% of max HP if the user is below 50% of max HP and damage is dealt. Unlocked each time the user damages an enemy with another attack. This skill is locked again after each use or if the user leaves the battlefield.",
-          "selected": "300% damage, can heal self when HP is low"
         }
       },
       "SneakStanceAttackDrainDoubleAOssiaDark": {
         "id": "SneakStanceAttackDrainDoubleAOssiaDark",
         "found": true,
+        "localization": {
+          "name": "Aeon Bane",
+          "description": "300% damage to 2 enemies and heals the user for 50% of max HP if damage is dealt. Usable only if the user has the Stealth or Counter Stance status effect. This attack ignores any enemy status effects (including Stealth), damage reduction effects, revenge passive skills, and skin passive skills.",
+          "selected": "300% damage, heals, needs Stealth/Counter Stance"
+        },
         "ability": {
           "name": "SneakStanceAttackDrainDoubleAOssiaDark",
           "class": "Ability",
@@ -827,16 +837,16 @@
               ]
             }
           }
-        },
-        "localization": {
-          "name": "Aeon Bane",
-          "description": "300% damage to 2 enemies and heals the user for 50% of max HP if damage is dealt. Usable only if the user has the Stealth or Counter Stance status effect. This attack ignores any enemy status effects (including Stealth), damage reduction effects, revenge passive skills, and skin passive skills.",
-          "selected": "300% damage, heals, needs Stealth/Counter Stance"
         }
       },
       "LimitBreakSleepDoubleAOssiaDark": {
         "id": "LimitBreakSleepDoubleAOssiaDark",
         "found": true,
+        "localization": {
+          "name": "Sleeping Death Mk2",
+          "description": "Grants 2 enemies the Sleep status effect for 300TU, even if they have already slept while on the battlefield. This sleep cannot be overwritten by Poison. This will overwrite other status effects on those units. Usable only if the user's party has 1 or less Spirit, and only once per battle.",
+          "selected": "Forces the targets to sleep for 300TU\n(Will overwrite other status effects)"
+        },
         "ability": {
           "name": "LimitBreakSleepDoubleAOssiaDark",
           "class": "Ability",
@@ -1222,56 +1232,92 @@
               "or": {
                 "class": "MonsterConditions",
                 "monsterTags": [
-                  "SleepImmuneVsWater"
+                  "SleepImmuneIfBeastAlly"
                 ],
-                "checkEnemyTeamOfMonster": true,
-                "enemyTeamMonsterConditionMatchesNeeded": {
-                  "IsWater": 1
+                "checkReinforcementsForTeamConditionMatches": true,
+                "myTeamMonsterConditionMatchesNeeded": {
+                  "IsBeastRegular": 1
                 },
                 "or": {
                   "class": "MonsterConditions",
                   "monsterTags": [
-                    "NegativeStatusImmunityFromThorns"
+                    "SleepImmuneVsWater"
                   ],
-                  "buffStackNames": [
-                    "SleepThorns"
-                  ]
+                  "checkEnemyTeamOfMonster": true,
+                  "enemyTeamMonsterConditionMatchesNeeded": {
+                    "IsWater": 1
+                  },
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "SleepImmuneVs2Enemies"
+                    ],
+                    "enemyTeamSize": 2,
+                    "or": {
+                      "class": "MonsterConditions",
+                      "monsterTags": [
+                        "NegativeStatusImmunityFromThorns"
+                      ],
+                      "buffStackNames": [
+                        "SleepThorns"
+                      ]
+                    }
+                  }
                 }
               }
             }
           }
-        },
-        "localization": {
-          "name": "Sleeping Death Mk2",
-          "description": "Grants 2 enemies the Sleep status effect for 300TU, even if they have already slept while on the battlefield. This sleep cannot be overwritten by Poison. This will overwrite other status effects on those units. Usable only if the user's party has 1 or less Spirit, and only once per battle.",
-          "selected": "Forces the targets to sleep for 300TU\n(Will overwrite other status effects)"
         }
       }
     },
     "passives": {
       "RageStealthSpiritPoisonChanceOnHP50PercentOssiaDark": {
         "id": "RageStealthSpiritPoisonChanceOnHP50PercentOssiaDark",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Aeon Plaguebearer+",
+          "description": "Whenever damage reduces this unit's HP to below 50%, each enemy that is not Sleeping or Burning has a 75% chance to become Poisoned. This will overwrite other status effects on those units. If this unit also survives until after the end of the turn it was damaged, it will gain the Stealth status effect, become Enraged (its Attack is increased to 1.5x until the end of its next turn) and Allies will gain 3 Spirit. This skill cannot trigger again until this unit recovers to above 50% of max HP."
+        }
       },
       "HoldGroundPoisonKillSleepHeal": {
         "id": "HoldGroundPoisonKillSleepHeal",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Plague Annihilator",
+          "description": "50% bonus to attacks against units that are poisoned.\n\nThis unit heals 30% of its max HP whenever a Sleeping enemy gets a turn.\n\nIf this unit would be defeated by an enemy attack or a status effect while having more than 1 HP, it instead survives with 1 HP."
+        }
       },
       "PlusHPBoostLv3": {
         "id": "PlusHPBoostLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv3",
+          "description": "Adds 1200 to this unit's max HP."
+        }
       },
       "AttackUpTargetEquippedSwordLv3": {
         "id": "AttackUpTargetEquippedSwordLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Sword Hunter Lv3",
+          "description": "10% bonus to attacks against units equipped with Swords."
+        }
       },
       "PlusAttackBoostLv3": {
         "id": "PlusAttackBoostLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv3",
+          "description": "Adds 300 to this unit's Attack."
+        }
       },
       "AddWeaponPrefSword": {
         "id": "AddWeaponPrefSword",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Sword Mastery",
+          "description": "Can use weapon skills of Swords in addition to their original preferred weapon type."
+        }
       }
     },
     "activeSkillsAI": {},
@@ -1414,9 +1460,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "8f5a3384ebaa4712226a7c5412fa597c04d878133fe608439541e12d793bcf5e",
-    "dependencyHash": "1a27ab4874b912fca06496a0970645fcc30dd1e256246c25247f0758ae094156",
-    "generatedAt": 1778013994
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "bed5bba0cc773e3c16fafcc953bd67a4e704369b3db83032f5ae7ee4fafb287e",
+    "dependencyHash": "4627cabf877be5a049356179bc009d1295b6a6d60c396b9750037158645fee4c",
+    "generatedAt": 1778081735
   }
 }

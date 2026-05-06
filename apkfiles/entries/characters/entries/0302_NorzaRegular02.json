@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 302,
-  "id": "norza-regular-02",
-  "name": "NorzaRegular02",
+  "id": "norza",
+  "name": "Norza",
+  "title": "",
   "category": "character",
   "rarity": null,
   "stars": 6,
@@ -42,6 +43,10 @@
       "GainAttackSingleStanceAAirNorzaRegular": {
         "id": "GainAttackSingleStanceAAirNorzaRegular",
         "found": true,
+        "localization": {
+          "name": "GainAttackSingleStanceAAirNorzaRegular",
+          "description": ""
+        },
         "ability": {
           "name": "GainAttackSingleStanceAAirNorzaRegular",
           "class": "Ability",
@@ -297,6 +302,10 @@
       "TimeStrikeANorzaRegular": {
         "id": "TimeStrikeANorzaRegular",
         "found": true,
+        "localization": {
+          "name": "TimeStrikeANorzaRegular",
+          "description": ""
+        },
         "ability": {
           "name": "TimeStrikeANorzaRegular",
           "class": "Ability",
@@ -404,6 +413,10 @@
       "RetributionStunDoubleANorzaRegular": {
         "id": "RetributionStunDoubleANorzaRegular",
         "found": true,
+        "localization": {
+          "name": "RetributionStunDoubleANorzaRegular",
+          "description": ""
+        },
         "ability": {
           "name": "RetributionStunDoubleANorzaRegular",
           "class": "Ability",
@@ -620,61 +633,71 @@
                     "or": {
                       "class": "MonsterConditions",
                       "monsterTags": [
-                        "StunImmuneIfAnyBurningAllies"
+                        "StunImmuneIfBeastAlly"
                       ],
+                      "checkReinforcementsForTeamConditionMatches": true,
                       "myTeamMonsterConditionMatchesNeeded": {
-                        "IsBurning": 1
+                        "IsBeastRegular": 1
                       },
                       "or": {
                         "class": "MonsterConditions",
                         "monsterTags": [
-                          "StunImmuneIfEnemyIsFireBurnBlastOrForce"
+                          "StunImmuneIfAnyBurningAllies"
                         ],
-                        "checkEnemyTeamOfMonster": true,
-                        "enemyTeamMonsterConditionMatchesNeeded": {
-                          "IsBurnBlastOrForceOrFire": 1
+                        "myTeamMonsterConditionMatchesNeeded": {
+                          "IsBurning": 1
                         },
                         "or": {
                           "class": "MonsterConditions",
                           "monsterTags": [
-                            "StunImmuneIfAllyIsFireBurnBlastOrForce"
+                            "StunImmuneIfEnemyIsFireBurnBlastOrForce"
                           ],
-                          "myTeamMonsterConditionMatchesNeeded": {
+                          "checkEnemyTeamOfMonster": true,
+                          "enemyTeamMonsterConditionMatchesNeeded": {
                             "IsBurnBlastOrForceOrFire": 1
                           },
                           "or": {
                             "class": "MonsterConditions",
                             "monsterTags": [
-                              "StunImmuneIfPoisonedEnemy"
+                              "StunImmuneIfAllyIsFireBurnBlastOrForce"
                             ],
-                            "checkEnemyTeamOfMonster": true,
-                            "enemyTeamMonsterConditionMatchesNeeded": {
-                              "IsPoisoned": 1
+                            "myTeamMonsterConditionMatchesNeeded": {
+                              "IsBurnBlastOrForceOrFire": 1
                             },
                             "or": {
                               "class": "MonsterConditions",
                               "monsterTags": [
-                                "StunImmunityIfNotBurning"
+                                "StunImmuneIfPoisonedEnemy"
                               ],
-                              "not": {
-                                "class": "MonsterConditions",
-                                "buffStackNames": [
-                                  "Burn"
-                                ]
+                              "checkEnemyTeamOfMonster": true,
+                              "enemyTeamMonsterConditionMatchesNeeded": {
+                                "IsPoisoned": 1
                               },
                               "or": {
                                 "class": "MonsterConditions",
                                 "monsterTags": [
-                                  "StunImmuneIfHoldGroundPlusTriggered"
-                                ],
-                                "buffStackNames": [
-                                  "BlockDeathUntilNextTurn"
+                                  "StunImmunityIfNotBurning"
                                 ],
                                 "not": {
                                   "class": "MonsterConditions",
                                   "buffStackNames": [
-                                    "HoldGroundOnceForHoldGroundPlus"
+                                    "Burn"
                                   ]
+                                },
+                                "or": {
+                                  "class": "MonsterConditions",
+                                  "monsterTags": [
+                                    "StunImmuneIfHoldGroundPlusTriggered"
+                                  ],
+                                  "buffStackNames": [
+                                    "BlockDeathUntilNextTurn"
+                                  ],
+                                  "not": {
+                                    "class": "MonsterConditions",
+                                    "buffStackNames": [
+                                      "HoldGroundOnceForHoldGroundPlus"
+                                    ]
+                                  }
                                 }
                               }
                             }
@@ -698,6 +721,10 @@
       "SurvivorANorzaRegular": {
         "id": "SurvivorANorzaRegular",
         "found": true,
+        "localization": {
+          "name": "SurvivorANorzaRegular",
+          "description": ""
+        },
         "ability": {
           "name": "SurvivorANorzaRegular",
           "class": "Ability",
@@ -876,27 +903,51 @@
     "passives": {
       "HoldGroundIfOverwatchForAirRetribution": {
         "id": "HoldGroundIfOverwatchForAirRetribution",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Hold Stance",
+          "description": "This unit cannot be defeated while it has the Counter Stance status effect, or during a turn it gains from counter stance."
+        }
       },
       "RegenerationOnMyTurnAir": {
         "id": "RegenerationOnMyTurnAir",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Regeneration",
+          "description": "When there is at least 1 other Storm ally and this unit gets the turn, this unit heals 30% of its max HP."
+        }
       },
       "SpearMinusDamageLv3": {
         "id": "SpearMinusDamageLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Spear Resist Lv3",
+          "description": "10% less damage from attacks by units equipped with Spears."
+        }
       },
       "PlusHPBoostLv3": {
         "id": "PlusHPBoostLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv3",
+          "description": "Adds 1200 to this unit's max HP."
+        }
       },
       "PlusAttackBoostLv3": {
         "id": "PlusAttackBoostLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv3",
+          "description": "Adds 300 to this unit's Attack."
+        }
       },
       "AddWeaponPrefAxe": {
         "id": "AddWeaponPrefAxe",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Axe Mastery",
+          "description": "Can use weapon skills of Axes in addition to their original preferred weapon type."
+        }
       }
     },
     "activeSkillsAI": {},
@@ -1039,9 +1090,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "4d9508f65b5332a23d49b6dac2478d4107294051f6586265c19e6c1c6e40c43d",
-    "dependencyHash": "150fbb776c6242da7e377c25525ef252dabd1fd5f950345e55e4dbe0670e321d",
-    "generatedAt": 1778013988
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "f4e61872d8950caf3e43190ca15088914621cdd4e06274254b6f8dae77f1d939",
+    "dependencyHash": "2f417f95634d546a9acbf7281c523a71a2b6a7d72ea239fece364eaf7555a646",
+    "generatedAt": 1778081729
   }
 }

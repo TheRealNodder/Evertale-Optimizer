@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 358,
-  "id": "axe-angel-02",
-  "name": "AxeAngel02",
+  "id": "eveline",
+  "name": "Eveline",
+  "title": "",
   "category": "character",
   "rarity": null,
   "stars": 5,
@@ -42,6 +43,11 @@
       "GainAttackSingleALife": {
         "id": "GainAttackSingleALife",
         "found": true,
+        "localization": {
+          "name": "Attack",
+          "description": "Damage to 1 enemy and allies gain 2 Spirit.",
+          "selected": "Damage to 1 enemy and gains 2 Spirit"
+        },
         "ability": {
           "name": "GainAttackSingleALife",
           "class": "Ability",
@@ -146,16 +152,16 @@
         },
         "buffs": {},
         "attackScalors": {},
-        "conditions": {},
-        "localization": {
-          "name": "Attack",
-          "description": "Damage to 1 enemy and allies gain 2 Spirit.",
-          "selected": "Damage to 1 enemy and gains 2 Spirit"
-        }
+        "conditions": {}
       },
       "SleepSingleA": {
         "id": "SleepSingleA",
         "found": true,
+        "localization": {
+          "name": "Sleep",
+          "description": "Grants 1 enemy the Sleep status effect for 200TU. This will overwrite other status effects on that unit. Sleep cannot be applied to a unit that Has Slept while on the battlefield.",
+          "selected": "Puts the target to sleep\n(Will overwrite other status effects)"
+        },
         "ability": {
           "name": "SleepSingleA",
           "class": "Ability",
@@ -432,34 +438,51 @@
               "or": {
                 "class": "MonsterConditions",
                 "monsterTags": [
-                  "SleepImmuneVsWater"
+                  "SleepImmuneIfBeastAlly"
                 ],
-                "checkEnemyTeamOfMonster": true,
-                "enemyTeamMonsterConditionMatchesNeeded": {
-                  "IsWater": 1
+                "checkReinforcementsForTeamConditionMatches": true,
+                "myTeamMonsterConditionMatchesNeeded": {
+                  "IsBeastRegular": 1
                 },
                 "or": {
                   "class": "MonsterConditions",
                   "monsterTags": [
-                    "NegativeStatusImmunityFromThorns"
+                    "SleepImmuneVsWater"
                   ],
-                  "buffStackNames": [
-                    "SleepThorns"
-                  ]
+                  "checkEnemyTeamOfMonster": true,
+                  "enemyTeamMonsterConditionMatchesNeeded": {
+                    "IsWater": 1
+                  },
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "SleepImmuneVs2Enemies"
+                    ],
+                    "enemyTeamSize": 2,
+                    "or": {
+                      "class": "MonsterConditions",
+                      "monsterTags": [
+                        "NegativeStatusImmunityFromThorns"
+                      ],
+                      "buffStackNames": [
+                        "SleepThorns"
+                      ]
+                    }
+                  }
                 }
               }
             }
           }
-        },
-        "localization": {
-          "name": "Sleep",
-          "description": "Grants 1 enemy the Sleep status effect for 200TU. This will overwrite other status effects on that unit. Sleep cannot be applied to a unit that Has Slept while on the battlefield.",
-          "selected": "Puts the target to sleep\n(Will overwrite other status effects)"
         }
       },
       "DreamHuntA2": {
         "id": "DreamHuntA2",
         "found": true,
+        "localization": {
+          "name": "Dream Hunter",
+          "description": "600% damage to 1 enemy if they are sleeping. Allies gain 4 Spirit if the target is asleep.",
+          "selected": "600% damage & gain 4 Spirit against sleeping target"
+        },
         "ability": {
           "name": "DreamHuntA2",
           "class": "Ability",
@@ -570,16 +593,15 @@
               "Sleep"
             ]
           }
-        },
-        "localization": {
-          "name": "Dream Hunter",
-          "description": "600% damage to 1 enemy if they are sleeping. Allies gain 4 Spirit if the target is asleep.",
-          "selected": "600% damage & gain 4 Spirit against sleeping target"
         }
       },
       "HighSpiritAttackAS1": {
         "id": "HighSpiritAttackAS1",
         "found": true,
+        "localization": {
+          "name": "HighSpiritAttackAS1",
+          "description": ""
+        },
         "ability": {
           "name": "HighSpiritAttackAS1",
           "class": "Ability",
@@ -642,27 +664,51 @@
     "passives": {
       "DamageReduceWhenAllySpiritHighLife": {
         "id": "DamageReduceWhenAllySpiritHighLife",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Spirit Armor",
+          "description": "50% damage reduction from attacks while allies have 7 or more spirit."
+        }
       },
       "HealPurifyAllRevengeA": {
         "id": "HealPurifyAllRevengeA",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Elixir Revenge",
+          "description": "Whenever this unit is defeated by an enemy, all allies on the battlefield are healed for 30% of their own max HP and any negative status effects like sleep, burn or poison are removed from them once TU next advances. The timing of these effects in relation to any other effects or skills triggering or expiring at any time between turns is not guaranteed, and they will only apply to units that have been on the battlefield since this unit was defeated."
+        }
       },
       "PlusAttackBoostLv2": {
         "id": "PlusAttackBoostLv2",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv2",
+          "description": "Adds 200 to this unit's Attack."
+        }
       },
       "AttackUpTargetEquippedStaffLv2": {
         "id": "AttackUpTargetEquippedStaffLv2",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Staff Hunter Lv2",
+          "description": "7% bonus to attacks against units equipped with Staffs."
+        }
       },
       "PlusHPBoostLv2": {
         "id": "PlusHPBoostLv2",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv2",
+          "description": "Adds 800 to this unit's max HP."
+        }
       },
       "AddWeaponPrefSpear": {
         "id": "AddWeaponPrefSpear",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Spear Mastery",
+          "description": "Can use weapon skills of Spears in addition to their original preferred weapon type."
+        }
       }
     },
     "activeSkillsAI": {},
@@ -785,9 +831,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "27eedfb951419fe50fd45b0362088bfb8fe7e1d48a6179b1cdc77c678f9da22e",
-    "dependencyHash": "de6011bfe0b513053305b072cc0a15c6329a5993c2c00f9a28c520126cdb9cac",
-    "generatedAt": 1778013990
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "6f20628c787d2643374274abcecb417bfe2e669448e1851e72d38cdf8e3e2317",
+    "dependencyHash": "40d925ef822aa612e797edf712dfb68652f0baaa6a459468b323856a40112572",
+    "generatedAt": 1778081730
   }
 }

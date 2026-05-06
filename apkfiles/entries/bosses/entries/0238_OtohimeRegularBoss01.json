@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 238,
-  "id": "otohime-regular-boss-01",
-  "name": "OtohimeRegularBoss01",
+  "id": "berserk-otohime",
+  "name": "Berserk Otohime",
+  "title": "",
   "category": "bosse",
   "rarity": null,
   "stars": 6,
@@ -37,6 +38,11 @@
       "ForceSleepAttackAOtohimeBoss": {
         "id": "ForceSleepAttackAOtohimeBoss",
         "found": true,
+        "localization": {
+          "name": "Knockout Wave",
+          "description": "100% damage to 1 enemy. If the user has a Power Charge, it will be consumed to deal 400% damage instead. If no enemies are sleeping, grants the target the Sleep status effect for 200TU, even if they have already slept while on the battlefield. This will overwrite other status effects on that unit. Damage from this attack does not wake up sleeping enemies.",
+          "selected": "100%+ damage, can apply sleep\n(Will overwrite other status effects)"
+        },
         "ability": {
           "name": "ForceSleepAttackAOtohimeBoss",
           "class": "Ability",
@@ -452,16 +458,16 @@
               }
             }
           }
-        },
-        "localization": {
-          "name": "Knockout Wave",
-          "description": "100% damage to 1 enemy. If the user has a Power Charge, it will be consumed to deal 400% damage instead. If no enemies are sleeping, grants the target the Sleep status effect for 200TU, even if they have already slept while on the battlefield. This will overwrite other status effects on that unit. Damage from this attack does not wake up sleeping enemies.",
-          "selected": "100%+ damage, can apply sleep\n(Will overwrite other status effects)"
         }
       },
       "HighSpiritOnslaughtAOtohimeBoss": {
         "id": "HighSpiritOnslaughtAOtohimeBoss",
         "found": true,
+        "localization": {
+          "name": "Rapid Blossom",
+          "description": "400% damage to 1 enemy, this damage will not wake up the enemy. Usable if the user's party has 6 or more Spirit or if 2 or more enemies are sleeping. This attack ignores skin passive skills, and the Counter Stance status effect. This skill activates 3 times in succession before its TU cost is applied. User gains a power charge every third time this skill is activated while on the battlefield. Power Charges cannot stack and will be removed when the user leaves the battlefield.",
+          "selected": "400% damage to 1 enemy"
+        },
         "ability": {
           "name": "HighSpiritOnslaughtAOtohimeBoss",
           "class": "Ability",
@@ -670,16 +676,16 @@
               ]
             }
           }
-        },
-        "localization": {
-          "name": "Rapid Blossom",
-          "description": "400% damage to 1 enemy, this damage will not wake up the enemy. Usable if the user's party has 6 or more Spirit or if 2 or more enemies are sleeping. This attack ignores skin passive skills, and the Counter Stance status effect. This skill activates 3 times in succession before its TU cost is applied. User gains a power charge every third time this skill is activated while on the battlefield. Power Charges cannot stack and will be removed when the user leaves the battlefield.",
-          "selected": "400% damage to 1 enemy"
         }
       },
       "NightmareHuntDoubleAOtohimeBoss": {
         "id": "NightmareHuntDoubleAOtohimeBoss",
         "found": true,
+        "localization": {
+          "name": "Nightmare Dragon",
+          "description": "600% damage to 2 enemies if they are sleeping, this damage will not wake up sleeping enemies. Allies gain 3 Spirit for each sleeping target hit. This attack ignores enemy damage reduction effects.",
+          "selected": "600% damage to sleeping enemies, ignores armor"
+        },
         "ability": {
           "name": "NightmareHuntDoubleAOtohimeBoss",
           "class": "Ability",
@@ -813,16 +819,16 @@
               "Sleep"
             ]
           }
-        },
-        "localization": {
-          "name": "Nightmare Dragon",
-          "description": "600% damage to 2 enemies if they are sleeping, this damage will not wake up sleeping enemies. Allies gain 3 Spirit for each sleeping target hit. This attack ignores enemy damage reduction effects.",
-          "selected": "600% damage to sleeping enemies, ignores armor"
         }
       },
       "KillSleepDoubleAOtohimeBoss": {
         "id": "KillSleepDoubleAOtohimeBoss",
         "found": true,
+        "localization": {
+          "name": "Triumph Sleep",
+          "description": "Grants 2 enemies the Sleep status effect for 200TU, even if they have already slept while on the battlefield. This will overwrite other status effects on those units. Unlocked each time the user defeats another unit with an attack. This skill is locked again after each use or if the user leaves the battlefield.",
+          "selected": "Forces the targets to sleep for 200TU\n(Will overwrite other status effects)"
+        },
         "ability": {
           "name": "KillSleepDoubleAOtohimeBoss",
           "class": "Ability",
@@ -1241,20 +1247,37 @@
               "or": {
                 "class": "MonsterConditions",
                 "monsterTags": [
-                  "SleepImmuneVsWater"
+                  "SleepImmuneIfBeastAlly"
                 ],
-                "checkEnemyTeamOfMonster": true,
-                "enemyTeamMonsterConditionMatchesNeeded": {
-                  "IsWater": 1
+                "checkReinforcementsForTeamConditionMatches": true,
+                "myTeamMonsterConditionMatchesNeeded": {
+                  "IsBeastRegular": 1
                 },
                 "or": {
                   "class": "MonsterConditions",
                   "monsterTags": [
-                    "NegativeStatusImmunityFromThorns"
+                    "SleepImmuneVsWater"
                   ],
-                  "buffStackNames": [
-                    "SleepThorns"
-                  ]
+                  "checkEnemyTeamOfMonster": true,
+                  "enemyTeamMonsterConditionMatchesNeeded": {
+                    "IsWater": 1
+                  },
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "SleepImmuneVs2Enemies"
+                    ],
+                    "enemyTeamSize": 2,
+                    "or": {
+                      "class": "MonsterConditions",
+                      "monsterTags": [
+                        "NegativeStatusImmunityFromThorns"
+                      ],
+                      "buffStackNames": [
+                        "SleepThorns"
+                      ]
+                    }
+                  }
                 }
               }
             }
@@ -1265,18 +1288,17 @@
             "fieldToCompareToProperty": "killsMade",
             "propertyFieldCompareStyle": "LessThan"
           }
-        },
-        "localization": {
-          "name": "Triumph Sleep",
-          "description": "Grants 2 enemies the Sleep status effect for 200TU, even if they have already slept while on the battlefield. This will overwrite other status effects on those units. Unlocked each time the user defeats another unit with an attack. This skill is locked again after each use or if the user leaves the battlefield.",
-          "selected": "Forces the targets to sleep for 200TU\n(Will overwrite other status effects)"
         }
       }
     },
     "passives": {
       "KnockbackImmunity": {
         "id": "KnockbackImmunity",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Immovable",
+          "description": "This unit cannot be sent to the reinforcements from the battlefield."
+        }
       }
     },
     "activeSkillsAI": {},
@@ -1351,9 +1373,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "386c921900376aeca6b91476b2a9d8ac33e69875d51f1b2a2e9bcc78bfc76317",
-    "dependencyHash": "23125f41a737714e3a22bf2823758fa1a0734db893f45c6826369e0de09f8848",
-    "generatedAt": 1778014036
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "1525bdd0606dd06bacc2df505437fbea872b186698a936a915bec71c229af7c6",
+    "dependencyHash": "9055ce9df444ef551202f2e3d5c2526545397d10ff79dbead516b045b82add0c",
+    "generatedAt": 1778081778
   }
 }

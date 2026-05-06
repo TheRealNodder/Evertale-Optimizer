@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 450,
-  "id": "jeanne-angel-valentine-02",
-  "name": "JeanneAngelValentine02",
+  "id": "mikaela",
+  "name": "Mikaela",
+  "title": "",
   "category": "character",
   "rarity": null,
   "stars": 6,
@@ -42,6 +43,10 @@
       "GainAttackSingleSJeanneAngelValentine": {
         "id": "GainAttackSingleSJeanneAngelValentine",
         "found": true,
+        "localization": {
+          "name": "GainAttackSingleSJeanneAngelValentine",
+          "description": ""
+        },
         "ability": {
           "name": "GainAttackSingleSJeanneAngelValentine",
           "class": "Ability",
@@ -153,6 +158,10 @@
       "SleepSingleAJeanneAngelValentine": {
         "id": "SleepSingleAJeanneAngelValentine",
         "found": true,
+        "localization": {
+          "name": "SleepSingleAJeanneAngelValentine",
+          "description": ""
+        },
         "ability": {
           "name": "SleepSingleAJeanneAngelValentine",
           "class": "Ability",
@@ -431,20 +440,37 @@
               "or": {
                 "class": "MonsterConditions",
                 "monsterTags": [
-                  "SleepImmuneVsWater"
+                  "SleepImmuneIfBeastAlly"
                 ],
-                "checkEnemyTeamOfMonster": true,
-                "enemyTeamMonsterConditionMatchesNeeded": {
-                  "IsWater": 1
+                "checkReinforcementsForTeamConditionMatches": true,
+                "myTeamMonsterConditionMatchesNeeded": {
+                  "IsBeastRegular": 1
                 },
                 "or": {
                   "class": "MonsterConditions",
                   "monsterTags": [
-                    "NegativeStatusImmunityFromThorns"
+                    "SleepImmuneVsWater"
                   ],
-                  "buffStackNames": [
-                    "SleepThorns"
-                  ]
+                  "checkEnemyTeamOfMonster": true,
+                  "enemyTeamMonsterConditionMatchesNeeded": {
+                    "IsWater": 1
+                  },
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "SleepImmuneVs2Enemies"
+                    ],
+                    "enemyTeamSize": 2,
+                    "or": {
+                      "class": "MonsterConditions",
+                      "monsterTags": [
+                        "NegativeStatusImmunityFromThorns"
+                      ],
+                      "buffStackNames": [
+                        "SleepThorns"
+                      ]
+                    }
+                  }
                 }
               }
             }
@@ -454,6 +480,10 @@
       "DreamHuntDoubleBJeanneAngelValentine": {
         "id": "DreamHuntDoubleBJeanneAngelValentine",
         "found": true,
+        "localization": {
+          "name": "DreamHuntDoubleBJeanneAngelValentine",
+          "description": ""
+        },
         "ability": {
           "name": "DreamHuntDoubleBJeanneAngelValentine",
           "class": "Ability",
@@ -594,6 +624,10 @@
       "HasSleptEaterDoubleAJeanneAngelValentine": {
         "id": "HasSleptEaterDoubleAJeanneAngelValentine",
         "found": true,
+        "localization": {
+          "name": "HasSleptEaterDoubleAJeanneAngelValentine",
+          "description": ""
+        },
         "ability": {
           "name": "HasSleptEaterDoubleAJeanneAngelValentine",
           "class": "Ability",
@@ -694,27 +728,51 @@
     "passives": {
       "RegenerationOnMyTurnSleep": {
         "id": "RegenerationOnMyTurnSleep",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Sleep Regeneration",
+          "description": "When there is at least 1 enemy with the Sleep status effect and this unit gets the turn, this unit heals 30% of its max HP."
+        }
       },
       "HoldGround": {
         "id": "HoldGround",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Hold Ground",
+          "description": "If this unit would be defeated by an enemy attack or a status effect while having more than 1 HP, it instead survives with 1 HP."
+        }
       },
       "PlusAttackBoostLv3": {
         "id": "PlusAttackBoostLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv3",
+          "description": "Adds 300 to this unit's Attack."
+        }
       },
       "AttackUpTargetEquippedGreatSwordLv3": {
         "id": "AttackUpTargetEquippedGreatSwordLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "G.sword Hunter Lv3",
+          "description": "10% bonus to attacks against units equipped with Greatswords."
+        }
       },
       "PlusHPBoostLv3": {
         "id": "PlusHPBoostLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv3",
+          "description": "Adds 1200 to this unit's max HP."
+        }
       },
       "AddWeaponPrefSword": {
         "id": "AddWeaponPrefSword",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Sword Mastery",
+          "description": "Can use weapon skills of Swords in addition to their original preferred weapon type."
+        }
       }
     },
     "activeSkillsAI": {},
@@ -808,9 +866,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "2baa3813d08464b5acc2d3e7c65545e570e0d2d9ff48b52c90f84be00994358d",
-    "dependencyHash": "133c1a9d7274af91905ace66e0d90610d2571eb0bfc59c4441c05f04d6eda762",
-    "generatedAt": 1778013993
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "ae6c09456769b3053363e5f3517a07b2695097da97f15d4a34b88e99c94b22b1",
+    "dependencyHash": "fd9e5f0757ee1ed9eefe26cb91fcff1aaf7fb6dd27fa960f35334b5070fedf9b",
+    "generatedAt": 1778081733
   }
 }

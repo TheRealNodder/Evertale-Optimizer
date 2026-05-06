@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 179,
-  "id": "yandere-maid-boss-01",
-  "name": "YandereMaidBossB01",
+  "id": "future-clarice",
+  "name": "Future Clarice",
+  "title": "",
   "category": "bosse",
   "rarity": null,
   "stars": 6,
@@ -40,6 +41,10 @@
       "SleepAttackAYandereBoss": {
         "id": "SleepAttackAYandereBoss",
         "found": true,
+        "localization": {
+          "name": "SleepAttackAYandereBoss",
+          "description": ""
+        },
         "ability": {
           "name": "SleepAttackAYandereBoss",
           "class": "Ability",
@@ -332,6 +337,10 @@
       "ForceSleepDoubleAYandereBoss": {
         "id": "ForceSleepDoubleAYandereBoss",
         "found": true,
+        "localization": {
+          "name": "ForceSleepDoubleAYandereBoss",
+          "description": ""
+        },
         "ability": {
           "name": "ForceSleepDoubleAYandereBoss",
           "class": "Ability",
@@ -699,20 +708,37 @@
               "or": {
                 "class": "MonsterConditions",
                 "monsterTags": [
-                  "SleepImmuneVsWater"
+                  "SleepImmuneIfBeastAlly"
                 ],
-                "checkEnemyTeamOfMonster": true,
-                "enemyTeamMonsterConditionMatchesNeeded": {
-                  "IsWater": 1
+                "checkReinforcementsForTeamConditionMatches": true,
+                "myTeamMonsterConditionMatchesNeeded": {
+                  "IsBeastRegular": 1
                 },
                 "or": {
                   "class": "MonsterConditions",
                   "monsterTags": [
-                    "NegativeStatusImmunityFromThorns"
+                    "SleepImmuneVsWater"
                   ],
-                  "buffStackNames": [
-                    "SleepThorns"
-                  ]
+                  "checkEnemyTeamOfMonster": true,
+                  "enemyTeamMonsterConditionMatchesNeeded": {
+                    "IsWater": 1
+                  },
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "SleepImmuneVs2Enemies"
+                    ],
+                    "enemyTeamSize": 2,
+                    "or": {
+                      "class": "MonsterConditions",
+                      "monsterTags": [
+                        "NegativeStatusImmunityFromThorns"
+                      ],
+                      "buffStackNames": [
+                        "SleepThorns"
+                      ]
+                    }
+                  }
                 }
               }
             }
@@ -722,6 +748,10 @@
       "DreamBusterBYandereBoss": {
         "id": "DreamBusterBYandereBoss",
         "found": true,
+        "localization": {
+          "name": "DreamBusterBYandereBoss",
+          "description": ""
+        },
         "ability": {
           "name": "DreamBusterBYandereBoss",
           "class": "Ability",
@@ -827,6 +857,10 @@
       "SurvivorDoubleAYandereBoss": {
         "id": "SurvivorDoubleAYandereBoss",
         "found": true,
+        "localization": {
+          "name": "SurvivorDoubleAYandereBoss",
+          "description": ""
+        },
         "ability": {
           "name": "SurvivorDoubleAYandereBoss",
           "class": "Ability",
@@ -1025,11 +1059,19 @@
     "passives": {
       "HoldGroundBoss": {
         "id": "HoldGroundBoss",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Hold Ground",
+          "description": "If this unit would be defeated by an enemy attack or a status effect while having more than 1 HP, it instead survives with 1 HP."
+        }
       },
       "GetRegenerateFor300TU": {
         "id": "GetRegenerateFor300TU",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Survival Regeneration",
+          "description": "When this unit gets a turn, it heals 30% of its max HP unless Survivor's Fury is unlocked by this unit."
+        }
       }
     },
     "activeSkillsAI": {
@@ -1136,9 +1178,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "fd3e161adca44db4c5fcdcce589a2ebaae4795b979767e2ad0d5e9802090bf77",
-    "dependencyHash": "9ec3939a201fbfc1d9b7044280a2b882e0a3c32423616731893313a89364dc6a",
-    "generatedAt": 1778014034
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "86920305783132f8c989280ac717df7e39a7d0fe3133cacae3fa773a43dbb555",
+    "dependencyHash": "bc83fab0b6db8c4e1e967d3bddc803e4ee3d7e591416784c4da94676e6d286da",
+    "generatedAt": 1778081776
   }
 }

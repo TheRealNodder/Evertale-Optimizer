@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 495,
-  "id": "round-table-knight-01",
-  "name": "RoundTableKnight01",
+  "id": "lancelot",
+  "name": "Lancelot",
+  "title": "",
   "category": "character",
   "rarity": null,
   "stars": 5,
@@ -41,6 +42,10 @@
       "GainAttackSingleStealthARoundTableKnight": {
         "id": "GainAttackSingleStealthARoundTableKnight",
         "found": true,
+        "localization": {
+          "name": "GainAttackSingleStealthARoundTableKnight",
+          "description": ""
+        },
         "ability": {
           "name": "GainAttackSingleStealthARoundTableKnight",
           "class": "Ability",
@@ -304,6 +309,11 @@
       "TimeBusterPlusStealthARoundTableKnight": {
         "id": "TimeBusterPlusStealthARoundTableKnight",
         "found": true,
+        "localization": {
+          "name": "Royal Swiftslash",
+          "description": "400% damage to 1 enemy if they have 100+ TU. 500% damage if the target has 130TU or more. 600% damage if the target has 200TU or more. This attack ignores enemy damage reduction effects. The user also gains the Stealth status effect if the target has 100TU or more. This will overwrite other status effects on the user. Stealthed units ignore the next enemy attack that would damage more than 1 target. Any damage will remove stealth.",
+          "selected": "400%+ damage against 100+ TU and gains Stealth\n(Will overwrite other status effects)"
+        },
         "ability": {
           "name": "TimeBusterPlusStealthARoundTableKnight",
           "class": "Ability",
@@ -566,16 +576,15 @@
             "class": "MonsterConditions",
             "currentTUGreaterThan": 100
           }
-        },
-        "localization": {
-          "name": "Royal Swiftslash",
-          "description": "400% damage to 1 enemy if they have 100+ TU. 500% damage if the target has 130TU or more. 600% damage if the target has 200TU or more. This attack ignores enemy damage reduction effects. The user also gains the Stealth status effect if the target has 100TU or more. This will overwrite other status effects on the user. Stealthed units ignore the next enemy attack that would damage more than 1 target. Any damage will remove stealth.",
-          "selected": "400%+ damage against 100+ TU and gains Stealth\n(Will overwrite other status effects)"
         }
       },
       "SneakAttackSlayerbaneARoundTableKnight": {
         "id": "SneakAttackSlayerbaneARoundTableKnight",
         "found": true,
+        "localization": {
+          "name": "SneakAttackSlayerbaneARoundTableKnight",
+          "description": ""
+        },
         "ability": {
           "name": "SneakAttackSlayerbaneARoundTableKnight",
           "class": "Ability",
@@ -804,6 +813,10 @@
       "InstantStun200ARoundTableKnight": {
         "id": "InstantStun200ARoundTableKnight",
         "found": true,
+        "localization": {
+          "name": "InstantStun200ARoundTableKnight",
+          "description": ""
+        },
         "ability": {
           "name": "InstantStun200ARoundTableKnight",
           "class": "Ability",
@@ -1011,61 +1024,71 @@
                     "or": {
                       "class": "MonsterConditions",
                       "monsterTags": [
-                        "StunImmuneIfAnyBurningAllies"
+                        "StunImmuneIfBeastAlly"
                       ],
+                      "checkReinforcementsForTeamConditionMatches": true,
                       "myTeamMonsterConditionMatchesNeeded": {
-                        "IsBurning": 1
+                        "IsBeastRegular": 1
                       },
                       "or": {
                         "class": "MonsterConditions",
                         "monsterTags": [
-                          "StunImmuneIfEnemyIsFireBurnBlastOrForce"
+                          "StunImmuneIfAnyBurningAllies"
                         ],
-                        "checkEnemyTeamOfMonster": true,
-                        "enemyTeamMonsterConditionMatchesNeeded": {
-                          "IsBurnBlastOrForceOrFire": 1
+                        "myTeamMonsterConditionMatchesNeeded": {
+                          "IsBurning": 1
                         },
                         "or": {
                           "class": "MonsterConditions",
                           "monsterTags": [
-                            "StunImmuneIfAllyIsFireBurnBlastOrForce"
+                            "StunImmuneIfEnemyIsFireBurnBlastOrForce"
                           ],
-                          "myTeamMonsterConditionMatchesNeeded": {
+                          "checkEnemyTeamOfMonster": true,
+                          "enemyTeamMonsterConditionMatchesNeeded": {
                             "IsBurnBlastOrForceOrFire": 1
                           },
                           "or": {
                             "class": "MonsterConditions",
                             "monsterTags": [
-                              "StunImmuneIfPoisonedEnemy"
+                              "StunImmuneIfAllyIsFireBurnBlastOrForce"
                             ],
-                            "checkEnemyTeamOfMonster": true,
-                            "enemyTeamMonsterConditionMatchesNeeded": {
-                              "IsPoisoned": 1
+                            "myTeamMonsterConditionMatchesNeeded": {
+                              "IsBurnBlastOrForceOrFire": 1
                             },
                             "or": {
                               "class": "MonsterConditions",
                               "monsterTags": [
-                                "StunImmunityIfNotBurning"
+                                "StunImmuneIfPoisonedEnemy"
                               ],
-                              "not": {
-                                "class": "MonsterConditions",
-                                "buffStackNames": [
-                                  "Burn"
-                                ]
+                              "checkEnemyTeamOfMonster": true,
+                              "enemyTeamMonsterConditionMatchesNeeded": {
+                                "IsPoisoned": 1
                               },
                               "or": {
                                 "class": "MonsterConditions",
                                 "monsterTags": [
-                                  "StunImmuneIfHoldGroundPlusTriggered"
-                                ],
-                                "buffStackNames": [
-                                  "BlockDeathUntilNextTurn"
+                                  "StunImmunityIfNotBurning"
                                 ],
                                 "not": {
                                   "class": "MonsterConditions",
                                   "buffStackNames": [
-                                    "HoldGroundOnceForHoldGroundPlus"
+                                    "Burn"
                                   ]
+                                },
+                                "or": {
+                                  "class": "MonsterConditions",
+                                  "monsterTags": [
+                                    "StunImmuneIfHoldGroundPlusTriggered"
+                                  ],
+                                  "buffStackNames": [
+                                    "BlockDeathUntilNextTurn"
+                                  ],
+                                  "not": {
+                                    "class": "MonsterConditions",
+                                    "buffStackNames": [
+                                      "HoldGroundOnceForHoldGroundPlus"
+                                    ]
+                                  }
                                 }
                               }
                             }
@@ -1093,23 +1116,43 @@
     "passives": {
       "DoubleTurnBlockDeathOnKillA": {
         "id": "DoubleTurnBlockDeathOnKillA",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Deadly Momentum",
+          "description": "Each time this unit defeats an enemy with an attack, this unit will get another turn. When this triggers, this unit will Endure the next damage that would defeat it with 1HP, Endure effects cannot stack. Effects that influence TU order may interrupt the extra turn (e.g. Stuns targeting the lowest TU target)."
+        }
       },
       "PlusAttackBoostLv3": {
         "id": "PlusAttackBoostLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv3",
+          "description": "Adds 300 to this unit's Attack."
+        }
       },
       "PlusHPBoostLv3": {
         "id": "PlusHPBoostLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv3",
+          "description": "Adds 1200 to this unit's max HP."
+        }
       },
       "FireMinusDamageLv3": {
         "id": "FireMinusDamageLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Fire Resist Lv3",
+          "description": "10% less damage from attacks by Fire units."
+        }
       },
       "AddWeaponPrefAxe": {
         "id": "AddWeaponPrefAxe",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Axe Mastery",
+          "description": "Can use weapon skills of Axes in addition to their original preferred weapon type."
+        }
       }
     },
     "activeSkillsAI": {},
@@ -1250,9 +1293,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "855d03b36804f485194969515146e1fcd55e3a16fee73a43e0bf885210e4088f",
-    "dependencyHash": "53c856ef94179c372f0c845d5fc96e779149ecf5c24bd56b58a4b53f490d06cd",
-    "generatedAt": 1778013994
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "09864513f391592ca8ca5357972c01fb687c12c38122939c9de65d4247094f39",
+    "dependencyHash": "7c63cededd3416e867fb6387501ae0f45f59c2d648f49150bbb6d5263bebbb2a",
+    "generatedAt": 1778081734
   }
 }

@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 222,
-  "id": "mecha-sister-bride-boss-01",
-  "name": "MechaSisterBrideBoss01",
+  "id": "berserk-anya",
+  "name": "Berserk Anya",
+  "title": "",
   "category": "bosse",
   "rarity": null,
   "stars": 6,
@@ -38,6 +39,11 @@
       "DawnStrikeSingleAMechaBrideBoss": {
         "id": "DawnStrikeSingleAMechaBrideBoss",
         "found": true,
+        "localization": {
+          "name": "Dream Weaver",
+          "description": "500% damage to 1 enemy if there is a sleeping enemy (even if the target is not sleeping). If there are no sleeping enemies, 50% damage instead and allies gain an additional 2 Spirit. This attack ignores enemy damage reduction effects and is considered a Dream Hunter type Active Skill.",
+          "selected": "Up to 500% damage if there is a Sleeping enemy"
+        },
         "ability": {
           "name": "DawnStrikeSingleAMechaBrideBoss",
           "class": "Ability",
@@ -230,16 +236,16 @@
               }
             }
           }
-        },
-        "localization": {
-          "name": "Dream Weaver",
-          "description": "500% damage to 1 enemy if there is a sleeping enemy (even if the target is not sleeping). If there are no sleeping enemies, 50% damage instead and allies gain an additional 2 Spirit. This attack ignores enemy damage reduction effects and is considered a Dream Hunter type Active Skill.",
-          "selected": "Up to 500% damage if there is a Sleeping enemy"
         }
       },
       "ForceSleepDoubleAMechaBrideBoss": {
         "id": "ForceSleepDoubleAMechaBrideBoss",
         "found": true,
+        "localization": {
+          "name": "Lights Out",
+          "description": "Grants 2 enemies the Sleep status effect for 200TU, even if they have already slept while on the battlefield. This will overwrite other status effects on those units. For each targeted enemy that does not fall asleep (e.g. due to a Sleep Ward), allies gain 2 Spirit. Usable only if no enemies are sleeping.",
+          "selected": "Puts targets to sleep even if they have already slept\n(Will overwrite other status effects)"
+        },
         "ability": {
           "name": "ForceSleepDoubleAMechaBrideBoss",
           "class": "Ability",
@@ -619,34 +625,51 @@
               "or": {
                 "class": "MonsterConditions",
                 "monsterTags": [
-                  "SleepImmuneVsWater"
+                  "SleepImmuneIfBeastAlly"
                 ],
-                "checkEnemyTeamOfMonster": true,
-                "enemyTeamMonsterConditionMatchesNeeded": {
-                  "IsWater": 1
+                "checkReinforcementsForTeamConditionMatches": true,
+                "myTeamMonsterConditionMatchesNeeded": {
+                  "IsBeastRegular": 1
                 },
                 "or": {
                   "class": "MonsterConditions",
                   "monsterTags": [
-                    "NegativeStatusImmunityFromThorns"
+                    "SleepImmuneVsWater"
                   ],
-                  "buffStackNames": [
-                    "SleepThorns"
-                  ]
+                  "checkEnemyTeamOfMonster": true,
+                  "enemyTeamMonsterConditionMatchesNeeded": {
+                    "IsWater": 1
+                  },
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "SleepImmuneVs2Enemies"
+                    ],
+                    "enemyTeamSize": 2,
+                    "or": {
+                      "class": "MonsterConditions",
+                      "monsterTags": [
+                        "NegativeStatusImmunityFromThorns"
+                      ],
+                      "buffStackNames": [
+                        "SleepThorns"
+                      ]
+                    }
+                  }
                 }
               }
             }
           }
-        },
-        "localization": {
-          "name": "Lights Out",
-          "description": "Grants 2 enemies the Sleep status effect for 200TU, even if they have already slept while on the battlefield. This will overwrite other status effects on those units. For each targeted enemy that does not fall asleep (e.g. due to a Sleep Ward), allies gain 2 Spirit. Usable only if no enemies are sleeping.",
-          "selected": "Puts targets to sleep even if they have already slept\n(Will overwrite other status effects)"
         }
       },
       "BadStatusEaterDoubleAMechaBrideBoss": {
         "id": "BadStatusEaterDoubleAMechaBrideBoss",
         "found": true,
+        "localization": {
+          "name": "Omni Devour",
+          "description": "600% damage to 2 enemies if they are poisoned, sleeping or burned. This attack ignores enemy damage reduction.",
+          "selected": "600% damage to enemies with bad status effects"
+        },
         "ability": {
           "name": "BadStatusEaterDoubleAMechaBrideBoss",
           "class": "Ability",
@@ -921,16 +944,16 @@
             "targetCondition": "HasBadStatusEffect"
           }
         },
-        "conditions": {},
-        "localization": {
-          "name": "Omni Devour",
-          "description": "600% damage to 2 enemies if they are poisoned, sleeping or burned. This attack ignores enemy damage reduction.",
-          "selected": "600% damage to enemies with bad status effects"
-        }
+        "conditions": {}
       },
       "BraveLastStandBusterAllAMechaBrideBoss": {
         "id": "BraveLastStandBusterAllAMechaBrideBoss",
         "found": true,
+        "localization": {
+          "name": "Brave Stand",
+          "description": "300% damage to all enemies. 500% damage if the user is alone on the battlefield. This attack ignores damage reduction effects. Usable if there are no allied reinforcements.",
+          "selected": "300%+ damage, stronger when alone\n(Will overwrite other status effects)"
+        },
         "ability": {
           "name": "BraveLastStandBusterAllAMechaBrideBoss",
           "class": "Ability",
@@ -1103,22 +1126,25 @@
               "allyReinforcements": 1
             }
           }
-        },
-        "localization": {
-          "name": "Brave Stand",
-          "description": "300% damage to all enemies. 500% damage if the user is alone on the battlefield. This attack ignores damage reduction effects. Usable if there are no allied reinforcements.",
-          "selected": "300%+ damage, stronger when alone\n(Will overwrite other status effects)"
         }
       }
     },
     "passives": {
       "OnEnterBarrierWithRecoveryOnEndBoss": {
         "id": "OnEnterBarrierWithRecoveryOnEndBoss",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Turbo Barrier",
+          "description": "Non-Guardian allies are granted 35% damage reduction from attacks. If this unit takes damage from an attack and survives until after the end of the turn, this unit will heal for 5% of max HP."
+        }
       },
       "BlockDeathAstridBrideBossInTeam": {
         "id": "BlockDeathAstridBrideBossInTeam",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Astrid's Protection",
+          "description": "This unit cannot be defeated if Astrid is an ally on the battlefield."
+        }
       }
     },
     "activeSkillsAI": {},
@@ -1200,9 +1226,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "c289b7d8cf216f5348d2e9c54872984b531ff0878f28c080bbe25e7ce84d220b",
-    "dependencyHash": "ecfef9bb399e9c968d4618fba2c62b0a5ccf9d71ec2356ab291ca1a039b07ab9",
-    "generatedAt": 1778014035
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "c06ef19b6070b1922783aa7a6c3f3d7009ff802cee867e104a1b5492adcbaefe",
+    "dependencyHash": "21aae298c10ff39c6bb66626ff784abd90904b93546f8319bb1ac2de6a55514e",
+    "generatedAt": 1778081777
   }
 }

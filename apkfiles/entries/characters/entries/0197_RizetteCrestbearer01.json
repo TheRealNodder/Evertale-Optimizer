@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 197,
-  "id": "rizette-crestbearer-01",
-  "name": "RizetteCrestbearer01",
+  "id": "rizette",
+  "name": "Rizette",
+  "title": "",
   "category": "character",
   "rarity": null,
   "stars": 5,
@@ -42,6 +43,11 @@
       "GainAttackSingleARizetteCrestbearer": {
         "id": "GainAttackSingleARizetteCrestbearer",
         "found": true,
+        "localization": {
+          "name": "Attack",
+          "description": "Damage to 1 enemy and allies gain 2 Spirit.",
+          "selected": "Damage to 1 enemy and gains 2 Spirit"
+        },
         "ability": {
           "name": "GainAttackSingleARizetteCrestbearer",
           "class": "Ability",
@@ -92,16 +98,16 @@
         },
         "buffs": {},
         "attackScalors": {},
-        "conditions": {},
-        "localization": {
-          "name": "Attack",
-          "description": "Damage to 1 enemy and allies gain 2 Spirit.",
-          "selected": "Damage to 1 enemy and gains 2 Spirit"
-        }
+        "conditions": {}
       },
       "SleepSingleA": {
         "id": "SleepSingleA",
         "found": true,
+        "localization": {
+          "name": "Sleep",
+          "description": "Grants 1 enemy the Sleep status effect for 200TU. This will overwrite other status effects on that unit. Sleep cannot be applied to a unit that Has Slept while on the battlefield.",
+          "selected": "Puts the target to sleep\n(Will overwrite other status effects)"
+        },
         "ability": {
           "name": "SleepSingleA",
           "class": "Ability",
@@ -378,34 +384,51 @@
               "or": {
                 "class": "MonsterConditions",
                 "monsterTags": [
-                  "SleepImmuneVsWater"
+                  "SleepImmuneIfBeastAlly"
                 ],
-                "checkEnemyTeamOfMonster": true,
-                "enemyTeamMonsterConditionMatchesNeeded": {
-                  "IsWater": 1
+                "checkReinforcementsForTeamConditionMatches": true,
+                "myTeamMonsterConditionMatchesNeeded": {
+                  "IsBeastRegular": 1
                 },
                 "or": {
                   "class": "MonsterConditions",
                   "monsterTags": [
-                    "NegativeStatusImmunityFromThorns"
+                    "SleepImmuneVsWater"
                   ],
-                  "buffStackNames": [
-                    "SleepThorns"
-                  ]
+                  "checkEnemyTeamOfMonster": true,
+                  "enemyTeamMonsterConditionMatchesNeeded": {
+                    "IsWater": 1
+                  },
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "SleepImmuneVs2Enemies"
+                    ],
+                    "enemyTeamSize": 2,
+                    "or": {
+                      "class": "MonsterConditions",
+                      "monsterTags": [
+                        "NegativeStatusImmunityFromThorns"
+                      ],
+                      "buffStackNames": [
+                        "SleepThorns"
+                      ]
+                    }
+                  }
                 }
               }
             }
           }
-        },
-        "localization": {
-          "name": "Sleep",
-          "description": "Grants 1 enemy the Sleep status effect for 200TU. This will overwrite other status effects on that unit. Sleep cannot be applied to a unit that Has Slept while on the battlefield.",
-          "selected": "Puts the target to sleep\n(Will overwrite other status effects)"
         }
       },
       "DreamHuntARizetteCrestbearer": {
         "id": "DreamHuntARizetteCrestbearer",
         "found": true,
+        "localization": {
+          "name": "Dream Hunter",
+          "description": "600% damage to 1 enemy if they are sleeping. Allies gain 4 Spirit if the target is asleep.",
+          "selected": "600% damage & gain 4 Spirit against sleeping target"
+        },
         "ability": {
           "name": "DreamHuntARizetteCrestbearer",
           "class": "Ability",
@@ -516,16 +539,16 @@
               "Sleep"
             ]
           }
-        },
-        "localization": {
-          "name": "Dream Hunter",
-          "description": "600% damage to 1 enemy if they are sleeping. Allies gain 4 Spirit if the target is asleep.",
-          "selected": "600% damage & gain 4 Spirit against sleeping target"
         }
       },
       "ProtectorKillerA": {
         "id": "ProtectorKillerA",
         "found": true,
+        "localization": {
+          "name": "Guard Destroyer",
+          "description": "500% damage to 1 enemy if they are a Guardian.",
+          "selected": "500% damage against Guardians"
+        },
         "ability": {
           "name": "ProtectorKillerA",
           "class": "Ability",
@@ -610,30 +633,41 @@
             "targetCondition": "IsProtecting"
           }
         },
-        "conditions": {},
-        "localization": {
-          "name": "Guard Destroyer",
-          "description": "500% damage to 1 enemy if they are a Guardian.",
-          "selected": "500% damage against Guardians"
-        }
+        "conditions": {}
       }
     },
     "passives": {
       "AttackUpTargetEquippedMaceLv3": {
         "id": "AttackUpTargetEquippedMaceLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Mace Hunter Lv3",
+          "description": "10% bonus to attacks against units equipped with Maces."
+        }
       },
       "PlusHPBoostLv3": {
         "id": "PlusHPBoostLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv3",
+          "description": "Adds 1200 to this unit's max HP."
+        }
       },
       "PlusAttackBoostLv3": {
         "id": "PlusAttackBoostLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv3",
+          "description": "Adds 300 to this unit's Attack."
+        }
       },
       "AddWeaponPrefAxe": {
         "id": "AddWeaponPrefAxe",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Axe Mastery",
+          "description": "Can use weapon skills of Axes in addition to their original preferred weapon type."
+        }
       }
     },
     "activeSkillsAI": {
@@ -791,9 +825,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "63590f4aaa9d74942be8c8013fc074aad990e541765d28a226505803bb2424bf",
-    "dependencyHash": "652ea2af110001dc0d1e34cc91cd27c99559c7aa98f27ffebec90d4c4dfa0d76",
-    "generatedAt": 1778013985
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "d8a9f69c7903c906a8df3553e62bb5c4e92b7f0f87cfea0b10cdf7cf00dbd327",
+    "dependencyHash": "280f9705e01b4df48b4a2a51355160b5933cd674164ce3a02c80700520732b9f",
+    "generatedAt": 1778081725
   }
 }

@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 301,
-  "id": "norza-regular-01",
-  "name": "NorzaRegular01",
+  "id": "norza",
+  "name": "Norza",
+  "title": "",
   "category": "character",
   "rarity": null,
   "stars": 5,
@@ -41,6 +42,10 @@
       "GainAttackSingleStanceAAirNorzaRegular": {
         "id": "GainAttackSingleStanceAAirNorzaRegular",
         "found": true,
+        "localization": {
+          "name": "GainAttackSingleStanceAAirNorzaRegular",
+          "description": ""
+        },
         "ability": {
           "name": "GainAttackSingleStanceAAirNorzaRegular",
           "class": "Ability",
@@ -296,6 +301,10 @@
       "TimeStrikeANorzaRegular": {
         "id": "TimeStrikeANorzaRegular",
         "found": true,
+        "localization": {
+          "name": "TimeStrikeANorzaRegular",
+          "description": ""
+        },
         "ability": {
           "name": "TimeStrikeANorzaRegular",
           "class": "Ability",
@@ -403,6 +412,10 @@
       "RetributionStunDoubleANorzaRegular": {
         "id": "RetributionStunDoubleANorzaRegular",
         "found": true,
+        "localization": {
+          "name": "RetributionStunDoubleANorzaRegular",
+          "description": ""
+        },
         "ability": {
           "name": "RetributionStunDoubleANorzaRegular",
           "class": "Ability",
@@ -619,61 +632,71 @@
                     "or": {
                       "class": "MonsterConditions",
                       "monsterTags": [
-                        "StunImmuneIfAnyBurningAllies"
+                        "StunImmuneIfBeastAlly"
                       ],
+                      "checkReinforcementsForTeamConditionMatches": true,
                       "myTeamMonsterConditionMatchesNeeded": {
-                        "IsBurning": 1
+                        "IsBeastRegular": 1
                       },
                       "or": {
                         "class": "MonsterConditions",
                         "monsterTags": [
-                          "StunImmuneIfEnemyIsFireBurnBlastOrForce"
+                          "StunImmuneIfAnyBurningAllies"
                         ],
-                        "checkEnemyTeamOfMonster": true,
-                        "enemyTeamMonsterConditionMatchesNeeded": {
-                          "IsBurnBlastOrForceOrFire": 1
+                        "myTeamMonsterConditionMatchesNeeded": {
+                          "IsBurning": 1
                         },
                         "or": {
                           "class": "MonsterConditions",
                           "monsterTags": [
-                            "StunImmuneIfAllyIsFireBurnBlastOrForce"
+                            "StunImmuneIfEnemyIsFireBurnBlastOrForce"
                           ],
-                          "myTeamMonsterConditionMatchesNeeded": {
+                          "checkEnemyTeamOfMonster": true,
+                          "enemyTeamMonsterConditionMatchesNeeded": {
                             "IsBurnBlastOrForceOrFire": 1
                           },
                           "or": {
                             "class": "MonsterConditions",
                             "monsterTags": [
-                              "StunImmuneIfPoisonedEnemy"
+                              "StunImmuneIfAllyIsFireBurnBlastOrForce"
                             ],
-                            "checkEnemyTeamOfMonster": true,
-                            "enemyTeamMonsterConditionMatchesNeeded": {
-                              "IsPoisoned": 1
+                            "myTeamMonsterConditionMatchesNeeded": {
+                              "IsBurnBlastOrForceOrFire": 1
                             },
                             "or": {
                               "class": "MonsterConditions",
                               "monsterTags": [
-                                "StunImmunityIfNotBurning"
+                                "StunImmuneIfPoisonedEnemy"
                               ],
-                              "not": {
-                                "class": "MonsterConditions",
-                                "buffStackNames": [
-                                  "Burn"
-                                ]
+                              "checkEnemyTeamOfMonster": true,
+                              "enemyTeamMonsterConditionMatchesNeeded": {
+                                "IsPoisoned": 1
                               },
                               "or": {
                                 "class": "MonsterConditions",
                                 "monsterTags": [
-                                  "StunImmuneIfHoldGroundPlusTriggered"
-                                ],
-                                "buffStackNames": [
-                                  "BlockDeathUntilNextTurn"
+                                  "StunImmunityIfNotBurning"
                                 ],
                                 "not": {
                                   "class": "MonsterConditions",
                                   "buffStackNames": [
-                                    "HoldGroundOnceForHoldGroundPlus"
+                                    "Burn"
                                   ]
+                                },
+                                "or": {
+                                  "class": "MonsterConditions",
+                                  "monsterTags": [
+                                    "StunImmuneIfHoldGroundPlusTriggered"
+                                  ],
+                                  "buffStackNames": [
+                                    "BlockDeathUntilNextTurn"
+                                  ],
+                                  "not": {
+                                    "class": "MonsterConditions",
+                                    "buffStackNames": [
+                                      "HoldGroundOnceForHoldGroundPlus"
+                                    ]
+                                  }
                                 }
                               }
                             }
@@ -697,6 +720,10 @@
       "SurvivorANorzaRegular": {
         "id": "SurvivorANorzaRegular",
         "found": true,
+        "localization": {
+          "name": "SurvivorANorzaRegular",
+          "description": ""
+        },
         "ability": {
           "name": "SurvivorANorzaRegular",
           "class": "Ability",
@@ -875,23 +902,43 @@
     "passives": {
       "HoldGroundIfOverwatchForAirRetribution": {
         "id": "HoldGroundIfOverwatchForAirRetribution",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Hold Stance",
+          "description": "This unit cannot be defeated while it has the Counter Stance status effect, or during a turn it gains from counter stance."
+        }
       },
       "SpearMinusDamageLv3": {
         "id": "SpearMinusDamageLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Spear Resist Lv3",
+          "description": "10% less damage from attacks by units equipped with Spears."
+        }
       },
       "PlusHPBoostLv3": {
         "id": "PlusHPBoostLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv3",
+          "description": "Adds 1200 to this unit's max HP."
+        }
       },
       "PlusAttackBoostLv3": {
         "id": "PlusAttackBoostLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv3",
+          "description": "Adds 300 to this unit's Attack."
+        }
       },
       "AddWeaponPrefAxe": {
         "id": "AddWeaponPrefAxe",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Axe Mastery",
+          "description": "Can use weapon skills of Axes in addition to their original preferred weapon type."
+        }
       }
     },
     "activeSkillsAI": {},
@@ -1032,9 +1079,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "cb93fc129156764e6fc2f0f7b840f8ffc37ea98b17e4dc5e19c12a5ba0a15f3e",
-    "dependencyHash": "c520d7e531c74232e4645526a17b449475213cb592f995c839dd5227056ca9b6",
-    "generatedAt": 1778013988
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "0e094006d6e5f69d65309e283d1b65a0e43b3c296615f5ce2b5fe48ad52dda43",
+    "dependencyHash": "da904576a36ef7a273c8f8e3e6b63be36b3cf8a097195f0b1fd95a71e47f065f",
+    "generatedAt": 1778081729
   }
 }

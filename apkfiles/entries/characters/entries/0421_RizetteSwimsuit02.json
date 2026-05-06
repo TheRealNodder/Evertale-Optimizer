@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 421,
-  "id": "rizette-swimsuit-02",
-  "name": "RizetteSwimsuit02",
+  "id": "rizette",
+  "name": "Rizette",
+  "title": "",
   "category": "character",
   "rarity": null,
   "stars": 6,
@@ -42,6 +43,10 @@
       "SleepAttackARizetteSwimsuit": {
         "id": "SleepAttackARizetteSwimsuit",
         "found": true,
+        "localization": {
+          "name": "SleepAttackARizetteSwimsuit",
+          "description": ""
+        },
         "ability": {
           "name": "SleepAttackARizetteSwimsuit",
           "class": "Ability",
@@ -328,6 +333,10 @@
       "ForceSleepARizetteSwimsuit": {
         "id": "ForceSleepARizetteSwimsuit",
         "found": true,
+        "localization": {
+          "name": "ForceSleepARizetteSwimsuit",
+          "description": ""
+        },
         "ability": {
           "name": "ForceSleepARizetteSwimsuit",
           "class": "Ability",
@@ -695,20 +704,37 @@
               "or": {
                 "class": "MonsterConditions",
                 "monsterTags": [
-                  "SleepImmuneVsWater"
+                  "SleepImmuneIfBeastAlly"
                 ],
-                "checkEnemyTeamOfMonster": true,
-                "enemyTeamMonsterConditionMatchesNeeded": {
-                  "IsWater": 1
+                "checkReinforcementsForTeamConditionMatches": true,
+                "myTeamMonsterConditionMatchesNeeded": {
+                  "IsBeastRegular": 1
                 },
                 "or": {
                   "class": "MonsterConditions",
                   "monsterTags": [
-                    "NegativeStatusImmunityFromThorns"
+                    "SleepImmuneVsWater"
                   ],
-                  "buffStackNames": [
-                    "SleepThorns"
-                  ]
+                  "checkEnemyTeamOfMonster": true,
+                  "enemyTeamMonsterConditionMatchesNeeded": {
+                    "IsWater": 1
+                  },
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "SleepImmuneVs2Enemies"
+                    ],
+                    "enemyTeamSize": 2,
+                    "or": {
+                      "class": "MonsterConditions",
+                      "monsterTags": [
+                        "NegativeStatusImmunityFromThorns"
+                      ],
+                      "buffStackNames": [
+                        "SleepThorns"
+                      ]
+                    }
+                  }
                 }
               }
             }
@@ -718,6 +744,10 @@
       "HasSleptDrainARizetteSwimsuit": {
         "id": "HasSleptDrainARizetteSwimsuit",
         "found": true,
+        "localization": {
+          "name": "HasSleptDrainARizetteSwimsuit",
+          "description": ""
+        },
         "ability": {
           "name": "HasSleptDrainARizetteSwimsuit",
           "class": "Ability",
@@ -864,6 +894,10 @@
       "DreamHuntDoubleARizetteSwimsuit": {
         "id": "DreamHuntDoubleARizetteSwimsuit",
         "found": true,
+        "localization": {
+          "name": "DreamHuntDoubleARizetteSwimsuit",
+          "description": ""
+        },
         "ability": {
           "name": "DreamHuntDoubleARizetteSwimsuit",
           "class": "Ability",
@@ -1005,27 +1039,51 @@
     "passives": {
       "HoldGround": {
         "id": "HoldGround",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Hold Ground",
+          "description": "If this unit would be defeated by an enemy attack or a status effect while having more than 1 HP, it instead survives with 1 HP."
+        }
       },
       "SleepLowestTUEnemyOnSleepingHit": {
         "id": "SleepLowestTUEnemyOnSleepingHit",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Chain Sleep",
+          "description": "The enemy with the lowest current TU is granted the Sleep status effect for 200TU. This will overwrite other status effects on that unit. Triggered whenever this unit damages a sleeping enemy with an attack. Sleep cannot be applied to a unit that Has Slept while on the battlefield."
+        }
       },
       "PlusAttackBoostLv3": {
         "id": "PlusAttackBoostLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv3",
+          "description": "Adds 300 to this unit's Attack."
+        }
       },
       "AttackUpTargetEquippedStaffLv3": {
         "id": "AttackUpTargetEquippedStaffLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Staff Hunter Lv3",
+          "description": "10% bonus to attacks against units equipped with Staffs."
+        }
       },
       "PlusHPBoostLv3": {
         "id": "PlusHPBoostLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv3",
+          "description": "Adds 1200 to this unit's max HP."
+        }
       },
       "AddWeaponPrefAxe": {
         "id": "AddWeaponPrefAxe",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Axe Mastery",
+          "description": "Can use weapon skills of Axes in addition to their original preferred weapon type."
+        }
       }
     },
     "activeSkillsAI": {},
@@ -1166,9 +1224,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "cd9d22edf6fe751b5c8baa99af4d73a5c5adeec46d4e63152d30ad96c8dc8ef3",
-    "dependencyHash": "cadcfd0f7bc58eb8213ddd9cea62482134421291bbc0f3bbb5d0fd59367f1419",
-    "generatedAt": 1778013992
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "aa62cc9a3ed80f3fbd9512c555b4bd747eec674eb972a71b32a41950716a4a0b",
+    "dependencyHash": "3ae8dd46b31a9f62374357ffda3460c6b4dfd1ae8f9b90a1323bacffafba57d3",
+    "generatedAt": 1778081732
   }
 }

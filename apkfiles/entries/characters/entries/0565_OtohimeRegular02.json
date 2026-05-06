@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 565,
-  "id": "otohime-regular-02",
-  "name": "OtohimeRegular02",
+  "id": "otohime",
+  "name": "Otohime",
+  "title": "",
   "category": "character",
   "rarity": null,
   "stars": 6,
@@ -42,6 +43,11 @@
       "ForceSleepAttackAOtohime": {
         "id": "ForceSleepAttackAOtohime",
         "found": true,
+        "localization": {
+          "name": "Knockout Hit",
+          "description": "100% damage to 1 enemy. 400% damage instead if the user's Drowning Blossom active skill has reached its usage limit. If no enemies are sleeping, grants the target the Sleep status effect for 200TU, even if they have already slept while on the battlefield. This will overwrite other status effects on that unit. Damage from this attack does not wake up sleeping enemies.",
+          "selected": "100%+ damage, can apply sleep\n(Will overwrite other status effects)"
+        },
         "ability": {
           "name": "ForceSleepAttackAOtohime",
           "class": "Ability",
@@ -432,16 +438,16 @@
               }
             }
           }
-        },
-        "localization": {
-          "name": "Knockout Hit",
-          "description": "100% damage to 1 enemy. 400% damage instead if the user's Drowning Blossom active skill has reached its usage limit. If no enemies are sleeping, grants the target the Sleep status effect for 200TU, even if they have already slept while on the battlefield. This will overwrite other status effects on that unit. Damage from this attack does not wake up sleeping enemies.",
-          "selected": "100%+ damage, can apply sleep\n(Will overwrite other status effects)"
         }
       },
       "HighSpiritOnslaughtAOtohime": {
         "id": "HighSpiritOnslaughtAOtohime",
         "found": true,
+        "localization": {
+          "name": "Drowning Blossom",
+          "description": "400% damage to 1 enemy, this damage will not wake up the enemy. Usable if the user's party has 6 or more Spirit or if 2 or more enemies are sleeping. This attack ignores skin passive skills, and the Counter Stance status effect. Usable 3 times per battle.",
+          "selected": "400% damage to 1 enemy"
+        },
         "ability": {
           "name": "HighSpiritOnslaughtAOtohime",
           "class": "Ability",
@@ -566,16 +572,16 @@
               }
             }
           }
-        },
-        "localization": {
-          "name": "Drowning Blossom",
-          "description": "400% damage to 1 enemy, this damage will not wake up the enemy. Usable if the user's party has 6 or more Spirit or if 2 or more enemies are sleeping. This attack ignores skin passive skills, and the Counter Stance status effect. Usable 3 times per battle.",
-          "selected": "400% damage to 1 enemy"
         }
       },
       "NightmareHuntDoubleAOtohime": {
         "id": "NightmareHuntDoubleAOtohime",
         "found": true,
+        "localization": {
+          "name": "Nightmare Dragon",
+          "description": "600% damage to 2 enemies if they are sleeping, this damage will not wake up sleeping enemies. Allies gain 3 Spirit for each sleeping target hit. This attack ignores enemy damage reduction effects.",
+          "selected": "600% damage to sleeping enemies, ignores armor"
+        },
         "ability": {
           "name": "NightmareHuntDoubleAOtohime",
           "class": "Ability",
@@ -709,16 +715,16 @@
               "Sleep"
             ]
           }
-        },
-        "localization": {
-          "name": "Nightmare Dragon",
-          "description": "600% damage to 2 enemies if they are sleeping, this damage will not wake up sleeping enemies. Allies gain 3 Spirit for each sleeping target hit. This attack ignores enemy damage reduction effects.",
-          "selected": "600% damage to sleeping enemies, ignores armor"
         }
       },
       "KillSleepDoubleAOtohime": {
         "id": "KillSleepDoubleAOtohime",
         "found": true,
+        "localization": {
+          "name": "With the Fishes",
+          "description": "Grants 2 enemies the Sleep status effect for 200TU, even if they have already slept while on the battlefield. This will overwrite other status effects on those units. Unlocked each time the user defeats another unit with an attack or if this unit is on the battlefield at the very start of the battle. This skill is locked again after each use or if the user leaves the battlefield.",
+          "selected": "Forces the targets to sleep for 200TU\n(Will overwrite other status effects)"
+        },
         "ability": {
           "name": "KillSleepDoubleAOtohime",
           "class": "Ability",
@@ -1137,20 +1143,37 @@
               "or": {
                 "class": "MonsterConditions",
                 "monsterTags": [
-                  "SleepImmuneVsWater"
+                  "SleepImmuneIfBeastAlly"
                 ],
-                "checkEnemyTeamOfMonster": true,
-                "enemyTeamMonsterConditionMatchesNeeded": {
-                  "IsWater": 1
+                "checkReinforcementsForTeamConditionMatches": true,
+                "myTeamMonsterConditionMatchesNeeded": {
+                  "IsBeastRegular": 1
                 },
                 "or": {
                   "class": "MonsterConditions",
                   "monsterTags": [
-                    "NegativeStatusImmunityFromThorns"
+                    "SleepImmuneVsWater"
                   ],
-                  "buffStackNames": [
-                    "SleepThorns"
-                  ]
+                  "checkEnemyTeamOfMonster": true,
+                  "enemyTeamMonsterConditionMatchesNeeded": {
+                    "IsWater": 1
+                  },
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "SleepImmuneVs2Enemies"
+                    ],
+                    "enemyTeamSize": 2,
+                    "or": {
+                      "class": "MonsterConditions",
+                      "monsterTags": [
+                        "NegativeStatusImmunityFromThorns"
+                      ],
+                      "buffStackNames": [
+                        "SleepThorns"
+                      ]
+                    }
+                  }
                 }
               }
             }
@@ -1161,38 +1184,57 @@
             "fieldToCompareToProperty": "killsMade",
             "propertyFieldCompareStyle": "LessThan"
           }
-        },
-        "localization": {
-          "name": "With the Fishes",
-          "description": "Grants 2 enemies the Sleep status effect for 200TU, even if they have already slept while on the battlefield. This will overwrite other status effects on those units. Unlocked each time the user defeats another unit with an attack or if this unit is on the battlefield at the very start of the battle. This skill is locked again after each use or if the user leaves the battlefield.",
-          "selected": "Forces the targets to sleep for 200TU\n(Will overwrite other status effects)"
         }
       }
     },
     "passives": {
       "ForceSleepHighLowEntranceAndKnockbackImmunity": {
         "id": "ForceSleepHighLowEntranceAndKnockbackImmunity",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Turning Tides",
+          "description": "Sleeps the non-sleeping enemy with the highest current TU for 200TU, then Sleeps the non-sleeping enemy with the lowest current TU for 200TU, even if those targets have already slept while on the battlefield. This unit will immediately get the next turn by having its TU reduced to 0. These effects are triggered when this unit enters the battlefield from the allied reinforcements.\n\nUntil this unit has defeated an enemy with an attack while on the battlefield, or if this unit is conjured:\n-This unit has 50% damage reduction from attacks.\n-When this unit gets a turn, it heals 30% of its max HP.\n\nThis unit cannot be sent to the reinforcements from the battlefield."
+        }
       },
       "SuperStealthReincarnationOtohime": {
         "id": "SuperStealthReincarnationOtohime",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Deadly Revival",
+          "description": "If this unit has defeated an enemy with an attack while on the battlefield, revive this unit to the very front of allied reinforcements with full HP when this unit is defeated by an enemy attack. The revived unit will be considered a conjured unit and cannot be revived again. Use limits on active skills will be reset for the revived unit. This is not a Revenge passive skill.\n\nIf this unit is conjured, its attacks will ignore any effects of non-boss enemies that would prevent the target from being defeated, until it defeats an enemy that isn't a Mori or Imposter with an attack.\n\nThis unit will ignore attacks that would damage exactly 2 targets (attacks that target All allies will not be ignored). If this unit gains the Stealth status effect, it will not be lost when ignoring attacks in this way."
+        }
       },
       "PlusHPBoostLv3": {
         "id": "PlusHPBoostLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv3",
+          "description": "Adds 1200 to this unit's max HP."
+        }
       },
       "PlusAttackBoostLv3": {
         "id": "PlusAttackBoostLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv3",
+          "description": "Adds 300 to this unit's Attack."
+        }
       },
       "FireMinusDamageLv3": {
         "id": "FireMinusDamageLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Fire Resist Lv3",
+          "description": "10% less damage from attacks by Fire units."
+        }
       },
       "AddWeaponPrefSword": {
         "id": "AddWeaponPrefSword",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Sword Mastery",
+          "description": "Can use weapon skills of Swords in addition to their original preferred weapon type."
+        }
       }
     },
     "activeSkillsAI": {},
@@ -1327,9 +1369,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "58bf3a99895eaee474b8e6f18cf96fd741bdc1d64b031e5af6f59dcd75c24211",
-    "dependencyHash": "6de1c3ebebad15327943c0b4b0303fc755d5a46af868a2134f6432ff3d07913e",
-    "generatedAt": 1778013996
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "d72da6f083b3bcc27b71b2f0e90abea0edd6b56f9b139d2c7a16ddf0a10988a4",
+    "dependencyHash": "71f0863e847497cc6cc704c953f2cd440ce03f1efa512a5ab3ac9be3153918d0",
+    "generatedAt": 1778081736
   }
 }

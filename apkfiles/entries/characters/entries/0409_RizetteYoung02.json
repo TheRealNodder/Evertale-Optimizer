@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 409,
-  "id": "rizette-young-02",
-  "name": "RizetteYoung02",
+  "id": "young-rizette",
+  "name": "Young Rizette",
+  "title": "",
   "category": "character",
   "rarity": null,
   "stars": 6,
@@ -42,6 +43,10 @@
       "GainAttackFastChargeARizetteYoung": {
         "id": "GainAttackFastChargeARizetteYoung",
         "found": true,
+        "localization": {
+          "name": "GainAttackFastChargeARizetteYoung",
+          "description": ""
+        },
         "ability": {
           "name": "GainAttackFastChargeARizetteYoung",
           "class": "Ability",
@@ -173,6 +178,10 @@
       "PurifyChargeDoubleARizetteYoung": {
         "id": "PurifyChargeDoubleARizetteYoung",
         "found": true,
+        "localization": {
+          "name": "PurifyChargeDoubleARizetteYoung",
+          "description": ""
+        },
         "ability": {
           "name": "PurifyChargeDoubleARizetteYoung",
           "class": "Ability",
@@ -391,6 +400,10 @@
       "EnergyBlastDrainSingleARizetteYoung": {
         "id": "EnergyBlastDrainSingleARizetteYoung",
         "found": true,
+        "localization": {
+          "name": "EnergyBlastDrainSingleARizetteYoung",
+          "description": ""
+        },
         "ability": {
           "name": "EnergyBlastDrainSingleARizetteYoung",
           "class": "Ability",
@@ -642,6 +655,10 @@
       "Stun100TUCooldownARizetteYoung": {
         "id": "Stun100TUCooldownARizetteYoung",
         "found": true,
+        "localization": {
+          "name": "Stun100TUCooldownARizetteYoung",
+          "description": ""
+        },
         "ability": {
           "name": "Stun100TUCooldownARizetteYoung",
           "class": "Ability",
@@ -828,61 +845,71 @@
                     "or": {
                       "class": "MonsterConditions",
                       "monsterTags": [
-                        "StunImmuneIfAnyBurningAllies"
+                        "StunImmuneIfBeastAlly"
                       ],
+                      "checkReinforcementsForTeamConditionMatches": true,
                       "myTeamMonsterConditionMatchesNeeded": {
-                        "IsBurning": 1
+                        "IsBeastRegular": 1
                       },
                       "or": {
                         "class": "MonsterConditions",
                         "monsterTags": [
-                          "StunImmuneIfEnemyIsFireBurnBlastOrForce"
+                          "StunImmuneIfAnyBurningAllies"
                         ],
-                        "checkEnemyTeamOfMonster": true,
-                        "enemyTeamMonsterConditionMatchesNeeded": {
-                          "IsBurnBlastOrForceOrFire": 1
+                        "myTeamMonsterConditionMatchesNeeded": {
+                          "IsBurning": 1
                         },
                         "or": {
                           "class": "MonsterConditions",
                           "monsterTags": [
-                            "StunImmuneIfAllyIsFireBurnBlastOrForce"
+                            "StunImmuneIfEnemyIsFireBurnBlastOrForce"
                           ],
-                          "myTeamMonsterConditionMatchesNeeded": {
+                          "checkEnemyTeamOfMonster": true,
+                          "enemyTeamMonsterConditionMatchesNeeded": {
                             "IsBurnBlastOrForceOrFire": 1
                           },
                           "or": {
                             "class": "MonsterConditions",
                             "monsterTags": [
-                              "StunImmuneIfPoisonedEnemy"
+                              "StunImmuneIfAllyIsFireBurnBlastOrForce"
                             ],
-                            "checkEnemyTeamOfMonster": true,
-                            "enemyTeamMonsterConditionMatchesNeeded": {
-                              "IsPoisoned": 1
+                            "myTeamMonsterConditionMatchesNeeded": {
+                              "IsBurnBlastOrForceOrFire": 1
                             },
                             "or": {
                               "class": "MonsterConditions",
                               "monsterTags": [
-                                "StunImmunityIfNotBurning"
+                                "StunImmuneIfPoisonedEnemy"
                               ],
-                              "not": {
-                                "class": "MonsterConditions",
-                                "buffStackNames": [
-                                  "Burn"
-                                ]
+                              "checkEnemyTeamOfMonster": true,
+                              "enemyTeamMonsterConditionMatchesNeeded": {
+                                "IsPoisoned": 1
                               },
                               "or": {
                                 "class": "MonsterConditions",
                                 "monsterTags": [
-                                  "StunImmuneIfHoldGroundPlusTriggered"
-                                ],
-                                "buffStackNames": [
-                                  "BlockDeathUntilNextTurn"
+                                  "StunImmunityIfNotBurning"
                                 ],
                                 "not": {
                                   "class": "MonsterConditions",
                                   "buffStackNames": [
-                                    "HoldGroundOnceForHoldGroundPlus"
+                                    "Burn"
                                   ]
+                                },
+                                "or": {
+                                  "class": "MonsterConditions",
+                                  "monsterTags": [
+                                    "StunImmuneIfHoldGroundPlusTriggered"
+                                  ],
+                                  "buffStackNames": [
+                                    "BlockDeathUntilNextTurn"
+                                  ],
+                                  "not": {
+                                    "class": "MonsterConditions",
+                                    "buffStackNames": [
+                                      "HoldGroundOnceForHoldGroundPlus"
+                                    ]
+                                  }
                                 }
                               }
                             }
@@ -910,27 +937,51 @@
     "passives": {
       "HoldGround": {
         "id": "HoldGround",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Hold Ground",
+          "description": "If this unit would be defeated by an enemy attack or a status effect while having more than 1 HP, it instead survives with 1 HP."
+        }
       },
       "DamageReduceWhenCharged": {
         "id": "DamageReduceWhenCharged",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Charge Armor",
+          "description": "50% damage reduction from attacks while this unit has any Charges."
+        }
       },
       "PlusAttackBoostLv3": {
         "id": "PlusAttackBoostLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv3",
+          "description": "Adds 300 to this unit's Attack."
+        }
       },
       "PlusHPBoostLv3": {
         "id": "PlusHPBoostLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv3",
+          "description": "Adds 1200 to this unit's max HP."
+        }
       },
       "GreatAxeMinusDamageLv3": {
         "id": "GreatAxeMinusDamageLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "G.axe Resist Lv3",
+          "description": "10% less damage from attacks by units equipped with Greataxes."
+        }
       },
       "AddWeaponPrefGreatAxe": {
         "id": "AddWeaponPrefGreatAxe",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Greataxe Mastery",
+          "description": "Can use weapon skills of Greataxes in addition to their original preferred weapon type."
+        }
       }
     },
     "activeSkillsAI": {},
@@ -1073,9 +1124,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "3aadfccd1d64e711dce1e79eca2e6e1402a9adfb8561bb37766e030ae244de21",
-    "dependencyHash": "63def56050eaf70fe7969d06f8eb82bb1fa8fa0ba6c9d661e7df125d98251512",
-    "generatedAt": 1778013991
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "36357e686407e1c0bbaa0e20f0819b07c7495f459fd4005aa0c2cb486155cbc0",
+    "dependencyHash": "5ced4c1a8d2299b59c3ce304e9323c92b48259869dac18a27a8763cbda41e392",
+    "generatedAt": 1778081732
   }
 }

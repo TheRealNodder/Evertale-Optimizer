@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 299,
-  "id": "super-water-minion-boss-01",
-  "name": "SuperWaterMinionBoss01",
+  "id": "super-suimori",
+  "name": "Super Suimori",
+  "title": "",
   "category": "bosse",
   "rarity": null,
   "stars": 0,
@@ -36,6 +37,11 @@
       "SleepAttackA": {
         "id": "SleepAttackA",
         "found": true,
+        "localization": {
+          "name": "Sleep Attack",
+          "description": "Damage to 1 enemy, with a 25% chance of granting that enemy the Sleep status effect for 200TU.  If applied, this will overwrite other status effects on that enemy. Sleep cannot be applied to a unit that Has Slept while on the battlefield. Damage from this attack does not wake up sleeping enemies. ",
+          "selected": "Damage to 1 enemy, chance of applying Sleep\n(Can overwrite other status effects)"
+        },
         "ability": {
           "name": "SleepAttackA",
           "class": "Ability",
@@ -339,16 +345,16 @@
               }
             }
           }
-        },
-        "localization": {
-          "name": "Sleep Attack",
-          "description": "Damage to 1 enemy, with a 25% chance of granting that enemy the Sleep status effect for 200TU.  If applied, this will overwrite other status effects on that enemy. Sleep cannot be applied to a unit that Has Slept while on the battlefield. Damage from this attack does not wake up sleeping enemies. ",
-          "selected": "Damage to 1 enemy, chance of applying Sleep\n(Can overwrite other status effects)"
         }
       },
       "ForceSleepBombA": {
         "id": "ForceSleepBombA",
         "found": true,
+        "localization": {
+          "name": "Force Sleep Bomb",
+          "description": "Sacrifices the user to grant 1 enemy the Sleep status effect for 200TU, even if they have already slept while on the battlefield. This will overwrite other status effects on that unit.",
+          "selected": "Puts the target to sleep, user is sacrificed\n(Will overwrite other status effects)"
+        },
         "ability": {
           "name": "ForceSleepBombA",
           "class": "Ability",
@@ -713,40 +719,60 @@
               "or": {
                 "class": "MonsterConditions",
                 "monsterTags": [
-                  "SleepImmuneVsWater"
+                  "SleepImmuneIfBeastAlly"
                 ],
-                "checkEnemyTeamOfMonster": true,
-                "enemyTeamMonsterConditionMatchesNeeded": {
-                  "IsWater": 1
+                "checkReinforcementsForTeamConditionMatches": true,
+                "myTeamMonsterConditionMatchesNeeded": {
+                  "IsBeastRegular": 1
                 },
                 "or": {
                   "class": "MonsterConditions",
                   "monsterTags": [
-                    "NegativeStatusImmunityFromThorns"
+                    "SleepImmuneVsWater"
                   ],
-                  "buffStackNames": [
-                    "SleepThorns"
-                  ]
+                  "checkEnemyTeamOfMonster": true,
+                  "enemyTeamMonsterConditionMatchesNeeded": {
+                    "IsWater": 1
+                  },
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "SleepImmuneVs2Enemies"
+                    ],
+                    "enemyTeamSize": 2,
+                    "or": {
+                      "class": "MonsterConditions",
+                      "monsterTags": [
+                        "NegativeStatusImmunityFromThorns"
+                      ],
+                      "buffStackNames": [
+                        "SleepThorns"
+                      ]
+                    }
+                  }
                 }
               }
             }
           }
-        },
-        "localization": {
-          "name": "Force Sleep Bomb",
-          "description": "Sacrifices the user to grant 1 enemy the Sleep status effect for 200TU, even if they have already slept while on the battlefield. This will overwrite other status effects on that unit.",
-          "selected": "Puts the target to sleep, user is sacrificed\n(Will overwrite other status effects)"
         }
       }
     },
     "passives": {
       "AutoProtectSourcePlus": {
         "id": "AutoProtectSourcePlus",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Auto Guard+",
+          "description": "This unit is a Guardian. For any enemy attack that would hit 1 or 2 other allies, this unit has a 100% chance to redirect 1 hit to itself instead. This unit will not redirect skills that don't deal damage."
+        }
       },
       "MirageMonster": {
         "id": "MirageMonster",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Ephemeral",
+          "description": "This unit is never considered to be defeated by attacks and does not trigger any skills of other units whenever it is defeated or sacrificed by any source while on the battlefield.\n\nThis unit will be fully healed after each turn if it takes damage but is not defeated. This unit will be defeated after any ally or enemy turn if this unit has any of the Burn, Super Poison, or Mega Poison status effects.\n\nDamage dealt to this unit is increased to 2.5 times the normal amount."
+        }
       }
     },
     "activeSkillsAI": {},
@@ -806,9 +832,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "840e64187c45562b9bd54579db28776b7b5baa1863ca40b9f5d0c0fb42af2448",
-    "dependencyHash": "507b9f03d0713cb4840967c3d8b2d980b7f1cb41b82d31679b9e054a8cef0980",
-    "generatedAt": 1778014038
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "f3e37facce48891a807c09f3c57a7b54331c1afbe100ce63eb0eec354923844e",
+    "dependencyHash": "f81b1dee0d16fccb0bad0a75448ec012f10844d0b1307cd2d710406ce1d13cb0",
+    "generatedAt": 1778081780
   }
 }

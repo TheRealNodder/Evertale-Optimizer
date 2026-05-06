@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 97,
-  "id": "air-elf-warrior-01",
-  "name": "AirElfWarrior01",
+  "id": "alina",
+  "name": "Alina",
+  "title": "",
   "category": "character",
   "rarity": null,
   "stars": 3,
@@ -40,6 +41,11 @@
       "GainAttackSingleA": {
         "id": "GainAttackSingleA",
         "found": true,
+        "localization": {
+          "name": "Attack",
+          "description": "Damage to 1 enemy and allies gain 2 Spirit.",
+          "selected": "Damage to 1 enemy and gains 2 Spirit"
+        },
         "ability": {
           "name": "GainAttackSingleA",
           "class": "Ability",
@@ -90,16 +96,16 @@
         },
         "buffs": {},
         "attackScalors": {},
-        "conditions": {},
-        "localization": {
-          "name": "Attack",
-          "description": "Damage to 1 enemy and allies gain 2 Spirit.",
-          "selected": "Damage to 1 enemy and gains 2 Spirit"
-        }
+        "conditions": {}
       },
       "StunBombDoubleA": {
         "id": "StunBombDoubleA",
         "found": true,
+        "localization": {
+          "name": "Stun Bomb",
+          "description": "Sacrifices the user to stun 2 enemies for 200TU. Locked for 100TU after user enters the battlefield.",
+          "selected": "Stuns targets for 200TU"
+        },
         "ability": {
           "name": "StunBombDoubleA",
           "class": "Ability",
@@ -293,61 +299,71 @@
                     "or": {
                       "class": "MonsterConditions",
                       "monsterTags": [
-                        "StunImmuneIfAnyBurningAllies"
+                        "StunImmuneIfBeastAlly"
                       ],
+                      "checkReinforcementsForTeamConditionMatches": true,
                       "myTeamMonsterConditionMatchesNeeded": {
-                        "IsBurning": 1
+                        "IsBeastRegular": 1
                       },
                       "or": {
                         "class": "MonsterConditions",
                         "monsterTags": [
-                          "StunImmuneIfEnemyIsFireBurnBlastOrForce"
+                          "StunImmuneIfAnyBurningAllies"
                         ],
-                        "checkEnemyTeamOfMonster": true,
-                        "enemyTeamMonsterConditionMatchesNeeded": {
-                          "IsBurnBlastOrForceOrFire": 1
+                        "myTeamMonsterConditionMatchesNeeded": {
+                          "IsBurning": 1
                         },
                         "or": {
                           "class": "MonsterConditions",
                           "monsterTags": [
-                            "StunImmuneIfAllyIsFireBurnBlastOrForce"
+                            "StunImmuneIfEnemyIsFireBurnBlastOrForce"
                           ],
-                          "myTeamMonsterConditionMatchesNeeded": {
+                          "checkEnemyTeamOfMonster": true,
+                          "enemyTeamMonsterConditionMatchesNeeded": {
                             "IsBurnBlastOrForceOrFire": 1
                           },
                           "or": {
                             "class": "MonsterConditions",
                             "monsterTags": [
-                              "StunImmuneIfPoisonedEnemy"
+                              "StunImmuneIfAllyIsFireBurnBlastOrForce"
                             ],
-                            "checkEnemyTeamOfMonster": true,
-                            "enemyTeamMonsterConditionMatchesNeeded": {
-                              "IsPoisoned": 1
+                            "myTeamMonsterConditionMatchesNeeded": {
+                              "IsBurnBlastOrForceOrFire": 1
                             },
                             "or": {
                               "class": "MonsterConditions",
                               "monsterTags": [
-                                "StunImmunityIfNotBurning"
+                                "StunImmuneIfPoisonedEnemy"
                               ],
-                              "not": {
-                                "class": "MonsterConditions",
-                                "buffStackNames": [
-                                  "Burn"
-                                ]
+                              "checkEnemyTeamOfMonster": true,
+                              "enemyTeamMonsterConditionMatchesNeeded": {
+                                "IsPoisoned": 1
                               },
                               "or": {
                                 "class": "MonsterConditions",
                                 "monsterTags": [
-                                  "StunImmuneIfHoldGroundPlusTriggered"
-                                ],
-                                "buffStackNames": [
-                                  "BlockDeathUntilNextTurn"
+                                  "StunImmunityIfNotBurning"
                                 ],
                                 "not": {
                                   "class": "MonsterConditions",
                                   "buffStackNames": [
-                                    "HoldGroundOnceForHoldGroundPlus"
+                                    "Burn"
                                   ]
+                                },
+                                "or": {
+                                  "class": "MonsterConditions",
+                                  "monsterTags": [
+                                    "StunImmuneIfHoldGroundPlusTriggered"
+                                  ],
+                                  "buffStackNames": [
+                                    "BlockDeathUntilNextTurn"
+                                  ],
+                                  "not": {
+                                    "class": "MonsterConditions",
+                                    "buffStackNames": [
+                                      "HoldGroundOnceForHoldGroundPlus"
+                                    ]
+                                  }
                                 }
                               }
                             }
@@ -364,16 +380,16 @@
             "class": "MonsterConditions",
             "timeInCombat": 100
           }
-        },
-        "localization": {
-          "name": "Stun Bomb",
-          "description": "Sacrifices the user to stun 2 enemies for 200TU. Locked for 100TU after user enters the battlefield.",
-          "selected": "Stuns targets for 200TU"
         }
       },
       "SlayerbaneA": {
         "id": "SlayerbaneA",
         "found": true,
+        "localization": {
+          "name": "Vengeance Strike",
+          "description": "300% damage to 1 enemy if they have defeated 1+ units with attacks while on the battlefield.",
+          "selected": "300% damage to targets that have defeated 1+ units"
+        },
         "ability": {
           "name": "SlayerbaneA",
           "class": "Ability",
@@ -465,34 +481,49 @@
             "targetCondition": "Kills1"
           }
         },
-        "conditions": {},
-        "localization": {
-          "name": "Vengeance Strike",
-          "description": "300% damage to 1 enemy if they have defeated 1+ units with attacks while on the battlefield.",
-          "selected": "300% damage to targets that have defeated 1+ units"
-        }
+        "conditions": {}
       }
     },
     "passives": {
       "StunRevengeC": {
         "id": "StunRevengeC",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Stun Revenge",
+          "description": "When this unit is defeated by an enemy, that enemy is stunned for 150TU."
+        }
       },
       "AttackUpTargetEquippedGreatAxeLv1": {
         "id": "AttackUpTargetEquippedGreatAxeLv1",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "G.axe Hunter Lv1",
+          "description": "5% bonus to attacks against units equipped with Greataxes."
+        }
       },
       "PlusHPBoostLv1": {
         "id": "PlusHPBoostLv1",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv1",
+          "description": "Adds 600 to this unit's max HP."
+        }
       },
       "PlusAttackBoostLv1": {
         "id": "PlusAttackBoostLv1",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv1",
+          "description": "Adds 150 to this unit's Attack."
+        }
       },
       "AddWeaponPrefAxe": {
         "id": "AddWeaponPrefAxe",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Axe Mastery",
+          "description": "Can use weapon skills of Axes in addition to their original preferred weapon type."
+        }
       }
     },
     "activeSkillsAI": {},
@@ -593,9 +624,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "e5db9df727b3bd18775bdf0c8c715214905fa1b658f0d4e611ee5770d73c161f",
-    "dependencyHash": "ce176786d406f5f60ce5bb0a9085467a47af9881060053c4689650d76c21bde0",
-    "generatedAt": 1778013981
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "9c7109ccf4f708edab2244766128b34aa778c52bff339ed2633fe91fbdd88ff8",
+    "dependencyHash": "a53d0734d3db697b8a53cd6f3590863835c8359e6e4d877bfbe81b13bfb155b0",
+    "generatedAt": 1778081722
   }
 }

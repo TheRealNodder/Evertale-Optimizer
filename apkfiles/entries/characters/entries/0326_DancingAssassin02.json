@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 326,
-  "id": "dancing-assassin-02",
-  "name": "DancingAssassin02",
+  "id": "alira",
+  "name": "Alira",
+  "title": "",
   "category": "character",
   "rarity": null,
   "stars": 6,
@@ -42,6 +43,10 @@
       "GainAttackSingleADancingAssassin": {
         "id": "GainAttackSingleADancingAssassin",
         "found": true,
+        "localization": {
+          "name": "GainAttackSingleADancingAssassin",
+          "description": ""
+        },
         "ability": {
           "name": "GainAttackSingleADancingAssassin",
           "class": "Ability",
@@ -153,6 +158,10 @@
       "SleepSingleADancingAssassin": {
         "id": "SleepSingleADancingAssassin",
         "found": true,
+        "localization": {
+          "name": "SleepSingleADancingAssassin",
+          "description": ""
+        },
         "ability": {
           "name": "SleepSingleADancingAssassin",
           "class": "Ability",
@@ -431,20 +440,37 @@
               "or": {
                 "class": "MonsterConditions",
                 "monsterTags": [
-                  "SleepImmuneVsWater"
+                  "SleepImmuneIfBeastAlly"
                 ],
-                "checkEnemyTeamOfMonster": true,
-                "enemyTeamMonsterConditionMatchesNeeded": {
-                  "IsWater": 1
+                "checkReinforcementsForTeamConditionMatches": true,
+                "myTeamMonsterConditionMatchesNeeded": {
+                  "IsBeastRegular": 1
                 },
                 "or": {
                   "class": "MonsterConditions",
                   "monsterTags": [
-                    "NegativeStatusImmunityFromThorns"
+                    "SleepImmuneVsWater"
                   ],
-                  "buffStackNames": [
-                    "SleepThorns"
-                  ]
+                  "checkEnemyTeamOfMonster": true,
+                  "enemyTeamMonsterConditionMatchesNeeded": {
+                    "IsWater": 1
+                  },
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "SleepImmuneVs2Enemies"
+                    ],
+                    "enemyTeamSize": 2,
+                    "or": {
+                      "class": "MonsterConditions",
+                      "monsterTags": [
+                        "NegativeStatusImmunityFromThorns"
+                      ],
+                      "buffStackNames": [
+                        "SleepThorns"
+                      ]
+                    }
+                  }
                 }
               }
             }
@@ -454,6 +480,10 @@
       "DreamHuntDrainBDancingAssassin": {
         "id": "DreamHuntDrainBDancingAssassin",
         "found": true,
+        "localization": {
+          "name": "DreamHuntDrainBDancingAssassin",
+          "description": ""
+        },
         "ability": {
           "name": "DreamHuntDrainBDancingAssassin",
           "class": "Ability",
@@ -600,6 +630,10 @@
       "SurvivorADancingAssassin": {
         "id": "SurvivorADancingAssassin",
         "found": true,
+        "localization": {
+          "name": "SurvivorADancingAssassin",
+          "description": ""
+        },
         "ability": {
           "name": "SurvivorADancingAssassin",
           "class": "Ability",
@@ -763,27 +797,51 @@
     "passives": {
       "DamageReduceWhenAtMaxHP": {
         "id": "DamageReduceWhenAtMaxHP",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Vigor Armor",
+          "description": "50% less attack damage taken by the user while at max HP."
+        }
       },
       "SleepRandomRevenge": {
         "id": "SleepRandomRevenge",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Sleep Random Revenge",
+          "description": "Whenever this unit is defeated by an enemy, a random enemy gains the Sleep status effect for 200TU. This will overwrite other status effects on that unit. Sleep cannot be applied to a unit that Has Slept while on the battlefield."
+        }
       },
       "WaterMinusDamageLv3": {
         "id": "WaterMinusDamageLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Water Resist Lv3",
+          "description": "10% less damage from attacks by Water units."
+        }
       },
       "PlusHPBoostLv3": {
         "id": "PlusHPBoostLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv3",
+          "description": "Adds 1200 to this unit's max HP."
+        }
       },
       "PlusAttackBoostLv3": {
         "id": "PlusAttackBoostLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv3",
+          "description": "Adds 300 to this unit's Attack."
+        }
       },
       "AddWeaponPrefMace": {
         "id": "AddWeaponPrefMace",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Mace Mastery",
+          "description": "Can use weapon skills of Maces in addition to their original preferred weapon type."
+        }
       }
     },
     "activeSkillsAI": {},
@@ -926,9 +984,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "8b3c1f7a968cd909eac71e1d15b18e2fd1569e0cbb1b6e87b964aaf9b5d27757",
-    "dependencyHash": "e51c28684b34825d17b293f9a772deb6112349f63d623a31c78678459ae71adc",
-    "generatedAt": 1778013989
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "f2063b2d1b115f63e6883c75ba1e9c31e02d1b5d5ce6622cb45b4714d2c1e3b2",
+    "dependencyHash": "405ce6c260761b76a0d913422a06fabd44a70d61fce4cb28a290f69588f7bd44",
+    "generatedAt": 1778081729
   }
 }

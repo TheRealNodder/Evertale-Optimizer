@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 448,
-  "id": "jeanne-valentine-02",
-  "name": "JeanneValentine02",
+  "id": "jeanne-d-arc",
+  "name": "Jeanne d'Arc",
+  "title": "",
   "category": "character",
   "rarity": null,
   "stars": 6,
@@ -44,6 +45,10 @@
       "SleepAttackAJeanneValentine": {
         "id": "SleepAttackAJeanneValentine",
         "found": true,
+        "localization": {
+          "name": "SleepAttackAJeanneValentine",
+          "description": ""
+        },
         "ability": {
           "name": "SleepAttackAJeanneValentine",
           "class": "Ability",
@@ -330,6 +335,11 @@
       "SwapSelfForSleepAngelA": {
         "id": "SwapSelfForSleepAngelA",
         "found": true,
+        "localization": {
+          "name": "Angelic Sleep",
+          "description": "Grants 1 enemy the Sleep status effect for 200TU, and adds Mikaela next in line of allied reinforcements. The user is then exchanged with Mikaela if there are already 4 allies on the battlefield. Mikaela's Level, Limit Breaks, Awakenings, Boosts, Potential, Mastery, Weapon and Accessory will match the user. Sleep will overwrite other status effects on the targeted enemy. Sleep cannot be applied to a unit that Has Slept while on the battlefield. Usable once per battle.",
+          "selected": "Grants Sleep & adds Mikaela to user's team\n(May pull the user back to reinforcements)"
+        },
         "ability": {
           "name": "SwapSelfForSleepAngelA",
           "class": "Ability",
@@ -709,34 +719,50 @@
               "or": {
                 "class": "MonsterConditions",
                 "monsterTags": [
-                  "SleepImmuneVsWater"
+                  "SleepImmuneIfBeastAlly"
                 ],
-                "checkEnemyTeamOfMonster": true,
-                "enemyTeamMonsterConditionMatchesNeeded": {
-                  "IsWater": 1
+                "checkReinforcementsForTeamConditionMatches": true,
+                "myTeamMonsterConditionMatchesNeeded": {
+                  "IsBeastRegular": 1
                 },
                 "or": {
                   "class": "MonsterConditions",
                   "monsterTags": [
-                    "NegativeStatusImmunityFromThorns"
+                    "SleepImmuneVsWater"
                   ],
-                  "buffStackNames": [
-                    "SleepThorns"
-                  ]
+                  "checkEnemyTeamOfMonster": true,
+                  "enemyTeamMonsterConditionMatchesNeeded": {
+                    "IsWater": 1
+                  },
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "SleepImmuneVs2Enemies"
+                    ],
+                    "enemyTeamSize": 2,
+                    "or": {
+                      "class": "MonsterConditions",
+                      "monsterTags": [
+                        "NegativeStatusImmunityFromThorns"
+                      ],
+                      "buffStackNames": [
+                        "SleepThorns"
+                      ]
+                    }
+                  }
                 }
               }
             }
           }
-        },
-        "localization": {
-          "name": "Angelic Sleep",
-          "description": "Grants 1 enemy the Sleep status effect for 200TU, and adds Mikaela next in line of allied reinforcements. The user is then exchanged with Mikaela if there are already 4 allies on the battlefield. Mikaela's Level, Limit Breaks, Awakenings, Boosts, Potential, Mastery, Weapon and Accessory will match the user. Sleep will overwrite other status effects on the targeted enemy. Sleep cannot be applied to a unit that Has Slept while on the battlefield. Usable once per battle.",
-          "selected": "Grants Sleep & adds Mikaela to user's team\n(May pull the user back to reinforcements)"
         }
       },
       "HasSleptDrainAJeanneValentine": {
         "id": "HasSleptDrainAJeanneValentine",
         "found": true,
+        "localization": {
+          "name": "HasSleptDrainAJeanneValentine",
+          "description": ""
+        },
         "ability": {
           "name": "HasSleptDrainAJeanneValentine",
           "class": "Ability",
@@ -883,6 +909,10 @@
       "DreamHuntDrainCJeanneValentine": {
         "id": "DreamHuntDrainCJeanneValentine",
         "found": true,
+        "localization": {
+          "name": "DreamHuntDrainCJeanneValentine",
+          "description": ""
+        },
         "ability": {
           "name": "DreamHuntDrainCJeanneValentine",
           "class": "Ability",
@@ -1025,27 +1055,51 @@
     "passives": {
       "AutoProtectWhileAngelPresent": {
         "id": "AutoProtectWhileAngelPresent",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Twin Guardian",
+          "description": "If there is a Water ally named Mikaela on the battlefield this unit is a Guardian and has 50% damage reduction from attacks. While this unit is a Guardian, for any enemy attack that would hit 1 or 2 other allies, this unit has a 100% chance to redirect 1 hit to itself instead. This unit will not redirect skills that don't deal damage."
+        }
       },
       "SleepLowestTUEntranceA": {
         "id": "SleepLowestTUEntranceA",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Dreamy Entry",
+          "description": "Grants the Sleep status effect to the enemy with the lowest TU for 200TU. Triggered when this unit enters the battlefield from reinforcements. Sleep cannot be applied to a unit that Has Slept while on the battlefield."
+        }
       },
       "PlusHPBoostLv3": {
         "id": "PlusHPBoostLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv3",
+          "description": "Adds 1200 to this unit's max HP."
+        }
       },
       "SpearMinusDamageLv3": {
         "id": "SpearMinusDamageLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Spear Resist Lv3",
+          "description": "10% less damage from attacks by units equipped with Spears."
+        }
       },
       "PlusAttackBoostLv3": {
         "id": "PlusAttackBoostLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv3",
+          "description": "Adds 300 to this unit's Attack."
+        }
       },
       "AddWeaponPrefMace": {
         "id": "AddWeaponPrefMace",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Mace Mastery",
+          "description": "Can use weapon skills of Maces in addition to their original preferred weapon type."
+        }
       }
     },
     "activeSkillsAI": {},
@@ -1196,9 +1250,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "6a21e82758889735518af8fc2157011c07287e2ad6b50a59a5082e51039e1d96",
-    "dependencyHash": "b378d6de6ab3f6930a9b0741788ec2e8133fc9dc20cd0de49623c1fa2da509a5",
-    "generatedAt": 1778013993
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "22715527d8fd2a4a6e197335a373f3b187300f09af7acc9195777d9fc1177593",
+    "dependencyHash": "401ded86a28d570e81a694d40d9d1d7f09de2ca0602bc5e0a676945d534c6a8d",
+    "generatedAt": 1778081733
   }
 }

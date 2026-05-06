@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 281,
-  "id": "tristan-regular-boss-01",
-  "name": "TristanRegularBoss01",
+  "id": "berserk-tristan",
+  "name": "Berserk Tristan",
+  "title": "",
   "category": "bosse",
   "rarity": null,
   "stars": 6,
@@ -38,6 +39,11 @@
       "NewbieSlashATristanRegularBoss": {
         "id": "NewbieSlashATristanRegularBoss",
         "found": true,
+        "localization": {
+          "name": "First Hit",
+          "description": "200% damage to 1 enemy. 500% damage instead if the user has not yet defeated an enemy with an attack while on the battlefield. If an enemy is sleeping, grants the target the Sleep status effect for 200TU, even if they have already slept while on the battlefield. This attack ignores enemy damage reduction effects and does not wake up sleeping enemies.",
+          "selected": "200%+ damage, may apply Sleep\n(Will overwrite other status effects)"
+        },
         "ability": {
           "name": "NewbieSlashATristanRegularBoss",
           "class": "Ability",
@@ -389,16 +395,16 @@
               "IsSleeping": 1
             }
           }
-        },
-        "localization": {
-          "name": "First Hit",
-          "description": "200% damage to 1 enemy. 500% damage instead if the user has not yet defeated an enemy with an attack while on the battlefield. If an enemy is sleeping, grants the target the Sleep status effect for 200TU, even if they have already slept while on the battlefield. This attack ignores enemy damage reduction effects and does not wake up sleeping enemies.",
-          "selected": "200%+ damage, may apply Sleep\n(Will overwrite other status effects)"
         }
       },
       "InstantForceSleepATristanRegularBoss": {
         "id": "InstantForceSleepATristanRegularBoss",
         "found": true,
+        "localization": {
+          "name": "Disabling Pulse",
+          "description": "Grants 1 enemy the Sleep status effect for 200TU, even if they have already slept while on the battlefield. This will overwrite other status effects on that unit.\n\nThen if that target is not asleep (e.g. due to a Sleep Ward), exchanges them with an Imposter. The exchanged enemy will be sent to a random place in line of enemy reinforcements. This exchange will fail if the target is Immovable or if there are less than 4 enemies on the battlefield (no imposter will be added). This skill becomes locked after use until the user uses another active skill.",
+          "selected": "Puts the target to sleep even if it has already slept\n(Will overwrite other status effects)"
+        },
         "ability": {
           "name": "InstantForceSleepATristanRegularBoss",
           "class": "Ability",
@@ -830,20 +836,37 @@
               "or": {
                 "class": "MonsterConditions",
                 "monsterTags": [
-                  "SleepImmuneVsWater"
+                  "SleepImmuneIfBeastAlly"
                 ],
-                "checkEnemyTeamOfMonster": true,
-                "enemyTeamMonsterConditionMatchesNeeded": {
-                  "IsWater": 1
+                "checkReinforcementsForTeamConditionMatches": true,
+                "myTeamMonsterConditionMatchesNeeded": {
+                  "IsBeastRegular": 1
                 },
                 "or": {
                   "class": "MonsterConditions",
                   "monsterTags": [
-                    "NegativeStatusImmunityFromThorns"
+                    "SleepImmuneVsWater"
                   ],
-                  "buffStackNames": [
-                    "SleepThorns"
-                  ]
+                  "checkEnemyTeamOfMonster": true,
+                  "enemyTeamMonsterConditionMatchesNeeded": {
+                    "IsWater": 1
+                  },
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "SleepImmuneVs2Enemies"
+                    ],
+                    "enemyTeamSize": 2,
+                    "or": {
+                      "class": "MonsterConditions",
+                      "monsterTags": [
+                        "NegativeStatusImmunityFromThorns"
+                      ],
+                      "buffStackNames": [
+                        "SleepThorns"
+                      ]
+                    }
+                  }
                 }
               }
             }
@@ -857,16 +880,16 @@
               ]
             }
           }
-        },
-        "localization": {
-          "name": "Disabling Pulse",
-          "description": "Grants 1 enemy the Sleep status effect for 200TU, even if they have already slept while on the battlefield. This will overwrite other status effects on that unit.\n\nThen if that target is not asleep (e.g. due to a Sleep Ward), exchanges them with an Imposter. The exchanged enemy will be sent to a random place in line of enemy reinforcements. This exchange will fail if the target is Immovable or if there are less than 4 enemies on the battlefield (no imposter will be added). This skill becomes locked after use until the user uses another active skill.",
-          "selected": "Puts the target to sleep even if it has already slept\n(Will overwrite other status effects)"
         }
       },
       "NightmareTurnDoubleATristanRegularBoss": {
         "id": "NightmareTurnDoubleATristanRegularBoss",
         "found": true,
+        "localization": {
+          "name": "Grand Fortissimo",
+          "description": "600% damage to 2 enemies if they are sleeping, this damage will not wake up sleeping enemies. This attack ignores damage reduction effects. If damage is dealt to 2 sleeping targets, the user will immediately get the next turn by having its TU reduced to 0, and this skill will become locked until the user damages an enemy with another attack.",
+          "selected": "600% damage to sleeping enemies, ignores armor"
+        },
         "ability": {
           "name": "NightmareTurnDoubleATristanRegularBoss",
           "class": "Ability",
@@ -1055,16 +1078,16 @@
               ]
             }
           }
-        },
-        "localization": {
-          "name": "Grand Fortissimo",
-          "description": "600% damage to 2 enemies if they are sleeping, this damage will not wake up sleeping enemies. This attack ignores damage reduction effects. If damage is dealt to 2 sleeping targets, the user will immediately get the next turn by having its TU reduced to 0, and this skill will become locked until the user damages an enemy with another attack.",
-          "selected": "600% damage to sleeping enemies, ignores armor"
         }
       },
       "SurvivorAttackATristanRegularBoss": {
         "id": "SurvivorAttackATristanRegularBoss",
         "found": true,
+        "localization": {
+          "name": "Royal Grandioso",
+          "description": "600% damage to 1 enemy. This attack ignores any effects of non-boss enemies that would prevent the target from being defeated. Damage from this attack does not wake up sleeping enemies. This skill is usable if all enemies are sleeping or if the user has survived 200TU on the battlefield. This skill becomes locked for 75TU after use.",
+          "selected": "Damages an enemy, ignores defeat prevention"
+        },
         "ability": {
           "name": "SurvivorAttackATristanRegularBoss",
           "class": "Ability",
@@ -1378,22 +1401,25 @@
               }
             }
           }
-        },
-        "localization": {
-          "name": "Royal Grandioso",
-          "description": "600% damage to 1 enemy. This attack ignores any effects of non-boss enemies that would prevent the target from being defeated. Damage from this attack does not wake up sleeping enemies. This skill is usable if all enemies are sleeping or if the user has survived 200TU on the battlefield. This skill becomes locked for 75TU after use.",
-          "selected": "Damages an enemy, ignores defeat prevention"
         }
       }
     },
     "passives": {
       "HeartyProtectionATristanRegularBoss": {
         "id": "HeartyProtectionATristanRegularBoss",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Symphony of Strength",
+          "description": "This unit cannot be defeated by damage from Poison or Burn status effects. If this unit would be defeated by an enemy attack or a status effect while having more than 1 HP, it instead survives with 1 HP. While this unit has 50% or more of max HP, it has 65% damage reduction from attacks.\n\nEach time a sleeping enemy gets the turn, all allies become Enraged.\n\nEach time this unit takes damage from an attack and survives until after the end of the turn with more than 1 HP, this unit becomes Enraged, and will Endure the next damage that would defeat it with 1HP, Endure effects cannot stack. This will overwrite the effects of other Enrage skills on this unit. Enraged units have their Attack increased to 1.5x until the end of their next turn."
+        }
       },
       "KnockbackImmunity": {
         "id": "KnockbackImmunity",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Immovable",
+          "description": "This unit cannot be sent to the reinforcements from the battlefield."
+        }
       }
     },
     "activeSkillsAI": {},
@@ -1465,9 +1491,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "57fb239bdb3fe88b59a523202e7e6289d71a18f63ba32d0bff33306696d0d679",
-    "dependencyHash": "e4b5ade64f01abb07e5c28a111e0ae233b1526a88ce9bd3f39262d959e141829",
-    "generatedAt": 1778014037
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "b9bbd90ee9823cb4d7cb9093c5b6837bf7c7491413cbae0b97dc65c4d79c0f15",
+    "dependencyHash": "55e25cc9e81788db01b76a5ff2d56c705ab0c75c4e29fcfc249dd5c2829963b5",
+    "generatedAt": 1778081779
   }
 }

@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 499,
-  "id": "jeanne-bride-01",
-  "name": "JeanneBride01",
+  "id": "jeanne-d-arc",
+  "name": "Jeanne d'Arc",
+  "title": "",
   "category": "character",
   "rarity": null,
   "stars": 5,
@@ -43,6 +44,10 @@
       "GainAttackSingleStealthBJeanneBride": {
         "id": "GainAttackSingleStealthBJeanneBride",
         "found": true,
+        "localization": {
+          "name": "GainAttackSingleStealthBJeanneBride",
+          "description": ""
+        },
         "ability": {
           "name": "GainAttackSingleStealthBJeanneBride",
           "class": "Ability",
@@ -312,6 +317,10 @@
       "HealEnrageSelfAJeanneBride01": {
         "id": "HealEnrageSelfAJeanneBride01",
         "found": true,
+        "localization": {
+          "name": "HealEnrageSelfAJeanneBride01",
+          "description": ""
+        },
         "ability": {
           "name": "HealEnrageSelfAJeanneBride01",
           "class": "Ability",
@@ -501,6 +510,10 @@
       "Stun125TUSurvivorLockAJeanneBride": {
         "id": "Stun125TUSurvivorLockAJeanneBride",
         "found": true,
+        "localization": {
+          "name": "Stun125TUSurvivorLockAJeanneBride",
+          "description": ""
+        },
         "ability": {
           "name": "Stun125TUSurvivorLockAJeanneBride",
           "class": "Ability",
@@ -680,61 +693,71 @@
                     "or": {
                       "class": "MonsterConditions",
                       "monsterTags": [
-                        "StunImmuneIfAnyBurningAllies"
+                        "StunImmuneIfBeastAlly"
                       ],
+                      "checkReinforcementsForTeamConditionMatches": true,
                       "myTeamMonsterConditionMatchesNeeded": {
-                        "IsBurning": 1
+                        "IsBeastRegular": 1
                       },
                       "or": {
                         "class": "MonsterConditions",
                         "monsterTags": [
-                          "StunImmuneIfEnemyIsFireBurnBlastOrForce"
+                          "StunImmuneIfAnyBurningAllies"
                         ],
-                        "checkEnemyTeamOfMonster": true,
-                        "enemyTeamMonsterConditionMatchesNeeded": {
-                          "IsBurnBlastOrForceOrFire": 1
+                        "myTeamMonsterConditionMatchesNeeded": {
+                          "IsBurning": 1
                         },
                         "or": {
                           "class": "MonsterConditions",
                           "monsterTags": [
-                            "StunImmuneIfAllyIsFireBurnBlastOrForce"
+                            "StunImmuneIfEnemyIsFireBurnBlastOrForce"
                           ],
-                          "myTeamMonsterConditionMatchesNeeded": {
+                          "checkEnemyTeamOfMonster": true,
+                          "enemyTeamMonsterConditionMatchesNeeded": {
                             "IsBurnBlastOrForceOrFire": 1
                           },
                           "or": {
                             "class": "MonsterConditions",
                             "monsterTags": [
-                              "StunImmuneIfPoisonedEnemy"
+                              "StunImmuneIfAllyIsFireBurnBlastOrForce"
                             ],
-                            "checkEnemyTeamOfMonster": true,
-                            "enemyTeamMonsterConditionMatchesNeeded": {
-                              "IsPoisoned": 1
+                            "myTeamMonsterConditionMatchesNeeded": {
+                              "IsBurnBlastOrForceOrFire": 1
                             },
                             "or": {
                               "class": "MonsterConditions",
                               "monsterTags": [
-                                "StunImmunityIfNotBurning"
+                                "StunImmuneIfPoisonedEnemy"
                               ],
-                              "not": {
-                                "class": "MonsterConditions",
-                                "buffStackNames": [
-                                  "Burn"
-                                ]
+                              "checkEnemyTeamOfMonster": true,
+                              "enemyTeamMonsterConditionMatchesNeeded": {
+                                "IsPoisoned": 1
                               },
                               "or": {
                                 "class": "MonsterConditions",
                                 "monsterTags": [
-                                  "StunImmuneIfHoldGroundPlusTriggered"
-                                ],
-                                "buffStackNames": [
-                                  "BlockDeathUntilNextTurn"
+                                  "StunImmunityIfNotBurning"
                                 ],
                                 "not": {
                                   "class": "MonsterConditions",
                                   "buffStackNames": [
-                                    "HoldGroundOnceForHoldGroundPlus"
+                                    "Burn"
                                   ]
+                                },
+                                "or": {
+                                  "class": "MonsterConditions",
+                                  "monsterTags": [
+                                    "StunImmuneIfHoldGroundPlusTriggered"
+                                  ],
+                                  "buffStackNames": [
+                                    "BlockDeathUntilNextTurn"
+                                  ],
+                                  "not": {
+                                    "class": "MonsterConditions",
+                                    "buffStackNames": [
+                                      "HoldGroundOnceForHoldGroundPlus"
+                                    ]
+                                  }
                                 }
                               }
                             }
@@ -759,6 +782,11 @@
       "SurvivorBusterDoubleAJeanneBride": {
         "id": "SurvivorBusterDoubleAJeanneBride",
         "found": true,
+        "localization": {
+          "name": "Survivor's Judgment",
+          "description": "500% damage to 2 enemies and the user will Endure the next damage that would defeat it with 1HP, Endure effects cannot stack. This attack ignores the Stealth status effect and enemy damage reduction effects. Locked for 300TU after the user has entered the battlefield.",
+          "selected": "500% damage, usable if user survived 300TU"
+        },
         "ability": {
           "name": "SurvivorBusterDoubleAJeanneBride",
           "class": "Ability",
@@ -953,34 +981,49 @@
             "class": "MonsterConditions",
             "timeInCombat": 300
           }
-        },
-        "localization": {
-          "name": "Survivor's Judgment",
-          "description": "500% damage to 2 enemies and the user will Endure the next damage that would defeat it with 1HP, Endure effects cannot stack. This attack ignores the Stealth status effect and enemy damage reduction effects. Locked for 300TU after the user has entered the battlefield.",
-          "selected": "500% damage, usable if user survived 300TU"
         }
       }
     },
     "passives": {
       "AllyDeathsToJeanneBrideAngelFront": {
         "id": "AllyDeathsToJeanneBrideAngelFront",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Mikaela's Vengeance",
+          "description": "When another non-conjured ally on the battlefield is defeated or sacrificed by any source, adds Mikaela to next in line of allied reinforcements, so long as this unit is not defeated or sacrificed at the same time and there is not already a Storm ally named Mikaela on the battlefield or in allied reinforcements. Mikaela's Level, Limit Breaks, Awakenings, Boosts, Potential, Mastery, Weapon and Accessory will match this unit."
+        }
       },
       "PlusHPBoostLv3": {
         "id": "PlusHPBoostLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv3",
+          "description": "Adds 1200 to this unit's max HP."
+        }
       },
       "PlusAttackBoostLv3": {
         "id": "PlusAttackBoostLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv3",
+          "description": "Adds 300 to this unit's Attack."
+        }
       },
       "AttackUpTargetEquippedGreatSwordLv3": {
         "id": "AttackUpTargetEquippedGreatSwordLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "G.sword Hunter Lv3",
+          "description": "10% bonus to attacks against units equipped with Greatswords."
+        }
       },
       "AddWeaponPrefSpear": {
         "id": "AddWeaponPrefSpear",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Spear Mastery",
+          "description": "Can use weapon skills of Spears in addition to their original preferred weapon type."
+        }
       }
     },
     "activeSkillsAI": {},
@@ -1130,9 +1173,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "b9eecde97ea971a8a3b05cb2388b03a070c9ec800a478fe7bc54db2564df4696",
-    "dependencyHash": "7ef0ebeed22694ee5eefdceb17342c6869e88d9b6867f9988a6a1c4c08a9931f",
-    "generatedAt": 1778013994
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "2651c385e372d6e0104d6c7271acc4445af34dd385447e8506c0db744ebc7d66",
+    "dependencyHash": "5fb248d00f4e5d9b48bd3a6981a9d83dee2680c2cc6de05c8674635ccedb60e0",
+    "generatedAt": 1778081734
   }
 }

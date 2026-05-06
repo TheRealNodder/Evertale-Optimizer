@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 478,
-  "id": "merlin-regular-02",
-  "name": "MerlinRegular02",
+  "id": "merlin",
+  "name": "Merlin",
+  "title": "",
   "category": "character",
   "rarity": null,
   "stars": 6,
@@ -42,6 +43,10 @@
       "DrainAttackSingleAMerlin": {
         "id": "DrainAttackSingleAMerlin",
         "found": true,
+        "localization": {
+          "name": "DrainAttackSingleAMerlin",
+          "description": ""
+        },
         "ability": {
           "name": "DrainAttackSingleAMerlin",
           "class": "Ability",
@@ -172,6 +177,10 @@
       "ProtectorKillerAMerlin": {
         "id": "ProtectorKillerAMerlin",
         "found": true,
+        "localization": {
+          "name": "ProtectorKillerAMerlin",
+          "description": ""
+        },
         "ability": {
           "name": "ProtectorKillerAMerlin",
           "class": "Ability",
@@ -263,6 +272,10 @@
       "StunAll100TURetreatAMerlin": {
         "id": "StunAll100TURetreatAMerlin",
         "found": true,
+        "localization": {
+          "name": "StunAll100TURetreatAMerlin",
+          "description": ""
+        },
         "ability": {
           "name": "StunAll100TURetreatAMerlin",
           "class": "Ability",
@@ -508,61 +521,71 @@
                     "or": {
                       "class": "MonsterConditions",
                       "monsterTags": [
-                        "StunImmuneIfAnyBurningAllies"
+                        "StunImmuneIfBeastAlly"
                       ],
+                      "checkReinforcementsForTeamConditionMatches": true,
                       "myTeamMonsterConditionMatchesNeeded": {
-                        "IsBurning": 1
+                        "IsBeastRegular": 1
                       },
                       "or": {
                         "class": "MonsterConditions",
                         "monsterTags": [
-                          "StunImmuneIfEnemyIsFireBurnBlastOrForce"
+                          "StunImmuneIfAnyBurningAllies"
                         ],
-                        "checkEnemyTeamOfMonster": true,
-                        "enemyTeamMonsterConditionMatchesNeeded": {
-                          "IsBurnBlastOrForceOrFire": 1
+                        "myTeamMonsterConditionMatchesNeeded": {
+                          "IsBurning": 1
                         },
                         "or": {
                           "class": "MonsterConditions",
                           "monsterTags": [
-                            "StunImmuneIfAllyIsFireBurnBlastOrForce"
+                            "StunImmuneIfEnemyIsFireBurnBlastOrForce"
                           ],
-                          "myTeamMonsterConditionMatchesNeeded": {
+                          "checkEnemyTeamOfMonster": true,
+                          "enemyTeamMonsterConditionMatchesNeeded": {
                             "IsBurnBlastOrForceOrFire": 1
                           },
                           "or": {
                             "class": "MonsterConditions",
                             "monsterTags": [
-                              "StunImmuneIfPoisonedEnemy"
+                              "StunImmuneIfAllyIsFireBurnBlastOrForce"
                             ],
-                            "checkEnemyTeamOfMonster": true,
-                            "enemyTeamMonsterConditionMatchesNeeded": {
-                              "IsPoisoned": 1
+                            "myTeamMonsterConditionMatchesNeeded": {
+                              "IsBurnBlastOrForceOrFire": 1
                             },
                             "or": {
                               "class": "MonsterConditions",
                               "monsterTags": [
-                                "StunImmunityIfNotBurning"
+                                "StunImmuneIfPoisonedEnemy"
                               ],
-                              "not": {
-                                "class": "MonsterConditions",
-                                "buffStackNames": [
-                                  "Burn"
-                                ]
+                              "checkEnemyTeamOfMonster": true,
+                              "enemyTeamMonsterConditionMatchesNeeded": {
+                                "IsPoisoned": 1
                               },
                               "or": {
                                 "class": "MonsterConditions",
                                 "monsterTags": [
-                                  "StunImmuneIfHoldGroundPlusTriggered"
-                                ],
-                                "buffStackNames": [
-                                  "BlockDeathUntilNextTurn"
+                                  "StunImmunityIfNotBurning"
                                 ],
                                 "not": {
                                   "class": "MonsterConditions",
                                   "buffStackNames": [
-                                    "HoldGroundOnceForHoldGroundPlus"
+                                    "Burn"
                                   ]
+                                },
+                                "or": {
+                                  "class": "MonsterConditions",
+                                  "monsterTags": [
+                                    "StunImmuneIfHoldGroundPlusTriggered"
+                                  ],
+                                  "buffStackNames": [
+                                    "BlockDeathUntilNextTurn"
+                                  ],
+                                  "not": {
+                                    "class": "MonsterConditions",
+                                    "buffStackNames": [
+                                      "HoldGroundOnceForHoldGroundPlus"
+                                    ]
+                                  }
                                 }
                               }
                             }
@@ -584,6 +607,10 @@
       "BraveLastStandLethalAMerlin": {
         "id": "BraveLastStandLethalAMerlin",
         "found": true,
+        "localization": {
+          "name": "BraveLastStandLethalAMerlin",
+          "description": ""
+        },
         "ability": {
           "name": "BraveLastStandLethalAMerlin",
           "class": "Ability",
@@ -1024,27 +1051,51 @@
     "passives": {
       "DamageReducWhileBrave": {
         "id": "DamageReducWhileBrave",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Brave Armor",
+          "description": "65% damage reduction from attacks while there are no allied reinforcements."
+        }
       },
       "TUStealEntranceA": {
         "id": "TUStealEntranceA",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Time Thief Entry",
+          "description": "Stuns the enemy with the lowest current TU for 100TU and reduces the current TU of the ally with the highest current TU by 100. Triggered when this unit enters the battlefield from reinforcements."
+        }
       },
       "PlusAttackBoostLv3": {
         "id": "PlusAttackBoostLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv3",
+          "description": "Adds 300 to this unit's Attack."
+        }
       },
       "AttackUpTargetEquippedSpearLv3": {
         "id": "AttackUpTargetEquippedSpearLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Spear Hunter Lv3",
+          "description": "10% bonus to attacks against units equipped with Spears."
+        }
       },
       "PlusHPBoostLv3": {
         "id": "PlusHPBoostLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv3",
+          "description": "Adds 1200 to this unit's max HP."
+        }
       },
       "AddWeaponPrefAxe": {
         "id": "AddWeaponPrefAxe",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Axe Mastery",
+          "description": "Can use weapon skills of Axes in addition to their original preferred weapon type."
+        }
       }
     },
     "activeSkillsAI": {},
@@ -1187,9 +1238,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "5fb8ce2ca6878881730ca1db2f988d3ab293c7a23d577fa45829caa354e3795a",
-    "dependencyHash": "8ba2c1546592e20e0dad57c1f7566828b8ddf711d6a6f801594b7fc400cd7c12",
-    "generatedAt": 1778013993
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "3c53c7f8f30ab2505ae8f8bae5fa5dd67d41f675e5be9336c88d015f707861fc",
+    "dependencyHash": "380783d04f28783ee96c69a310dbe75bd525b9cda6b57f864233e7749fa587e9",
+    "generatedAt": 1778081734
   }
 }

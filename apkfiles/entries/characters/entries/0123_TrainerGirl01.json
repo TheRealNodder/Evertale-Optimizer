@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 123,
-  "id": "trainer-girl-01",
-  "name": "TrainerGirl01",
+  "id": "luna",
+  "name": "Luna",
+  "title": "",
   "category": "character",
   "rarity": null,
   "stars": 3,
@@ -42,6 +43,10 @@
       "GainAttackDoubleALuna": {
         "id": "GainAttackDoubleALuna",
         "found": true,
+        "localization": {
+          "name": "GainAttackDoubleALuna",
+          "description": ""
+        },
         "ability": {
           "name": "GainAttackDoubleALuna",
           "class": "Ability",
@@ -160,6 +165,11 @@
       "SleepBombDoubleA2": {
         "id": "SleepBombDoubleA2",
         "found": true,
+        "localization": {
+          "name": "Sleep Bomb",
+          "description": "Sacrifices the user to grant 2 enemies the Sleep status effect for 200TU. Locked for 200TU after user enters the battlefield. This will overwrite other status effects on these units. Sleep cannot be applied to a unit that Has Slept while on the battlefield.",
+          "selected": "Puts the targets to sleep, user is sacrificed\n(Will overwrite other status effects)"
+        },
         "ability": {
           "name": "SleepBombDoubleA2",
           "class": "Ability",
@@ -454,20 +464,37 @@
               "or": {
                 "class": "MonsterConditions",
                 "monsterTags": [
-                  "SleepImmuneVsWater"
+                  "SleepImmuneIfBeastAlly"
                 ],
-                "checkEnemyTeamOfMonster": true,
-                "enemyTeamMonsterConditionMatchesNeeded": {
-                  "IsWater": 1
+                "checkReinforcementsForTeamConditionMatches": true,
+                "myTeamMonsterConditionMatchesNeeded": {
+                  "IsBeastRegular": 1
                 },
                 "or": {
                   "class": "MonsterConditions",
                   "monsterTags": [
-                    "NegativeStatusImmunityFromThorns"
+                    "SleepImmuneVsWater"
                   ],
-                  "buffStackNames": [
-                    "SleepThorns"
-                  ]
+                  "checkEnemyTeamOfMonster": true,
+                  "enemyTeamMonsterConditionMatchesNeeded": {
+                    "IsWater": 1
+                  },
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "SleepImmuneVs2Enemies"
+                    ],
+                    "enemyTeamSize": 2,
+                    "or": {
+                      "class": "MonsterConditions",
+                      "monsterTags": [
+                        "NegativeStatusImmunityFromThorns"
+                      ],
+                      "buffStackNames": [
+                        "SleepThorns"
+                      ]
+                    }
+                  }
                 }
               }
             }
@@ -476,16 +503,16 @@
             "class": "MonsterConditions",
             "timeInCombat": 200
           }
-        },
-        "localization": {
-          "name": "Sleep Bomb",
-          "description": "Sacrifices the user to grant 2 enemies the Sleep status effect for 200TU. Locked for 200TU after user enters the battlefield. This will overwrite other status effects on these units. Sleep cannot be applied to a unit that Has Slept while on the battlefield.",
-          "selected": "Puts the targets to sleep, user is sacrificed\n(Will overwrite other status effects)"
         }
       },
       "RecklessGainSpiritA2": {
         "id": "RecklessGainSpiritA2",
         "found": true,
+        "localization": {
+          "name": "Pain Spirit",
+          "description": "Reduces the user's current HP by 30% of max and allies are granted 3 Spirit.",
+          "selected": "Gain 3 Spirit, then user loses 30% HP"
+        },
         "ability": {
           "name": "RecklessGainSpiritA2",
           "class": "Ability",
@@ -569,16 +596,15 @@
           }
         },
         "attackScalors": {},
-        "conditions": {},
-        "localization": {
-          "name": "Pain Spirit",
-          "description": "Reduces the user's current HP by 30% of max and allies are granted 3 Spirit.",
-          "selected": "Gain 3 Spirit, then user loses 30% HP"
-        }
+        "conditions": {}
       },
       "DesperateStrikeALuna": {
         "id": "DesperateStrikeALuna",
         "found": true,
+        "localization": {
+          "name": "DesperateStrikeALuna",
+          "description": ""
+        },
         "ability": {
           "name": "DesperateStrikeALuna",
           "class": "Ability",
@@ -740,19 +766,35 @@
     "passives": {
       "PlusAttackBoostLv1": {
         "id": "PlusAttackBoostLv1",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv1",
+          "description": "Adds 150 to this unit's Attack."
+        }
       },
       "FireMinusDamageLv1": {
         "id": "FireMinusDamageLv1",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Fire Resist Lv1",
+          "description": "5% less damage from attacks by Fire units."
+        }
       },
       "PlusHPBoostLv1": {
         "id": "PlusHPBoostLv1",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv1",
+          "description": "Adds 600 to this unit's max HP."
+        }
       },
       "AddWeaponPrefSpear": {
         "id": "AddWeaponPrefSpear",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Spear Mastery",
+          "description": "Can use weapon skills of Spears in addition to their original preferred weapon type."
+        }
       }
     },
     "activeSkillsAI": {
@@ -891,9 +933,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "42c8c52394a3bb6678c5a830a06a5b66f378e6a4b99ea2b6ed44c67109367b52",
-    "dependencyHash": "5e077ff3a1710e5b68bd26c1e37fcda67659506f70a309cde15e39c7ec7e39bf",
-    "generatedAt": 1778013982
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "b711e5789f633d7991cd3ff6d0e71648780b40a80a12ed368605cce904959d2c",
+    "dependencyHash": "f16e41757afaa96bf75f8de812cbc17897ef4a4818098fe9880aaa6d7ed10ee9",
+    "generatedAt": 1778081723
   }
 }

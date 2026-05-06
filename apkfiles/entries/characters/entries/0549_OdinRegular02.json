@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 549,
-  "id": "odin-regular-02",
-  "name": "OdinRegular02",
+  "id": "odin",
+  "name": "Odin",
+  "title": "",
   "category": "character",
   "rarity": null,
   "stars": 6,
@@ -44,6 +45,11 @@
       "TimeSapperAOdinRegular": {
         "id": "TimeSapperAOdinRegular",
         "found": true,
+        "localization": {
+          "name": "Time Blaster",
+          "description": "Targets 1 enemy and deals 100% damage minimum. If the target has 50+ TU, deals 300% damage and steals 1 Spirit from enemies. 500% damage and 2 Spirit stolen instead if the target has 100+ TU.",
+          "selected": "Up to 500% damage and steals up to 2 Spirit"
+        },
         "ability": {
           "name": "TimeSapperAOdinRegular",
           "class": "Ability",
@@ -239,16 +245,16 @@
             "teamSpiritGreaterThan": 0,
             "currentTUGreaterThan": 50
           }
-        },
-        "localization": {
-          "name": "Time Blaster",
-          "description": "Targets 1 enemy and deals 100% damage minimum. If the target has 50+ TU, deals 300% damage and steals 1 Spirit from enemies. 500% damage and 2 Spirit stolen instead if the target has 100+ TU.",
-          "selected": "Up to 500% damage and steals up to 2 Spirit"
         }
       },
       "Stun500AOdinRegular": {
         "id": "Stun500AOdinRegular",
         "found": true,
+        "localization": {
+          "name": "Supreme Stun",
+          "description": "Stuns 1 enemy for 500TU. The user is fully healed and purified (any negative status effects such as Sleep, Burn, or Poison are removed from the user). Usable once per battle.",
+          "selected": "Stuns for 500TU, heals and purifies the user"
+        },
         "ability": {
           "name": "Stun500AOdinRegular",
           "class": "Ability",
@@ -461,61 +467,71 @@
                     "or": {
                       "class": "MonsterConditions",
                       "monsterTags": [
-                        "StunImmuneIfAnyBurningAllies"
+                        "StunImmuneIfBeastAlly"
                       ],
+                      "checkReinforcementsForTeamConditionMatches": true,
                       "myTeamMonsterConditionMatchesNeeded": {
-                        "IsBurning": 1
+                        "IsBeastRegular": 1
                       },
                       "or": {
                         "class": "MonsterConditions",
                         "monsterTags": [
-                          "StunImmuneIfEnemyIsFireBurnBlastOrForce"
+                          "StunImmuneIfAnyBurningAllies"
                         ],
-                        "checkEnemyTeamOfMonster": true,
-                        "enemyTeamMonsterConditionMatchesNeeded": {
-                          "IsBurnBlastOrForceOrFire": 1
+                        "myTeamMonsterConditionMatchesNeeded": {
+                          "IsBurning": 1
                         },
                         "or": {
                           "class": "MonsterConditions",
                           "monsterTags": [
-                            "StunImmuneIfAllyIsFireBurnBlastOrForce"
+                            "StunImmuneIfEnemyIsFireBurnBlastOrForce"
                           ],
-                          "myTeamMonsterConditionMatchesNeeded": {
+                          "checkEnemyTeamOfMonster": true,
+                          "enemyTeamMonsterConditionMatchesNeeded": {
                             "IsBurnBlastOrForceOrFire": 1
                           },
                           "or": {
                             "class": "MonsterConditions",
                             "monsterTags": [
-                              "StunImmuneIfPoisonedEnemy"
+                              "StunImmuneIfAllyIsFireBurnBlastOrForce"
                             ],
-                            "checkEnemyTeamOfMonster": true,
-                            "enemyTeamMonsterConditionMatchesNeeded": {
-                              "IsPoisoned": 1
+                            "myTeamMonsterConditionMatchesNeeded": {
+                              "IsBurnBlastOrForceOrFire": 1
                             },
                             "or": {
                               "class": "MonsterConditions",
                               "monsterTags": [
-                                "StunImmunityIfNotBurning"
+                                "StunImmuneIfPoisonedEnemy"
                               ],
-                              "not": {
-                                "class": "MonsterConditions",
-                                "buffStackNames": [
-                                  "Burn"
-                                ]
+                              "checkEnemyTeamOfMonster": true,
+                              "enemyTeamMonsterConditionMatchesNeeded": {
+                                "IsPoisoned": 1
                               },
                               "or": {
                                 "class": "MonsterConditions",
                                 "monsterTags": [
-                                  "StunImmuneIfHoldGroundPlusTriggered"
-                                ],
-                                "buffStackNames": [
-                                  "BlockDeathUntilNextTurn"
+                                  "StunImmunityIfNotBurning"
                                 ],
                                 "not": {
                                   "class": "MonsterConditions",
                                   "buffStackNames": [
-                                    "HoldGroundOnceForHoldGroundPlus"
+                                    "Burn"
                                   ]
+                                },
+                                "or": {
+                                  "class": "MonsterConditions",
+                                  "monsterTags": [
+                                    "StunImmuneIfHoldGroundPlusTriggered"
+                                  ],
+                                  "buffStackNames": [
+                                    "BlockDeathUntilNextTurn"
+                                  ],
+                                  "not": {
+                                    "class": "MonsterConditions",
+                                    "buffStackNames": [
+                                      "HoldGroundOnceForHoldGroundPlus"
+                                    ]
+                                  }
                                 }
                               }
                             }
@@ -528,16 +544,16 @@
               }
             }
           }
-        },
-        "localization": {
-          "name": "Supreme Stun",
-          "description": "Stuns 1 enemy for 500TU. The user is fully healed and purified (any negative status effects such as Sleep, Burn, or Poison are removed from the user). Usable once per battle.",
-          "selected": "Stuns for 500TU, heals and purifies the user"
         }
       },
       "BirdSplitterAOdinRegular": {
         "id": "BirdSplitterAOdinRegular",
         "found": true,
+        "localization": {
+          "name": "Gungnir",
+          "description": "Sacrifices the ally Winged Shade on the battlefield with the highest current TU for 600% damage to 1 enemy, then adds 2 Winged Shades to random places in ally reinforcements. The user is healed fully and is purified. This does not prevent new status effects from applying to the user. Usable only if there is an ally Winged Shade on the battlefield.",
+          "selected": "600% damage, sacrifices a raven to make 2 more"
+        },
         "ability": {
           "name": "BirdSplitterAOdinRegular",
           "class": "Ability",
@@ -721,16 +737,16 @@
               "IsOdinRaven": 1
             }
           }
-        },
-        "localization": {
-          "name": "Gungnir",
-          "description": "Sacrifices the ally Winged Shade on the battlefield with the highest current TU for 600% damage to 1 enemy, then adds 2 Winged Shades to random places in ally reinforcements. The user is healed fully and is purified. This does not prevent new status effects from applying to the user. Usable only if there is an ally Winged Shade on the battlefield.",
-          "selected": "600% damage, sacrifices a raven to make 2 more"
         }
       },
       "MegaBirdBombAOdinRegular": {
         "id": "MegaBirdBombAOdinRegular",
         "found": true,
+        "localization": {
+          "name": "Ragnarok",
+          "description": "Sacrifices the user to deal 600% damage to all enemies. This attack ignores enemy damage reduction effects and the Stealth status effect. Adds 1 Winged Shade to a random place in ally reinforcements for each Awakening the user has, up to 4 max when fully awakened. Locked for 200TU after the user has entered the battlefield.",
+          "selected": "Sacrifices self for 600% damage to all enemies"
+        },
         "ability": {
           "name": "MegaBirdBombAOdinRegular",
           "class": "Ability",
@@ -1030,38 +1046,57 @@
             "class": "MonsterConditions",
             "timeInCombat": 200
           }
-        },
-        "localization": {
-          "name": "Ragnarok",
-          "description": "Sacrifices the user to deal 600% damage to all enemies. This attack ignores enemy damage reduction effects and the Stealth status effect. Adds 1 Winged Shade to a random place in ally reinforcements for each Awakening the user has, up to 4 max when fully awakened. Locked for 200TU after the user has entered the battlefield.",
-          "selected": "Sacrifices self for 600% damage to all enemies"
         }
       }
     },
     "passives": {
       "BirdSwarmingOdin": {
         "id": "BirdSwarmingOdin",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Eyes of Odin",
+          "description": "Add a number of Winged Shades to random places in ally reinforcements equal to the number of Awakenings this unit has plus 1, up to 5 max when fully awakened. Triggered when this unit enters battle (whether at the start of battle or from reinforcements), so long as this unit is not conjured and there are at least 5 non-conjured units in the ally team (including reinforcements). The number of Winged Shades added by this effect will be doubled if there are at least 10 non-conjured units in the ally team, up to 10 max when fully awakened.\n\nIf this unit is not conjured, this unit cannot be sent to the reinforcements from the battlefield.\n\nEvery Winged Shade conjured by this unit will have its Level, Limit Breaks, Awakenings, Boosts, Potential, Mastery, Weapon, and Accessory match this unit."
+        }
       },
       "BirdRegenerationOdin": {
         "id": "BirdRegenerationOdin",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Supreme Will",
+          "description": "If this unit would be defeated by an enemy attack or a status effect while having more than 1 HP, it instead survives with 1 HP.\n\nThis unit enters battle with a Sleep Ward.\n\nIf this unit is conjured, it immediately gets the turn by having its TU reduced to 0 whenever it enters the battlefield from reinforcements.\n\nWhenever an ally Winged Shade gets the turn or enters the battlefield, this unit will be healed for 50% of max HP, will wake up if it is Sleeping, and will gain a Sleep Ward.\n\n-Sleep Ward prevents Sleep from being applied once, then is removed. Sleep Wards cannot stack."
+        }
       },
       "PlusAttackBoostLv3": {
         "id": "PlusAttackBoostLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv3",
+          "description": "Adds 300 to this unit's Attack."
+        }
       },
       "AirMinusDamageLv3": {
         "id": "AirMinusDamageLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Storm Resist Lv3",
+          "description": "10% less damage from attacks by Storm units."
+        }
       },
       "PlusHPBoostLv3": {
         "id": "PlusHPBoostLv3",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv3",
+          "description": "Adds 1200 to this unit's max HP."
+        }
       },
       "AddWeaponPrefGreatSword": {
         "id": "AddWeaponPrefGreatSword",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Greatsword Mastery",
+          "description": "Can use weapon skills of Greatswords in addition to their original preferred weapon type."
+        }
       }
     },
     "activeSkillsAI": {},
@@ -1205,9 +1240,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "7e46b5807d6e65453926fabe80b34117f0ada9589a7dea1ebd7db7fb03842ce4",
-    "dependencyHash": "89b29055b54ea37c4f141f554b4537a870ef8e3b863abe60a46141b39558e1c1",
-    "generatedAt": 1778013996
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "82818d8421a21258fd29c5762a5c3d2862fa4c4e1d26773afbfa34ac963051b3",
+    "dependencyHash": "76fe7628e78739728f338cd9a3f8af6afb8b77a462c2c5a69211ba9883a869a4",
+    "generatedAt": 1778081736
   }
 }

@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 44,
-  "id": "primeval-demon-01",
-  "name": "PrimevalDemonC01",
+  "id": "aeon-knight",
+  "name": "Aeon Knight",
+  "title": "",
   "category": "bosse",
   "rarity": null,
   "stars": 4,
@@ -38,6 +39,11 @@
       "GainAttackSingleA": {
         "id": "GainAttackSingleA",
         "found": true,
+        "localization": {
+          "name": "Attack",
+          "description": "Damage to 1 enemy and allies gain 2 Spirit.",
+          "selected": "Damage to 1 enemy and gains 2 Spirit"
+        },
         "ability": {
           "name": "GainAttackSingleA",
           "class": "Ability",
@@ -88,16 +94,16 @@
         },
         "buffs": {},
         "attackScalors": {},
-        "conditions": {},
-        "localization": {
-          "name": "Attack",
-          "description": "Damage to 1 enemy and allies gain 2 Spirit.",
-          "selected": "Damage to 1 enemy and gains 2 Spirit"
-        }
+        "conditions": {}
       },
       "SleepSingleB": {
         "id": "SleepSingleB",
         "found": true,
+        "localization": {
+          "name": "Sleep",
+          "description": "Grants 1 enemy the Sleep status effect for 200TU. This will overwrite other status effects on that unit. Sleep cannot be applied to a unit that Has Slept while on the battlefield.",
+          "selected": "Puts the target to sleep\n(Will overwrite other status effects)"
+        },
         "ability": {
           "name": "SleepSingleB",
           "class": "Ability",
@@ -374,34 +380,51 @@
               "or": {
                 "class": "MonsterConditions",
                 "monsterTags": [
-                  "SleepImmuneVsWater"
+                  "SleepImmuneIfBeastAlly"
                 ],
-                "checkEnemyTeamOfMonster": true,
-                "enemyTeamMonsterConditionMatchesNeeded": {
-                  "IsWater": 1
+                "checkReinforcementsForTeamConditionMatches": true,
+                "myTeamMonsterConditionMatchesNeeded": {
+                  "IsBeastRegular": 1
                 },
                 "or": {
                   "class": "MonsterConditions",
                   "monsterTags": [
-                    "NegativeStatusImmunityFromThorns"
+                    "SleepImmuneVsWater"
                   ],
-                  "buffStackNames": [
-                    "SleepThorns"
-                  ]
+                  "checkEnemyTeamOfMonster": true,
+                  "enemyTeamMonsterConditionMatchesNeeded": {
+                    "IsWater": 1
+                  },
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "SleepImmuneVs2Enemies"
+                    ],
+                    "enemyTeamSize": 2,
+                    "or": {
+                      "class": "MonsterConditions",
+                      "monsterTags": [
+                        "NegativeStatusImmunityFromThorns"
+                      ],
+                      "buffStackNames": [
+                        "SleepThorns"
+                      ]
+                    }
+                  }
                 }
               }
             }
           }
-        },
-        "localization": {
-          "name": "Sleep",
-          "description": "Grants 1 enemy the Sleep status effect for 200TU. This will overwrite other status effects on that unit. Sleep cannot be applied to a unit that Has Slept while on the battlefield.",
-          "selected": "Puts the target to sleep\n(Will overwrite other status effects)"
         }
       },
       "DreamHuntA2": {
         "id": "DreamHuntA2",
         "found": true,
+        "localization": {
+          "name": "Dream Hunter",
+          "description": "600% damage to 1 enemy if they are sleeping. Allies gain 4 Spirit if the target is asleep.",
+          "selected": "600% damage & gain 4 Spirit against sleeping target"
+        },
         "ability": {
           "name": "DreamHuntA2",
           "class": "Ability",
@@ -512,16 +535,16 @@
               "Sleep"
             ]
           }
-        },
-        "localization": {
-          "name": "Dream Hunter",
-          "description": "600% damage to 1 enemy if they are sleeping. Allies gain 4 Spirit if the target is asleep.",
-          "selected": "600% damage & gain 4 Spirit against sleeping target"
         }
       },
       "DesperateBiteA3": {
         "id": "DesperateBiteA3",
         "found": true,
+        "localization": {
+          "name": "Desperate Drain",
+          "description": "500% damage to 1 enemy, and the user recovers HP by 50% of its own max if damage is dealt. Usable only if the user's HP is at 25% or less.",
+          "selected": "500% damage, usable if user HP is 25% or less"
+        },
         "ability": {
           "name": "DesperateBiteA3",
           "class": "Ability",
@@ -715,22 +738,25 @@
             "class": "MonsterConditions",
             "hpLessThanPercent": 0.2500001
           }
-        },
-        "localization": {
-          "name": "Desperate Drain",
-          "description": "500% damage to 1 enemy, and the user recovers HP by 50% of its own max if damage is dealt. Usable only if the user's HP is at 25% or less.",
-          "selected": "500% damage, usable if user HP is 25% or less"
         }
       }
     },
     "passives": {
       "SpiritLossRevengeA": {
         "id": "SpiritLossRevengeA",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Spirit- Revenge",
+          "description": "Whenever this unit is defeated by an enemy, the enemy party loses 2 Spirit."
+        }
       },
       "HoldGround": {
         "id": "HoldGround",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Hold Ground",
+          "description": "If this unit would be defeated by an enemy attack or a status effect while having more than 1 HP, it instead survives with 1 HP."
+        }
       }
     },
     "activeSkillsAI": {},
@@ -809,9 +835,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "e0efd6264c8e5703d39cabb031c164ea0847fab35d66d898c34eda70d0e728c0",
-    "dependencyHash": "e9c827197e5411f33038817861955bc412f79770e205f9935fc8e3d2f33dd348",
-    "generatedAt": 1778014030
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "86c73df6cd338f313ad7ed6c3d60dac75b7de1e3a75da20026ede9824531f82f",
+    "dependencyHash": "6ae0e7ea17531817663570962a8855cf79ba30725b3bd3729f409346856f7c2d",
+    "generatedAt": 1778081772
   }
 }

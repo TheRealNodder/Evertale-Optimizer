@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 175,
-  "id": "ludmilla-school-girl-boss-02",
-  "name": "LudmillaSchoolGirlBoss02",
+  "id": "mega-ludmilla-clarice",
+  "name": "Mega Ludmilla & Clarice",
+  "title": "",
   "category": "bosse",
   "rarity": null,
   "stars": 6,
@@ -40,6 +41,11 @@
       "SleepAttackALudmillaSchoolBoss": {
         "id": "SleepAttackALudmillaSchoolBoss",
         "found": true,
+        "localization": {
+          "name": "Knockout Strike",
+          "description": "Damage to 1 enemy. 35% chance of forcing that enemy to Sleep for 200TU, even if it has already slept while on the battlefield. If Sleep is applied, it will overwrite other status effects on that enemy. Damage from this attack does not wake up sleeping enemies.",
+          "selected": "Damage to 1 enemy, chance of forcing Sleep\n(Can overwrite other status effects)"
+        },
         "ability": {
           "name": "SleepAttackALudmillaSchoolBoss",
           "class": "Ability",
@@ -299,16 +305,16 @@
           }
         },
         "attackScalors": {},
-        "conditions": {},
-        "localization": {
-          "name": "Knockout Strike",
-          "description": "Damage to 1 enemy. 35% chance of forcing that enemy to Sleep for 200TU, even if it has already slept while on the battlefield. If Sleep is applied, it will overwrite other status effects on that enemy. Damage from this attack does not wake up sleeping enemies.",
-          "selected": "Damage to 1 enemy, chance of forcing Sleep\n(Can overwrite other status effects)"
-        }
+        "conditions": {}
       },
       "DreamHuntDrainInstantALudmillaSchoolBoss": {
         "id": "DreamHuntDrainInstantALudmillaSchoolBoss",
         "found": true,
+        "localization": {
+          "name": "Nightmare Hunter",
+          "description": "600% damage to 1 enemy if they are sleeping, this damage will not wake up the enemy.",
+          "selected": "600% damage to sleeping target, does not wake"
+        },
         "ability": {
           "name": "DreamHuntDrainInstantALudmillaSchoolBoss",
           "class": "Ability",
@@ -407,16 +413,15 @@
             "targetCondition": "IsSleeping"
           }
         },
-        "conditions": {},
-        "localization": {
-          "name": "Nightmare Hunter",
-          "description": "600% damage to 1 enemy if they are sleeping, this damage will not wake up the enemy.",
-          "selected": "600% damage to sleeping target, does not wake"
-        }
+        "conditions": {}
       },
       "ForceSleepALudmillaSchoolBoss": {
         "id": "ForceSleepALudmillaSchoolBoss",
         "found": true,
+        "localization": {
+          "name": "ForceSleepALudmillaSchoolBoss",
+          "description": ""
+        },
         "ability": {
           "name": "ForceSleepALudmillaSchoolBoss",
           "class": "Ability",
@@ -813,20 +818,37 @@
               "or": {
                 "class": "MonsterConditions",
                 "monsterTags": [
-                  "SleepImmuneVsWater"
+                  "SleepImmuneIfBeastAlly"
                 ],
-                "checkEnemyTeamOfMonster": true,
-                "enemyTeamMonsterConditionMatchesNeeded": {
-                  "IsWater": 1
+                "checkReinforcementsForTeamConditionMatches": true,
+                "myTeamMonsterConditionMatchesNeeded": {
+                  "IsBeastRegular": 1
                 },
                 "or": {
                   "class": "MonsterConditions",
                   "monsterTags": [
-                    "NegativeStatusImmunityFromThorns"
+                    "SleepImmuneVsWater"
                   ],
-                  "buffStackNames": [
-                    "SleepThorns"
-                  ]
+                  "checkEnemyTeamOfMonster": true,
+                  "enemyTeamMonsterConditionMatchesNeeded": {
+                    "IsWater": 1
+                  },
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "SleepImmuneVs2Enemies"
+                    ],
+                    "enemyTeamSize": 2,
+                    "or": {
+                      "class": "MonsterConditions",
+                      "monsterTags": [
+                        "NegativeStatusImmunityFromThorns"
+                      ],
+                      "buffStackNames": [
+                        "SleepThorns"
+                      ]
+                    }
+                  }
                 }
               }
             }
@@ -836,6 +858,11 @@
       "BloodfuryBusterDoubleSLudmillaSchoolBoss": {
         "id": "BloodfuryBusterDoubleSLudmillaSchoolBoss",
         "found": true,
+        "localization": {
+          "name": "Savage Knockout",
+          "description": "500% damage to 2 enemies. Forces those enemies to Sleep for 200TU if they are left with 25% or less of max HP and are not already sleeping, even if they have already slept while on the battlefield. This attack ignores enemy damage reduction effects and the Stealth status effect. Damage from this attack does not wake up sleeping enemies. Sleep will overwrite other status effects on those enemies. Usable if the user has defeated 1+ units with attacks while on the battlefield.",
+          "selected": "500% damage to 2 enemies, can force them to Sleep\n(Will overwrite other status effects)"
+        },
         "ability": {
           "name": "BloodfuryBusterDoubleSLudmillaSchoolBoss",
           "class": "Ability",
@@ -1135,30 +1162,41 @@
             "class": "MonsterConditions",
             "killsMade": 1
           }
-        },
-        "localization": {
-          "name": "Savage Knockout",
-          "description": "500% damage to 2 enemies. Forces those enemies to Sleep for 200TU if they are left with 25% or less of max HP and are not already sleeping, even if they have already slept while on the battlefield. This attack ignores enemy damage reduction effects and the Stealth status effect. Damage from this attack does not wake up sleeping enemies. Sleep will overwrite other status effects on those enemies. Usable if the user has defeated 1+ units with attacks while on the battlefield.",
-          "selected": "500% damage to 2 enemies, can force them to Sleep\n(Will overwrite other status effects)"
         }
       }
     },
     "passives": {
       "KillGuardModeBoss": {
         "id": "KillGuardModeBoss",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Triumph Guard",
+          "description": "When this unit defeats an enemy unit with an attack while it is not a Guardian, it will become a Guardian for 100TU.\n\nFor any enemy attack that would hit 1 or 2 other allies while this unit is a Guardian, 1 of the hits is instead redirected to this unit. This unit will not redirect skills that don't deal damage.\n\nThis unit cannot become a Guardian from other skills."
+        }
       },
       "DamageReducWhileGuardingAttackUpDodgeWhileNotGuarding": {
         "id": "DamageReducWhileGuardingAttackUpDodgeWhileNotGuarding",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Dual Prodigies",
+          "description": "While this unit is a Guardian, it has 65% damage reduction from attacks.\n\nWhile this unit is not a Guardian, its Attack is increased to 1.5x (this will not stack with Enrage effects) and it will ignore attacks that would damage exactly 2 targets (attacks that target All allies will not be ignored). If this unit gains the Stealth status effect, it will not be lost when ignoring attacks in this way."
+        }
       },
       "StunImmunity": {
         "id": "StunImmunity",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Stun Immunity",
+          "description": "This unit is not affected by stun effects."
+        }
       },
       "KnockbackImmunity": {
         "id": "KnockbackImmunity",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Immovable",
+          "description": "This unit cannot be sent to the reinforcements from the battlefield."
+        }
       }
     },
     "activeSkillsAI": {},
@@ -1260,9 +1298,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "d7f581aa4896172ed36f07646167a5f1096504f588ad0bd16dee80534a7edd7f",
-    "dependencyHash": "afa7058e4178afba626ce3294645554f0a5008a25f4a5ea7f63cf73114cbb311",
-    "generatedAt": 1778014034
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "486dd495865f01f534c538923f028e19b205e715067b1f80d782c24c70316e54",
+    "dependencyHash": "1ade4d09973840b3f2931ceb4013a8df9c9b99bbf8e6b67f06385e3ea95efaff",
+    "generatedAt": 1778081776
   }
 }

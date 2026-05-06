@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 129,
-  "id": "water-construct-01-b",
-  "name": "WaterConstruct01B",
+  "id": "water-golem",
+  "name": "Water Golem",
+  "title": "",
   "category": "bosse",
   "rarity": null,
   "stars": 5,
@@ -37,6 +38,10 @@
       "GainAttackDoubleAGolem": {
         "id": "GainAttackDoubleAGolem",
         "found": true,
+        "localization": {
+          "name": "GainAttackDoubleAGolem",
+          "description": ""
+        },
         "ability": {
           "name": "GainAttackDoubleAGolem",
           "class": "Ability",
@@ -130,6 +135,11 @@
       "SleepSingleA": {
         "id": "SleepSingleA",
         "found": true,
+        "localization": {
+          "name": "Sleep",
+          "description": "Grants 1 enemy the Sleep status effect for 200TU. This will overwrite other status effects on that unit. Sleep cannot be applied to a unit that Has Slept while on the battlefield.",
+          "selected": "Puts the target to sleep\n(Will overwrite other status effects)"
+        },
         "ability": {
           "name": "SleepSingleA",
           "class": "Ability",
@@ -406,34 +416,51 @@
               "or": {
                 "class": "MonsterConditions",
                 "monsterTags": [
-                  "SleepImmuneVsWater"
+                  "SleepImmuneIfBeastAlly"
                 ],
-                "checkEnemyTeamOfMonster": true,
-                "enemyTeamMonsterConditionMatchesNeeded": {
-                  "IsWater": 1
+                "checkReinforcementsForTeamConditionMatches": true,
+                "myTeamMonsterConditionMatchesNeeded": {
+                  "IsBeastRegular": 1
                 },
                 "or": {
                   "class": "MonsterConditions",
                   "monsterTags": [
-                    "NegativeStatusImmunityFromThorns"
+                    "SleepImmuneVsWater"
                   ],
-                  "buffStackNames": [
-                    "SleepThorns"
-                  ]
+                  "checkEnemyTeamOfMonster": true,
+                  "enemyTeamMonsterConditionMatchesNeeded": {
+                    "IsWater": 1
+                  },
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "SleepImmuneVs2Enemies"
+                    ],
+                    "enemyTeamSize": 2,
+                    "or": {
+                      "class": "MonsterConditions",
+                      "monsterTags": [
+                        "NegativeStatusImmunityFromThorns"
+                      ],
+                      "buffStackNames": [
+                        "SleepThorns"
+                      ]
+                    }
+                  }
                 }
               }
             }
           }
-        },
-        "localization": {
-          "name": "Sleep",
-          "description": "Grants 1 enemy the Sleep status effect for 200TU. This will overwrite other status effects on that unit. Sleep cannot be applied to a unit that Has Slept while on the battlefield.",
-          "selected": "Puts the target to sleep\n(Will overwrite other status effects)"
         }
       },
       "RecklessHealA": {
         "id": "RecklessHealA",
         "found": true,
+        "localization": {
+          "name": "Pain Heal",
+          "description": "Heals 1 ally for HP equal to 400% of the user's Attack, then reduces the user's current HP by 40% of max.",
+          "selected": "Heal HP of 1 ally, then user loses 40% HP"
+        },
         "ability": {
           "name": "RecklessHealA",
           "class": "Ability",
@@ -523,16 +550,15 @@
           }
         },
         "attackScalors": {},
-        "conditions": {},
-        "localization": {
-          "name": "Pain Heal",
-          "description": "Heals 1 ally for HP equal to 400% of the user's Attack, then reduces the user's current HP by 40% of max.",
-          "selected": "Heal HP of 1 ally, then user loses 40% HP"
-        }
+        "conditions": {}
       },
       "HasSleptEaterAGolem": {
         "id": "HasSleptEaterAGolem",
         "found": true,
+        "localization": {
+          "name": "HasSleptEaterAGolem",
+          "description": ""
+        },
         "ability": {
           "name": "HasSleptEaterAGolem",
           "class": "Ability",
@@ -633,7 +659,11 @@
     "passives": {
       "SleepRevenge": {
         "id": "SleepRevenge",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Sleep Revenge",
+          "description": "Whenever this unit is defeated by an enemy, that enemy gains the Sleep status effect for 200TU. This will overwrite other status effects on that unit. Sleep cannot be applied to a unit that Has Slept while on the battlefield."
+        }
       }
     },
     "activeSkillsAI": {},
@@ -702,9 +732,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "81c8c4c31fd01378a2b5fda622a645a6c797a585bf559973e458b77128692b07",
-    "dependencyHash": "a495a441ab0a08129086d22b148bae4e3c26ccdaf72de1301b1c43bea5f4ac40",
-    "generatedAt": 1778014032
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "2e47534a08134b3adc7d140c049418b7579aff39721524ab2f7c5c8b8ee23607",
+    "dependencyHash": "2e1a0df0a2d3615446d5dc346bfbc3d4c44d4374758d27db9c23f0ad48385ab2",
+    "generatedAt": 1778081774
   }
 }

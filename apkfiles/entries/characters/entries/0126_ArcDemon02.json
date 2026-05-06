@@ -1,8 +1,9 @@
 {
   "schemaVersion": 3,
   "order": 126,
-  "id": "arc-demon-02",
-  "name": "ArcDemon02",
+  "id": "kavaat-merc",
+  "name": "Kavaat Merc",
+  "title": "",
   "category": "character",
   "rarity": null,
   "stars": 4,
@@ -43,6 +44,11 @@
       "RecklessAttackA": {
         "id": "RecklessAttackA",
         "found": true,
+        "localization": {
+          "name": "Brash Strike",
+          "description": "150% damage to 1 enemy and allies gain 1 Spirit. Reflects 30% of the damage to the user.",
+          "selected": "150% damage and 1 Spirit, 30% damage reflection"
+        },
         "ability": {
           "name": "RecklessAttackA",
           "class": "Ability",
@@ -98,16 +104,16 @@
         },
         "buffs": {},
         "attackScalors": {},
-        "conditions": {},
-        "localization": {
-          "name": "Brash Strike",
-          "description": "150% damage to 1 enemy and allies gain 1 Spirit. Reflects 30% of the damage to the user.",
-          "selected": "150% damage and 1 Spirit, 30% damage reflection"
-        }
+        "conditions": {}
       },
       "KillStunSingle200A": {
         "id": "KillStunSingle200A",
         "found": true,
+        "localization": {
+          "name": "Triumph Stun",
+          "description": "Stuns 1 enemy for 200TU. Unlocked each time the user defeats another unit with an attack. This skill is locked again after each use or if the user leaves the battlefield.",
+          "selected": "Stuns target for 200TU"
+        },
         "ability": {
           "name": "KillStunSingle200A",
           "class": "Ability",
@@ -319,61 +325,71 @@
                     "or": {
                       "class": "MonsterConditions",
                       "monsterTags": [
-                        "StunImmuneIfAnyBurningAllies"
+                        "StunImmuneIfBeastAlly"
                       ],
+                      "checkReinforcementsForTeamConditionMatches": true,
                       "myTeamMonsterConditionMatchesNeeded": {
-                        "IsBurning": 1
+                        "IsBeastRegular": 1
                       },
                       "or": {
                         "class": "MonsterConditions",
                         "monsterTags": [
-                          "StunImmuneIfEnemyIsFireBurnBlastOrForce"
+                          "StunImmuneIfAnyBurningAllies"
                         ],
-                        "checkEnemyTeamOfMonster": true,
-                        "enemyTeamMonsterConditionMatchesNeeded": {
-                          "IsBurnBlastOrForceOrFire": 1
+                        "myTeamMonsterConditionMatchesNeeded": {
+                          "IsBurning": 1
                         },
                         "or": {
                           "class": "MonsterConditions",
                           "monsterTags": [
-                            "StunImmuneIfAllyIsFireBurnBlastOrForce"
+                            "StunImmuneIfEnemyIsFireBurnBlastOrForce"
                           ],
-                          "myTeamMonsterConditionMatchesNeeded": {
+                          "checkEnemyTeamOfMonster": true,
+                          "enemyTeamMonsterConditionMatchesNeeded": {
                             "IsBurnBlastOrForceOrFire": 1
                           },
                           "or": {
                             "class": "MonsterConditions",
                             "monsterTags": [
-                              "StunImmuneIfPoisonedEnemy"
+                              "StunImmuneIfAllyIsFireBurnBlastOrForce"
                             ],
-                            "checkEnemyTeamOfMonster": true,
-                            "enemyTeamMonsterConditionMatchesNeeded": {
-                              "IsPoisoned": 1
+                            "myTeamMonsterConditionMatchesNeeded": {
+                              "IsBurnBlastOrForceOrFire": 1
                             },
                             "or": {
                               "class": "MonsterConditions",
                               "monsterTags": [
-                                "StunImmunityIfNotBurning"
+                                "StunImmuneIfPoisonedEnemy"
                               ],
-                              "not": {
-                                "class": "MonsterConditions",
-                                "buffStackNames": [
-                                  "Burn"
-                                ]
+                              "checkEnemyTeamOfMonster": true,
+                              "enemyTeamMonsterConditionMatchesNeeded": {
+                                "IsPoisoned": 1
                               },
                               "or": {
                                 "class": "MonsterConditions",
                                 "monsterTags": [
-                                  "StunImmuneIfHoldGroundPlusTriggered"
-                                ],
-                                "buffStackNames": [
-                                  "BlockDeathUntilNextTurn"
+                                  "StunImmunityIfNotBurning"
                                 ],
                                 "not": {
                                   "class": "MonsterConditions",
                                   "buffStackNames": [
-                                    "HoldGroundOnceForHoldGroundPlus"
+                                    "Burn"
                                   ]
+                                },
+                                "or": {
+                                  "class": "MonsterConditions",
+                                  "monsterTags": [
+                                    "StunImmuneIfHoldGroundPlusTriggered"
+                                  ],
+                                  "buffStackNames": [
+                                    "BlockDeathUntilNextTurn"
+                                  ],
+                                  "not": {
+                                    "class": "MonsterConditions",
+                                    "buffStackNames": [
+                                      "HoldGroundOnceForHoldGroundPlus"
+                                    ]
+                                  }
                                 }
                               }
                             }
@@ -392,16 +408,16 @@
             "fieldToCompareToProperty": "killsMade",
             "propertyFieldCompareStyle": "LessThan"
           }
-        },
-        "localization": {
-          "name": "Triumph Stun",
-          "description": "Stuns 1 enemy for 200TU. Unlocked each time the user defeats another unit with an attack. This skill is locked again after each use or if the user leaves the battlefield.",
-          "selected": "Stuns target for 200TU"
         }
       },
       "ThrowA": {
         "id": "ThrowA",
         "found": true,
+        "localization": {
+          "name": "Blood Nova",
+          "description": "Sacrifices the last unit in the allied reinforcements for 400% damage to 1 enemy. Usable only if there are 1 or more allied reinforcements left.",
+          "selected": "Sacrifices 1 ally to deal 400% damage"
+        },
         "ability": {
           "name": "ThrowA",
           "class": "Ability",
@@ -498,16 +514,16 @@
             "class": "MonsterConditions",
             "allyReinforcements": 1
           }
-        },
-        "localization": {
-          "name": "Blood Nova",
-          "description": "Sacrifices the last unit in the allied reinforcements for 400% damage to 1 enemy. Usable only if there are 1 or more allied reinforcements left.",
-          "selected": "Sacrifices 1 ally to deal 400% damage"
         }
       },
       "GiveTurnA": {
         "id": "GiveTurnA",
         "found": true,
+        "localization": {
+          "name": "Give Turn",
+          "description": "Immediately give 1 other ally the next turn by reducing their current TU to 0. Active skills that grant turns cannot be used on turns given by this skill.",
+          "selected": "Reduce TU of 1 ally to 0"
+        },
         "ability": {
           "name": "GiveTurnA",
           "class": "Ability",
@@ -663,34 +679,49 @@
               "OnExtraTurn"
             ]
           }
-        },
-        "localization": {
-          "name": "Give Turn",
-          "description": "Immediately give 1 other ally the next turn by reducing their current TU to 0. Active skills that grant turns cannot be used on turns given by this skill.",
-          "selected": "Reduce TU of 1 ally to 0"
         }
       }
     },
     "passives": {
       "Summon1MinionEntranceAir": {
         "id": "Summon1MinionEntranceAir",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Summon Entry",
+          "description": "Adds 1 Denmori to the very end of this unit's team. Triggered when this unit enters the battlefield from the allied reinforcements."
+        }
       },
       "Stun10TUMinus": {
         "id": "Stun10TUMinus",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Stun Resist Lv1",
+          "description": "Reduces the amount of any stun effects against this unit by 10TU."
+        }
       },
       "PlusHPBoostLv1": {
         "id": "PlusHPBoostLv1",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv1",
+          "description": "Adds 600 to this unit's max HP."
+        }
       },
       "PlusAttackBoostLv1": {
         "id": "PlusAttackBoostLv1",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv1",
+          "description": "Adds 150 to this unit's Attack."
+        }
       },
       "AddWeaponPrefSpear": {
         "id": "AddWeaponPrefSpear",
-        "found": false
+        "found": true,
+        "localization": {
+          "name": "Spear Mastery",
+          "description": "Can use weapon skills of Spears in addition to their original preferred weapon type."
+        }
       }
     },
     "activeSkillsAI": {},
@@ -798,9 +829,9 @@
     ]
   },
   "_build": {
-    "scriptVersion": "3-incremental-checkpoint",
-    "sourceHash": "c1450c76d9d1ae1d130807c317a051115351c00d4d8811b608d96cf30dea3c65",
-    "dependencyHash": "500776745ae9b5f8f955f835f7a4380631cb1ecd36a6fd4ac01e237d5c1d7dc6",
-    "generatedAt": 1778013982
+    "scriptVersion": "4-passive-localization",
+    "sourceHash": "82693741f0bb7887538a1344ae4832d071fbfd3a3d534e555c9c21f2cabfc4b2",
+    "dependencyHash": "88f0045eff73d90d5bcbd4cdf3b9226d67ac6f924b9c171c6ff1ac29c81d1344",
+    "generatedAt": 1778081723
   }
 }
