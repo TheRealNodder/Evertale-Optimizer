@@ -36,10 +36,6 @@ def write_json(path: Path, data: Any) -> None:
     )
 
 
-def strip_form_suffix(value: str) -> str:
-    return str(value or "").rstrip("0123456789")
-
-
 def image_url(source_id: str, image_base: str) -> str:
     return f"{image_base.rstrip('/')}/{source_id}.png"
 
@@ -47,19 +43,11 @@ def image_url(source_id: str, image_base: str) -> str:
 def default_states_for_family(family: str, rarity: str, image_base: str) -> List[Dict[str, Any]]:
     rarity = str(rarity or "").upper()
     if rarity == "SSR":
-        rows = [
-            ("base", "01", 5),
-            ("evolved", "02", 6),
-            ("final", "03", 6),
-        ]
+        rows = [("base", "01", 5), ("evolved", "02", 6), ("final", "03", 6)]
     elif rarity == "SR":
-        rows = [
-            ("base", "01", 3),
-            ("evolved", "02", 4),
-        ]
+        rows = [("base", "01", 3), ("evolved", "02", 4)]
     else:
         rows = [("base", "01", 1)]
-
     return [
         {
             "state": state,
@@ -112,6 +100,21 @@ def build_from_family_file(path: Path, image_base: str) -> Optional[Dict[str, An
     }
 
 
+def resolve_family_path(entries_root: Path, family_dir: Path, rel: str) -> Path:
+    rel_path = Path(rel)
+    candidates = []
+    # index.json may store either "SnowWhiteNew.json" or "families/SnowWhiteNew.json".
+    candidates.append(family_dir / rel_path)
+    candidates.append(entries_root / "characters" / rel_path)
+    candidates.append(entries_root / rel_path)
+    if rel.startswith("families/"):
+        candidates.append(family_dir / rel.split("/", 1)[1])
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate
+    return candidates[0]
+
+
 def build_from_families(entries_root: Path, image_base: str) -> Dict[str, Any]:
     family_dir = entries_root / "characters" / "families"
     index = load_json(family_dir / "index.json", {}) or {}
@@ -120,10 +123,10 @@ def build_from_families(entries_root: Path, image_base: str) -> Dict[str, Any]:
     missing: List[str] = []
 
     for row in rows or []:
-        rel = str(row.get("file") or "").replace("\\", "/")
+        rel = str(row.get("file") or "").replace("\\", "/").lstrip("./")
         if not rel:
             continue
-        path = family_dir / rel
+        path = resolve_family_path(entries_root, family_dir, rel)
         built = build_from_family_file(path, image_base)
         if built:
             result[built["family"]] = built
@@ -164,6 +167,7 @@ def main() -> int:
         "output": str(entries_root / "maps" / "character_image_map.json"),
         "count": payload["count"],
         "sourceCount": built["sourceCount"],
+        "missingCount": len(built["missing"]),
         "missing": built["missing"],
     }
 
