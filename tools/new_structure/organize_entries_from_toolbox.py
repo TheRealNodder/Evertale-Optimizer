@@ -5,7 +5,7 @@ Organize entry indexes using the order shown by Evertale Toolbox Explorer.
 Universal behavior:
 - Can run from repo root, tools/new_structure, apkfiles, or any repo subfolder.
 - Auto-detects repo root and apkfiles/entries.
-- Pulls order from https://evertaletoolbox.runasp.net/Explorer by default.
+- Pulls order from https://evertaletoolbox2.runasp.net/Explorer by default.
 - Can use a saved Explorer text/html file with --source-file if the site is down.
 - Writes stable order maps into apkfiles/entries/maps/.
 - Rewrites category index.json order by default without moving entry files.
@@ -22,6 +22,7 @@ Offline source:
 Outputs:
   apkfiles/entries/maps/character_order_map.json
   apkfiles/entries/maps/weapon_order_map.json
+  apkfiles/entries/maps/accessory_order_map.json
   apkfiles/entries/maps/boss_order_map.json
   apkfiles/entries/reports/toolbox_order_report.json
 """
@@ -34,14 +35,21 @@ import re
 import time
 import urllib.request
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
-EXPLORER_URL = "https://evertaletoolbox.runasp.net/Explorer"
-CATEGORIES = ["characters", "weapons", "bosses"]
+EXPLORER_URL = "https://evertaletoolbox2.runasp.net/Explorer"
+CATEGORIES = ["characters", "weapons", "accessories", "bosses"]
 CATEGORY_TO_MAP = {
     "characters": "character_order_map.json",
     "weapons": "weapon_order_map.json",
+    "accessories": "accessory_order_map.json",
     "bosses": "boss_order_map.json",
+}
+SECTION_LABELS = {
+    "Character": "characters",
+    "Weapon": "weapons",
+    "Accessory": "accessories",
+    "Boss": "bosses",
 }
 
 
@@ -99,26 +107,36 @@ def visible_text(raw: str) -> str:
     return text
 
 
-def parse_explorer_rows(raw: str) -> List[Tuple[str, str]]:
+def parse_explorer_sections(raw: str) -> Dict[str, List[Tuple[str, str]]]:
     text = visible_text(raw)
-    rows: List[Tuple[str, str]] = []
-    seen = set()
-    pattern = re.compile(r"^\s*([A-Za-z][A-Za-z0-9_]*?)(?:01|02|03|04|05)?\s*\(([^\n()]+)\)\s*$")
-    for line in text.splitlines():
-        line = line.strip()
-        if not line or line in {"English", "日本語", "Character", "Boss", "Weapon", "Accessory"}:
+    sections: Dict[str, List[Tuple[str, str]]] = {cat: [] for cat in CATEGORIES}
+    seen = {cat: set() for cat in CATEGORIES}
+    current: Optional[str] = None
+    pending_label: Optional[str] = None
+    item_pattern = re.compile(r"^\s*([A-Za-z][A-Za-z0-9_]*?)\s*\(([^\n()]*)\)\s*$")
+
+    for raw_line in text.splitlines():
+        line = raw_line.strip()
+        if not line:
             continue
-        match = pattern.match(line)
-        if not match:
+        if line in SECTION_LABELS:
+            pending_label = SECTION_LABELS[line]
+            continue
+        if line == "ALL" and pending_label:
+            current = pending_label
+            pending_label = None
+            continue
+        match = item_pattern.match(line)
+        if not match or not current:
             continue
         key = match.group(1).strip()
         display = match.group(2).strip()
         pair = (key, display)
-        if pair in seen:
+        if pair in seen[current]:
             continue
-        seen.add(pair)
-        rows.append(pair)
-    return rows
+        seen[current].add(pair)
+        sections[current].append(pair)
+    return sections
 
 
 def load_index(entries_root: Path, category: str) -> Dict[str, Any]:
@@ -154,14 +172,14 @@ def build_existing_key_map(index: Dict[str, Any], category: str) -> Dict[str, Di
     return out
 
 
-def classify_toolbox_rows(toolbox_rows: List[Tuple[str, str]], indexes: Dict[str, Dict[str, Any]]) -> Dict[str, List[Dict[str, Any]]]:
+def classify_rows(section_rows: Dict[str, List[Tuple[str, str]]], indexes: Dict[str, Dict[str, Any]]) -> Dict[str, List[Dict[str, Any]]]:
     existing = {cat: build_existing_key_map(indexes[cat], cat) for cat in CATEGORIES}
     output = {cat: [] for cat in CATEGORIES}
     used = {cat: set() for cat in CATEGORIES}
 
-    for source_key, display in toolbox_rows:
-        candidates = [norm(source_key), norm(strip_form_suffix(source_key)), norm(display)]
-        for category in CATEGORIES:
+    for category in CATEGORIES:
+        for source_key, display in section_rows.get(category, []):
+            candidates = [norm(source_key), norm(strip_form_suffix(source_key)), norm(display)]
             matched_row = None
             matched_key = None
             for candidate in candidates:
@@ -178,11 +196,10 @@ def classify_toolbox_rows(toolbox_rows: List[Tuple[str, str]], indexes: Dict[str
             output[category].append({
                 "key": strip_form_suffix(source_id) if category == "characters" else source_id,
                 "sourceId": source_id,
-                "displayName": display,
+                "displayName": display or matched_row.get("name") or source_id,
                 "matchedBy": matched_key,
                 "file": matched_row.get("file"),
             })
-            break
     return output
 
 
@@ -203,7 +220,7 @@ def append_unmatched(category: str, index: Dict[str, Any], ordered: List[Dict[st
     return ordered
 
 
-def rewrite_index(entries_root: Path, category: str, index: Dict[str, Any], ordered: List[Dict[str, Any]], dry_run: bool) -> Dict[str, Any]:
+def rewrite_index(entries_root: Path, category: str, index: Dict[str, Any], ordered: List[Dict[str, Any]], source: str, dry_run: bool) -> Dict[str, Any]:
     by_source = {str(row.get("sourceId") or ""): dict(row) for row in index.get("entries", []) or []}
     rewritten = []
     for i, order_row in enumerate(ordered, start=1):
@@ -219,7 +236,7 @@ def rewrite_index(entries_root: Path, category: str, index: Dict[str, Any], orde
     new_index = dict(index)
     new_index["entries"] = rewritten
     new_index["count"] = len(rewritten)
-    new_index["orderSource"] = "evertaletoolbox.runasp.net/Explorer"
+    new_index["orderSource"] = source
     new_index["orderGeneratedAt"] = int(time.time())
     if not dry_run:
         write_json(entries_root / category / "index.json", new_index)
@@ -237,10 +254,11 @@ def main() -> int:
 
     repo_root = find_repo_root()
     entries_root = find_entries(repo_root, args.entries)
+    source = args.source_url if not args.source_file else str(args.source_file)
     raw = read_text(resolve_path(args.source_file, repo_root, args.source_file)) if args.source_file else fetch_explorer(args.source_url)
-    toolbox_rows = parse_explorer_rows(raw)
+    section_rows = parse_explorer_sections(raw)
     indexes = {cat: load_index(entries_root, cat) for cat in CATEGORIES}
-    classified = classify_toolbox_rows(toolbox_rows, indexes)
+    classified = classify_rows(section_rows, indexes)
 
     maps_dir = entries_root / "maps"
     report_categories: Dict[str, Any] = {}
@@ -264,16 +282,17 @@ def main() -> int:
         if not args.dry_run:
             write_json(maps_dir / CATEGORY_TO_MAP[category], {
                 "schemaVersion": 1,
-                "source": args.source_url if not args.source_file else str(args.source_file),
+                "source": source,
                 "generatedAt": int(time.time()),
                 "category": category,
                 "count": len(map_rows),
                 "order": map_rows,
             })
         if not args.no_rewrite_index:
-            rewrite_index(entries_root, category, indexes[category], ordered, args.dry_run)
+            rewrite_index(entries_root, category, indexes[category], ordered, source, args.dry_run)
         report_categories[category] = {
             "indexCount": len(indexes[category].get("entries", []) or []),
+            "parsedFromExplorerSection": len(section_rows.get(category, [])),
             "matchedFromToolbox": len(classified[category]),
             "finalOrderedCount": len(map_rows),
             "unmatchedTailCount": max(0, len(map_rows) - len(classified[category])),
@@ -286,9 +305,9 @@ def main() -> int:
         "generatedAt": int(time.time()),
         "repoRoot": str(repo_root),
         "entriesRoot": str(entries_root),
-        "source": args.source_url if not args.source_file else str(args.source_file),
-        "toolboxRowsParsed": len(toolbox_rows),
+        "source": source,
         "dryRun": bool(args.dry_run),
+        "sectionsParsed": {cat: len(section_rows.get(cat, [])) for cat in CATEGORIES},
         "categories": report_categories,
     }
     if not args.dry_run:
