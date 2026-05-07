@@ -1,0 +1,51 @@
+/* =========================================================
+   ELEMENT WATERMARK ICONS — COMPACT CARDS ONLY
+   Uses UI/<Element>.png assets.
+   Scope intentionally limited to roster/catalog compact cards.
+   ========================================================= */
+
+body.mobile-compact .unitCard.el-fire,
+body.mobile-compact .unitCard.el-water,
+body.mobile-compact .unitCard.el-storm,
+body.mobile-compact .unitCard.el-earth,
+body.mobile-compact .unitCard.el-light,
+body.mobile-compact .unitCard.el-dark{
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+}
+
+body.mobile-compact .unitCard.el-fire  { --element-watermark:url("./UI/Fire.png"); }
+body.mobile-compact .unitCard.el-water { --element-watermark:url("./UI/Water.png"); }
+body.mobile-compact .unitCard.el-storm { --element-watermark:url("./UI/Storm.png"); }
+body.mobile-compact .unitCard.el-earth { --element-watermark:url("./UI/Earth.png"); }
+body.mobile-compact .unitCard.el-light { --element-watermark:url("./UI/Light.png"); }
+body.mobile-compact .unitCard.el-dark  { --element-watermark:url("./UI/Dark.png"); }
+
+body.mobile-compact .unitCard[class*="el-"]::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  background-image:var(--element-watermark);
+  background-repeat:no-repeat;
+  background-position:center 54%;
+  background-size:72%;
+  opacity:.075;
+  filter:saturate(1.15) contrast(1.05);
+}
+
+body.mobile-compact .unitCard[class*="el-"] > *{
+  position:relative;
+  z-index:1;
+}
+
+/* Keep watermark subtle on very small cards. */
+@media (max-width:560px){
+  body.mobile-compact .unitCard[class*="el-"]::after{
+    background-size:82%;
+    background-position:center 58%;
+    opacity:.065;
+  }
+}
