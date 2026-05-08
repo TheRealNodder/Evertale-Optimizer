@@ -1,0 +1,1171 @@
+{
+  "schemaVersion": 3,
+  "order": 311,
+  "id": "berserk-shen-long",
+  "name": "Berserk Shen Long",
+  "title": "",
+  "description": "",
+  "category": "bosse",
+  "rarity": null,
+  "stars": 6,
+  "evolvedStars": 6,
+  "element": "Fire",
+  "weaponType": "Sword",
+  "stats": {
+    "atk": 888,
+    "hp": 28800,
+    "spd": 532,
+    "cost": 999
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/DragonGirlRegular01.png",
+  "refs": {
+    "activeSkills": [
+      "DoubleAttackADragonGirlRegularBoss",
+      "2AllyEnrageADragonGirlRegularBoss",
+      "IgnoreDefeatBurnForceADragonGirlRegularBoss"
+    ],
+    "passives": [
+      "FireFocusPassiveADragonGirlRegularBoss"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": null,
+    "leaderBuffCondition": null,
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "DoubleAttackADragonGirlRegularBoss": {
+        "id": "DoubleAttackADragonGirlRegularBoss",
+        "found": true,
+        "localization": {
+          "name": "Dragon Fang",
+          "description": "Damage to 2 Enemies, 500% damage instead if the user is burning. Then the user is granted the Burn status effect. This attack ignores the Stealth Status Effect. This unit will immediately get the next turn if this is the first time this skill has been used while on the battlefield or if this unit has used Incinerate since this skill was last used.\n\nBurn will overwrite other status effects on the user. Any unit that deals damage to or is dealt damage by a unit with Burn will gain the Burn status effect.",
+          "selected": "100%+ damage to 2 enemies & may act again"
+        },
+        "ability": {
+          "name": "DoubleAttackADragonGirlRegularBoss",
+          "class": "Ability",
+          "abilityScalor": 0,
+          "conditionalAbilityScalors": [
+            4
+          ],
+          "config": "DoubleAttackADragonGirlRegularBoss",
+          "tuCost": 70,
+          "useLimit": 0,
+          "spiritGain": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "applyToTargetType": "Enemy",
+              "damageFlags": [
+                "DragonGirlHitFlag"
+              ]
+            },
+            {
+              "buffs": [
+                "GiveTurn",
+                "OnExtraTurn",
+                "JustGivenTurn"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true,
+              "buffAppliedEffects": [
+                "blank1"
+              ],
+              "applyConditions": "NoFreshNewMomentum",
+              "showMissConditions": "ShowNoMiss"
+            },
+            {
+              "buffs": [
+                "Burn",
+                "FreshNewMomentum"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "attackScalors": [
+            "GoodIfBurning"
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "MidFire1",
+          "conditionedAbilityEffects": [
+            "DragonGirlBigDragon"
+          ],
+          "flags": [
+            "Burn",
+            "ApplyStatusToSelf",
+            "IgnoreStealth"
+          ],
+          "recommendEffectWhenUsable": -2
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.3,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_casting5/batfx_casting5",
+            "batfx_firelarge2/batfx_firelarge2",
+            "batsfx_prefab/batsfx_fire2",
+            "batfx_rippleredlow/batfx_rippleredlow"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -2,
+            1,
+            -2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            true,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "Burn": {
+            "class": "Buff",
+            "stackName": "Burn",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "DamageOverTime",
+              "BuffChanceOnHit",
+              "BuffWhenMonsterHurt"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "LockHasBurnedSkills"
+              },
+              {
+                "name": "SleepThorns"
+              },
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "percentOfTargetHp": 0.001,
+                "damageColor": "Red",
+                "abilityEffect": "BurnDamage1",
+                "bossDamageCap": 500,
+                "extraDamageFlag": "Burn"
+              },
+              {
+                "contextBuffs": [
+                  "BurnAfterTurn"
+                ],
+                "chance": 1.0
+              },
+              {
+                "contextBuffs": [
+                  "BurnAfterTurn",
+                  "RemovePoison"
+                ],
+                "spreadCondition": "IsNotBurnImmune",
+                "cancelFromDamageFlags": [
+                  "Sneak",
+                  "RemoveStatus"
+                ],
+                "cancelFromDamageTypes": [
+                  "BuffDamage"
+                ]
+              }
+            ],
+            "tags": [
+              "Burn"
+            ],
+            "canBePurified": true,
+            "duration": 300,
+            "statusEffect": "BurnStatus",
+            "statusEffectOffset": 0.1,
+            "damageType": "Burn",
+            "noIconShownOnBattleStatus": false,
+            "applyConditions": "IsNotBurning",
+            "showAsTimer": true,
+            "iconSpriteName": "IconRedBurn01"
+          },
+          "FreshNewMomentum": {
+            "class": "Buff",
+            "stackName": "FreshNewMomentumReady",
+            "duration": -1,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "isHiddenFromPlayers": true
+          },
+          "GiveTurn": {
+            "class": "Buff",
+            "behaviors": [
+              "GiveTurn"
+            ],
+            "behaviorOverrides": [
+              {}
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "textKeyToShowWhenApplied": "TurnGivenKey",
+            "isHiddenFromPlayers": true
+          },
+          "JustGivenTurn": {
+            "class": "Buff",
+            "duration": 1,
+            "stackName": "JustGivenTurnBuff",
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "isHiddenFromPlayers": true,
+            "noIconShownOnBattleStatus": true
+          },
+          "OnExtraTurn": {
+            "class": "Buff",
+            "stackName": "OnExtraTurn",
+            "duration": 1,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {
+          "GoodIfBurning": {
+            "class": "AttackScalor",
+            "sourceCondition": "IsBurning"
+          }
+        },
+        "conditions": {
+          "NoFreshNewMomentum": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "FreshNewMomentumReady"
+              ]
+            }
+          },
+          "OnExtraTurn": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "OnExtraTurn"
+            ]
+          }
+        }
+      },
+      "2AllyEnrageADragonGirlRegularBoss": {
+        "id": "2AllyEnrageADragonGirlRegularBoss",
+        "found": true,
+        "localization": {
+          "name": "Dragon Fire",
+          "description": "Enrages 2 allies and grants them the burn status effect. Unlocked each time the user damages an enemy with an attack. This skill is locked again after each use or if the user leaves the battlefield.\n\nThis will overwrite the effects of previous Enrage skills. Enraged units have their Attack increased to 1.5x until the end of their next turn.",
+          "selected": "Enrages, and burns 2 allies\n(Will overwrite other status effects)"
+        },
+        "ability": {
+          "name": "2AllyEnrageADragonGirlRegularBoss",
+          "class": "Ability",
+          "config": "2AllyEnrageADragonGirlRegularBoss",
+          "tuCost": 1,
+          "useLimit": 0,
+          "spiritGain": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Ally",
+          "components": [
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "Burn",
+                "AttackPlus50Percent1TurnOnly"
+              ],
+              "applyToTargetType": "Friendly"
+            },
+            {
+              "buffs": [
+                "MomentumUsed"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "friendlyEventType": "Finish",
+          "sourceEventType": "Finish",
+          "abilityEffect": "DragonGirlBuff",
+          "flags": [
+            "Burn",
+            "Momentum",
+            "MomentumReadyUser"
+          ],
+          "useCondition": "HasDamagedWithAttack",
+          "killLockSkillIcon": "IconRedEx01",
+          "killLockUnlockedSkillIcon": "IconGreenCircle01",
+          "killLockUnlockedKey": "SkillReadyToUseKey",
+          "killLockLockedKey": "InstantPoisonTouchRandomALockLockedKey"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "friendlyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0.3,
+            0,
+            0.7,
+            0,
+            0,
+            0,
+            0.5,
+            0.2,
+            0,
+            0,
+            0,
+            0.2
+          ],
+          "prefabs": [
+            "batfx_common/batfx_redbase1",
+            "batfx_DragonGirl/batfx_SwordFirewaveup1",
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_castingred1/batfx_castingred1",
+            "batfx_DragonGirl/batfx_DragonBite",
+            "batfx_DragonGirl/batfx_castingSmokeFire2",
+            "batsfx_prefab/batsfx_fire2",
+            "batfx_healbottom1/batfx_healbottom1",
+            "batfx_healtop2/batfx_healtop2",
+            "batsfx_prefab/batsfx_heal1",
+            "batfx_common/batfx_burnheal",
+            "batfx_burnspiral/batfx_burnspiral",
+            "batfx_common/batfx_burnheal"
+          ],
+          "sortOrderOffset": [
+            -2,
+            2,
+            -2,
+            2,
+            2,
+            2,
+            -2,
+            2,
+            2,
+            -2,
+            2,
+            2,
+            2
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle2"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            true,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "AttackPlus50Percent1TurnOnly": {
+            "class": "Buff",
+            "stackName": "AttackPlus50Percent",
+            "behaviors": [
+              "RemoveAfterTurnsBehavior",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "turnCount": 1,
+                "scalorStatBonuses": {
+                  "Attack": 0.5
+                }
+              },
+              {
+                "name": "AttackMinus25Percent"
+              }
+            ],
+            "iconSpriteName": "IconRedRage01",
+            "showAsTimer": true,
+            "duration": -1
+          },
+          "Burn": {
+            "class": "Buff",
+            "stackName": "Burn",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "DamageOverTime",
+              "BuffChanceOnHit",
+              "BuffWhenMonsterHurt"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "LockHasBurnedSkills"
+              },
+              {
+                "name": "SleepThorns"
+              },
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "percentOfTargetHp": 0.001,
+                "damageColor": "Red",
+                "abilityEffect": "BurnDamage1",
+                "bossDamageCap": 500,
+                "extraDamageFlag": "Burn"
+              },
+              {
+                "contextBuffs": [
+                  "BurnAfterTurn"
+                ],
+                "chance": 1.0
+              },
+              {
+                "contextBuffs": [
+                  "BurnAfterTurn",
+                  "RemovePoison"
+                ],
+                "spreadCondition": "IsNotBurnImmune",
+                "cancelFromDamageFlags": [
+                  "Sneak",
+                  "RemoveStatus"
+                ],
+                "cancelFromDamageTypes": [
+                  "BuffDamage"
+                ]
+              }
+            ],
+            "tags": [
+              "Burn"
+            ],
+            "canBePurified": true,
+            "duration": 300,
+            "statusEffect": "BurnStatus",
+            "statusEffectOffset": 0.1,
+            "damageType": "Burn",
+            "noIconShownOnBattleStatus": false,
+            "applyConditions": "IsNotBurning",
+            "showAsTimer": true,
+            "iconSpriteName": "IconRedBurn01"
+          },
+          "MomentumUsed": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "MomentumReady"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "HasDamagedWithAttack": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "MomentumReady"
+            ]
+          }
+        }
+      },
+      "IgnoreDefeatBurnForceADragonGirlRegularBoss": {
+        "id": "IgnoreDefeatBurnForceADragonGirlRegularBoss",
+        "found": true,
+        "localization": {
+          "name": "Incinerate",
+          "description": "400% damage to 1 enemy. 800% damage instead if this is the first time this skill has been used while on the battlefield. This attack ignores effects of non-boss enemies that would prevent the target from being defeated. Usable if the user has the Burn status effect.",
+          "selected": "Up to 800% damage, ignores defeat prevention"
+        },
+        "ability": {
+          "name": "IgnoreDefeatBurnForceADragonGirlRegularBoss",
+          "class": "Ability",
+          "abilityScalor": 3,
+          "conditionalAbilityScalors": [
+            7
+          ],
+          "config": "IgnoreDefeatBurnForceADragonGirlRegularBoss",
+          "tuCost": 70,
+          "useLimit": 0,
+          "spiritCost": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "applyToTargetType": "Enemy",
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "damageFlags": [
+                "HardIgnoreBlockDeath",
+                "DragonGirlHitFlag"
+              ]
+            },
+            {
+              "buffs": [
+                "LosingFreshMomentumBoss",
+                "ThisMoveHasBeenUsedBuffBoss"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "DragonGirlSpecial",
+          "flags": [
+            "BurnBlast"
+          ],
+          "attackScalors": [
+            "GoodIfNeverUsed"
+          ],
+          "conditionedAbilityEffects": [
+            "DragonGirlSpecial"
+          ],
+          "useCondition": "IsBurning"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0.9,
+            0,
+            0,
+            0,
+            0.1,
+            0,
+            0,
+            0.5,
+            0,
+            0,
+            0.8,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0.1
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_charge1",
+            "batfx_burnspiral/batfx_burnspiral",
+            "batfx_DragonGirl/batfx_tailwindfire8",
+            "batfx_slash2/batfx_slash2",
+            "batfx_astridbride1/batfx_impactfire1",
+            "batsfx_prefab/batsfx_slash1",
+            "batfx_DragonGirl/batfx_castingSmokeFire2",
+            "batfx_astridbride1/batfx_astridbride1",
+            "batfx_luburegular1/batfx_firewavelubu1",
+            "batsfx_prefab/batsfx_slash1",
+            "batfx_DragonGirl/batfx_dragonfire4",
+            "batfx_DragonGirl/batfx_CastingHardLightOrange",
+            "batsfx_prefab/batsfx_accelerate1",
+            "batfx_DragonGirl/batfx_greatswordbeam3",
+            "batfx_DragonGirl/batfx_xslashRed",
+            "batfx_crossswordknightDark/batfx_castingSmokeGawain",
+            "batfx_DragonGirl/batfx_tailwindfirenoBG",
+            "batsfx_prefab/batsfx_dragonflow1",
+            "batsfx_prefab/batsfx_earth1",
+            "batfx_DragonGirl/batfx_castingSmokeFire2",
+            "batfx_common/batfx_whiteout2",
+            "batfx_common/batfx_empty"
+          ],
+          "sortOrderOffset": [
+            -2,
+            2,
+            -50,
+            2,
+            1,
+            0,
+            2,
+            100,
+            2,
+            0,
+            -2,
+            2,
+            0,
+            10,
+            10,
+            15,
+            80,
+            0,
+            0,
+            2,
+            30,
+            2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            false,
+            false,
+            true,
+            true,
+            true,
+            false,
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            true,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "LosingFreshMomentumBoss": {
+            "class": "Buff",
+            "duration": 0,
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "FreshNewMomentumReady"
+              }
+            ],
+            "isHiddenFromPlayers": true
+          },
+          "ThisMoveHasBeenUsedBuffBoss": {
+            "class": "Buff",
+            "stackName": "UsedGoods",
+            "duration": -1,
+            "isHiddenFromPlayers": true,
+            "showAsPermanent": false,
+            "showAsTimer": false
+          }
+        },
+        "attackScalors": {
+          "GoodIfNeverUsed": {
+            "class": "AttackScalor",
+            "sourceCondition": "IsNotUsedGoods"
+          }
+        },
+        "conditions": {
+          "IsBurning": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "Burn"
+            ]
+          }
+        }
+      }
+    },
+    "passives": {
+      "FireFocusPassiveADragonGirlRegularBoss": {
+        "id": "FireFocusPassiveADragonGirlRegularBoss",
+        "found": true,
+        "localization": {
+          "name": "Dragon's Focus",
+          "description": "This unit cannot be defeated by damage from Burn status effects, and cannot be Stunned. If this unit is burning, this unit has Hold Ground (if this unit would be defeated by an enemy attack or a status effect while having more than 1 HP, it instead survives with 1 HP).\n\nAdd a Super Himori to the end of allied reinforcements whenever:\n- this unit defeats any number of enemies with an attack while on the battlefield.\n- a non-conjured Fire ally on the battlefield is defeated or sacrificed by any source.\n\nWhenever a Himori ally on the battlefield is defeated or sacrificed by any source (even if Ephemeral), a random burning enemy is Stunned for 100TU. Whenever an ally Himori enters the battlefield from reinforcements, stun a random enemy for 50TU."
+        }
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": null
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "DragonGirlRegularBoss01",
+    "family": "DragonGirlRegularBoss",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "DragonGirlRegularBoss01",
+    "class": "Monster",
+    "family": "DragonGirlRegularBoss",
+    "activeSkills": {
+      "0": "DoubleAttackADragonGirlRegularBoss",
+      "1": "2AllyEnrageADragonGirlRegularBoss",
+      "2": "IgnoreDefeatBurnForceADragonGirlRegularBoss"
+    },
+    "passives": {
+      "0": "FireFocusPassiveADragonGirlRegularBoss"
+    },
+    "cost": 999,
+    "baseAttack": 888,
+    "baseMaxHp": 28800,
+    "speed": 532,
+    "element": "Fire",
+    "weaponPref": "Sword",
+    "weaponPivotIndex": 0,
+    "walkSound": "TestSound",
+    "secure": 1,
+    "aiTargetPickWeight": 1,
+    "stars": 6,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 1,
+    "battleOrbImageFlip": 0,
+    "skillVoices": {
+      "0": [
+        1,
+        2
+      ],
+      "1": [
+        5,
+        6
+      ],
+      "2": [
+        13,
+        14
+      ],
+      "3": [
+        9,
+        10
+      ]
+    },
+    "damageVoices": [
+      17,
+      18
+    ],
+    "deathVoices": [
+      21,
+      22
+    ]
+  },
+  "_build": {
+    "scriptVersion": "6-character-family-states",
+    "sourceHash": "c2a123ee858215b995cb27125ddbdd51ab32743207e20c9e7a04b52755a8d09f",
+    "dependencyHash": "4141ca0de2d226e3d81f81f189c7901387a1fe7f8124f44eb685faba04f6c678",
+    "generatedAt": 1778213448
+  }
+}

@@ -1,0 +1,766 @@
+{
+  "schemaVersion": 3,
+  "order": 5,
+  "id": "the-eternal",
+  "name": "The Eternal",
+  "title": "",
+  "description": "",
+  "category": "bosse",
+  "rarity": null,
+  "stars": 6,
+  "evolvedStars": 6,
+  "element": "Dark",
+  "weaponType": "GreatSword",
+  "stats": {
+    "atk": 910,
+    "hp": 47000,
+    "spd": 760,
+    "cost": 999
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/Eternal01.png",
+  "refs": {
+    "activeSkills": [
+      "SpiritDrainAttackBoss1",
+      "HighSpiritAttackBoss1",
+      "RegenerateBoss1",
+      "LowSpiritKillerDoubleBoss1"
+    ],
+    "passives": [
+      "HoldGroundKnockbackImmunitySilent",
+      "ExtraTurnCycle",
+      "Stun70TUMinus"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": "Eternal01Seq",
+    "leaderBuff": null,
+    "leaderBuffCondition": null,
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "SpiritDrainAttackBoss1": {
+        "id": "SpiritDrainAttackBoss1",
+        "found": true,
+        "localization": {
+          "name": "Void Grasp",
+          "description": "Damage to 1 enemy and they lose 3 Spirit. Allies then gain 2 Spirit.",
+          "selected": "Damage to 1 enemy and they lose 3 Spirit"
+        },
+        "ability": {
+          "name": "SpiritDrainAttackBoss1",
+          "class": "Ability",
+          "abilityScalor": 0,
+          "config": "SpiritDrainAttackBoss1",
+          "tuCost": 100,
+          "useLimit": 0,
+          "spiritGain": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "applyToTargetType": "Source",
+              "buffs": [
+                "SpiritLossAContra"
+              ]
+            }
+          ],
+          "sourceEventType": "Finish",
+          "enemyEventType": "Hit",
+          "abilityEffect": "MidDeath1",
+          "ignoreEffectForSourceEvent": true,
+          "flags": [
+            "SpiritDrain"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.3,
+            0.35,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_casting7/batfx_casting7",
+            "batfx_deathmid1/batfx_deathmid1",
+            "batsfx_prefab/batsfx_death1",
+            "batfx_ripplepurplelow/batfx_ripplepurplelow"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -2,
+            1,
+            -2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            true
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            true
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            true,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "SpiritLossAContra": {
+            "class": "Buff",
+            "behaviors": [
+              "AddSpirit"
+            ],
+            "behaviorOverrides": [
+              {
+                "percentOfMax": -0.3,
+                "toEnemyTeam": true
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {}
+      },
+      "HighSpiritAttackBoss1": {
+        "id": "HighSpiritAttackBoss1",
+        "found": true,
+        "localization": {
+          "name": "Over Drive",
+          "description": "400% damage to 1 enemy. Usable only if allies have 7+ Spirit.",
+          "selected": "400% damage, usable if Spirit is 7+"
+        },
+        "ability": {
+          "name": "HighSpiritAttackBoss1",
+          "class": "Ability",
+          "abilityScalor": 3,
+          "config": "HighSpiritAttackBoss1",
+          "tuCost": 160,
+          "useLimit": 0,
+          "spiritCost": 4,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage"
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "HighSpiritAbility2",
+          "useCondition": "AllySpirit7OrMore",
+          "flags": [
+            "HighSpirits",
+            "StealthWorthy"
+          ],
+          "recommendEffectWhenUsable": 1
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.1,
+            0,
+            0.75,
+            0
+          ],
+          "prefabs": [
+            "batfx_tailwindred/batfx_tailwindred",
+            "batsfx_prefab/batsfx_stealth1",
+            "batsfx_prefab/batsfx_timestrike1",
+            "batfx_spiritcrest1/batfx_spiritcrest1",
+            "batfx_bluntimpact3/batfx_bluntimpact3",
+            "batsfx_prefab/batsfx_bomb1"
+          ],
+          "sortOrderOffset": [
+            -100,
+            -2,
+            2,
+            -2,
+            1,
+            -2
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            false,
+            true,
+            true,
+            false,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            true,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {},
+        "conditions": {
+          "AllySpirit7OrMore": {
+            "class": "MonsterConditions",
+            "teamSpiritGreaterThan": 600
+          }
+        }
+      },
+      "RegenerateBoss1": {
+        "id": "RegenerateBoss1",
+        "found": true,
+        "localization": {
+          "name": "Immortal Flesh",
+          "description": "Reduces enemy Spirit by 4. Then heals some HP and removes negative status effects like poison.",
+          "selected": "Heals some HP and removes negative status effects"
+        },
+        "ability": {
+          "name": "RegenerateBoss1",
+          "class": "Ability",
+          "config": "RegenerateBoss1",
+          "tuCost": 100,
+          "useLimit": 0,
+          "spiritCost": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "AllEnemy",
+          "components": [
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "SpiritLossCContra"
+              ],
+              "applyToSourceOnly": true
+            },
+            {
+              "buffs": [
+                "RemoveBuffs"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "SlightHeal"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "sourceEventType": "Finish",
+          "enemyEventType": "Hit",
+          "abilityEffect": "HealAlly1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "allEnemies": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0.3,
+            0,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_castinggreen1/batfx_castinggreen1",
+            "batfx_castinggreen2/batfx_castinggreen2",
+            "batfx_ripplebluelow/batfx_ripplebluelow",
+            "batsfx_prefab/batsfx_heal1",
+            "batfx_healbottom1/batfx_healbottom1",
+            "batfx_healtop1/batfx_healtop1"
+          ],
+          "sortOrderOffset": [
+            2,
+            -2,
+            2,
+            -2,
+            -2,
+            -2,
+            2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            false,
+            true,
+            false,
+            false
+          ],
+          "noHitReactionVoice": true
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "RemoveBuffs": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "SlightHeal": {
+            "class": "Buff",
+            "behaviors": [
+              "AdjustHp"
+            ],
+            "behaviorOverrides": [
+              {
+                "percent": 0.1,
+                "abilityEffect": "Blank",
+                "hpboosts": [
+                  "HealBoost"
+                ]
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "SpiritLossCContra": {
+            "class": "Buff",
+            "behaviors": [
+              "AddSpirit"
+            ],
+            "behaviorOverrides": [
+              {
+                "percentOfMax": -0.4,
+                "toEnemyTeam": true
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {}
+      },
+      "LowSpiritKillerDoubleBoss1": {
+        "id": "LowSpiritKillerDoubleBoss1",
+        "found": true,
+        "localization": {
+          "name": "Zero Slash",
+          "description": "400% damage to 2 enemies. Usable only if enemy has 0 Spirit.",
+          "selected": "400% damage, usable if enemy Spirit is 0"
+        },
+        "ability": {
+          "name": "LowSpiritKillerDoubleBoss1",
+          "class": "Ability",
+          "abilityScalor": 3,
+          "config": "LowSpiritKillerDoubleBoss1",
+          "tuCost": 50,
+          "useLimit": 0,
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "LowSpiritKillerDamageBoost"
+              ]
+            }
+          ],
+          "flags": [
+            "LowSpiritKiller"
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "LowSpiritKillerDoubleBoss1",
+          "useCondition": "EnemySpirit0"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.15,
+            0,
+            0.75,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_stealth1",
+            "batfx_tailwindpurple/batfx_tailwindpurple",
+            "batsfx_prefab/batsfx_timestrike1",
+            "batfx_deathtarget/batfx_deathtarget",
+            "batfx_bluntimpact3/batfx_bluntimpact3",
+            "batsfx_prefab/batsfx_bomb1"
+          ],
+          "sortOrderOffset": [
+            2,
+            -100,
+            2,
+            2,
+            1,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            false,
+            true,
+            true,
+            false,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            true,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {},
+        "conditions": {
+          "EnemySpirit0": {
+            "class": "MonsterConditions",
+            "enemyTeamSpiritLessThan": 100
+          }
+        }
+      }
+    },
+    "passives": {
+      "HoldGroundKnockbackImmunitySilent": {
+        "id": "HoldGroundKnockbackImmunitySilent",
+        "found": true,
+        "localization": {
+          "name": "Hold Ground",
+          "description": "If this unit would be defeated by an enemy attack or a status effect while having more than 1 HP, it instead survives with 1 HP."
+        }
+      },
+      "ExtraTurnCycle": {
+        "id": "ExtraTurnCycle",
+        "found": true,
+        "localization": {
+          "name": "Chronomastery",
+          "description": "On every third normal turn this unit takes, they immediately get 1 extra turn."
+        }
+      },
+      "Stun70TUMinus": {
+        "id": "Stun70TUMinus",
+        "found": true,
+        "localization": {
+          "name": "Stun Resist Lv6",
+          "description": "Reduces the amount of any stun effects against this unit by 70TU."
+        }
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": {
+      "id": "Eternal01Seq",
+      "found": true,
+      "sequence": {
+        "class": "AbilityAISequence",
+        "sequence": [
+          [
+            "0",
+            "1",
+            "3"
+          ],
+          [
+            "0",
+            "1",
+            "3"
+          ],
+          [
+            "0",
+            "1",
+            "2",
+            "3"
+          ]
+        ]
+      }
+    },
+    "leaderCondition": null
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "Eternal01",
+    "family": "Eternal",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "Eternal01",
+    "class": "Monster",
+    "family": "Eternal",
+    "activeSkills": {
+      "0": "SpiritDrainAttackBoss1",
+      "1": "HighSpiritAttackBoss1",
+      "2": "RegenerateBoss1",
+      "3": "LowSpiritKillerDoubleBoss1"
+    },
+    "passives": {
+      "0": "HoldGroundKnockbackImmunitySilent",
+      "1": "ExtraTurnCycle",
+      "2": "Stun70TUMinus"
+    },
+    "aiSequence": "Eternal01Seq",
+    "cost": 999,
+    "baseAttack": 910,
+    "baseMaxHp": 47000,
+    "speed": 760,
+    "element": "Death",
+    "weaponPref": "GreatSword",
+    "weaponPivotIndex": 0,
+    "walkSound": "TestSound",
+    "secure": 1,
+    "aiTargetPickWeight": 1,
+    "stars": 6,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 1,
+    "battleOrbImageFlip": 0,
+    "skillVoices": {
+      "0": [
+        1,
+        2
+      ],
+      "1": [
+        3,
+        4
+      ],
+      "2": [
+        5,
+        6
+      ],
+      "3": [
+        7,
+        8
+      ]
+    },
+    "deathVoices": [
+      9
+    ]
+  },
+  "_build": {
+    "scriptVersion": "6-character-family-states",
+    "sourceHash": "fdad9adbefca6d18a62f89fb3dc6412f79cece8b9d338b44401ac88c468de779",
+    "dependencyHash": "da73b1c7dcd8bb5b743430d1b200d3974163722cebaae3b8e1f95789c0b9594a",
+    "generatedAt": 1778213442
+  }
+}

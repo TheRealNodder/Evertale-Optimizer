@@ -1,0 +1,1978 @@
+{
+  "schemaVersion": 3,
+  "order": 635,
+  "id": "kojiro",
+  "name": "Kojiro",
+  "title": "Wandering Swordmaster",
+  "description": "Kojiro Sasaki was born into a samurai household. After the untimely death of her mother, she lived alone with her father, whose forced retirement from the way of the warrior due to an injury prompted him to put all his unfulfilled dreams onto his daughter's shoulders. His fixation with raising the perfect swordsman resulted in extreme strictness, which kept young Kojiro constantly discouraged instead of motivating her.",
+  "category": "character",
+  "rarity": null,
+  "stars": 6,
+  "evolvedStars": 6,
+  "element": "Light",
+  "weaponType": "Katana",
+  "stats": {
+    "atk": 1343,
+    "hp": 7705,
+    "spd": 415,
+    "cost": 34
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/KojiroRegular02.png",
+  "refs": {
+    "activeSkills": [
+      "DoubleStrikeAKojiroRegular",
+      "SakuraSweepAKojiroRegular",
+      "MegaSelfBuffAKojiroRegular",
+      "IgnoreDefeatAKojiroRegular"
+    ],
+    "passives": [
+      "HighToleranceAKojiroRegular",
+      "BloodSpeedPassiveAKojiroRegular",
+      "PlusHPBoostLv3",
+      "PlusAttackBoostLv3",
+      "FireMinusDamageLv3",
+      "AddWeaponPrefGreatSword"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": "AttackAndHPUp6Life",
+    "leaderBuffCondition": "IsLife",
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "DoubleStrikeAKojiroRegular": {
+        "id": "DoubleStrikeAKojiroRegular",
+        "found": true,
+        "localization": {
+          "name": "Clean Strike",
+          "description": "100% damage to 1 enemy. 600% damage instead and this unit will immediately get the next turn if this is the first time this skill has been used while on the battlefield or if this unit has used Sakura Storm since this skill was last used. This attack ignores damage reduction effects, skin passive skills and the Counter Stance status effect.",
+          "selected": "100%+ damage to 1 enemy & may act again"
+        },
+        "ability": {
+          "name": "DoubleStrikeAKojiroRegular",
+          "class": "Ability",
+          "abilityScalor": 0,
+          "conditionalAbilityScalors": [
+            5
+          ],
+          "config": "DoubleStrikeAKojiroRegular",
+          "tuCost": 100,
+          "useLimit": 0,
+          "spiritGain": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "applyToTargetType": "Enemy",
+              "damageFlags": [
+                "IgnoreArmor",
+                "IgnoreSkin"
+              ]
+            },
+            {
+              "buffs": [
+                "GiveTurn",
+                "OnExtraTurn",
+                "JustGivenTurn"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true,
+              "buffAppliedEffects": [
+                "blank1"
+              ],
+              "applyConditions": "NoFreshNewMomentum",
+              "showMissConditions": "ShowNoMiss"
+            },
+            {
+              "buffs": [
+                "FreshNewMomentum"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "attackScalors": [
+            "GoodWithNoFreshNewMomentum"
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "KojiroSlash",
+          "conditionedAbilityEffects": [
+            "KojiroSlash",
+            "KojiroSlash"
+          ],
+          "recommendEffectWhenUsable": -2
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0.6,
+            0.1,
+            0,
+            0.3,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_whoosh2",
+            "batfx_jumpsmoke1/batfx_jumpsmoke1",
+            "batfx_kojiro/batfx_blackout3",
+            "batsfx_prefab/batsfx_ring1",
+            "batfx_slash6/batfx_slash6",
+            "batsfx_prefab/batsfx_slash1"
+          ],
+          "sortOrderOffset": [
+            0,
+            -2,
+            50,
+            0,
+            80,
+            0
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            true,
+            false,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            false,
+            true,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "FreshNewMomentum": {
+            "class": "Buff",
+            "stackName": "FreshNewMomentumReady",
+            "duration": -1,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "isHiddenFromPlayers": true
+          },
+          "GiveTurn": {
+            "class": "Buff",
+            "behaviors": [
+              "GiveTurn"
+            ],
+            "behaviorOverrides": [
+              {}
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "textKeyToShowWhenApplied": "TurnGivenKey",
+            "isHiddenFromPlayers": true
+          },
+          "JustGivenTurn": {
+            "class": "Buff",
+            "duration": 1,
+            "stackName": "JustGivenTurnBuff",
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "isHiddenFromPlayers": true,
+            "noIconShownOnBattleStatus": true
+          },
+          "OnExtraTurn": {
+            "class": "Buff",
+            "stackName": "OnExtraTurn",
+            "duration": 1,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {
+          "GoodWithNoFreshNewMomentum": {
+            "class": "AttackScalor",
+            "sourceCondition": "NoFreshNewMomentum"
+          }
+        },
+        "conditions": {
+          "NoFreshNewMomentum": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "FreshNewMomentumReady"
+              ]
+            }
+          },
+          "OnExtraTurn": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "OnExtraTurn"
+            ]
+          }
+        }
+      },
+      "SakuraSweepAKojiroRegular": {
+        "id": "SakuraSweepAKojiroRegular",
+        "found": true,
+        "localization": {
+          "name": "Sakura Storm",
+          "description": "200% damage to all enemies, plus 100% for each Charge stored on the user (max of 500% total damage). This attack ignores any effects of non-boss enemies that would prevent the targets from being defeated, the Counter Stance Status Effect, and the effects of Skin passive skills.",
+          "selected": "200%+ damage enemies, ignores defeat prevention"
+        },
+        "ability": {
+          "name": "SakuraSweepAKojiroRegular",
+          "class": "Ability",
+          "abilityScalor": 1,
+          "conditionalAbilityScalors": [
+            2,
+            3,
+            4
+          ],
+          "config": "SakuraSweepAKojiroRegular",
+          "tuCost": 100,
+          "useLimit": 0,
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "AllEnemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "damageFlags": [
+                "HardIgnoreBlockDeath",
+                "IgnoreSkin"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "LosingFreshMomentum"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "MidLife1",
+          "attackScalors": [
+            "GoodIfCharged1",
+            "GoodIfCharged2",
+            "GoodIfCharged3"
+          ],
+          "conditionedAbilityEffects": [
+            "KojiroSakuraStorm",
+            "KojiroSakuraStorm",
+            "KojiroSakuraStorm"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "allEnemies": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.3,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_casting3/batfx_casting3",
+            "batfx_holymid1/batfx_holymid1",
+            "batsfx_prefab/batsfx_life1",
+            "batfx_rippleyellowlow/batfx_rippleyellowlow"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -2,
+            1,
+            -2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            true,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "LosingFreshMomentum": {
+            "class": "Buff",
+            "duration": 0,
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "FreshNewMomentumReady"
+              }
+            ],
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {
+          "GoodIfCharged1": {
+            "class": "AttackScalor",
+            "sourceCondition": "IsCharged1"
+          },
+          "GoodIfCharged2": {
+            "class": "AttackScalor",
+            "sourceCondition": "IsCharged2"
+          },
+          "GoodIfCharged3": {
+            "class": "AttackScalor",
+            "sourceCondition": "IsCharged3"
+          }
+        },
+        "conditions": {}
+      },
+      "MegaSelfBuffAKojiroRegular": {
+        "id": "MegaSelfBuffAKojiroRegular",
+        "found": true,
+        "localization": {
+          "name": "Healing Blossom",
+          "description": "Heals the user fully, and Purifies them (removes negative status effects like sleep, burn or poison). The user is granted a Sleep Ward, Stun Ward, Poison Ward, and will Endure the next damage that would defeat it with 1HP. This skill becomes locked for 50TU after use. If the user has defeated 1+ units with attacks while on the battlefield, this skill becomes locked for 100TU after use instead.\n\nEndure effects cannot stack. Each Ward prevents their named effect from being applied once, then is removed. Identical Wards cannot stack.",
+          "selected": "Gains Endure, Wards, Purifies & Heals User"
+        },
+        "ability": {
+          "name": "MegaSelfBuffAKojiroRegular",
+          "class": "Ability",
+          "config": "MegaSelfBuffAKojiroRegular",
+          "tuCost": 10,
+          "useLimit": 0,
+          "spiritGain": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "SelfOnly",
+          "components": [
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "HealFull",
+                "RemoveBuffs",
+                "StunImmunityOnce",
+                "PoisonImmunityOnce",
+                "SleepImmunityOnce",
+                "StunImmunityOnceIfNotStunImmune",
+                "BlockDeathOnce"
+              ],
+              "applyToTargetType": "Source"
+            },
+            {
+              "buffs": [
+                "KojiroRegularCooldown50"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss",
+              "applyConditions": "Kills0"
+            },
+            {
+              "buffs": [
+                "KojiroRegularCooldown100"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss",
+              "applyConditions": "Kills1"
+            }
+          ],
+          "sourceEventType": "Finish",
+          "abilityEffect": "KojiroBuff",
+          "flags": [
+            "Purify",
+            "Healer"
+          ],
+          "useCondition": "NotInstantCooldown",
+          "recommendEffectWhenUsable": -1
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "selfOnly": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0.3,
+            0,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batfx_kojiro/batfx_tailwinddirectional2",
+            "batsfx_prefab/batsfx_charge1",
+            "batfx_kojiro/batfx_jb_prep3",
+            "batfx_UnicornRegular/batfx_footSpiral",
+            "batsfx_prefab/batsfx_charge1",
+            "batfx_kojiro/batfx_SakuraSpiral",
+            "batfx_mechasisbride1/batfx_petalswirl2",
+            "batfx_kojiro/batfx_feather3",
+            "batfx_feather1/batfx_feather2",
+            "batfx_kojiro/batfx_cherrybloom2",
+            "batfx_powerupred/batfx_powerupred",
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_ripplebluelow/batfx_ripplebluelow",
+            "batfx_castinggreen1/batfx_castinggreen1",
+            "batfx_castinggreen2/batfx_castinggreen2",
+            "batfx_ripplebluelow/batfx_ripplebluelow",
+            "batsfx_prefab/batsfx_heal1",
+            "batfx_healbottom1/batfx_healbottom1",
+            "batfx_healtop1/batfx_healtop1"
+          ],
+          "sortOrderOffset": [
+            100,
+            -2,
+            -1,
+            15,
+            20,
+            15,
+            15,
+            15,
+            15,
+            -1,
+            -1,
+            2,
+            2,
+            -2,
+            2,
+            -2,
+            -2,
+            -2,
+            2
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            false,
+            false
+          ],
+          "positionInBattlefieldCenter": [
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "BlockDeathOnce": {
+            "class": "Buff",
+            "behaviors": [
+              "BlockDeath"
+            ],
+            "behaviorOverrides": [
+              {
+                "cancelFromDamageFlags": [
+                  "IgnoreHoldGround",
+                  "IgnoreBlockDeath",
+                  "HardIgnoreBlockDeath",
+                  "LethalPoison"
+                ],
+                "conditions": "AlwaysTrue",
+                "removeAfterTriggers": 1
+              }
+            ],
+            "stackName": "HoldGround",
+            "tags": [
+              "BlockDeathOnce"
+            ],
+            "duration": -1,
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "iconSpriteName": "IconWhiteFightSword01"
+          },
+          "HealFull": {
+            "class": "Buff",
+            "behaviors": [
+              "AdjustHp"
+            ],
+            "behaviorOverrides": [
+              {
+                "percent": 1.0,
+                "abilityEffect": "LargeHeal1"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "KojiroRegularCooldown100": {
+            "class": "Buff",
+            "duration": 100,
+            "stackName": "InstantCooldown",
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "iconSpriteName": "IconBlueCountdownClock3"
+          },
+          "KojiroRegularCooldown50": {
+            "class": "Buff",
+            "duration": 50,
+            "stackName": "InstantCooldown",
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "iconSpriteName": "IconBlueCountdownClock3"
+          },
+          "PoisonImmunityOnce": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity"
+            ],
+            "stackName": "PoisonImmunityOnce",
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Poison"
+                ],
+                "useLimit": 1
+              }
+            ],
+            "duration": -1,
+            "showAsTimer": true,
+            "tags": [
+              "PoisonImmuneTemp"
+            ],
+            "iconSpriteName": "IconRedPoisonInvalid01"
+          },
+          "RemoveBuffs": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "SleepImmunityOnce": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity"
+            ],
+            "stackName": "SleepImmunityOnce",
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Sleep"
+                ],
+                "useLimit": 1
+              }
+            ],
+            "duration": -1,
+            "showAsTimer": true,
+            "tags": [
+              "SleepImmuneTemp"
+            ],
+            "iconSpriteName": "IconRedSleepInvalidZs01"
+          },
+          "StunImmunityOnce": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity"
+            ],
+            "stackName": "StunImmunityOnce",
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Stun",
+                  "StunNoAbsorb"
+                ],
+                "useLimit": 1
+              }
+            ],
+            "duration": -1,
+            "showAsTimer": true,
+            "tags": [
+              "StunImmuneTemp"
+            ],
+            "iconSpriteName": "IconRedStunInvalidLightning01"
+          },
+          "StunImmunityOnceIfNotStunImmune": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity"
+            ],
+            "stackName": "StunImmunityOnce",
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Stun",
+                  "StunNoAbsorb"
+                ],
+                "useLimit": 1,
+                "activateCondition": "IsNotStunImmune"
+              }
+            ],
+            "duration": -1,
+            "showAsTimer": true,
+            "tags": [
+              "StunImmuneTemp"
+            ],
+            "iconSpriteName": "IconRedStunInvalidLightning01"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "Kills0": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "killsMade": 1
+            }
+          },
+          "Kills1": {
+            "class": "MonsterConditions",
+            "killsMade": 1
+          },
+          "NotInstantCooldown": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "InstantCooldown"
+              ]
+            }
+          }
+        }
+      },
+      "IgnoreDefeatAKojiroRegular": {
+        "id": "IgnoreDefeatAKojiroRegular",
+        "found": true,
+        "localization": {
+          "name": "Swallow's Flight",
+          "description": "Immediately defeats 1 non-boss enemy that has survived for 200TU or more on the battlefield, the user is considered to have defeated the target with an attack if successful. This effect ignores Revenge passive skills, Revival passive skills, any passive skills or effects of active skills that would prevent the target from being defeated, and cannot be redirected by Guardians. Usable if the user has 2+ Charges stored and only 3 times per battle. Consumes 2 Charges on the user.",
+          "selected": "May immediately defeat the target"
+        },
+        "ability": {
+          "name": "IgnoreDefeatAKojiroRegular",
+          "class": "Ability",
+          "config": "IgnoreDefeatAKojiroRegular",
+          "tuCost": 50,
+          "useLimit": 3,
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "Add1Kill"
+              ],
+              "applyToTargetType": "Enemy",
+              "applyConditions": "Survived200PlusTUNotBossAndNotInstantKillImmune",
+              "buffBackMode": true,
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "InstantKill"
+              ],
+              "applyToTargetType": "Enemy",
+              "applyConditions": "Survived200PlusTUNotBoss",
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "RemoveEnergyCount1",
+                "RemoveEnergyCount1"
+              ],
+              "applyToTargetType": "Source"
+            }
+          ],
+          "immuneSuggestionCondition": "TimeInCombatUnder200IsBossOrInstantKillImmune",
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "KojiroSpecial",
+          "flags": [
+            "InstantDeath",
+            "NoDamage"
+          ],
+          "useCondition": "IsCharged2"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0.77,
+            0,
+            0,
+            0.1,
+            0.15,
+            0,
+            0.2,
+            0.9,
+            0,
+            0,
+            0.1,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_slashsheen",
+            "batfx_kojiro/batfx_CastingHardLight1",
+            "batfx_Hijikata/batfx_redspiderbgBlue",
+            "batfx_kojiro/batfx_slashPink1",
+            "batfx_kojiro/batfx_bluntimpact1",
+            "batsfx_prefab/batsfx_slash1",
+            "batsfx_prefab/batsfx_slash1",
+            "batfx_kojiro/batfx_slashPink2",
+            "batfx_kojiro/batfx_bluntimpact1",
+            "batsfx_prefab/batsfx_KabukiClappers",
+            "batsfx_prefab/batsfx_slash1",
+            "batsfx_prefab/batsfx_KabukiShamisen",
+            "batfx_kojiro/batfx_redspiderbgPink",
+            "batfx_kojiro/batfx_KojiroBigSlash",
+            "batfx_kojiro/batfx_bluntimpact2",
+            "batfx_kojiro/batfx_slashPink2"
+          ],
+          "sortOrderOffset": [
+            -2,
+            3,
+            -100,
+            3,
+            -1,
+            2,
+            2,
+            3,
+            -1,
+            0,
+            0,
+            0,
+            -100,
+            4,
+            5,
+            2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "audiobundle1",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "Add1Kill": {
+            "class": "Buff",
+            "duration": 0,
+            "behaviors": [
+              "AddBattleProperty"
+            ],
+            "behaviorOverrides": [
+              {
+                "addToKills": 1,
+                "properties": {
+                  "NothingReally": 1
+                },
+                "replace": true
+              }
+            ],
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "InstantDeath": {
+            "class": "Buff",
+            "stackName": "InstantDeath",
+            "behaviors": [
+              "InstantDeath"
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "InstantKill": {
+            "class": "Buff",
+            "stackName": "InstantKill",
+            "behaviors": [
+              "InstantDeath"
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "RemoveEnergyCount1": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "StoreEnergy",
+                "decreaseCount": 1
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "IsCharged2": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "StoreEnergy"
+            ],
+            "buffStackCounts": [
+              2
+            ]
+          },
+          "Survived200PlusTUNotBoss": {
+            "class": "MonsterConditions",
+            "timeInCombat": 200,
+            "not": {
+              "class": "MonsterConditions",
+              "families": [
+                "Mibone",
+                "RedMinotaur",
+                "Eternal",
+                "Norza",
+                "Gyurelle",
+                "Druke",
+                "Luther",
+                "Cetus",
+                "GyurelleInDisguise",
+                "FloatingMageBoss",
+                "MetalDragonBoss",
+                "MaskViola",
+                "DrukeSmall",
+                "FireDragonBoss",
+                "FireLizardLancer",
+                "Gyurelle0",
+                "GyurelleInDisguise0",
+                "AstridBoss",
+                "DeathKnightBoss",
+                "TaotieBoss",
+                "AirCloakKnight",
+                "UndeadMinotaur",
+                "Darna",
+                "NorzaRegularBoss",
+                "GolemBoss",
+                "MechanicalTitan",
+                "DarkRizetteBoss",
+                "FireLich",
+                "NovaBlastDragonBoss",
+                "EarthKaijuBoss",
+                "WindDragonBoss",
+                "BabyDarkDragonBoss",
+                "MetalDragonDemon",
+                "MaskElfWarrior",
+                "DarkLudmillaBoss",
+                "LifeEyeballEX",
+                "GoldAngelEX",
+                "DarkAstridBoss",
+                "LudmillaRegularBoss",
+                "YandereMaidBoss",
+                "BunnySamuraiBoss",
+                "SchoolGirlWarriorBoss",
+                "OniSchoolGirlBoss",
+                "Orcanix",
+                "DarkFinnBoss",
+                "CyrusBoss",
+                "BahamutBoss",
+                "RoundTableKnightBoss",
+                "CrossSwordKnightBoss",
+                "MerlinRegularBoss",
+                "GyurelleRegularBoss",
+                "OssiaDarkBoss",
+                "AstridNewBoss",
+                "IbarahimeRegularBoss",
+                "CinderellaRegularBoss",
+                "SnowWhiteBoss",
+                "DarkRizetteSwimsuitBoss",
+                "LudmillaSchoolGirlBoss",
+                "RolotiaNewBoss",
+                "SnowWhiteBrideBoss",
+                "SnowBlackBrideBoss",
+                "NobunagaRegularBoss",
+                "BurnedGirlRegularBoss",
+                "DeerGirlBoss",
+                "KingArthurRegularBoss",
+                "YandereMaidRaceQueenBoss",
+                "LudmillaRacequeenBoss",
+                "LifeMinionBoss",
+                "JeanneDarkSwimsuitBoss",
+                "JeanneDarkBoss",
+                "JeanneDarkAngelBoss",
+                "HimikoRegularBoss",
+                "KaguyahimeRegularBoss",
+                "OdinRegularBoss",
+                "OdinRavenBoss",
+                "LokiRegularBoss",
+                "FreyaRegularBoss",
+                "AstridBrideBoss",
+                "MechaSisterBrideBoss",
+                "HorseIdolGirlBoss",
+                "AntaresModernBoss",
+                "CatIdolGirlBoss",
+                "MyshaIdolGirlBoss",
+                "CleopatraRegularBoss",
+                "GilgameshRegularBoss",
+                "GokuDarkBoss",
+                "GokuDarkBossClone",
+                "OtohimeRegularBoss",
+                "CinderellaDarkBoss",
+                "CerberusRegularBoss",
+                "LudmillaYukataBoss",
+                "PercivalRegularBoss",
+                "MordredRegularBoss",
+                "IbarahimeSwimsuitBoss",
+                "RapunzelRegularBoss",
+                "LuBuRegularBoss",
+                "MusashiRegularBoss",
+                "KingArthurSwimsuitBoss",
+                "FrankensteinRegularBoss",
+                "FrankensteinRegularDollBoss",
+                "GenieRegularBoss",
+                "CinderellaSwimsuitBoss",
+                "CthulhuGirlRegularBoss",
+                "NapoleonRegularBoss",
+                "CleopatraDarkBoss",
+                "HijikataRegularBoss",
+                "OkitaRegularBoss",
+                "KaguyahimeSwimsuitBoss",
+                "ExcaliburRegularBoss",
+                "TristanRegularBoss",
+                "RoundTableKnightDarkBoss",
+                "LuciferRegularBoss",
+                "CrossSwordKnightDarkBoss",
+                "SnowWhiteMaidBoss",
+                "MurasakiRegularBoss",
+                "MermaidRegularBoss",
+                "GokuBrideBoss",
+                "GoemonRegularBoss",
+                "KojiroRegularBoss",
+                "DaVinciRegularBoss",
+                "SatanRegularBoss",
+                "DragonGirlRegularBoss",
+                "HokusaiRegularBoss",
+                "MechaSisterNewBoss",
+                "YamatoRegularBoss",
+                "ZoroRegularBoss",
+                "KaguyahimeDarkBoss",
+                "KirinGirlRegularBoss",
+                "LudmillaDarkNewBoss",
+                "ElizabethRegularBoss",
+                "YandereMaidDarkBoss",
+                "NikeRegularBoss",
+                "ChronosRegularBoss",
+                "RolotiaDarkBoss",
+                "RizKouhaiRegularBoss",
+                "KongmingRegularBoss",
+                "PinocchioRegularBoss",
+                "MasamuneRegularBoss",
+                "RyomaRegularBoss",
+                "PerryRegularBoss",
+                "OniSchoolDarkBoss",
+                "ElminaModernBoss",
+                "PeachGirlRegularBoss",
+                "KingArthurEvilBoss",
+                "DonQuixoteRegularBoss",
+                "AnastasiaRegularBoss",
+                "BahamutGirlRegularBoss",
+                "ElmKouhaiRegularBoss",
+                "SiegfriedRegularBoss",
+                "ZeusRegularBoss",
+                "RizetteBraveBoss",
+                "VenusRegularBoss",
+                "MusashiDarkBoss",
+                "KenshinRegularBoss",
+                "MyshaKnightBoss",
+                "ThorRegularBoss",
+                "CalKouhaiRegularBoss",
+                "FreyaNewBoss",
+                "MechaSisterBandBoss",
+                "ChopinRegularBoss",
+                "WashingtonRegularBoss",
+                "SnowWhiteNewBoss",
+                "BeautyBeastRegularBoss",
+                "BeautyRegularBoss",
+                "BeastRegularBoss",
+                "KintaroRegularBoss"
+              ]
+            }
+          },
+          "Survived200PlusTUNotBossAndNotInstantKillImmune": {
+            "class": "MonsterConditions",
+            "timeInCombat": 200,
+            "not": {
+              "class": "MonsterConditions",
+              "families": [
+                "Mibone",
+                "RedMinotaur",
+                "Eternal",
+                "Norza",
+                "Gyurelle",
+                "Druke",
+                "Luther",
+                "Cetus",
+                "GyurelleInDisguise",
+                "FloatingMageBoss",
+                "MetalDragonBoss",
+                "MaskViola",
+                "DrukeSmall",
+                "FireDragonBoss",
+                "FireLizardLancer",
+                "Gyurelle0",
+                "GyurelleInDisguise0",
+                "AstridBoss",
+                "DeathKnightBoss",
+                "TaotieBoss",
+                "AirCloakKnight",
+                "UndeadMinotaur",
+                "Darna",
+                "NorzaRegularBoss",
+                "GolemBoss",
+                "MechanicalTitan",
+                "DarkRizetteBoss",
+                "FireLich",
+                "NovaBlastDragonBoss",
+                "EarthKaijuBoss",
+                "WindDragonBoss",
+                "BabyDarkDragonBoss",
+                "MetalDragonDemon",
+                "MaskElfWarrior",
+                "DarkLudmillaBoss",
+                "LifeEyeballEX",
+                "GoldAngelEX",
+                "DarkAstridBoss",
+                "LudmillaRegularBoss",
+                "YandereMaidBoss",
+                "BunnySamuraiBoss",
+                "SchoolGirlWarriorBoss",
+                "OniSchoolGirlBoss",
+                "Orcanix",
+                "DarkFinnBoss",
+                "CyrusBoss",
+                "BahamutBoss",
+                "RoundTableKnightBoss",
+                "CrossSwordKnightBoss",
+                "MerlinRegularBoss",
+                "GyurelleRegularBoss",
+                "OssiaDarkBoss",
+                "AstridNewBoss",
+                "IbarahimeRegularBoss",
+                "CinderellaRegularBoss",
+                "SnowWhiteBoss",
+                "DarkRizetteSwimsuitBoss",
+                "LudmillaSchoolGirlBoss",
+                "RolotiaNewBoss",
+                "SnowWhiteBrideBoss",
+                "SnowBlackBrideBoss",
+                "NobunagaRegularBoss",
+                "BurnedGirlRegularBoss",
+                "DeerGirlBoss",
+                "KingArthurRegularBoss",
+                "YandereMaidRaceQueenBoss",
+                "LudmillaRacequeenBoss",
+                "LifeMinionBoss",
+                "JeanneDarkSwimsuitBoss",
+                "JeanneDarkBoss",
+                "JeanneDarkAngelBoss",
+                "HimikoRegularBoss",
+                "KaguyahimeRegularBoss",
+                "OdinRegularBoss",
+                "OdinRavenBoss",
+                "LokiRegularBoss",
+                "FreyaRegularBoss",
+                "AstridBrideBoss",
+                "MechaSisterBrideBoss",
+                "HorseIdolGirlBoss",
+                "AntaresModernBoss",
+                "CatIdolGirlBoss",
+                "MyshaIdolGirlBoss",
+                "CleopatraRegularBoss",
+                "GilgameshRegularBoss",
+                "GokuDarkBoss",
+                "GokuDarkBossClone",
+                "OtohimeRegularBoss",
+                "CinderellaDarkBoss",
+                "CerberusRegularBoss",
+                "LudmillaYukataBoss",
+                "PercivalRegularBoss",
+                "MordredRegularBoss",
+                "IbarahimeSwimsuitBoss",
+                "RapunzelRegularBoss",
+                "LuBuRegularBoss",
+                "MusashiRegularBoss",
+                "KingArthurSwimsuitBoss",
+                "FrankensteinRegularBoss",
+                "FrankensteinRegularDollBoss",
+                "GenieRegularBoss",
+                "CinderellaSwimsuitBoss",
+                "CthulhuGirlRegularBoss",
+                "NapoleonRegularBoss",
+                "CleopatraDarkBoss",
+                "HijikataRegularBoss",
+                "OkitaRegularBoss",
+                "KaguyahimeSwimsuitBoss",
+                "ExcaliburRegularBoss",
+                "TristanRegularBoss",
+                "RoundTableKnightDarkBoss",
+                "LuciferRegularBoss",
+                "CrossSwordKnightDarkBoss",
+                "SnowWhiteMaidBoss",
+                "MurasakiRegularBoss",
+                "MermaidRegularBoss",
+                "GokuBrideBoss",
+                "GoemonRegularBoss",
+                "KojiroRegularBoss",
+                "DaVinciRegularBoss",
+                "SatanRegularBoss",
+                "DragonGirlRegularBoss",
+                "HokusaiRegularBoss",
+                "MechaSisterNewBoss",
+                "YamatoRegularBoss",
+                "ZoroRegularBoss",
+                "KaguyahimeDarkBoss",
+                "KirinGirlRegularBoss",
+                "LudmillaDarkNewBoss",
+                "ElizabethRegularBoss",
+                "YandereMaidDarkBoss",
+                "NikeRegularBoss",
+                "ChronosRegularBoss",
+                "RolotiaDarkBoss",
+                "RizKouhaiRegularBoss",
+                "KongmingRegularBoss",
+                "PinocchioRegularBoss",
+                "MasamuneRegularBoss",
+                "RyomaRegularBoss",
+                "PerryRegularBoss",
+                "OniSchoolDarkBoss",
+                "ElminaModernBoss",
+                "PeachGirlRegularBoss",
+                "KingArthurEvilBoss",
+                "DonQuixoteRegularBoss",
+                "AnastasiaRegularBoss",
+                "BahamutGirlRegularBoss",
+                "ElmKouhaiRegularBoss",
+                "SiegfriedRegularBoss",
+                "ZeusRegularBoss",
+                "RizetteBraveBoss",
+                "VenusRegularBoss",
+                "MusashiDarkBoss",
+                "KenshinRegularBoss",
+                "MyshaKnightBoss",
+                "ThorRegularBoss",
+                "CalKouhaiRegularBoss",
+                "FreyaNewBoss",
+                "MechaSisterBandBoss",
+                "ChopinRegularBoss",
+                "WashingtonRegularBoss",
+                "SnowWhiteNewBoss",
+                "BeautyBeastRegularBoss",
+                "BeautyRegularBoss",
+                "BeastRegularBoss",
+                "KintaroRegularBoss"
+              ],
+              "or": {
+                "class": "MonsterConditions",
+                "monsterTags": [
+                  "InstantKillImmune"
+                ],
+                "or": {
+                  "class": "MonsterConditions",
+                  "monsterTags": [
+                    "InstantKillImmuneTemp"
+                  ]
+                }
+              }
+            }
+          },
+          "TimeInCombatUnder200IsBossOrInstantKillImmune": {
+            "class": "MonsterConditions",
+            "monsterTags": [
+              "InstantKillImmune"
+            ],
+            "or": {
+              "class": "MonsterConditions",
+              "families": [
+                "Mibone",
+                "RedMinotaur",
+                "Eternal",
+                "Norza",
+                "Gyurelle",
+                "Druke",
+                "Luther",
+                "Cetus",
+                "GyurelleInDisguise",
+                "FloatingMageBoss",
+                "MetalDragonBoss",
+                "MaskViola",
+                "DrukeSmall",
+                "FireDragonBoss",
+                "FireLizardLancer",
+                "Gyurelle0",
+                "GyurelleInDisguise0",
+                "AstridBoss",
+                "DeathKnightBoss",
+                "TaotieBoss",
+                "AirCloakKnight",
+                "UndeadMinotaur",
+                "Darna",
+                "NorzaRegularBoss",
+                "GolemBoss",
+                "MechanicalTitan",
+                "DarkRizetteBoss",
+                "FireLich",
+                "NovaBlastDragonBoss",
+                "EarthKaijuBoss",
+                "WindDragonBoss",
+                "BabyDarkDragonBoss",
+                "MetalDragonDemon",
+                "MaskElfWarrior",
+                "DarkLudmillaBoss",
+                "LifeEyeballEX",
+                "GoldAngelEX",
+                "DarkAstridBoss",
+                "LudmillaRegularBoss",
+                "YandereMaidBoss",
+                "BunnySamuraiBoss",
+                "SchoolGirlWarriorBoss",
+                "OniSchoolGirlBoss",
+                "Orcanix",
+                "DarkFinnBoss",
+                "CyrusBoss",
+                "BahamutBoss",
+                "RoundTableKnightBoss",
+                "CrossSwordKnightBoss",
+                "MerlinRegularBoss",
+                "GyurelleRegularBoss",
+                "OssiaDarkBoss",
+                "AstridNewBoss",
+                "IbarahimeRegularBoss",
+                "CinderellaRegularBoss",
+                "SnowWhiteBoss",
+                "DarkRizetteSwimsuitBoss",
+                "LudmillaSchoolGirlBoss",
+                "RolotiaNewBoss",
+                "SnowWhiteBrideBoss",
+                "SnowBlackBrideBoss",
+                "NobunagaRegularBoss",
+                "BurnedGirlRegularBoss",
+                "DeerGirlBoss",
+                "KingArthurRegularBoss",
+                "YandereMaidRaceQueenBoss",
+                "LudmillaRacequeenBoss",
+                "LifeMinionBoss",
+                "JeanneDarkSwimsuitBoss",
+                "JeanneDarkBoss",
+                "JeanneDarkAngelBoss",
+                "HimikoRegularBoss",
+                "KaguyahimeRegularBoss",
+                "OdinRegularBoss",
+                "OdinRavenBoss",
+                "LokiRegularBoss",
+                "FreyaRegularBoss",
+                "AstridBrideBoss",
+                "MechaSisterBrideBoss",
+                "HorseIdolGirlBoss",
+                "AntaresModernBoss",
+                "CatIdolGirlBoss",
+                "MyshaIdolGirlBoss",
+                "CleopatraRegularBoss",
+                "GilgameshRegularBoss",
+                "GokuDarkBoss",
+                "GokuDarkBossClone",
+                "OtohimeRegularBoss",
+                "CinderellaDarkBoss",
+                "CerberusRegularBoss",
+                "LudmillaYukataBoss",
+                "PercivalRegularBoss",
+                "MordredRegularBoss",
+                "IbarahimeSwimsuitBoss",
+                "RapunzelRegularBoss",
+                "LuBuRegularBoss",
+                "MusashiRegularBoss",
+                "KingArthurSwimsuitBoss",
+                "FrankensteinRegularBoss",
+                "FrankensteinRegularDollBoss",
+                "GenieRegularBoss",
+                "CinderellaSwimsuitBoss",
+                "CthulhuGirlRegularBoss",
+                "NapoleonRegularBoss",
+                "CleopatraDarkBoss",
+                "HijikataRegularBoss",
+                "OkitaRegularBoss",
+                "KaguyahimeSwimsuitBoss",
+                "ExcaliburRegularBoss",
+                "TristanRegularBoss",
+                "RoundTableKnightDarkBoss",
+                "LuciferRegularBoss",
+                "CrossSwordKnightDarkBoss",
+                "SnowWhiteMaidBoss",
+                "MurasakiRegularBoss",
+                "MermaidRegularBoss",
+                "GokuBrideBoss",
+                "GoemonRegularBoss",
+                "KojiroRegularBoss",
+                "DaVinciRegularBoss",
+                "SatanRegularBoss",
+                "DragonGirlRegularBoss",
+                "HokusaiRegularBoss",
+                "MechaSisterNewBoss",
+                "YamatoRegularBoss",
+                "ZoroRegularBoss",
+                "KaguyahimeDarkBoss",
+                "KirinGirlRegularBoss",
+                "LudmillaDarkNewBoss",
+                "ElizabethRegularBoss",
+                "YandereMaidDarkBoss",
+                "NikeRegularBoss",
+                "ChronosRegularBoss",
+                "RolotiaDarkBoss",
+                "RizKouhaiRegularBoss",
+                "KongmingRegularBoss",
+                "PinocchioRegularBoss",
+                "MasamuneRegularBoss",
+                "RyomaRegularBoss",
+                "PerryRegularBoss",
+                "OniSchoolDarkBoss",
+                "ElminaModernBoss",
+                "PeachGirlRegularBoss",
+                "KingArthurEvilBoss",
+                "DonQuixoteRegularBoss",
+                "AnastasiaRegularBoss",
+                "BahamutGirlRegularBoss",
+                "ElmKouhaiRegularBoss",
+                "SiegfriedRegularBoss",
+                "ZeusRegularBoss",
+                "RizetteBraveBoss",
+                "VenusRegularBoss",
+                "MusashiDarkBoss",
+                "KenshinRegularBoss",
+                "MyshaKnightBoss",
+                "ThorRegularBoss",
+                "CalKouhaiRegularBoss",
+                "FreyaNewBoss",
+                "MechaSisterBandBoss",
+                "ChopinRegularBoss",
+                "WashingtonRegularBoss",
+                "SnowWhiteNewBoss",
+                "BeautyBeastRegularBoss",
+                "BeautyRegularBoss",
+                "BeastRegularBoss",
+                "KintaroRegularBoss"
+              ],
+              "or": {
+                "class": "MonsterConditions",
+                "not": {
+                  "class": "MonsterConditions",
+                  "timeInCombat": 200
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "passives": {
+      "HighToleranceAKojiroRegular": {
+        "id": "HighToleranceAKojiroRegular",
+        "found": true,
+        "localization": {
+          "name": "Legendary Resolve",
+          "description": "This unit enters battle with a Poison Ward, Sleep Ward, Stun Ward, Endure and Counter Stance for 300TU. Counter Stance will overwrite status effects on this unit. The next time the unit with counter stance takes damage from an enemy attack, it will become their turn.\n\nThis unit has 80% damage reduction from attacks. This reduction is lowered by 10% for each enemy this unit has defeated with an attack while on the battlefield (to a minimum of 50% after defeating 3+ enemies).\n\nWhen this unit defeats any number of non-conjured enemies with an attack while on the battlefield:\n\n- this unit gains a Charge. Certain skills are affected by and may consume charges. A unit can store a maximum of 3 charges, and all charges are removed from a unit that leaves the battlefield.\n- this unit gains Recovery Mist for 100TU. Recovery Mist effects do not stack. A unit with Recovery Mist will heal for 5% of their max HP and have a 30% chance to be Purified after every turn.\n- all allies are Purified (negative status effects like sleep, burn or poison are removed).\n- another random ally is given the next turn by reducing their current TU to 0. Effects that influence TU order may interrupt the extra turn (e.g. Stuns targeting the lowest TU target)."
+        }
+      },
+      "BloodSpeedPassiveAKojiroRegular": {
+        "id": "BloodSpeedPassiveAKojiroRegular",
+        "found": true,
+        "localization": {
+          "name": "Killer Focus",
+          "description": "This unit cannot be sent to the reinforcements from the battlefield. This unit cannot be Stunned until it has defeated 1 enemy with an attack while on the battlefield.\n\nThis unit has 25% reduction to TU Costs if it has defeated 1 enemy with an attack while on the battlefield. This increases by 25% per additional enemy defeated, up to 75% max TU Cost reduction after this unit has defeated 3+ enemies.\n\nEach time this unit takes damage from an attack and survives until after the end of the turn, this unit will be granted Counter Stance for 300TU, and heal for 30% of its max HP."
+        }
+      },
+      "PlusHPBoostLv3": {
+        "id": "PlusHPBoostLv3",
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv3",
+          "description": "Adds 1200 to this unit's max HP."
+        }
+      },
+      "PlusAttackBoostLv3": {
+        "id": "PlusAttackBoostLv3",
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv3",
+          "description": "Adds 300 to this unit's Attack."
+        }
+      },
+      "FireMinusDamageLv3": {
+        "id": "FireMinusDamageLv3",
+        "found": true,
+        "localization": {
+          "name": "Fire Resist Lv3",
+          "description": "10% less damage from attacks by Fire units."
+        }
+      },
+      "AddWeaponPrefGreatSword": {
+        "id": "AddWeaponPrefGreatSword",
+        "found": true,
+        "localization": {
+          "name": "Greatsword Mastery",
+          "description": "Can use weapon skills of Greatswords in addition to their original preferred weapon type."
+        }
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": {
+      "class": "MonsterConditions",
+      "elements": [
+        "Life"
+      ]
+    }
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "KojiroRegular02",
+    "family": "KojiroRegular",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "KojiroRegular02",
+    "family": "KojiroRegular",
+    "class": "Monster",
+    "leaderBuff": "AttackAndHPUp6Life",
+    "leaderBuffCondition": "IsLife",
+    "activeSkills": {
+      "0": "DoubleStrikeAKojiroRegular",
+      "1": "SakuraSweepAKojiroRegular",
+      "2": "MegaSelfBuffAKojiroRegular",
+      "3": "IgnoreDefeatAKojiroRegular"
+    },
+    "passives": {
+      "0": "HighToleranceAKojiroRegular",
+      "1": "BloodSpeedPassiveAKojiroRegular",
+      "2": "PlusHPBoostLv3",
+      "3": "PlusAttackBoostLv3",
+      "4": "FireMinusDamageLv3",
+      "5": "AddWeaponPrefGreatSword"
+    },
+    "cost": 34,
+    "baseAttack": 1343,
+    "baseMaxHp": 7705,
+    "speed": 415,
+    "element": "Life",
+    "weaponPref": "Katana",
+    "weaponPivotIndex": 0,
+    "secure": 1,
+    "evolveFrom": "KojiroRegular01",
+    "aiTargetPickWeight": 1,
+    "stars": 6,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 0,
+    "battleOrbImageFlip": 0,
+    "attackType": "Bash",
+    "formTwitterShare": 1,
+    "cosmoName": "KojiroRegular03",
+    "cosmoBattleOrbImageFlip": 1,
+    "skillVoices": {
+      "0": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "1": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "2": [
+        9,
+        10,
+        11,
+        12
+      ],
+      "3": [
+        13,
+        14,
+        15,
+        16
+      ]
+    },
+    "damageVoices": [
+      17,
+      18,
+      19,
+      20
+    ],
+    "deathVoices": [
+      21,
+      22,
+      23,
+      24
+    ],
+    "victoryVoices": [
+      25,
+      26
+    ],
+    "lineupVoices": [
+      27,
+      28,
+      29,
+      30,
+      31,
+      32
+    ],
+    "evolutionVoices": [
+      38
+    ],
+    "trainVoices": [
+      33,
+      34,
+      35,
+      36,
+      37,
+      39,
+      40,
+      41,
+      42,
+      43
+    ],
+    "titleVoices": [
+      44
+    ],
+    "gachaVoices": [
+      45
+    ],
+    "loginVoices": [
+      46
+    ],
+    "tapVoices": [
+      47,
+      48,
+      49
+    ],
+    "idleVoices": [
+      50
+    ]
+  },
+  "_build": {
+    "scriptVersion": "6-character-family-states",
+    "sourceHash": "e91a269258ac78969cd776385d4403b81a3e7df01a874674984e68fc7de41d64",
+    "dependencyHash": "8b5bdc4b4db5ee0bc8ea8c51779da502fce818a62e3ef3f09d9f147e43573b1f",
+    "generatedAt": 1778213418
+  }
+}

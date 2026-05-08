@@ -1,0 +1,937 @@
+{
+  "schemaVersion": 3,
+  "order": 178,
+  "id": "future-ludmilla",
+  "name": "Future Ludmilla",
+  "title": "",
+  "description": "",
+  "category": "bosse",
+  "rarity": null,
+  "stars": 6,
+  "evolvedStars": 6,
+  "element": "Light",
+  "weaponType": "Mace",
+  "stats": {
+    "atk": 1400,
+    "hp": 25000,
+    "spd": 950,
+    "cost": 999
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/LudmillaRegularBossB01.png",
+  "refs": {
+    "activeSkills": [
+      "GainAttackSingleBLudmillaBoss",
+      "DesperateBiteALudmillaBoss",
+      "GiveTurnInstantALudmillaBoss",
+      "PurifySingleALudmillaBoss"
+    ],
+    "passives": [
+      "AutoProtectSourcePlus",
+      "HoldGroundBoss"
+    ],
+    "activeSkillsAI": {
+      "0": "GainAttackSingleBLudmillaBoss_AI",
+      "1": "DesperateBiteALudmillaBoss_AI",
+      "2": "GiveTurnInstantALudmillaBoss_AI",
+      "3": "PurifySingleALudmillaBoss_AI"
+    },
+    "aiSequence": null,
+    "leaderBuff": null,
+    "leaderBuffCondition": null,
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "GainAttackSingleBLudmillaBoss": {
+        "id": "GainAttackSingleBLudmillaBoss",
+        "found": true,
+        "localization": {
+          "name": "GainAttackSingleBLudmillaBoss",
+          "description": ""
+        },
+        "ability": {
+          "name": "GainAttackSingleBLudmillaBoss",
+          "class": "Ability",
+          "abilityScalor": 0,
+          "config": "GainAttackSingleALudmillaRegular",
+          "tuCost": 100,
+          "useLimit": 0,
+          "nameKey": "GainAttackSingleA",
+          "descriptionKey": "GainAttackSingleA",
+          "spiritGain": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ]
+            }
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "MidLife1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.3,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_casting3/batfx_casting3",
+            "batfx_holymid1/batfx_holymid1",
+            "batsfx_prefab/batsfx_life1",
+            "batfx_rippleyellowlow/batfx_rippleyellowlow"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -2,
+            1,
+            -2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            true,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {},
+        "conditions": {}
+      },
+      "DesperateBiteALudmillaBoss": {
+        "id": "DesperateBiteALudmillaBoss",
+        "found": true,
+        "localization": {
+          "name": "DesperateBiteALudmillaBoss",
+          "description": ""
+        },
+        "ability": {
+          "name": "DesperateBiteALudmillaBoss",
+          "class": "Ability",
+          "abilityScalor": 4,
+          "config": "DesperateBiteALudmillaRegular",
+          "tuCost": 160,
+          "useLimit": 0,
+          "nameKey": "DesperateBiteA",
+          "descriptionKey": "DesperateBiteA",
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "applyToTargetType": "Enemy",
+              "damageBoosts": [
+                "DesperateDamageBoost"
+              ]
+            },
+            {
+              "applyToTargetOnly": true,
+              "buffs": [
+                "HealHalfStack"
+              ],
+              "skipAbilityEffect": true,
+              "buffBackMode": true
+            }
+          ],
+          "useCondition": "HPBelow25Percent",
+          "flags": [
+            "Desperate"
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Hit",
+          "abilityEffect": "DesperateBiteLudmilla1",
+          "recommendEffectWhenUsable": 1,
+          "hammerAbilityEffect": "DesperateBiteLudmilla1",
+          "maceAbilityEffect": "DesperateBiteLudmilla1",
+          "staffAbilityEffect": "DesperateBiteLudmilla1",
+          "biteAbilityEffect": "DesperateBiteLudmilla1",
+          "bashAbilityEffect": "DesperateBiteLudmilla1",
+          "clawAbilityEffect": "DesperateBiteLudmilla1",
+          "spearAbilityEffect": "DesperateBiteLudmilla1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0.8,
+            0,
+            0.7,
+            0,
+            1.1,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_superskill1",
+            "batfx_tailwindenergy2/batfx_tailwindenergy2",
+            "batfx_cutinludmilla1/batfx_cutinludmilla1",
+            "batfx_desperatestrikeSSR/batfx_desperatestrikeSSR",
+            "batsfx_prefab/batsfx_timestrike1",
+            "batfx_bluntimpact2/batfx_bluntimpact2",
+            "batsfx_prefab/batsfx_slash1",
+            "batfx_healtop1/batfx_healtop1",
+            "batsfx_prefab/batsfx_heal1"
+          ],
+          "sortOrderOffset": [
+            -2,
+            0,
+            200,
+            -2,
+            3,
+            2,
+            -2,
+            2,
+            2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            true,
+            true,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            true,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "HealHalfStack": {
+            "class": "Buff",
+            "stackName": "Healing",
+            "behaviors": [
+              "AdjustHp"
+            ],
+            "behaviorOverrides": [
+              {
+                "percent": 0.5,
+                "abilityEffect": "SmallHeal1"
+              }
+            ],
+            "duration": 0,
+            "applyConditions": "IsNotHealing",
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {
+          "HPBelow25Percent": {
+            "class": "AttackScalor",
+            "sourceCondition": "HPBelow25Percent"
+          }
+        },
+        "conditions": {
+          "HPBelow25Percent": {
+            "class": "MonsterConditions",
+            "hpLessThanPercent": 0.2500001
+          }
+        }
+      },
+      "GiveTurnInstantALudmillaBoss": {
+        "id": "GiveTurnInstantALudmillaBoss",
+        "found": true,
+        "localization": {
+          "name": "Instant Give Turn",
+          "description": "Immediately give 1 other ally the next turn by reducing their current TU to 0. This skill becomes locked for 100TU after use. Active skills that grant turns cannot be used on turns given by this skill.",
+          "selected": "Reduce TU of 1 ally to 0"
+        },
+        "ability": {
+          "name": "GiveTurnInstantALudmillaBoss",
+          "class": "Ability",
+          "config": "GiveTurnInstantALudmillaBoss",
+          "tuCost": 1,
+          "useLimit": 0,
+          "spiritGain": 0,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "oneAllyNotMe",
+          "components": [
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "GiveTurn",
+                "OnExtraTurn",
+                "JustGivenTurn"
+              ],
+              "applyToTargetType": "Friendly"
+            },
+            {
+              "buffs": [
+                "InstantTurnBossCooldown"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "friendlyEventType": "Finish",
+          "sourceEventType": "Finish",
+          "abilityEffect": "GiveTurnLudmilla1",
+          "useCondition": "GiveTurnCooledDown",
+          "flags": [
+            "StealthWorthy",
+            "GiveTurn"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "friendlyTargets": 1,
+          "oneAllyNotMe": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0.3,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_tailwindconfetti1/batfx_tailwindconfetti1",
+            "batfx_rippleredlow/batfx_rippleredlow",
+            "batfx_castingred1/batfx_castingred1",
+            "batfx_castingred2/batfx_castingred2",
+            "batfx_rippleredlow/batfx_rippleredlow",
+            "batsfx_prefab/batsfx_heal1",
+            "batfx_magicnuke1/batfx_magicnuke1"
+          ],
+          "sortOrderOffset": [
+            2,
+            2,
+            2,
+            -2,
+            2,
+            -2,
+            -2,
+            4
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            true,
+            false,
+            true,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            false
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "GiveTurn": {
+            "class": "Buff",
+            "behaviors": [
+              "GiveTurn"
+            ],
+            "behaviorOverrides": [
+              {}
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "textKeyToShowWhenApplied": "TurnGivenKey",
+            "isHiddenFromPlayers": true
+          },
+          "InstantTurnBossCooldown": {
+            "class": "Buff",
+            "stackName": "GiveTurnCooldown",
+            "duration": 100,
+            "isHiddenFromPlayers": false,
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "iconSpriteName": "IconBlueCountdownClock3"
+          },
+          "JustGivenTurn": {
+            "class": "Buff",
+            "duration": 1,
+            "stackName": "JustGivenTurnBuff",
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "isHiddenFromPlayers": true,
+            "noIconShownOnBattleStatus": true
+          },
+          "OnExtraTurn": {
+            "class": "Buff",
+            "stackName": "OnExtraTurn",
+            "duration": 1,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "GiveTurnCooledDown": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "GiveTurnCooldown"
+              ]
+            }
+          },
+          "OnExtraTurn": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "OnExtraTurn"
+            ]
+          }
+        }
+      },
+      "PurifySingleALudmillaBoss": {
+        "id": "PurifySingleALudmillaBoss",
+        "found": true,
+        "localization": {
+          "name": "PurifySingleALudmillaBoss",
+          "description": ""
+        },
+        "ability": {
+          "name": "PurifySingleALudmillaBoss",
+          "class": "Ability",
+          "config": "PurifySingleALudmillaRegular",
+          "tuCost": 70,
+          "useLimit": 0,
+          "nameKey": "PurifySingleA",
+          "descriptionKey": "PurifySingleA",
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Ally",
+          "components": [
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "RemoveBuffs"
+              ]
+            }
+          ],
+          "friendlyEventType": "Hit",
+          "abilityEffect": "Purify1",
+          "flags": [
+            "Purify"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "friendlyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0,
+            0.3,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_ripplebluelow/batfx_ripplebluelow",
+            "batfx_castinggreen1/batfx_castinggreen1",
+            "batfx_castinggreen2/batfx_castinggreen2",
+            "batfx_ripplebluelow/batfx_ripplebluelow",
+            "batsfx_prefab/batsfx_heal1",
+            "batfx_purify1/batfx_purify1"
+          ],
+          "sortOrderOffset": [
+            2,
+            2,
+            -2,
+            2,
+            -2,
+            -2,
+            2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "RemoveBuffs": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {}
+      }
+    },
+    "passives": {
+      "AutoProtectSourcePlus": {
+        "id": "AutoProtectSourcePlus",
+        "found": true,
+        "localization": {
+          "name": "Auto Guard+",
+          "description": "This unit is a Guardian. For any enemy attack that would hit 1 or 2 other allies, this unit has a 100% chance to redirect 1 hit to itself instead. This unit will not redirect skills that don't deal damage."
+        }
+      },
+      "HoldGroundBoss": {
+        "id": "HoldGroundBoss",
+        "found": true,
+        "localization": {
+          "name": "Hold Ground",
+          "description": "If this unit would be defeated by an enemy attack or a status effect while having more than 1 HP, it instead survives with 1 HP."
+        }
+      }
+    },
+    "activeSkillsAI": {
+      "0": {
+        "id": "GainAttackSingleBLudmillaBoss_AI",
+        "found": true,
+        "ai": {
+          "class": "AbilityAI",
+          "baseAITargetingWeight": 1,
+          "globalScalorsToIgnore": [
+            "HPAbove1Percent",
+            "HPBelow5Percent"
+          ],
+          "aiTargetingMonsterConditions": {
+            "HPBelow10Percent": 2,
+            "HPBelow50Percent": 1.1,
+            "LessHPThanActiveMonsterAttack": 2,
+            "IsProtectedNotProtector": 0.5,
+            "HasArmor": 1.05,
+            "NotProtectorHasProtectorSleepInTeam": 0.25
+          }
+        }
+      },
+      "1": {
+        "id": "DesperateBiteALudmillaBoss_AI",
+        "found": true,
+        "ai": {
+          "class": "AbilityAI",
+          "baseAITargetingWeight": 3
+        }
+      },
+      "2": {
+        "id": "GiveTurnInstantALudmillaBoss_AI",
+        "found": true,
+        "ai": {
+          "class": "AbilityAI",
+          "baseAITargetingWeight": 10,
+          "globalScalorsToIgnore": [
+            "CurrentTULessThan200",
+            "HPAbove1Percent",
+            "ElementWeakness",
+            "IsSleeper",
+            "ActiveStunAndAllyNoAbsorb",
+            "IsBurning",
+            "HasRevenge",
+            "HasNastyRevenge",
+            "HasSkin",
+            "IsActiveStun",
+            "HPBelow5Percent",
+            "0SpiritDamageReducerAt0Spirit"
+          ],
+          "aiTargetingSourceMonsterConditions": {
+            "IsAlone": 0.0
+          },
+          "aiTargetingMonsterConditions": {
+            "CurrentTUGreaterThan100": 2,
+            "RarityGreaterThan3": 1.1,
+            "RarityGreaterThan4": 1.1,
+            "RarityGreaterThan5": 1.1,
+            "JustGrantedTurn": 0.0,
+            "IsGiveTurner": 0.1,
+            "IsGiveTurnerOver300TU": 5,
+            "ShouldGiveTurnTo": 1.1,
+            "CurrentTULessThan50": 0.1,
+            "IsFrozen": 0,
+            "Spirit1OrLessAndIsLimitBreaker": 8,
+            "IsProtectorBlockDeathUntilNextTurn": 0,
+            "IsLudmillaSchoolGirlBoss": 1.5,
+            "IsSleeping": 0
+          }
+        }
+      },
+      "3": {
+        "id": "PurifySingleALudmillaBoss_AI",
+        "found": true,
+        "ai": {
+          "class": "AbilityAI",
+          "baseAITargetingWeight": 0.5,
+          "globalScalorsToIgnore": [
+            "CurrentTULessThan200",
+            "IsSleeping",
+            "ElementWeakness",
+            "IsSleeper",
+            "ActiveStunAndAllyNoAbsorb",
+            "IsBurning",
+            "HasRevenge",
+            "HasNastyRevenge",
+            "HasSkin",
+            "IsActiveStun",
+            "0SpiritDamageReducerAt0Spirit"
+          ],
+          "aiTargetingMonsterConditions": {
+            "IsPoisonedNotDetox": 5,
+            "IsSleeping": 5.1,
+            "IsBurningNotSilent": 4.5,
+            "RarityGreaterThan3": 1.1,
+            "IsSleepingBadFriend": 20,
+            "RarityGreaterThan4": 1.1,
+            "RarityGreaterThan5": 1.1,
+            "IsBurnBlasterAndBurning": 0,
+            "IsDecay": 5.5
+          }
+        }
+      }
+    },
+    "aiSequence": null,
+    "leaderCondition": null
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "LudmillaRegularBossB01",
+    "family": "LudmillaRegularBoss",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "LudmillaRegularBossB01",
+    "class": "Monster",
+    "family": "LudmillaRegularBoss",
+    "activeSkills": {
+      "0": "GainAttackSingleBLudmillaBoss",
+      "1": "DesperateBiteALudmillaBoss",
+      "2": "GiveTurnInstantALudmillaBoss",
+      "3": "PurifySingleALudmillaBoss"
+    },
+    "passives": {
+      "0": "AutoProtectSourcePlus",
+      "1": "HoldGroundBoss"
+    },
+    "activeSkillsAI": {
+      "0": "GainAttackSingleBLudmillaBoss_AI",
+      "1": "DesperateBiteALudmillaBoss_AI",
+      "2": "GiveTurnInstantALudmillaBoss_AI",
+      "3": "PurifySingleALudmillaBoss_AI"
+    },
+    "cost": 999,
+    "baseAttack": 1400,
+    "baseMaxHp": 25000,
+    "speed": 950,
+    "element": "Life",
+    "weaponPref": "Mace",
+    "weaponPivotIndex": 0,
+    "walkSound": "TestSound",
+    "secure": 1,
+    "aiTargetPickWeight": 1,
+    "stars": 6,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 1,
+    "battleOrbImageFlip": 0,
+    "skillVoices": {
+      "0": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "1": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "2": [
+        9,
+        10,
+        11,
+        12
+      ],
+      "3": [
+        13,
+        14,
+        15,
+        16
+      ]
+    },
+    "damageVoices": [
+      17,
+      18,
+      19,
+      20
+    ],
+    "deathVoices": [
+      21,
+      22,
+      23,
+      24
+    ]
+  },
+  "_build": {
+    "scriptVersion": "6-character-family-states",
+    "sourceHash": "ea2c7d226726b0b28251736588977a8cd8d1dba15f6af90e2b2bf1cd4a2d7adf",
+    "dependencyHash": "38f74c35a277161746fd39d54b5307614b8ba54cf406857aaba67bdcc8e981a2",
+    "generatedAt": 1778213445
+  }
+}

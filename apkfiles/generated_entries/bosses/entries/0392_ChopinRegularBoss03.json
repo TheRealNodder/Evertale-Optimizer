@@ -1,0 +1,1959 @@
+{
+  "schemaVersion": 3,
+  "order": 392,
+  "id": "mega-chopin",
+  "name": "Mega Chopin",
+  "title": "",
+  "description": "",
+  "category": "bosse",
+  "rarity": null,
+  "stars": 6,
+  "evolvedStars": 6,
+  "element": "Light",
+  "weaponType": "Mace",
+  "stats": {
+    "atk": 4000,
+    "hp": 178000,
+    "spd": 457,
+    "cost": 999
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/ChopinRegular03.png",
+  "refs": {
+    "activeSkills": [
+      "AllAttackAChopinRegularBoss",
+      "SingleAttackAChopinRegularBoss",
+      "DoubleAttackAChopinRegularBoss",
+      "LargeBuffAChopinRegularBoss"
+    ],
+    "passives": [
+      "PianoMusicPassiveAChopinRegularBoss",
+      "MusicalWarfarePassiveAChopinRegularBoss"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": null,
+    "leaderBuffCondition": null,
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "AllAttackAChopinRegularBoss": {
+        "id": "AllAttackAChopinRegularBoss",
+        "found": true,
+        "localization": {
+          "name": "Grand Finale",
+          "description": "400% damage to all enemies. This attack ignores enemy damage reduction effects, skin passive skills, and the Counter Stance status effect.\n\nWhen this attack hits a non-boss, non-Ephemeral target and that target has 10% or less of max HP remaining after damage, that target is immediately defeated (the user is considered to have defeated the target with an attack if successful). This effect ignores Revenge passive skills, Revival passive skills, and any passive skills or effects of active skills that would prevent the enemy from being defeated.\n\nUsable only if the user has stored 3 Charges. Consumes all Charges on the user.",
+          "selected": "400% damage, may immediately defeat"
+        },
+        "ability": {
+          "name": "AllAttackAChopinRegularBoss",
+          "class": "Ability",
+          "abilityScalor": 3,
+          "config": "AllAttackAChopinRegularBoss",
+          "tuCost": 75,
+          "useLimit": 0,
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "AllEnemy",
+          "components": [
+            "Damage",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageFlags": [
+                "IgnoreArmor",
+                "IgnoreSkin"
+              ],
+              "damageBoosts": [
+                "ChopinDamageBoost"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "InstantKillAndCreditSource"
+              ],
+              "applyConditions": "On10PercentMaxHPIsNotBossAndNotMirage",
+              "applyToTargetType": "Enemy",
+              "showMissConditions": "ShowNoMiss",
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "RemoveAllMelodyReady",
+                "RemoveEnergy",
+                "RemoveActive2LOCKChopinRegular"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            },
+            {
+              "randomBuffFromList": [
+                "WaterMelodyREADY",
+                "FireMelodyREADY",
+                "StormMelodyREADY",
+                "EarthMelodyREADY"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss"
+            }
+          ],
+          "enemyEventType": "Finish",
+          "sourceEventType": "Finish",
+          "abilityEffect": "ChopinSpecial",
+          "useCondition": "IsCharged3"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "allEnemies": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.1,
+            0,
+            0.7,
+            0,
+            0.4,
+            0,
+            1.5,
+            0,
+            0.5,
+            0,
+            0.2,
+            0,
+            0,
+            0,
+            1
+          ],
+          "prefabs": [
+            "batfx_Chopin/batfx_BlackBGChopin",
+            "batsfx_prefab/batsfx_timestrike1",
+            "batfx_myshaidolgirl1/batfx_musicnotes1",
+            "batfx_Chopin/batfx_chargeboomChopin2",
+            "batfx_myshaidolgirl1/batfx_myshavigor1",
+            "batsfx_prefab/batsfx_myshatune",
+            "batfx_Chopin/batfx_MusicCast2",
+            "batsfx_prefab/batsfx_charge1",
+            "batfx_Chopin/batfx_ChopinCutin",
+            "batsfx_prefab/batsfx_swordring",
+            "batfx_Chopin/batfx_anchorMeteoBig2",
+            "batfx_Chopin/batfx_BigPiano1",
+            "batfx_Chopin/batfx_BGChopinPurple1",
+            "batfx_Chopin/batfx_BigPiano2",
+            "batfx_common/batfx_empty",
+            "batsfx_prefab/batsfx_bomb1",
+            "batfx_SnowWhiteMaid/batfx_whiteout3"
+          ],
+          "sortOrderOffset": [
+            -300,
+            0,
+            222,
+            2,
+            3,
+            0,
+            2,
+            0,
+            -45,
+            0,
+            100,
+            45,
+            -100,
+            48,
+            2,
+            0,
+            50
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            true,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            true
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "EarthMelodyREADY": {
+            "class": "Buff",
+            "stackName": "EarthMelodyREADY",
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true,
+            "noIconShownOnBattleStatus": true
+          },
+          "FireMelodyREADY": {
+            "class": "Buff",
+            "stackName": "FireMelodyREADY",
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true,
+            "noIconShownOnBattleStatus": true
+          },
+          "InstantKillAndCreditSource": {
+            "class": "Buff",
+            "stackName": "InstantKill",
+            "behaviors": [
+              "InstantDeath",
+              "EnterBattleBuff"
+            ],
+            "behaviorOverrides": [
+              {},
+              {
+                "sourceBuffs": [
+                  "Add1Kill"
+                ]
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "RemoveActive2LOCKChopinRegular": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "Active2LOCKChopinRegular"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "RemoveAllMelodyReady": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "WaterMelodyREADY"
+              },
+              {
+                "name": "FireMelodyREADY"
+              },
+              {
+                "name": "StormMelodyREADY"
+              },
+              {
+                "name": "EarthMelodyREADY"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "RemoveEnergy": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "StoreEnergy"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "StormMelodyREADY": {
+            "class": "Buff",
+            "stackName": "StormMelodyREADY",
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true,
+            "noIconShownOnBattleStatus": true
+          },
+          "WaterMelodyREADY": {
+            "class": "Buff",
+            "stackName": "WaterMelodyREADY",
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true,
+            "noIconShownOnBattleStatus": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "IsCharged3": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "StoreEnergy"
+            ],
+            "buffStackCounts": [
+              3
+            ]
+          },
+          "On10PercentMaxHPIsNotBossAndNotMirage": {
+            "class": "MonsterConditions",
+            "hpLessThanPercent": 0.1000001,
+            "not": {
+              "class": "MonsterConditions",
+              "families": [
+                "Mibone",
+                "RedMinotaur",
+                "Eternal",
+                "Norza",
+                "Gyurelle",
+                "Druke",
+                "Luther",
+                "Cetus",
+                "GyurelleInDisguise",
+                "FloatingMageBoss",
+                "MetalDragonBoss",
+                "MaskViola",
+                "DrukeSmall",
+                "FireDragonBoss",
+                "FireLizardLancer",
+                "Gyurelle0",
+                "GyurelleInDisguise0",
+                "AstridBoss",
+                "DeathKnightBoss",
+                "TaotieBoss",
+                "AirCloakKnight",
+                "UndeadMinotaur",
+                "Darna",
+                "NorzaRegularBoss",
+                "GolemBoss",
+                "MechanicalTitan",
+                "DarkRizetteBoss",
+                "FireLich",
+                "NovaBlastDragonBoss",
+                "EarthKaijuBoss",
+                "WindDragonBoss",
+                "BabyDarkDragonBoss",
+                "MetalDragonDemon",
+                "MaskElfWarrior",
+                "DarkLudmillaBoss",
+                "LifeEyeballEX",
+                "GoldAngelEX",
+                "DarkAstridBoss",
+                "LudmillaRegularBoss",
+                "YandereMaidBoss",
+                "BunnySamuraiBoss",
+                "SchoolGirlWarriorBoss",
+                "OniSchoolGirlBoss",
+                "Orcanix",
+                "DarkFinnBoss",
+                "CyrusBoss",
+                "BahamutBoss",
+                "RoundTableKnightBoss",
+                "CrossSwordKnightBoss",
+                "MerlinRegularBoss",
+                "GyurelleRegularBoss",
+                "OssiaDarkBoss",
+                "AstridNewBoss",
+                "IbarahimeRegularBoss",
+                "CinderellaRegularBoss",
+                "SnowWhiteBoss",
+                "DarkRizetteSwimsuitBoss",
+                "LudmillaSchoolGirlBoss",
+                "RolotiaNewBoss",
+                "SnowWhiteBrideBoss",
+                "SnowBlackBrideBoss",
+                "NobunagaRegularBoss",
+                "BurnedGirlRegularBoss",
+                "DeerGirlBoss",
+                "KingArthurRegularBoss",
+                "YandereMaidRaceQueenBoss",
+                "LudmillaRacequeenBoss",
+                "LifeMinionBoss",
+                "JeanneDarkSwimsuitBoss",
+                "JeanneDarkBoss",
+                "JeanneDarkAngelBoss",
+                "HimikoRegularBoss",
+                "KaguyahimeRegularBoss",
+                "OdinRegularBoss",
+                "OdinRavenBoss",
+                "LokiRegularBoss",
+                "FreyaRegularBoss",
+                "AstridBrideBoss",
+                "MechaSisterBrideBoss",
+                "HorseIdolGirlBoss",
+                "AntaresModernBoss",
+                "CatIdolGirlBoss",
+                "MyshaIdolGirlBoss",
+                "CleopatraRegularBoss",
+                "GilgameshRegularBoss",
+                "GokuDarkBoss",
+                "GokuDarkBossClone",
+                "OtohimeRegularBoss",
+                "CinderellaDarkBoss",
+                "CerberusRegularBoss",
+                "LudmillaYukataBoss",
+                "PercivalRegularBoss",
+                "MordredRegularBoss",
+                "IbarahimeSwimsuitBoss",
+                "RapunzelRegularBoss",
+                "LuBuRegularBoss",
+                "MusashiRegularBoss",
+                "KingArthurSwimsuitBoss",
+                "FrankensteinRegularBoss",
+                "FrankensteinRegularDollBoss",
+                "GenieRegularBoss",
+                "CinderellaSwimsuitBoss",
+                "CthulhuGirlRegularBoss",
+                "NapoleonRegularBoss",
+                "CleopatraDarkBoss",
+                "HijikataRegularBoss",
+                "OkitaRegularBoss",
+                "KaguyahimeSwimsuitBoss",
+                "ExcaliburRegularBoss",
+                "TristanRegularBoss",
+                "RoundTableKnightDarkBoss",
+                "LuciferRegularBoss",
+                "CrossSwordKnightDarkBoss",
+                "SnowWhiteMaidBoss",
+                "MurasakiRegularBoss",
+                "MermaidRegularBoss",
+                "GokuBrideBoss",
+                "GoemonRegularBoss",
+                "KojiroRegularBoss",
+                "DaVinciRegularBoss",
+                "SatanRegularBoss",
+                "DragonGirlRegularBoss",
+                "HokusaiRegularBoss",
+                "MechaSisterNewBoss",
+                "YamatoRegularBoss",
+                "ZoroRegularBoss",
+                "KaguyahimeDarkBoss",
+                "KirinGirlRegularBoss",
+                "LudmillaDarkNewBoss",
+                "ElizabethRegularBoss",
+                "YandereMaidDarkBoss",
+                "NikeRegularBoss",
+                "ChronosRegularBoss",
+                "RolotiaDarkBoss",
+                "RizKouhaiRegularBoss",
+                "KongmingRegularBoss",
+                "PinocchioRegularBoss",
+                "MasamuneRegularBoss",
+                "RyomaRegularBoss",
+                "PerryRegularBoss",
+                "OniSchoolDarkBoss",
+                "ElminaModernBoss",
+                "PeachGirlRegularBoss",
+                "KingArthurEvilBoss",
+                "DonQuixoteRegularBoss",
+                "AnastasiaRegularBoss",
+                "BahamutGirlRegularBoss",
+                "ElmKouhaiRegularBoss",
+                "SiegfriedRegularBoss",
+                "ZeusRegularBoss",
+                "RizetteBraveBoss",
+                "VenusRegularBoss",
+                "MusashiDarkBoss",
+                "KenshinRegularBoss",
+                "MyshaKnightBoss",
+                "ThorRegularBoss",
+                "CalKouhaiRegularBoss",
+                "FreyaNewBoss",
+                "MechaSisterBandBoss",
+                "ChopinRegularBoss",
+                "WashingtonRegularBoss",
+                "SnowWhiteNewBoss",
+                "BeautyBeastRegularBoss",
+                "BeautyRegularBoss",
+                "BeastRegularBoss",
+                "KintaroRegularBoss"
+              ],
+              "or": {
+                "class": "MonsterConditions",
+                "buffStackNames": [
+                  "MirageMonster"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "SingleAttackAChopinRegularBoss": {
+        "id": "SingleAttackAChopinRegularBoss",
+        "found": true,
+        "localization": {
+          "name": "Sharp Note",
+          "description": "500% damage to 1 enemy, and then grants that enemy the Sleep status effect for 200TU, even if they have already slept while on the battlefield. Then the user is granted a Charge. This attack ignores Guardians, damage reduction effects, the Counter Stance Status Effect, and the effects of Skin passive skills. Damage from this attack does not wake up sleeping enemies.\n\nThis skill unlocks Broken Chord upon use, and becomes locked after use until the user uses Broken Chord or Grand Finale. Certain skills are affected by and may consume charges. A unit can store a maximum of 3 charges.",
+          "selected": "500% damage, may grant sleep\n(Will overwrite other status effects)"
+        },
+        "ability": {
+          "name": "SingleAttackAChopinRegularBoss",
+          "class": "Ability",
+          "abilityScalor": 4,
+          "config": "SingleAttackAChopinRegularBoss",
+          "tuCost": 1,
+          "useLimit": 0,
+          "spiritGain": 0,
+          "blockTargetManipulation": 1,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "ChopinDamageBoost"
+              ],
+              "damageFlags": [
+                "DoNotWake",
+                "IgnoreArmor",
+                "IgnoreSkin"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "SleepForced"
+              ],
+              "applyToTargetType": "Enemy",
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "RemoveAllMelodyReady",
+                "StoreEnergy",
+                "Active2LOCKChopinRegular",
+                "RemoveActive3LOCKChopinRegular"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            },
+            {
+              "randomBuffFromList": [
+                "WaterMelodyREADY",
+                "FireMelodyREADY",
+                "StormMelodyREADY",
+                "EarthMelodyREADY"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss"
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "ChopinAttack1",
+          "flags": [
+            "Sleep",
+            "SleepChance"
+          ],
+          "recommendEffectWhenUsable": -1,
+          "useCondition": "IsNotActive2LOCKChopinRegular"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0.8,
+            0,
+            0.6,
+            0
+          ],
+          "prefabs": [
+            "batfx_Chopin/batfx_tailwindPurple1",
+            "batfx_Chopin/batfx_chargeboomChopin1",
+            "batsfx_prefab/batsfx_catidoltune",
+            "batfx_Chopin/batfx_MusicCast1",
+            "batfx_deadlyvampire1/batfx_camerashake1",
+            "batfx_Chopin/batfx_throwparticle5",
+            "batfx_Chopin/batfx_throwparticle4",
+            "batfx_Chopin/batfx_ChopinDamage1",
+            "batsfx_prefab/batsfx_bluntimpact1"
+          ],
+          "sortOrderOffset": [
+            100,
+            2,
+            0,
+            2,
+            2,
+            5,
+            60,
+            60,
+            0
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            false,
+            false,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "isProjectileFX": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            true,
+            false,
+            false
+          ],
+          "projectileFlightDuration": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0.6,
+            0.6,
+            0,
+            0
+          ],
+          "projectileStartOffsetX": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "projectileStartOffsetY": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            100,
+            100,
+            0,
+            0
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "Active2LOCKChopinRegular": {
+            "class": "Buff",
+            "stackName": "Active2LOCKChopinRegular",
+            "duration": -1,
+            "isHiddenFromPlayers": true,
+            "showAsPermanent": false,
+            "showAsTimer": false
+          },
+          "EarthMelodyREADY": {
+            "class": "Buff",
+            "stackName": "EarthMelodyREADY",
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true,
+            "noIconShownOnBattleStatus": true
+          },
+          "FireMelodyREADY": {
+            "class": "Buff",
+            "stackName": "FireMelodyREADY",
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true,
+            "noIconShownOnBattleStatus": true
+          },
+          "RemoveActive3LOCKChopinRegular": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "Active3LOCKChopinRegular"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "RemoveAllMelodyReady": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "WaterMelodyREADY"
+              },
+              {
+                "name": "FireMelodyREADY"
+              },
+              {
+                "name": "StormMelodyREADY"
+              },
+              {
+                "name": "EarthMelodyREADY"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "Sleep": {
+            "class": "Buff",
+            "stackName": "Sleep",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "LoseTurn",
+              "RemoveOnHurt"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "PurifyChain"
+              },
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "name": "AutoPurifyAfterTurnNoSleep"
+              },
+              {},
+              {
+                "ignoreIfHurtBySelf": true,
+                "cancelFromDamageFlags": [
+                  "DoNotWake"
+                ]
+              }
+            ],
+            "applyConditions": "HasNotSlept",
+            "duration": 200,
+            "showAsTimer": true,
+            "statusEffect": "SleepStatus",
+            "statusEffectOffset": 0.1,
+            "iconSpriteName": "IconWhiteSleepZs01",
+            "textKeyToShowWhenApplied": "SleepKey",
+            "canBePurified": true
+          },
+          "SleepForced": {
+            "class": "Buff",
+            "stackName": "Sleep",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "LoseTurn",
+              "RemoveOnHurt"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "PurifyChain"
+              },
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "name": "AutoPurifyAfterTurnNoSleep"
+              },
+              {},
+              {
+                "ignoreIfHurtBySelf": true,
+                "cancelFromDamageFlags": [
+                  "DoNotWake"
+                ]
+              }
+            ],
+            "duration": 200,
+            "showAsTimer": true,
+            "statusEffect": "SleepStatus",
+            "statusEffectOffset": 0.1,
+            "iconSpriteName": "IconWhiteSleepZs01",
+            "textKeyToShowWhenApplied": "SleepKey",
+            "canBePurified": true
+          },
+          "StoreEnergy": {
+            "class": "Buff",
+            "stackLimit": 3,
+            "duration": -1,
+            "showAsTimer": false,
+            "stackName": "StoreEnergy",
+            "noIconShownOnBattleStatus": true,
+            "usesStackCountDescription": true,
+            "iconSpriteName": "IconPinkCharge01"
+          },
+          "StormMelodyREADY": {
+            "class": "Buff",
+            "stackName": "StormMelodyREADY",
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true,
+            "noIconShownOnBattleStatus": true
+          },
+          "WaterMelodyREADY": {
+            "class": "Buff",
+            "stackName": "WaterMelodyREADY",
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true,
+            "noIconShownOnBattleStatus": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "IsNotActive2LOCKChopinRegular": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "Active2LOCKChopinRegular"
+              ]
+            }
+          }
+        }
+      },
+      "DoubleAttackAChopinRegularBoss": {
+        "id": "DoubleAttackAChopinRegularBoss",
+        "found": true,
+        "localization": {
+          "name": "Broken Chord",
+          "description": "250% damage to 2 enemies, and the user is granted a Charge. This attack ignores enemy damage reduction effects and any effects of non-boss enemies that would prevent the target from being defeated. Damage from this attack does not wake up sleeping enemies.\n\nIf Ally Spirit is less than 5, raises Ally Spirit to 5. If Enemy Spirit is more than 5, lowers Enemy Spirit to 5.\n\nThis skill is locked until it becomes unlocked by Sharp Note. This skill is locked again after each use or if the user leaves the battlefield.",
+          "selected": "250% damage & charges user"
+        },
+        "ability": {
+          "name": "DoubleAttackAChopinRegularBoss",
+          "class": "Ability",
+          "abilityScalor": 1.5,
+          "config": "DoubleAttackAChopinRegularBoss",
+          "tuCost": 50,
+          "useLimit": 0,
+          "spiritGain": 0,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "ChopinDamageBoost"
+              ],
+              "damageFlags": [
+                "HardIgnoreBlockDeath",
+                "DoNotWake",
+                "IgnoreArmor"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "RemoveAllMelodyReady",
+                "StoreEnergy",
+                "Active3LOCKChopinRegular",
+                "RemoveActive2LOCKChopinRegular",
+                "IncreaseSpiritTo5",
+                "IncreaseSpiritTo5",
+                "IncreaseSpiritTo5",
+                "IncreaseSpiritTo5",
+                "IncreaseSpiritTo5",
+                "ReduceSpiritTo5Enemy",
+                "ReduceSpiritTo5Enemy",
+                "ReduceSpiritTo5Enemy",
+                "ReduceSpiritTo5Enemy",
+                "ReduceSpiritTo5Enemy"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            },
+            {
+              "randomBuffFromList": [
+                "WaterMelodyREADY",
+                "FireMelodyREADY",
+                "StormMelodyREADY",
+                "EarthMelodyREADY"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss"
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "ChopinStrings1",
+          "useCondition": "IsNotActive3LOCKChopinRegular"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.1,
+            0.15,
+            0.2,
+            0.2,
+            0.1,
+            0.4,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0.2
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_timestrike1",
+            "batfx_LudmillaDark/batfx_quickchargeRed",
+            "batsfx_prefab/batsfx_multislash1",
+            "batfx_Chopin/batfx_impactcuts2",
+            "batfx_Chopin/batfx_ChopinLight1",
+            "batfx_impact3/batfx_impact3",
+            "batfx_slashtrail2/batfx_slashtrail2",
+            "batfx_spotred/batfx_spotred",
+            "batfx_groundimpact/batfx_groundimpact",
+            "batsfx_prefab/batsfx_slash1",
+            "batfx_Chopin/batfx_multiplestabChopin1",
+            "batfx_bluntimpact3/batfx_bluntimpact3"
+          ],
+          "sortOrderOffset": [
+            2,
+            2,
+            1,
+            100,
+            -1,
+            1,
+            -2,
+            -2,
+            -2,
+            2,
+            2,
+            2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "boneToAttachTo": [
+            "",
+            "",
+            "",
+            "",
+            "thread_3",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "Active3LOCKChopinRegular": {
+            "class": "Buff",
+            "stackName": "Active3LOCKChopinRegular",
+            "duration": -1,
+            "isHiddenFromPlayers": true,
+            "showAsPermanent": false,
+            "showAsTimer": false
+          },
+          "EarthMelodyREADY": {
+            "class": "Buff",
+            "stackName": "EarthMelodyREADY",
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true,
+            "noIconShownOnBattleStatus": true
+          },
+          "FireMelodyREADY": {
+            "class": "Buff",
+            "stackName": "FireMelodyREADY",
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true,
+            "noIconShownOnBattleStatus": true
+          },
+          "IncreaseSpiritTo5": {
+            "class": "Buff",
+            "behaviors": [
+              "AddSpirit"
+            ],
+            "behaviorOverrides": [
+              {
+                "percentOfMax": 0.1
+              }
+            ],
+            "duration": 0,
+            "applyConditions": "AllySpirit4OrLess",
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "ReduceSpiritTo5Enemy": {
+            "class": "Buff",
+            "behaviors": [
+              "AddSpirit"
+            ],
+            "behaviorOverrides": [
+              {
+                "percentOfMax": -0.1,
+                "toEnemyTeam": true
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true,
+            "applyConditions": "EnemySpirit6OrMore"
+          },
+          "RemoveActive2LOCKChopinRegular": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "Active2LOCKChopinRegular"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "RemoveAllMelodyReady": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "WaterMelodyREADY"
+              },
+              {
+                "name": "FireMelodyREADY"
+              },
+              {
+                "name": "StormMelodyREADY"
+              },
+              {
+                "name": "EarthMelodyREADY"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "StoreEnergy": {
+            "class": "Buff",
+            "stackLimit": 3,
+            "duration": -1,
+            "showAsTimer": false,
+            "stackName": "StoreEnergy",
+            "noIconShownOnBattleStatus": true,
+            "usesStackCountDescription": true,
+            "iconSpriteName": "IconPinkCharge01"
+          },
+          "StormMelodyREADY": {
+            "class": "Buff",
+            "stackName": "StormMelodyREADY",
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true,
+            "noIconShownOnBattleStatus": true
+          },
+          "WaterMelodyREADY": {
+            "class": "Buff",
+            "stackName": "WaterMelodyREADY",
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true,
+            "noIconShownOnBattleStatus": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "IsNotActive3LOCKChopinRegular": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "Active3LOCKChopinRegular"
+              ]
+            }
+          }
+        }
+      },
+      "LargeBuffAChopinRegularBoss": {
+        "id": "LargeBuffAChopinRegularBoss",
+        "found": true,
+        "localization": {
+          "name": "Inspiring Ballad",
+          "description": "Heals all allies on the battlefield for 1% of max HP, and Purifies them (removes negative status effects like sleep, burn or poison).\n\nThe user randomly gains either the Water, Storm, Earth or Fire Melody.\n\nThen immediately give all other allies the next turns by reducing their current TU. Active skills that grant turns cannot be used by any affected units until after they have had the turn. Locked for 50TU after the user has entered the battlefield, and locks again for 50TU after each use.",
+          "selected": "Heals allies & removes negative status effects"
+        },
+        "ability": {
+          "name": "LargeBuffAChopinRegularBoss",
+          "class": "Ability",
+          "config": "LargeBuffAChopinRegularBoss",
+          "tuCost": 10,
+          "useLimit": 0,
+          "spiritGain": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "AllAlly",
+          "components": [
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "1PercentHealMaxHPBoss",
+                "RemoveBuffs"
+              ],
+              "applyToTargetType": "Friendly",
+              "showMissConditions": "ShowNoMiss"
+            },
+            {
+              "randomBuffFromList": [
+                "WaterMelodySleepImmunity",
+                "FireMelodyBurnImmunity",
+                "StormMelodyStunImmunity",
+                "EarthMelodyPoisonImmunity"
+              ],
+              "buffs": [
+                "GrantAllOtherAlliesTurnEBB"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss"
+            },
+            {
+              "buffs": [
+                "ChopinRegularBossActive4Cooldown50"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss"
+            }
+          ],
+          "friendlyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "ChopinHeal1",
+          "flags": [
+            "Duration",
+            "Healer",
+            "GiveTurn"
+          ],
+          "useCondition": "TimeInCombat50NotInstantCooldown"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "allFriends": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batfx_Chopin/batfx_chargeChopin2",
+            "batsfx_prefab/batsfx_myshatune",
+            "batfx_Chopin/batfx_MusicCast2"
+          ],
+          "sortOrderOffset": [
+            2,
+            0,
+            2
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "1PercentHealMaxHPBoss": {
+            "class": "Buff",
+            "behaviors": [
+              "AdjustHp"
+            ],
+            "behaviorOverrides": [
+              {
+                "percent": 0.01,
+                "abilityEffect": "Blank",
+                "hpboosts": [
+                  "HealBoost"
+                ]
+              }
+            ],
+            "duration": 0,
+            "effectToShowWhenApplied": "SmallHeal1",
+            "showAsPermanent": false,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "ChopinRegularBossActive4Cooldown50": {
+            "class": "Buff",
+            "stackName": "InstantCooldown",
+            "duration": 50,
+            "isHiddenFromPlayers": false,
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "iconSpriteName": "IconBlueCountdownClock3"
+          },
+          "EarthMelodyPoisonImmunity": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity",
+              "StatOnly"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Poison"
+                ]
+              },
+              {
+                "boosts": {
+                  "ChopinDamageBoost": 1.0
+                }
+              }
+            ],
+            "stackName": "EarthMelody",
+            "duration": -1,
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "tags": [
+              "PoisonImmune"
+            ],
+            "statusEffect": "EarthMelodyStatus",
+            "iconSpriteName": "IconRedPoisonInvalid01"
+          },
+          "FireMelodyBurnImmunity": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity",
+              "StatOnly"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Burn"
+                ]
+              },
+              {
+                "boosts": {
+                  "ChopinDamageBoost": 1.0
+                }
+              }
+            ],
+            "stackName": "FireMelody",
+            "duration": -1,
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "tags": [
+              "BurnImmune"
+            ],
+            "statusEffect": "FireMelodyStatus",
+            "iconSpriteName": "IconRedBurnInvalid01"
+          },
+          "GiveTurn": {
+            "class": "Buff",
+            "behaviors": [
+              "GiveTurn"
+            ],
+            "behaviorOverrides": [
+              {}
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "textKeyToShowWhenApplied": "TurnGivenKey",
+            "isHiddenFromPlayers": true
+          },
+          "GrantAllOtherAlliesTurnEBB": {
+            "class": "Buff",
+            "behaviors": [
+              "EnterBattleBuff"
+            ],
+            "behaviorOverrides": [
+              {
+                "allAlliesButSelfBuffs": [
+                  "GiveTurn",
+                  "OnExtraTurn",
+                  "JustGivenTurn"
+                ]
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "isHiddenFromPlayers": true
+          },
+          "RemoveBuffs": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "StormMelodyStunImmunity": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity",
+              "StatOnly"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Stun",
+                  "StunNoAbsorb"
+                ]
+              },
+              {
+                "boosts": {
+                  "ChopinDamageBoost": 1.0
+                }
+              }
+            ],
+            "stackName": "StormMelody",
+            "duration": -1,
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "tags": [
+              "StunImmune"
+            ],
+            "statusEffect": "StormMelodyStatus",
+            "iconSpriteName": "IconRedStunInvalidLightning01"
+          },
+          "WaterMelodySleepImmunity": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity",
+              "StatOnly"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Sleep"
+                ]
+              },
+              {
+                "boosts": {
+                  "ChopinDamageBoost": 1.0
+                }
+              }
+            ],
+            "stackName": "WaterMelody",
+            "duration": -1,
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "statusEffect": "WaterMelodyStatus",
+            "iconSpriteName": "IconRedSleepInvalidZs01",
+            "tags": [
+              "SleepImmune"
+            ]
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "TimeInCombat50NotInstantCooldown": {
+            "class": "MonsterConditions",
+            "timeInCombat": 50,
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "InstantCooldown"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "passives": {
+      "PianoMusicPassiveAChopinRegularBoss": {
+        "id": "PianoMusicPassiveAChopinRegularBoss",
+        "found": true,
+        "localization": {
+          "name": "Chopin's Performance",
+          "description": "When this unit enters battle, this unit is granted a Sleep Ward, Stun Ward, Poison Ward, and Burn Ward.\n\nThis unit cannot be sent to the reinforcements from the battlefield.\n\nWhen this unit defeats any number of enemies with an attack while on the battlefield, at the end of the turn this unit is healed for 1% of max HP and gains one of the following Melodies at random:\n- Water Melody: Grants this unit Sleep Immunity.\n- Storm Melody:  Grants this unit Stun Immunity.\n- Earth Melody: Grants this unit Poison Immunity.\n- Fire Melody: Grants this unit Burn Immunity.\n\nMelodies do not end unless Chopin is defeated or leaves the battlefield. Chopin can have multiple Melodies active at once, but is not guaranteed to gain one she does not already have when a Melody is randomized by her skills.\n\nEach Ward prevents their named effect from being applied once, then is removed. Identical Wards cannot stack."
+        }
+      },
+      "MusicalWarfarePassiveAChopinRegularBoss": {
+        "id": "MusicalWarfarePassiveAChopinRegularBoss",
+        "found": true,
+        "localization": {
+          "name": "Musical Composition",
+          "description": "If this unit would be defeated, it instead survives with 1 HP and then cannot be defeated until its next turn. This effect ends after triggering once each time this unit enters the battlefield.\n\nThis unit has 50% damage reduction from attacks.\n\nEach time this unit takes damage from an attack and survives until after the end of the turn, this unit will heal for 1% of its max HP.\n\nWhen attacking, adds 100% to the damage % of this unit's attacks for each unique Melody this unit has active. (e.g. Grand Finale: 400% => 800% damage with all 4 Melodies active).\n\nAt the end of each enemy turn, this unit will be Purified (any negative status effects like sleep, burn or poison are removed), and will have its TU reduced to 0. Then this effect cannot trigger again until 50TU advances."
+        }
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": null
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "ChopinRegularBoss03",
+    "family": "ChopinRegularBoss",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "ChopinRegularBoss03",
+    "class": "Monster",
+    "family": "ChopinRegularBoss",
+    "activeSkills": {
+      "0": "AllAttackAChopinRegularBoss",
+      "1": "SingleAttackAChopinRegularBoss",
+      "2": "DoubleAttackAChopinRegularBoss",
+      "3": "LargeBuffAChopinRegularBoss"
+    },
+    "passives": {
+      "0": "PianoMusicPassiveAChopinRegularBoss",
+      "1": "MusicalWarfarePassiveAChopinRegularBoss"
+    },
+    "cost": 999,
+    "baseAttack": 4000,
+    "baseMaxHp": 178000,
+    "speed": 457,
+    "element": "Life",
+    "weaponPref": "Mace",
+    "weaponPivotIndex": 0,
+    "walkSound": "TestSound",
+    "secure": 1,
+    "aiTargetPickWeight": 1,
+    "stars": 6,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 1,
+    "battleOrbImageFlip": 0,
+    "skillVoices": {
+      "0": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "1": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "2": [
+        9,
+        10,
+        11,
+        12
+      ],
+      "3": [
+        13,
+        14,
+        15,
+        16
+      ]
+    },
+    "damageVoices": [
+      17,
+      18,
+      19,
+      20
+    ],
+    "deathVoices": [
+      21,
+      22,
+      23,
+      24
+    ]
+  },
+  "_build": {
+    "scriptVersion": "6-character-family-states",
+    "sourceHash": "05ba7753074992dd1c526ff73787d3ae1e5270feec52b6f011336a7c524503b4",
+    "dependencyHash": "06a00b039dbda858d75716c47470e785e7e41e90589831e56b3519632d3f4c6c",
+    "generatedAt": 1778213449
+  }
+}

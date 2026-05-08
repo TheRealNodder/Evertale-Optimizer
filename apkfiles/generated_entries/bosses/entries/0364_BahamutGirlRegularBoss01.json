@@ -1,0 +1,1410 @@
+{
+  "schemaVersion": 3,
+  "order": 364,
+  "id": "berserk-bahamut",
+  "name": "Berserk Bahamut",
+  "title": "",
+  "description": "",
+  "category": "bosse",
+  "rarity": null,
+  "stars": 6,
+  "evolvedStars": 6,
+  "element": "Light",
+  "weaponType": "Axe",
+  "stats": {
+    "atk": 1257,
+    "hp": 20000,
+    "spd": 422,
+    "cost": 999
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/BahamutGirlRegular01.png",
+  "refs": {
+    "activeSkills": [
+      "SingleAttackABahamutGirlRegularBoss",
+      "AllAllyBuffABahamutGirlRegularBoss",
+      "DoubleAttackABahamutGirlRegularBoss"
+    ],
+    "passives": [
+      "SwoopInPassiveABahamutGirlRegularBoss",
+      "BarrierPassiveABahamutGirlRegularBoss",
+      "SleepImmunity"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": null,
+    "leaderBuffCondition": null,
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "SingleAttackABahamutGirlRegularBoss": {
+        "id": "SingleAttackABahamutGirlRegularBoss",
+        "found": true,
+        "localization": {
+          "name": "Meteor Lance",
+          "description": "300% damage to 1 enemy, plus 100% for each charge stored by the user (max of 600% total damage). This attack does not consume charges. This attack ignores any effects of non-boss enemies that would prevent the target from being defeated. That enemy will also be granted the Burn status effect, and become infected with it.\n\nAfter the end of each turn, this infection will trigger to apply Burn to a random non-burning unit on the infected unit's team. Infection ends after 3 triggers (even if they find no valid target) or once the infected enemy is defeated or leaves the battlefield. Infection is not a status effect and cannot be prevented or purified, but the status effect spread by the infection may be. A unit cannot get a new infection until their existing one ends.\n\nBurn will overwrite other status effects. Any unit that deals damage to or is dealt damage by a unit with burn will also become burned.",
+          "selected": "300%+ damage, grants Burn & Infection"
+        },
+        "ability": {
+          "name": "SingleAttackABahamutGirlRegularBoss",
+          "class": "Ability",
+          "abilityScalor": 2,
+          "conditionalAbilityScalors": [
+            3,
+            4,
+            5
+          ],
+          "config": "SingleAttackABahamutGirlRegularBoss",
+          "tuCost": 70,
+          "useLimit": 0,
+          "spiritGain": 3,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "applyToTargetType": "Enemy",
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "damageFlags": [
+                "HardIgnoreBlockDeath"
+              ]
+            },
+            {
+              "buffs": [
+                "Burn",
+                "SpreadPlagueBurn"
+              ],
+              "chance": 1.0,
+              "applyToTargetType": "Enemy",
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss"
+            }
+          ],
+          "enemyEventType": "Hit",
+          "attackScalors": [
+            "GoodIfCharged1",
+            "GoodIfCharged2",
+            "GoodIfCharged3"
+          ],
+          "conditionedAbilityEffects": [
+            "BahamutGirlAttack",
+            "BahamutGirlAttack",
+            "BahamutGirlAttack"
+          ],
+          "abilityEffect": "BahamutGirlAttack",
+          "flags": [
+            "Burn"
+          ],
+          "recommendEffectWhenUsable": -1
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0.4,
+            0,
+            0,
+            0,
+            0,
+            1.3,
+            0,
+            0,
+            1.3,
+            0
+          ],
+          "prefabs": [
+            "batfx_BahamutGirl/batfx_tailwindRedZoro",
+            "batfx_BahamutGirl/batfx_biglightBahamut",
+            "batsfx_prefab/batsfx_ring1",
+            "batfx_BahamutGirl/batfx_firepillarBlue3",
+            "batfx_BahamutGirl/batfx_firepillarBlue4",
+            "batfx_deadlyvampire1/batfx_camerashake1",
+            "batfx_BahamutGirl/batfx_DashShock2",
+            "batsfx_prefab/batsfx_whoosh3",
+            "batfx_deadlyvampire1/batfx_camerashake1",
+            "batfx_BahamutGirl/batfx_Redslash1",
+            "batsfx_prefab/batsfx_slash1"
+          ],
+          "sortOrderOffset": [
+            -80,
+            2,
+            0,
+            -2,
+            2,
+            2,
+            2,
+            0,
+            2,
+            2,
+            0
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle3",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            true,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            true,
+            false,
+            false,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "Burn": {
+            "class": "Buff",
+            "stackName": "Burn",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "DamageOverTime",
+              "BuffChanceOnHit",
+              "BuffWhenMonsterHurt"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "LockHasBurnedSkills"
+              },
+              {
+                "name": "SleepThorns"
+              },
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "percentOfTargetHp": 0.001,
+                "damageColor": "Red",
+                "abilityEffect": "BurnDamage1",
+                "bossDamageCap": 500,
+                "extraDamageFlag": "Burn"
+              },
+              {
+                "contextBuffs": [
+                  "BurnAfterTurn"
+                ],
+                "chance": 1.0
+              },
+              {
+                "contextBuffs": [
+                  "BurnAfterTurn",
+                  "RemovePoison"
+                ],
+                "spreadCondition": "IsNotBurnImmune",
+                "cancelFromDamageFlags": [
+                  "Sneak",
+                  "RemoveStatus"
+                ],
+                "cancelFromDamageTypes": [
+                  "BuffDamage"
+                ]
+              }
+            ],
+            "tags": [
+              "Burn"
+            ],
+            "canBePurified": true,
+            "duration": 300,
+            "statusEffect": "BurnStatus",
+            "statusEffectOffset": 0.1,
+            "damageType": "Burn",
+            "noIconShownOnBattleStatus": false,
+            "applyConditions": "IsNotBurning",
+            "showAsTimer": true,
+            "iconSpriteName": "IconRedBurn01"
+          },
+          "SpreadPlagueBurn": {
+            "class": "Buff",
+            "stackName": "SpreadPlague",
+            "behaviors": [
+              "BuffOnMonsterTurnEnd"
+            ],
+            "behaviorOverrides": [
+              {
+                "randomEnemyBuffs": [
+                  "SpreadingPlagueFX",
+                  "Burn"
+                ],
+                "numRandomToBuff": 1,
+                "spreadCondition": "IsNotBurning",
+                "activeMonsterConditions": "AlwaysTrue",
+                "removeAfterTriggers": 3,
+                "forwardSource": true
+              }
+            ],
+            "duration": -1,
+            "iconSpriteName": "IconRedInfection01",
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "tags": [
+              "SpreadPlagueBurn"
+            ],
+            "applyConditions": "IsNotSpreadPlague"
+          }
+        },
+        "attackScalors": {
+          "GoodIfCharged1": {
+            "class": "AttackScalor",
+            "sourceCondition": "IsCharged1"
+          },
+          "GoodIfCharged2": {
+            "class": "AttackScalor",
+            "sourceCondition": "IsCharged2"
+          },
+          "GoodIfCharged3": {
+            "class": "AttackScalor",
+            "sourceCondition": "IsCharged3"
+          }
+        },
+        "conditions": {}
+      },
+      "AllAllyBuffABahamutGirlRegularBoss": {
+        "id": "AllAllyBuffABahamutGirlRegularBoss",
+        "found": true,
+        "localization": {
+          "name": "Draconic Strength",
+          "description": "Grants all allies Piercing, and Intense Rage. A unit with Piercing will have their Attacks ignore enemy damage reduction effects until the end of their next turn. Intense Rage increases a units Attack to 1.5x for their next 3 turns, and will overwrite existing Weak or Enrage effects. It cannot be overwritten by other Enrage effects but can be overwritten by Weak effects.\n\nAll allies that are Fire element or have a Burn Blast or Burn Drive type active skill are granted the Burn status effect. Then the user is granted the Healing Burn status effect for 300TU.\n\nLocked for 150TU after the user has entered the battlefield, and locks again for 150TU after each use.\n\nA unit with Healing Burn will heal after each turn at the same rate as Burn would deal damage instead of taking damage from Burn. Healing Burn will overwrite other status effects on the user and can replace the Burn status effect, but cannot be replaced by Burn. Any unit that deals damage to or is dealt damage by a unit with Healing Burn will gain the Burn status effect. Healing Burn will not be removed by Purify skills.",
+          "selected": "Grants Piercing, Intense Rage & maybe Burn\n(Will overwrite other status effects)"
+        },
+        "ability": {
+          "name": "AllAllyBuffABahamutGirlRegularBoss",
+          "class": "Ability",
+          "config": "AllAllyBuffABahamutGirlRegularBoss",
+          "tuCost": 1,
+          "useLimit": 0,
+          "spiritGain": 0,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "AllAlly",
+          "components": [
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "IgnoreDamageReduction1TurnOnly",
+                "AttackPlus50Percent3TurnsOnly"
+              ],
+              "applyToTargetType": "Friendly"
+            },
+            {
+              "buffs": [
+                "Burn"
+              ],
+              "applyToTargetType": "Friendly",
+              "applyConditions": "IsBurnBlastOrForceOrFire",
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss"
+            },
+            {
+              "buffs": [
+                "HealingBurn",
+                "BahamutGirlRegularCooldown150Boss"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss"
+            }
+          ],
+          "friendlyEventType": "Finish",
+          "sourceEventType": "Finish",
+          "abilityEffect": "BahamutBuff",
+          "flags": [
+            "Burn",
+            "ApplyStatusToSelf"
+          ],
+          "useCondition": "TimeInCombat150NotInstantCooldown"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "allFriends": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.6,
+            0,
+            0,
+            1.3,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_fire2",
+            "batfx_Satan/batfx_tailwindfireSatan",
+            "batsfx_prefab/batsfx_fire1",
+            "batfx_BahamutGirl/batfx_freyabuff2",
+            "batfx_BahamutGirl/batfx_freyabuff3",
+            "batfx_kaguyahimeSwim/batfx_KaguyaSwimbash1",
+            "batsfx_prefab/batsfx_fire3"
+          ],
+          "sortOrderOffset": [
+            0,
+            -100,
+            0,
+            -2,
+            2,
+            2,
+            0
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle2",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            false,
+            false,
+            false,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "AttackPlus50Percent3TurnsOnly": {
+            "class": "Buff",
+            "stackName": "AttackPlus50Percent",
+            "behaviors": [
+              "RemoveAfterTurnsBehavior",
+              "RemoveBuffs",
+              "Immunity",
+              "EnterBattleBuff"
+            ],
+            "behaviorOverrides": [
+              {
+                "turnCount": 3,
+                "scalorStatBonuses": {
+                  "Attack": 0.5
+                }
+              },
+              {
+                "name": "AttackMinus25Percent"
+              },
+              {
+                "stackNamesToBlock": [
+                  "AttackPlus50Percent"
+                ],
+                "dontShowText": true
+              },
+              {
+                "selfBuffs": [
+                  "RageCount1Icon",
+                  "RageCount2Icon",
+                  "RageCount3Icon"
+                ]
+              }
+            ],
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true,
+            "showAsPermanent": false,
+            "duration": -1
+          },
+          "BahamutGirlRegularCooldown150Boss": {
+            "class": "Buff",
+            "duration": 150,
+            "stackName": "InstantCooldown",
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "iconSpriteName": "IconBlueCountdownClock3"
+          },
+          "Burn": {
+            "class": "Buff",
+            "stackName": "Burn",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "DamageOverTime",
+              "BuffChanceOnHit",
+              "BuffWhenMonsterHurt"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "LockHasBurnedSkills"
+              },
+              {
+                "name": "SleepThorns"
+              },
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "percentOfTargetHp": 0.001,
+                "damageColor": "Red",
+                "abilityEffect": "BurnDamage1",
+                "bossDamageCap": 500,
+                "extraDamageFlag": "Burn"
+              },
+              {
+                "contextBuffs": [
+                  "BurnAfterTurn"
+                ],
+                "chance": 1.0
+              },
+              {
+                "contextBuffs": [
+                  "BurnAfterTurn",
+                  "RemovePoison"
+                ],
+                "spreadCondition": "IsNotBurnImmune",
+                "cancelFromDamageFlags": [
+                  "Sneak",
+                  "RemoveStatus"
+                ],
+                "cancelFromDamageTypes": [
+                  "BuffDamage"
+                ]
+              }
+            ],
+            "tags": [
+              "Burn"
+            ],
+            "canBePurified": true,
+            "duration": 300,
+            "statusEffect": "BurnStatus",
+            "statusEffectOffset": 0.1,
+            "damageType": "Burn",
+            "noIconShownOnBattleStatus": false,
+            "applyConditions": "IsNotBurning",
+            "showAsTimer": true,
+            "iconSpriteName": "IconRedBurn01"
+          },
+          "HealingBurn": {
+            "class": "Buff",
+            "stackName": "Burn",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "Regen",
+              "BuffChanceOnHit",
+              "BuffWhenMonsterHurt"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "LockHasBurnedSkills"
+              },
+              {
+                "name": "SleepThorns"
+              },
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "percent": 0.001
+              },
+              {
+                "contextBuffs": [
+                  "BurnAfterTurn"
+                ],
+                "chance": 1.0
+              },
+              {
+                "contextBuffs": [
+                  "BurnAfterTurn",
+                  "RemovePoison"
+                ],
+                "spreadCondition": "IsNotBurnImmune",
+                "cancelFromDamageFlags": [
+                  "Sneak",
+                  "RemoveStatus"
+                ],
+                "cancelFromDamageTypes": [
+                  "BuffDamage",
+                  "RemoveStatus"
+                ]
+              }
+            ],
+            "tags": [
+              "Burn",
+              "HealingBurn"
+            ],
+            "duration": 300,
+            "statusEffect": "BurnHealStatus",
+            "statusEffectOffset": 0.1,
+            "noIconShownOnBattleStatus": false,
+            "showAsTimer": true,
+            "iconSpriteName": "IconPurpleBurn01"
+          },
+          "IgnoreDamageReduction1TurnOnly": {
+            "class": "Buff",
+            "stackName": "IgnoreDamageReduction",
+            "behaviors": [
+              "RemoveAfterTurnsBehavior",
+              "BuffOnMonsterTurn"
+            ],
+            "behaviorOverrides": [
+              {
+                "turnCount": 1
+              },
+              {
+                "selfBuffs": [
+                  "IgnoreDamageReductionBehaviorFlag"
+                ]
+              }
+            ],
+            "duration": -1,
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "iconSpriteName": "IconPinkPiercing01"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "IsBurnBlastOrForceOrFire": {
+            "class": "MonsterConditions",
+            "abilityConfigFlag": "BurnBlast",
+            "or": {
+              "class": "MonsterConditions",
+              "abilityConfigFlag": "BurnForce",
+              "or": {
+                "class": "MonsterConditions",
+                "elements": [
+                  "Fire"
+                ]
+              }
+            }
+          },
+          "TimeInCombat150NotInstantCooldown": {
+            "class": "MonsterConditions",
+            "timeInCombat": 150,
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "InstantCooldown"
+              ]
+            }
+          }
+        }
+      },
+      "DoubleAttackABahamutGirlRegularBoss": {
+        "id": "DoubleAttackABahamutGirlRegularBoss",
+        "found": true,
+        "localization": {
+          "name": "Bahamut Blast!",
+          "description": "400% damage to 2 enemies, plus 100% for each burning unit on the battlefield (max of 800% total damage if 4 or more units on the battlefield are burning). All non-burning enemies hit are then granted the Burn status effect. This attack ignores any effects of non-boss enemies that would prevent the targets from being defeated, the Counter Stance Status Effect, and the effects of Skin passive skills. This is considered a Burn Drive type skill.\n\nUnlocked each time a unit on the battlefield is defeated or sacrificed by any source. This skill is locked again after each use unless it defeats an enemy.",
+          "selected": "400%+ damage, ignores defeat prevention & skins"
+        },
+        "ability": {
+          "name": "DoubleAttackABahamutGirlRegularBoss",
+          "class": "Ability",
+          "abilityScalor": 3,
+          "conditionalAbilityScalors": [
+            4,
+            5,
+            6,
+            7
+          ],
+          "config": "DoubleAttackABahamutGirlRegularBoss",
+          "tuCost": 100,
+          "useLimit": 0,
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "applyToTargetType": "Enemy",
+              "damageFlags": [
+                "IgnoreSkin",
+                "HardIgnoreBlockDeath"
+              ]
+            },
+            {
+              "buffs": [
+                "Burn"
+              ],
+              "applyConditions": "IsNotBurning",
+              "applyToTargetType": "Enemy",
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "RemoveDoubleAttackABahamutGirlRegularEnabledBoss"
+              ],
+              "applyToTargetType": "Source",
+              "chance": 1.0,
+              "skipAbilityEffect": true
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "BahamutBreath",
+          "attackScalors": [
+            "GoodWith1BurningUnit",
+            "GoodWith2BurningsUnits",
+            "GoodWith3BurningsUnits",
+            "GoodWith4BurningsUnits"
+          ],
+          "conditionedAbilityEffects": [
+            "BahamutBreath",
+            "BahamutBreath",
+            "BahamutBreath",
+            "BahamutBreath"
+          ],
+          "flags": [
+            "Burn",
+            "BurnForce"
+          ],
+          "recommendEffectWhenUsable": -1,
+          "useCondition": "Active3EnabledABahamutGirlRegular"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0.9,
+            0.1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0.1
+          ],
+          "prefabs": [
+            "batfx_inugamiregular1/batfx_tailwindred3",
+            "batfx_BahamutGirl/batfx_spiralcharge1",
+            "batsfx_prefab/batsfx_charge1",
+            "batfx_BahamutGirl/batfx_DashShock3",
+            "batfx_BahamutGirl/batfx_DashImpact3",
+            "batfx_BahamutGirl/batfx_castingSmokeBahamut",
+            "batfx_BahamutGirl/batfx_greatswordbeam2",
+            "batfx_merlinregular1/batfx_impactbeam1",
+            "batfx_crossswordknightDark/batfx_tailwindrocks5",
+            "batsfx_prefab/batsfx_dragonflow1",
+            "batfx_crossswordknightDark/batfx_whiteout3",
+            "batsfx_prefab/batsfx_bomb1",
+            "batfx_common/batfx_empty"
+          ],
+          "sortOrderOffset": [
+            -80,
+            10,
+            0,
+            20,
+            10,
+            15,
+            8,
+            8,
+            80,
+            0,
+            32,
+            0,
+            2
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            1
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            true,
+            false,
+            true,
+            true,
+            true,
+            true,
+            false
+          ],
+          "positionInBattlefieldCenter": [
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            true,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "Burn": {
+            "class": "Buff",
+            "stackName": "Burn",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "DamageOverTime",
+              "BuffChanceOnHit",
+              "BuffWhenMonsterHurt"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "LockHasBurnedSkills"
+              },
+              {
+                "name": "SleepThorns"
+              },
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "percentOfTargetHp": 0.001,
+                "damageColor": "Red",
+                "abilityEffect": "BurnDamage1",
+                "bossDamageCap": 500,
+                "extraDamageFlag": "Burn"
+              },
+              {
+                "contextBuffs": [
+                  "BurnAfterTurn"
+                ],
+                "chance": 1.0
+              },
+              {
+                "contextBuffs": [
+                  "BurnAfterTurn",
+                  "RemovePoison"
+                ],
+                "spreadCondition": "IsNotBurnImmune",
+                "cancelFromDamageFlags": [
+                  "Sneak",
+                  "RemoveStatus"
+                ],
+                "cancelFromDamageTypes": [
+                  "BuffDamage"
+                ]
+              }
+            ],
+            "tags": [
+              "Burn"
+            ],
+            "canBePurified": true,
+            "duration": 300,
+            "statusEffect": "BurnStatus",
+            "statusEffectOffset": 0.1,
+            "damageType": "Burn",
+            "noIconShownOnBattleStatus": false,
+            "applyConditions": "IsNotBurning",
+            "showAsTimer": true,
+            "iconSpriteName": "IconRedBurn01"
+          },
+          "RemoveDoubleAttackABahamutGirlRegularEnabledBoss": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "DoubleAttackABahamutGirlRegularEnabled"
+              }
+            ],
+            "duration": 0,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {
+          "GoodWith1BurningUnit": {
+            "class": "AttackScalor",
+            "sourceCondition": "AtLeast1BurningInBattle"
+          },
+          "GoodWith2BurningsUnits": {
+            "class": "AttackScalor",
+            "sourceCondition": "AtLeast2BurningInBattle"
+          },
+          "GoodWith3BurningsUnits": {
+            "class": "AttackScalor",
+            "sourceCondition": "AtLeast3BurningInBattle"
+          },
+          "GoodWith4BurningsUnits": {
+            "class": "AttackScalor",
+            "sourceCondition": "AtLeast4BurningInBattle"
+          }
+        },
+        "conditions": {
+          "Active3EnabledABahamutGirlRegular": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "DoubleAttackABahamutGirlRegularEnabled"
+            ]
+          },
+          "IsNotBurning": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "Burn"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "passives": {
+      "SwoopInPassiveABahamutGirlRegularBoss": {
+        "id": "SwoopInPassiveABahamutGirlRegularBoss",
+        "found": true,
+        "localization": {
+          "name": "Dragon's Will",
+          "description": "This unit cannot be defeated by damage from Poison or Burn status effects.\n\nThis unit enters battle with the Healing Burn status effect for 300TU, a Burn Shield, and 3 Charges. Burn Shields prevent the next non-burn status effect a unit would gain while Burning from applying.\n\nIf this unit would be defeated while it has any charges, this unit will consume 1 charge to survive with 1HP remaining instead."
+        }
+      },
+      "BarrierPassiveABahamutGirlRegularBoss": {
+        "id": "BarrierPassiveABahamutGirlRegularBoss",
+        "found": true,
+        "localization": {
+          "name": "Blazing Heat",
+          "description": "This unit has 70% damage reduction from attacks.\n\nThis unit is not affected by stun effects and cannot be sent to the reinforcements from the battlefield.\n\nWhenever a non-conjured ally on the battlefield is defeated or sacrificed by any source, all allies are granted the Burn status effect and the next turns by reducing their current TU."
+        }
+      },
+      "SleepImmunity": {
+        "id": "SleepImmunity",
+        "found": true,
+        "localization": {
+          "name": "Sleep Immunity",
+          "description": "This unit is not affected by sleep effects."
+        }
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": null
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "BahamutGirlRegularBoss01",
+    "family": "BahamutGirlRegularBoss",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "BahamutGirlRegularBoss01",
+    "class": "Monster",
+    "family": "BahamutGirlRegularBoss",
+    "activeSkills": {
+      "0": "SingleAttackABahamutGirlRegularBoss",
+      "1": "AllAllyBuffABahamutGirlRegularBoss",
+      "2": "DoubleAttackABahamutGirlRegularBoss"
+    },
+    "passives": {
+      "0": "SwoopInPassiveABahamutGirlRegularBoss",
+      "1": "BarrierPassiveABahamutGirlRegularBoss",
+      "2": "SleepImmunity"
+    },
+    "cost": 999,
+    "baseAttack": 1257,
+    "baseMaxHp": 20000,
+    "speed": 422,
+    "element": "Life",
+    "weaponPref": "Axe",
+    "weaponPivotIndex": 0,
+    "walkSound": "TestSound",
+    "secure": 1,
+    "aiTargetPickWeight": 1,
+    "stars": 6,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 1,
+    "battleOrbImageFlip": 0,
+    "skillVoices": {
+      "0": [
+        13,
+        14
+      ],
+      "1": [
+        1,
+        2
+      ],
+      "2": [
+        9,
+        10
+      ],
+      "3": [
+        5,
+        6
+      ]
+    },
+    "damageVoices": [
+      17,
+      18
+    ],
+    "deathVoices": [
+      21,
+      22
+    ]
+  },
+  "_build": {
+    "scriptVersion": "6-character-family-states",
+    "sourceHash": "9978246bbec916382f1a32baff4722cad9ac72fa7c943be9b44473887aa577f1",
+    "dependencyHash": "e2373607cbf2d6a914e82df9aedda7490ca1e0385eab016e2d754e94419f4035",
+    "generatedAt": 1778213449
+  }
+}

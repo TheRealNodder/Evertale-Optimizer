@@ -1,0 +1,596 @@
+{
+  "schemaVersion": 3,
+  "order": 69,
+  "id": "frozen-soul",
+  "name": "Frozen Soul",
+  "title": "Frozen Soul",
+  "description": "These spirits are usually friendly, but when the Pandemonium throws the energies of the world out of balance they turn vicious.",
+  "category": "character",
+  "rarity": null,
+  "stars": 2,
+  "evolvedStars": 2,
+  "element": "Water",
+  "weaponType": "Staff",
+  "stats": {
+    "atk": 325,
+    "hp": 1460,
+    "spd": 53,
+    "cost": 12
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/IceSpirit01.png",
+  "refs": {
+    "activeSkills": [
+      "GainAttackSingleBIce",
+      "SleepBombDoubleA2"
+    ],
+    "passives": [
+      "HoldGround"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": null,
+    "leaderBuffCondition": null,
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "GainAttackSingleBIce": {
+        "id": "GainAttackSingleBIce",
+        "found": true,
+        "localization": {
+          "name": "Attack",
+          "description": "Damage to 1 enemy and allies gain 1 Spirit.",
+          "selected": "Damage to 1 enemy and gains 1 Spirit"
+        },
+        "ability": {
+          "name": "GainAttackSingleBIce",
+          "class": "Ability",
+          "abilityScalor": 0,
+          "config": "GainAttackSingleBIce",
+          "tuCost": 100,
+          "useLimit": 0,
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ]
+            }
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "SmallIce1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0.02,
+            0.28,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_castingblue1/batfx_castingblue1",
+            "batfx_castingblue2/batfx_castingblue2",
+            "batsfx_prefab/batsfx_ice1New",
+            "batfx_icelarge1/batfx_icelarge1",
+            "batfx_spotblue/batfx_spotblue",
+            "batfx_ripplebluelow/batfx_ripplebluelow"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -2,
+            2,
+            1,
+            1,
+            -2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {},
+        "conditions": {}
+      },
+      "SleepBombDoubleA2": {
+        "id": "SleepBombDoubleA2",
+        "found": true,
+        "localization": {
+          "name": "Sleep Bomb",
+          "description": "Sacrifices the user to grant 2 enemies the Sleep status effect for 200TU. Locked for 200TU after user enters the battlefield. This will overwrite other status effects on these units. Sleep cannot be applied to a unit that Has Slept while on the battlefield.",
+          "selected": "Puts the targets to sleep, user is sacrificed\n(Will overwrite other status effects)"
+        },
+        "ability": {
+          "name": "SleepBombDoubleA2",
+          "class": "Ability",
+          "config": "SleepBombDoubleA2",
+          "useLimit": 0,
+          "spiritCost": 3,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 1
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "ApplyBuff",
+            "ChanceToDie"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "Sleep",
+                "BurnImmunityTempForRevengeSleepAttack"
+              ],
+              "chance": 1.0,
+              "applyConditions": "HasNotSlept"
+            },
+            {
+              "chance": 1.0
+            }
+          ],
+          "immuneSuggestionCondition": "IsSleepImmune",
+          "useCondition": "TimeInCombat200",
+          "enemyEventType": "Hit",
+          "sourceEventType": "Hit",
+          "abilityEffect": "MidSleep1",
+          "flags": [
+            "Sleep",
+            "NoDamage",
+            "Duration"
+          ],
+          "bombSkillIcon": "IconBrownCountdownClock01",
+          "bombSkillIconDescriptionKey": "SleepBombDoubleA2CountdownKey",
+          "recommendEffectWhenUsable": 1,
+          "killsUser": true,
+          "ignoreEffectForSourceEvent": true
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0.3,
+            0,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_castingpurple1/batfx_castingpurple1",
+            "batfx_castingpurple2/batfx_castingpurple2",
+            "batfx_sleep1/batfx_sleep1",
+            "batsfx_prefab/batsfx_sleep1",
+            "batfx_spotpurple/batfx_spotpurple",
+            "batfx_ripplepurplelow/batfx_ripplepurplelow"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -2,
+            2,
+            1,
+            -2,
+            -2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            false,
+            true,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          },
+          "ChanceToDie": {
+            "class": "ChanceToDieAbilityComponent"
+          }
+        },
+        "buffs": {
+          "BurnImmunityTempForRevengeSleepAttack": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Burn",
+                  "BurnAfterTurn",
+                  "BurnAtEndOfTurn"
+                ],
+                "dontShowText": true
+              },
+              {
+                "name": "BurnAfterTurn"
+              },
+              {
+                "name": "BurnSelfOnHit"
+              }
+            ],
+            "duration": 1,
+            "showAsTimer": false,
+            "applyConditions": "IsNotAnySleepImmune",
+            "showAsPermanent": false,
+            "tags": [
+              "BurnImmune"
+            ],
+            "stackName": "BurnImmunityTempForRevenge",
+            "isHiddenFromPlayers": true
+          },
+          "Sleep": {
+            "class": "Buff",
+            "stackName": "Sleep",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "LoseTurn",
+              "RemoveOnHurt"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "PurifyChain"
+              },
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "name": "AutoPurifyAfterTurnNoSleep"
+              },
+              {},
+              {
+                "ignoreIfHurtBySelf": true,
+                "cancelFromDamageFlags": [
+                  "DoNotWake"
+                ]
+              }
+            ],
+            "applyConditions": "HasNotSlept",
+            "duration": 200,
+            "showAsTimer": true,
+            "statusEffect": "SleepStatus",
+            "statusEffectOffset": 0.1,
+            "iconSpriteName": "IconWhiteSleepZs01",
+            "textKeyToShowWhenApplied": "SleepKey",
+            "canBePurified": true
+          }
+        },
+        "attackScalors": {
+          "TimeInCombat200": {
+            "class": "AttackScalor",
+            "sourceCondition": "TimeInCombat200"
+          }
+        },
+        "conditions": {
+          "HasNotSlept": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "properties": {
+                "hasSlept": 1
+              }
+            }
+          },
+          "IsSleepImmune": {
+            "class": "MonsterConditions",
+            "monsterTags": [
+              "SleepImmune"
+            ],
+            "or": {
+              "class": "MonsterConditions",
+              "monsterTags": [
+                "LethalPoison"
+              ],
+              "or": {
+                "class": "MonsterConditions",
+                "monsterTags": [
+                  "SleepImmuneIfBeastAlly"
+                ],
+                "checkReinforcementsForTeamConditionMatches": true,
+                "myTeamMonsterConditionMatchesNeeded": {
+                  "IsBeastRegular": 1
+                },
+                "or": {
+                  "class": "MonsterConditions",
+                  "monsterTags": [
+                    "SleepImmuneVsWater"
+                  ],
+                  "checkEnemyTeamOfMonster": true,
+                  "enemyTeamMonsterConditionMatchesNeeded": {
+                    "IsWater": 1
+                  },
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "SleepImmuneVs2Enemies"
+                    ],
+                    "enemyTeamSize": 2,
+                    "or": {
+                      "class": "MonsterConditions",
+                      "monsterTags": [
+                        "NegativeStatusImmunityFromThorns"
+                      ],
+                      "buffStackNames": [
+                        "SleepThorns"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "TimeInCombat200": {
+            "class": "MonsterConditions",
+            "timeInCombat": 200
+          }
+        }
+      }
+    },
+    "passives": {
+      "HoldGround": {
+        "id": "HoldGround",
+        "found": true,
+        "localization": {
+          "name": "Hold Ground",
+          "description": "If this unit would be defeated by an enemy attack or a status effect while having more than 1 HP, it instead survives with 1 HP."
+        }
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": null
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "IceSpirit01",
+    "family": "IceSpirit",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "IceSpirit01",
+    "family": "IceSpirit",
+    "class": "Monster",
+    "activeSkills": {
+      "0": "GainAttackSingleBIce",
+      "1": "SleepBombDoubleA2"
+    },
+    "passives": {
+      "0": "HoldGround"
+    },
+    "cost": 12,
+    "baseAttack": 325,
+    "baseMaxHp": 1460,
+    "speed": 53,
+    "element": "Water",
+    "weaponPref": "Staff",
+    "weaponPivotIndex": 0,
+    "secure": 0,
+    "aiTargetPickWeight": 1,
+    "stars": 2,
+    "evolvedStars": 2,
+    "goldMultiplier": 0,
+    "consolationMultiplier": 0,
+    "battleOrbImageFlip": 1,
+    "attackType": "Bash",
+    "visible": 1,
+    "formTwitterShare": 1,
+    "skillVoices": {
+      "0": [
+        1
+      ],
+      "1": [
+        1
+      ]
+    },
+    "damageVoices": [
+      5
+    ],
+    "deathVoices": [
+      6
+    ],
+    "victoryVoices": [
+      7
+    ],
+    "lineupVoices": [
+      7
+    ],
+    "evolutionVoices": [
+      7
+    ],
+    "trainVoices": [
+      7
+    ]
+  },
+  "_build": {
+    "scriptVersion": "6-character-family-states",
+    "sourceHash": "ad19d88384bcc8ff7a2643c8c6fe34f0ee16c9bcc50a88662bbf20d384aac9ee",
+    "dependencyHash": "97982be9b097a3480c3245ae61e6a9cece6aa726e1af1f743020c064305bb355",
+    "generatedAt": 1778213408
+  }
+}

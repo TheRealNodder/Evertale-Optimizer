@@ -1,0 +1,739 @@
+{
+  "schemaVersion": 3,
+  "order": 388,
+  "id": "nanami",
+  "name": "Nanami",
+  "title": "Fleetfoot Samurai",
+  "description": "Most of Nanami's students think her ears gave her away as a Vessel. And they're not totally wrong: a little girl with bunny ears will naturally draw more Church attention than her normal classmates. But even non-Vessels can gain an animal's ears or tail, if the Goddess chooses to bless them with it. \n\nNo. Five-year-old Nanami saw a car hurtling towards a puppy in the road and dove out to save it. In a matter of seconds, she had not only reached the puppy and picked it up; she'd shot across the street, clear into the next neighborhood, too panicked to stop running. \n\nThey found her downtown a day later, still holding the puppy. <i>That</i> was when the Church knew she was truly special.",
+  "category": "character",
+  "rarity": null,
+  "stars": 5,
+  "evolvedStars": 5,
+  "element": "Light",
+  "weaponType": "Katana",
+  "stats": {
+    "atk": 845,
+    "hp": 4573,
+    "spd": 117,
+    "cost": 28
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/BunnySamurai02.png",
+  "refs": {
+    "activeSkills": [
+      "GainAttackSingleA",
+      "TimeStrikeA",
+      "SurvivorA",
+      "StunSmallSingleA"
+    ],
+    "passives": [
+      "DamageReduceWhenAtMaxHP",
+      "StunRevengeA",
+      "PlusHPBoostLv2",
+      "Stun15TUMinus",
+      "PlusAttackBoostLv2",
+      "AddWeaponPrefGreatSword"
+    ],
+    "activeSkillsAI": {
+      "1": "SmarterTimeStrike_AI"
+    },
+    "aiSequence": null,
+    "leaderBuff": "AttackAndHPUp5Life",
+    "leaderBuffCondition": "IsLife",
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "GainAttackSingleA": {
+        "id": "GainAttackSingleA",
+        "found": true,
+        "localization": {
+          "name": "Attack",
+          "description": "Damage to 1 enemy and allies gain 2 Spirit.",
+          "selected": "Damage to 1 enemy and gains 2 Spirit"
+        },
+        "ability": {
+          "name": "GainAttackSingleA",
+          "class": "Ability",
+          "abilityScalor": 0,
+          "config": "GainAttackSingleA",
+          "tuCost": 130,
+          "useLimit": 0,
+          "spiritGain": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ]
+            }
+          ],
+          "enemyEventType": "Hit",
+          "axeAbilityEffect": "SmallSlash1",
+          "greatSwordAbilityEffect": "SmallSlash1",
+          "greatAxeAbilityEffect": "SmallSlash1",
+          "hammerAbilityEffect": "SmallBlunt1",
+          "katanaAbilityEffect": "SmallSlash1",
+          "maceAbilityEffect": "SmallBlunt1",
+          "spearAbilityEffect": "SmallSpear1",
+          "staffAbilityEffect": "SmallBlunt1",
+          "swordAbilityEffect": "SmallSlash1",
+          "clawAbilityEffect": "SmallClaw1",
+          "biteAbilityEffect": "SmallBite1",
+          "bashAbilityEffect": "SmallBlunt1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": null,
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {},
+        "conditions": {}
+      },
+      "TimeStrikeA": {
+        "id": "TimeStrikeA",
+        "found": true,
+        "localization": {
+          "name": "Time Strike",
+          "description": "500% damage to 1 enemy if they have 130TU or more in the turn order. 600% damage if the target has 200TU or more.",
+          "selected": "500%+ damage against target with 130+ TU"
+        },
+        "ability": {
+          "name": "TimeStrikeA",
+          "class": "Ability",
+          "abilityScalor": -2,
+          "conditionalAbilityScalors": [
+            4,
+            5
+          ],
+          "config": "TimeStrikeA",
+          "tuCost": 100,
+          "useLimit": 0,
+          "spiritCost": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "TimestrikeDamageBoost"
+              ]
+            }
+          ],
+          "attackScalors": [
+            "GoodVs130Tu",
+            "GoodVs200Tu"
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "SmallHit1",
+          "flags": [
+            "Timestrike",
+            "StealthWorthy"
+          ],
+          "conditionedAbilityEffects": [
+            "TimeStrikeSpecial1R",
+            "TimeStrikeSpecial1R"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.4,
+            0
+          ],
+          "prefabs": [
+            "batfx_bluntimpact1/batfx_bluntimpact1",
+            "batsfx_prefab/batsfx_impactsmall1"
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            true
+          ],
+          "scale": [
+            0.4,
+            1
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {
+          "GoodVs130Tu": {
+            "class": "AttackScalor",
+            "targetCondition": "CurrentTUGreaterThan130"
+          },
+          "GoodVs200Tu": {
+            "class": "AttackScalor",
+            "targetCondition": "CurrentTUGreaterThan200"
+          }
+        },
+        "conditions": {}
+      },
+      "SurvivorA": {
+        "id": "SurvivorA",
+        "found": true,
+        "localization": {
+          "name": "Survivor's Fury",
+          "description": "500% damage to 1 enemy. Locked for 300TU after the user has entered the battlefield.",
+          "selected": "500% damage, usable if user survived 300TU"
+        },
+        "ability": {
+          "name": "SurvivorA",
+          "class": "Ability",
+          "abilityScalor": 4,
+          "config": "SurvivorA",
+          "tuCost": 100,
+          "useLimit": 0,
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "SurvivorDamageBoost"
+              ]
+            }
+          ],
+          "useCondition": "TimeInCombat300",
+          "bombSkillIcon": "IconBrownCountdownClock01",
+          "bombSkillIconDescriptionKey": "SurvivorACountdownKey",
+          "flags": [
+            "Survivor",
+            "Duration"
+          ],
+          "enemyEventType": "Hit",
+          "recommendEffectWhenUsable": 1,
+          "axeAbilityEffect": "SurvivorSpecial1R",
+          "greatAxeAbilityEffect": "SurvivorSpecial1R",
+          "greatSwordAbilityEffect": "SurvivorSpecial1R",
+          "swordAbilityEffect": "SurvivorSpecial1R",
+          "spearAbilityEffect": "SurvivorSpecial1SpearR",
+          "katanaAbilityEffect": "SurvivorSpecial1R",
+          "hammerAbilityEffect": "SurvivorSpecial1BluntR",
+          "staffAbilityEffect": "SurvivorSpecial1BluntR",
+          "maceAbilityEffect": "SurvivorSpecial1BluntR",
+          "biteAbilityEffect": "SurvivorSpecial1BiteR",
+          "bashAbilityEffect": "SurvivorSpecial1BluntR",
+          "clawAbilityEffect": "SurvivorSpecial1ClawR"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": null,
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {
+          "TimeInCombat300": {
+            "class": "AttackScalor",
+            "sourceCondition": "TimeInCombat300"
+          }
+        },
+        "conditions": {
+          "TimeInCombat300": {
+            "class": "MonsterConditions",
+            "timeInCombat": 300
+          }
+        }
+      },
+      "StunSmallSingleA": {
+        "id": "StunSmallSingleA",
+        "found": true,
+        "localization": {
+          "name": "StunSmallSingleA",
+          "description": "Stuns 1 enemy for 150TU.",
+          "selected": "Stuns target for 150TU"
+        },
+        "ability": {
+          "name": "StunSmallSingleA",
+          "class": "Ability",
+          "config": "StunSmallSingleA",
+          "tuCost": 200,
+          "useLimit": 0,
+          "nameKey": "StunSingle100B",
+          "spiritCost": 3,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "Stun150"
+              ]
+            }
+          ],
+          "immuneSuggestionCondition": "AnyStunImmunity",
+          "flags": [
+            "Stun",
+            "StealthWorthy"
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "SmallStun1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.3,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting2",
+            "batfx_casting3/batfx_casting3",
+            "batfx_stun1/batfx_stun1",
+            "batsfx_prefab/batsfx_stun1",
+            "batfx_ripplebluelow/batfx_ripplebluelow"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -2,
+            1,
+            -2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            true,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "Stun150": {
+            "class": "Buff",
+            "stackName": "Stun",
+            "behaviors": [
+              "Stun"
+            ],
+            "behaviorOverrides": [
+              {
+                "stunTU": 150,
+                "abilityEffect": "StunStatus1"
+              }
+            ],
+            "duration": 0,
+            "tags": [
+              "Stun"
+            ],
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "AnyStunImmunity": {
+            "class": "MonsterConditions",
+            "monsterTags": [
+              "StunImmuneIfSpiritLowFire"
+            ],
+            "teamSpiritLessThan": 200,
+            "or": {
+              "class": "MonsterConditions",
+              "monsterTags": [
+                "StunImmune"
+              ],
+              "or": {
+                "class": "MonsterConditions",
+                "monsterTags": [
+                  "StunImmuneIfBurn"
+                ],
+                "buffStackNames": [
+                  "Burn"
+                ],
+                "or": {
+                  "class": "MonsterConditions",
+                  "monsterTags": [
+                    "StunImmuneWith2AirAllies"
+                  ],
+                  "myTeamMonsterConditionMatchesNeeded": {
+                    "IsAir": 2
+                  },
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "StunImmuneFromThorns"
+                    ],
+                    "myTeamMonsterConditionMatchesNeeded": {
+                      "IsThorned": 1
+                    },
+                    "or": {
+                      "class": "MonsterConditions",
+                      "monsterTags": [
+                        "StunImmuneIfBeastAlly"
+                      ],
+                      "checkReinforcementsForTeamConditionMatches": true,
+                      "myTeamMonsterConditionMatchesNeeded": {
+                        "IsBeastRegular": 1
+                      },
+                      "or": {
+                        "class": "MonsterConditions",
+                        "monsterTags": [
+                          "StunImmuneIfAnyBurningAllies"
+                        ],
+                        "myTeamMonsterConditionMatchesNeeded": {
+                          "IsBurning": 1
+                        },
+                        "or": {
+                          "class": "MonsterConditions",
+                          "monsterTags": [
+                            "StunImmuneIfEnemyIsFireBurnBlastOrForce"
+                          ],
+                          "checkEnemyTeamOfMonster": true,
+                          "enemyTeamMonsterConditionMatchesNeeded": {
+                            "IsBurnBlastOrForceOrFire": 1
+                          },
+                          "or": {
+                            "class": "MonsterConditions",
+                            "monsterTags": [
+                              "StunImmuneIfAllyIsFireBurnBlastOrForce"
+                            ],
+                            "myTeamMonsterConditionMatchesNeeded": {
+                              "IsBurnBlastOrForceOrFire": 1
+                            },
+                            "or": {
+                              "class": "MonsterConditions",
+                              "monsterTags": [
+                                "StunImmuneIfPoisonedEnemy"
+                              ],
+                              "checkEnemyTeamOfMonster": true,
+                              "enemyTeamMonsterConditionMatchesNeeded": {
+                                "IsPoisoned": 1
+                              },
+                              "or": {
+                                "class": "MonsterConditions",
+                                "monsterTags": [
+                                  "StunImmunityIfNotBurning"
+                                ],
+                                "not": {
+                                  "class": "MonsterConditions",
+                                  "buffStackNames": [
+                                    "Burn"
+                                  ]
+                                },
+                                "or": {
+                                  "class": "MonsterConditions",
+                                  "monsterTags": [
+                                    "StunImmuneIfHoldGroundPlusTriggered"
+                                  ],
+                                  "buffStackNames": [
+                                    "BlockDeathUntilNextTurn"
+                                  ],
+                                  "not": {
+                                    "class": "MonsterConditions",
+                                    "buffStackNames": [
+                                      "HoldGroundOnceForHoldGroundPlus"
+                                    ]
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "passives": {
+      "DamageReduceWhenAtMaxHP": {
+        "id": "DamageReduceWhenAtMaxHP",
+        "found": true,
+        "localization": {
+          "name": "Vigor Armor",
+          "description": "50% less attack damage taken by the user while at max HP."
+        }
+      },
+      "StunRevengeA": {
+        "id": "StunRevengeA",
+        "found": true,
+        "localization": {
+          "name": "Stun Revenge",
+          "description": "When this unit is defeated by an enemy, that enemy is stunned for 200TU."
+        }
+      },
+      "PlusHPBoostLv2": {
+        "id": "PlusHPBoostLv2",
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv2",
+          "description": "Adds 800 to this unit's max HP."
+        }
+      },
+      "Stun15TUMinus": {
+        "id": "Stun15TUMinus",
+        "found": true,
+        "localization": {
+          "name": "Stun Resist Lv2",
+          "description": "Reduces the amount of any stun effects against this unit by 15TU."
+        }
+      },
+      "PlusAttackBoostLv2": {
+        "id": "PlusAttackBoostLv2",
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv2",
+          "description": "Adds 200 to this unit's Attack."
+        }
+      },
+      "AddWeaponPrefGreatSword": {
+        "id": "AddWeaponPrefGreatSword",
+        "found": true,
+        "localization": {
+          "name": "Greatsword Mastery",
+          "description": "Can use weapon skills of Greatswords in addition to their original preferred weapon type."
+        }
+      }
+    },
+    "activeSkillsAI": {
+      "1": {
+        "id": "SmarterTimeStrike_AI",
+        "found": true,
+        "ai": {
+          "class": "AbilityAI",
+          "baseAITargetingWeight": 1.5,
+          "globalScalorsToIgnore": [
+            "CurrentTULessThan200"
+          ],
+          "aiTargetingMonsterConditions": {
+            "HasProtectorLessThan130TUInTeam": 0.05
+          }
+        }
+      }
+    },
+    "aiSequence": null,
+    "leaderCondition": {
+      "class": "MonsterConditions",
+      "elements": [
+        "Life"
+      ]
+    }
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "BunnySamurai02",
+    "family": "BunnySamurai",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "BunnySamurai02",
+    "family": "BunnySamurai",
+    "class": "Monster",
+    "leaderBuff": "AttackAndHPUp5Life",
+    "leaderBuffCondition": "IsLife",
+    "activeSkills": {
+      "0": "GainAttackSingleA",
+      "1": "TimeStrikeA",
+      "2": "SurvivorA",
+      "3": "StunSmallSingleA"
+    },
+    "passives": {
+      "0": "DamageReduceWhenAtMaxHP",
+      "1": "StunRevengeA",
+      "2": "PlusHPBoostLv2",
+      "3": "Stun15TUMinus",
+      "4": "PlusAttackBoostLv2",
+      "5": "AddWeaponPrefGreatSword"
+    },
+    "cost": 28,
+    "baseAttack": 845,
+    "baseMaxHp": 4573,
+    "speed": 117,
+    "element": "Life",
+    "weaponPref": "Katana",
+    "weaponPivotIndex": 0,
+    "secure": 1,
+    "evolveFrom": "BunnySamurai01",
+    "aiTargetPickWeight": 1,
+    "stars": 5,
+    "evolvedStars": 5,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 0,
+    "battleOrbImageFlip": 0,
+    "attackType": "Weapon",
+    "formTwitterShare": 1,
+    "activeSkillsAI": {
+      "1": "SmarterTimeStrike_AI"
+    },
+    "skillVoices": {
+      "0": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "1": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "2": [
+        9,
+        10,
+        11,
+        12
+      ],
+      "3": [
+        13,
+        14
+      ]
+    },
+    "damageVoices": [
+      15,
+      16,
+      17,
+      18
+    ],
+    "deathVoices": [
+      19,
+      20,
+      21,
+      22
+    ],
+    "victoryVoices": [
+      23,
+      24
+    ],
+    "lineupVoices": [
+      25,
+      26,
+      27,
+      28
+    ],
+    "trainVoices": [
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37
+    ],
+    "titleVoices": [
+      38
+    ],
+    "gachaVoices": [
+      39
+    ]
+  },
+  "_build": {
+    "scriptVersion": "6-character-family-states",
+    "sourceHash": "d62879dac26d0465ce06315987e56aaddce50749b7a58c6b5c769b01ce967db8",
+    "dependencyHash": "a1491ecf110768d7db88e5b70fc49025018085bc33c5be1991794e7ca95ccc0a",
+    "generatedAt": 1778213414
+  }
+}

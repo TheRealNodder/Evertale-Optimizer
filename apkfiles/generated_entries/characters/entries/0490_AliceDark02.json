@@ -1,0 +1,1249 @@
+{
+  "schemaVersion": 3,
+  "order": 490,
+  "id": "dark-alice",
+  "name": "Dark Alice",
+  "title": "One More Nightmare",
+  "description": "She paints white roses red, without anyone's knowledge or permission—she just wants to make her favorite garden pretty. So that it is ready when someone comes to visit. So that she can be the best host there ever was. But such a day never comes, and Alice's heart breaks into dark, lonely pieces—or maybe it has already been broken long ago.",
+  "category": "character",
+  "rarity": null,
+  "stars": 6,
+  "evolvedStars": 6,
+  "element": "Dark",
+  "weaponType": "Mace",
+  "stats": {
+    "atk": 1490,
+    "hp": 6970,
+    "spd": 375,
+    "cost": 34
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/AliceDark02.png",
+  "refs": {
+    "activeSkills": [
+      "PoisonAttackGainStanceAAliceDark",
+      "ConfidentStrikeSingleSMegaPoisonAliceDark",
+      "InstantPoisonEaterAAliceDark",
+      "SurvivorDoubleAAliceDark"
+    ],
+    "passives": [
+      "MegaPoisonKillerOnAllyDeaths",
+      "HoldGroundRegenerationOnMyTurn",
+      "PlusAttackBoostLv3",
+      "PlusHPBoostLv3",
+      "Stun20TUMinus",
+      "AddWeaponPrefAxe"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": "AttackAndHPUp6Death",
+    "leaderBuffCondition": "IsDeath",
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "PoisonAttackGainStanceAAliceDark": {
+        "id": "PoisonAttackGainStanceAAliceDark",
+        "found": true,
+        "localization": {
+          "name": "PoisonAttackGainStanceAAliceDark",
+          "description": ""
+        },
+        "ability": {
+          "name": "PoisonAttackGainStanceAAliceDark",
+          "class": "Ability",
+          "config": "PoisonAttackGainStanceAAliceDark",
+          "tuCost": 100,
+          "nameKey": "PoisonAttackGainStanceA",
+          "descriptionKey": "PoisonAttackGainStanceA",
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "Poison",
+                "BurnImmunityTempForRevenge"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "Overwatch",
+                "BurnImmunityTempForRevenge"
+              ],
+              "applyConditions": "IsNotOverwatchOrAlreadyOverwatched",
+              "applyToSourceOnly": true,
+              "showMissConditions": "ShowNoMiss",
+              "skipAbilityEffect": true
+            }
+          ],
+          "immuneSuggestionCondition": "PoisonImmunityNotFromStealth",
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "flags": [
+            "Poisoner"
+          ],
+          "abilityEffect": "PoisonAttackAlice1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.65,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batfx_impactmagic5/batfx_impactmagic5",
+            "batfx_alicedark1/batfx_cardimpact1",
+            "batsfx_prefab/batsfx_slash1"
+          ],
+          "sortOrderOffset": [
+            2,
+            2,
+            -2
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            true,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "BurnImmunityTempForRevenge": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Burn",
+                  "BurnAfterTurn",
+                  "BurnAtEndOfTurn"
+                ],
+                "dontShowText": true
+              },
+              {
+                "name": "BurnAfterTurn"
+              },
+              {
+                "name": "BurnSelfOnHit"
+              }
+            ],
+            "duration": 1,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "tags": [
+              "BurnImmune"
+            ],
+            "stackName": "BurnImmunityTempForRevenge",
+            "isHiddenFromPlayers": true
+          },
+          "Overwatch": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "BuffWhenMonsterHurt",
+              "RemoveOnHurt"
+            ],
+            "stackName": "Stance",
+            "behaviorOverrides": [
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "selfBuffs": [
+                  "GiveTurnOverwatch",
+                  "AlreadyOverwatched"
+                ],
+                "cancelFromDamageTypes": [
+                  "BuffDamage"
+                ],
+                "cancelFromDamageFlags": [
+                  "IgnoreSkin",
+                  "Sneak",
+                  "RemoveStatus"
+                ]
+              },
+              {
+                "cancelFromDamageTypes": [
+                  "BuffDamage"
+                ],
+                "cancelFromDamageFlags": [
+                  "IgnoreSkin",
+                  "Sneak",
+                  "RemoveStatus"
+                ]
+              }
+            ],
+            "applyConditions": "IsNotOverwatch",
+            "duration": 150,
+            "showAsTimer": true,
+            "iconSpriteName": "IconOverwatch01"
+          },
+          "Poison": {
+            "class": "Buff",
+            "stackName": "Poison",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "DamageOverTime"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "percentOfAttack": 0.0025,
+                "damageColor": "Green",
+                "abilityEffect": "PoisonDamage",
+                "extraDamageFlag": "Poison"
+              }
+            ],
+            "tags": [
+              "Poison"
+            ],
+            "canBePurified": true,
+            "duration": -1,
+            "applyConditions": "NotSuperOrMegaPoisoned",
+            "showAsTimer": false,
+            "statusEffect": "PoisonStatus",
+            "statusEffectOffset": 0.1,
+            "damageType": "Poison",
+            "noIconShownOnBattleStatus": true,
+            "iconSpriteName": "IconPurplePoison01"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "IsNotOverwatchOrAlreadyOverwatched": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "Stance"
+              ],
+              "or": {
+                "class": "MonsterConditions",
+                "buffStackNames": [
+                  "AlreadyInStance"
+                ]
+              }
+            }
+          },
+          "PoisonImmunityNotFromStealth": {
+            "class": "MonsterConditions",
+            "monsterTags": [
+              "PoisonImmune"
+            ],
+            "or": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "PoisonImmunity"
+              ],
+              "or": {
+                "class": "MonsterConditions",
+                "monsterTags": [
+                  "LethalPoison"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "ConfidentStrikeSingleSMegaPoisonAliceDark": {
+        "id": "ConfidentStrikeSingleSMegaPoisonAliceDark",
+        "found": true,
+        "localization": {
+          "name": "ConfidentStrikeSingleSMegaPoisonAliceDark",
+          "description": ""
+        },
+        "ability": {
+          "name": "ConfidentStrikeSingleSMegaPoisonAliceDark",
+          "class": "Ability",
+          "abilityScalor": 2,
+          "config": "ConfidentStrikeSingleSMegaPoisonAliceDark",
+          "tuCost": 100,
+          "useLimit": 0,
+          "nameKey": "ConfidentStrikeSingleSMegaPoison",
+          "descriptionKey": "ConfidentStrikeSingleSMegaPoison",
+          "spiritCost": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "MegaPoison100TU",
+                "BurnImmunityTempForRevenge"
+              ],
+              "applyToTargetType": "Enemy"
+            }
+          ],
+          "useCondition": "HPAbove75Percent",
+          "enemyEventType": "Hit",
+          "abilityEffect": "AliceClaw1",
+          "flags": [
+            "StealthWorthy",
+            "Poisoner"
+          ],
+          "recommendEffectWhenUsable": 1
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            1.9,
+            0,
+            0.9,
+            0,
+            0.35,
+            0.1,
+            0
+          ],
+          "prefabs": [
+            "batfx_alicedark1/batfx_castclock2",
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_alicedark1/batfx_redportal1",
+            "batsfx_prefab/batsfx_dragonflow1",
+            "batfx_alicedark1/batfx_darkclaw1",
+            "batfx_alicedark1/batfx_darkclaw2",
+            "batfx_alicedark1/batfx_bombpurple1",
+            "batfx_alicedark1/batfx_megacloud1",
+            "batsfx_prefab/batsfx_bluntimpact1"
+          ],
+          "sortOrderOffset": [
+            -2,
+            0,
+            -3,
+            0,
+            -2,
+            2,
+            2,
+            2,
+            0
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            true
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "BurnImmunityTempForRevenge": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Burn",
+                  "BurnAfterTurn",
+                  "BurnAtEndOfTurn"
+                ],
+                "dontShowText": true
+              },
+              {
+                "name": "BurnAfterTurn"
+              },
+              {
+                "name": "BurnSelfOnHit"
+              }
+            ],
+            "duration": 1,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "tags": [
+              "BurnImmune"
+            ],
+            "stackName": "BurnImmunityTempForRevenge",
+            "isHiddenFromPlayers": true
+          },
+          "MegaPoison100TU": {
+            "class": "Buff",
+            "stackName": "Poison",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "DamageOverTime"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "percentOfAttack": 0.05,
+                "damageColor": "Green",
+                "abilityEffect": "MidDeath1MegaPoison",
+                "extraDamageFlag": "MegaPoison"
+              }
+            ],
+            "tags": [
+              "Poison",
+              "MegaPoison"
+            ],
+            "canBePurified": true,
+            "duration": 100,
+            "showAsTimer": true,
+            "statusEffect": "MegaPoisonStatus",
+            "statusEffectOffset": 0.1,
+            "damageType": "Poison",
+            "effectToShowWhenApplied": "MegaPoisonEntry1",
+            "iconSpriteName": "IconPurplePoison01"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "HPAbove75Percent": {
+            "class": "MonsterConditions",
+            "hpMoreThanPercent": 0.7499999
+          }
+        }
+      },
+      "InstantPoisonEaterAAliceDark": {
+        "id": "InstantPoisonEaterAAliceDark",
+        "found": true,
+        "localization": {
+          "name": "InstantPoisonEaterAAliceDark",
+          "description": ""
+        },
+        "ability": {
+          "name": "InstantPoisonEaterAAliceDark",
+          "class": "Ability",
+          "abilityScalor": -2,
+          "conditionalAbilityScalors": [
+            3
+          ],
+          "config": "InstantPoisonEaterAAliceDark",
+          "tuCost": 1,
+          "useLimit": 0,
+          "nameKey": "InstantPoisonEaterA",
+          "descriptionKey": "InstantPoisonEaterA",
+          "spiritCost": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "PoisonEaterDamageBoost"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "InstantPoisonEaterACooldown"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "attackScalors": [
+            "GoodVsPoisoned"
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "SmallHitRanged1",
+          "conditionedAbilityEffects": [
+            "AliceInstant1"
+          ],
+          "useCondition": "NotInstantCooldown",
+          "flags": [
+            "PoisonEater",
+            "StealthWorthy"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.8,
+            0
+          ],
+          "prefabs": [
+            "batfx_bluntimpact1/batfx_bluntimpact1",
+            "batsfx_prefab/batsfx_impactsmall1"
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            true
+          ],
+          "scale": [
+            0.4,
+            1
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "InstantPoisonEaterACooldown": {
+            "class": "Buff",
+            "stackName": "InstantCooldown",
+            "duration": 100,
+            "isHiddenFromPlayers": false,
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "iconSpriteName": "IconBlueCountdownClock3"
+          }
+        },
+        "attackScalors": {
+          "GoodVsPoisoned": {
+            "class": "AttackScalor",
+            "targetCondition": "IsPoisoned"
+          }
+        },
+        "conditions": {
+          "NotInstantCooldown": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "InstantCooldown"
+              ]
+            }
+          }
+        }
+      },
+      "SurvivorDoubleAAliceDark": {
+        "id": "SurvivorDoubleAAliceDark",
+        "found": true,
+        "localization": {
+          "name": "SurvivorDoubleAAliceDark",
+          "description": ""
+        },
+        "ability": {
+          "name": "SurvivorDoubleAAliceDark",
+          "class": "Ability",
+          "abilityScalor": 4,
+          "config": "SurvivorDoubleAAliceDark",
+          "tuCost": 130,
+          "useLimit": 0,
+          "nameKey": "SurvivorDoubleA",
+          "descriptionKey": "SurvivorDoubleA",
+          "spiritCost": 3,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "SurvivorDamageBoost"
+              ]
+            }
+          ],
+          "useCondition": "TimeInCombat300",
+          "bombSkillIcon": "IconBrownCountdownClock01",
+          "bombSkillIconDescriptionKey": "SurvivorDoubleACountdownKey",
+          "flags": [
+            "Survivor",
+            "Duration"
+          ],
+          "enemyEventType": "Hit",
+          "recommendEffectWhenUsable": 1,
+          "abilityEffect": "AliceSurvivor1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1.7,
+            1,
+            0,
+            1,
+            0
+          ],
+          "prefabs": [
+            "batfx_common/batfx_empty",
+            "batfx_tailwindspace2/batfx_tailwindspace2",
+            "batfx_alicedark1/batfx_tailwindroses1",
+            "batfx_alicedark1/batfx_alicedark1",
+            "batfx_alicedark1/batfx_alicedark2",
+            "batfx_fauxAreaLightPurple1/batfx_fauxAreaLightPurple1",
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_alicedark1/batfx_portal1",
+            "batfx_alicedark1/batfx_barrage1",
+            "batfx_freyaregular1/batfx_firemulti1",
+            "batfx_alicedark1/batfx_bombpurple1",
+            "batsfx_prefab/batsfx_bluntimpact1"
+          ],
+          "sortOrderOffset": [
+            0,
+            -5,
+            -2,
+            -2,
+            -2,
+            -2,
+            0,
+            2,
+            2,
+            2,
+            2,
+            0
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            true,
+            false
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            false,
+            true
+          ],
+          "boneToAttachTo": [
+            "bone65",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "bone65",
+            "",
+            "",
+            "",
+            ""
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            true,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {
+          "TimeInCombat300": {
+            "class": "AttackScalor",
+            "sourceCondition": "TimeInCombat300"
+          }
+        },
+        "conditions": {
+          "TimeInCombat300": {
+            "class": "MonsterConditions",
+            "timeInCombat": 300
+          }
+        }
+      }
+    },
+    "passives": {
+      "MegaPoisonKillerOnAllyDeaths": {
+        "id": "MegaPoisonKillerOnAllyDeaths",
+        "found": true,
+        "localization": {
+          "name": "Mega Vengeance",
+          "description": "Grants the Mega Poison status effect for 100TU to any enemy that defeats a non-conjured ally (including this unit) with an attack. This will overwrite other status effects on that enemy. Mega Poison deals 20 times the damage of normal poison and cannot be overwritten by normal Poison or Super Poison. This skill will not trigger if Survivor's Fury is unlocked by this unit. This is not a Revenge passive skill."
+        }
+      },
+      "HoldGroundRegenerationOnMyTurn": {
+        "id": "HoldGroundRegenerationOnMyTurn",
+        "found": true,
+        "localization": {
+          "name": "Regeneration Heart",
+          "description": "When this unit gets a turn, it heals 30% of its max HP. If this unit would be defeated by an enemy attack or a status effect while having more than 1 HP, it instead survives with 1 HP."
+        }
+      },
+      "PlusAttackBoostLv3": {
+        "id": "PlusAttackBoostLv3",
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv3",
+          "description": "Adds 300 to this unit's Attack."
+        }
+      },
+      "PlusHPBoostLv3": {
+        "id": "PlusHPBoostLv3",
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv3",
+          "description": "Adds 1200 to this unit's max HP."
+        }
+      },
+      "Stun20TUMinus": {
+        "id": "Stun20TUMinus",
+        "found": true,
+        "localization": {
+          "name": "Stun Resist Lv3",
+          "description": "Reduces the amount of any stun effects against this unit by 20TU."
+        }
+      },
+      "AddWeaponPrefAxe": {
+        "id": "AddWeaponPrefAxe",
+        "found": true,
+        "localization": {
+          "name": "Axe Mastery",
+          "description": "Can use weapon skills of Axes in addition to their original preferred weapon type."
+        }
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": {
+      "class": "MonsterConditions",
+      "elements": [
+        "Death"
+      ]
+    }
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "AliceDark02",
+    "family": "AliceDark",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "AliceDark02",
+    "family": "AliceDark",
+    "class": "Monster",
+    "leaderBuff": "AttackAndHPUp6Death",
+    "leaderBuffCondition": "IsDeath",
+    "activeSkills": {
+      "0": "PoisonAttackGainStanceAAliceDark",
+      "1": "ConfidentStrikeSingleSMegaPoisonAliceDark",
+      "2": "InstantPoisonEaterAAliceDark",
+      "3": "SurvivorDoubleAAliceDark"
+    },
+    "passives": {
+      "0": "MegaPoisonKillerOnAllyDeaths",
+      "1": "HoldGroundRegenerationOnMyTurn",
+      "2": "PlusAttackBoostLv3",
+      "3": "PlusHPBoostLv3",
+      "4": "Stun20TUMinus",
+      "5": "AddWeaponPrefAxe"
+    },
+    "cost": 34,
+    "baseAttack": 1490,
+    "baseMaxHp": 6970,
+    "speed": 375,
+    "element": "Death",
+    "weaponPref": "Mace",
+    "weaponPivotIndex": 0,
+    "secure": 1,
+    "evolveFrom": "AliceDark01",
+    "aiTargetPickWeight": 1,
+    "stars": 6,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 0,
+    "battleOrbImageFlip": 0,
+    "attackType": "Bash",
+    "formTwitterShare": 1,
+    "cosmoName": "AliceDark03",
+    "cosmoBattleOrbImageFlip": 0,
+    "skillVoices": {
+      "0": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "1": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "2": [
+        9,
+        10,
+        11,
+        12
+      ],
+      "3": [
+        13,
+        14,
+        15,
+        16
+      ]
+    },
+    "damageVoices": [
+      17,
+      18,
+      19,
+      20
+    ],
+    "deathVoices": [
+      21,
+      22,
+      23,
+      24
+    ],
+    "victoryVoices": [
+      25,
+      26
+    ],
+    "lineupVoices": [
+      27,
+      28,
+      29,
+      30,
+      31,
+      32
+    ],
+    "evolutionVoices": [
+      33
+    ],
+    "trainVoices": [
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43
+    ],
+    "titleVoices": [
+      44
+    ],
+    "gachaVoices": [
+      45
+    ],
+    "loginVoices": [
+      46
+    ],
+    "tapVoices": [
+      47,
+      48,
+      49
+    ],
+    "idleVoices": [
+      50
+    ]
+  },
+  "_build": {
+    "scriptVersion": "6-character-family-states",
+    "sourceHash": "43c6eccfdc6c285dc9d4c081fd400c27d5c4f4bda4ae26ec2084dcf8e0b4c5e7",
+    "dependencyHash": "3c416fd859037e1bb4a6f88fc534d9904e5abf9113ad51707039f7089648bba3",
+    "generatedAt": 1778213416
+  }
+}

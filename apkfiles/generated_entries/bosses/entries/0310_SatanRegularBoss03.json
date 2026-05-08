@@ -1,0 +1,2201 @@
+{
+  "schemaVersion": 3,
+  "order": 310,
+  "id": "mega-satan",
+  "name": "Mega Satan",
+  "title": "",
+  "description": "",
+  "category": "bosse",
+  "rarity": null,
+  "stars": 6,
+  "evolvedStars": 6,
+  "element": "Fire",
+  "weaponType": "Spear",
+  "stats": {
+    "atk": 3666,
+    "hp": 196600,
+    "spd": 394,
+    "cost": 999
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/SatanRegular03.png",
+  "refs": {
+    "activeSkills": [
+      "SingleHellballASatanRegularBoss",
+      "MassDefeatASatanRegularBoss",
+      "DoubleAttackASatanRegularBoss",
+      "GiveTurnASatanRegularBoss"
+    ],
+    "passives": [
+      "DevilImmunityASatanRegularBoss",
+      "HoldGoundPlusPassiveASatanRegularBoss",
+      "KnockbackImmunity",
+      "StunImmunity",
+      "SleepImmunity"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": null,
+    "leaderBuffCondition": null,
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "SingleHellballASatanRegularBoss": {
+        "id": "SingleHellballASatanRegularBoss",
+        "found": true,
+        "localization": {
+          "name": "Fiery Hellball",
+          "description": "200% damage to 1 enemy, plus 200% for each Charge stored on the user (max of 800% total damage). This attack ignores the Counter Stance Status Effect, and the effects of Skin passive skills.\n\nThe user and target are both granted the Burn status effect. This will overwrite other status effects on those units. Any unit that deals damage to or is dealt damage by a unit with burn will also become burned.\n\nStuns for 50TU one other non-water, burning enemy per Charge stored on the user (max of 3 targets).",
+          "selected": "200%+ damage, ignores skins & counter stances"
+        },
+        "ability": {
+          "name": "SingleHellballASatanRegularBoss",
+          "class": "Ability",
+          "abilityScalor": 1,
+          "conditionalAbilityScalors": [
+            3,
+            5,
+            7
+          ],
+          "config": "SingleHellballASatanRegularBoss",
+          "tuCost": 50,
+          "useLimit": 0,
+          "spiritGain": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "applyToTargetType": "Enemy",
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "damageFlags": [
+                "AttackerIgnition",
+                "RemoveSatanLock",
+                "IgnoreSkin"
+              ]
+            },
+            {
+              "buffs": [
+                "Burn"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true,
+              "buffAppliedEffects": [
+                "BurnSelf1"
+              ]
+            },
+            {
+              "applyToTargetType": "Enemy",
+              "buffs": [
+                "Burn",
+                "HellballMarkedEnemySatanRegularBoss"
+              ]
+            },
+            {
+              "buffs": [
+                "Stun1RandomBurningNonWaterEnemyEBBBoss"
+              ],
+              "chance": 1.0,
+              "applyToSourceOnly": true,
+              "showMissConditions": "ShowNoMiss",
+              "skipAbilityEffect": true,
+              "applyConditions": "IsCharged1Exact"
+            },
+            {
+              "buffs": [
+                "Stun2RandomBurningNonWaterEnemiesEBBBoss"
+              ],
+              "chance": 1.0,
+              "applyToSourceOnly": true,
+              "showMissConditions": "ShowNoMiss",
+              "skipAbilityEffect": true,
+              "applyConditions": "IsCharged2Exact"
+            },
+            {
+              "buffs": [
+                "Stun3RandomBurningNonWaterEnemiesEBBBoss"
+              ],
+              "chance": 1.0,
+              "applyToSourceOnly": true,
+              "showMissConditions": "ShowNoMiss",
+              "skipAbilityEffect": true,
+              "applyConditions": "IsCharged3"
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "flags": [
+            "Burn",
+            "ApplyStatusToSelf",
+            "StunChance"
+          ],
+          "abilityEffect": "SatanMeteo",
+          "recommendEffectWhenUsable": 1,
+          "attackScalors": [
+            "GoodIfCharged1",
+            "GoodIfCharged2",
+            "GoodIfCharged3"
+          ],
+          "conditionedAbilityEffects": [
+            "SatanMeteo",
+            "SatanMeteo",
+            "SatanMeteo"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0,
+            0.2,
+            0,
+            0.6,
+            0.2,
+            0,
+            0.4,
+            0,
+            0,
+            0,
+            0.6,
+            0.4,
+            0,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_charge1",
+            "batfx_inugamiregular1/batfx_dimensionfloor1",
+            "batfx_OssiaHalloween1/batfx_ossiafloor1",
+            "batfx_casting5/batfx_casting5",
+            "batfx_OssiaHalloween1/batfx_bats1",
+            "batsfx_prefab/batsfx_charge1",
+            "batfx_yandereprep2/batfx_yandereprep2",
+            "batfx_Satan/batfx_candymeteoBig",
+            "batsfx_prefab/batsfx_earth2",
+            "batfx_bluntimpact2/batfx_bluntimpact2",
+            "batsfx_prefab/batsfx_bomb1",
+            "batfx_Satan/batfx_bahamut3-01",
+            "batsfx_prefab/batsfx_fire4",
+            "batfx_Satan/batfx_bahamut3-02",
+            "batfx_common/batfx_whiteout2",
+            "batfx_crossswordknight1/batfx_cskfloor1",
+            "batsfx_prefab/batsfx_fire4",
+            "batsfx_prefab/batsfx_bomb1"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -4,
+            -2,
+            -2,
+            10,
+            20,
+            -2,
+            3,
+            -2,
+            2,
+            -2,
+            3,
+            0,
+            3,
+            50,
+            -2,
+            3,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "Burn": {
+            "class": "Buff",
+            "stackName": "Burn",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "DamageOverTime",
+              "BuffChanceOnHit",
+              "BuffWhenMonsterHurt"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "LockHasBurnedSkills"
+              },
+              {
+                "name": "SleepThorns"
+              },
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "percentOfTargetHp": 0.001,
+                "damageColor": "Red",
+                "abilityEffect": "BurnDamage1",
+                "bossDamageCap": 500,
+                "extraDamageFlag": "Burn"
+              },
+              {
+                "contextBuffs": [
+                  "BurnAfterTurn"
+                ],
+                "chance": 1.0
+              },
+              {
+                "contextBuffs": [
+                  "BurnAfterTurn",
+                  "RemovePoison"
+                ],
+                "spreadCondition": "IsNotBurnImmune",
+                "cancelFromDamageFlags": [
+                  "Sneak",
+                  "RemoveStatus"
+                ],
+                "cancelFromDamageTypes": [
+                  "BuffDamage"
+                ]
+              }
+            ],
+            "tags": [
+              "Burn"
+            ],
+            "canBePurified": true,
+            "duration": 300,
+            "statusEffect": "BurnStatus",
+            "statusEffectOffset": 0.1,
+            "damageType": "Burn",
+            "noIconShownOnBattleStatus": false,
+            "applyConditions": "IsNotBurning",
+            "showAsTimer": true,
+            "iconSpriteName": "IconRedBurn01"
+          },
+          "HellballMarkedEnemySatanRegularBoss": {
+            "class": "Buff",
+            "stackName": "SatanEnemyMarked",
+            "duration": 0,
+            "isHiddenFromPlayers": true,
+            "showAsPermanent": false,
+            "showAsTimer": false
+          },
+          "Stun1RandomBurningNonWaterEnemyEBBBoss": {
+            "class": "Buff",
+            "stackName": "Stun2RandomBurningAllies",
+            "behaviors": [
+              "EnterBattleBuff"
+            ],
+            "behaviorOverrides": [
+              {
+                "randomEnemyBuffs": [
+                  "Stun50"
+                ],
+                "numRandomToBuff": 1,
+                "spreadCondition": "IsBurningNotWaterOrMarked"
+              }
+            ],
+            "duration": 0,
+            "isHiddenFromPlayers": true,
+            "showAsPermanent": false,
+            "showAsTimer": false
+          },
+          "Stun2RandomBurningNonWaterEnemiesEBBBoss": {
+            "class": "Buff",
+            "stackName": "Stun2RandomBurningAllies",
+            "behaviors": [
+              "EnterBattleBuff"
+            ],
+            "behaviorOverrides": [
+              {
+                "randomEnemyBuffs": [
+                  "Stun50"
+                ],
+                "numRandomToBuff": 2,
+                "spreadCondition": "IsBurningNotWaterOrMarked"
+              }
+            ],
+            "duration": 0,
+            "isHiddenFromPlayers": true,
+            "showAsPermanent": false,
+            "showAsTimer": false
+          },
+          "Stun3RandomBurningNonWaterEnemiesEBBBoss": {
+            "class": "Buff",
+            "stackName": "Stun2RandomBurningAllies",
+            "behaviors": [
+              "EnterBattleBuff"
+            ],
+            "behaviorOverrides": [
+              {
+                "randomEnemyBuffs": [
+                  "Stun50"
+                ],
+                "numRandomToBuff": 3,
+                "spreadCondition": "IsBurningNotWaterOrMarked"
+              }
+            ],
+            "duration": 0,
+            "isHiddenFromPlayers": true,
+            "showAsPermanent": false,
+            "showAsTimer": false
+          }
+        },
+        "attackScalors": {
+          "GoodIfCharged1": {
+            "class": "AttackScalor",
+            "sourceCondition": "IsCharged1"
+          },
+          "GoodIfCharged2": {
+            "class": "AttackScalor",
+            "sourceCondition": "IsCharged2"
+          },
+          "GoodIfCharged3": {
+            "class": "AttackScalor",
+            "sourceCondition": "IsCharged3"
+          }
+        },
+        "conditions": {
+          "IsCharged1Exact": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "StoreEnergy"
+            ],
+            "buffStackCounts": [
+              1
+            ],
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "StoreEnergy"
+              ],
+              "buffStackCounts": [
+                2
+              ]
+            }
+          },
+          "IsCharged2Exact": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "StoreEnergy"
+            ],
+            "buffStackCounts": [
+              2
+            ],
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "StoreEnergy"
+              ],
+              "buffStackCounts": [
+                3
+              ]
+            }
+          },
+          "IsCharged3": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "StoreEnergy"
+            ],
+            "buffStackCounts": [
+              3
+            ]
+          }
+        }
+      },
+      "MassDefeatASatanRegularBoss": {
+        "id": "MassDefeatASatanRegularBoss",
+        "found": true,
+        "localization": {
+          "name": "Mass Dismissal",
+          "description": "Immediately defeats all conjured, non-boss units on both sides of the battlefield. Allies gain 2 Spirit and the enemy team loses 2 Spirit for each unit defeated in this way. The user is considered to have defeated with attacks as many units as are defeated this way (even if they were Ephemeral). This effect ignores Revenge passive skills, Revival passive skills, and any passive skills or effects of active skills that would prevent the targets from being defeated. This skill becomes locked for 150TU after use.",
+          "selected": "Immediately defeats all conjured units"
+        },
+        "ability": {
+          "name": "MassDefeatASatanRegularBoss",
+          "class": "Ability",
+          "config": "MassDefeatASatanRegularBoss",
+          "tuCost": 1,
+          "useLimit": 0,
+          "spiritGain": 0,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "All",
+          "components": [
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "Add1Kill",
+                "SpiritGainB"
+              ],
+              "applyConditions": "IsSummonedAndNotBoss",
+              "buffBackMode": true,
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "SpiritLossD",
+                "InstantDeath"
+              ],
+              "applyConditions": "IsSummonedAndNotBoss",
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "SpiritLossDContra",
+                "InstantDeath"
+              ],
+              "applyConditions": "IsSummonedAndNotBoss",
+              "applyToTargetType": "Friendly"
+            },
+            {
+              "buffs": [
+                "SatanRegularCooldown150Boss"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "EmptyPlaceholder"
+              ],
+              "applyToTargetType": "Source",
+              "chance": 1.0,
+              "skipAbilityEffect": true
+            }
+          ],
+          "enemyEventType": "Hit",
+          "friendlyEventType": "Finish",
+          "sourceEventType": "Finish",
+          "abilityEffect": "SatanFireWall",
+          "flags": [
+            "NoDamage",
+            "InstantDeath"
+          ],
+          "recommendEffectWhenUsable": 1,
+          "useCondition": "NotInstantCooldown"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "all": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_accelerate1",
+            "batfx_Satan/batfx_tailwindfirewall2",
+            "batfx_Satan/batfx_tailwindfireSatan",
+            "batfx_Satan/batfx_FireTouch",
+            "batsfx_prefab/batsfx_fire2",
+            "batfx_Satan/batfx_FireTouch",
+            "batfx_common/batfx_empty",
+            "batfx_common/batfx_empty",
+            "batsfx_prefab/batsfx_fire2",
+            "batsfx_prefab/batsfx_bomb1"
+          ],
+          "sortOrderOffset": [
+            2,
+            10,
+            -50,
+            5,
+            1,
+            5,
+            2,
+            2,
+            0,
+            1
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            true,
+            false,
+            true,
+            true,
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            true,
+            false,
+            true,
+            true,
+            true,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            true,
+            true,
+            false,
+            true,
+            false,
+            false,
+            false,
+            true,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            true,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "isEnemyTargetEffect": [
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false
+          ],
+          "isFriendlyTargetEffect": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            true,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "Add1Kill": {
+            "class": "Buff",
+            "duration": 0,
+            "behaviors": [
+              "AddBattleProperty"
+            ],
+            "behaviorOverrides": [
+              {
+                "addToKills": 1,
+                "properties": {
+                  "NothingReally": 1
+                },
+                "replace": true
+              }
+            ],
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "EmptyPlaceholder": {
+            "class": "Buff",
+            "isHiddenFromPlayers": true,
+            "duration": 0,
+            "showAsTimer": false,
+            "showAsPermanent": false
+          },
+          "InstantDeath": {
+            "class": "Buff",
+            "stackName": "InstantDeath",
+            "behaviors": [
+              "InstantDeath"
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "SatanRegularCooldown150Boss": {
+            "class": "Buff",
+            "duration": 150,
+            "stackName": "InstantCooldown",
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "iconSpriteName": "IconBlueCountdownClock3"
+          },
+          "SpiritGainB": {
+            "class": "Buff",
+            "behaviors": [
+              "AddSpirit"
+            ],
+            "behaviorOverrides": [
+              {
+                "percentOfMax": 0.2
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "SpiritLossD": {
+            "class": "Buff",
+            "behaviors": [
+              "AddSpirit"
+            ],
+            "behaviorOverrides": [
+              {
+                "percentOfMax": -0.2
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "SpiritLossDContra": {
+            "class": "Buff",
+            "behaviors": [
+              "AddSpirit"
+            ],
+            "behaviorOverrides": [
+              {
+                "percentOfMax": -0.2,
+                "toEnemyTeam": true
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "IsSummonedAndNotBoss": {
+            "class": "MonsterConditions",
+            "summoned": true,
+            "not": {
+              "class": "MonsterConditions",
+              "families": [
+                "Mibone",
+                "RedMinotaur",
+                "Eternal",
+                "Norza",
+                "Gyurelle",
+                "Druke",
+                "Luther",
+                "Cetus",
+                "GyurelleInDisguise",
+                "FloatingMageBoss",
+                "MetalDragonBoss",
+                "MaskViola",
+                "DrukeSmall",
+                "FireDragonBoss",
+                "FireLizardLancer",
+                "Gyurelle0",
+                "GyurelleInDisguise0",
+                "AstridBoss",
+                "DeathKnightBoss",
+                "TaotieBoss",
+                "AirCloakKnight",
+                "UndeadMinotaur",
+                "Darna",
+                "NorzaRegularBoss",
+                "GolemBoss",
+                "MechanicalTitan",
+                "DarkRizetteBoss",
+                "FireLich",
+                "NovaBlastDragonBoss",
+                "EarthKaijuBoss",
+                "WindDragonBoss",
+                "BabyDarkDragonBoss",
+                "MetalDragonDemon",
+                "MaskElfWarrior",
+                "DarkLudmillaBoss",
+                "LifeEyeballEX",
+                "GoldAngelEX",
+                "DarkAstridBoss",
+                "LudmillaRegularBoss",
+                "YandereMaidBoss",
+                "BunnySamuraiBoss",
+                "SchoolGirlWarriorBoss",
+                "OniSchoolGirlBoss",
+                "Orcanix",
+                "DarkFinnBoss",
+                "CyrusBoss",
+                "BahamutBoss",
+                "RoundTableKnightBoss",
+                "CrossSwordKnightBoss",
+                "MerlinRegularBoss",
+                "GyurelleRegularBoss",
+                "OssiaDarkBoss",
+                "AstridNewBoss",
+                "IbarahimeRegularBoss",
+                "CinderellaRegularBoss",
+                "SnowWhiteBoss",
+                "DarkRizetteSwimsuitBoss",
+                "LudmillaSchoolGirlBoss",
+                "RolotiaNewBoss",
+                "SnowWhiteBrideBoss",
+                "SnowBlackBrideBoss",
+                "NobunagaRegularBoss",
+                "BurnedGirlRegularBoss",
+                "DeerGirlBoss",
+                "KingArthurRegularBoss",
+                "YandereMaidRaceQueenBoss",
+                "LudmillaRacequeenBoss",
+                "LifeMinionBoss",
+                "JeanneDarkSwimsuitBoss",
+                "JeanneDarkBoss",
+                "JeanneDarkAngelBoss",
+                "HimikoRegularBoss",
+                "KaguyahimeRegularBoss",
+                "OdinRegularBoss",
+                "OdinRavenBoss",
+                "LokiRegularBoss",
+                "FreyaRegularBoss",
+                "AstridBrideBoss",
+                "MechaSisterBrideBoss",
+                "HorseIdolGirlBoss",
+                "AntaresModernBoss",
+                "CatIdolGirlBoss",
+                "MyshaIdolGirlBoss",
+                "CleopatraRegularBoss",
+                "GilgameshRegularBoss",
+                "GokuDarkBoss",
+                "GokuDarkBossClone",
+                "OtohimeRegularBoss",
+                "CinderellaDarkBoss",
+                "CerberusRegularBoss",
+                "LudmillaYukataBoss",
+                "PercivalRegularBoss",
+                "MordredRegularBoss",
+                "IbarahimeSwimsuitBoss",
+                "RapunzelRegularBoss",
+                "LuBuRegularBoss",
+                "MusashiRegularBoss",
+                "KingArthurSwimsuitBoss",
+                "FrankensteinRegularBoss",
+                "FrankensteinRegularDollBoss",
+                "GenieRegularBoss",
+                "CinderellaSwimsuitBoss",
+                "CthulhuGirlRegularBoss",
+                "NapoleonRegularBoss",
+                "CleopatraDarkBoss",
+                "HijikataRegularBoss",
+                "OkitaRegularBoss",
+                "KaguyahimeSwimsuitBoss",
+                "ExcaliburRegularBoss",
+                "TristanRegularBoss",
+                "RoundTableKnightDarkBoss",
+                "LuciferRegularBoss",
+                "CrossSwordKnightDarkBoss",
+                "SnowWhiteMaidBoss",
+                "MurasakiRegularBoss",
+                "MermaidRegularBoss",
+                "GokuBrideBoss",
+                "GoemonRegularBoss",
+                "KojiroRegularBoss",
+                "DaVinciRegularBoss",
+                "SatanRegularBoss",
+                "DragonGirlRegularBoss",
+                "HokusaiRegularBoss",
+                "MechaSisterNewBoss",
+                "YamatoRegularBoss",
+                "ZoroRegularBoss",
+                "KaguyahimeDarkBoss",
+                "KirinGirlRegularBoss",
+                "LudmillaDarkNewBoss",
+                "ElizabethRegularBoss",
+                "YandereMaidDarkBoss",
+                "NikeRegularBoss",
+                "ChronosRegularBoss",
+                "RolotiaDarkBoss",
+                "RizKouhaiRegularBoss",
+                "KongmingRegularBoss",
+                "PinocchioRegularBoss",
+                "MasamuneRegularBoss",
+                "RyomaRegularBoss",
+                "PerryRegularBoss",
+                "OniSchoolDarkBoss",
+                "ElminaModernBoss",
+                "PeachGirlRegularBoss",
+                "KingArthurEvilBoss",
+                "DonQuixoteRegularBoss",
+                "AnastasiaRegularBoss",
+                "BahamutGirlRegularBoss",
+                "ElmKouhaiRegularBoss",
+                "SiegfriedRegularBoss",
+                "ZeusRegularBoss",
+                "RizetteBraveBoss",
+                "VenusRegularBoss",
+                "MusashiDarkBoss",
+                "KenshinRegularBoss",
+                "MyshaKnightBoss",
+                "ThorRegularBoss",
+                "CalKouhaiRegularBoss",
+                "FreyaNewBoss",
+                "MechaSisterBandBoss",
+                "ChopinRegularBoss",
+                "WashingtonRegularBoss",
+                "SnowWhiteNewBoss",
+                "BeautyBeastRegularBoss",
+                "BeautyRegularBoss",
+                "BeastRegularBoss",
+                "KintaroRegularBoss"
+              ]
+            }
+          },
+          "NotInstantCooldown": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "InstantCooldown"
+              ]
+            }
+          }
+        }
+      },
+      "DoubleAttackASatanRegularBoss": {
+        "id": "DoubleAttackASatanRegularBoss",
+        "found": true,
+        "localization": {
+          "name": "Devil's Anger",
+          "description": "200% damage to 2 enemies, plus 200% for each Charge stored on the user (max of 800% damage). This attack ignores the Stealth status effect, and effects of non-boss enemies that would prevent the targets from being defeated. The user gains the Healing Burn status effect for 300TU.\n\nUsable if the user has defeated 1+ units with attacks while on the battlefield or if all enemy units on the battlefield are Fire or have Burn Blast, or Burn Drive type active skills. A unit with Healing Burn will heal after each turn at the same rate as Burn deals damage. Healing Burn will overwrite other status effects on the user and can replace the Burn status effect, but cannot be replaced by Burn. Any unit that deals damage to or is dealt damage by a unit with Healing Burn will gain the Burn status effect. Healing Burn will not be removed by Purify skills.",
+          "selected": "200%+ damage, ignores defeat prevention"
+        },
+        "ability": {
+          "name": "DoubleAttackASatanRegularBoss",
+          "class": "Ability",
+          "abilityScalor": 1,
+          "conditionalAbilityScalors": [
+            3,
+            5,
+            7
+          ],
+          "config": "DoubleAttackASatanRegularBoss",
+          "tuCost": 60,
+          "useLimit": 0,
+          "spiritCost": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "applyToTargetType": "Enemy",
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "damageFlags": [
+                "HardIgnoreBlockDeath",
+                "RemoveSatanLock"
+              ]
+            },
+            {
+              "buffs": [
+                "HealingBurn"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss"
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "SatanMultiSpecial",
+          "flags": [
+            "Burn",
+            "ApplyStatusToSelf",
+            "HealingBurn",
+            "IgnoreStealth"
+          ],
+          "attackScalors": [
+            "GoodIfCharged1",
+            "GoodIfCharged2",
+            "GoodIfCharged3"
+          ],
+          "conditionedAbilityEffects": [
+            "SatanMultiSpecial",
+            "SatanMultiSpecial",
+            "SatanMultiSpecial"
+          ],
+          "useCondition": "Kills1OrAllEnemiesBurnBlastOrForceOrFire"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0.3,
+            0,
+            0.6,
+            0,
+            0.3,
+            0,
+            0.3,
+            0,
+            0.1,
+            0,
+            0,
+            0.6,
+            0.9,
+            0,
+            0.6,
+            0,
+            0.62,
+            0
+          ],
+          "prefabs": [
+            "batfx_Satan/batfx_tailwindfireSatan2",
+            "batfx_Satan/batfx_FireWarp",
+            "batsfx_prefab/batsfx_fire4",
+            "batfx_Satan/batfx_firePop",
+            "batsfx_prefab/batsfx_fire4",
+            "batfx_Satan/batfx_tailwindfirewall2",
+            "batsfx_prefab/batsfx_fire2",
+            "batfx_Satan/batfx_FireSpiral",
+            "batsfx_prefab/batsfx_multislash2",
+            "batfx_lokiregular1/batfx_multiscythe1",
+            "batsfx_prefab/batsfx_fire1",
+            "batfx_kaguya1/batfx_bamboohit1",
+            "batfx_kaguya1/batfx_bamboohit1",
+            "batfx_Satan/batfx_finalslashFire1",
+            "batsfx_prefab/batsfx_slash1",
+            "batfx_Satan/batfx_firePop",
+            "batsfx_prefab/batsfx_fire4",
+            "batfx_Satan/batfx_FireWarp",
+            "batsfx_prefab/batsfx_fire4"
+          ],
+          "sortOrderOffset": [
+            -50,
+            2,
+            0,
+            2,
+            0,
+            50,
+            0,
+            -2,
+            0,
+            2,
+            0,
+            2,
+            2,
+            4,
+            0,
+            2,
+            0,
+            2,
+            0
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            true,
+            false,
+            true,
+            true,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            true,
+            false,
+            true,
+            true,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            false,
+            true,
+            false,
+            false,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            true,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "Burn": {
+            "class": "Buff",
+            "stackName": "Burn",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "DamageOverTime",
+              "BuffChanceOnHit",
+              "BuffWhenMonsterHurt"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "LockHasBurnedSkills"
+              },
+              {
+                "name": "SleepThorns"
+              },
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "percentOfTargetHp": 0.001,
+                "damageColor": "Red",
+                "abilityEffect": "BurnDamage1",
+                "bossDamageCap": 500,
+                "extraDamageFlag": "Burn"
+              },
+              {
+                "contextBuffs": [
+                  "BurnAfterTurn"
+                ],
+                "chance": 1.0
+              },
+              {
+                "contextBuffs": [
+                  "BurnAfterTurn",
+                  "RemovePoison"
+                ],
+                "spreadCondition": "IsNotBurnImmune",
+                "cancelFromDamageFlags": [
+                  "Sneak",
+                  "RemoveStatus"
+                ],
+                "cancelFromDamageTypes": [
+                  "BuffDamage"
+                ]
+              }
+            ],
+            "tags": [
+              "Burn"
+            ],
+            "canBePurified": true,
+            "duration": 300,
+            "statusEffect": "BurnStatus",
+            "statusEffectOffset": 0.1,
+            "damageType": "Burn",
+            "noIconShownOnBattleStatus": false,
+            "applyConditions": "IsNotBurning",
+            "showAsTimer": true,
+            "iconSpriteName": "IconRedBurn01"
+          },
+          "HealingBurn": {
+            "class": "Buff",
+            "stackName": "Burn",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "Regen",
+              "BuffChanceOnHit",
+              "BuffWhenMonsterHurt"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "LockHasBurnedSkills"
+              },
+              {
+                "name": "SleepThorns"
+              },
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "percent": 0.001
+              },
+              {
+                "contextBuffs": [
+                  "BurnAfterTurn"
+                ],
+                "chance": 1.0
+              },
+              {
+                "contextBuffs": [
+                  "BurnAfterTurn",
+                  "RemovePoison"
+                ],
+                "spreadCondition": "IsNotBurnImmune",
+                "cancelFromDamageFlags": [
+                  "Sneak",
+                  "RemoveStatus"
+                ],
+                "cancelFromDamageTypes": [
+                  "BuffDamage",
+                  "RemoveStatus"
+                ]
+              }
+            ],
+            "tags": [
+              "Burn",
+              "HealingBurn"
+            ],
+            "duration": 300,
+            "statusEffect": "BurnHealStatus",
+            "statusEffectOffset": 0.1,
+            "noIconShownOnBattleStatus": false,
+            "showAsTimer": true,
+            "iconSpriteName": "IconPurpleBurn01"
+          }
+        },
+        "attackScalors": {
+          "GoodIfCharged1": {
+            "class": "AttackScalor",
+            "sourceCondition": "IsCharged1"
+          },
+          "GoodIfCharged2": {
+            "class": "AttackScalor",
+            "sourceCondition": "IsCharged2"
+          },
+          "GoodIfCharged3": {
+            "class": "AttackScalor",
+            "sourceCondition": "IsCharged3"
+          }
+        },
+        "conditions": {
+          "Kills1OrAllEnemiesBurnBlastOrForceOrFire": {
+            "class": "MonsterConditions",
+            "killsMade": 1,
+            "or": {
+              "class": "MonsterConditions",
+              "not": {
+                "class": "MonsterConditions",
+                "checkEnemyTeamOfMonster": true,
+                "enemyTeamMonsterConditionMatchesNeeded": {
+                  "NotBurnBlastOrForceOrFire": 1
+                }
+              }
+            }
+          }
+        }
+      },
+      "GiveTurnASatanRegularBoss": {
+        "id": "GiveTurnASatanRegularBoss",
+        "found": true,
+        "localization": {
+          "name": "Deal with the Devil",
+          "description": "Enrages 1 other ally, grants them the burn status effect, and immediately gives them the next turn by reducing their current TU to 0. Active skills that grant turns cannot be used on turns given by this skill. This skill locks after use, and unlocks when this unit damages an enemy with an attack. This is not considered a Combo Burst type active skill.\n\nThis will overwrite the effects of previous Enrage skills. Enraged units have their Attack increased to 1.5x until the end of their next turn.",
+          "selected": "Enrages, burns, and grants turn to 1 other ally\n(Will overwrite other status effects)"
+        },
+        "ability": {
+          "name": "GiveTurnASatanRegularBoss",
+          "class": "Ability",
+          "config": "GiveTurnASatanRegularBoss",
+          "tuCost": 1,
+          "useLimit": 0,
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "oneAllyNotMe",
+          "components": [
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "Burn",
+                "AttackPlus50Percent1TurnOnly",
+                "GiveTurn",
+                "OnExtraTurn",
+                "JustGivenTurn"
+              ],
+              "applyToTargetType": "Friendly"
+            },
+            {
+              "buffs": [
+                "GiveTurnASatanRegularLockBoss"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "friendlyEventType": "Finish",
+          "sourceEventType": "Finish",
+          "abilityEffect": "SatanScroll",
+          "flags": [
+            "Burn",
+            "GiveTurn"
+          ],
+          "useCondition": "NotGiveTurnLockedASatanRegularBoss",
+          "killLockSkillIcon": "IconRedEx01",
+          "killLockUnlockedSkillIcon": "IconGreenCircle01",
+          "killLockUnlockedKey": "SkillReadyToUseKey",
+          "killLockLockedKey": "InstantPoisonTouchRandomALockLockedKey"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "friendlyTargets": 1,
+          "oneAllyNotMe": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0.3,
+            0,
+            0.9,
+            0,
+            0.2,
+            1.4,
+            0,
+            0.5,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_fire2",
+            "batfx_Satan/batfx_burnall2",
+            "batfx_kaguyahimeSwim/batfx_chargeboomOrange1",
+            "batfx_Satan/batfx_chargefireScroll",
+            "batsfx_prefab/batsfx_fire4",
+            "batsfx_prefab/batsfx_knockback1",
+            "batfx_Satan/batfx_SmokeFire",
+            "batsfx_prefab/batsfx_protect1",
+            "batfx_Satan/batfx_redhelix1",
+            "batsfx_prefab/batsfx_spiritgain1"
+          ],
+          "sortOrderOffset": [
+            1,
+            -2,
+            -2,
+            -2,
+            1,
+            1,
+            2,
+            1,
+            2,
+            1
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            true
+          ],
+          "boneToAttachTo": [
+            "",
+            "",
+            "",
+            "scroll",
+            "",
+            "",
+            "scroll",
+            "",
+            "",
+            ""
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "AttackPlus50Percent1TurnOnly": {
+            "class": "Buff",
+            "stackName": "AttackPlus50Percent",
+            "behaviors": [
+              "RemoveAfterTurnsBehavior",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "turnCount": 1,
+                "scalorStatBonuses": {
+                  "Attack": 0.5
+                }
+              },
+              {
+                "name": "AttackMinus25Percent"
+              }
+            ],
+            "iconSpriteName": "IconRedRage01",
+            "showAsTimer": true,
+            "duration": -1
+          },
+          "Burn": {
+            "class": "Buff",
+            "stackName": "Burn",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "DamageOverTime",
+              "BuffChanceOnHit",
+              "BuffWhenMonsterHurt"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "LockHasBurnedSkills"
+              },
+              {
+                "name": "SleepThorns"
+              },
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "percentOfTargetHp": 0.001,
+                "damageColor": "Red",
+                "abilityEffect": "BurnDamage1",
+                "bossDamageCap": 500,
+                "extraDamageFlag": "Burn"
+              },
+              {
+                "contextBuffs": [
+                  "BurnAfterTurn"
+                ],
+                "chance": 1.0
+              },
+              {
+                "contextBuffs": [
+                  "BurnAfterTurn",
+                  "RemovePoison"
+                ],
+                "spreadCondition": "IsNotBurnImmune",
+                "cancelFromDamageFlags": [
+                  "Sneak",
+                  "RemoveStatus"
+                ],
+                "cancelFromDamageTypes": [
+                  "BuffDamage"
+                ]
+              }
+            ],
+            "tags": [
+              "Burn"
+            ],
+            "canBePurified": true,
+            "duration": 300,
+            "statusEffect": "BurnStatus",
+            "statusEffectOffset": 0.1,
+            "damageType": "Burn",
+            "noIconShownOnBattleStatus": false,
+            "applyConditions": "IsNotBurning",
+            "showAsTimer": true,
+            "iconSpriteName": "IconRedBurn01"
+          },
+          "GiveTurn": {
+            "class": "Buff",
+            "behaviors": [
+              "GiveTurn"
+            ],
+            "behaviorOverrides": [
+              {}
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "textKeyToShowWhenApplied": "TurnGivenKey",
+            "isHiddenFromPlayers": true
+          },
+          "GiveTurnASatanRegularLockBoss": {
+            "class": "Buff",
+            "stackName": "GiveTurnASatanRegularLockBoss",
+            "iconSpriteName": "IconRedEx01",
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "isHiddenFromPlayers": true,
+            "duration": -1
+          },
+          "JustGivenTurn": {
+            "class": "Buff",
+            "duration": 1,
+            "stackName": "JustGivenTurnBuff",
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "isHiddenFromPlayers": true,
+            "noIconShownOnBattleStatus": true
+          },
+          "OnExtraTurn": {
+            "class": "Buff",
+            "stackName": "OnExtraTurn",
+            "duration": 1,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "NotGiveTurnLockedASatanRegularBoss": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "GiveTurnASatanRegularLockBoss"
+              ]
+            }
+          },
+          "OnExtraTurn": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "OnExtraTurn"
+            ]
+          }
+        }
+      }
+    },
+    "passives": {
+      "DevilImmunityASatanRegularBoss": {
+        "id": "DevilImmunityASatanRegularBoss",
+        "found": true,
+        "localization": {
+          "name": "Ruler of the Wicked",
+          "description": "This unit cannot be defeated by damage from Burn status effects. This unit enters battle with the Healing Burn status effect for 300TU.\n\nIf all units on the battlefield are Fire or have Burn Blast, or Burn Drive type active skills, this unit has a 50% bonus to attacks.\n\nWhenever a Fire ally on the battlefield is defeated or sacrificed by any source:\n\n- All allies become Enraged.\n- All enemies are granted the Burn status effect and become Weakened. Weakened units have their Attack reduced to 0.75x until the end of their next turn. This will overwrite any existing Weak or Enrage effects on the target and can be overwritten by Enrage effects. The effect of Weakening may be diminished if the affected unit's Attack is increased by other effects and it can be overwritten by Enrage effects. A unit with Healing Burn will heal after each turn at the same rate as Burn deals damage. Healing Burn will overwrite other status effects on the user and can replace the Burn status effect, but cannot be replaced by Burn. Any unit that deals damage to or is dealt damage by a unit with Healing Burn will gain the Burn status effect. Healing Burn will not be removed by Purify skills."
+        }
+      },
+      "HoldGoundPlusPassiveASatanRegularBoss": {
+        "id": "HoldGoundPlusPassiveASatanRegularBoss",
+        "found": true,
+        "localization": {
+          "name": "Demon Charges",
+          "description": "This unit enters battle with 2 Charges. Certain skills are affected by and may consume charges. A unit can store a maximum of 3 charges, and all charges are removed from a unit that leaves the battlefield.\n\nIf this unit would be defeated, it instead survives with 1 HP and then cannot be defeated until its next turn. This effect ends after triggering once each time this unit enters the battlefield. Whenever this unit defeats any number of units with an attack, this unit gains a Charge and this Hold Ground+ effect is reset so it can trigger again.\n\nWhen this unit has:\n- 2+ Charges stored, this unit has 50% damage reduction from attacks.\n- 3 Charges stored, this unit will ignore attacks that would damage exactly 2 targets. Attacks that target All allies will not be ignored.\n\nWhenever a non-conjured ally on the battlefield is defeated or sacrificed by any source, this unit loses 1 Charge."
+        }
+      },
+      "KnockbackImmunity": {
+        "id": "KnockbackImmunity",
+        "found": true,
+        "localization": {
+          "name": "Immovable",
+          "description": "This unit cannot be sent to the reinforcements from the battlefield."
+        }
+      },
+      "StunImmunity": {
+        "id": "StunImmunity",
+        "found": true,
+        "localization": {
+          "name": "Stun Immunity",
+          "description": "This unit is not affected by stun effects."
+        }
+      },
+      "SleepImmunity": {
+        "id": "SleepImmunity",
+        "found": true,
+        "localization": {
+          "name": "Sleep Immunity",
+          "description": "This unit is not affected by sleep effects."
+        }
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": null
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "SatanRegularBoss03",
+    "family": "SatanRegularBoss",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "SatanRegularBoss03",
+    "class": "Monster",
+    "family": "SatanRegularBoss",
+    "activeSkills": {
+      "0": "SingleHellballASatanRegularBoss",
+      "1": "MassDefeatASatanRegularBoss",
+      "2": "DoubleAttackASatanRegularBoss",
+      "3": "GiveTurnASatanRegularBoss"
+    },
+    "passives": {
+      "0": "DevilImmunityASatanRegularBoss",
+      "1": "HoldGoundPlusPassiveASatanRegularBoss",
+      "2": "KnockbackImmunity",
+      "3": "StunImmunity",
+      "4": "SleepImmunity"
+    },
+    "cost": 999,
+    "baseAttack": 3666,
+    "baseMaxHp": 196600,
+    "speed": 394,
+    "element": "Fire",
+    "weaponPref": "Spear",
+    "weaponPivotIndex": 0,
+    "walkSound": "TestSound",
+    "secure": 1,
+    "aiTargetPickWeight": 1,
+    "stars": 6,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 1,
+    "battleOrbImageFlip": 0,
+    "skillVoices": {
+      "0": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "1": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "2": [
+        13,
+        14,
+        15,
+        16
+      ],
+      "3": [
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    "damageVoices": [
+      17,
+      18,
+      19,
+      20
+    ],
+    "deathVoices": [
+      21,
+      22,
+      23,
+      24
+    ]
+  },
+  "_build": {
+    "scriptVersion": "6-character-family-states",
+    "sourceHash": "1d92fc61d6317b731798531dd984d0f82e697f6b90b0fcb8b4199da6c83d39da",
+    "dependencyHash": "153c983071cd65b9d4621c848d62f9cac3a98406a464c1f7895164540b1d36e5",
+    "generatedAt": 1778213448
+  }
+}

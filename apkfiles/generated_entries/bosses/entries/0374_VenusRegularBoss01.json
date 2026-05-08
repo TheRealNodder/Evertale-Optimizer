@@ -1,0 +1,1094 @@
+{
+  "schemaVersion": 3,
+  "order": 374,
+  "id": "berserk-venus",
+  "name": "Berserk Venus",
+  "title": "",
+  "description": "",
+  "category": "bosse",
+  "rarity": null,
+  "stars": 6,
+  "evolvedStars": 6,
+  "element": "Light",
+  "weaponType": "Mace",
+  "stats": {
+    "atk": 1400,
+    "hp": 20100,
+    "spd": 406,
+    "cost": 999
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/VenusRegular01.png",
+  "refs": {
+    "activeSkills": [
+      "SingleAttackAVenusRegularBoss",
+      "WeakenAndStunBuffAVenusRegularBoss",
+      "AllUnitBuffAVenusRegularBoss",
+      "SpecialAllAttackAVenusRegularBoss"
+    ],
+    "passives": [
+      "LovingOthersPassiveAVenusRegularBoss"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": null,
+    "leaderBuffCondition": null,
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "SingleAttackAVenusRegularBoss": {
+        "id": "SingleAttackAVenusRegularBoss",
+        "found": true,
+        "localization": {
+          "name": "Venus Strike",
+          "description": "600% damage to 1 enemy. The enemy hit by this attack will become Weakened, this will overwrite any existing Weak or Enrage effects on that unit. This attack ignores damage reduction effects, skins and counter stance.\n\nWeakened units have their Attack reduced to 0.75x until the end of their next turn. The effect of Weakening may be diminished if the affected unit's Attack is increased by other effects and it can be overwritten by Enrage effects.",
+          "selected": "600% damage to 1 enemy and Weaken them"
+        },
+        "ability": {
+          "name": "SingleAttackAVenusRegularBoss",
+          "class": "Ability",
+          "abilityScalor": 5,
+          "config": "SingleAttackAVenusRegularBoss",
+          "tuCost": 70,
+          "useLimit": 0,
+          "spiritGain": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "applyToTargetType": "Enemy",
+              "damageFlags": [
+                "IgnoreArmor",
+                "IgnoreSkin",
+                "DoNotWake"
+              ]
+            },
+            {
+              "buffs": [
+                "AttackMinus25Percent1TurnOnly"
+              ],
+              "applyToTargetType": "Enemy",
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss"
+            }
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "VenusAttack1",
+          "recommendEffectWhenUsable": -1
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            1,
+            0.1,
+            0.4,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batfx_Venus/batfx_slashlifePink02",
+            "batsfx_prefab/batsfx_slash1",
+            "batfx_deadlyvampire1/batfx_camerashake1",
+            "batsfx_prefab/batsfx_slash1",
+            "batsfx_prefab/batsfx_protect1"
+          ],
+          "sortOrderOffset": [
+            1,
+            2,
+            2,
+            2,
+            2
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            true,
+            false,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            true,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "AttackMinus25Percent1TurnOnly": {
+            "class": "Buff",
+            "stackName": "AttackMinus25Percent",
+            "behaviors": [
+              "RemoveAfterTurnsBehavior",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "turnCount": 1,
+                "scalorStatBonuses": {
+                  "Attack": -0.3333333
+                }
+              },
+              {
+                "name": "AttackPlus50Percent"
+              },
+              {
+                "name": "RageCount1Icon"
+              },
+              {
+                "name": "RageCount2Icon"
+              },
+              {
+                "name": "RageCount3Icon"
+              }
+            ],
+            "iconSpriteName": "IconRedWeak01",
+            "showAsTimer": true,
+            "duration": -1
+          }
+        },
+        "attackScalors": {},
+        "conditions": {}
+      },
+      "WeakenAndStunBuffAVenusRegularBoss": {
+        "id": "WeakenAndStunBuffAVenusRegularBoss",
+        "found": true,
+        "localization": {
+          "name": "Stunning Goddess",
+          "description": "All enemies on the battlefield are Weakened and Stunned for 50TU. This skill becomes locked for 50TU after use.",
+          "selected": "Weaken and Stun Enemies"
+        },
+        "ability": {
+          "name": "WeakenAndStunBuffAVenusRegularBoss",
+          "class": "Ability",
+          "config": "WeakenAndStunBuffAVenusRegularBoss",
+          "tuCost": 1,
+          "useLimit": 0,
+          "spiritCost": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "AllEnemy",
+          "components": [
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "AttackMinus25Percent1TurnOnly"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "StunAllEnemiesFor50TUVenusRegularEBB",
+                "VenusRegularBossCooldown50Active2"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "VenusCharmed",
+          "flags": [
+            "StunChance",
+            "NoDamage"
+          ],
+          "useCondition": "NotInstantCooldown2"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "allEnemies": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0.35,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_timestrike1",
+            "batfx_Venus/batfx_tailwindlove8",
+            "batsfx_prefab/batsfx_buff1",
+            "batfx_chargelove1/batfx_chargelove2",
+            "batsfx_prefab/batsfx_beautyring1",
+            "batfx_Venus/batfx_HeartCharge1",
+            "batfx_Venus/batfx_BlackhallPink2",
+            "batsfx_prefab/batsfx_ringing1",
+            "batfx_christmasturn1/batfx_christmasturn1",
+            "batsfx_prefab/batsfx_heartbeat1"
+          ],
+          "sortOrderOffset": [
+            0,
+            -50,
+            0,
+            2,
+            0,
+            2,
+            80,
+            0,
+            2,
+            0
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            false,
+            true,
+            false,
+            true,
+            true,
+            false,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "AttackMinus25Percent1TurnOnly": {
+            "class": "Buff",
+            "stackName": "AttackMinus25Percent",
+            "behaviors": [
+              "RemoveAfterTurnsBehavior",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "turnCount": 1,
+                "scalorStatBonuses": {
+                  "Attack": -0.3333333
+                }
+              },
+              {
+                "name": "AttackPlus50Percent"
+              },
+              {
+                "name": "RageCount1Icon"
+              },
+              {
+                "name": "RageCount2Icon"
+              },
+              {
+                "name": "RageCount3Icon"
+              }
+            ],
+            "iconSpriteName": "IconRedWeak01",
+            "showAsTimer": true,
+            "duration": -1
+          },
+          "StunAllEnemiesFor50TUVenusRegularEBB": {
+            "class": "Buff",
+            "behaviors": [
+              "EnterBattleBuff"
+            ],
+            "behaviorOverrides": [
+              {
+                "randomEnemyBuffs": [
+                  "Stun50"
+                ],
+                "numRandomToBuff": 4
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "isHiddenFromPlayers": true
+          },
+          "VenusRegularBossCooldown50Active2": {
+            "class": "Buff",
+            "duration": 50,
+            "stackName": "InstantCooldown2",
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "iconSpriteName": "IconBlueCountdownClock3Numbered02"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "NotInstantCooldown2": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "InstantCooldown2"
+              ]
+            }
+          }
+        }
+      },
+      "AllUnitBuffAVenusRegularBoss": {
+        "id": "AllUnitBuffAVenusRegularBoss",
+        "found": true,
+        "localization": {
+          "name": "Last Chance At Love",
+          "description": "All allies on the battlefield are granted the Armor status effect, and healed for 50% of max HP. Usable if the user is on or below 50% of max HP. Usable 1 time per battle.\n\nArmor grants 50% damage reduction from the next attack, then the effect is removed. Armor will overwrite other status effects on those units.",
+          "selected": "Heals & Grants Armor"
+        },
+        "ability": {
+          "name": "AllUnitBuffAVenusRegularBoss",
+          "class": "Ability",
+          "config": "AllUnitBuffAVenusRegularBoss",
+          "tuCost": 1,
+          "useLimit": 1,
+          "spiritGain": 0,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "AllAlly",
+          "components": [
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "HealHalf",
+                "Armor"
+              ],
+              "applyToTargetType": "Friendly",
+              "showMissConditions": "ShowNoMiss"
+            }
+          ],
+          "friendlyEventType": "Finish",
+          "abilityEffect": "VenusLovePotion",
+          "flags": [
+            "Healer"
+          ],
+          "useCondition": "HPBelow50Percent"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "allFriends": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0.8,
+            0,
+            0.1,
+            0,
+            0.2,
+            0
+          ],
+          "prefabs": [
+            "batfx_Venus/batfx_HeartBG1",
+            "batsfx_prefab/batsfx_beautyring1",
+            "batfx_tailwindlove1/batfx_tailwindlove1",
+            "batfx_reibride1/batfx_reibridecharge1",
+            "batsfx_prefab/batsfx_charge1",
+            "batfx_jeannevalentine1/batfx_jv_cast1",
+            "batsfx_prefab/batsfx_ludmillaballad1",
+            "batfx_healtop1/batfx_healtop1",
+            "batsfx_prefab/batsfx_heal1"
+          ],
+          "sortOrderOffset": [
+            100,
+            -2,
+            -100,
+            20,
+            3,
+            -2,
+            2,
+            2,
+            0
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            true,
+            false,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            true,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "Armor": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "ModifyDamage"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "useLimit": 1,
+                "percent": 0.5,
+                "cancelFromDamageTypes": [
+                  "BuffDamage"
+                ],
+                "cancelFromDamageFlags": [
+                  "Sneak",
+                  "IgnoreArmor",
+                  "RemoveStatus"
+                ]
+              }
+            ],
+            "tags": [
+              "Armor"
+            ],
+            "duration": -1,
+            "showAsTimer": true,
+            "iconSpriteName": "IconGreenArmor01",
+            "stackName": "Armor"
+          },
+          "HealHalf": {
+            "class": "Buff",
+            "behaviors": [
+              "AdjustHp"
+            ],
+            "behaviorOverrides": [
+              {
+                "percent": 0.5,
+                "abilityEffect": "SmallHeal1"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {
+          "HPBelow50Percent": {
+            "class": "AttackScalor",
+            "sourceCondition": "HPBelow50Percent"
+          }
+        },
+        "conditions": {
+          "HPBelow50Percent": {
+            "class": "MonsterConditions",
+            "hpLessThanPercent": 0.5000001
+          }
+        }
+      },
+      "SpecialAllAttackAVenusRegularBoss": {
+        "id": "SpecialAllAttackAVenusRegularBoss",
+        "found": true,
+        "localization": {
+          "name": "Waves of Love",
+          "description": "300% damage to all enemies. 400% damage instead if the user has survived 100TU or more on the battlefield. 500% damage instead if the user has survived 200TU or more on the battlefield. This attack ignores enemy damage reduction effects, any effects of non-boss enemies that would prevent the target from being defeated, skin passive skills and the Counter Stance status effect.\n\nThis skill becomes locked for 100TU after use.",
+          "selected": "300%+ damage, ignores defeat prevention"
+        },
+        "ability": {
+          "name": "SpecialAllAttackAVenusRegularBoss",
+          "class": "Ability",
+          "abilityScalor": 2,
+          "conditionalAbilityScalors": [
+            3,
+            4
+          ],
+          "config": "SpecialAllAttackAVenusRegularBoss",
+          "tuCost": 70,
+          "useLimit": 0,
+          "spiritCost": 3,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "AllEnemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "damageFlags": [
+                "IgnoreArmor",
+                "IgnoreSkin",
+                "HardIgnoreBlockDeath"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "VenusRegularBossCooldown100Active4"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "VenusSpecial",
+          "attackScalors": [
+            "TimeInCombat100",
+            "TimeInCombat200"
+          ],
+          "conditionedAbilityEffects": [
+            "VenusSpecial",
+            "VenusSpecial",
+            "VenusSpecial"
+          ],
+          "recommendEffectWhenUsable": -1,
+          "useCondition": "NotInstantCooldown"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "allEnemies": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0.2,
+            0,
+            0.2,
+            0.5,
+            0.5,
+            0
+          ],
+          "prefabs": [
+            "batfx_Kongming/batfx_blackout4",
+            "batfx_PeachGirl/batfx_chargepetal5",
+            "batfx_Venus/batfx_Venus_feather1",
+            "batfx_common/batfx_chargeparticlespurple",
+            "batsfx_prefab/batsfx_specialattacksfx1",
+            "batfx_Venus/batfx_MultiMagicShot1",
+            "batsfx_prefab/batsfx_catidoltune",
+            "batfx_Venus/batfx_VenusBG",
+            "batfx_Venus/batfx_BlackhallPink1",
+            "batfx_RolotiaDark/batfx_Sparklemulti1",
+            "batfx_common/batfx_empty",
+            "batfx_ossiadark1/batfx_bluntimpactpurple1",
+            "batsfx_prefab/batsfx_bluntimpact1"
+          ],
+          "sortOrderOffset": [
+            -100,
+            -5,
+            5,
+            5,
+            2,
+            5,
+            2,
+            -60,
+            100,
+            50,
+            2,
+            60,
+            2
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            true,
+            true,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            true,
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            false,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            true,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "VenusRegularBossCooldown100Active4": {
+            "class": "Buff",
+            "duration": 100,
+            "stackName": "InstantCooldown",
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "iconSpriteName": "IconBlueCountdownClock3Numbered04"
+          }
+        },
+        "attackScalors": {
+          "TimeInCombat100": {
+            "class": "AttackScalor",
+            "sourceCondition": "TimeInCombat100"
+          },
+          "TimeInCombat200": {
+            "class": "AttackScalor",
+            "sourceCondition": "TimeInCombat200"
+          }
+        },
+        "conditions": {
+          "NotInstantCooldown": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "InstantCooldown"
+              ]
+            }
+          },
+          "TimeInCombat100": {
+            "class": "MonsterConditions",
+            "timeInCombat": 100
+          },
+          "TimeInCombat200": {
+            "class": "MonsterConditions",
+            "timeInCombat": 200
+          }
+        }
+      }
+    },
+    "passives": {
+      "LovingOthersPassiveAVenusRegularBoss": {
+        "id": "LovingOthersPassiveAVenusRegularBoss",
+        "found": true,
+        "localization": {
+          "name": "Faint of Heart",
+          "description": "This unit cannot be sent to the reinforcements from the battlefield.\n\nThis unit has 50% damage reduction.\n\nThis unit cannot be Poisoned until the end of it's first turn.\nThis unit cannot be Slept until the end of its third turn.\nThis unit cannot be Stunned until the end of its fifth turn."
+        }
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": null
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "VenusRegularBoss01",
+    "family": "VenusRegularBoss",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "VenusRegularBoss01",
+    "class": "Monster",
+    "family": "VenusRegularBoss",
+    "activeSkills": {
+      "0": "SingleAttackAVenusRegularBoss",
+      "1": "WeakenAndStunBuffAVenusRegularBoss",
+      "2": "AllUnitBuffAVenusRegularBoss",
+      "3": "SpecialAllAttackAVenusRegularBoss"
+    },
+    "passives": {
+      "0": "LovingOthersPassiveAVenusRegularBoss"
+    },
+    "cost": 999,
+    "baseAttack": 1400,
+    "baseMaxHp": 20100,
+    "speed": 406,
+    "element": "Life",
+    "weaponPref": "Mace",
+    "weaponPivotIndex": 0,
+    "walkSound": "TestSound",
+    "secure": 1,
+    "aiTargetPickWeight": 1,
+    "stars": 6,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 1,
+    "battleOrbImageFlip": 0,
+    "skillVoices": {
+      "0": [
+        1,
+        2
+      ],
+      "1": [
+        5,
+        6
+      ],
+      "2": [
+        9,
+        10
+      ],
+      "3": [
+        13,
+        14
+      ]
+    },
+    "damageVoices": [
+      17,
+      18
+    ],
+    "deathVoices": [
+      21,
+      22
+    ]
+  },
+  "_build": {
+    "scriptVersion": "6-character-family-states",
+    "sourceHash": "e87765780c0d25c3e28a6248b8a83451513f9b54a5fc8eb8126b96519116b281",
+    "dependencyHash": "8bdc3fab4b11413bed9a13b928eeb0d80f0dfc164c5086f236e79b9b91cb2d46",
+    "generatedAt": 1778213449
+  }
+}

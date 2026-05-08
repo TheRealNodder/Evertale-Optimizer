@@ -1,0 +1,1782 @@
+{
+  "schemaVersion": 3,
+  "order": 352,
+  "id": "berserk-hibiki",
+  "name": "Berserk Hibiki",
+  "title": "",
+  "description": "",
+  "category": "bosse",
+  "rarity": null,
+  "stars": 6,
+  "evolvedStars": 6,
+  "element": "Dark",
+  "weaponType": "GreatSword",
+  "stats": {
+    "atk": 1257,
+    "hp": 20000,
+    "spd": 422,
+    "cost": 999
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/OniSchoolDark01.png",
+  "refs": {
+    "activeSkills": [
+      "BuffAlliesAOniSchoolDarkBoss",
+      "BuffEnemiesAOniSchoolDarkBoss",
+      "InstantDoubleAttackAOniSchoolDarkBoss",
+      "SpecialDoubleAttackAOniSchoolDarkBoss"
+    ],
+    "passives": [
+      "AfterSchoolPassiveAOniSchoolDarkBoss",
+      "KnockbackImmunity",
+      "StunImmunity"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": null,
+    "leaderBuffCondition": null,
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "BuffAlliesAOniSchoolDarkBoss": {
+        "id": "BuffAlliesAOniSchoolDarkBoss",
+        "found": true,
+        "localization": {
+          "name": "Demonic Dissent",
+          "description": "Grants all allies Stealth, a Stealth Shield, Poison Ward, and Burn Ward. Unlocks at random either Destructive Reign or Oni Blast. This skill becomes locked after use until the user uses the Toxic Finish skill or leaves battlefield.\n\nEach Ward prevents their named effect from being applied once, then is removed. Identical Wards cannot stack. Stealth will overwrite other Status effects on affected units. Stealth Shields prevent the next non-stealth status effect a unit would gain while Stealthed from applying. Stealthed units ignore the next enemy attack that would damage more than 1 target. Any damage will remove stealth.",
+          "selected": "Grants stealth to targets\n(Will overwrite other status effects)"
+        },
+        "ability": {
+          "name": "BuffAlliesAOniSchoolDarkBoss",
+          "class": "Ability",
+          "config": "BuffAlliesAOniSchoolDarkBoss",
+          "tuCost": 1,
+          "useLimit": 0,
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "AllAlly",
+          "components": [
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "BurnImmunityOnce",
+                "PoisonImmunityOnce",
+                "Stealth",
+                "StealthShieldOnce"
+              ],
+              "applyToTargetType": "Friendly"
+            },
+            {
+              "buffs": [
+                "LockBuffAlliesAOniSchoolDarkBoss"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            },
+            {
+              "randomBuffFromList": [
+                "RemoveLockBuffEnemiesAOniSchoolDarkBoss",
+                "RemoveLockInstantDoubleAttackAOniSchoolDarkBoss"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss"
+            }
+          ],
+          "sourceEventType": "Finish",
+          "friendlyEventType": "Finish",
+          "abilityEffect": "OniSchoolDarkHeal",
+          "recommendEffectWhenUsable": -1,
+          "useCondition": "Active1IsNotLockedOniSchoolDark"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "allFriends": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0.8,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batfx_OniSchoolDark01/batfx_cowgirlcharge3",
+            "batsfx_prefab/batsfx_charge1",
+            "batfx_OniSchoolDark01/batfx_cowgirlcharge4",
+            "batsfx_prefab/batsfx_heal1",
+            "batfx_bahabuff1/batfx_bahabuff1",
+            "batfx_Excalibur/batfx_healbottomPurple1",
+            "batfx_OniSchoolDark01/batfx_healtopPurple2",
+            "batsfx_prefab/batsfx_purify1"
+          ],
+          "sortOrderOffset": [
+            2,
+            0,
+            -2,
+            2,
+            0,
+            0,
+            0,
+            2
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle3",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            true
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "BurnImmunityOnce": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity"
+            ],
+            "stackName": "BurnImmunityOnce",
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Burn"
+                ],
+                "useLimit": 1
+              }
+            ],
+            "duration": -1,
+            "showAsTimer": true,
+            "tags": [
+              "BurnImmuneTemp"
+            ],
+            "iconSpriteName": "IconRedBurnInvalid01"
+          },
+          "LockBuffAlliesAOniSchoolDarkBoss": {
+            "class": "Buff",
+            "stackName": "LockBuffAlliesAOniSchoolDark",
+            "iconSpriteName": "IconRedExNumber01",
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "isHiddenFromPlayers": false,
+            "duration": -1
+          },
+          "PoisonImmunityOnce": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity"
+            ],
+            "stackName": "PoisonImmunityOnce",
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Poison"
+                ],
+                "useLimit": 1
+              }
+            ],
+            "duration": -1,
+            "showAsTimer": true,
+            "tags": [
+              "PoisonImmuneTemp"
+            ],
+            "iconSpriteName": "IconRedPoisonInvalid01"
+          },
+          "RemoveLockBuffEnemiesAOniSchoolDarkBoss": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "LockBuffEnemiesAOniSchoolDark"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "RemoveLockInstantDoubleAttackAOniSchoolDarkBoss": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "LockInstantDoubleAttackAOniSchoolDark"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "Stealth": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "ManipulateTargeting",
+              "RemoveOnHurt",
+              "Immunity",
+              "Immunity"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "LockHideSkills"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "dodgeMultitarget": true,
+                "forceAllowAllEnemiesAChanceToManipulate": true,
+                "removeAfterTriggers": 1,
+                "abilityFlagsToIgnore": [
+                  "Stun",
+                  "NoDamage",
+                  "Sneak",
+                  "IgnoreStealth"
+                ]
+              },
+              {},
+              {
+                "stackNamesToBlock": [
+                  "Stealth"
+                ],
+                "dontShowText": true
+              },
+              {
+                "stackNamesToBlock": [
+                  "Placeholder"
+                ],
+                "dontShowText": true,
+                "activateCondition": "MissingStealthOrStealthShield"
+              }
+            ],
+            "tags": [
+              "Stealth"
+            ],
+            "duration": -1,
+            "showAsTimer": true,
+            "iconSpriteName": "IconBlackStealth01",
+            "stackName": "Stealth",
+            "useCount": 1
+          },
+          "StealthShieldOnce": {
+            "class": "Buff",
+            "stackName": "StealthShieldOnce",
+            "behaviors": [
+              "Immunity"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Sleep",
+                  "Armor",
+                  "Poison",
+                  "Burn",
+                  "Stance",
+                  "SpiritLeaking",
+                  "SpiritLeakReady",
+                  "Condemn",
+                  "Slowed",
+                  "StunSkinStatus",
+                  "Decay"
+                ],
+                "activateCondition": "IsStealth",
+                "useLimit": 1
+              }
+            ],
+            "duration": -1,
+            "showAsTimer": true,
+            "iconSpriteName": "IconBlackStealthShield01"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "Active1IsNotLockedOniSchoolDark": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "LockBuffAlliesAOniSchoolDark"
+              ]
+            }
+          }
+        }
+      },
+      "BuffEnemiesAOniSchoolDarkBoss": {
+        "id": "BuffEnemiesAOniSchoolDarkBoss",
+        "found": true,
+        "localization": {
+          "name": "Destructive Reign",
+          "description": "Removes Burn (including Mega Healing Burn) and Stealth Shields from all enemy units on the battlefield. Then all enemies are granted Mega Poison for 200TU, and Burn Wards. Then 1 random enemy is granted Lethal Poison for 999TU. This skill is locked until it becomes unlocked by Demonic Dissent, and unlocks Toxic Finish upon use. This skill is locked again after each use or if the user leaves the battlefield.\n\nMega Poison will overwrite other status effects on those enemies. Mega Poison deals 20 times the damage of normal Poison and cannot be overwritten by normal Poison or Super Poison. Lethal Poison will overwrite other status effects on the affected enemy, cannot be overwritten by status effects other than Burn or Stealth, and cannot be Purified. Lethal Poison deals 2 times the damage of normal Poison and ignores passive skills or effects of active skills that would prevent the target from being defeated, other than those which specifically prevent defeat from Poison or non-attack damage. Lethal Poison cannot apply to Burning units or Boss units.",
+          "selected": "Removes Burn & Stealth Shields, Grants Poison"
+        },
+        "ability": {
+          "name": "BuffEnemiesAOniSchoolDarkBoss",
+          "class": "Ability",
+          "config": "BuffEnemiesAOniSchoolDarkBoss",
+          "tuCost": 1,
+          "useLimit": 0,
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "AllEnemy",
+          "components": [
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "RemoveBurn",
+                "RemoveStealthShieldOnce",
+                "BurnImmunityOnce"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "MegaPoison"
+              ],
+              "skipAbilityEffect": true,
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "LethalPoison1RandomEnemyEBB",
+                "RemoveLockSpecialDoubleAttackAOniSchoolDarkBoss",
+                "LockBuffEnemiesAOniSchoolDarkBoss"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "OniSchoolDarkCloud",
+          "flags": [
+            "NoDamage"
+          ],
+          "recommendEffectWhenUsable": -1,
+          "useCondition": "Active2IsNotLockedOniSchoolDark"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "allEnemies": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0.4,
+            0.2,
+            0,
+            0,
+            0,
+            0.2,
+            0,
+            0.5,
+            0.1,
+            0,
+            0.1,
+            0,
+            0.3,
+            0.1,
+            0,
+            0.1,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_cherryprep1",
+            "batfx_roundtableknightDark/batfx_fanprepPurple1",
+            "batfx_YandereDark/batfx_BgRedYandereDark",
+            "batfx_fauxAreaLightPurple1/batfx_fauxAreaLightPurple1",
+            "batsfx_prefab/batsfx_ice1New",
+            "batfx_OniSchoolDark01/batfx_bloodmoon1",
+            "batfx_OniSchoolDark01/batfx_bloodmoon2",
+            "batfx_YandereDark/batfx_BgRedYandereDark",
+            "batfx_OniSchoolDark01/batfx_candymeteo2",
+            "batsfx_prefab/batsfx_chains1",
+            "batfx_callendragondark7/batfx_callendragondark7",
+            "batfx_callendragondark3/batfx_callendragondark3",
+            "batfx_ripplepurplelow/batfx_ripplepurplelow",
+            "batfx_callendragondark3/batfx_callendragondark4",
+            "batfx_PurpleSplash2/batfx_PurpleSplash2",
+            "batfx_callendragondark7/batfx_callendragondark7",
+            "batfx_callendragondark3/batfx_callendragondark3",
+            "batfx_ripplepurplelow/batfx_ripplepurplelow",
+            "batfx_callendragondark3/batfx_callendragondark4",
+            "batfx_PurpleSplash2/batfx_PurpleSplash2"
+          ],
+          "sortOrderOffset": [
+            -2,
+            5,
+            -100,
+            2,
+            0,
+            -10,
+            20,
+            -100,
+            20,
+            0,
+            2,
+            2,
+            -5,
+            2,
+            5,
+            2,
+            2,
+            -5,
+            2,
+            5
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            false,
+            true,
+            false,
+            false,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "BurnImmunityOnce": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity"
+            ],
+            "stackName": "BurnImmunityOnce",
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Burn"
+                ],
+                "useLimit": 1
+              }
+            ],
+            "duration": -1,
+            "showAsTimer": true,
+            "tags": [
+              "BurnImmuneTemp"
+            ],
+            "iconSpriteName": "IconRedBurnInvalid01"
+          },
+          "LethalPoison1RandomEnemyEBB": {
+            "class": "Buff",
+            "stackName": "LethalPoison1RandomEnemyEBB",
+            "behaviors": [
+              "EnterBattleBuff"
+            ],
+            "behaviorOverrides": [
+              {
+                "randomEnemyBuffs": [
+                  "LethalPoison"
+                ],
+                "numRandomToBuff": 1
+              }
+            ],
+            "duration": 0,
+            "isHiddenFromPlayers": true,
+            "showAsPermanent": false,
+            "showAsTimer": false
+          },
+          "LockBuffEnemiesAOniSchoolDarkBoss": {
+            "class": "Buff",
+            "stackName": "LockBuffEnemiesAOniSchoolDark",
+            "iconSpriteName": "IconRedExNumber02",
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "isHiddenFromPlayers": false,
+            "duration": -1
+          },
+          "MegaPoison": {
+            "class": "Buff",
+            "stackName": "Poison",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "DamageOverTime"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "percentOfAttack": 0.05,
+                "damageColor": "Green",
+                "abilityEffect": "MidDeath1MegaPoison",
+                "extraDamageFlag": "MegaPoison"
+              }
+            ],
+            "tags": [
+              "Poison",
+              "MegaPoison"
+            ],
+            "canBePurified": true,
+            "duration": 200,
+            "showAsTimer": true,
+            "statusEffect": "MegaPoisonStatus",
+            "statusEffectOffset": 0.1,
+            "damageType": "Poison",
+            "iconSpriteName": "IconPurplePoison01"
+          },
+          "RemoveBurn": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "RemoveMegaHealingBurnApplyHealingBurn"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "RemoveLockSpecialDoubleAttackAOniSchoolDarkBoss": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "LockSpecialDoubleAttackAOniSchoolDark"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "RemoveStealthShieldOnce": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "StealthShieldOnce"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "Active2IsNotLockedOniSchoolDark": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "LockBuffEnemiesAOniSchoolDark"
+              ]
+            }
+          }
+        }
+      },
+      "InstantDoubleAttackAOniSchoolDarkBoss": {
+        "id": "InstantDoubleAttackAOniSchoolDarkBoss",
+        "found": true,
+        "localization": {
+          "name": "Oni Blast",
+          "description": "300% damage to 2 enemies. This attack ignores damage reduction effects, any effects of non-boss enemies that would prevent the target from being defeated, skin passive skills and the Counter Stance status effect. This skill is locked until it becomes unlocked by Demonic Dissent, and unlocks Toxic Finish upon use. This skill is locked again after each use or if the user leaves the battlefield.",
+          "selected": "300% damage, ignores defeat prevention"
+        },
+        "ability": {
+          "name": "InstantDoubleAttackAOniSchoolDarkBoss",
+          "class": "Ability",
+          "abilityScalor": 2,
+          "config": "InstantDoubleAttackAOniSchoolDarkBoss",
+          "tuCost": 1,
+          "useLimit": 0,
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "applyToTargetType": "Enemy",
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "damageFlags": [
+                "HardIgnoreBlockDeath",
+                "IgnoreSkin",
+                "IgnoreArmor"
+              ]
+            },
+            {
+              "buffs": [
+                "RemoveLockSpecialDoubleAttackAOniSchoolDarkBoss",
+                "LockInstantDoubleAttackAOniSchoolDarkBoss"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "OniSchoolDarkThrowparticle",
+          "flags": [
+            "StealthWorthy"
+          ],
+          "useCondition": "Active3IsNotLockedOniSchoolDark"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0.1,
+            0,
+            0,
+            0,
+            0.4,
+            0,
+            0,
+            0,
+            0.5,
+            0,
+            0.1,
+            0.2
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_fire2",
+            "batfx_OniSchoolDark01/batfx_tailwindfireSatan",
+            "batsfx_prefab/batsfx_casting2",
+            "batfx_OniSchoolDark01/batfx_onicrisisPurple1",
+            "batfx_common/batfx_empty",
+            "batfx_OniSchoolDark01/batfx_throwparticleOni",
+            "batsfx_prefab/batsfx_fire4",
+            "batfx_roundtableknightDark/batfx_castingSmoke",
+            "batfx_deadlyvampire1/batfx_camerashake1",
+            "batfx_bluntimpact2/batfx_bluntimpact2",
+            "batsfx_prefab/batsfx_bomb1",
+            "batfx_OniSchoolDark01/batfx_onicrisisMask1",
+            "batfx_bluntimpact2/batfx_bluntimpact2"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -100,
+            -2,
+            -2,
+            2,
+            3,
+            3,
+            2,
+            2,
+            2,
+            -2,
+            50,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0.1
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            true,
+            false,
+            true,
+            true
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            true,
+            true,
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "isProjectileFX": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "projectileFlightDuration": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0.5,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "projectileStartOffsetX": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "projectileStartOffsetY": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            150,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "rotateSingleOrientationProjectile": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "LockInstantDoubleAttackAOniSchoolDarkBoss": {
+            "class": "Buff",
+            "stackName": "LockInstantDoubleAttackAOniSchoolDark",
+            "iconSpriteName": "IconRedExNumber03",
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "isHiddenFromPlayers": false,
+            "duration": -1
+          },
+          "RemoveLockSpecialDoubleAttackAOniSchoolDarkBoss": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "LockSpecialDoubleAttackAOniSchoolDark"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "Active3IsNotLockedOniSchoolDark": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "LockInstantDoubleAttackAOniSchoolDark"
+              ]
+            }
+          }
+        }
+      },
+      "SpecialDoubleAttackAOniSchoolDarkBoss": {
+        "id": "SpecialDoubleAttackAOniSchoolDarkBoss",
+        "found": true,
+        "localization": {
+          "name": "Toxic Finish",
+          "description": "350% damage to 2 enemies. 600% damage instead to targets that are poisoned. All non-poisoned enemies hit are then granted Lethal Poison for 999TU. This attack ignores enemy damage reduction effects. This skill is locked until it becomes unlocked by Destructive Reign or Oni Blast. This skill is locked again after each use or if the user leaves the battlefield. This skill unlocks Demonic Dissent after use.",
+          "selected": "Up to 600% damage, ignores damage reduction"
+        },
+        "ability": {
+          "name": "SpecialDoubleAttackAOniSchoolDarkBoss",
+          "class": "Ability",
+          "abilityScalor": 2.5,
+          "conditionalAbilityScalors": [
+            5
+          ],
+          "config": "SpecialDoubleAttackAOniSchoolDarkBoss",
+          "tuCost": 100,
+          "useLimit": 0,
+          "spiritGain": 0,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "applyToTargetType": "Enemy",
+              "damageBoosts": [
+                "PoisonEaterDamageBoost"
+              ],
+              "damageFlags": [
+                "IgnoreArmor"
+              ]
+            },
+            {
+              "buffs": [
+                "LethalPoison",
+                "BurnImmunityTempForRevenge"
+              ],
+              "applyConditions": "NotPoisoned",
+              "showMissConditions": "ShowNoMiss",
+              "applyToTargetType": "Enemy",
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "LockSpecialDoubleAttackAOniSchoolDarkBoss",
+                "RemoveLockBuffAlliesAOniSchoolDarkBoss"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "OniSchoolDarkSpecial",
+          "attackScalors": [
+            "GoodVsPoisoned"
+          ],
+          "conditionedAbilityEffects": [
+            "OniSchoolDarkSpecial",
+            "OniSchoolDarkSpecial"
+          ],
+          "flags": [
+            "Poisoner",
+            "PoisonEater"
+          ],
+          "useCondition": "Active4IsNotLockedOniSchoolDark"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0.25,
+            0.11,
+            0,
+            0.35,
+            0,
+            0.4,
+            0,
+            0.7,
+            0,
+            0,
+            0,
+            0,
+            0.1,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_timestrike1",
+            "batfx_OniSchoolDark01/batfx_tailwindPurpleOniD",
+            "batfx_roundtableknightDark/batfx_ruvychargePurple",
+            "batsfx_prefab/batsfx_whoosh1",
+            "batfx_OniSchoolDark01/batfx_slashleft",
+            "batsfx_prefab/batsfx_slash1",
+            "batfx_OniSchoolDark01/batfx_slash2",
+            "batsfx_prefab/batsfx_slash1",
+            "batfx_OniSchoolDark01/batfx_ThunderSlash1",
+            "batfx_OniSchoolDark01/batfx_onicrisisMask2",
+            "batfx_YandereDark/batfx_BGBlood",
+            "batsfx_prefab/batsfx_water2",
+            "batsfx_prefab/batsfx_blaster1",
+            "batsfx_prefab/batsfx_slash1",
+            "batfx_OniSchoolDark01/batfx_BgOni"
+          ],
+          "sortOrderOffset": [
+            2,
+            -100,
+            -2,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            -2,
+            -60,
+            2,
+            2,
+            2,
+            -80
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "audiobundle1",
+            "audiobundle1",
+            "BattleEffectsBundle3"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            true,
+            false,
+            true,
+            true,
+            true,
+            false,
+            false,
+            false,
+            true
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            true,
+            false,
+            true,
+            true,
+            true,
+            false,
+            false,
+            false,
+            true
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            false,
+            true,
+            false,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            true
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "BurnImmunityTempForRevenge": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Burn",
+                  "BurnAfterTurn",
+                  "BurnAtEndOfTurn"
+                ],
+                "dontShowText": true
+              },
+              {
+                "name": "BurnAfterTurn"
+              },
+              {
+                "name": "BurnSelfOnHit"
+              }
+            ],
+            "duration": 1,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "tags": [
+              "BurnImmune"
+            ],
+            "stackName": "BurnImmunityTempForRevenge",
+            "isHiddenFromPlayers": true
+          },
+          "LethalPoison": {
+            "class": "Buff",
+            "stackName": "Poison",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "DamageOverTime"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Poison",
+                  "SuperPoison",
+                  "MegaPoison",
+                  "PoisonDelay",
+                  "PoisonDelayedMegaPoisonChance",
+                  "Sleep",
+                  "SleepDelayed",
+                  "Armor",
+                  "Stance",
+                  "Decay",
+                  "SpiritLeaking",
+                  "SpiritLeakReady"
+                ],
+                "dontShowText": true
+              },
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "percentOfAttack": 0.005,
+                "damageColor": "Green",
+                "abilityEffect": "PoisonDamageRed",
+                "extraDamageFlag": "LethalPoison"
+              }
+            ],
+            "tags": [
+              "Poison",
+              "LethalPoison"
+            ],
+            "duration": 999,
+            "showAsTimer": false,
+            "statusEffect": "PoisonStatusRed",
+            "statusEffectOffset": 0.1,
+            "damageType": "Poison",
+            "noIconShownOnBattleStatus": true,
+            "iconSpriteName": "IconPurplePoison01",
+            "applyConditions": "IsNotBurningNotBoss"
+          },
+          "LockSpecialDoubleAttackAOniSchoolDarkBoss": {
+            "class": "Buff",
+            "stackName": "LockSpecialDoubleAttackAOniSchoolDark",
+            "iconSpriteName": "IconRedExNumber04",
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "isHiddenFromPlayers": false,
+            "duration": -1
+          },
+          "RemoveLockBuffAlliesAOniSchoolDarkBoss": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "LockBuffAlliesAOniSchoolDark"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {
+          "GoodVsPoisoned": {
+            "class": "AttackScalor",
+            "targetCondition": "IsPoisoned"
+          }
+        },
+        "conditions": {
+          "Active4IsNotLockedOniSchoolDark": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "LockSpecialDoubleAttackAOniSchoolDark"
+              ]
+            }
+          },
+          "NotPoisoned": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "Poison"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "passives": {
+      "AfterSchoolPassiveAOniSchoolDarkBoss": {
+        "id": "AfterSchoolPassiveAOniSchoolDarkBoss",
+        "found": true,
+        "localization": {
+          "name": "Dark Cycle",
+          "description": "If this unit would be defeated by an enemy attack or a status effect while having more than 1 HP, it instead survives with 1 HP.\n\nAt the end of each of this unit's turns:\n- A random ally on the battlefield is healed for 1% of max HP.\n- A random ally on the battlefield is Enraged. This will overwrite any existing Weak or Enrage effects.\n- A random ally on the battlefield will have its TU costs for all of its skills reduced by 20%. This will overwrite the effect of previous quicken skills.\n\nEnraged units have their Attack increased to 1.5x until the end of their next turn."
+        }
+      },
+      "KnockbackImmunity": {
+        "id": "KnockbackImmunity",
+        "found": true,
+        "localization": {
+          "name": "Immovable",
+          "description": "This unit cannot be sent to the reinforcements from the battlefield."
+        }
+      },
+      "StunImmunity": {
+        "id": "StunImmunity",
+        "found": true,
+        "localization": {
+          "name": "Stun Immunity",
+          "description": "This unit is not affected by stun effects."
+        }
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": null
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "OniSchoolDarkBoss01",
+    "family": "OniSchoolDarkBoss",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "OniSchoolDarkBoss01",
+    "class": "Monster",
+    "family": "OniSchoolDarkBoss",
+    "activeSkills": {
+      "0": "BuffAlliesAOniSchoolDarkBoss",
+      "1": "BuffEnemiesAOniSchoolDarkBoss",
+      "2": "InstantDoubleAttackAOniSchoolDarkBoss",
+      "3": "SpecialDoubleAttackAOniSchoolDarkBoss"
+    },
+    "passives": {
+      "0": "AfterSchoolPassiveAOniSchoolDarkBoss",
+      "1": "KnockbackImmunity",
+      "2": "StunImmunity"
+    },
+    "cost": 999,
+    "baseAttack": 1257,
+    "baseMaxHp": 20000,
+    "speed": 422,
+    "element": "Death",
+    "weaponPref": "GreatSword",
+    "weaponPivotIndex": 0,
+    "walkSound": "TestSound",
+    "secure": 1,
+    "aiTargetPickWeight": 1,
+    "stars": 6,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 1,
+    "battleOrbImageFlip": 0,
+    "skillVoices": {
+      "0": [
+        9,
+        10
+      ],
+      "1": [
+        5,
+        6
+      ],
+      "2": [
+        1,
+        2
+      ],
+      "3": [
+        13,
+        14
+      ]
+    },
+    "damageVoices": [
+      17,
+      18
+    ],
+    "deathVoices": [
+      21,
+      22
+    ]
+  },
+  "_build": {
+    "scriptVersion": "6-character-family-states",
+    "sourceHash": "240894badb66dd437539b168f73fff2947afc7fc195284852da978745cd9cf20",
+    "dependencyHash": "89cd3312f81e0bda35561943a490a7e2240cdf2aa4263bc194731df056825705",
+    "generatedAt": 1778213448
+  }
+}

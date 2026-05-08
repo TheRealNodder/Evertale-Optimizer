@@ -1,0 +1,838 @@
+{
+  "schemaVersion": 3,
+  "order": 126,
+  "id": "kavaat-merc",
+  "name": "Kavaat Merc",
+  "title": "Infernal Mercenary",
+  "description": "The resemblance between sziviik and the Kavaat has led some scholars to suggest they may share a common ancestor. The fact that both groups have given the world many powerful warriors supports this theory. Unlike the sziviik, however, the Kavaat have no particular homeland, and tend to operate alone.",
+  "category": "character",
+  "rarity": null,
+  "stars": 4,
+  "evolvedStars": 4,
+  "element": "Storm",
+  "weaponType": "GreatAxe",
+  "stats": {
+    "atk": 654,
+    "hp": 3160,
+    "spd": 22,
+    "cost": 23
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/ArcDemon02.png",
+  "refs": {
+    "activeSkills": [
+      "RecklessAttackA",
+      "KillStunSingle200A",
+      "ThrowA",
+      "GiveTurnA"
+    ],
+    "passives": [
+      "Summon1MinionEntranceAir",
+      "Stun10TUMinus",
+      "PlusHPBoostLv1",
+      "PlusAttackBoostLv1",
+      "AddWeaponPrefSpear"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": "AttackUpAirB",
+    "leaderBuffCondition": "IsAir",
+    "summonableMonsters": [
+      "AirMinion01"
+    ]
+  },
+  "resolved": {
+    "activeSkills": {
+      "RecklessAttackA": {
+        "id": "RecklessAttackA",
+        "found": true,
+        "localization": {
+          "name": "Brash Strike",
+          "description": "150% damage to 1 enemy and allies gain 1 Spirit. Reflects 30% of the damage to the user.",
+          "selected": "150% damage and 1 Spirit, 30% damage reflection"
+        },
+        "ability": {
+          "name": "RecklessAttackA",
+          "class": "Ability",
+          "abilityScalor": 0.5,
+          "config": "RecklessAttackA",
+          "tuCost": 100,
+          "useLimit": 0,
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RecklessDamageBoost"
+              ],
+              "selfDamagePercent": 0.3,
+              "selfDamageEffect": "SelfDamageZealous"
+            }
+          ],
+          "flags": [
+            "Reckless"
+          ],
+          "enemyEventType": "Hit",
+          "axeAbilityEffect": "MidSlash1",
+          "greatSwordAbilityEffect": "MidSlash1",
+          "greatAxeAbilityEffect": "MidSlash1",
+          "hammerAbilityEffect": "MidBlunt1",
+          "katanaAbilityEffect": "MidSlash1",
+          "maceAbilityEffect": "MidBlunt1",
+          "spearAbilityEffect": "MidSpear1",
+          "staffAbilityEffect": "MidBlunt1",
+          "swordAbilityEffect": "MidSlash1",
+          "clawAbilityEffect": "MidClaw1",
+          "biteAbilityEffect": "SmallBite1",
+          "bashAbilityEffect": "MidBlunt1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": null,
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {},
+        "conditions": {}
+      },
+      "KillStunSingle200A": {
+        "id": "KillStunSingle200A",
+        "found": true,
+        "localization": {
+          "name": "Triumph Stun",
+          "description": "Stuns 1 enemy for 200TU. Unlocked each time the user defeats another unit with an attack. This skill is locked again after each use or if the user leaves the battlefield.",
+          "selected": "Stuns target for 200TU"
+        },
+        "ability": {
+          "name": "KillStunSingle200A",
+          "class": "Ability",
+          "config": "KillStunSingle200A",
+          "tuCost": 50,
+          "useLimit": 0,
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "Stun200"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "FudgeUsed"
+              ],
+              "applyToTargetType": "Source",
+              "chance": 1.0
+            }
+          ],
+          "immuneSuggestionCondition": "AnyStunImmunity",
+          "flags": [
+            "Stun",
+            "StealthWorthy",
+            "KillLock"
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "MidStun1",
+          "useCondition": "KillsMoreThanSkillUsed",
+          "recommendEffectWhenUsable": 1,
+          "killLockSkillIcon": "IconRedEx01",
+          "killLockUnlockedSkillIcon": "IconGreenCircle01",
+          "killLockUnlockedKey": "SkillReadyToUseKey",
+          "killLockLockedKey": "KillStunSingle200ALockLockedKey"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.5,
+            0.2,
+            0,
+            0.1,
+            0.2
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting2",
+            "batfx_casting3/batfx_casting3",
+            "batsfx_prefab/batsfx_stun2",
+            "batfx_stun2/batfx_stun2",
+            "batfx_ripplebluelow/batfx_ripplebluelow",
+            "batsfx_prefab/batsfx_stun2",
+            "batsfx_prefab/batsfx_stun2"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -2,
+            -2,
+            1,
+            -2,
+            -2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            false,
+            false,
+            true,
+            true
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "FudgeUsed": {
+            "class": "Buff",
+            "duration": 0,
+            "behaviors": [
+              "AddBattleProperty"
+            ],
+            "behaviorOverrides": [
+              {
+                "properties": {
+                  "fudgeSkillUses": 1
+                },
+                "replace": true,
+                "setToKills": true
+              }
+            ],
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "Stun200": {
+            "class": "Buff",
+            "stackName": "Stun",
+            "behaviors": [
+              "Stun"
+            ],
+            "behaviorOverrides": [
+              {
+                "stunTU": 200,
+                "abilityEffect": "StunStatus1"
+              }
+            ],
+            "tags": [
+              "Stun"
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "AnyStunImmunity": {
+            "class": "MonsterConditions",
+            "monsterTags": [
+              "StunImmuneIfSpiritLowFire"
+            ],
+            "teamSpiritLessThan": 200,
+            "or": {
+              "class": "MonsterConditions",
+              "monsterTags": [
+                "StunImmune"
+              ],
+              "or": {
+                "class": "MonsterConditions",
+                "monsterTags": [
+                  "StunImmuneIfBurn"
+                ],
+                "buffStackNames": [
+                  "Burn"
+                ],
+                "or": {
+                  "class": "MonsterConditions",
+                  "monsterTags": [
+                    "StunImmuneWith2AirAllies"
+                  ],
+                  "myTeamMonsterConditionMatchesNeeded": {
+                    "IsAir": 2
+                  },
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "StunImmuneFromThorns"
+                    ],
+                    "myTeamMonsterConditionMatchesNeeded": {
+                      "IsThorned": 1
+                    },
+                    "or": {
+                      "class": "MonsterConditions",
+                      "monsterTags": [
+                        "StunImmuneIfBeastAlly"
+                      ],
+                      "checkReinforcementsForTeamConditionMatches": true,
+                      "myTeamMonsterConditionMatchesNeeded": {
+                        "IsBeastRegular": 1
+                      },
+                      "or": {
+                        "class": "MonsterConditions",
+                        "monsterTags": [
+                          "StunImmuneIfAnyBurningAllies"
+                        ],
+                        "myTeamMonsterConditionMatchesNeeded": {
+                          "IsBurning": 1
+                        },
+                        "or": {
+                          "class": "MonsterConditions",
+                          "monsterTags": [
+                            "StunImmuneIfEnemyIsFireBurnBlastOrForce"
+                          ],
+                          "checkEnemyTeamOfMonster": true,
+                          "enemyTeamMonsterConditionMatchesNeeded": {
+                            "IsBurnBlastOrForceOrFire": 1
+                          },
+                          "or": {
+                            "class": "MonsterConditions",
+                            "monsterTags": [
+                              "StunImmuneIfAllyIsFireBurnBlastOrForce"
+                            ],
+                            "myTeamMonsterConditionMatchesNeeded": {
+                              "IsBurnBlastOrForceOrFire": 1
+                            },
+                            "or": {
+                              "class": "MonsterConditions",
+                              "monsterTags": [
+                                "StunImmuneIfPoisonedEnemy"
+                              ],
+                              "checkEnemyTeamOfMonster": true,
+                              "enemyTeamMonsterConditionMatchesNeeded": {
+                                "IsPoisoned": 1
+                              },
+                              "or": {
+                                "class": "MonsterConditions",
+                                "monsterTags": [
+                                  "StunImmunityIfNotBurning"
+                                ],
+                                "not": {
+                                  "class": "MonsterConditions",
+                                  "buffStackNames": [
+                                    "Burn"
+                                  ]
+                                },
+                                "or": {
+                                  "class": "MonsterConditions",
+                                  "monsterTags": [
+                                    "StunImmuneIfHoldGroundPlusTriggered"
+                                  ],
+                                  "buffStackNames": [
+                                    "BlockDeathUntilNextTurn"
+                                  ],
+                                  "not": {
+                                    "class": "MonsterConditions",
+                                    "buffStackNames": [
+                                      "HoldGroundOnceForHoldGroundPlus"
+                                    ]
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "KillsMoreThanSkillUsed": {
+            "class": "MonsterConditions",
+            "propertyToCompareToField": "fudgeSkillUses",
+            "fieldToCompareToProperty": "killsMade",
+            "propertyFieldCompareStyle": "LessThan"
+          }
+        }
+      },
+      "ThrowA": {
+        "id": "ThrowA",
+        "found": true,
+        "localization": {
+          "name": "Blood Nova",
+          "description": "Sacrifices the last unit in the allied reinforcements for 400% damage to 1 enemy. Usable only if there are 1 or more allied reinforcements left.",
+          "selected": "Sacrifices 1 ally to deal 400% damage"
+        },
+        "ability": {
+          "name": "ThrowA",
+          "class": "Ability",
+          "abilityScalor": 3,
+          "config": "ThrowA",
+          "tuCost": 130,
+          "useLimit": 0,
+          "spiritCost": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 1
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Sacrifice",
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "applyToTargetType": "Source",
+              "overrideAbilityEffect": "ThrowBloodCrest1"
+            },
+            {
+              "applyToTargetType": "Enemy",
+              "damageBoosts": [
+                "ThrowDamageBoost"
+              ]
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "flags": [
+            "Devour",
+            "StealthWorthy"
+          ],
+          "abilityEffect": "ThrowA",
+          "conditionedAbilityEffects": [
+            "ThrowA",
+            "ThrowA"
+          ],
+          "useCondition": "AllyHasReinforcements",
+          "requiredReplacementMonsterMustBeLast": true
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.2,
+            0.5,
+            0.0
+          ],
+          "damagePercents": [
+            0,
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            true,
+            false
+          ],
+          "prefabs": [
+            "batfx_throwparticle1/batfx_throwparticle1",
+            "batfx_bluntimpact1/batfx_bluntimpact1",
+            "batsfx_prefab/batsfx_bluntimpact1"
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "isDeckParticleFX": [
+            true,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Sacrifice": {
+            "class": "SacrificeAbilityComponent"
+          },
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {},
+        "conditions": {
+          "AllyHasReinforcements": {
+            "class": "MonsterConditions",
+            "allyReinforcements": 1
+          }
+        }
+      },
+      "GiveTurnA": {
+        "id": "GiveTurnA",
+        "found": true,
+        "localization": {
+          "name": "Give Turn",
+          "description": "Immediately give 1 other ally the next turn by reducing their current TU to 0. Active skills that grant turns cannot be used on turns given by this skill.",
+          "selected": "Reduce TU of 1 ally to 0"
+        },
+        "ability": {
+          "name": "GiveTurnA",
+          "class": "Ability",
+          "config": "GiveTurnA",
+          "tuCost": 200,
+          "useLimit": 0,
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "oneAllyNotMe",
+          "components": [
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "GiveTurn",
+                "OnExtraTurn",
+                "JustGivenTurn"
+              ]
+            }
+          ],
+          "friendlyEventType": "Finish",
+          "abilityEffect": "GiveTurn",
+          "flags": [
+            "StealthWorthy",
+            "GiveTurn"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "friendlyTargets": 1,
+          "oneAllyNotMe": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0.7,
+            0,
+            0
+          ],
+          "prefabs": [
+            "",
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_casting4/batfx_casting4",
+            "batfx_bluehelix1/batfx_bluehelix1",
+            "batsfx_prefab/batsfx_knockback1",
+            "batfx_ripplebluelow/batfx_ripplebluelow"
+          ],
+          "sortOrderOffset": [
+            0,
+            -2,
+            -2,
+            1,
+            -2,
+            -2
+          ],
+          "assetBundles": [
+            "",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            true,
+            true,
+            false,
+            true,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "GiveTurn": {
+            "class": "Buff",
+            "behaviors": [
+              "GiveTurn"
+            ],
+            "behaviorOverrides": [
+              {}
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "textKeyToShowWhenApplied": "TurnGivenKey",
+            "isHiddenFromPlayers": true
+          },
+          "JustGivenTurn": {
+            "class": "Buff",
+            "duration": 1,
+            "stackName": "JustGivenTurnBuff",
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "isHiddenFromPlayers": true,
+            "noIconShownOnBattleStatus": true
+          },
+          "OnExtraTurn": {
+            "class": "Buff",
+            "stackName": "OnExtraTurn",
+            "duration": 1,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "OnExtraTurn": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "OnExtraTurn"
+            ]
+          }
+        }
+      }
+    },
+    "passives": {
+      "Summon1MinionEntranceAir": {
+        "id": "Summon1MinionEntranceAir",
+        "found": true,
+        "localization": {
+          "name": "Summon Entry",
+          "description": "Adds 1 Denmori to the very end of this unit's team. Triggered when this unit enters the battlefield from the allied reinforcements."
+        }
+      },
+      "Stun10TUMinus": {
+        "id": "Stun10TUMinus",
+        "found": true,
+        "localization": {
+          "name": "Stun Resist Lv1",
+          "description": "Reduces the amount of any stun effects against this unit by 10TU."
+        }
+      },
+      "PlusHPBoostLv1": {
+        "id": "PlusHPBoostLv1",
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv1",
+          "description": "Adds 600 to this unit's max HP."
+        }
+      },
+      "PlusAttackBoostLv1": {
+        "id": "PlusAttackBoostLv1",
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv1",
+          "description": "Adds 150 to this unit's Attack."
+        }
+      },
+      "AddWeaponPrefSpear": {
+        "id": "AddWeaponPrefSpear",
+        "found": true,
+        "localization": {
+          "name": "Spear Mastery",
+          "description": "Can use weapon skills of Spears in addition to their original preferred weapon type."
+        }
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": {
+      "class": "MonsterConditions",
+      "elements": [
+        "Air"
+      ]
+    }
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "ArcDemon02",
+    "family": "ArcDemon",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "ArcDemon02",
+    "family": "ArcDemon",
+    "class": "Monster",
+    "leaderBuff": "AttackUpAirB",
+    "leaderBuffCondition": "IsAir",
+    "activeSkills": {
+      "0": "RecklessAttackA",
+      "1": "KillStunSingle200A",
+      "2": "ThrowA",
+      "3": "GiveTurnA"
+    },
+    "passives": {
+      "0": "Summon1MinionEntranceAir",
+      "2": "Stun10TUMinus",
+      "3": "PlusHPBoostLv1",
+      "4": "PlusAttackBoostLv1",
+      "5": "AddWeaponPrefSpear"
+    },
+    "cost": 23,
+    "baseAttack": 654,
+    "baseMaxHp": 3160,
+    "speed": 22,
+    "element": "Air",
+    "weaponPref": "GreatAxe",
+    "weaponPivotIndex": 0,
+    "secure": 1,
+    "evolveFrom": "ArcDemon01",
+    "aiTargetPickWeight": 1,
+    "stars": 4,
+    "evolvedStars": 4,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 0,
+    "battleOrbImageFlip": 0,
+    "attackType": "Weapon",
+    "formTwitterShare": 1,
+    "summonableMonsters": [
+      "AirMinion01"
+    ],
+    "summonableMatchSource": [
+      false
+    ],
+    "skillVoices": {
+      "0": [
+        1,
+        2
+      ],
+      "1": [
+        3,
+        4
+      ],
+      "2": [
+        5,
+        6
+      ],
+      "3": [
+        7,
+        8
+      ]
+    },
+    "damageVoices": [
+      9,
+      10
+    ],
+    "deathVoices": [
+      11,
+      12
+    ],
+    "victoryVoices": [
+      13
+    ],
+    "lineupVoices": [
+      14,
+      15
+    ],
+    "trainVoices": [
+      17,
+      18,
+      19
+    ],
+    "titleVoices": [
+      20
+    ],
+    "gachaVoices": [
+      21
+    ]
+  },
+  "_build": {
+    "scriptVersion": "6-character-family-states",
+    "sourceHash": "20259888afa3ea9ee94b535121ccbf6c9494e6ee94161c4e4cca189e081ad5f9",
+    "dependencyHash": "8ad56345435d83e285987b19505ca55ba6fa6e80459dc3ff500bfde19dce661e",
+    "generatedAt": 1778213409
+  }
+}

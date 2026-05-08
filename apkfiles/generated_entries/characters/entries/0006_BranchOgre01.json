@@ -1,0 +1,255 @@
+{
+  "schemaVersion": 3,
+  "order": 6,
+  "id": "orc-ward",
+  "name": "Orc Ward",
+  "title": "Orc Ward",
+  "description": "Orcs choose roles by body shape and size. The most massive are chosen as guardians, who protect chieftains and are sometimes hired out as bodyguards.",
+  "category": "character",
+  "rarity": null,
+  "stars": 0,
+  "evolvedStars": 0,
+  "element": "Dark",
+  "weaponType": "Mace",
+  "stats": {
+    "atk": 232,
+    "hp": 1012,
+    "spd": 132,
+    "cost": 4
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/BranchOgre01.png",
+  "refs": {
+    "activeSkills": [
+      "GainAttackSingleB",
+      "HighSpiritAttackC"
+    ],
+    "passives": [],
+    "activeSkillsAI": {
+      "1": "HighSpiritAttackA3Star_AI"
+    },
+    "aiSequence": null,
+    "leaderBuff": null,
+    "leaderBuffCondition": null,
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "GainAttackSingleB": {
+        "id": "GainAttackSingleB",
+        "found": true,
+        "localization": {
+          "name": "Attack",
+          "description": "Damage to 1 enemy and allies gain 1 Spirit.",
+          "selected": "Damage to 1 enemy and gains 1 Spirit"
+        },
+        "ability": {
+          "name": "GainAttackSingleB",
+          "class": "Ability",
+          "abilityScalor": 0,
+          "config": "GainAttackSingleB",
+          "tuCost": 100,
+          "useLimit": 0,
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ]
+            }
+          ],
+          "enemyEventType": "Hit",
+          "axeAbilityEffect": "SmallSlash1",
+          "greatSwordAbilityEffect": "SmallSlash1",
+          "greatAxeAbilityEffect": "SmallSlash1",
+          "hammerAbilityEffect": "SmallBlunt1",
+          "katanaAbilityEffect": "SmallSlash1",
+          "maceAbilityEffect": "SmallBlunt1",
+          "spearAbilityEffect": "SmallSpear1",
+          "staffAbilityEffect": "SmallBlunt1",
+          "swordAbilityEffect": "SmallSlash1",
+          "clawAbilityEffect": "SmallClaw1",
+          "biteAbilityEffect": "SmallBite1",
+          "bashAbilityEffect": "SmallBlunt1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": null,
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {},
+        "conditions": {}
+      },
+      "HighSpiritAttackC": {
+        "id": "HighSpiritAttackC",
+        "found": true,
+        "localization": {
+          "name": "Over Flow",
+          "description": "300% damage to 1 enemy. Usable only if the user's party has 7 or more Spirit.",
+          "selected": "300% damage, usable if Spirit is 7 or more"
+        },
+        "ability": {
+          "name": "HighSpiritAttackC",
+          "class": "Ability",
+          "abilityScalor": 2,
+          "config": "HighSpiritAttackC",
+          "tuCost": 200,
+          "useLimit": 0,
+          "spiritCost": 5,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage"
+          ],
+          "enemyEventType": "Hit",
+          "useCondition": "AllySpirit7OrMore",
+          "flags": [
+            "HighSpirits",
+            "StealthWorthy"
+          ],
+          "recommendEffectWhenUsable": 1,
+          "axeAbilityEffect": "HighSpiritSpecial1N",
+          "greatAxeAbilityEffect": "HighSpiritSpecial1N",
+          "greatSwordAbilityEffect": "HighSpiritSpecial1N",
+          "swordAbilityEffect": "HighSpiritSpecial1N",
+          "spearAbilityEffect": "HighSpiritSpecial1SpearN",
+          "katanaAbilityEffect": "HighSpiritSpecial1N",
+          "hammerAbilityEffect": "HighSpiritSpecial1BluntN",
+          "staffAbilityEffect": "HighSpiritSpecial1BluntN",
+          "maceAbilityEffect": "HighSpiritSpecial1BluntN",
+          "biteAbilityEffect": "HighSpiritSpecial1BiteN",
+          "bashAbilityEffect": "HighSpiritSpecial1BluntN",
+          "clawAbilityEffect": "HighSpiritSpecial1ClawN"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": null,
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {},
+        "conditions": {
+          "AllySpirit7OrMore": {
+            "class": "MonsterConditions",
+            "teamSpiritGreaterThan": 600
+          }
+        }
+      }
+    },
+    "passives": {},
+    "activeSkillsAI": {
+      "1": {
+        "id": "HighSpiritAttackA3Star_AI",
+        "found": true,
+        "ai": {
+          "class": "AbilityAI",
+          "baseAITargetingWeight": 1,
+          "aiTargetingSourceMonsterConditions": {
+            "AllySpirit7ButRarerAllyWithHighSpirit4Star": 0.01
+          }
+        }
+      }
+    },
+    "aiSequence": null,
+    "leaderCondition": null
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "BranchOgre01",
+    "family": "BranchOgre",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "BranchOgre01",
+    "family": "BranchOgre",
+    "class": "Monster",
+    "activeSkills": {
+      "0": "GainAttackSingleB",
+      "1": "HighSpiritAttackC"
+    },
+    "cost": 4,
+    "baseAttack": 232,
+    "baseMaxHp": 1012,
+    "speed": 132,
+    "element": "Death",
+    "weaponPref": "Mace",
+    "weaponPivotIndex": 0,
+    "secure": 0,
+    "aiTargetPickWeight": 1,
+    "stars": 0,
+    "evolvedStars": 0,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 0,
+    "battleOrbImageFlip": 1,
+    "attackType": "Weapon",
+    "visible": 1,
+    "formTwitterShare": 1,
+    "activeSkillsAI": {
+      "1": "HighSpiritAttackA3Star_AI"
+    },
+    "skillVoices": {
+      "0": [
+        1,
+        2
+      ],
+      "1": [
+        3
+      ]
+    },
+    "damageVoices": [
+      5,
+      6
+    ],
+    "deathVoices": [
+      7,
+      8
+    ],
+    "victoryVoices": [
+      9,
+      10
+    ],
+    "lineupVoices": [
+      11,
+      12
+    ],
+    "evolutionVoices": [
+      11,
+      12
+    ],
+    "trainVoices": [
+      11,
+      12
+    ]
+  },
+  "_build": {
+    "scriptVersion": "6-character-family-states",
+    "sourceHash": "145e8e8aa95c55e64b29ae0385eefa18fa712e1685c391c0d72f77b90b3c691f",
+    "dependencyHash": "5a96db6c2dd760b5806a5896edea70afb07ecb160b9d124657f561c90b03548a",
+    "generatedAt": 1778213407
+  }
+}

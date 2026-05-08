@@ -1,0 +1,370 @@
+{
+  "schemaVersion": 3,
+  "order": 70,
+  "id": "orc-vet",
+  "name": "Orc Vet",
+  "title": "Orc Vet",
+  "description": "Orcs denote rank with bone adornments. A skull helm is the sign of an accomplished warrior.",
+  "category": "character",
+  "rarity": null,
+  "stars": 2,
+  "evolvedStars": 2,
+  "element": "Storm",
+  "weaponType": "Axe",
+  "stats": {
+    "atk": 333,
+    "hp": 1428,
+    "spd": 52,
+    "cost": 12
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/SkeletonHelmetOrc01.png",
+  "refs": {
+    "activeSkills": [
+      "GainAttackDoubleAAir",
+      "ThrowB"
+    ],
+    "passives": [],
+    "activeSkillsAI": {
+      "0": "GainAttackDoubleASmarter_AI"
+    },
+    "aiSequence": null,
+    "leaderBuff": null,
+    "leaderBuffCondition": null,
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "GainAttackDoubleAAir": {
+        "id": "GainAttackDoubleAAir",
+        "found": true,
+        "localization": {
+          "name": "Attack Two",
+          "description": "Damage to 2 enemies and allies gain 1 Spirit.",
+          "selected": "Damage to 2 enemies and gains 1 Spirit"
+        },
+        "ability": {
+          "name": "GainAttackDoubleAAir",
+          "class": "Ability",
+          "abilityScalor": 0,
+          "config": "GainAttackDoubleAAir",
+          "tuCost": 160,
+          "useLimit": 0,
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ]
+            }
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "MidAir1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.3,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_casting3/batfx_casting3",
+            "batfx_stormmid2/batfx_stormmid2",
+            "batsfx_prefab/batsfx_air1",
+            "batfx_rippleyellowlow/batfx_rippleyellowlow"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -2,
+            1,
+            -2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            true,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {},
+        "conditions": {}
+      },
+      "ThrowB": {
+        "id": "ThrowB",
+        "found": true,
+        "localization": {
+          "name": "Blood Shot",
+          "description": "Sacrifices the last unit in the allied reinforcements for 400% damage to 1 enemy. Usable only if there are 1 or more allied reinforcements left.",
+          "selected": "Sacrifices 1 ally to deal 400% damage"
+        },
+        "ability": {
+          "name": "ThrowB",
+          "class": "Ability",
+          "abilityScalor": 3,
+          "config": "ThrowB",
+          "tuCost": 160,
+          "useLimit": 0,
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 1
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Sacrifice",
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "applyToTargetType": "Source",
+              "overrideAbilityEffect": "ThrowBloodCrest1NC"
+            },
+            {
+              "applyToTargetType": "Enemy",
+              "damageBoosts": [
+                "ThrowDamageBoost"
+              ]
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "flags": [
+            "Devour",
+            "StealthWorthy"
+          ],
+          "abilityEffect": "ThrowA",
+          "conditionedAbilityEffects": [
+            "ThrowA",
+            "ThrowA"
+          ],
+          "useCondition": "AllyHasReinforcements",
+          "requiredReplacementMonsterMustBeLast": true
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.2,
+            0.5,
+            0.0
+          ],
+          "damagePercents": [
+            0,
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            true,
+            false
+          ],
+          "prefabs": [
+            "batfx_throwparticle1/batfx_throwparticle1",
+            "batfx_bluntimpact1/batfx_bluntimpact1",
+            "batsfx_prefab/batsfx_bluntimpact1"
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "isDeckParticleFX": [
+            true,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Sacrifice": {
+            "class": "SacrificeAbilityComponent"
+          },
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {},
+        "conditions": {
+          "AllyHasReinforcements": {
+            "class": "MonsterConditions",
+            "allyReinforcements": 1
+          }
+        }
+      }
+    },
+    "passives": {},
+    "activeSkillsAI": {
+      "0": {
+        "id": "GainAttackDoubleASmarter_AI",
+        "found": true,
+        "ai": {
+          "class": "AbilityAI",
+          "baseAITargetingWeight": 0.75,
+          "globalScalorsToIgnore": [
+            "HPAbove1Percent",
+            "HPBelow5Percent"
+          ],
+          "aiTargetingSourceMonsterConditions": {
+            "EnemyHasTimestrikerNoProtector": 0.8,
+            "HPBelow10PercentEnemyCount2NoStealth": 2.5,
+            "Has2ProtectorNotLessHPThanActiveMonsterAttackOrStealthInAllyTeam": 0.3,
+            "HasArmor": 1.05
+          },
+          "aiTargetingMonsterConditions": {
+            "HPBelow10PercentNoStealth": 1.2,
+            "HPBelow50PercentNoStealth": 1.1,
+            "IsProtecting": 1.1,
+            "HasProtectorAndLowHPAlly": 3,
+            "IsAlone": 0.5,
+            "IsStealth": 1.05,
+            "IsAlwaysDodging": 0.4,
+            "NotProtectingDodging": 0.4,
+            "IsAloneAndStealth": 0.25,
+            "LessHPThanActiveMonsterAttackNotStealth": 3
+          }
+        }
+      }
+    },
+    "aiSequence": null,
+    "leaderCondition": null
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "SkeletonHelmetOrc01",
+    "family": "SkeletonHelmetOrc",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "SkeletonHelmetOrc01",
+    "family": "SkeletonHelmetOrc",
+    "class": "Monster",
+    "activeSkills": {
+      "0": "GainAttackDoubleAAir",
+      "1": "ThrowB"
+    },
+    "cost": 12,
+    "baseAttack": 333,
+    "baseMaxHp": 1428,
+    "speed": 52,
+    "element": "Air",
+    "weaponPref": "Axe",
+    "weaponPivotIndex": 0,
+    "secure": 0,
+    "aiTargetPickWeight": 1,
+    "stars": 2,
+    "evolvedStars": 2,
+    "goldMultiplier": 0,
+    "consolationMultiplier": 0,
+    "battleOrbImageFlip": 1,
+    "attackType": "Weapon",
+    "visible": 1,
+    "formTwitterShare": 1,
+    "activeSkillsAI": {
+      "0": "GainAttackDoubleASmarter_AI"
+    },
+    "skillVoices": {
+      "0": [
+        1,
+        2
+      ],
+      "1": [
+        3
+      ]
+    },
+    "damageVoices": [
+      5,
+      6
+    ],
+    "deathVoices": [
+      7,
+      8
+    ],
+    "victoryVoices": [
+      9,
+      10
+    ],
+    "lineupVoices": [
+      11,
+      12
+    ],
+    "evolutionVoices": [
+      11,
+      12
+    ],
+    "trainVoices": [
+      11,
+      12
+    ]
+  },
+  "_build": {
+    "scriptVersion": "6-character-family-states",
+    "sourceHash": "55265927bc4f961f4d4741d873d3353ada7a5b26d2cc9926549674bb8b011cf8",
+    "dependencyHash": "b31b10ab5502a62ecdcebd8b01bfe4f2f1494d477f71d59c189f004ac5ec51e8",
+    "generatedAt": 1778213408
+  }
+}

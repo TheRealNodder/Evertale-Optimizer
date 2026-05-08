@@ -1,0 +1,1380 @@
+{
+  "schemaVersion": 3,
+  "order": 552,
+  "id": "loki",
+  "name": "Loki",
+  "title": "Goddess of Lies and Betrayal",
+  "description": "She's been around since ancient times, but not a single person has ever truly known her. She comes and goes as she pleases, changes appearances on a whim, and always keeps her cards close to her chest. Some say that even the form everyone knows as \"Loki\" is actually fake.",
+  "category": "character",
+  "rarity": null,
+  "stars": 5,
+  "evolvedStars": 6,
+  "element": "Dark",
+  "weaponType": "GreatAxe",
+  "stats": {
+    "atk": 1183,
+    "hp": 5295,
+    "spd": 391,
+    "cost": 28
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/LokiRegular01.png",
+  "refs": {
+    "activeSkills": [
+      "MegaPoisonPloyALokiRegular",
+      "GuardSweepAllMegaPoisonALokiRegular",
+      "MiniPoisonEatALokiRegular",
+      "MegaPoisonSurvivorALokiRegular"
+    ],
+    "passives": [
+      "SurvivalEvasionLokiRegular",
+      "PlusAttackBoostLv3",
+      "Stun20TUMinus",
+      "PlusHPBoostLv3",
+      "AddWeaponPrefSpear"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": "AttackUpDeathD",
+    "leaderBuffCondition": "IsDeath",
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "MegaPoisonPloyALokiRegular": {
+        "id": "MegaPoisonPloyALokiRegular",
+        "found": true,
+        "localization": {
+          "name": "Dark Hypnosis",
+          "description": "Hypnotizes a random enemy (20%+ chance) and Mega Poisons them for 200TU (100% chance). A Hypnotized enemy will use its next turn to grant the turn to and Purify the hypnotizer (the turn will be lost as if it were sleeping), and then the hypnosis will end. The chance of Hypnosis applying increases by 20% for each awakening the user has, up to 100% max when fully awakened.\n\nHypnosis is not a status effect and cannot be removed by Purify skills, but will be canceled if the user is defeated or leaves the battlefield. Mega Poison will overwrite other status effects on that enemy. Mega Poison deals 20 times the damage of normal Poison and cannot be overwritten by normal Poison or Super Poison.\n\nThis skill becomes locked for 100TU after use and cannot be used if an enemy is already Hypnotized. Hypnosis will fail against Boss units.",
+          "selected": "Mega Poison a random enemy, chance of Hypnosis\n(Will overwrite other status effects)"
+        },
+        "ability": {
+          "name": "MegaPoisonPloyALokiRegular",
+          "class": "Ability",
+          "config": "MegaPoisonPloyALokiRegular",
+          "tuCost": 1,
+          "useLimit": 0,
+          "spiritGain": 0,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "RandomEnemy",
+          "components": [
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "LokiCooldown100",
+                "LokiPloying"
+              ],
+              "skipAbilityEffect": true,
+              "applyToTargetType": "Source"
+            },
+            {
+              "buffs": [
+                "LokiPloy"
+              ],
+              "applyConditions": "EnemyPloySucceeded",
+              "skipAbilityEffect": true,
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "MegaPoison",
+                "BurnImmunityTempForRevenge"
+              ],
+              "applyToTargetType": "Enemy"
+            }
+          ],
+          "useCondition": "NotInstantCooldownNoPloyingAlly",
+          "enemyEventType": "Finish",
+          "sourceEventType": "Hit",
+          "abilityEffect": "LokiRegularAbility1",
+          "flags": [
+            "NoDamage",
+            "StealthWorthy",
+            "Poisoner"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "randomEnemy": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.3,
+            0,
+            1,
+            0
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            false,
+            false,
+            true
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1"
+          ],
+          "sortOrderOffset": [
+            -2,
+            0,
+            0,
+            -2,
+            2,
+            0
+          ],
+          "prefabs": [
+            "batfx_common/batfx_purplebase1",
+            "batsfx_prefab/batsfx_casting2",
+            "batsfx_prefab/batsfx_gravityball",
+            "batfx_lokiregular1/batfx_evileye1",
+            "batfx_lokiregular1/batfx_puffred1",
+            "batsfx_prefab/batsfx_poison1"
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "BurnImmunityTempForRevenge": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Burn",
+                  "BurnAfterTurn",
+                  "BurnAtEndOfTurn"
+                ],
+                "dontShowText": true
+              },
+              {
+                "name": "BurnAfterTurn"
+              },
+              {
+                "name": "BurnSelfOnHit"
+              }
+            ],
+            "duration": 1,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "tags": [
+              "BurnImmune"
+            ],
+            "stackName": "BurnImmunityTempForRevenge",
+            "isHiddenFromPlayers": true
+          },
+          "LokiCooldown100": {
+            "class": "Buff",
+            "duration": 100,
+            "stackName": "InstantCooldown",
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "iconSpriteName": "IconBlueCountdownClock3"
+          },
+          "LokiPloy": {
+            "class": "Buff",
+            "stackName": "Ploy",
+            "behaviors": [
+              "BuffOnMonsterTurn",
+              "LoseTurn",
+              "RemoveOnSourceDeath",
+              "RemoveAfterTurnsBehavior",
+              "BuffOnMonsterTurnEnd"
+            ],
+            "behaviorOverrides": [
+              {
+                "selfBuffs": [
+                  "GiveTurnUserFX"
+                ],
+                "sourceBuffs": [
+                  "RemoveBuffs",
+                  "GiveTurn",
+                  "GiveTurnTargetFX"
+                ]
+              },
+              {},
+              {},
+              {
+                "turnCount": 1
+              },
+              {
+                "selfBuffs": [
+                  "RemovePloy"
+                ],
+                "spreadCondition": "NoPloyingEnemy",
+                "activeMonsterConditions": "AlwaysTrue"
+              }
+            ],
+            "duration": -1,
+            "iconSpriteName": "IconBlueHypnotized01",
+            "showAsTimer": true,
+            "applyConditions": "IsNotBoss"
+          },
+          "LokiPloying": {
+            "class": "Buff",
+            "duration": -1,
+            "stackName": "Ploying",
+            "behaviors": [
+              "BuffOnMonsterTurnEnd",
+              "BuffWhenMonstersDie"
+            ],
+            "behaviorOverrides": [
+              {
+                "selfBuffs": [
+                  "RemovePloying"
+                ],
+                "spreadCondition": "NoPloyedEnemy",
+                "activeMonsterConditions": "AlwaysTrue"
+              },
+              {
+                "selfBuffs": [
+                  "RemovePloying"
+                ],
+                "spreadCondition": "NoPloyedEnemy"
+              }
+            ],
+            "applyConditions": "PloySucceeded",
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "iconSpriteName": "IconBlueHypnotizer01"
+          },
+          "MegaPoison": {
+            "class": "Buff",
+            "stackName": "Poison",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "DamageOverTime"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "percentOfAttack": 0.05,
+                "damageColor": "Green",
+                "abilityEffect": "MidDeath1MegaPoison",
+                "extraDamageFlag": "MegaPoison"
+              }
+            ],
+            "tags": [
+              "Poison",
+              "MegaPoison"
+            ],
+            "canBePurified": true,
+            "duration": 200,
+            "showAsTimer": true,
+            "statusEffect": "MegaPoisonStatus",
+            "statusEffectOffset": 0.1,
+            "damageType": "Poison",
+            "iconSpriteName": "IconPurplePoison01"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "EnemyPloySucceeded": {
+            "class": "MonsterConditions",
+            "checkEnemyTeamOfMonster": true,
+            "enemyTeamMonsterConditionMatchesNeeded": {
+              "PloySucceeded": 1
+            }
+          },
+          "NotInstantCooldownNoPloyingAlly": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "InstantCooldown"
+              ],
+              "or": {
+                "class": "MonsterConditions",
+                "myTeamMonsterConditionMatchesNeeded": {
+                  "IsPloying": 1
+                }
+              }
+            }
+          }
+        }
+      },
+      "GuardSweepAllMegaPoisonALokiRegular": {
+        "id": "GuardSweepAllMegaPoisonALokiRegular",
+        "found": true,
+        "localization": {
+          "name": "Devil's Dance",
+          "description": "300% damage to all enemies, and each enemy hit has a 50% chance to be Mega Poisoned for 200TU. This attack ignores skin passive skills and the Counter Stance status effect.\n\nUsable only if there is an enemy Guardian on the battlefield.",
+          "selected": "300% damage, chance of Mega Poison\n(Will overwrite other status effects)"
+        },
+        "ability": {
+          "name": "GuardSweepAllMegaPoisonALokiRegular",
+          "class": "Ability",
+          "abilityScalor": 2,
+          "config": "GuardSweepAllMegaPoisonALokiRegular",
+          "tuCost": 130,
+          "useLimit": 0,
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "AllEnemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageFlags": [
+                "IgnoreSkin"
+              ]
+            },
+            {
+              "buffs": [
+                "MegaPoison",
+                "BurnImmunityTempForRevenge"
+              ],
+              "chance": 0.5,
+              "showMissConditions": "ShowNoMiss"
+            }
+          ],
+          "useCondition": "EnemyHas1Protecting",
+          "enemyEventType": "Hit",
+          "abilityEffect": "LokiRegularAbility2",
+          "flags": [
+            "ProtectorKiller",
+            "Poisoner"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "allEnemies": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            1.5,
+            0,
+            0,
+            0,
+            1.5,
+            0
+          ],
+          "prefabs": [
+            "batfx_common/batfx_chargeparticlespurple",
+            "batsfx_prefab/batsfx_charge1",
+            "batfx_lokiregular1/batfx_multiscythe1",
+            "batsfx_prefab/batsfx_multislash1",
+            "batsfx_prefab/batsfx_multislash2",
+            "batfx_lokiregular1/batfx_multipleslash3",
+            "batfx_common/batfx_finalslash1",
+            "batsfx_prefab/batsfx_slash1"
+          ],
+          "sortOrderOffset": [
+            -2,
+            0,
+            2,
+            0,
+            0,
+            2,
+            4,
+            0
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1"
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            true,
+            true,
+            false,
+            false,
+            true
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "BurnImmunityTempForRevenge": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Burn",
+                  "BurnAfterTurn",
+                  "BurnAtEndOfTurn"
+                ],
+                "dontShowText": true
+              },
+              {
+                "name": "BurnAfterTurn"
+              },
+              {
+                "name": "BurnSelfOnHit"
+              }
+            ],
+            "duration": 1,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "tags": [
+              "BurnImmune"
+            ],
+            "stackName": "BurnImmunityTempForRevenge",
+            "isHiddenFromPlayers": true
+          },
+          "MegaPoison": {
+            "class": "Buff",
+            "stackName": "Poison",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "DamageOverTime"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "percentOfAttack": 0.05,
+                "damageColor": "Green",
+                "abilityEffect": "MidDeath1MegaPoison",
+                "extraDamageFlag": "MegaPoison"
+              }
+            ],
+            "tags": [
+              "Poison",
+              "MegaPoison"
+            ],
+            "canBePurified": true,
+            "duration": 200,
+            "showAsTimer": true,
+            "statusEffect": "MegaPoisonStatus",
+            "statusEffectOffset": 0.1,
+            "damageType": "Poison",
+            "iconSpriteName": "IconPurplePoison01"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "EnemyHas1Protecting": {
+            "class": "MonsterConditions",
+            "checkEnemyTeamOfMonster": true,
+            "enemyTeamMonsterConditionMatchesNeeded": {
+              "IsProtecting": 1
+            }
+          }
+        }
+      },
+      "MiniPoisonEatALokiRegular": {
+        "id": "MiniPoisonEatALokiRegular",
+        "found": true,
+        "localization": {
+          "name": "Reaping Scythe",
+          "description": "Targets 2 enemies and deals 100% damage. 400% damage instead against poisoned targets and steals 1 Spirit from enemies for each poisoned enemy hit. This attack ignores enemy damage reduction effects, skin passive skills, and the Counter Stance status effect.",
+          "selected": "400% damage to poisoned targets, can steal Spirit"
+        },
+        "ability": {
+          "name": "MiniPoisonEatALokiRegular",
+          "class": "Ability",
+          "abilityScalor": 0,
+          "conditionalAbilityScalors": [
+            3
+          ],
+          "config": "MiniPoisonEatALokiRegular",
+          "tuCost": 100,
+          "useLimit": 0,
+          "spiritGain": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "ApplyBuff",
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "SpiritDrainDContra"
+              ],
+              "applyConditions": "IsPoisonedAllySpirit1OrMore",
+              "buffBackMode": true,
+              "skipAbilityEffect": true,
+              "applyToTargetType": "Enemy",
+              "showMissConditions": "ShowNoMiss"
+            },
+            {
+              "damageBoosts": [
+                "PoisonEaterDamageBoost"
+              ],
+              "damageFlags": [
+                "IgnoreArmor",
+                "IgnoreSkin"
+              ]
+            }
+          ],
+          "attackScalors": [
+            "GoodVsPoisoned"
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "LokiRegularAttack1",
+          "conditionedAbilityEffects": [
+            "LokiRegularAttack1",
+            "LokiRegularAttack1"
+          ],
+          "flags": [
+            "PoisonEater",
+            "StealthWorthy",
+            "PoisonEaterDoubleAlt"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.85,
+            0,
+            0.03
+          ],
+          "prefabs": [
+            "batfx_poisoncrest1/batfx_poisoncrest1",
+            "batsfx_prefab/batsfx_timestrike1",
+            "batfx_lokiregular1/batfx_scythe1",
+            "batsfx_prefab/batsfx_slash1",
+            "batfx_inugamiregular1/batfx_comboslash2"
+          ],
+          "sortOrderOffset": [
+            -2,
+            0,
+            2,
+            0,
+            3
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            true
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            true
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            false
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useTeamEffectPosition": [
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          },
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {
+          "SpiritDrainDContra": {
+            "class": "Buff",
+            "behaviors": [
+              "AddSpirit",
+              "AddSpirit"
+            ],
+            "behaviorOverrides": [
+              {
+                "percentOfMax": -0.1,
+                "toEnemyTeam": true
+              },
+              {
+                "percentOfMax": 0.1
+              }
+            ],
+            "duration": 0,
+            "applyConditions": "EnemySpirit1OrMore",
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {
+          "GoodVsPoisoned": {
+            "class": "AttackScalor",
+            "targetCondition": "IsPoisoned"
+          }
+        },
+        "conditions": {
+          "IsPoisonedAllySpirit1OrMore": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "Poison"
+            ],
+            "teamSpiritGreaterThan": 0
+          }
+        }
+      },
+      "MegaPoisonSurvivorALokiRegular": {
+        "id": "MegaPoisonSurvivorALokiRegular",
+        "found": true,
+        "localization": {
+          "name": "Survivor's Edict",
+          "description": "600% damage to 1 enemy then Mega Poisons them for 200TU, this will overwrite other status effects on that enemy. Heals the user for 100% of max HP if damage is dealt. This attack ignores enemy damage reduction effects. The user will also Endure the next damage that would defeat it with 1 HP. Endure effects cannot stack. Locked for 300TU after the user has entered the battlefield.",
+          "selected": "600% damage to 1 enemy and Mega Poisons them\n(Will overwrite other status effects)"
+        },
+        "ability": {
+          "name": "MegaPoisonSurvivorALokiRegular",
+          "class": "Ability",
+          "abilityScalor": 5,
+          "config": "MegaPoisonSurvivorALokiRegular",
+          "tuCost": 100,
+          "useLimit": 0,
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "SurvivorDamageBoost"
+              ],
+              "damageFlags": [
+                "IgnoreArmor"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "MegaPoison",
+                "BurnImmunityTempForRevenge"
+              ],
+              "applyToTargetType": "Enemy",
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "HealFull",
+                "BlockDeathOnce"
+              ],
+              "applyToTargetType": "Source",
+              "skipAbilityEffect": true
+            }
+          ],
+          "useCondition": "TimeInCombat300",
+          "bombSkillIcon": "IconBrownCountdownClock01",
+          "bombSkillIconDescriptionKey": "MegaPoisonSurvivorALokiRegularCountdownKey",
+          "flags": [
+            "Survivor",
+            "Duration",
+            "Poisoner"
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "recommendEffectWhenUsable": 1,
+          "abilityEffect": "LokiRegularSpecial1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0.2,
+            0,
+            1,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_timestrike1",
+            "batfx_lokiregular1/batfx_chainlock1",
+            "batsfx_prefab/batsfx_chains1",
+            "batfx_common/batfx_finalslash1",
+            "batfx_lokiregular1/batfx_chainbreak1",
+            "batsfx_prefab/batsfx_slash1"
+          ],
+          "sortOrderOffset": [
+            0,
+            2,
+            0,
+            2,
+            3,
+            0
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            false,
+            true,
+            false,
+            false,
+            true
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "BlockDeathOnce": {
+            "class": "Buff",
+            "behaviors": [
+              "BlockDeath"
+            ],
+            "behaviorOverrides": [
+              {
+                "cancelFromDamageFlags": [
+                  "IgnoreHoldGround",
+                  "IgnoreBlockDeath",
+                  "HardIgnoreBlockDeath",
+                  "LethalPoison"
+                ],
+                "conditions": "AlwaysTrue",
+                "removeAfterTriggers": 1
+              }
+            ],
+            "stackName": "HoldGround",
+            "tags": [
+              "BlockDeathOnce"
+            ],
+            "duration": -1,
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "iconSpriteName": "IconWhiteFightSword01"
+          },
+          "BurnImmunityTempForRevenge": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Burn",
+                  "BurnAfterTurn",
+                  "BurnAtEndOfTurn"
+                ],
+                "dontShowText": true
+              },
+              {
+                "name": "BurnAfterTurn"
+              },
+              {
+                "name": "BurnSelfOnHit"
+              }
+            ],
+            "duration": 1,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "tags": [
+              "BurnImmune"
+            ],
+            "stackName": "BurnImmunityTempForRevenge",
+            "isHiddenFromPlayers": true
+          },
+          "HealFull": {
+            "class": "Buff",
+            "behaviors": [
+              "AdjustHp"
+            ],
+            "behaviorOverrides": [
+              {
+                "percent": 1.0,
+                "abilityEffect": "LargeHeal1"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "MegaPoison": {
+            "class": "Buff",
+            "stackName": "Poison",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "DamageOverTime"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "percentOfAttack": 0.05,
+                "damageColor": "Green",
+                "abilityEffect": "MidDeath1MegaPoison",
+                "extraDamageFlag": "MegaPoison"
+              }
+            ],
+            "tags": [
+              "Poison",
+              "MegaPoison"
+            ],
+            "canBePurified": true,
+            "duration": 200,
+            "showAsTimer": true,
+            "statusEffect": "MegaPoisonStatus",
+            "statusEffectOffset": 0.1,
+            "damageType": "Poison",
+            "iconSpriteName": "IconPurplePoison01"
+          }
+        },
+        "attackScalors": {
+          "TimeInCombat300": {
+            "class": "AttackScalor",
+            "sourceCondition": "TimeInCombat300"
+          }
+        },
+        "conditions": {
+          "TimeInCombat300": {
+            "class": "MonsterConditions",
+            "timeInCombat": 300
+          }
+        }
+      }
+    },
+    "passives": {
+      "SurvivalEvasionLokiRegular": {
+        "id": "SurvivalEvasionLokiRegular",
+        "found": true,
+        "localization": {
+          "name": "Valshamr",
+          "description": "This unit will ignore attacks that would damage exactly 2 targets unless Survivor's Edict is unlocked by this unit (attacks that target All allies will not be ignored). If this unit gains the Stealth status effect, it will not be lost when ignoring attacks in this way."
+        }
+      },
+      "PlusAttackBoostLv3": {
+        "id": "PlusAttackBoostLv3",
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv3",
+          "description": "Adds 300 to this unit's Attack."
+        }
+      },
+      "Stun20TUMinus": {
+        "id": "Stun20TUMinus",
+        "found": true,
+        "localization": {
+          "name": "Stun Resist Lv3",
+          "description": "Reduces the amount of any stun effects against this unit by 20TU."
+        }
+      },
+      "PlusHPBoostLv3": {
+        "id": "PlusHPBoostLv3",
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv3",
+          "description": "Adds 1200 to this unit's max HP."
+        }
+      },
+      "AddWeaponPrefSpear": {
+        "id": "AddWeaponPrefSpear",
+        "found": true,
+        "localization": {
+          "name": "Spear Mastery",
+          "description": "Can use weapon skills of Spears in addition to their original preferred weapon type."
+        }
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": {
+      "class": "MonsterConditions",
+      "elements": [
+        "Death"
+      ]
+    }
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "LokiRegular01",
+    "family": "LokiRegular",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "LokiRegular01",
+    "family": "LokiRegular",
+    "class": "Monster",
+    "leaderBuff": "AttackUpDeathD",
+    "leaderBuffCondition": "IsDeath",
+    "activeSkills": {
+      "0": "MegaPoisonPloyALokiRegular",
+      "1": "GuardSweepAllMegaPoisonALokiRegular",
+      "2": "MiniPoisonEatALokiRegular",
+      "3": "MegaPoisonSurvivorALokiRegular"
+    },
+    "passives": {
+      "0": "SurvivalEvasionLokiRegular",
+      "2": "PlusAttackBoostLv3",
+      "3": "Stun20TUMinus",
+      "4": "PlusHPBoostLv3",
+      "5": "AddWeaponPrefSpear"
+    },
+    "cost": 28,
+    "baseAttack": 1183,
+    "baseMaxHp": 5295,
+    "speed": 391,
+    "element": "Death",
+    "weaponPref": "GreatAxe",
+    "weaponPivotIndex": 0,
+    "secure": 1,
+    "superEvolve1": "LokiRegular02",
+    "aiTargetPickWeight": 1,
+    "stars": 5,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 0,
+    "battleOrbImageFlip": 0,
+    "attackType": "Bash",
+    "visible": 1,
+    "formTwitterShare": 1,
+    "skillVoices": {
+      "0": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "1": [
+        9,
+        11,
+        12
+      ],
+      "2": [
+        5,
+        10,
+        14
+      ],
+      "3": [
+        13,
+        15,
+        16
+      ]
+    },
+    "damageVoices": [
+      17,
+      18,
+      19,
+      20
+    ],
+    "deathVoices": [
+      21,
+      22,
+      23,
+      24
+    ],
+    "victoryVoices": [
+      25,
+      26
+    ],
+    "lineupVoices": [
+      27,
+      29,
+      31
+    ],
+    "evolutionVoices": [
+      33
+    ],
+    "trainVoices": [
+      34,
+      36,
+      38,
+      40,
+      42
+    ],
+    "titleVoices": [
+      44
+    ],
+    "gachaVoices": [
+      45
+    ],
+    "loginVoices": [
+      46
+    ],
+    "tapVoices": [
+      47,
+      48,
+      49
+    ],
+    "idleVoices": [
+      50
+    ]
+  },
+  "_build": {
+    "scriptVersion": "6-character-family-states",
+    "sourceHash": "5c560f98e99618f4c0a2149537a3ddf1766e11918b2a3e8bd5493fd14c27a8d8",
+    "dependencyHash": "d4e306be756ef1323a90bdc16c078b6b99815422f8d0380ead5dc708ae6c073e",
+    "generatedAt": 1778213417
+  }
+}

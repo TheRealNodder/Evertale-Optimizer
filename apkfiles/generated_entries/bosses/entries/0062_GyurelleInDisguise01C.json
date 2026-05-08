@@ -1,0 +1,1280 @@
+{
+  "schemaVersion": 3,
+  "order": 62,
+  "id": "aeon-knight",
+  "name": "Aeon Knight",
+  "title": "",
+  "description": "",
+  "category": "bosse",
+  "rarity": null,
+  "stars": 4,
+  "evolvedStars": 4,
+  "element": "Dark",
+  "weaponType": "Axe",
+  "stats": {
+    "atk": 640,
+    "hp": 3000,
+    "spd": 225,
+    "cost": 999
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/GyurelleInDisguise01C.png",
+  "refs": {
+    "activeSkills": [
+      "GainAttackSingleA",
+      "DreamHuntA2",
+      "ProtectTeammatesA",
+      "DesperateBiteA3",
+      "TimeStrikeA",
+      "StealthAllyB",
+      "GainAttackDoubleBoss1Death",
+      "DisguiseSelfBoss2C"
+    ],
+    "passives": [
+      "SpiritLossRevengeFakeC",
+      "HoldGroundFake"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": "Gyurelle01DisguiseSeqB",
+    "leaderBuff": null,
+    "leaderBuffCondition": null,
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "GainAttackSingleA": {
+        "id": "GainAttackSingleA",
+        "found": true,
+        "localization": {
+          "name": "Attack",
+          "description": "Damage to 1 enemy and allies gain 2 Spirit.",
+          "selected": "Damage to 1 enemy and gains 2 Spirit"
+        },
+        "ability": {
+          "name": "GainAttackSingleA",
+          "class": "Ability",
+          "abilityScalor": 0,
+          "config": "GainAttackSingleA",
+          "tuCost": 130,
+          "useLimit": 0,
+          "spiritGain": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ]
+            }
+          ],
+          "enemyEventType": "Hit",
+          "axeAbilityEffect": "SmallSlash1",
+          "greatSwordAbilityEffect": "SmallSlash1",
+          "greatAxeAbilityEffect": "SmallSlash1",
+          "hammerAbilityEffect": "SmallBlunt1",
+          "katanaAbilityEffect": "SmallSlash1",
+          "maceAbilityEffect": "SmallBlunt1",
+          "spearAbilityEffect": "SmallSpear1",
+          "staffAbilityEffect": "SmallBlunt1",
+          "swordAbilityEffect": "SmallSlash1",
+          "clawAbilityEffect": "SmallClaw1",
+          "biteAbilityEffect": "SmallBite1",
+          "bashAbilityEffect": "SmallBlunt1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": null,
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {},
+        "conditions": {}
+      },
+      "DreamHuntA2": {
+        "id": "DreamHuntA2",
+        "found": true,
+        "localization": {
+          "name": "Dream Hunter",
+          "description": "600% damage to 1 enemy if they are sleeping. Allies gain 4 Spirit if the target is asleep.",
+          "selected": "600% damage & gain 4 Spirit against sleeping target"
+        },
+        "ability": {
+          "name": "DreamHuntA2",
+          "class": "Ability",
+          "abilityScalor": -2,
+          "conditionalAbilityScalors": [
+            5
+          ],
+          "config": "DreamHuntA2",
+          "tuCost": 160,
+          "useLimit": 0,
+          "spiritCost": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "AddSpirit"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "DreamhuntDamageBoost"
+              ],
+              "damageFlags": [
+                "DreamDamage"
+              ]
+            },
+            {
+              "spiritCondition": "IsSleeping",
+              "spiritToAdd": 400
+            }
+          ],
+          "attackScalors": [
+            "GoodVsSleeping"
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "SmallHitRanged1",
+          "conditionedAbilityEffects": [
+            "DreamHuntAbility2R",
+            "DreamHuntAbility2R"
+          ],
+          "flags": [
+            "Dreamhunt",
+            "StealthWorthy"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.8,
+            0
+          ],
+          "prefabs": [
+            "batfx_bluntimpact1/batfx_bluntimpact1",
+            "batsfx_prefab/batsfx_impactsmall1"
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            true
+          ],
+          "scale": [
+            0.4,
+            1
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "AddSpirit": {
+            "class": "AddSpiritAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {
+          "GoodVsSleeping": {
+            "class": "AttackScalor",
+            "targetCondition": "IsSleeping"
+          }
+        },
+        "conditions": {
+          "IsSleeping": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "Sleep"
+            ]
+          }
+        }
+      },
+      "ProtectTeammatesA": {
+        "id": "ProtectTeammatesA",
+        "found": true,
+        "localization": {
+          "name": "Guard Allies",
+          "description": "The user becomes a Guardian. For any enemy attack that would hit 1 or 2 other allies, 1 of the hits is instead redirected to this unit. This unit will not redirect skills that don't deal damage. Usable only if this unit is not already a Guardian.",
+          "selected": "User becomes a Guardian and protects allies"
+        },
+        "ability": {
+          "name": "ProtectTeammatesA",
+          "class": "Ability",
+          "config": "ProtectTeammatesA",
+          "tuCost": 70,
+          "useLimit": 0,
+          "spiritCost": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "SelfOnly",
+          "components": [
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "ProtectSource"
+              ],
+              "buffBackMode": true,
+              "applyToSourceOnly": true
+            }
+          ],
+          "useCondition": "NotProtecting",
+          "sourceEventType": "Hit",
+          "friendlyEventType": "Hit",
+          "abilityEffect": "Protect1",
+          "flags": [
+            "Protect"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "selfOnly": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "sortOrderOffset": [
+            2,
+            1,
+            0,
+            0,
+            -2,
+            -2
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_protect1",
+            "batfx_protector1/batfx_protector1",
+            "batfx_rainbowiris/batfx_rainbowiris",
+            "batfx_lightray1/batfx_lightray1",
+            "batfx_spotblue/batfx_spotblue",
+            "batfx_ripplebluelow/batfx_ripplebluelow"
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "ProtectSource": {
+            "class": "Buff",
+            "behaviors": [
+              "ManipulateTargeting",
+              "RemoveOnSourceDeath"
+            ],
+            "behaviorOverrides": [
+              {
+                "redirectToMe": true,
+                "redirectAlways": true,
+                "chanceToBlock": 1.0,
+                "consumeRedirectCountEvenOnSelf": true,
+                "failOnAllSkills": true,
+                "abilityFlagsToIgnore": [
+                  "Stun",
+                  "NoDamage"
+                ]
+              },
+              {}
+            ],
+            "stackName": "Protector",
+            "duration": -1,
+            "showAsTimer": true,
+            "iconSpriteName": "IconBlueDefenseShield01"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "NotProtecting": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "Protector"
+              ],
+              "or": {
+                "class": "MonsterConditions",
+                "buffStackNames": [
+                  "AutoProtect"
+                ],
+                "or": {
+                  "class": "MonsterConditions",
+                  "buffStackNames": [
+                    "TimedProtector"
+                  ],
+                  "or": {
+                    "class": "MonsterConditions",
+                    "buffStackNames": [
+                      "ConditionedProtector"
+                    ],
+                    "or": {
+                      "class": "MonsterConditions",
+                      "buffStackNames": [
+                        "Taunting"
+                      ],
+                      "checkEnemyTeamOfMonster": true,
+                      "enemyTeamMonsterConditionMatchesNeeded": {
+                        "IsTauntedTakingTurn": 1
+                      },
+                      "or": {
+                        "class": "MonsterConditions",
+                        "buffStackNames": [
+                          "SleepThorns",
+                          "ThornProtector"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "DesperateBiteA3": {
+        "id": "DesperateBiteA3",
+        "found": true,
+        "localization": {
+          "name": "Desperate Drain",
+          "description": "500% damage to 1 enemy, and the user recovers HP by 50% of its own max if damage is dealt. Usable only if the user's HP is at 25% or less.",
+          "selected": "500% damage, usable if user HP is 25% or less"
+        },
+        "ability": {
+          "name": "DesperateBiteA3",
+          "class": "Ability",
+          "abilityScalor": 4,
+          "config": "DesperateBiteA3",
+          "tuCost": 160,
+          "useLimit": 0,
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "applyToTargetType": "Enemy",
+              "damageBoosts": [
+                "DesperateDamageBoost"
+              ]
+            },
+            {
+              "applyToTargetOnly": true,
+              "buffs": [
+                "HealHalfStack"
+              ],
+              "skipAbilityEffect": true,
+              "buffBackMode": true
+            }
+          ],
+          "useCondition": "HPBelow25Percent",
+          "flags": [
+            "Desperate"
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Hit",
+          "abilityEffect": "DesperateBiteSpecial1",
+          "recommendEffectWhenUsable": 1,
+          "ignoreEffectForSourceEvent": true
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0,
+            0.4,
+            0.35,
+            0,
+            0,
+            0.5,
+            0.1,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_timestrike1",
+            "batfx_rainbowiris/batfx_rainbowiris",
+            "batfx_lightray1/batfx_lightray1",
+            "batfx_desperatestrike1/batfx_desperatestrike1",
+            "batfx_jumpsmoke1/batfx_jumpsmoke1",
+            "batfx_slash2/batfx_slash2",
+            "batfx_groundimpact/batfx_groundimpact",
+            "batsfx_prefab/batsfx_slash1",
+            "batfx_jumpsmoke1/batfx_jumpsmoke1",
+            "batfx_healtop1/batfx_healtop1",
+            "batsfx_prefab/batsfx_heal1"
+          ],
+          "sortOrderOffset": [
+            2,
+            -2,
+            -2,
+            -2,
+            1,
+            1,
+            -2,
+            2,
+            1,
+            1,
+            1
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "HealHalfStack": {
+            "class": "Buff",
+            "stackName": "Healing",
+            "behaviors": [
+              "AdjustHp"
+            ],
+            "behaviorOverrides": [
+              {
+                "percent": 0.5,
+                "abilityEffect": "SmallHeal1"
+              }
+            ],
+            "duration": 0,
+            "applyConditions": "IsNotHealing",
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {
+          "HPBelow25Percent": {
+            "class": "AttackScalor",
+            "sourceCondition": "HPBelow25Percent"
+          }
+        },
+        "conditions": {
+          "HPBelow25Percent": {
+            "class": "MonsterConditions",
+            "hpLessThanPercent": 0.2500001
+          }
+        }
+      },
+      "TimeStrikeA": {
+        "id": "TimeStrikeA",
+        "found": true,
+        "localization": {
+          "name": "Time Strike",
+          "description": "500% damage to 1 enemy if they have 130TU or more in the turn order. 600% damage if the target has 200TU or more.",
+          "selected": "500%+ damage against target with 130+ TU"
+        },
+        "ability": {
+          "name": "TimeStrikeA",
+          "class": "Ability",
+          "abilityScalor": -2,
+          "conditionalAbilityScalors": [
+            4,
+            5
+          ],
+          "config": "TimeStrikeA",
+          "tuCost": 100,
+          "useLimit": 0,
+          "spiritCost": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "TimestrikeDamageBoost"
+              ]
+            }
+          ],
+          "attackScalors": [
+            "GoodVs130Tu",
+            "GoodVs200Tu"
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "SmallHit1",
+          "flags": [
+            "Timestrike",
+            "StealthWorthy"
+          ],
+          "conditionedAbilityEffects": [
+            "TimeStrikeSpecial1R",
+            "TimeStrikeSpecial1R"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.4,
+            0
+          ],
+          "prefabs": [
+            "batfx_bluntimpact1/batfx_bluntimpact1",
+            "batsfx_prefab/batsfx_impactsmall1"
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            true
+          ],
+          "scale": [
+            0.4,
+            1
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {
+          "GoodVs130Tu": {
+            "class": "AttackScalor",
+            "targetCondition": "CurrentTUGreaterThan130"
+          },
+          "GoodVs200Tu": {
+            "class": "AttackScalor",
+            "targetCondition": "CurrentTUGreaterThan200"
+          }
+        },
+        "conditions": {}
+      },
+      "StealthAllyB": {
+        "id": "StealthAllyB",
+        "found": true,
+        "localization": {
+          "name": "Grant Stealth",
+          "description": "Grants the Stealth status effect to 1 ally. This will overwrite other status effects on that unit. Stealthed units ignore the next enemy attack that would damage more than 1 target. Any damage will remove stealth.",
+          "selected": "Grants stealth to target\n(Will overwrite other status effects)"
+        },
+        "ability": {
+          "name": "StealthAllyB",
+          "class": "Ability",
+          "config": "StealthAllyB",
+          "tuCost": 100,
+          "useLimit": 0,
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Ally",
+          "components": [
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "ActiveStealthJustGained",
+                "Stealth"
+              ]
+            }
+          ],
+          "immuneSuggestionCondition": "IsStatusImmune",
+          "friendlyEventType": "Finish",
+          "abilityEffect": "Stealth1",
+          "flags": [
+            "Stealth",
+            "Purify"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "friendlyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.3,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_casting7/batfx_casting7",
+            "batfx_stealth1/batfx_stealth1",
+            "batsfx_prefab/batsfx_stealth1"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -2,
+            2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            true
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "ActiveStealthJustGained": {
+            "class": "Buff",
+            "stackName": "ActiveStealthJustGained",
+            "duration": 1,
+            "isHiddenFromPlayers": true,
+            "applyConditions": "IsNotStealth"
+          },
+          "Stealth": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "ManipulateTargeting",
+              "RemoveOnHurt",
+              "Immunity",
+              "Immunity"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "LockHideSkills"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "dodgeMultitarget": true,
+                "forceAllowAllEnemiesAChanceToManipulate": true,
+                "removeAfterTriggers": 1,
+                "abilityFlagsToIgnore": [
+                  "Stun",
+                  "NoDamage",
+                  "Sneak",
+                  "IgnoreStealth"
+                ]
+              },
+              {},
+              {
+                "stackNamesToBlock": [
+                  "Stealth"
+                ],
+                "dontShowText": true
+              },
+              {
+                "stackNamesToBlock": [
+                  "Placeholder"
+                ],
+                "dontShowText": true,
+                "activateCondition": "MissingStealthOrStealthShield"
+              }
+            ],
+            "tags": [
+              "Stealth"
+            ],
+            "duration": -1,
+            "showAsTimer": true,
+            "iconSpriteName": "IconBlackStealth01",
+            "stackName": "Stealth",
+            "useCount": 1
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "IsStatusImmune": {
+            "class": "MonsterConditions",
+            "monsterTags": [
+              "StatusImmune"
+            ],
+            "or": {
+              "class": "MonsterConditions",
+              "monsterTags": [
+                "LethalPoison"
+              ]
+            }
+          }
+        }
+      },
+      "GainAttackDoubleBoss1Death": {
+        "id": "GainAttackDoubleBoss1Death",
+        "found": true,
+        "localization": {
+          "name": "Attack",
+          "description": "Damage to 2 enemies and allies gain 2 Spirit.",
+          "selected": "Damage to 2 enemies and gains 2 Spirit"
+        },
+        "ability": {
+          "name": "GainAttackDoubleBoss1Death",
+          "class": "Ability",
+          "abilityScalor": 0,
+          "config": "GainAttackDoubleBoss1Death",
+          "tuCost": 70,
+          "useLimit": 0,
+          "spiritGain": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ]
+            }
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "MidDeath1",
+          "hideSkillInfoInPopup": true
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.3,
+            0.35,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_casting7/batfx_casting7",
+            "batfx_deathmid1/batfx_deathmid1",
+            "batsfx_prefab/batsfx_death1",
+            "batfx_ripplepurplelow/batfx_ripplepurplelow"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -2,
+            1,
+            -2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            true
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            true
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            true,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {},
+        "conditions": {}
+      },
+      "DisguiseSelfBoss2C": {
+        "id": "DisguiseSelfBoss2C",
+        "found": true,
+        "localization": {
+          "name": "Reveal Disguise",
+          "description": "Reveals user as Gyurelle.",
+          "selected": "Reveals the user's true form"
+        },
+        "ability": {
+          "name": "DisguiseSelfBoss2C",
+          "class": "Ability",
+          "config": "DisguiseSelfBoss2C",
+          "useLimit": 0,
+          "spiritCost": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "SelfOnly",
+          "components": [
+            "ApplyBuff",
+            "ChanceToDie"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "SummonGyurelle01BossC"
+              ]
+            },
+            {
+              "chance": 1.0
+            }
+          ],
+          "sourceEventType": "Finish",
+          "abilityEffect": "BlueHelix1",
+          "flags": [
+            "Summon",
+            "Duration"
+          ],
+          "killsUser": true,
+          "hideSkillInfoInPopup": true
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "selfOnly": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0
+          ],
+          "prefabs": [
+            "batfx_bluehelix1/batfx_bluehelix1",
+            "batsfx_prefab/batsfx_knockback1"
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          },
+          "ChanceToDie": {
+            "class": "ChanceToDieAbilityComponent"
+          }
+        },
+        "buffs": {
+          "SummonGyurelle01BossC": {
+            "class": "Buff",
+            "behaviors": [
+              "SummonMonster"
+            ],
+            "behaviorOverrides": [
+              {
+                "frontOfLineup": true,
+                "monsterType": "Gyurelle01C",
+                "monsterLevel": 88,
+                "weapon": "Gyurelle01Sword01",
+                "wepLevel": 88,
+                "isBoss": true
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {}
+      }
+    },
+    "passives": {
+      "SpiritLossRevengeFakeC": {
+        "id": "SpiritLossRevengeFakeC",
+        "found": true,
+        "localization": {
+          "name": "Stun Absorb",
+          "description": "Whenever any ally would be affected by stun, this unit takes the stun instead."
+        }
+      },
+      "HoldGroundFake": {
+        "id": "HoldGroundFake",
+        "found": true,
+        "localization": {
+          "name": "Hold Ground",
+          "description": "If this unit would be defeated by an enemy attack or a status effect while having more than 1 HP, it instead survives with 1 HP."
+        }
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": {
+      "id": "Gyurelle01DisguiseSeqB",
+      "found": true,
+      "sequence": {
+        "class": "AbilityAISequence",
+        "sequence": [
+          [
+            "0",
+            "7"
+          ],
+          [
+            "0",
+            "7"
+          ],
+          [
+            "7"
+          ]
+        ]
+      }
+    },
+    "leaderCondition": null
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "GyurelleInDisguise01C",
+    "family": "GyurelleInDisguise0",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": "PrimevalDemon01"
+  },
+  "raw": {
+    "name": "GyurelleInDisguise01C",
+    "class": "Monster",
+    "family": "GyurelleInDisguise0",
+    "activeSkills": {
+      "0": "GainAttackSingleA",
+      "1": "DreamHuntA2",
+      "2": "ProtectTeammatesA",
+      "3": "DesperateBiteA3",
+      "4": "TimeStrikeA",
+      "5": "StealthAllyB",
+      "6": "GainAttackDoubleBoss1Death",
+      "7": "DisguiseSelfBoss2C"
+    },
+    "passives": {
+      "0": "SpiritLossRevengeFakeC",
+      "1": "HoldGroundFake"
+    },
+    "aiSequence": "Gyurelle01DisguiseSeqB",
+    "cost": 999,
+    "baseAttack": 640,
+    "baseMaxHp": 3000,
+    "speed": 225,
+    "element": "Death",
+    "weaponPref": "Axe",
+    "weaponPivotIndex": 0,
+    "walkSound": "TestSound",
+    "secure": 1,
+    "aiTargetPickWeight": 1,
+    "stars": 4,
+    "evolvedStars": 4,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 1,
+    "battleOrbImageFlip": 0,
+    "treatAsDuplicateOf": "PrimevalDemon01",
+    "skillVoices": {
+      "0": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "1": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "2": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "3": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "4": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "5": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    "damageVoices": [
+      17
+    ],
+    "deathVoices": [
+      19
+    ]
+  },
+  "_build": {
+    "scriptVersion": "6-character-family-states",
+    "sourceHash": "d8d064c3874351b0a961380e6aa254d4cca8854ff4344572b548f046e3bdd27b",
+    "dependencyHash": "27dbb3f704f47de0f318186dba093d730b7fc386f01aef70b31a62ab5666f648",
+    "generatedAt": 1778213443
+  }
+}

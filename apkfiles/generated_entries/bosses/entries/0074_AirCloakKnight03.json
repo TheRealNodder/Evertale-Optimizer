@@ -1,0 +1,652 @@
+{
+  "schemaVersion": 3,
+  "order": 74,
+  "id": "argento",
+  "name": "Argento",
+  "title": "Chimeric Saint",
+  "description": "Now, Mercy is showing hints of evolving a soul. The last time he left a battlefield silent from the kill, a single tear fell from his blue right eye. Instead of running away from this feelings, he's relishing them, pursuing them further. After all, the perfect warrior must truly understand the pain he causes if he intends to master it.",
+  "category": "bosse",
+  "rarity": null,
+  "stars": 6,
+  "evolvedStars": 6,
+  "element": "Dark",
+  "weaponType": "Sword",
+  "stats": {
+    "atk": 1100,
+    "hp": 34000,
+    "spd": 20,
+    "cost": 999
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/AirCloakKnight03.png",
+  "refs": {
+    "activeSkills": [
+      "GainAttackSingleA",
+      "PoisonForceArgento",
+      "TimeStrikeArgento",
+      "LastStandA2",
+      "DesperateGainSpiritA"
+    ],
+    "passives": [
+      "BurnImmunity",
+      "HoldGroundKnockbackImmunitySilent",
+      "Stun70TUMinus"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": null,
+    "leaderBuffCondition": null,
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "GainAttackSingleA": {
+        "id": "GainAttackSingleA",
+        "found": true,
+        "localization": {
+          "name": "Attack",
+          "description": "Damage to 1 enemy and allies gain 2 Spirit.",
+          "selected": "Damage to 1 enemy and gains 2 Spirit"
+        },
+        "ability": {
+          "name": "GainAttackSingleA",
+          "class": "Ability",
+          "abilityScalor": 0,
+          "config": "GainAttackSingleA",
+          "tuCost": 130,
+          "useLimit": 0,
+          "spiritGain": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ]
+            }
+          ],
+          "enemyEventType": "Hit",
+          "axeAbilityEffect": "SmallSlash1",
+          "greatSwordAbilityEffect": "SmallSlash1",
+          "greatAxeAbilityEffect": "SmallSlash1",
+          "hammerAbilityEffect": "SmallBlunt1",
+          "katanaAbilityEffect": "SmallSlash1",
+          "maceAbilityEffect": "SmallBlunt1",
+          "spearAbilityEffect": "SmallSpear1",
+          "staffAbilityEffect": "SmallBlunt1",
+          "swordAbilityEffect": "SmallSlash1",
+          "clawAbilityEffect": "SmallClaw1",
+          "biteAbilityEffect": "SmallBite1",
+          "bashAbilityEffect": "SmallBlunt1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": null,
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {},
+        "conditions": {}
+      },
+      "PoisonForceArgento": {
+        "id": "PoisonForceArgento",
+        "found": true,
+        "localization": {
+          "name": "Poison Devour",
+          "description": "600% damage to all enemies if they are poisoned.",
+          "selected": "600% damage to poisoned targets"
+        },
+        "ability": {
+          "name": "PoisonForceArgento",
+          "class": "Ability",
+          "abilityScalor": -2,
+          "conditionalAbilityScalors": [
+            5
+          ],
+          "config": "PoisonForceArgento",
+          "tuCost": 100,
+          "useLimit": 0,
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "AllEnemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "PoisonEaterDamageBoost"
+              ]
+            }
+          ],
+          "attackScalors": [
+            "GoodVsPoisoned"
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "SmallHitRanged1",
+          "conditionedAbilityEffects": [
+            "PoisonEaterAbility2R",
+            "PoisonEaterAbility2R"
+          ],
+          "flags": [
+            "PoisonEater",
+            "StealthWorthy"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "allEnemies": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.8,
+            0
+          ],
+          "prefabs": [
+            "batfx_bluntimpact1/batfx_bluntimpact1",
+            "batsfx_prefab/batsfx_impactsmall1"
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            true
+          ],
+          "scale": [
+            0.4,
+            1
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {
+          "GoodVsPoisoned": {
+            "class": "AttackScalor",
+            "targetCondition": "IsPoisoned"
+          }
+        },
+        "conditions": {}
+      },
+      "TimeStrikeArgento": {
+        "id": "TimeStrikeArgento",
+        "found": true,
+        "localization": {
+          "name": "Time Strike",
+          "description": "600% damage to 1 enemy if they have 150TU or more in the turn order. This attack ignores Guardians.",
+          "selected": "600% damage against 150+ TU, ignores Guardians"
+        },
+        "ability": {
+          "name": "TimeStrikeArgento",
+          "class": "Ability",
+          "abilityScalor": -1,
+          "conditionalAbilityScalors": [
+            5
+          ],
+          "config": "TimeStrikeArgento",
+          "tuCost": 1,
+          "useLimit": 0,
+          "nameKey": "TimeSniperAAir",
+          "spiritCost": 1,
+          "blockTargetManipulation": 1,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "TimestrikeDamageBoost"
+              ]
+            }
+          ],
+          "attackScalors": [
+            "GoodVs150Tu"
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "SmallHit1",
+          "flags": [
+            "Timestrike",
+            "StealthWorthy"
+          ],
+          "conditionedAbilityEffects": [
+            "TimeStrikeAbility2"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.4,
+            0
+          ],
+          "prefabs": [
+            "batfx_bluntimpact1/batfx_bluntimpact1",
+            "batsfx_prefab/batsfx_impactsmall1"
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            true
+          ],
+          "scale": [
+            0.4,
+            1
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {
+          "GoodVs150Tu": {
+            "class": "AttackScalor",
+            "targetCondition": "CurrentTUGreaterThan150"
+          }
+        },
+        "conditions": {}
+      },
+      "LastStandA2": {
+        "id": "LastStandA2",
+        "found": true,
+        "localization": {
+          "name": "Final Stand",
+          "description": "500% damage to 1 enemy. Usable only if the user has no allies on the battlefield.",
+          "selected": "500% damage, usable if user is last alive"
+        },
+        "ability": {
+          "name": "LastStandA2",
+          "class": "Ability",
+          "abilityScalor": 4,
+          "config": "LastStandA2",
+          "tuCost": 70,
+          "useLimit": 0,
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage"
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "LastStandAbility2",
+          "useCondition": "IsAlone",
+          "flags": [
+            "StealthWorthy",
+            "LastStand"
+          ],
+          "recommendEffectWhenUsable": 1
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0,
+            0.75,
+            0,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_timestrike1",
+            "batfx_rainbowiris/batfx_rainbowiris",
+            "batfx_lightray1/batfx_lightray1",
+            "batfx_laststand1/batfx_laststand1",
+            "batfx_poisonsmall1/batfx_poisonsmall1",
+            "batsfx_prefab/batsfx_poison1",
+            "batfx_spotgreen/batfx_spotgreen",
+            "batfx_ripplegreenlow/batfx_ripplegreenlow"
+          ],
+          "sortOrderOffset": [
+            2,
+            -2,
+            -2,
+            -2,
+            1,
+            -2,
+            -2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {},
+        "conditions": {
+          "IsAlone": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "allyTeamSize": 2
+            }
+          }
+        }
+      },
+      "DesperateGainSpiritA": {
+        "id": "DesperateGainSpiritA",
+        "found": true,
+        "localization": {
+          "name": "Desperate Spirit",
+          "description": "Allies are granted 4 spirit. Usable only if the user's HP is at 50% or less.",
+          "selected": "Gain 4 spirit, usable if user HP is 50% or less"
+        },
+        "ability": {
+          "name": "DesperateGainSpiritA",
+          "class": "Ability",
+          "config": "DesperateGainSpiritA",
+          "tuCost": 50,
+          "useLimit": 0,
+          "spiritGain": 4,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "SelfOnly",
+          "components": [
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "Empty"
+              ]
+            }
+          ],
+          "flags": [
+            "SpiritGain",
+            "Desperate"
+          ],
+          "useCondition": "HPBelow50Percent",
+          "sourceEventType": "Hit",
+          "abilityEffect": "GainSpirit1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "selfOnly": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0
+          ],
+          "prefabs": [
+            "batfx_spirit1/batfx_spirit1",
+            "batsfx_prefab/batsfx_spiritgain1"
+          ],
+          "damagePercents": [
+            0,
+            0
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "Empty": {
+            "class": "Buff",
+            "duration": -1,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {
+          "HPBelow50Percent": {
+            "class": "AttackScalor",
+            "sourceCondition": "HPBelow50Percent"
+          }
+        },
+        "conditions": {
+          "HPBelow50Percent": {
+            "class": "MonsterConditions",
+            "hpLessThanPercent": 0.5000001
+          }
+        }
+      }
+    },
+    "passives": {
+      "BurnImmunity": {
+        "id": "BurnImmunity",
+        "found": true,
+        "localization": {
+          "name": "Burn Immunity",
+          "description": "This unit is not affected by burn."
+        }
+      },
+      "HoldGroundKnockbackImmunitySilent": {
+        "id": "HoldGroundKnockbackImmunitySilent",
+        "found": true,
+        "localization": {
+          "name": "Hold Ground",
+          "description": "If this unit would be defeated by an enemy attack or a status effect while having more than 1 HP, it instead survives with 1 HP."
+        }
+      },
+      "Stun70TUMinus": {
+        "id": "Stun70TUMinus",
+        "found": true,
+        "localization": {
+          "name": "Stun Resist Lv6",
+          "description": "Reduces the amount of any stun effects against this unit by 70TU."
+        }
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": null
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "AirCloakKnight03",
+    "family": "AirCloakKnight",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "AirCloakKnight03",
+    "class": "Monster",
+    "family": "AirCloakKnight",
+    "activeSkills": {
+      "0": "GainAttackSingleA",
+      "1": "PoisonForceArgento",
+      "2": "TimeStrikeArgento",
+      "3": "LastStandA2",
+      "4": "DesperateGainSpiritA"
+    },
+    "passives": {
+      "0": "BurnImmunity",
+      "1": "HoldGroundKnockbackImmunitySilent",
+      "2": "Stun70TUMinus"
+    },
+    "cost": 999,
+    "baseAttack": 1100,
+    "baseMaxHp": 34000,
+    "speed": 20,
+    "element": "Death",
+    "weaponPref": "Sword",
+    "weaponPivotIndex": 0,
+    "walkSound": "TestSound",
+    "secure": 1,
+    "aiTargetPickWeight": 1,
+    "stars": 6,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 1,
+    "battleOrbImageFlip": 0,
+    "skillVoices": {
+      "0": [
+        1,
+        2
+      ],
+      "1": [
+        3,
+        4
+      ],
+      "2": [
+        5,
+        6
+      ],
+      "3": [
+        7,
+        8
+      ],
+      "4": [
+        9,
+        10
+      ]
+    },
+    "damageVoices": [
+      11,
+      12
+    ],
+    "deathVoices": [
+      13
+    ]
+  },
+  "_build": {
+    "scriptVersion": "6-character-family-states",
+    "sourceHash": "9f55227ca4e821c87a2d14584b27a1d9892eb6cb61dfd42acdbaf50ed78e416a",
+    "dependencyHash": "c2e32edf84b9ab2b26fcb14144a0ab79e183cdedf6fe1dd89adc535920e1d3d4",
+    "generatedAt": 1778213443
+  }
+}
