@@ -1,6 +1,6 @@
 {
 	"Version": 23,
-	"Time": 1777345296,
+	"Time": 1778198595,
 	"AbilityConfig": {
 		"StunSingle200A": {
 			"class": "AbilityConfig",
@@ -45247,6 +45247,280 @@
 			"abilityEffect": "MidLife1",
 			"killsUser": true,
 			"ignoreEffectForSourceEvent": true
+		},
+		"SingleAttackABeautyRegular": {
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage", "ApplyBuff"],
+			"componentOverrides": [{
+				"applyToTargetType": "Enemy",
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"damageFlags": ["RemoveBeautyExtraDefeat","IgnoreSkin","IgnoreArmor"],
+				"drainPercent": 1.0,
+				"drainEffect": "MerlinSelfHeal1"
+			},{
+				"randomBuffFromList": ["LethalPoison","MegaPoison"],
+				"buffs": ["BurnImmunityTempForRevenge"],
+				"applyToTargetType": "Enemy",
+				"showMissConditions": "ShowNoMiss",
+				"skipAbilityEffect": true
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "BeautyAttack",
+			"attackScalors": ["GoodWithPoisonEnemy"],
+			"conditionedAbilityEffects": ["BeautyAttack","BeautyAttack"],
+			"recommendEffectWhenUsable": -1
+		},
+		"BuffABeautyRegular": {
+			"class": "AbilityConfig",
+			"targetingData": "All",
+			"components": ["ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"buffs": ["EmptyPlaceholder"],
+				"applyToTargetType": "Friendly",
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs": ["Heal500Percent","AttackPlus50Percent1TurnOnly"],
+				"applyToTargetType": "Friendly",
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss",
+				"applyConditions": "IsNotBurning"
+			},{
+				"buffs": ["HasteUp30Percent"],
+				"applyToTargetType": "Friendly",
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss",
+				"applyConditions": "2EnemiesPoisoned"
+			},{
+				"randomBuffFromList": ["LethalPoison","MegaPoison"],
+				"buffs": ["BurnImmunityTempForRevenge"],
+				"applyToTargetType": "Enemy",
+				"showMissConditions": "ShowNoMiss",
+				"applyConditions": "LessThan2AlliesPoisoned"
+			},{
+				"buffs": ["BeautyRegularActive2Cooldown50"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			}],
+			"friendlyEventType": "Finish",
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"flags": ["NoDamage","PoisonChance"],
+			"abilityEffect": "BeautyBuffVersion2",
+			"useCondition": "NotInstantCooldown"
+		},
+		"BigSingleAttackABeautyRegular01": {
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage","ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"damageFlags": ["RemoveBeautyExtraDefeat","IgnoreArmor"],
+				"applyToTargetType": "Enemy",
+				"drainPercent": 1.0,
+				"drainEffect": "MerlinSelfHeal1"
+			},{
+				"buffs": ["BurnImmunityTempForRevenge","LethalPoison","MegaPoison"],
+				"applyToTargetType": "Enemy",
+				"showMissConditions": "ShowNoMiss",
+				"skipAbilityEffect": true	
+			},{
+				"buffs": ["HijikataCounter","HijikataCounterFuseAfterTime"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["BeautyRegularActive3Cooldown25"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"applyConditions": "IsHijikataCharged2",
+				"showMissConditions": "ShowNoMiss"	
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "BeautyMultiSlash",
+			"flags": ["IsTheBeautyRegular01"],
+			"recommendEffectWhenUsable": -1,
+			"useCondition": "BeastRegularAllyAndNotInstantCooldown2"
+		},
+		"BigSingleAttackABeautyRegular02": {
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage","ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"damageFlags": ["RemoveBeautyExtraDefeat","IgnoreArmor"],
+				"applyToTargetType": "Enemy",
+				"drainPercent": 1.0,
+				"drainEffect": "MerlinSelfHeal1"
+			},{
+				"buffs": ["BurnImmunityTempForRevenge","LethalPoison","MegaPoison"],
+				"applyToTargetType": "Enemy",
+				"showMissConditions": "ShowNoMiss",
+				"skipAbilityEffect": true	
+			},{
+				"buffs": ["HijikataCounter","HijikataCounterFuseAfterTime"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["BeautyRegularActive3Cooldown25"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"applyConditions": "IsHijikataCharged2",
+				"showMissConditions": "ShowNoMiss"	
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "BeautyMultiSlash",
+			"flags": ["IsTheBeautyRegular02"],
+			"recommendEffectWhenUsable": -1,
+			"useCondition": "BeastRegularAllyAndNotInstantCooldown2"
+		},
+		"SpecialSingleAttackABeautyRegular": {
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage"],
+			"componentOverrides": [{
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"applyToTargetType": "Enemy",
+				"damageFlags": ["HardIgnoreBlockDeath","IgnoreArmor","IgnoreSkin"],
+				"drainPercent": 1.0,
+				"drainEffect": "MerlinSelfHeal1"
+			}],
+			"enemyEventType": "Hit",
+			"attackScalors":["GoodVsMegaPoisoned","GoodVsLethalPoison"],
+			"conditionedAbilityEffects": ["BeautySpecial","BeautySpecial"],
+			"abilityEffect": "BeautySpecial",
+			"recommendEffectWhenUsable": -2,
+			"useCondition": "1AllyIsKills1"
+		},
+		"SingleAttackABeastRegular": {
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage", "ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"applyToTargetType": "Enemy",
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"damageFlags": ["IgnoreArmor","IgnoreSkin","HardIgnoreBlockDeath"],
+				"drainPercent": 1.0,
+				"drainEffect": "MerlinSelfHeal1"
+			},{
+				"buffs": ["RemoveBurn","BurnImmunityTempForRevenge"],
+				"chance": 1.0,
+				"applyToTargetType": "Enemy",
+				"skipAbilityEffect": true
+			},{
+				"randomBuffFromList": ["MegaPoison","LethalPoison"],
+				"applyToTargetType": "Enemy",
+				"skipAbilityEffect": true
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "BeastAttack1",
+			"attackScalors": ["GoodVs1NotPoisonedEnemy","GoodVs2NotPoisonedEnemies","GoodVs3NotPoisonedEnemies","GoodVs4NotPoisonedEnemies"],
+			"conditionedAbilityEffects": ["BeastAttack1","BeastAttack1","BeastAttack1","BeastAttack1"],
+			"flags": ["Poisoner"],
+			"recommendEffectWhenUsable": -1
+		},
+		"AllAttackABeastRegular": {
+			"class": "AbilityConfig",
+			"targetingData": "AllEnemy",
+			"components": ["Damage","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"damageFlags": ["IgnoreArmor", "IgnoreSkin"],
+				"applyToTargetType": "Enemy",
+				"drainPercent": 1.0,
+				"drainEffect": "MerlinSelfHeal1"
+			},{
+				"randomBuffFromList": ["MegaPoison","LethalPoison"],
+				"buffs": ["BurnImmunityTempForRevenge"],
+				"applyToTargetType": "Enemy",
+				"skipAbilityEffect": true	
+			},{
+				"buffs": ["BeastRegularActive2Cooldown30"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"flags": ["Poisoner"],
+			"abilityEffect": "BeastRoseAttack1",
+			"useCondition": "LessThan2EnemiesPoisonedAndNotInstantCooldown"
+		},
+		"RevivalBuffABeastRegular01": {
+			"class": "AbilityConfig",
+			"targetingData": "oneAllyNotMe",
+			"components": ["ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"buffs": ["AddTheBeautyRegular01Next"],
+				"applyToTargetOnly": true,
+				"buffBackMode": true,
+				"skipAbilityEffect": true,
+				"applyConditions": "AtLeast4AlliesLeft",
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs": ["SendToFrontOfReinforcements", "RemoveBuffs"],
+				"buffAppliedEffects": ["StepBackEffect"],
+				"applyToTargetOnly": true,
+				"skipAbilityEffect": true,
+				"applyConditions": "AtLeast4AlliesLeftNotKnockbackImmune",
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs": ["AddTheBeautyRegular01Next"],
+				"applyConditions": "3OrFewerAlliesLeft",
+				"applyToTargetOnly": true,
+				"buffBackMode": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs": ["Empty"],
+				"applyToSourceOnly": true
+			}],
+			"friendlyEventType": "Finish",
+			"sourceEventType": "Hit",
+			"recommendEffectWhenUsable":-1,
+			"useCondition": "NoTheBeautyRegularInTeam",
+			"abilityEffect": "BeastRevive",
+			"flags": ["Summon", "NoDamage"]
+		},
+		"RevivalBuffABeastRegular02": {
+			"class": "AbilityConfig",
+			"targetingData": "oneAllyNotMe",
+			"components": ["ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"buffs": ["AddTheBeautyRegular02Next"],
+				"applyToTargetOnly": true,
+				"buffBackMode": true,
+				"skipAbilityEffect": true,
+				"applyConditions": "AtLeast4AlliesLeft",
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs": ["SendToFrontOfReinforcements", "RemoveBuffs"],
+				"applyToTargetOnly": true,
+				"skipAbilityEffect": true,
+				"buffAppliedEffects": ["StepBackEffect"],
+				"applyConditions": "AtLeast4AlliesLeftNotKnockbackImmune",
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs": ["AddTheBeautyRegular02Next"],
+				"applyConditions": "3OrFewerAlliesLeft",
+				"applyToTargetOnly": true,
+				"skipAbilityEffect": true,
+				"buffBackMode": true,
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs": ["Empty"],
+				"applyToSourceOnly": true
+			}],
+			"friendlyEventType": "Finish",
+			"sourceEventType": "Hit",
+			"recommendEffectWhenUsable":-1,
+			"useCondition": "NoTheBeautyRegularInTeam",
+			"abilityEffect": "BeastRevive",
+			"flags": ["Summon", "NoDamage"]
 		}
 	}
 }
