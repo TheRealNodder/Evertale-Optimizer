@@ -1,0 +1,1123 @@
+{
+  "schemaVersion": 3,
+  "order": 662,
+  "id": "nike",
+  "name": "Nike",
+  "title": "Goddess of Victory",
+  "description": "Nike's talent stood out even among the temple elite. At the mere age of seventeen, her pure magical power already rivaled that of the priests. Everyone believed she was destined to become an amazing Priestess of Time.\nHowever, that very talent, coupled with her seeming aloofness, made her the target of envy. One would often find her alone on temple grounds.",
+  "category": "character",
+  "rarity": null,
+  "stars": 5,
+  "evolvedStars": 6,
+  "element": "Storm",
+  "weaponType": "Hammer",
+  "stats": {
+    "atk": 1002,
+    "hp": 6200,
+    "spd": 474,
+    "cost": 28
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/NikeRegular01.png",
+  "refs": {
+    "activeSkills": [
+      "SingleAttackANikeRegular",
+      "StunBarrageANikeRegular",
+      "DoubleAttackANikeRegular"
+    ],
+    "passives": [
+      "BladedWingsPassiveANikeRegular",
+      "VictoryChantPassiveANikeRegular",
+      "PlusHPBoostLv3",
+      "PlusAttackBoostLv3",
+      "SwordMinusDamageLv3",
+      "AddWeaponPrefGreatSword"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": "AttackAndHPUp6Air",
+    "leaderBuffCondition": "IsAir",
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "SingleAttackANikeRegular": {
+        "id": "SingleAttackANikeRegular",
+        "found": true,
+        "localization": {
+          "name": "Storm of Blades",
+          "description": "200% damage to 1 enemy. If the user has a Power Charge, it will be consumed to deal 400% damage instead and the user will immediately get the next turn. This extra turn may be interrupted by other effects that influence the turn order (e.g. stuns targeting the lowest TU target). This attack ignores enemy damage reduction effects and any effects of non-boss enemies that would prevent the target from being defeated.",
+          "selected": "200%+ damage, may consume Power Charge"
+        },
+        "ability": {
+          "name": "SingleAttackANikeRegular",
+          "class": "Ability",
+          "abilityScalor": 1,
+          "conditionalAbilityScalors": [
+            3
+          ],
+          "config": "SingleAttackANikeRegular",
+          "tuCost": 50,
+          "useLimit": 0,
+          "spiritGain": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "damageFlags": [
+                "HardIgnoreBlockDeath",
+                "IgnoreArmor"
+              ],
+              "applyToTargetType": "Enemy",
+              "drainPercent": 1.0,
+              "drainEffect": "MerlinSelfHeal1"
+            },
+            {
+              "buffs": [
+                "GiveTurn",
+                "OnExtraTurn",
+                "JustGivenTurn",
+                "RemovePowerCharge"
+              ],
+              "applyConditions": "HasPowerCharge",
+              "applyToTargetType": "Source",
+              "showMissConditions": "ShowNoMiss",
+              "skipAbilityEffect": true
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "NikeWing",
+          "attackScalors": [
+            "GoodWithPowerCharge"
+          ],
+          "conditionedAbilityEffects": [
+            "NikeWing"
+          ],
+          "recommendEffectWhenUsable": 1
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0.1,
+            0.7,
+            0,
+            0,
+            0.2,
+            0.1,
+            0,
+            0.5,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_protect1",
+            "batfx_Nike/batfx_jeannecast2",
+            "batfx_Nike/batfx_wing2",
+            "batfx_Nike/batfx_wing1",
+            "batsfx_prefab/batsfx_multislash1",
+            "batfx_ibarahime1/batfx_multiplestab7",
+            "batfx_Nike/batfx_impactbeam2",
+            "batfx_groundimpact2/batfx_groundimpact2",
+            "batfx_Nike/batfx_impactmagicYelow",
+            "batfx_groundimpact2/batfx_groundimpact2",
+            "batsfx_prefab/batsfx_slash1"
+          ],
+          "sortOrderOffset": [
+            2,
+            -2,
+            10,
+            10,
+            2,
+            15,
+            2,
+            -2,
+            2,
+            -2,
+            2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "GiveTurn": {
+            "class": "Buff",
+            "behaviors": [
+              "GiveTurn"
+            ],
+            "behaviorOverrides": [
+              {}
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "textKeyToShowWhenApplied": "TurnGivenKey",
+            "isHiddenFromPlayers": true
+          },
+          "JustGivenTurn": {
+            "class": "Buff",
+            "duration": 1,
+            "stackName": "JustGivenTurnBuff",
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "isHiddenFromPlayers": true,
+            "noIconShownOnBattleStatus": true
+          },
+          "OnExtraTurn": {
+            "class": "Buff",
+            "stackName": "OnExtraTurn",
+            "duration": 1,
+            "isHiddenFromPlayers": true
+          },
+          "RemovePowerCharge": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "PowerCharge"
+              }
+            ],
+            "duration": 0,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {
+          "GoodWithPowerCharge": {
+            "class": "AttackScalor",
+            "sourceCondition": "HasPowerCharge"
+          }
+        },
+        "conditions": {
+          "HasPowerCharge": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "PowerCharge"
+            ],
+            "or": {
+              "class": "MonsterConditions",
+              "monsterTags": [
+                "PowerCharge"
+              ]
+            }
+          },
+          "OnExtraTurn": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "OnExtraTurn"
+            ]
+          }
+        }
+      },
+      "StunBarrageANikeRegular": {
+        "id": "StunBarrageANikeRegular",
+        "found": true,
+        "localization": {
+          "name": "Stun Barrage",
+          "description": "Stun a random enemy for 100TU, this effect triggers 4 times. If the user has a Power Charge, it will be consumed to trigger this effect 8 times instead. This skill locks after each use until the user defeats a non-conjured enemy on the battlefield with an attack. Usable 3 times per battle.",
+          "selected": "Stun a random enemy"
+        },
+        "ability": {
+          "name": "StunBarrageANikeRegular",
+          "class": "Ability",
+          "config": "StunBarrageANikeRegular",
+          "tuCost": 1,
+          "useLimit": 3,
+          "spiritCost": 3,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "AllEnemy",
+          "components": [
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "EmptyPlaceholder"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "Stun1RandomEnemyFor100TUEBB",
+                "Stun1RandomEnemyFor100TUEBB",
+                "Stun1RandomEnemyFor100TUEBB",
+                "Stun1RandomEnemyFor100TUEBB",
+                "LockNikeRegular"
+              ],
+              "applyToTargetType": "Source",
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss"
+            },
+            {
+              "buffs": [
+                "Stun1RandomEnemyFor100TUEBB",
+                "Stun1RandomEnemyFor100TUEBB",
+                "Stun1RandomEnemyFor100TUEBB",
+                "Stun1RandomEnemyFor100TUEBB",
+                "RemovePowerCharge",
+                "LockNikeRegular"
+              ],
+              "applyToTargetType": "Source",
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss",
+              "applyConditions": "HasPowerCharge"
+            }
+          ],
+          "sourceEventType": "Finish",
+          "enemyEventType": "Finish",
+          "abilityEffect": "NikeHolyArrow",
+          "flags": [
+            "StunChance",
+            "GoodWithPowerCharge",
+            "NoDamage"
+          ],
+          "useCondition": "NotLockedNikeRegular"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "allEnemies": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.4,
+            0,
+            0.3,
+            0.2,
+            1,
+            0.5,
+            0
+          ],
+          "prefabs": [
+            "batfx_Nike/batfx_quickchargeYellow1",
+            "batsfx_prefab/batsfx_charge1",
+            "batfx_Nike/batfx_jb_spotlightArrow",
+            "batsfx_prefab/batsfx_frost1",
+            "batfx_Nike/batfx_jb_prep1",
+            "batfx_Nike/batfx_jb_prep2",
+            "batsfx_prefab/batsfx_casting2",
+            "batfx_stun1/batfx_stun1",
+            "batsfx_prefab/batsfx_stun1"
+          ],
+          "sortOrderOffset": [
+            20,
+            2,
+            30,
+            2,
+            50,
+            50,
+            2,
+            50,
+            2
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            false,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            false,
+            true,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "EmptyPlaceholder": {
+            "class": "Buff",
+            "isHiddenFromPlayers": true,
+            "duration": 0,
+            "showAsTimer": false,
+            "showAsPermanent": false
+          },
+          "LockNikeRegular": {
+            "class": "Buff",
+            "stackName": "LockNikeRegular",
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "isHiddenFromPlayers": true,
+            "duration": -1
+          },
+          "RemovePowerCharge": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "PowerCharge"
+              }
+            ],
+            "duration": 0,
+            "isHiddenFromPlayers": true
+          },
+          "Stun1RandomEnemyFor100TUEBB": {
+            "class": "Buff",
+            "stackName": "Stun1RandomEnemyEBB",
+            "behaviors": [
+              "EnterBattleBuff"
+            ],
+            "behaviorOverrides": [
+              {
+                "randomEnemyBuffs": [
+                  "Stun100"
+                ],
+                "numRandomToBuff": 1
+              }
+            ],
+            "duration": 0,
+            "isHiddenFromPlayers": true,
+            "showAsPermanent": false,
+            "showAsTimer": false
+          }
+        },
+        "attackScalors": {
+          "GoodWithPowerCharge": {
+            "class": "AttackScalor",
+            "sourceCondition": "HasPowerCharge"
+          }
+        },
+        "conditions": {
+          "HasPowerCharge": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "PowerCharge"
+            ],
+            "or": {
+              "class": "MonsterConditions",
+              "monsterTags": [
+                "PowerCharge"
+              ]
+            }
+          },
+          "NotLockedNikeRegular": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "LockNikeRegular"
+              ]
+            }
+          }
+        }
+      },
+      "DoubleAttackANikeRegular": {
+        "id": "DoubleAttackANikeRegular",
+        "found": true,
+        "localization": {
+          "name": "Divine Blast",
+          "description": "300% damage to 2 enemies. For each target with 50+ TU, deals 400% damage to that target instead. For each target with 100+ TU, deals 600% damage to that target instead. If at least one of the hit enemies is not defeated by this attack, the user gains a Power Charge. This attack ignores any effects of non-boss enemies that would prevent the targets from being defeated, the Counter Stance Status Effect, and the effects of Skin passive skills. Power Charges cannot stack and will be removed when the user leaves the battlefield.",
+          "selected": "300%+ damage, may gain Power Charge"
+        },
+        "ability": {
+          "name": "DoubleAttackANikeRegular",
+          "class": "Ability",
+          "abilityScalor": 2,
+          "conditionalAbilityScalors": [
+            3,
+            5
+          ],
+          "config": "DoubleAttackANikeRegular",
+          "tuCost": 70,
+          "useLimit": 0,
+          "spiritCost": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "damageFlags": [
+                "HardIgnoreBlockDeath",
+                "IgnoreSkin"
+              ],
+              "applyToTargetType": "Enemy",
+              "drainPercent": 1.0,
+              "drainEffect": "MerlinSelfHeal1"
+            },
+            {
+              "buffs": [
+                "PowerCharge"
+              ],
+              "applyConditions": "MoreThan0HP",
+              "applyToTargetOnly": true,
+              "buffBackMode": true,
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss"
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "NikeSwordBeam",
+          "attackScalors": [
+            "GoodVs50Tu",
+            "GoodVs100Tu"
+          ],
+          "conditionedAbilityEffects": [
+            "NikeSwordBeam",
+            "NikeSwordBeam",
+            "NikeSwordBeam"
+          ],
+          "recommendEffectWhenUsable": -1,
+          "flags": [
+            "Timestrike"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0.9,
+            0,
+            0.5,
+            0.5,
+            0,
+            0,
+            0,
+            0,
+            0.2,
+            0.2,
+            0,
+            0,
+            0,
+            0.8,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_dreamhunt1",
+            "batfx_KirinGirl/batfx_tailwindyellow",
+            "batfx_Nike/batfx_NikePrep",
+            "batfx_Nike/batfx_chargeboomYellow1",
+            "batfx_Nike/batfx_FrankenCloudThunder",
+            "batfx_Nike/batfx_NikeThunderSword",
+            "batsfx_prefab/batsfx_electric1",
+            "batfx_KirinGirl/batfx_tailwindyellow",
+            "batfx_jeannebride1/batfx_holytarget2",
+            "batsfx_prefab/batsfx_buff1",
+            "batfx_ludmillayukata1/batfx_yukatawind1",
+            "batsfx_prefab/batsfx_ring1",
+            "batfx_crossswordknightDark/batfx_LineSlash",
+            "batfx_Nike/batfx_xslashYellow",
+            "batfx_Nike/batfx_castingSmokeNike",
+            "batsfx_prefab/batsfx_electric2",
+            "batfx_Nike/batfx_greatswordbeamYellow1",
+            "batsfx_prefab/batsfx_earth1",
+            "batfx_KirinGirl/batfx_stormfinish3",
+            "batfx_Nike/batfx_SlashYellow1",
+            "batsfx_prefab/batsfx_electric1"
+          ],
+          "sortOrderOffset": [
+            2,
+            -80,
+            10,
+            10,
+            10,
+            10,
+            2,
+            -80,
+            -2,
+            0,
+            3,
+            0,
+            10,
+            30,
+            15,
+            0,
+            50,
+            0,
+            50,
+            50,
+            0
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            true,
+            true
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "boneToAttachTo": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "Sword",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "PowerCharge": {
+            "class": "Buff",
+            "stackName": "PowerCharge",
+            "duration": -1,
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "iconSpriteName": "IconPowerCharge01"
+          }
+        },
+        "attackScalors": {
+          "GoodVs100Tu": {
+            "class": "AttackScalor",
+            "targetCondition": "CurrentTUGreaterThan100"
+          },
+          "GoodVs50Tu": {
+            "class": "AttackScalor",
+            "targetCondition": "CurrentTUGreaterThan50"
+          }
+        },
+        "conditions": {
+          "MoreThan0HP": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "hpLessThanValue": 0
+            }
+          }
+        }
+      }
+    },
+    "passives": {
+      "BladedWingsPassiveANikeRegular": {
+        "id": "BladedWingsPassiveANikeRegular",
+        "found": true,
+        "localization": {
+          "name": "Wings of Victory",
+          "description": "If this unit would be defeated by an enemy attack or a status effect while having more than 1 HP, it instead survives with 1 HP.\n\nThis unit will ignore attacks that would damage exactly 2 targets (attacks that target All allies will not be ignored). If this unit gains the Stealth status effect, it will not be lost when ignoring attacks in this way.\n\nThis unit's attacks heal this unit for 100% of total damage dealt.\n\nWhenever this unit takes damage from an attack by an enemy unit that has defeated 0 units with attacks while on the battlefield, and survives until after the end of the turn, this unit will Purified (any negative status effects like sleep, burn or poison are removed), and will get the next turn by having its TU reduced to 0. This extra turn may be interrupted by other effects that influence the turn order (e.g. other stuns targeting the lowest TU target)."
+        }
+      },
+      "VictoryChantPassiveANikeRegular": {
+        "id": "VictoryChantPassiveANikeRegular",
+        "found": true,
+        "localization": {
+          "name": "Victory Cry",
+          "description": "This unit cannot fall asleep.\n\nWhen this unit enters battle, for 200TU, at the end of each turn an ally gets, the ally:\n- will heal for 10% of their max HP, plus 10% per Awakening Nike has (up to 50% if Nike has 4 Awakenings).\n- will have Sleep and Poison status effects other than Lethal Poison removed.\n- may gain a Sleep Ward, Stun Ward and a Poison Ward (50% chance for each ward).\nThis effect will end if this unit leaves the battlefield. Each Ward prevents their named effect from being applied once, then is removed. Identical Wards cannot stack.\n\nIf all allies on the battlefield are at max HP when this unit enters battle, this unit gains a Power Charge and Intense Rage. Otherwise, all allies are healed for 100% of their max HP, Purified, and may gain a Sleep Ward, Stun Ward, and a Poison Ward (50% chance for each ward).\n\nIntense Rage increases a units Attack to 1.5x for their next 3 turns, and will overwrite existing Weak or Enrage effects. It cannot be overwritten by other Enrage effects but can be by Weak effects."
+        }
+      },
+      "PlusHPBoostLv3": {
+        "id": "PlusHPBoostLv3",
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv3",
+          "description": "Adds 1200 to this unit's max HP."
+        }
+      },
+      "PlusAttackBoostLv3": {
+        "id": "PlusAttackBoostLv3",
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv3",
+          "description": "Adds 300 to this unit's Attack."
+        }
+      },
+      "SwordMinusDamageLv3": {
+        "id": "SwordMinusDamageLv3",
+        "found": true,
+        "localization": {
+          "name": "Sword Resist Lv3",
+          "description": "10% less damage from attacks by units equipped with Swords."
+        }
+      },
+      "AddWeaponPrefGreatSword": {
+        "id": "AddWeaponPrefGreatSword",
+        "found": true,
+        "localization": {
+          "name": "Greatsword Mastery",
+          "description": "Can use weapon skills of Greatswords in addition to their original preferred weapon type."
+        }
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": {
+      "class": "MonsterConditions",
+      "elements": [
+        "Air"
+      ]
+    }
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "NikeRegular01",
+    "family": "NikeRegular",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "NikeRegular01",
+    "family": "NikeRegular",
+    "class": "Monster",
+    "leaderBuff": "AttackAndHPUp6Air",
+    "leaderBuffCondition": "IsAir",
+    "activeSkills": {
+      "0": "SingleAttackANikeRegular",
+      "1": "StunBarrageANikeRegular",
+      "2": "DoubleAttackANikeRegular"
+    },
+    "passives": {
+      "0": "BladedWingsPassiveANikeRegular",
+      "1": "VictoryChantPassiveANikeRegular",
+      "2": "PlusHPBoostLv3",
+      "3": "PlusAttackBoostLv3",
+      "4": "SwordMinusDamageLv3",
+      "5": "AddWeaponPrefGreatSword"
+    },
+    "cost": 28,
+    "baseAttack": 1002,
+    "baseMaxHp": 6200,
+    "speed": 474,
+    "element": "Air",
+    "weaponPref": "Hammer",
+    "weaponPivotIndex": 0,
+    "secure": 1,
+    "superEvolve1": "NikeRegular02",
+    "aiTargetPickWeight": 1,
+    "stars": 5,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 0,
+    "battleOrbImageFlip": 0,
+    "attackType": "Bash",
+    "visible": 1,
+    "skillVoices": {
+      "0": [
+        1,
+        2
+      ],
+      "1": [
+        5,
+        6
+      ],
+      "2": [
+        9,
+        10
+      ],
+      "3": [
+        13,
+        14
+      ]
+    },
+    "damageVoices": [
+      17,
+      18
+    ],
+    "deathVoices": [
+      21,
+      22
+    ],
+    "victoryVoices": [
+      25
+    ],
+    "lineupVoices": [
+      27,
+      28,
+      29
+    ],
+    "evolutionVoices": [
+      38
+    ],
+    "trainVoices": [
+      33,
+      34,
+      35,
+      36,
+      37
+    ],
+    "titleVoices": [
+      44
+    ],
+    "gachaVoices": [
+      45
+    ],
+    "loginVoices": [
+      46
+    ],
+    "tapVoices": [
+      47,
+      48,
+      49
+    ],
+    "idleVoices": [
+      50
+    ]
+  },
+  "_build": {
+    "scriptVersion": "6-character-family-states",
+    "sourceHash": "647d23189cbc386aa13c57c099dbbfdac225df4cf874c989a076aaedb28a7283",
+    "dependencyHash": "0cc5e9107f6481dc96b1c07a054d78d25c30aebc13f5732c65e7f10738489af4",
+    "generatedAt": 1778213418
+  }
+}

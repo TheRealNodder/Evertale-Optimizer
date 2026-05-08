@@ -1,0 +1,1036 @@
+{
+  "schemaVersion": 3,
+  "order": 425,
+  "id": "dark-jeanne",
+  "name": "Dark Jeanne",
+  "title": "Maiden of Darkness",
+  "description": "She was the hero of her country. She was a saint to all the Followers of Light - until the very people who adored her betrayed her and condemned her to death.\n\nNow, she rises again from the ashes. Her banner flies high, no longer a symbol of light, but of darkness.",
+  "category": "character",
+  "rarity": null,
+  "stars": 5,
+  "evolvedStars": 6,
+  "element": "Dark",
+  "weaponType": "GreatSword",
+  "stats": {
+    "atk": 1033,
+    "hp": 6045,
+    "spd": 385,
+    "cost": 28
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/JeanneDark01.png",
+  "refs": {
+    "activeSkills": [
+      "PoisonTouchRandomDoubleAJeanneDark",
+      "PoisonEaterDoubleAFastJeanneDark",
+      "HealEnrageSelfAJeanneDark01",
+      "SurvivorDoubleAJeanneDark"
+    ],
+    "passives": [
+      "SummonAngelRevenge",
+      "PlusAttackBoostLv3",
+      "LifeMinusDamageLv3",
+      "PlusHPBoostLv3",
+      "AddWeaponPrefSpear"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": "AttackUpDeathD",
+    "leaderBuffCondition": "IsDeath",
+    "summonableMonsters": [
+      "JeanneDarkAngel01"
+    ]
+  },
+  "resolved": {
+    "activeSkills": {
+      "PoisonTouchRandomDoubleAJeanneDark": {
+        "id": "PoisonTouchRandomDoubleAJeanneDark",
+        "found": true,
+        "localization": {
+          "name": "PoisonTouchRandomDoubleAJeanneDark",
+          "description": ""
+        },
+        "ability": {
+          "name": "PoisonTouchRandomDoubleAJeanneDark",
+          "class": "Ability",
+          "config": "PoisonTouchRandomDoubleAJeanneDark",
+          "tuCost": 100,
+          "useLimit": 0,
+          "nameKey": "PoisonTouchRandomDoubleA",
+          "descriptionKey": "PoisonTouchRandomDoubleA",
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2RandomEnemy",
+          "components": [
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "Poison",
+                "BurnImmunityTempForRevenge"
+              ]
+            }
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "SmallPoison1",
+          "flags": [
+            "Poisoner",
+            "NoDamage"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "twoRandomEnemy": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.3,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_castinggreen1/batfx_castinggreen1",
+            "batfx_poisonsmall1/batfx_poisonsmall1",
+            "batsfx_prefab/batsfx_poison1"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -2,
+            1,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            true,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            true
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "BurnImmunityTempForRevenge": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Burn",
+                  "BurnAfterTurn",
+                  "BurnAtEndOfTurn"
+                ],
+                "dontShowText": true
+              },
+              {
+                "name": "BurnAfterTurn"
+              },
+              {
+                "name": "BurnSelfOnHit"
+              }
+            ],
+            "duration": 1,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "tags": [
+              "BurnImmune"
+            ],
+            "stackName": "BurnImmunityTempForRevenge",
+            "isHiddenFromPlayers": true
+          },
+          "Poison": {
+            "class": "Buff",
+            "stackName": "Poison",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "DamageOverTime"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "percentOfAttack": 0.0025,
+                "damageColor": "Green",
+                "abilityEffect": "PoisonDamage",
+                "extraDamageFlag": "Poison"
+              }
+            ],
+            "tags": [
+              "Poison"
+            ],
+            "canBePurified": true,
+            "duration": -1,
+            "applyConditions": "NotSuperOrMegaPoisoned",
+            "showAsTimer": false,
+            "statusEffect": "PoisonStatus",
+            "statusEffectOffset": 0.1,
+            "damageType": "Poison",
+            "noIconShownOnBattleStatus": true,
+            "iconSpriteName": "IconPurplePoison01"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {}
+      },
+      "PoisonEaterDoubleAFastJeanneDark": {
+        "id": "PoisonEaterDoubleAFastJeanneDark",
+        "found": true,
+        "localization": {
+          "name": "PoisonEaterDoubleAFastJeanneDark",
+          "description": ""
+        },
+        "ability": {
+          "name": "PoisonEaterDoubleAFastJeanneDark",
+          "class": "Ability",
+          "abilityScalor": -2,
+          "conditionalAbilityScalors": [
+            1.5
+          ],
+          "config": "PoisonEaterDoubleAFastJeanneDark",
+          "tuCost": 130,
+          "useLimit": 0,
+          "nameKey": "PoisonEaterDoubleAFast",
+          "descriptionKey": "PoisonEaterDoubleAFast",
+          "spiritCost": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "PoisonEaterDamageBoost"
+              ]
+            }
+          ],
+          "attackScalors": [
+            "GoodVsPoisoned"
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "SmallMiss1",
+          "conditionedAbilityEffects": [
+            "PoisonDevourDarkJeanne1",
+            "PoisonDevourDarkJeanne1"
+          ],
+          "flags": [
+            "PoisonEater",
+            "StealthWorthy",
+            "PoisonEaterDoubleAlt"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.85,
+            0
+          ],
+          "prefabs": [
+            "batfx_bluntimpact1/batfx_bluntimpact1",
+            "batsfx_prefab/batsfx_impactsmall1"
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            true
+          ],
+          "scale": [
+            0.4,
+            1
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {
+          "GoodVsPoisoned": {
+            "class": "AttackScalor",
+            "targetCondition": "IsPoisoned"
+          }
+        },
+        "conditions": {}
+      },
+      "HealEnrageSelfAJeanneDark01": {
+        "id": "HealEnrageSelfAJeanneDark01",
+        "found": true,
+        "localization": {
+          "name": "HealEnrageSelfAJeanneDark01",
+          "description": ""
+        },
+        "ability": {
+          "name": "HealEnrageSelfAJeanneDark01",
+          "class": "Ability",
+          "config": "HealEnrageSelfAJeanneDark01",
+          "tuCost": 50,
+          "useLimit": 0,
+          "nameKey": "HealEnrageSelfA",
+          "descriptionKey": "HealEnrageSelfA",
+          "spiritGain": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "SelfOnly",
+          "components": [
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "AttackPlus50Percent1TurnOnly",
+                "HealHalf"
+              ]
+            }
+          ],
+          "useCondition": "HPBelow100Percent",
+          "sourceEventType": "Hit",
+          "abilityEffect": "EnrageDarkJeanne1",
+          "flags": [
+            "Heal",
+            "IsJeanneDark01"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "selfOnly": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            1.5,
+            0,
+            0,
+            0,
+            0.3,
+            0,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batfx_tailwindfeather2/batfx_tailwindfeather2",
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_cutinjeannedark1/batfx_cutinjeannedark1",
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_CrescentEnrage1/batfx_CrescentEnrage1",
+            "batfx_castingyellow1/batfx_castingyellow1",
+            "batfx_castingyellow2/batfx_castingyellow2",
+            "batfx_rippleyellowlow/batfx_rippleyellowlow",
+            "batsfx_prefab/batsfx_heal1",
+            "batfx_healbottom1/batfx_healbottom1",
+            "batfx_healtop1/batfx_healtop1"
+          ],
+          "sortOrderOffset": [
+            -100,
+            100,
+            100,
+            -2,
+            -2,
+            2,
+            -2,
+            -2,
+            -2,
+            2
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            false,
+            false
+          ],
+          "positionInBattlefieldCenter": [
+            true,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "AttackPlus50Percent1TurnOnly": {
+            "class": "Buff",
+            "stackName": "AttackPlus50Percent",
+            "behaviors": [
+              "RemoveAfterTurnsBehavior",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "turnCount": 1,
+                "scalorStatBonuses": {
+                  "Attack": 0.5
+                }
+              },
+              {
+                "name": "AttackMinus25Percent"
+              }
+            ],
+            "iconSpriteName": "IconRedRage01",
+            "showAsTimer": true,
+            "duration": -1
+          },
+          "Heal": {
+            "class": "Buff",
+            "behaviors": [
+              "AdjustHp"
+            ],
+            "behaviorOverrides": [
+              {
+                "percent": 0.3,
+                "abilityEffect": "Blank",
+                "hpboosts": [
+                  "HealBoost"
+                ]
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "HealHalf": {
+            "class": "Buff",
+            "behaviors": [
+              "AdjustHp"
+            ],
+            "behaviorOverrides": [
+              {
+                "percent": 0.5,
+                "abilityEffect": "SmallHeal1"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "HPBelow100Percent": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "hpMoreThanPercent": 0.9999999
+            }
+          },
+          "IsJeanneDark01": {
+            "class": "MonsterConditions",
+            "abilityConfigFlag": "IsJeanneDark01"
+          }
+        }
+      },
+      "SurvivorDoubleAJeanneDark": {
+        "id": "SurvivorDoubleAJeanneDark",
+        "found": true,
+        "localization": {
+          "name": "SurvivorDoubleAJeanneDark",
+          "description": ""
+        },
+        "ability": {
+          "name": "SurvivorDoubleAJeanneDark",
+          "class": "Ability",
+          "abilityScalor": 4,
+          "config": "SurvivorDoubleAJeanneDark",
+          "tuCost": 160,
+          "useLimit": 0,
+          "nameKey": "SurvivorDoubleA",
+          "descriptionKey": "SurvivorDoubleA",
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "SurvivorDamageBoost"
+              ]
+            }
+          ],
+          "useCondition": "TimeInCombat300",
+          "bombSkillIcon": "IconBrownCountdownClock01",
+          "bombSkillIconDescriptionKey": "SurvivorDoubleACountdownKey",
+          "flags": [
+            "Survivor",
+            "Duration"
+          ],
+          "enemyEventType": "Hit",
+          "recommendEffectWhenUsable": 1,
+          "abilityEffect": "SurvivorDarkJeanne1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            2,
+            0,
+            0,
+            1,
+            0,
+            0.3,
+            0.1,
+            0,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_timestrike1",
+            "batfx_JeanneDark1/batfx_JeanneDark1",
+            "batfx_JeanneDark2/batfx_JeanneDark2",
+            "batfx_fauxAreaLightRed1/batfx_fauxAreaLightRed1",
+            "batsfx_prefab/batsfx_stun1",
+            "batfx_JeanneDarkSwipe1/batfx_JeanneDarkSwipe1",
+            "batsfx_prefab/batsfx_whoosh1",
+            "batfx_JeanneDarkAura1/batfx_JeanneDarkAura1",
+            "batfx_slash6/batfx_slash6",
+            "batsfx_prefab/batsfx_slash1",
+            "batfx_spotgreen/batfx_spotgreen",
+            "batfx_ripplegreenlow/batfx_ripplegreenlow"
+          ],
+          "sortOrderOffset": [
+            2,
+            -2,
+            -2,
+            4,
+            0,
+            100,
+            0,
+            0,
+            1,
+            -2,
+            -2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            false,
+            false
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false
+          ],
+          "scale": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            2,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {
+          "TimeInCombat300": {
+            "class": "AttackScalor",
+            "sourceCondition": "TimeInCombat300"
+          }
+        },
+        "conditions": {
+          "TimeInCombat300": {
+            "class": "MonsterConditions",
+            "timeInCombat": 300
+          }
+        }
+      }
+    },
+    "passives": {
+      "SummonAngelRevenge": {
+        "id": "SummonAngelRevenge",
+        "found": true,
+        "localization": {
+          "name": "Mikaela's Revenge",
+          "description": "When this unit is defeated by an enemy, add Dark Mikaela to next in line of allied reinforcements. Dark Mikaela's Level, Limit Breaks, Awakenings, Boosts, Potential, Mastery, Weapon and Accessory will match this unit."
+        }
+      },
+      "PlusAttackBoostLv3": {
+        "id": "PlusAttackBoostLv3",
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv3",
+          "description": "Adds 300 to this unit's Attack."
+        }
+      },
+      "LifeMinusDamageLv3": {
+        "id": "LifeMinusDamageLv3",
+        "found": true,
+        "localization": {
+          "name": "Light Resist Lv3",
+          "description": "10% less damage from attacks by Light units."
+        }
+      },
+      "PlusHPBoostLv3": {
+        "id": "PlusHPBoostLv3",
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv3",
+          "description": "Adds 1200 to this unit's max HP."
+        }
+      },
+      "AddWeaponPrefSpear": {
+        "id": "AddWeaponPrefSpear",
+        "found": true,
+        "localization": {
+          "name": "Spear Mastery",
+          "description": "Can use weapon skills of Spears in addition to their original preferred weapon type."
+        }
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": {
+      "class": "MonsterConditions",
+      "elements": [
+        "Death"
+      ]
+    }
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "JeanneDark01",
+    "family": "JeanneDark",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "JeanneDark01",
+    "family": "JeanneDark",
+    "class": "Monster",
+    "leaderBuff": "AttackUpDeathD",
+    "leaderBuffCondition": "IsDeath",
+    "activeSkills": {
+      "0": "PoisonTouchRandomDoubleAJeanneDark",
+      "1": "PoisonEaterDoubleAFastJeanneDark",
+      "2": "HealEnrageSelfAJeanneDark01",
+      "3": "SurvivorDoubleAJeanneDark"
+    },
+    "activeSkillsFamily": {
+      "2": "HealEnrageSelfAJeanneDark"
+    },
+    "passives": {
+      "0": "SummonAngelRevenge",
+      "2": "PlusAttackBoostLv3",
+      "3": "LifeMinusDamageLv3",
+      "4": "PlusHPBoostLv3",
+      "5": "AddWeaponPrefSpear"
+    },
+    "cost": 28,
+    "baseAttack": 1033,
+    "baseMaxHp": 6045,
+    "speed": 385,
+    "element": "Death",
+    "weaponPref": "GreatSword",
+    "weaponPivotIndex": 0,
+    "secure": 1,
+    "superEvolve1": "JeanneDark02",
+    "aiTargetPickWeight": 1,
+    "stars": 5,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 0,
+    "battleOrbImageFlip": 0,
+    "attackType": "Weapon",
+    "visible": 1,
+    "formTwitterShare": 1,
+    "summonableMonsters": [
+      "JeanneDarkAngel01"
+    ],
+    "summonableMatchSource": [
+      true
+    ],
+    "skillVoices": {
+      "0": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "1": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "2": [
+        9,
+        10,
+        11,
+        12
+      ],
+      "3": [
+        13,
+        14,
+        15,
+        16
+      ]
+    },
+    "damageVoices": [
+      17,
+      18,
+      19,
+      20
+    ],
+    "deathVoices": [
+      21,
+      22,
+      23,
+      24
+    ],
+    "victoryVoices": [
+      25,
+      26
+    ],
+    "lineupVoices": [
+      27,
+      28,
+      29,
+      30,
+      31,
+      32
+    ],
+    "evolutionVoices": [
+      33
+    ],
+    "trainVoices": [
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43
+    ],
+    "titleVoices": [
+      44
+    ],
+    "gachaVoices": [
+      45
+    ],
+    "loginVoices": [
+      46
+    ],
+    "tapVoices": [
+      47,
+      48,
+      49
+    ],
+    "idleVoices": [
+      50
+    ]
+  },
+  "_build": {
+    "scriptVersion": "6-character-family-states",
+    "sourceHash": "af664a10cbb7a3e80b62c8cfd86d270409e77d50ed64053484ea22a03fbf993c",
+    "dependencyHash": "57127bc9b3beaf27d5c4e33958d4ef26bb2fbd5f7589fba66521950bf7a8d9b2",
+    "generatedAt": 1778213414
+  }
+}

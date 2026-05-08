@@ -1,0 +1,823 @@
+{
+  "schemaVersion": 3,
+  "order": 414,
+  "id": "snow-white",
+  "name": "Snow White",
+  "title": "Queen of Dreams",
+  "description": "She has always been alone. Born in a snowy kingdom, she was kept imprisoned in a single room of a castle by her stepmother. Even when she was abandoned in the woods as a child and adopted by her new mother, she was unable to go outside. The outside world, framed by her window, has always been faded in shades of black and white.",
+  "category": "character",
+  "rarity": null,
+  "stars": 5,
+  "evolvedStars": 6,
+  "element": "Dark",
+  "weaponType": "Staff",
+  "stats": {
+    "atk": 1029,
+    "hp": 6065,
+    "spd": 325,
+    "cost": 28
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/SnowWhite01.png",
+  "refs": {
+    "activeSkills": [
+      "GainAttackSingleSDeathSnowWhite",
+      "MegaThrowASnowWhite",
+      "PurifyCallADeathSnowWhite"
+    ],
+    "passives": [
+      "RegenerationOnMyTurnGetStealth",
+      "Summon2MinionStartDeath",
+      "PlusAttackBoostLv3",
+      "AttackUpTargetEquippedHammerLv3",
+      "PlusHPBoostLv3",
+      "AddWeaponPrefSword"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": "AttackAndHPUp6Death",
+    "leaderBuffCondition": "IsDeath",
+    "summonableMonsters": [
+      "DeathMinion01"
+    ]
+  },
+  "resolved": {
+    "activeSkills": {
+      "GainAttackSingleSDeathSnowWhite": {
+        "id": "GainAttackSingleSDeathSnowWhite",
+        "found": true,
+        "localization": {
+          "name": "GainAttackSingleSDeathSnowWhite",
+          "description": ""
+        },
+        "ability": {
+          "name": "GainAttackSingleSDeathSnowWhite",
+          "class": "Ability",
+          "abilityScalor": 0,
+          "config": "GainAttackSingleSDeathSnowWhite",
+          "tuCost": 100,
+          "useLimit": 0,
+          "nameKey": "GainAttackSingleA",
+          "descriptionKey": "GainAttackSingleA",
+          "spiritGain": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ]
+            }
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "RangedDeath1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.3,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_casting7/batfx_casting7",
+            "batfx_impactmagic2/batfx_impactmagic2",
+            "batsfx_prefab/batsfx_bluntimpact1",
+            "batfx_rippleredlow/batfx_rippleredlow"
+          ],
+          "sortOrderOffset": [
+            -2,
+            3,
+            1,
+            -2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            true,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {},
+        "conditions": {}
+      },
+      "MegaThrowASnowWhite": {
+        "id": "MegaThrowASnowWhite",
+        "found": true,
+        "localization": {
+          "name": "MegaThrowASnowWhite",
+          "description": ""
+        },
+        "ability": {
+          "name": "MegaThrowASnowWhite",
+          "class": "Ability",
+          "abilityScalor": 4,
+          "config": "MegaThrowASnowWhite",
+          "tuCost": 100,
+          "useLimit": 0,
+          "nameKey": "MegaThrowA",
+          "descriptionKey": "MegaThrowA",
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 1
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "applyToTargetType": "Enemy",
+              "damageBoosts": [
+                "ThrowDamageBoost"
+              ],
+              "damageFlags": [
+                "IgnoreArmor"
+              ]
+            },
+            {
+              "buffs": [
+                "SacLastReinforcement"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "flags": [
+            "Devour",
+            "StealthWorthy"
+          ],
+          "abilityEffect": "SnowWhite1",
+          "useCondition": "AllyHasReinforcements",
+          "requiredReplacementMonsterMustBeLast": true
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0.1,
+            0,
+            0,
+            1.6,
+            0,
+            0,
+            0.4,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_gravityball",
+            "batfx_tailwindashes4/batfx_tailwindashes4",
+            "batfx_snowwhite1/batfx_snowwhite1",
+            "batsfx_prefab/batsfx_charge1",
+            "batfx_snowwhitethrow1/batfx_snowwhitethrow1",
+            "batsfx_prefab/batsfx_fire4",
+            "batfx_snowwhite1/batfx_snowwhite2",
+            "batfx_snowwhitedmg1/batfx_snowwhitedmg1",
+            "batsfx_prefab/batsfx_bomb1"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -100,
+            20,
+            3,
+            3,
+            3,
+            3,
+            2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            false,
+            true,
+            true,
+            true,
+            false,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "isProjectileFX": [
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false
+          ],
+          "projectileFlightDuration": [
+            0,
+            0,
+            0,
+            0,
+            0.4,
+            0,
+            0,
+            0,
+            0
+          ],
+          "projectileStartOffsetX": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "projectileStartOffsetY": [
+            0,
+            0,
+            0,
+            0,
+            300,
+            0,
+            0,
+            0,
+            0
+          ],
+          "projectileShouldTargetTeamEffectPosition": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "SacLastReinforcement": {
+            "class": "Buff",
+            "behaviors": [
+              "InstantDeath"
+            ],
+            "behaviorOverrides": [
+              {
+                "sacLastReinforcement": true
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "AllyHasReinforcements": {
+            "class": "MonsterConditions",
+            "allyReinforcements": 1
+          }
+        }
+      },
+      "PurifyCallADeathSnowWhite": {
+        "id": "PurifyCallADeathSnowWhite",
+        "found": true,
+        "localization": {
+          "name": "PurifyCallADeathSnowWhite",
+          "description": ""
+        },
+        "ability": {
+          "name": "PurifyCallADeathSnowWhite",
+          "class": "Ability",
+          "config": "PurifyCallADeathSnowWhite",
+          "tuCost": 70,
+          "useLimit": 0,
+          "nameKey": "PurifyCallADeath",
+          "descriptionKey": "PurifyCallADeath",
+          "spiritCost": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Ally",
+          "components": [
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "Add1DeathMinionToEnd"
+              ],
+              "applyToTargetType": "Friendly",
+              "buffBackMode": true,
+              "applyConditions": "HasNegativeStatusEffect",
+              "buffAppliedEffects": [
+                "SummonNoNumberNeutral"
+              ],
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "RemoveBuffs"
+              ]
+            }
+          ],
+          "friendlyEventType": "Hit",
+          "abilityEffect": "Purify1",
+          "flags": [
+            "Purify",
+            "PurifyBonus"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "friendlyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0,
+            0.3,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_ripplebluelow/batfx_ripplebluelow",
+            "batfx_castinggreen1/batfx_castinggreen1",
+            "batfx_castinggreen2/batfx_castinggreen2",
+            "batfx_ripplebluelow/batfx_ripplebluelow",
+            "batsfx_prefab/batsfx_heal1",
+            "batfx_purify1/batfx_purify1"
+          ],
+          "sortOrderOffset": [
+            2,
+            2,
+            -2,
+            2,
+            -2,
+            -2,
+            2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "Add1DeathMinionToEnd": {
+            "class": "Buff",
+            "behaviors": [
+              "SummonMonster"
+            ],
+            "behaviorOverrides": [
+              {
+                "monsterType": "DeathMinion01"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "RemoveBuffs": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "HasNegativeStatusEffect": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "Freeze"
+            ],
+            "or": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "Poison"
+              ],
+              "not": {
+                "class": "MonsterConditions",
+                "monsterTags": [
+                  "LethalPoison"
+                ]
+              },
+              "or": {
+                "class": "MonsterConditions",
+                "buffStackNames": [
+                  "Sleep"
+                ],
+                "or": {
+                  "class": "MonsterConditions",
+                  "buffStackNames": [
+                    "Decay"
+                  ],
+                  "or": {
+                    "class": "MonsterConditions",
+                    "buffStackNames": [
+                      "SpiritLeaking"
+                    ],
+                    "or": {
+                      "class": "MonsterConditions",
+                      "buffStackNames": [
+                        "SpiritLeakReady"
+                      ],
+                      "or": {
+                        "class": "MonsterConditions",
+                        "buffStackNames": [
+                          "Burn"
+                        ],
+                        "not": {
+                          "class": "MonsterConditions",
+                          "monsterTags": [
+                            "HealingBurn"
+                          ],
+                          "or": {
+                            "class": "MonsterConditions",
+                            "monsterTags": [
+                              "SilentBurn"
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "passives": {
+      "RegenerationOnMyTurnGetStealth": {
+        "id": "RegenerationOnMyTurnGetStealth",
+        "found": true,
+        "localization": {
+          "name": "Regeneration Shroud",
+          "description": "When this unit gets a turn, it heals 30% of its max HP. After each turn this unit gets, it gains the Stealth status effect unless it is sleeping. This will overwrite other status effects on this unit. Stealthed units ignore the next enemy attack that would damage more than 1 target. Any damage will remove stealth."
+        }
+      },
+      "Summon2MinionStartDeath": {
+        "id": "Summon2MinionStartDeath",
+        "found": true,
+        "localization": {
+          "name": "Summon Dawn",
+          "description": "Adds 2 Kuromoris to the very end of this unit's team. Triggered at the very start of the battle if this unit is on the battlefield."
+        }
+      },
+      "PlusAttackBoostLv3": {
+        "id": "PlusAttackBoostLv3",
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv3",
+          "description": "Adds 300 to this unit's Attack."
+        }
+      },
+      "AttackUpTargetEquippedHammerLv3": {
+        "id": "AttackUpTargetEquippedHammerLv3",
+        "found": true,
+        "localization": {
+          "name": "Hammer Hunter Lv3",
+          "description": "10% bonus to attacks against units equipped with Hammers."
+        }
+      },
+      "PlusHPBoostLv3": {
+        "id": "PlusHPBoostLv3",
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv3",
+          "description": "Adds 1200 to this unit's max HP."
+        }
+      },
+      "AddWeaponPrefSword": {
+        "id": "AddWeaponPrefSword",
+        "found": true,
+        "localization": {
+          "name": "Sword Mastery",
+          "description": "Can use weapon skills of Swords in addition to their original preferred weapon type."
+        }
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": {
+      "class": "MonsterConditions",
+      "elements": [
+        "Death"
+      ]
+    }
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "SnowWhite01",
+    "family": "SnowWhite",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "SnowWhite01",
+    "family": "SnowWhite",
+    "class": "Monster",
+    "leaderBuff": "AttackAndHPUp6Death",
+    "leaderBuffCondition": "IsDeath",
+    "activeSkills": {
+      "0": "GainAttackSingleSDeathSnowWhite",
+      "1": "MegaThrowASnowWhite",
+      "2": "PurifyCallADeathSnowWhite"
+    },
+    "passives": {
+      "0": "RegenerationOnMyTurnGetStealth",
+      "1": "Summon2MinionStartDeath",
+      "2": "PlusAttackBoostLv3",
+      "3": "AttackUpTargetEquippedHammerLv3",
+      "4": "PlusHPBoostLv3",
+      "5": "AddWeaponPrefSword"
+    },
+    "cost": 28,
+    "baseAttack": 1029,
+    "baseMaxHp": 6065,
+    "speed": 325,
+    "element": "Death",
+    "weaponPref": "Staff",
+    "weaponPivotIndex": 0,
+    "secure": 1,
+    "superEvolve1": "SnowWhite02",
+    "aiTargetPickWeight": 1,
+    "stars": 5,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 0,
+    "battleOrbImageFlip": 1,
+    "attackType": "Weapon",
+    "visible": 1,
+    "formTwitterShare": 1,
+    "summonableMonsters": [
+      "DeathMinion01"
+    ],
+    "summonableMatchSource": [
+      false
+    ],
+    "skillVoices": {
+      "0": [
+        1,
+        3
+      ],
+      "1": [
+        5,
+        7
+      ],
+      "2": [
+        9,
+        11
+      ],
+      "3": [
+        13,
+        15
+      ]
+    },
+    "damageVoices": [
+      17,
+      19
+    ],
+    "deathVoices": [
+      21,
+      23
+    ],
+    "victoryVoices": [
+      25
+    ],
+    "lineupVoices": [
+      27,
+      29,
+      31
+    ],
+    "evolutionVoices": [
+      43
+    ],
+    "trainVoices": [
+      33,
+      35,
+      37,
+      39,
+      41
+    ],
+    "titleVoices": [
+      44
+    ],
+    "gachaVoices": [
+      45
+    ],
+    "loginVoices": [
+      46
+    ],
+    "tapVoices": [
+      47,
+      48,
+      49
+    ],
+    "idleVoices": [
+      50
+    ]
+  },
+  "_build": {
+    "scriptVersion": "6-character-family-states",
+    "sourceHash": "97f4a92435a3f570b4c232483629e3384a29a166b6f4cc7e7a2b2c708c103db2",
+    "dependencyHash": "23117d2d6bc8232054794c8fd3efc2298398e0f3c6a07c13b53cd8b98ae66834",
+    "generatedAt": 1778213414
+  }
+}

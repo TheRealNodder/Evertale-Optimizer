@@ -1,0 +1,1237 @@
+{
+  "schemaVersion": 3,
+  "order": 563,
+  "id": "dark-sun-wukong",
+  "name": "Dark Sun Wukong",
+  "title": "The Great Menace, Hell's Equal",
+  "description": "When the Monkey God took Wukong in, he was well aware of the two personalities dwelling in her. And so, he didn't only raise one of them, he raised both.\nWhen Vajra finally emerged, she could wield Ruyi Bang, fly Nimbus, and use Monkey God's techniques just as well as Wukong could—because she trained just as hard, though hidden the whole time.",
+  "category": "character",
+  "rarity": null,
+  "stars": 6,
+  "evolvedStars": 6,
+  "element": "Dark",
+  "weaponType": "Hammer",
+  "stats": {
+    "atk": 1305,
+    "hp": 7895,
+    "spd": 525,
+    "cost": 34
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/GokuDark02.png",
+  "refs": {
+    "activeSkills": [
+      "CloneAttackAGokuDark",
+      "VigorRushDownAGokuDark",
+      "MegaPoisonCounterAttackAGokuDark",
+      "CloneEscapeAGokuDark"
+    ],
+    "passives": [
+      "BuffSelfAndSuperPoisonEnemiesEntry",
+      "PoisonExtraTurnGokuDark",
+      "PlusHPBoostLv3",
+      "SwordMinusDamageLv3",
+      "PlusAttackBoostLv3",
+      "AddWeaponPrefSpear"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": "AttackUpDeathD",
+    "leaderBuffCondition": "IsDeath",
+    "summonableMonsters": [
+      "GokuDark02"
+    ]
+  },
+  "resolved": {
+    "activeSkills": {
+      "CloneAttackAGokuDark": {
+        "id": "CloneAttackAGokuDark",
+        "found": true,
+        "localization": {
+          "name": "Combined Forces",
+          "description": "50% damage to 1 enemy. Damage doubles for each other \"Dark Sun Wukong, The Great Menace, Hell's Equal\" in the ally team, including reinforcements (800% max). Enrages each other ally \"Dark Sun Wukong, The Great Menace, Hell's Equal\" on the battlefield. This will overwrite the effects of previous Enrage skills. Enraged units have their Attack increased to 1.5x until the end of their next turn.",
+          "selected": "50% damage, doubles for each ally clone of the user"
+        },
+        "ability": {
+          "name": "CloneAttackAGokuDark",
+          "class": "Ability",
+          "abilityScalor": -1,
+          "conditionalAbilityScalors": [
+            0,
+            1,
+            3,
+            7
+          ],
+          "config": "CloneAttackAGokuDark",
+          "tuCost": 50,
+          "useLimit": 0,
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "AttackPlus50Percent1TurnOnlyIfGokuDark"
+              ],
+              "applyToTargetType": "Source"
+            }
+          ],
+          "attackScalors": [
+            "GoodWith2GokuDark",
+            "GoodWith3GokuDark",
+            "GoodWith4GokuDark",
+            "GoodWith5GokuDark"
+          ],
+          "conditionedAbilityEffects": [
+            "GokuDarkAttack1",
+            "GokuDarkAttack1",
+            "GokuDarkAttack1",
+            "GokuDarkAttack1"
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "GokuDarkAttack1",
+          "recommendEffectWhenUsable": -2,
+          "ignoreEffectForSourceEvent": true
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0.45,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batfx_jumpsmoke1/batfx_jumpsmoke1",
+            "batfx_gokudark1/batfx_groundimpact4",
+            "batfx_gokudark1/batfx_impactrock4",
+            "batsfx_prefab/batsfx_bluntimpact1"
+          ],
+          "sortOrderOffset": [
+            2,
+            -2,
+            2,
+            0
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            1,
+            0,
+            0
+          ],
+          "forceHitReactions": [
+            false,
+            true,
+            false,
+            false
+          ],
+          "damageHitReactions": [
+            false,
+            true,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            false,
+            false,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "AttackPlus50Percent1TurnOnlyIfGokuDark": {
+            "class": "Buff",
+            "behaviors": [
+              "BuffOnMonsterTurnEnd"
+            ],
+            "behaviorOverrides": [
+              {
+                "allAlliesButSelfBuffs": [
+                  "AttackPlus50Percent1TurnOnly",
+                  "RageFXBuff2"
+                ],
+                "spreadCondition": "IsGokuDark"
+              }
+            ],
+            "stackName": "AttackPlus50Percent1TurnOnlyIfGokuDark",
+            "duration": 0,
+            "showAsPermanent": true,
+            "iconSpriteName": "IconRedBurnRage01"
+          }
+        },
+        "attackScalors": {
+          "GoodWith2GokuDark": {
+            "class": "AttackScalor",
+            "sourceCondition": "AtLeast2GokuDarksAlly"
+          },
+          "GoodWith3GokuDark": {
+            "class": "AttackScalor",
+            "sourceCondition": "AtLeast3GokuDarksAlly"
+          },
+          "GoodWith4GokuDark": {
+            "class": "AttackScalor",
+            "sourceCondition": "AtLeast4GokuDarksAlly"
+          },
+          "GoodWith5GokuDark": {
+            "class": "AttackScalor",
+            "sourceCondition": "AtLeast5GokuDarksAlly"
+          }
+        },
+        "conditions": {}
+      },
+      "VigorRushDownAGokuDark": {
+        "id": "VigorRushDownAGokuDark",
+        "found": true,
+        "localization": {
+          "name": "Prime Blow",
+          "description": "400% damage to 1 enemy. Usable only if the user's HP is at 75%+.",
+          "selected": "400% damage, usable if HP is at 75%+"
+        },
+        "ability": {
+          "name": "VigorRushDownAGokuDark",
+          "class": "Ability",
+          "abilityScalor": 3,
+          "config": "VigorRushDownAGokuDark",
+          "tuCost": 50,
+          "useLimit": 0,
+          "spiritCost": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "applyToTargetType": "Enemy"
+            }
+          ],
+          "useCondition": "HPAbove75Percent",
+          "enemyEventType": "Hit",
+          "abilityEffect": "GokuDarkAbility2",
+          "flags": [
+            "StealthWorthy"
+          ],
+          "recommendEffectWhenUsable": 1
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.2,
+            0.3,
+            0.4,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batfx_gokudark1/batfx_bigrock1",
+            "batsfx_prefab/batsfx_bluntimpact1",
+            "batfx_common/batfx_empty",
+            "batfx_jumpsmoke1/batfx_jumpsmoke1",
+            "batfx_gokudark1/batfx_groundimpact4",
+            "batfx_gokudark1/batfx_impactrock3",
+            "batsfx_prefab/batsfx_bluntimpact1"
+          ],
+          "sortOrderOffset": [
+            5,
+            0,
+            0,
+            2,
+            -2,
+            2,
+            0
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            true,
+            false,
+            true,
+            false,
+            false
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            true,
+            false,
+            true,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            true,
+            false,
+            true,
+            false,
+            false,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {},
+        "conditions": {
+          "HPAbove75Percent": {
+            "class": "MonsterConditions",
+            "hpMoreThanPercent": 0.7499999
+          }
+        }
+      },
+      "MegaPoisonCounterAttackAGokuDark": {
+        "id": "MegaPoisonCounterAttackAGokuDark",
+        "found": true,
+        "localization": {
+          "name": "Lightning Kick",
+          "description": "800% damage to 1 enemy and then Mega Poisons them for 200TU. Heals the user fully. Mega Poison will overwrite other status effects on that enemy.\n\nLocked for 100TU after the user has entered the battlefield, and locks again for 100TU after each use.\n\nMega Poison deals 20 times the damage of normal poison and cannot be overwritten by normal Poison or Super Poison.",
+          "selected": "800% damage to 1 enemy, applies Mega Poison\n(Will overwrite other status effects)"
+        },
+        "ability": {
+          "name": "MegaPoisonCounterAttackAGokuDark",
+          "class": "Ability",
+          "abilityScalor": 7,
+          "config": "MegaPoisonCounterAttackAGokuDark",
+          "tuCost": 1,
+          "useLimit": 0,
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "applyToTargetType": "Enemy",
+              "buffs": [
+                "MegaPoison",
+                "BurnImmunityTempForRevenge"
+              ],
+              "showMissConditions": "ShowNoMiss",
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "GokuDarkCooldown100"
+              ],
+              "applyToTargetType": "Source"
+            },
+            {
+              "buffs": [
+                "HealFull"
+              ],
+              "applyToSourceOnly": true
+            }
+          ],
+          "useCondition": "TimeInCombat100NotInstantCooldown",
+          "recommendEffectWhenUsable": 1,
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "GokuDarkSpecial1",
+          "flags": [
+            "MegaPoison",
+            "Overwatch"
+          ],
+          "ignoreEffectForSourceEvent": true
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0.25,
+            0.8,
+            0,
+            0.2,
+            0,
+            2,
+            0.35,
+            0
+          ],
+          "prefabs": [
+            "batfx_gokudark1/batfx_panelsgoku1",
+            "batfx_jumpsmoke1/batfx_jumpsmoke1",
+            "batfx_gokudark1/batfx_impactrock3",
+            "batsfx_prefab/batsfx_bluntimpact1",
+            "batfx_gokudark1/batfx_gokucombo1",
+            "batsfx_prefab/batsfx_multislash2",
+            "batfx_gokudark1/batfx_purplerip1",
+            "batfx_bluntimpact3/batfx_bluntimpact3",
+            "batsfx_prefab/batsfx_bluntimpact1"
+          ],
+          "sortOrderOffset": [
+            100,
+            -2,
+            2,
+            0,
+            2,
+            0,
+            -2,
+            2,
+            0
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            true,
+            true,
+            true,
+            false,
+            false,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "BurnImmunityTempForRevenge": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Burn",
+                  "BurnAfterTurn",
+                  "BurnAtEndOfTurn"
+                ],
+                "dontShowText": true
+              },
+              {
+                "name": "BurnAfterTurn"
+              },
+              {
+                "name": "BurnSelfOnHit"
+              }
+            ],
+            "duration": 1,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "tags": [
+              "BurnImmune"
+            ],
+            "stackName": "BurnImmunityTempForRevenge",
+            "isHiddenFromPlayers": true
+          },
+          "GokuDarkCooldown100": {
+            "class": "Buff",
+            "duration": 100,
+            "stackName": "InstantCooldown",
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "iconSpriteName": "IconBlueCountdownClock3"
+          },
+          "HealFull": {
+            "class": "Buff",
+            "behaviors": [
+              "AdjustHp"
+            ],
+            "behaviorOverrides": [
+              {
+                "percent": 1.0,
+                "abilityEffect": "LargeHeal1"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "MegaPoison": {
+            "class": "Buff",
+            "stackName": "Poison",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "DamageOverTime"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "percentOfAttack": 0.05,
+                "damageColor": "Green",
+                "abilityEffect": "MidDeath1MegaPoison",
+                "extraDamageFlag": "MegaPoison"
+              }
+            ],
+            "tags": [
+              "Poison",
+              "MegaPoison"
+            ],
+            "canBePurified": true,
+            "duration": 200,
+            "showAsTimer": true,
+            "statusEffect": "MegaPoisonStatus",
+            "statusEffectOffset": 0.1,
+            "damageType": "Poison",
+            "iconSpriteName": "IconPurplePoison01"
+          },
+          "Overwatch": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "BuffWhenMonsterHurt",
+              "RemoveOnHurt"
+            ],
+            "stackName": "Stance",
+            "behaviorOverrides": [
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "selfBuffs": [
+                  "GiveTurnOverwatch",
+                  "AlreadyOverwatched"
+                ],
+                "cancelFromDamageTypes": [
+                  "BuffDamage"
+                ],
+                "cancelFromDamageFlags": [
+                  "IgnoreSkin",
+                  "Sneak",
+                  "RemoveStatus"
+                ]
+              },
+              {
+                "cancelFromDamageTypes": [
+                  "BuffDamage"
+                ],
+                "cancelFromDamageFlags": [
+                  "IgnoreSkin",
+                  "Sneak",
+                  "RemoveStatus"
+                ]
+              }
+            ],
+            "applyConditions": "IsNotOverwatch",
+            "duration": 150,
+            "showAsTimer": true,
+            "iconSpriteName": "IconOverwatch01"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "TimeInCombat100NotInstantCooldown": {
+            "class": "MonsterConditions",
+            "timeInCombat": 100,
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "InstantCooldown"
+              ]
+            }
+          }
+        }
+      },
+      "CloneEscapeAGokuDark": {
+        "id": "CloneEscapeAGokuDark",
+        "found": true,
+        "localization": {
+          "name": "Doubling Arts",
+          "description": "Adds another Dark Sun Wukong to the next in line of allied reinforcements. This Dark Sun Wukong's Level, Limit Breaks, Awakenings, Boosts, Potential, Mastery, Weapon, and Accessory will match the user.\n\nThen if 4 allies are on the battlefield, the user exchanges themselves with the Dark Sun Wukong added to allied reinforcements. Usable only if the user doesn't have the Counter Stance status effect. This skill is locked if there are 4+ conjured copies of \"Dark Sun Wukong, The Great Menace, Hell's Equal\" among allies on the battlefield and allied reinforcements.",
+          "selected": "Clones user and may step back"
+        },
+        "ability": {
+          "name": "CloneEscapeAGokuDark",
+          "class": "Ability",
+          "config": "CloneEscapeAGokuDark",
+          "tuCost": 50,
+          "useLimit": 0,
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "SelfOnly",
+          "components": [
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "CloneSourceToFrontGokuDark"
+              ]
+            },
+            {
+              "buffs": [
+                "SendToFrontOfReinforcements",
+                "RemoveBuffs"
+              ],
+              "applyConditions": "AtLeast4AlliesLeft",
+              "showMissConditions": "ShowNoMiss"
+            },
+            {
+              "buffs": [
+                "FudgeUsed"
+              ],
+              "skipAbilityEffect": true
+            }
+          ],
+          "sourceEventType": "Finish",
+          "abilityEffect": "GokuDarkAbility1",
+          "useCondition": "IsNotOverwatchAndSummonGokuDarkAllowed"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "selfOnly": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.2,
+            0,
+            0,
+            0.6,
+            0,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batfx_gokudark1/batfx_hair2",
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_gokudark1/batfx_radialcharge3",
+            "batfx_gokudark1/batfx_hair1",
+            "batfx_gokudark1/batfx_blow1",
+            "batfx_gokudark1/batfx_clone1",
+            "batsfx_prefab/batsfx_stealth1"
+          ],
+          "sortOrderOffset": [
+            2,
+            0,
+            -2,
+            2,
+            2,
+            5,
+            0
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "CloneSourceToFrontGokuDark": {
+            "class": "Buff",
+            "stackName": "CloneSourceToFrontGokuDark",
+            "behaviors": [
+              "SummonMonster"
+            ],
+            "behaviorOverrides": [
+              {
+                "cloneSource": true,
+                "cloneSourceStats": true,
+                "cloneSourceWeapon": true,
+                "cloneSourceEquipment": true,
+                "frontOfLineup": true
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "FudgeUsed": {
+            "class": "Buff",
+            "duration": 0,
+            "behaviors": [
+              "AddBattleProperty"
+            ],
+            "behaviorOverrides": [
+              {
+                "properties": {
+                  "fudgeSkillUses": 1
+                },
+                "replace": true,
+                "setToKills": true
+              }
+            ],
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "RemoveBuffs": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "SendToFrontOfReinforcements": {
+            "class": "Buff",
+            "stackName": "Pushback",
+            "behaviors": [
+              "SendToReinforcements"
+            ],
+            "behaviorOverrides": [
+              {
+                "frontOfLineup": true
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "AtLeast4AlliesLeft": {
+            "class": "MonsterConditions",
+            "allyTeamSize": 4
+          },
+          "IsNotOverwatchAndSummonGokuDarkAllowed": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "Stance"
+              ]
+            },
+            "and": {
+              "class": "MonsterConditions",
+              "not": {
+                "class": "MonsterConditions",
+                "checkReinforcementsForTeamConditionMatches": true,
+                "myTeamMonsterConditionMatchesNeeded": {
+                  "IsSummonedGokuDark": 4
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "passives": {
+      "BuffSelfAndSuperPoisonEnemiesEntry": {
+        "id": "BuffSelfAndSuperPoisonEnemiesEntry",
+        "found": true,
+        "localization": {
+          "name": "Dark Gifts",
+          "description": "Super Poisons all enemies. This unit will immediately get the next turn by having its TU reduced to 0, is granted the Counter Stance status effect, and is fully healed. These effects are triggered when this unit enters the battlefield from the allied reinforcements. Super Poison and Counter Stance overwrite other status effects on those units. Super Poison deals 4 times the damage of normal poison, and cannot be overwritten by normal Poison.\n\nWhenever this unit enters the battlefield, whether at the start of battle or from reinforcements, it will Endure the next damage that would defeat it with 1HP. Endure effects cannot stack."
+        }
+      },
+      "PoisonExtraTurnGokuDark": {
+        "id": "PoisonExtraTurnGokuDark",
+        "found": true,
+        "localization": {
+          "name": "Thousand Thrusts",
+          "description": "Each time this unit damages a poisoned enemy with an attack, this unit will get another turn and allies gain 1 Spirit for each other ally \"Dark Sun Wukong, The Great Menace, Hell's Equal\" on the battlefield or in allied reinforcements, up to 4 spirit gained max.\n\nThese effects cannot trigger again against the same target until TU advances.\n\nEffects that influence TU order may interrupt the extra turn (e.g. Stuns targeting the lowest TU target)."
+        }
+      },
+      "PlusHPBoostLv3": {
+        "id": "PlusHPBoostLv3",
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv3",
+          "description": "Adds 1200 to this unit's max HP."
+        }
+      },
+      "SwordMinusDamageLv3": {
+        "id": "SwordMinusDamageLv3",
+        "found": true,
+        "localization": {
+          "name": "Sword Resist Lv3",
+          "description": "10% less damage from attacks by units equipped with Swords."
+        }
+      },
+      "PlusAttackBoostLv3": {
+        "id": "PlusAttackBoostLv3",
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv3",
+          "description": "Adds 300 to this unit's Attack."
+        }
+      },
+      "AddWeaponPrefSpear": {
+        "id": "AddWeaponPrefSpear",
+        "found": true,
+        "localization": {
+          "name": "Spear Mastery",
+          "description": "Can use weapon skills of Spears in addition to their original preferred weapon type."
+        }
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": {
+      "class": "MonsterConditions",
+      "elements": [
+        "Death"
+      ]
+    }
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "GokuDark02",
+    "family": "GokuDark",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "GokuDark02",
+    "family": "GokuDark",
+    "class": "Monster",
+    "leaderBuff": "AttackUpDeathD",
+    "leaderBuffCondition": "IsDeath",
+    "activeSkills": {
+      "0": "CloneAttackAGokuDark",
+      "1": "VigorRushDownAGokuDark",
+      "2": "MegaPoisonCounterAttackAGokuDark",
+      "3": "CloneEscapeAGokuDark"
+    },
+    "passives": {
+      "0": "BuffSelfAndSuperPoisonEnemiesEntry",
+      "1": "PoisonExtraTurnGokuDark",
+      "2": "PlusHPBoostLv3",
+      "3": "SwordMinusDamageLv3",
+      "4": "PlusAttackBoostLv3",
+      "5": "AddWeaponPrefSpear"
+    },
+    "cost": 34,
+    "baseAttack": 1305,
+    "baseMaxHp": 7895,
+    "speed": 525,
+    "element": "Death",
+    "weaponPref": "Hammer",
+    "weaponPivotIndex": 0,
+    "secure": 1,
+    "evolveFrom": "GokuDark01",
+    "aiTargetPickWeight": 1,
+    "stars": 6,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 0,
+    "battleOrbImageFlip": 1,
+    "attackType": "Bash",
+    "formTwitterShare": 1,
+    "cosmoName": "GokuDark03",
+    "cosmoBattleOrbImageFlip": 1,
+    "summonableMonsters": [
+      "GokuDark02"
+    ],
+    "summonableMatchSource": [
+      true
+    ],
+    "skillVoices": {
+      "0": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "1": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "2": [
+        13,
+        14,
+        15,
+        16
+      ],
+      "3": [
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    "damageVoices": [
+      17,
+      18,
+      19,
+      20
+    ],
+    "deathVoices": [
+      21,
+      22,
+      23,
+      24
+    ],
+    "victoryVoices": [
+      25,
+      26
+    ],
+    "lineupVoices": [
+      30,
+      31,
+      32
+    ],
+    "evolutionVoices": [
+      33
+    ],
+    "trainVoices": [
+      39,
+      40,
+      41,
+      42,
+      43
+    ],
+    "titleVoices": [
+      44
+    ],
+    "gachaVoices": [
+      45
+    ],
+    "loginVoices": [
+      46
+    ],
+    "tapVoices": [
+      47,
+      48,
+      49
+    ],
+    "idleVoices": [
+      50
+    ]
+  },
+  "_build": {
+    "scriptVersion": "6-character-family-states",
+    "sourceHash": "8253142105971f6d71223953651e9cfdf6b09d2ffd585f17585ed5113716ae34",
+    "dependencyHash": "5bc29b9b18238010b3dc8253ac06a5592c184edab36223346647294b1bb4e9e5",
+    "generatedAt": 1778213417
+  }
+}

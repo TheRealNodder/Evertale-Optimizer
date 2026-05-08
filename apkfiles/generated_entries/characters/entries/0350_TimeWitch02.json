@@ -1,0 +1,824 @@
+{
+  "schemaVersion": 3,
+  "order": 350,
+  "id": "gemina",
+  "name": "Gemina",
+  "title": "Devoted Timekeeper",
+  "description": "Gemina heard legends as she was growing up. Cautionary tales of a priestesses who ran from the temple and caused untold disaster. Her elders used their tragic fates to scare the acolytes into compliance. Gemina, however, would not be swayed.\n\nShe understood the importance of her order's neutrality. Those trusted to oversee time itself had a great responsibility, greater than most in Erden would ever have to face. But how could the guardians of history perform their duty if the world was nothing to them but a collection of sad stories?\n\nThat is why she ran away. Gemina escaped the priestesses' temple not to defile her duty, but to embrace its truest purpose.",
+  "category": "character",
+  "rarity": null,
+  "stars": 5,
+  "evolvedStars": 5,
+  "element": "Storm",
+  "weaponType": "Staff",
+  "stats": {
+    "atk": 704,
+    "hp": 5402,
+    "spd": 382,
+    "cost": 28
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/TimeWitch02.png",
+  "refs": {
+    "activeSkills": [
+      "GainAttackSingleAAir",
+      "ProtectTeammatesA",
+      "TimeDrainA",
+      "AccelerateAllyA"
+    ],
+    "passives": [
+      "HoldGround",
+      "StunRandomEntranceA",
+      "PlusAttackBoostLv2",
+      "AxeMinusDamageLv2",
+      "PlusHPBoostLv2",
+      "AddWeaponPrefMace"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": "HPUpAirC",
+    "leaderBuffCondition": "IsAir",
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "GainAttackSingleAAir": {
+        "id": "GainAttackSingleAAir",
+        "found": true,
+        "localization": {
+          "name": "Attack",
+          "description": "Damage to 1 enemy and allies gain 2 Spirit.",
+          "selected": "Damage to 1 enemy and gains 2 Spirit"
+        },
+        "ability": {
+          "name": "GainAttackSingleAAir",
+          "class": "Ability",
+          "abilityScalor": 0,
+          "config": "GainAttackSingleAAir",
+          "tuCost": 130,
+          "useLimit": 0,
+          "spiritGain": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ]
+            }
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "MidAir1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.3,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_casting3/batfx_casting3",
+            "batfx_stormmid2/batfx_stormmid2",
+            "batsfx_prefab/batsfx_air1",
+            "batfx_rippleyellowlow/batfx_rippleyellowlow"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -2,
+            1,
+            -2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            true,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {},
+        "conditions": {}
+      },
+      "ProtectTeammatesA": {
+        "id": "ProtectTeammatesA",
+        "found": true,
+        "localization": {
+          "name": "Guard Allies",
+          "description": "The user becomes a Guardian. For any enemy attack that would hit 1 or 2 other allies, 1 of the hits is instead redirected to this unit. This unit will not redirect skills that don't deal damage. Usable only if this unit is not already a Guardian.",
+          "selected": "User becomes a Guardian and protects allies"
+        },
+        "ability": {
+          "name": "ProtectTeammatesA",
+          "class": "Ability",
+          "config": "ProtectTeammatesA",
+          "tuCost": 70,
+          "useLimit": 0,
+          "spiritCost": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "SelfOnly",
+          "components": [
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "ProtectSource"
+              ],
+              "buffBackMode": true,
+              "applyToSourceOnly": true
+            }
+          ],
+          "useCondition": "NotProtecting",
+          "sourceEventType": "Hit",
+          "friendlyEventType": "Hit",
+          "abilityEffect": "Protect1",
+          "flags": [
+            "Protect"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "selfOnly": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "sortOrderOffset": [
+            2,
+            1,
+            0,
+            0,
+            -2,
+            -2
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_protect1",
+            "batfx_protector1/batfx_protector1",
+            "batfx_rainbowiris/batfx_rainbowiris",
+            "batfx_lightray1/batfx_lightray1",
+            "batfx_spotblue/batfx_spotblue",
+            "batfx_ripplebluelow/batfx_ripplebluelow"
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "ProtectSource": {
+            "class": "Buff",
+            "behaviors": [
+              "ManipulateTargeting",
+              "RemoveOnSourceDeath"
+            ],
+            "behaviorOverrides": [
+              {
+                "redirectToMe": true,
+                "redirectAlways": true,
+                "chanceToBlock": 1.0,
+                "consumeRedirectCountEvenOnSelf": true,
+                "failOnAllSkills": true,
+                "abilityFlagsToIgnore": [
+                  "Stun",
+                  "NoDamage"
+                ]
+              },
+              {}
+            ],
+            "stackName": "Protector",
+            "duration": -1,
+            "showAsTimer": true,
+            "iconSpriteName": "IconBlueDefenseShield01"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "NotProtecting": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "Protector"
+              ],
+              "or": {
+                "class": "MonsterConditions",
+                "buffStackNames": [
+                  "AutoProtect"
+                ],
+                "or": {
+                  "class": "MonsterConditions",
+                  "buffStackNames": [
+                    "TimedProtector"
+                  ],
+                  "or": {
+                    "class": "MonsterConditions",
+                    "buffStackNames": [
+                      "ConditionedProtector"
+                    ],
+                    "or": {
+                      "class": "MonsterConditions",
+                      "buffStackNames": [
+                        "Taunting"
+                      ],
+                      "checkEnemyTeamOfMonster": true,
+                      "enemyTeamMonsterConditionMatchesNeeded": {
+                        "IsTauntedTakingTurn": 1
+                      },
+                      "or": {
+                        "class": "MonsterConditions",
+                        "buffStackNames": [
+                          "SleepThorns",
+                          "ThornProtector"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "TimeDrainA": {
+        "id": "TimeDrainA",
+        "found": true,
+        "localization": {
+          "name": "Time Drain",
+          "description": "500% damage to 1 enemy if they have 130+ TU. 600% damage if the target has 200TU or more. If damage is dealt and the target's TU is 130 or more, the user will heal 50% of max HP.",
+          "selected": "500%+ damage against 130+ TU and heals user"
+        },
+        "ability": {
+          "name": "TimeDrainA",
+          "class": "Ability",
+          "abilityScalor": -2,
+          "conditionalAbilityScalors": [
+            4,
+            5
+          ],
+          "config": "TimeDrainA",
+          "tuCost": 130,
+          "useLimit": 0,
+          "spiritCost": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "TimestrikeDamageBoost"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "HealHalfStack"
+              ],
+              "applyConditions": "CurrentTUGreaterThan130",
+              "applyToTargetOnly": true,
+              "buffBackMode": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "attackScalors": [
+            "GoodVs130Tu",
+            "GoodVs200Tu"
+          ],
+          "enemyEventType": "Finish",
+          "sourceEventType": "Hit",
+          "abilityEffect": "SmallHit1",
+          "flags": [
+            "Timestrike",
+            "StealthWorthy"
+          ],
+          "conditionedAbilityEffects": [
+            "TimeDrainSpecialRanged1R",
+            "TimeDrainSpecialRanged1R"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.4,
+            0
+          ],
+          "prefabs": [
+            "batfx_bluntimpact1/batfx_bluntimpact1",
+            "batsfx_prefab/batsfx_impactsmall1"
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            true
+          ],
+          "scale": [
+            0.4,
+            1
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "HealHalfStack": {
+            "class": "Buff",
+            "stackName": "Healing",
+            "behaviors": [
+              "AdjustHp"
+            ],
+            "behaviorOverrides": [
+              {
+                "percent": 0.5,
+                "abilityEffect": "SmallHeal1"
+              }
+            ],
+            "duration": 0,
+            "applyConditions": "IsNotHealing",
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {
+          "GoodVs130Tu": {
+            "class": "AttackScalor",
+            "targetCondition": "CurrentTUGreaterThan130"
+          },
+          "GoodVs200Tu": {
+            "class": "AttackScalor",
+            "targetCondition": "CurrentTUGreaterThan200"
+          }
+        },
+        "conditions": {
+          "CurrentTUGreaterThan130": {
+            "class": "MonsterConditions",
+            "currentTUGreaterThan": 130
+          }
+        }
+      },
+      "AccelerateAllyA": {
+        "id": "AccelerateAllyA",
+        "found": true,
+        "localization": {
+          "name": "Quicken Ally",
+          "description": "1 ally's TU costs for all of their skills are reduced by 20%. This will overwrite the effect of previous Quicken skills.",
+          "selected": "Reduces the TU costs of target's skills"
+        },
+        "ability": {
+          "name": "AccelerateAllyA",
+          "class": "Ability",
+          "config": "AccelerateAllyA",
+          "tuCost": 70,
+          "useLimit": 0,
+          "spiritCost": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Ally",
+          "components": [
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "HasteUp20Percent"
+              ]
+            }
+          ],
+          "friendlyEventType": "Hit",
+          "immuneSuggestionCondition": "IsAccelerateSkillImmune",
+          "abilityEffect": "AccelerateAlly1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "friendlyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0,
+            0.3,
+            0,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_rippleyellowlow/batfx_rippleyellowlow",
+            "batfx_castingyellow1/batfx_castingyellow1",
+            "batfx_castingyellow2/batfx_castingyellow2",
+            "batfx_rippleyellowlow/batfx_rippleyellowlow",
+            "batsfx_prefab/batsfx_accelerate1",
+            "batfx_acceleratebottom1/batfx_acceleratebottom1",
+            "batfx_acceleratetop1/batfx_acceleratetop1"
+          ],
+          "sortOrderOffset": [
+            2,
+            -2,
+            -2,
+            2,
+            -2,
+            -2,
+            -2,
+            2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "HasteUp20Percent": {
+            "class": "Buff",
+            "behaviors": [
+              "StatOnly"
+            ],
+            "behaviorOverrides": [
+              {
+                "flatStatBonuses": {
+                  "Haste": -250
+                }
+              }
+            ],
+            "duration": -1,
+            "showAsTimer": false,
+            "stackName": "Accelerated",
+            "tags": [
+              "Accelerated20Percent"
+            ],
+            "noIconShownOnBattleStatus": true,
+            "iconSpriteName": "IconBrownSpeedUpClock01"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "IsAccelerateSkillImmune": {
+            "class": "MonsterConditions",
+            "monsterTags": [
+              "AccelerateSkillImmune"
+            ]
+          }
+        }
+      }
+    },
+    "passives": {
+      "HoldGround": {
+        "id": "HoldGround",
+        "found": true,
+        "localization": {
+          "name": "Hold Ground",
+          "description": "If this unit would be defeated by an enemy attack or a status effect while having more than 1 HP, it instead survives with 1 HP."
+        }
+      },
+      "StunRandomEntranceA": {
+        "id": "StunRandomEntranceA",
+        "found": true,
+        "localization": {
+          "name": "Stun Entry",
+          "description": "Stuns 1 random enemy for 150TU. Triggered when entering the battlefield from reinforcements."
+        }
+      },
+      "PlusAttackBoostLv2": {
+        "id": "PlusAttackBoostLv2",
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv2",
+          "description": "Adds 200 to this unit's Attack."
+        }
+      },
+      "AxeMinusDamageLv2": {
+        "id": "AxeMinusDamageLv2",
+        "found": true,
+        "localization": {
+          "name": "Axe Resist Lv2",
+          "description": "7% less damage from attacks by units equipped with Axes."
+        }
+      },
+      "PlusHPBoostLv2": {
+        "id": "PlusHPBoostLv2",
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv2",
+          "description": "Adds 800 to this unit's max HP."
+        }
+      },
+      "AddWeaponPrefMace": {
+        "id": "AddWeaponPrefMace",
+        "found": true,
+        "localization": {
+          "name": "Mace Mastery",
+          "description": "Can use weapon skills of Maces in addition to their original preferred weapon type."
+        }
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": {
+      "class": "MonsterConditions",
+      "elements": [
+        "Air"
+      ]
+    }
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "TimeWitch02",
+    "family": "TimeWitch",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "TimeWitch02",
+    "family": "TimeWitch",
+    "class": "Monster",
+    "leaderBuff": "HPUpAirC",
+    "leaderBuffCondition": "IsAir",
+    "activeSkills": {
+      "0": "GainAttackSingleAAir",
+      "1": "ProtectTeammatesA",
+      "2": "TimeDrainA",
+      "3": "AccelerateAllyA"
+    },
+    "passives": {
+      "0": "HoldGround",
+      "1": "StunRandomEntranceA",
+      "2": "PlusAttackBoostLv2",
+      "3": "AxeMinusDamageLv2",
+      "4": "PlusHPBoostLv2",
+      "5": "AddWeaponPrefMace"
+    },
+    "cost": 28,
+    "baseAttack": 704,
+    "baseMaxHp": 5402,
+    "speed": 382,
+    "element": "Air",
+    "weaponPref": "Staff",
+    "weaponPivotIndex": 1,
+    "secure": 1,
+    "evolveFrom": "TimeWitch01",
+    "aiTargetPickWeight": 1,
+    "stars": 5,
+    "evolvedStars": 5,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 0,
+    "battleOrbImageFlip": 0,
+    "attackType": "Weapon",
+    "formTwitterShare": 1,
+    "skillVoices": {
+      "0": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "1": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "2": [
+        9,
+        10,
+        11,
+        12
+      ],
+      "3": [
+        13,
+        14,
+        15,
+        16
+      ]
+    },
+    "damageVoices": [
+      17,
+      18,
+      19,
+      20
+    ],
+    "deathVoices": [
+      21,
+      22,
+      23,
+      24
+    ],
+    "victoryVoices": [
+      25,
+      26
+    ],
+    "lineupVoices": [
+      27,
+      28,
+      29,
+      30
+    ],
+    "trainVoices": [
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39
+    ],
+    "titleVoices": [
+      40
+    ],
+    "gachaVoices": [
+      41
+    ]
+  },
+  "_build": {
+    "scriptVersion": "6-character-family-states",
+    "sourceHash": "d4f69478ba69af164788d24463a9f284a1554f4e48b49fb238387948a7c56543",
+    "dependencyHash": "e0afadf1a2846925391de0073c7b6a36ad8212d0ea4632cd8a01e54bdbcd8bc2",
+    "generatedAt": 1778213413
+  }
+}

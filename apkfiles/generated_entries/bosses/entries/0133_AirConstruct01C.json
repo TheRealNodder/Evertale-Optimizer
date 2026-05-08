@@ -1,0 +1,624 @@
+{
+  "schemaVersion": 3,
+  "order": 133,
+  "id": "small-storm-golem",
+  "name": "Small Storm Golem",
+  "title": "",
+  "description": "",
+  "category": "bosse",
+  "rarity": null,
+  "stars": 5,
+  "evolvedStars": 5,
+  "element": "Storm",
+  "weaponType": "GreatSword",
+  "stats": {
+    "atk": 1350,
+    "hp": 3000,
+    "spd": 600,
+    "cost": 999
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/AirConstruct01C.png",
+  "refs": {
+    "activeSkills": [
+      "GainAttackSingleAFastGolem",
+      "MomentumStrikeDoubleA",
+      "TimeBombSingleA"
+    ],
+    "passives": [
+      "HoldGround"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": null,
+    "leaderBuffCondition": null,
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "GainAttackSingleAFastGolem": {
+        "id": "GainAttackSingleAFastGolem",
+        "found": true,
+        "localization": {
+          "name": "GainAttackSingleAFastGolem",
+          "description": ""
+        },
+        "ability": {
+          "name": "GainAttackSingleAFastGolem",
+          "class": "Ability",
+          "abilityScalor": -0.33,
+          "config": "GainAttackSingleAFastGolem",
+          "tuCost": 70,
+          "useLimit": 0,
+          "nameKey": "GainAttackSingleAFast",
+          "descriptionKey": "GainAttackSingleAFast",
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "applyToTargetType": "Enemy",
+              "buffs": [
+                "MomentumReady"
+              ],
+              "buffBackMode": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Hit",
+          "abilityEffect": "MidBlunt1Golem"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0.4,
+            0
+          ],
+          "prefabs": [
+            "batfx_jumpsmoke1/batfx_jumpsmoke1",
+            "batsfx_prefab/batsfx_bluntimpact1",
+            "batfx_bluntimpact2/batfx_bluntimpact2"
+          ],
+          "sortOrderOffset": [
+            1,
+            2,
+            2
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            1
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            true
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            true
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "MomentumReady": {
+            "class": "Buff",
+            "stackName": "MomentumReady",
+            "duration": -1,
+            "isHiddenFromPlayers": true,
+            "applyConditions": "UsesMomentumReady"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {}
+      },
+      "MomentumStrikeDoubleA": {
+        "id": "MomentumStrikeDoubleA",
+        "found": true,
+        "localization": {
+          "name": "Combo Burst",
+          "description": "300% damage to 2 enemies. Unlocked each time the user damages an enemy with another attack. This skill is locked again after each use or if the user leaves the battlefield.",
+          "selected": "300% damage, usable after another attack"
+        },
+        "ability": {
+          "name": "MomentumStrikeDoubleA",
+          "class": "Ability",
+          "abilityScalor": 2,
+          "config": "MomentumStrikeDoubleA",
+          "tuCost": 130,
+          "useLimit": 0,
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "MomentumDamageBoost"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "MomentumUsed"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "useCondition": "HasDamagedWithAttack",
+          "flags": [
+            "Momentum",
+            "MomentumReadyUser"
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Hit",
+          "abilityEffect": "SurvivorAbility2",
+          "recommendEffectWhenUsable": 1,
+          "killLockSkillIcon": "IconRedEx01",
+          "killLockUnlockedSkillIcon": "IconGreenCircle01",
+          "killLockUnlockedKey": "SkillReadyToUseKey",
+          "killLockLockedKey": "MomentumStrikeDoubleALockLockedKey"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.75,
+            0,
+            0.1,
+            0.3,
+            0.4,
+            0.23,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_timestrike1",
+            "batfx_survivor1/batfx_survivor1",
+            "batfx_physicalmagic1/batfx_physicalmagic2",
+            "batsfx_prefab/batsfx_stealth1",
+            "batsfx_prefab/batsfx_slash1",
+            "batsfx_prefab/batsfx_slash1",
+            "batsfx_prefab/batsfx_ring1",
+            "batfx_bluntimpact2/batfx_bluntimpact2",
+            "batsfx_prefab/batsfx_bomb1"
+          ],
+          "sortOrderOffset": [
+            2,
+            -2,
+            1,
+            -2,
+            -2,
+            -2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "audiobundle1",
+            "audiobundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0.2,
+            0,
+            0,
+            0,
+            0,
+            0.8,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            true,
+            true,
+            true,
+            true,
+            false,
+            true
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "MomentumUsed": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "MomentumReady"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "HasDamagedWithAttack": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "MomentumReady"
+            ]
+          }
+        }
+      },
+      "TimeBombSingleA": {
+        "id": "TimeBombSingleA",
+        "found": true,
+        "localization": {
+          "name": "Survival Bomb",
+          "description": "Sacrifices the user for 500% damage to 1 enemy. Locked for 300TU after the user enters the battlefield. 600% damage if the user has survived for 400TU.",
+          "selected": "500%+ damage, requires 300TU, user is sacrificed"
+        },
+        "ability": {
+          "name": "TimeBombSingleA",
+          "class": "Ability",
+          "abilityScalor": 4,
+          "conditionalAbilityScalors": [
+            5
+          ],
+          "config": "TimeBombSingleA",
+          "useLimit": 0,
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 1
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ChanceToDie"
+          ],
+          "componentOverrides": [
+            {
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "chance": 1.0,
+              "applyToTargetType": "Source"
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "Bomb2",
+          "bombSkillIcon": "IconBrownCountdownClock01",
+          "bombSkillIconDescriptionKey": "TimeBombSingleACountdownKey",
+          "useCondition": "TimeInCombat300",
+          "attackScalors": [
+            "TimeInCombat400"
+          ],
+          "conditionedAbilityEffects": [
+            "Bomb2"
+          ],
+          "flags": [
+            "Duration"
+          ],
+          "killsUser": true,
+          "usesExtraSurvivalScalor": true,
+          "recommendEffectWhenUsable": 1
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.75,
+            0,
+            0.15,
+            0,
+            0.1,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting2",
+            "batfx_casting3/batfx_casting3",
+            "batsfx_prefab/batsfx_bomb1",
+            "batfx_bomb/batfx_bomb1",
+            "batsfx_prefab/batsfx_bomb1",
+            "batfx_bomb/batfx_bomb2",
+            "batsfx_prefab/batsfx_bomb1",
+            "batfx_bomb/batfx_bomb1"
+          ],
+          "sortOrderOffset": [
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            true,
+            false,
+            true,
+            false,
+            true
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            true,
+            false,
+            true,
+            false,
+            true
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            false,
+            true,
+            false,
+            true,
+            false
+          ],
+          "scale": [
+            1,
+            1,
+            1,
+            0.4,
+            1,
+            0.5,
+            1,
+            1
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ChanceToDie": {
+            "class": "ChanceToDieAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {
+          "TimeInCombat300": {
+            "class": "AttackScalor",
+            "sourceCondition": "TimeInCombat300"
+          },
+          "TimeInCombat400": {
+            "class": "AttackScalor",
+            "sourceCondition": "TimeInCombat400"
+          }
+        },
+        "conditions": {
+          "TimeInCombat300": {
+            "class": "MonsterConditions",
+            "timeInCombat": 300
+          },
+          "TimeInCombat400": {
+            "class": "MonsterConditions",
+            "timeInCombat": 400
+          }
+        }
+      }
+    },
+    "passives": {
+      "HoldGround": {
+        "id": "HoldGround",
+        "found": true,
+        "localization": {
+          "name": "Hold Ground",
+          "description": "If this unit would be defeated by an enemy attack or a status effect while having more than 1 HP, it instead survives with 1 HP."
+        }
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": null
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "AirConstruct01C",
+    "family": "AirConstruct",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "AirConstruct01C",
+    "class": "Monster",
+    "family": "AirConstruct",
+    "activeSkills": {
+      "0": "GainAttackSingleAFastGolem",
+      "1": "MomentumStrikeDoubleA",
+      "2": "TimeBombSingleA"
+    },
+    "passives": {
+      "0": "HoldGround"
+    },
+    "cost": 999,
+    "baseAttack": 1350,
+    "baseMaxHp": 3000,
+    "speed": 600,
+    "element": "Air",
+    "weaponPref": "GreatSword",
+    "weaponPivotIndex": 0,
+    "walkSound": "TestSound",
+    "secure": 1,
+    "aiTargetPickWeight": 1,
+    "stars": 5,
+    "evolvedStars": 5,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 1,
+    "battleOrbImageFlip": 0,
+    "skillVoices": {
+      "0": [
+        1,
+        3
+      ],
+      "1": [
+        1,
+        3
+      ],
+      "2": [
+        1,
+        3
+      ],
+      "3": [
+        1,
+        3
+      ]
+    },
+    "damageVoices": [
+      9
+    ],
+    "deathVoices": [
+      11
+    ]
+  },
+  "_build": {
+    "scriptVersion": "6-character-family-states",
+    "sourceHash": "563b05e215486b52972c0bfa3d597af239484c25a981a22ab6c9883e4b44044e",
+    "dependencyHash": "9d419ab3bf92e789549c28c1818e4c367cb55b36d5dc9c7020ea6b2f4a49c371",
+    "generatedAt": 1778213444
+  }
+}

@@ -1,0 +1,829 @@
+{
+  "schemaVersion": 3,
+  "order": 535,
+  "id": "morphie",
+  "name": "Morphie",
+  "title": "Dreamy Familiar",
+  "description": "A rabbit-like little creature, as mysterious as she's cute. She understands human speech, and can even say a couple of words herself. Though at first glance she might look helpless, her tiny body hides incredibly powerful magic.",
+  "category": "character",
+  "rarity": null,
+  "stars": 0,
+  "evolvedStars": 0,
+  "element": "Water",
+  "weaponType": "Hammer",
+  "stats": {
+    "atk": 50,
+    "hp": 1690,
+    "spd": 1000,
+    "cost": 0
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/MagicalRabbit01.png",
+  "refs": {
+    "activeSkills": [
+      "PurifyHealDoubleBMagicalRabbit",
+      "ProtectTeammatesUntilNextTurnAMagicalRabbit",
+      "MagicalGirlSacA"
+    ],
+    "passives": [
+      "GetTurnEnrageAllyGainSpiritEntranceA",
+      "StunImmunity"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": null,
+    "leaderBuffCondition": null,
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "PurifyHealDoubleBMagicalRabbit": {
+        "id": "PurifyHealDoubleBMagicalRabbit",
+        "found": true,
+        "localization": {
+          "name": "PurifyHealDoubleBMagicalRabbit",
+          "description": "Removes negative status effects like sleep, burn or poison from 2 allies, and heals them each for 25% of their max HP.",
+          "selected": "Removes bad effects and heals targets"
+        },
+        "ability": {
+          "name": "PurifyHealDoubleBMagicalRabbit",
+          "class": "Ability",
+          "config": "PurifyHealDoubleBMagicalRabbit",
+          "tuCost": 70,
+          "useLimit": 0,
+          "nameKey": "PurifyHealDoubleA",
+          "spiritCost": 0,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Ally",
+          "components": [
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "QuarterHeal",
+                "RemoveBuffs"
+              ]
+            }
+          ],
+          "flags": [
+            "Purify",
+            "Healer"
+          ],
+          "friendlyEventType": "Finish",
+          "abilityEffect": "Purify1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "friendlyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0,
+            0.3,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_ripplebluelow/batfx_ripplebluelow",
+            "batfx_castinggreen1/batfx_castinggreen1",
+            "batfx_castinggreen2/batfx_castinggreen2",
+            "batfx_ripplebluelow/batfx_ripplebluelow",
+            "batsfx_prefab/batsfx_heal1",
+            "batfx_purify1/batfx_purify1"
+          ],
+          "sortOrderOffset": [
+            2,
+            2,
+            -2,
+            2,
+            -2,
+            -2,
+            2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "QuarterHeal": {
+            "class": "Buff",
+            "behaviors": [
+              "AdjustHp"
+            ],
+            "behaviorOverrides": [
+              {
+                "percent": 0.25,
+                "abilityEffect": "SmallHeal1",
+                "hpboosts": [
+                  "HealBoost"
+                ]
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "RemoveBuffs": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {}
+      },
+      "ProtectTeammatesUntilNextTurnAMagicalRabbit": {
+        "id": "ProtectTeammatesUntilNextTurnAMagicalRabbit",
+        "found": true,
+        "localization": {
+          "name": "Morphie Forcefield",
+          "description": "Until the end of the user's next turn, the user will become a Guardian and cannot be defeated. For any enemy attack that would hit 1 or 2 other allies while this unit is a Guardian, 1 of the hits is instead redirected to this unit. This unit will not redirect skills that don't deal damage. Usable once each time this unit is conjured.",
+          "selected": "Guards and cannot be defeated until its next turn"
+        },
+        "ability": {
+          "name": "ProtectTeammatesUntilNextTurnAMagicalRabbit",
+          "class": "Ability",
+          "config": "ProtectTeammatesUntilNextTurnAMagicalRabbit",
+          "tuCost": 100,
+          "useLimit": 1,
+          "spiritCost": 0,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "SelfOnly",
+          "components": [
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "ProtectSourceBlockDeathUntilNextTurnMagicalRabbit"
+              ],
+              "buffBackMode": true,
+              "applyToSourceOnly": true
+            }
+          ],
+          "useCondition": "NotProtecting",
+          "sourceEventType": "Hit",
+          "friendlyEventType": "Hit",
+          "abilityEffect": "Protect1",
+          "flags": [
+            "Protect"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "selfOnly": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "sortOrderOffset": [
+            2,
+            1,
+            0,
+            0,
+            -2,
+            -2
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_protect1",
+            "batfx_protector1/batfx_protector1",
+            "batfx_rainbowiris/batfx_rainbowiris",
+            "batfx_lightray1/batfx_lightray1",
+            "batfx_spotblue/batfx_spotblue",
+            "batfx_ripplebluelow/batfx_ripplebluelow"
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "ProtectSourceBlockDeathUntilNextTurnMagicalRabbit": {
+            "class": "Buff",
+            "stackName": "AutoProtect",
+            "behaviors": [
+              "RemoveAfterTurnsBehavior",
+              "BlockDeath",
+              "ManipulateTargeting",
+              "RemoveOnSourceDeath",
+              "Immunity"
+            ],
+            "behaviorOverrides": [
+              {
+                "turnCount": 1
+              },
+              {
+                "conditions": "AlwaysTrue",
+                "cancelFromDamageFlags": [
+                  "HardIgnoreBlockDeath",
+                  "LethalPoison"
+                ]
+              },
+              {
+                "redirectToMe": true,
+                "redirectAlways": true,
+                "chanceToBlock": 1.0,
+                "consumeRedirectCountEvenOnSelf": true,
+                "failOnAllSkills": true,
+                "abilityFlagsToIgnore": [
+                  "Stun",
+                  "NoDamage"
+                ]
+              },
+              {},
+              {
+                "stackNamesToBlock": [
+                  "StunAbsorber",
+                  "StunAbsorberGranted",
+                  "StunAbsorberTemp"
+                ]
+              }
+            ],
+            "iconSpriteName": "IconRedHoldTaunt01",
+            "tags": [
+              "ProtectorBlockDeathUntilNextTurn"
+            ],
+            "duration": -1,
+            "showAsTimer": true,
+            "showAsPermanent": false
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "NotProtecting": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "Protector"
+              ],
+              "or": {
+                "class": "MonsterConditions",
+                "buffStackNames": [
+                  "AutoProtect"
+                ],
+                "or": {
+                  "class": "MonsterConditions",
+                  "buffStackNames": [
+                    "TimedProtector"
+                  ],
+                  "or": {
+                    "class": "MonsterConditions",
+                    "buffStackNames": [
+                      "ConditionedProtector"
+                    ],
+                    "or": {
+                      "class": "MonsterConditions",
+                      "buffStackNames": [
+                        "Taunting"
+                      ],
+                      "checkEnemyTeamOfMonster": true,
+                      "enemyTeamMonsterConditionMatchesNeeded": {
+                        "IsTauntedTakingTurn": 1
+                      },
+                      "or": {
+                        "class": "MonsterConditions",
+                        "buffStackNames": [
+                          "SleepThorns",
+                          "ThornProtector"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "MagicalGirlSacA": {
+        "id": "MagicalGirlSacA",
+        "found": true,
+        "localization": {
+          "name": "Starlight Sacrifice",
+          "description": "The user is sacrificed to grant \"Alice, Dreamy Magical Girl\" her Starlight Champion form. When Alice enters Starlight Champion form her Hold Ground+ is reset so it can trigger again, she will be purified, healed for 100% of her max HP, Quickened by 20% (this will overwrite the effects of other quicken skills), and will immediately get the next turn by having her TU reduced to 0. While in Starlight Champion form, Alice will heal 15% of max HP on every ally and enemy turn, has a 50% chance to gain 1 Spirit after every ally and enemy turn, has her Attack increased to 1.5x (this will not stack with Enrage effects), and cannot be sent to the reinforcements from the battlefield. Only usable when an ally \"Alice, Dreamy Magical Girl\" unit on the battlefield no longer has Hold Ground+ active.",
+          "selected": "Sacrifices self to grant Alice her Starlight Champion form"
+        },
+        "ability": {
+          "name": "MagicalGirlSacA",
+          "class": "Ability",
+          "config": "MagicalGirlSacA",
+          "tuCost": 0,
+          "useLimit": 0,
+          "spiritGain": 3,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "AllAlly",
+          "components": [
+            "ChanceToDie",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "chance": 1.0
+            },
+            {
+              "buffs": [
+                "RemoveBuffs",
+                "HealFull",
+                "GiveTurn",
+                "KnockbackImmunityIcon",
+                "HasteUp20Percent",
+                "RegenerationGain1SpiritChanceOnTurn",
+                "LockSummonMagicalRabbit",
+                "HoldGroundOnceForHoldGroundPlus",
+                "BlockDeathUntilNextTurnForHoldGroundPlus"
+              ],
+              "applyToTargetType": "Friendly",
+              "buffAppliedEffects": [
+                "RabbitWhiteout1"
+              ],
+              "applyConditions": "IsAliceMagicalGirl",
+              "showMissConditions": "ShowNoMiss"
+            }
+          ],
+          "sourceEventType": "Finish",
+          "friendlyEventType": "Hit",
+          "abilityEffect": "RabbitSacrifice1",
+          "hideTargetingInfo": true,
+          "useCondition": "AllyAliceMagicalGirlNotBlockDeathUntilNextTurn1OrMore",
+          "flags": [
+            "StealthWorthy"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "allFriends": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.3,
+            0,
+            0,
+            1.6
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_alicemagi1/batfx_magisac1",
+            "batfx_bluehelix1/batfx_bluehelix1",
+            "batsfx_prefab/batsfx_knockback1",
+            "batfx_ripplebluelow/batfx_ripplebluelow",
+            "batfx_common/batfx_empty"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -2,
+            1,
+            -2,
+            -2,
+            0
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle2"
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            true,
+            false,
+            true
+          ]
+        },
+        "components": {
+          "ChanceToDie": {
+            "class": "ChanceToDieAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "BlockDeathUntilNextTurnForHoldGroundPlus": {
+            "class": "Buff",
+            "stackName": "BlockDeathUntilNextTurn",
+            "behaviors": [
+              "BuffOnMonsterTurn",
+              "BlockDeath",
+              "Immunity"
+            ],
+            "behaviorOverrides": [
+              {
+                "selfBuffs": [
+                  "RemoveBlockDeathUntilNextTurnForHoldGroundPlus"
+                ],
+                "spreadCondition": "NotHoldGroundOnceForHoldGroundPlus"
+              },
+              {
+                "conditions": "NotAlwaysEnemyTurn",
+                "cancelFromDamageFlags": [
+                  "IgnoreBlockDeath",
+                  "HardIgnoreBlockDeath",
+                  "LethalPoison"
+                ]
+              },
+              {
+                "stackNamesToBlock": [
+                  "BlockDeathUntilNextTurn"
+                ],
+                "activateCondition": "NotHoldGroundOnceForHoldGroundPlusNotMyTurn",
+                "dontShowText": true
+              }
+            ],
+            "hideFromPlayerCondition": "HoldGroundOnceForHoldGroundPlusOrMyTurn",
+            "iconSpriteName": "IconWhiteFightSwordPlus01",
+            "duration": -1,
+            "showAsTimer": true
+          },
+          "GiveTurn": {
+            "class": "Buff",
+            "behaviors": [
+              "GiveTurn"
+            ],
+            "behaviorOverrides": [
+              {}
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "textKeyToShowWhenApplied": "TurnGivenKey",
+            "isHiddenFromPlayers": true
+          },
+          "HasteUp20Percent": {
+            "class": "Buff",
+            "behaviors": [
+              "StatOnly"
+            ],
+            "behaviorOverrides": [
+              {
+                "flatStatBonuses": {
+                  "Haste": -250
+                }
+              }
+            ],
+            "duration": -1,
+            "showAsTimer": false,
+            "stackName": "Accelerated",
+            "tags": [
+              "Accelerated20Percent"
+            ],
+            "noIconShownOnBattleStatus": true,
+            "iconSpriteName": "IconBrownSpeedUpClock01"
+          },
+          "HealFull": {
+            "class": "Buff",
+            "behaviors": [
+              "AdjustHp"
+            ],
+            "behaviorOverrides": [
+              {
+                "percent": 1.0,
+                "abilityEffect": "LargeHeal1"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "HoldGroundOnceForHoldGroundPlus": {
+            "class": "Buff",
+            "stackName": "HoldGroundOnceForHoldGroundPlus",
+            "behaviors": [
+              "BlockDeath"
+            ],
+            "behaviorOverrides": [
+              {
+                "conditions": "AlwaysTrue",
+                "removeAfterTriggers": 1,
+                "cancelFromDamageFlags": [
+                  "IgnoreBlockDeath",
+                  "HardIgnoreBlockDeath",
+                  "LethalPoison"
+                ]
+              }
+            ],
+            "iconSpriteName": "IconWhiteFightSwordPlus01",
+            "duration": -1,
+            "showAsTimer": true
+          },
+          "KnockbackImmunityIcon": {
+            "class": "Buff",
+            "duration": -1,
+            "showAsTimer": true,
+            "showAsPermanent": true,
+            "isHiddenFromPlayers": true,
+            "iconSpriteName": "IconWhiteKnockbackImmune01"
+          },
+          "LockSummonMagicalRabbit": {
+            "class": "Buff",
+            "stackName": "LockSummonMagicalRabbit",
+            "duration": -1,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "isHiddenFromPlayers": true
+          },
+          "RegenerationGain1SpiritChanceOnTurn": {
+            "class": "Buff",
+            "behaviors": [
+              "BuffOnMonsterTurn",
+              "BuffOnMonsterTurnEnd",
+              "StatOnly",
+              "Immunity"
+            ],
+            "behaviorOverrides": [
+              {
+                "selfBuffs": [
+                  "AliceMagicHeal"
+                ],
+                "activeMonsterConditions": "AlwaysTrue"
+              },
+              {
+                "selfBuffs": [
+                  "SpiritGainDIdolFX"
+                ],
+                "activeMonsterConditions": "AlwaysTrue",
+                "chance": 0.5
+              },
+              {
+                "conditions": "NotEnraged",
+                "scalorStatBonuses": {
+                  "Attack": 0.5
+                }
+              },
+              {
+                "stackNamesToBlock": [
+                  "Knockback",
+                  "Pushback",
+                  "Swap",
+                  "Switch",
+                  "KnockRandom"
+                ]
+              }
+            ],
+            "stackName": "RegenerationGain1SpiritChanceOnTurn",
+            "duration": -1,
+            "showAsPermanent": false,
+            "tags": [
+              "KnockbackImmune"
+            ],
+            "statusEffect": "StarlightChampion1",
+            "showAsTimer": true,
+            "iconSpriteName": "IconPinkStarlight01"
+          },
+          "RemoveBuffs": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "AllyAliceMagicalGirlNotBlockDeathUntilNextTurn1OrMore": {
+            "class": "MonsterConditions",
+            "myTeamMonsterConditionMatchesNeeded": {
+              "IsAliceMagicalGirlNotBlockDeathUntilNextTurn": 1
+            }
+          },
+          "HoldGroundOnceForHoldGroundPlus": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "HoldGroundOnceForHoldGroundPlus"
+            ]
+          },
+          "IsAliceMagicalGirl": {
+            "class": "MonsterConditions",
+            "families": [
+              "AliceMagicalGirl"
+            ]
+          }
+        }
+      }
+    },
+    "passives": {
+      "GetTurnEnrageAllyGainSpiritEntranceA": {
+        "id": "GetTurnEnrageAllyGainSpiritEntranceA",
+        "found": true,
+        "localization": {
+          "name": "Meet Morphie!",
+          "description": "When this unit enters battle all allies become Enraged, having their Attack increased to 1.5x until the end of their next turns, and allies gain 3 Spirit.\n\nThis unit will immediately get the turn by having its TU reduced to 0 whenever it enters the battlefield."
+        }
+      },
+      "StunImmunity": {
+        "id": "StunImmunity",
+        "found": true,
+        "localization": {
+          "name": "Stun Immunity",
+          "description": "This unit is not affected by stun effects."
+        }
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": null
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "MagicalRabbit01",
+    "family": "MagicalRabbit",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "MagicalRabbit01",
+    "family": "MagicalRabbit",
+    "class": "Monster",
+    "activeSkills": {
+      "0": "PurifyHealDoubleBMagicalRabbit",
+      "1": "ProtectTeammatesUntilNextTurnAMagicalRabbit",
+      "2": "MagicalGirlSacA"
+    },
+    "passives": {
+      "0": "GetTurnEnrageAllyGainSpiritEntranceA",
+      "1": "StunImmunity"
+    },
+    "cost": 0,
+    "baseAttack": 50,
+    "baseMaxHp": 1690,
+    "speed": 1000,
+    "element": "Water",
+    "weaponPref": "Hammer",
+    "weaponPivotIndex": 0,
+    "secure": 1,
+    "aiTargetPickWeight": 1,
+    "stars": 0,
+    "evolvedStars": 0,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 0,
+    "battleOrbImageFlip": 1,
+    "attackType": "Bash",
+    "skillVoices": {
+      "0": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "1": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "2": [
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    "damageVoices": [
+      13,
+      14,
+      15,
+      16
+    ],
+    "deathVoices": [
+      17,
+      18,
+      19,
+      20
+    ],
+    "victoryVoices": [
+      21,
+      22
+    ]
+  },
+  "_build": {
+    "scriptVersion": "6-character-family-states",
+    "sourceHash": "b3480abeed19b9ad392752e9b320064d9b57eab8f80fd34ac3ba592d8519f09d",
+    "dependencyHash": "ad3342c71422fed7cb14c35f57eb797a2495feabc2cec4a2ab640a2624eff8e6",
+    "generatedAt": 1778213416
+  }
+}

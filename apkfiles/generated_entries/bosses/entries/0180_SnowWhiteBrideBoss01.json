@@ -1,0 +1,1202 @@
+{
+  "schemaVersion": 3,
+  "order": 180,
+  "id": "berserk-snow-white",
+  "name": "Berserk Snow White",
+  "title": "",
+  "description": "",
+  "category": "bosse",
+  "rarity": null,
+  "stars": 6,
+  "evolvedStars": 6,
+  "element": "Light",
+  "weaponType": "Spear",
+  "stats": {
+    "atk": 1400,
+    "hp": 100000,
+    "spd": 900,
+    "cost": 999
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/SnowWhiteBride01.png",
+  "refs": {
+    "activeSkills": [
+      "SleepAttackASnowWhiteBrideBoss",
+      "DreamBusterPlusASnowWhiteBrideBoss",
+      "ForceSleepDoubleASnowWhiteBrideBoss",
+      "SummonSnowBlackBrideBossSacA01"
+    ],
+    "passives": [
+      "GainSpiritGetTurnOnEnterSnowWhiteBrideBoss",
+      "DoubleTurnOnKillABoss",
+      "AttackUpIfEnemyHasSlept",
+      "PurifySelfOnMyTurn",
+      "KnockbackImmunity",
+      "StunImmunity"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": null,
+    "leaderBuffCondition": null,
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "SleepAttackASnowWhiteBrideBoss": {
+        "id": "SleepAttackASnowWhiteBrideBoss",
+        "found": true,
+        "localization": {
+          "name": "Sleep Attack",
+          "description": "Damage to 1 enemy, with a 100% chance of granting that enemy the Sleep status effect for 200TU. If applied, this will overwrite other status effects on that enemy. Sleep cannot be applied to a unit that Has Slept while on the battlefield. Damage from this attack does not wake up sleeping enemies.",
+          "selected": "Damage to 1 enemy and apply Sleep to them\n(Can overwrite other status effects)"
+        },
+        "ability": {
+          "name": "SleepAttackASnowWhiteBrideBoss",
+          "class": "Ability",
+          "abilityScalor": 0,
+          "config": "SleepAttackASnowWhiteBrideBoss",
+          "tuCost": 100,
+          "useLimit": 0,
+          "spiritGain": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "damageFlags": [
+                "DoNotWake"
+              ]
+            },
+            {
+              "buffs": [
+                "BurnImmunityTempForRevengeSleepAttack",
+                "Sleep"
+              ],
+              "chance": 1.0,
+              "applyConditions": "HasNotSlept",
+              "buffAppliedEffects": [
+                "SleepBuffInstant"
+              ],
+              "showMissConditions": "ShowNoMiss",
+              "skipAbilityEffect": true
+            }
+          ],
+          "useCondition": "SnowBrideBossSummonLocked",
+          "enemyEventType": "Hit",
+          "abilityEffect": "MediumMagicModule",
+          "flags": [
+            "SleepChance",
+            "SleepWithDamage",
+            "StealthWorthy"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0.3,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_castingpurple1/batfx_castingpurple1",
+            "batfx_castingpurple2/batfx_castingpurple2",
+            "batfx_sleep1/batfx_sleep1",
+            "batsfx_prefab/batsfx_poison1",
+            "batfx_ripplepurplelow/batfx_ripplepurplelow"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -2,
+            2,
+            0,
+            -2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            false,
+            true,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "BurnImmunityTempForRevengeSleepAttack": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Burn",
+                  "BurnAfterTurn",
+                  "BurnAtEndOfTurn"
+                ],
+                "dontShowText": true
+              },
+              {
+                "name": "BurnAfterTurn"
+              },
+              {
+                "name": "BurnSelfOnHit"
+              }
+            ],
+            "duration": 1,
+            "showAsTimer": false,
+            "applyConditions": "IsNotAnySleepImmune",
+            "showAsPermanent": false,
+            "tags": [
+              "BurnImmune"
+            ],
+            "stackName": "BurnImmunityTempForRevenge",
+            "isHiddenFromPlayers": true
+          },
+          "Sleep": {
+            "class": "Buff",
+            "stackName": "Sleep",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "LoseTurn",
+              "RemoveOnHurt"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "PurifyChain"
+              },
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "name": "AutoPurifyAfterTurnNoSleep"
+              },
+              {},
+              {
+                "ignoreIfHurtBySelf": true,
+                "cancelFromDamageFlags": [
+                  "DoNotWake"
+                ]
+              }
+            ],
+            "applyConditions": "HasNotSlept",
+            "duration": 200,
+            "showAsTimer": true,
+            "statusEffect": "SleepStatus",
+            "statusEffectOffset": 0.1,
+            "iconSpriteName": "IconWhiteSleepZs01",
+            "textKeyToShowWhenApplied": "SleepKey",
+            "canBePurified": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "HasNotSlept": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "properties": {
+                "hasSlept": 1
+              }
+            }
+          },
+          "SnowBrideBossSummonLocked": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "SnowBrideBossSummonLocked"
+            ]
+          }
+        }
+      },
+      "DreamBusterPlusASnowWhiteBrideBoss": {
+        "id": "DreamBusterPlusASnowWhiteBrideBoss",
+        "found": true,
+        "localization": {
+          "name": "Nightmare Assassin",
+          "description": "600% damage to 1 enemy if they are sleeping. 300% damage instead if they are awake after having fallen asleep while on the battlefield. A random enemy that has not slept while on the battlefield is granted the Sleep status effect for 200TU. This attack ignores enemy damage reduction effects.",
+          "selected": "Up to 600% to Sleeping/Has Slept, spreads Sleep\n(Will overwrite other status effects)"
+        },
+        "ability": {
+          "name": "DreamBusterPlusASnowWhiteBrideBoss",
+          "class": "Ability",
+          "abilityScalor": -2,
+          "conditionalAbilityScalors": [
+            2,
+            5
+          ],
+          "config": "DreamBusterPlusASnowWhiteBrideBoss",
+          "tuCost": 100,
+          "useLimit": 0,
+          "spiritCost": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "DreamhuntDamageBoost"
+              ],
+              "damageFlags": [
+                "DreamDamage",
+                "IgnoreArmor"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "Sleep1RandomAllyHasNotSlept"
+              ],
+              "applyToSourceOnly": true,
+              "showMissConditions": "ShowNoMiss",
+              "skipAbilityEffect": true
+            }
+          ],
+          "attackScalors": [
+            "GoodVsHasSlept",
+            "GoodVsSleeping"
+          ],
+          "useCondition": "SnowBrideBossSummonLocked",
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "SmallHitRanged1",
+          "conditionedAbilityEffects": [
+            "SnowWhiteBrideSpecial1",
+            "SnowWhiteBrideSpecial1"
+          ],
+          "flags": [
+            "Dreamhunt",
+            "HasSleptEater",
+            "StealthWorthy"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.8,
+            0
+          ],
+          "prefabs": [
+            "batfx_bluntimpact1/batfx_bluntimpact1",
+            "batsfx_prefab/batsfx_impactsmall1"
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            true
+          ],
+          "scale": [
+            0.4,
+            1
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "Sleep1RandomAllyHasNotSlept": {
+            "class": "Buff",
+            "stackName": "Sleep1RandomAllyHasNotSlept",
+            "behaviors": [
+              "BuffOnMonsterTurnEnd"
+            ],
+            "behaviorOverrides": [
+              {
+                "activeMonsterConditions": "AlwaysTrue",
+                "randomEnemyBuffs": [
+                  "Sleep"
+                ],
+                "numRandomToBuff": 1,
+                "chance": 1.0,
+                "spreadCondition": "HasNotSlept"
+              }
+            ],
+            "duration": 0,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {
+          "GoodVsHasSlept": {
+            "class": "AttackScalor",
+            "targetCondition": "HasSleptButNotSleeping"
+          },
+          "GoodVsSleeping": {
+            "class": "AttackScalor",
+            "targetCondition": "IsSleeping"
+          }
+        },
+        "conditions": {
+          "SnowBrideBossSummonLocked": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "SnowBrideBossSummonLocked"
+            ]
+          }
+        }
+      },
+      "ForceSleepDoubleASnowWhiteBrideBoss": {
+        "id": "ForceSleepDoubleASnowWhiteBrideBoss",
+        "found": true,
+        "localization": {
+          "name": "Sleep Echo",
+          "description": "Grants 2 enemies the Sleep status effect for 200TU, even if they have already slept while on the battlefield. This will overwrite other status effects on those units. Usable if all enemies have already slept while on the battlefield.",
+          "selected": "Puts targets to sleep even if they have already slept\n(Will overwrite other status effects)"
+        },
+        "ability": {
+          "name": "ForceSleepDoubleASnowWhiteBrideBoss",
+          "class": "Ability",
+          "config": "ForceSleepDoubleASnowWhiteBrideBoss",
+          "tuCost": 100,
+          "useLimit": 0,
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "SleepForced",
+                "BurnImmunityTempForRevengeSleepAttack"
+              ],
+              "chance": 1.0
+            }
+          ],
+          "immuneSuggestionCondition": "IsSleepImmune",
+          "useCondition": "AllEnemiesHasSleptSnowBrideBossSummonLocked",
+          "enemyEventType": "Hit",
+          "abilityEffect": "SnowWhiteSleep1",
+          "flags": [
+            "Sleep",
+            "NoDamage",
+            "StealthWorthy",
+            "IsSnowWhiteBrideBoss01"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.1,
+            0.05
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_snowwhitebride1/batfx_restore1",
+            "batsfx_prefab/batsfx_sleep1",
+            "batfx_sleep1/batfx_sleep1"
+          ],
+          "sortOrderOffset": [
+            2,
+            -2,
+            0,
+            0
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "BurnImmunityTempForRevengeSleepAttack": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Burn",
+                  "BurnAfterTurn",
+                  "BurnAtEndOfTurn"
+                ],
+                "dontShowText": true
+              },
+              {
+                "name": "BurnAfterTurn"
+              },
+              {
+                "name": "BurnSelfOnHit"
+              }
+            ],
+            "duration": 1,
+            "showAsTimer": false,
+            "applyConditions": "IsNotAnySleepImmune",
+            "showAsPermanent": false,
+            "tags": [
+              "BurnImmune"
+            ],
+            "stackName": "BurnImmunityTempForRevenge",
+            "isHiddenFromPlayers": true
+          },
+          "Sleep": {
+            "class": "Buff",
+            "stackName": "Sleep",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "LoseTurn",
+              "RemoveOnHurt"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "PurifyChain"
+              },
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "name": "AutoPurifyAfterTurnNoSleep"
+              },
+              {},
+              {
+                "ignoreIfHurtBySelf": true,
+                "cancelFromDamageFlags": [
+                  "DoNotWake"
+                ]
+              }
+            ],
+            "applyConditions": "HasNotSlept",
+            "duration": 200,
+            "showAsTimer": true,
+            "statusEffect": "SleepStatus",
+            "statusEffectOffset": 0.1,
+            "iconSpriteName": "IconWhiteSleepZs01",
+            "textKeyToShowWhenApplied": "SleepKey",
+            "canBePurified": true
+          },
+          "SleepForced": {
+            "class": "Buff",
+            "stackName": "Sleep",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "LoseTurn",
+              "RemoveOnHurt"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "PurifyChain"
+              },
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "name": "AutoPurifyAfterTurnNoSleep"
+              },
+              {},
+              {
+                "ignoreIfHurtBySelf": true,
+                "cancelFromDamageFlags": [
+                  "DoNotWake"
+                ]
+              }
+            ],
+            "duration": 200,
+            "showAsTimer": true,
+            "statusEffect": "SleepStatus",
+            "statusEffectOffset": 0.1,
+            "iconSpriteName": "IconWhiteSleepZs01",
+            "textKeyToShowWhenApplied": "SleepKey",
+            "canBePurified": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "AllEnemiesHasSleptSnowBrideBossSummonLocked": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "SnowBrideBossSummonLocked"
+            ],
+            "not": {
+              "class": "MonsterConditions",
+              "checkEnemyTeamOfMonster": true,
+              "enemyTeamMonsterConditionMatchesNeeded": {
+                "HasNotSlept": 1
+              }
+            }
+          },
+          "IsSleepImmune": {
+            "class": "MonsterConditions",
+            "monsterTags": [
+              "SleepImmune"
+            ],
+            "or": {
+              "class": "MonsterConditions",
+              "monsterTags": [
+                "LethalPoison"
+              ],
+              "or": {
+                "class": "MonsterConditions",
+                "monsterTags": [
+                  "SleepImmuneIfBeastAlly"
+                ],
+                "checkReinforcementsForTeamConditionMatches": true,
+                "myTeamMonsterConditionMatchesNeeded": {
+                  "IsBeastRegular": 1
+                },
+                "or": {
+                  "class": "MonsterConditions",
+                  "monsterTags": [
+                    "SleepImmuneVsWater"
+                  ],
+                  "checkEnemyTeamOfMonster": true,
+                  "enemyTeamMonsterConditionMatchesNeeded": {
+                    "IsWater": 1
+                  },
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "SleepImmuneVs2Enemies"
+                    ],
+                    "enemyTeamSize": 2,
+                    "or": {
+                      "class": "MonsterConditions",
+                      "monsterTags": [
+                        "NegativeStatusImmunityFromThorns"
+                      ],
+                      "buffStackNames": [
+                        "SleepThorns"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "IsSnowWhiteBrideBoss01": {
+            "class": "MonsterConditions",
+            "abilityConfigFlag": "IsSnowWhiteBrideBoss01"
+          }
+        }
+      },
+      "SummonSnowBlackBrideBossSacA01": {
+        "id": "SummonSnowBlackBrideBossSacA01",
+        "found": true,
+        "localization": {
+          "name": "Dark Transformation",
+          "description": "The user transforms into Berserk Snow Black. Berserk Snow Black's Level, Limit Breaks, Awakenings, Boosts, Potential, Mastery, Weapon, Accessory and remaining HP will match the user. Berserk Snow Black will be treated as a new conjured unit, and is considered to have entered the battlefield upon transformation.\n\nLocked until a non-conjured enemy on the battlefield is defeated or sacrificed by any source. Berserk Snow White cannot activate any other active skills while this skill is unlocked. When a unit transforms, it is not considered to have been defeated or sacrificed.",
+          "selected": "Transforms into Berserk Snow Black"
+        },
+        "ability": {
+          "name": "SummonSnowBlackBrideBossSacA01",
+          "class": "Ability",
+          "config": "SummonSnowBlackBrideBossSacA01",
+          "tuCost": 0,
+          "useLimit": 1,
+          "spiritGain": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "SelfOnly",
+          "components": [
+            "ApplyBuff",
+            "ChanceToDie"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "AddSnowBlackBrideBoss01Next"
+              ]
+            },
+            {
+              "chance": 1.0
+            }
+          ],
+          "useCondition": "SnowBrideBossSummonUnlocked",
+          "sourceEventType": "Finish",
+          "abilityEffect": "SnowWhiteTransform1",
+          "flags": [
+            "Summon",
+            "Transform",
+            "Duration"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "selfOnly": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            1.5,
+            0,
+            0,
+            0.3,
+            0.4,
+            0,
+            0.8
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batsfx_prefab/batsfx_whoosh2",
+            "batfx_snowwhitebride1/batfx_transformwhite1",
+            "batsfx_prefab/batsfx_life2",
+            "batsfx_prefab/batsfx_summon1",
+            "batsfx_prefab/batsfx_timestrike1",
+            "batfx_ripplebluelow/batfx_ripplebluelow",
+            "batsfx_prefab/batsfx_heal1",
+            "batfx_snowwhitebride1/batfx_purpleout1"
+          ],
+          "sortOrderOffset": [
+            2,
+            2,
+            -2,
+            2,
+            2,
+            2,
+            -2,
+            -2,
+            50
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "audiobundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle2"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          },
+          "ChanceToDie": {
+            "class": "ChanceToDieAbilityComponent"
+          }
+        },
+        "buffs": {
+          "AddSnowBlackBrideBoss01Next": {
+            "class": "Buff",
+            "stackName": "AddSnowBlackBrideBoss01Next",
+            "behaviors": [
+              "SummonMonster"
+            ],
+            "behaviorOverrides": [
+              {
+                "monsterType": "SnowBlackBrideBoss01",
+                "cloneSourceStats": true,
+                "cloneSourceWeapon": true,
+                "cloneSourceEquipment": true,
+                "frontOfLineup": true,
+                "hpStyle": "CopySource",
+                "isBoss": true
+              }
+            ],
+            "duration": 0,
+            "allowBuffOnDeadTarget": true,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "SnowBrideBossSummonUnlocked": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "SnowBrideBossSummonUnlocked"
+            ]
+          }
+        }
+      }
+    },
+    "passives": {
+      "GainSpiritGetTurnOnEnterSnowWhiteBrideBoss": {
+        "id": "GainSpiritGetTurnOnEnterSnowWhiteBrideBoss",
+        "found": true,
+        "localization": {
+          "name": "Brightest Light",
+          "description": "When this unit enters battle (including at the start of battle or from transformation), Ally Spirit is doubled. If Ally Spirit is at 0, gain 1 Spirit instead.\n\nThis unit will immediately get the turn by having its TU reduced to 0 whenever it enters the battlefield from reinforcements or transformation."
+        }
+      },
+      "DoubleTurnOnKillABoss": {
+        "id": "DoubleTurnOnKillABoss",
+        "found": true,
+        "localization": {
+          "name": "Battle Momentum",
+          "description": "Each time this unit defeats an enemy with an attack, this unit will get another turn. Effects that influence TU order may interrupt the extra turn (e.g. Stuns targeting the lowest TU target)."
+        }
+      },
+      "AttackUpIfEnemyHasSlept": {
+        "id": "AttackUpIfEnemyHasSlept",
+        "found": true,
+        "localization": {
+          "name": "Sleep Drive",
+          "description": "This unit's Attack is increased to 1.15x if an enemy has already slept while on the battlefield. This increases by 0.15 for each enemy that has already slept beyond the first, up to a maximum of 1.6x if 4 enemies have slept while on the battlefield."
+        }
+      },
+      "PurifySelfOnMyTurn": {
+        "id": "PurifySelfOnMyTurn",
+        "found": true,
+        "localization": {
+          "name": "Auto Nullify",
+          "description": "When this unit gets the turn, all status effects and other effects removable by Purify are removed from this unit."
+        }
+      },
+      "KnockbackImmunity": {
+        "id": "KnockbackImmunity",
+        "found": true,
+        "localization": {
+          "name": "Immovable",
+          "description": "This unit cannot be sent to the reinforcements from the battlefield."
+        }
+      },
+      "StunImmunity": {
+        "id": "StunImmunity",
+        "found": true,
+        "localization": {
+          "name": "Stun Immunity",
+          "description": "This unit is not affected by stun effects."
+        }
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": null
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "SnowWhiteBrideBoss01",
+    "family": "SnowWhiteBrideBoss",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "SnowWhiteBrideBoss01",
+    "class": "Monster",
+    "family": "SnowWhiteBrideBoss",
+    "activeSkills": {
+      "0": "SleepAttackASnowWhiteBrideBoss",
+      "1": "DreamBusterPlusASnowWhiteBrideBoss",
+      "2": "ForceSleepDoubleASnowWhiteBrideBoss",
+      "3": "SummonSnowBlackBrideBossSacA01"
+    },
+    "passives": {
+      "0": "GainSpiritGetTurnOnEnterSnowWhiteBrideBoss",
+      "1": "DoubleTurnOnKillABoss",
+      "2": "AttackUpIfEnemyHasSlept",
+      "3": "PurifySelfOnMyTurn",
+      "4": "KnockbackImmunity",
+      "5": "StunImmunity"
+    },
+    "cost": 999,
+    "baseAttack": 1400,
+    "baseMaxHp": 100000,
+    "speed": 900,
+    "element": "Life",
+    "weaponPref": "Spear",
+    "weaponPivotIndex": 0,
+    "walkSound": "TestSound",
+    "secure": 1,
+    "aiTargetPickWeight": 1,
+    "stars": 6,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 1,
+    "battleOrbImageFlip": 0,
+    "skillVoices": {
+      "0": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "1": [
+        5,
+        6,
+        7
+      ],
+      "2": [
+        8,
+        10
+      ],
+      "3": [
+        13,
+        14,
+        15,
+        16
+      ]
+    },
+    "damageVoices": [
+      17,
+      18,
+      19,
+      20
+    ],
+    "deathVoices": [
+      21,
+      23,
+      24
+    ]
+  },
+  "_build": {
+    "scriptVersion": "6-character-family-states",
+    "sourceHash": "e18bf1d05c88210add65beaddede0ba1596bdcc76dc973cb90633e9a1bb99973",
+    "dependencyHash": "2db2c9fb053b328d9cd6c1a439252def90bd2d32a58ac491ac4a212515de6d05",
+    "generatedAt": 1778213445
+  }
+}

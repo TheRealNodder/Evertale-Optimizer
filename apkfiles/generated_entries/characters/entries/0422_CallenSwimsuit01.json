@@ -1,0 +1,1285 @@
+{
+  "schemaVersion": 3,
+  "order": 422,
+  "id": "callen",
+  "name": "Callen",
+  "title": "Seaside Scholar",
+  "description": "To Callen, who spent her days cooped up in her lab, the sun-soaked paradise of Orka was practically an alternate dimension. But despite her protests, she actually found it somewhat enjoyable - the headlong rush into a new, unknown world.",
+  "category": "character",
+  "rarity": null,
+  "stars": 5,
+  "evolvedStars": 6,
+  "element": "Water",
+  "weaponType": "Katana",
+  "stats": {
+    "atk": 1146,
+    "hp": 5480,
+    "spd": 290,
+    "cost": 28
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/CallenSwimsuit01.png",
+  "refs": {
+    "activeSkills": [
+      "SleepAttackDoubleACallenSwimsuit",
+      "BloodfuryDoubleACallenSwimsuit",
+      "SwapEnemyForBadFriendACallenSwimsuit",
+      "LifeFlipSleepACallenSwimsuit"
+    ],
+    "passives": [
+      "HoldGroundPlus",
+      "PlusAttackBoostLv3",
+      "AttackUpTargetEquippedSwordLv3",
+      "PlusHPBoostLv3",
+      "AddWeaponPrefGreatSword"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": "AttackUpWaterD",
+    "leaderBuffCondition": "IsWater",
+    "summonableMonsters": [
+      "Imposter01"
+    ]
+  },
+  "resolved": {
+    "activeSkills": {
+      "SleepAttackDoubleACallenSwimsuit": {
+        "id": "SleepAttackDoubleACallenSwimsuit",
+        "found": true,
+        "localization": {
+          "name": "SleepAttackDoubleACallenSwimsuit",
+          "description": ""
+        },
+        "ability": {
+          "name": "SleepAttackDoubleACallenSwimsuit",
+          "class": "Ability",
+          "abilityScalor": 0,
+          "config": "SleepAttackDoubleACallenSwimsuit",
+          "tuCost": 130,
+          "useLimit": 0,
+          "nameKey": "SleepAttackDoubleA",
+          "descriptionKey": "SleepAttackDoubleA",
+          "spiritGain": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "damageFlags": [
+                "DoNotWake"
+              ]
+            },
+            {
+              "buffs": [
+                "BurnImmunityTempForRevengeSleepAttack",
+                "Sleep"
+              ],
+              "chance": 0.15,
+              "showMissConditions": "ShowNoMiss",
+              "applyConditions": "HasNotSlept",
+              "buffAppliedEffects": [
+                "SleepBuffInstant"
+              ]
+            }
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "MidWater1",
+          "flags": [
+            "SleepChance",
+            "SleepWithDamage",
+            "StealthWorthy"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.3,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_casting4/batfx_casting4",
+            "batfx_waterlarge2/batfx_waterlarge2",
+            "batsfx_prefab/batsfx_water1",
+            "batfx_ripplebluelow/batfx_ripplebluelow"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -2,
+            1,
+            -2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            true,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "BurnImmunityTempForRevengeSleepAttack": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Burn",
+                  "BurnAfterTurn",
+                  "BurnAtEndOfTurn"
+                ],
+                "dontShowText": true
+              },
+              {
+                "name": "BurnAfterTurn"
+              },
+              {
+                "name": "BurnSelfOnHit"
+              }
+            ],
+            "duration": 1,
+            "showAsTimer": false,
+            "applyConditions": "IsNotAnySleepImmune",
+            "showAsPermanent": false,
+            "tags": [
+              "BurnImmune"
+            ],
+            "stackName": "BurnImmunityTempForRevenge",
+            "isHiddenFromPlayers": true
+          },
+          "Sleep": {
+            "class": "Buff",
+            "stackName": "Sleep",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "LoseTurn",
+              "RemoveOnHurt"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "PurifyChain"
+              },
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "name": "AutoPurifyAfterTurnNoSleep"
+              },
+              {},
+              {
+                "ignoreIfHurtBySelf": true,
+                "cancelFromDamageFlags": [
+                  "DoNotWake"
+                ]
+              }
+            ],
+            "applyConditions": "HasNotSlept",
+            "duration": 200,
+            "showAsTimer": true,
+            "statusEffect": "SleepStatus",
+            "statusEffectOffset": 0.1,
+            "iconSpriteName": "IconWhiteSleepZs01",
+            "textKeyToShowWhenApplied": "SleepKey",
+            "canBePurified": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "HasNotSlept": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "properties": {
+                "hasSlept": 1
+              }
+            }
+          }
+        }
+      },
+      "BloodfuryDoubleACallenSwimsuit": {
+        "id": "BloodfuryDoubleACallenSwimsuit",
+        "found": true,
+        "localization": {
+          "name": "BloodfuryDoubleACallenSwimsuit",
+          "description": ""
+        },
+        "ability": {
+          "name": "BloodfuryDoubleACallenSwimsuit",
+          "class": "Ability",
+          "abilityScalor": 4,
+          "config": "BloodfuryDoubleACallenSwimsuit",
+          "tuCost": 130,
+          "useLimit": 0,
+          "nameKey": "BloodfuryDoubleA",
+          "descriptionKey": "BloodfuryDoubleA",
+          "spiritCost": 3,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "Damage"
+          ],
+          "useCondition": "Kills1",
+          "flags": [
+            "BloodSkill",
+            "1KillTrigger",
+            "StealthWorthy"
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "CallenSwimsuit1",
+          "recommendEffectWhenUsable": 1
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.1,
+            0,
+            0,
+            0,
+            0.55,
+            0,
+            0.2,
+            0.2,
+            0.7,
+            0,
+            0.7,
+            0,
+            0.6,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batsfx_prefab/batsfx_sillyjump1",
+            "batfx_rolotiaprep1/batfx_rolotiaprep1",
+            "batfx_ripplebluelow/batfx_ripplebluelow",
+            "batfx_callenswimsuit2/batfx_callenswimsuit2-b",
+            "batsfx_prefab/batsfx_dragonflow1",
+            "batsfx_prefab/batsfx_cherryprep1",
+            "batfx_callenswimsuit1/batfx_callenswimsuit1",
+            "batfx_bluntimpact3/batfx_bluntimpact3",
+            "batsfx_prefab/batsfx_bomb1",
+            "batfx_bluntimpact2/batfx_bluntimpact2",
+            "batsfx_prefab/batsfx_bomb1",
+            "batfx_bluntimpact3/batfx_bluntimpact3",
+            "batsfx_prefab/batsfx_bomb1"
+          ],
+          "sortOrderOffset": [
+            2,
+            2,
+            -100,
+            2,
+            6,
+            2,
+            2,
+            50,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            true,
+            false,
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "boneToAttachTo": [
+            "",
+            "",
+            "",
+            "",
+            "effectbone",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {},
+        "conditions": {
+          "Kills1": {
+            "class": "MonsterConditions",
+            "killsMade": 1
+          }
+        }
+      },
+      "SwapEnemyForBadFriendACallenSwimsuit": {
+        "id": "SwapEnemyForBadFriendACallenSwimsuit",
+        "found": true,
+        "localization": {
+          "name": "SwapEnemyForBadFriendACallenSwimsuit",
+          "description": ""
+        },
+        "ability": {
+          "name": "SwapEnemyForBadFriendACallenSwimsuit",
+          "class": "Ability",
+          "config": "SwapEnemyForBadFriendACallenSwimsuit",
+          "tuCost": 100,
+          "useLimit": 3,
+          "nameKey": "SwapEnemyForBadFriendA",
+          "descriptionKey": "SwapEnemyForBadFriendA",
+          "spiritCost": 3,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "AddImposterNext",
+                "SendToFrontOfReinforcements",
+                "RemoveBuffs"
+              ],
+              "applyConditions": "NotKnockbackImmune"
+            }
+          ],
+          "enemyEventType": "Finish",
+          "immuneSuggestionCondition": "IsKnockbackImmune",
+          "abilityEffect": "CallenSwimsuit3",
+          "flags": [
+            "Summon",
+            "StealthWorthy",
+            "NoDamage",
+            "AddBadFriend"
+          ],
+          "useCondition": "GoodForImposter"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0.1,
+            0,
+            0,
+            0.5,
+            0,
+            0.4,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_stealth1",
+            "batfx_tailwindblue/batfx_tailwindblue",
+            "batsfx_prefab/batsfx_whoosh1",
+            "batsfx_prefab/batsfx_dreamhunt1",
+            "batfx_windslash1/batfx_windslash1",
+            "batfx_chargebluefloor1/batfx_chargebluefloor1",
+            "batfx_bluehelix1/batfx_bluehelix1",
+            "batsfx_prefab/batsfx_knockback1"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -100,
+            1,
+            2,
+            -2,
+            3,
+            2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "AddImposterNext": {
+            "class": "Buff",
+            "behaviors": [
+              "SummonMonster"
+            ],
+            "behaviorOverrides": [
+              {
+                "monsterType": "Imposter01",
+                "frontOfLineup": true
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "RemoveBuffs": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "SendToFrontOfReinforcements": {
+            "class": "Buff",
+            "stackName": "Pushback",
+            "behaviors": [
+              "SendToReinforcements"
+            ],
+            "behaviorOverrides": [
+              {
+                "frontOfLineup": true
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "GoodForImposter": {
+            "class": "MonsterConditions",
+            "enemyTeamSize": 4,
+            "not": {
+              "class": "MonsterConditions",
+              "checkEnemyTeamOfMonster": true,
+              "enemyTeamMonsterConditionMatchesNeeded": {
+                "IsImposter": 1
+              }
+            }
+          },
+          "IsKnockbackImmune": {
+            "class": "MonsterConditions",
+            "monsterTags": [
+              "KnockbackImmune"
+            ]
+          },
+          "NotKnockbackImmune": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "monsterTags": [
+                "KnockbackImmune"
+              ]
+            }
+          }
+        }
+      },
+      "LifeFlipSleepACallenSwimsuit": {
+        "id": "LifeFlipSleepACallenSwimsuit",
+        "found": true,
+        "localization": {
+          "name": "LifeFlipSleepACallenSwimsuit",
+          "description": ""
+        },
+        "ability": {
+          "name": "LifeFlipSleepACallenSwimsuit",
+          "class": "Ability",
+          "config": "LifeFlipSleepACallenSwimsuit",
+          "tuCost": 50,
+          "useLimit": 1,
+          "nameKey": "LifeFlipSleepA",
+          "descriptionKey": "LifeFlipSleepA",
+          "spiritGain": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "Sleep",
+                "BurnImmunityTempForRevengeSleepAttack"
+              ],
+              "applyToTargetType": "Enemy",
+              "applyConditions": "HasNotSlept",
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "Empty"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "LifeFlip"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Hit",
+          "abilityEffect": "CallenSwimsuit2",
+          "flags": [
+            "Sleep",
+            "NoDamage",
+            "NoDamage"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.7,
+            0.7,
+            0,
+            0,
+            0.2,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_electric1",
+            "batfx_casting3/batfx_casting3",
+            "batfx_cutincallenswim1/batfx_cutincallenswim1",
+            "batfx_sleep1/batfx_sleep1",
+            "batsfx_prefab/batsfx_sleep1",
+            "batfx_ripplebluelow/batfx_ripplebluelow",
+            "batfx_healtop1/batfx_healtop1",
+            "batsfx_prefab/batsfx_heal1"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -2,
+            200,
+            10,
+            -2,
+            -2,
+            2,
+            2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            false,
+            true,
+            false,
+            true,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "BurnImmunityTempForRevengeSleepAttack": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Burn",
+                  "BurnAfterTurn",
+                  "BurnAtEndOfTurn"
+                ],
+                "dontShowText": true
+              },
+              {
+                "name": "BurnAfterTurn"
+              },
+              {
+                "name": "BurnSelfOnHit"
+              }
+            ],
+            "duration": 1,
+            "showAsTimer": false,
+            "applyConditions": "IsNotAnySleepImmune",
+            "showAsPermanent": false,
+            "tags": [
+              "BurnImmune"
+            ],
+            "stackName": "BurnImmunityTempForRevenge",
+            "isHiddenFromPlayers": true
+          },
+          "Empty": {
+            "class": "Buff",
+            "duration": -1,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "LifeFlip": {
+            "class": "Buff",
+            "behaviors": [
+              "AdjustHp"
+            ],
+            "behaviorOverrides": [
+              {
+                "lifeFlip": true,
+                "abilityEffect": "Blank"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "Sleep": {
+            "class": "Buff",
+            "stackName": "Sleep",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "LoseTurn",
+              "RemoveOnHurt"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "PurifyChain"
+              },
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "name": "AutoPurifyAfterTurnNoSleep"
+              },
+              {},
+              {
+                "ignoreIfHurtBySelf": true,
+                "cancelFromDamageFlags": [
+                  "DoNotWake"
+                ]
+              }
+            ],
+            "applyConditions": "HasNotSlept",
+            "duration": 200,
+            "showAsTimer": true,
+            "statusEffect": "SleepStatus",
+            "statusEffectOffset": 0.1,
+            "iconSpriteName": "IconWhiteSleepZs01",
+            "textKeyToShowWhenApplied": "SleepKey",
+            "canBePurified": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "HasNotSlept": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "properties": {
+                "hasSlept": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "passives": {
+      "HoldGroundPlus": {
+        "id": "HoldGroundPlus",
+        "found": true,
+        "localization": {
+          "name": "Hold Ground+",
+          "description": "If this unit would be defeated, it instead survives with 1 HP and then cannot be defeated until its next turn. This effect can trigger only once each time this unit enters the battlefield."
+        }
+      },
+      "PlusAttackBoostLv3": {
+        "id": "PlusAttackBoostLv3",
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv3",
+          "description": "Adds 300 to this unit's Attack."
+        }
+      },
+      "AttackUpTargetEquippedSwordLv3": {
+        "id": "AttackUpTargetEquippedSwordLv3",
+        "found": true,
+        "localization": {
+          "name": "Sword Hunter Lv3",
+          "description": "10% bonus to attacks against units equipped with Swords."
+        }
+      },
+      "PlusHPBoostLv3": {
+        "id": "PlusHPBoostLv3",
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv3",
+          "description": "Adds 1200 to this unit's max HP."
+        }
+      },
+      "AddWeaponPrefGreatSword": {
+        "id": "AddWeaponPrefGreatSword",
+        "found": true,
+        "localization": {
+          "name": "Greatsword Mastery",
+          "description": "Can use weapon skills of Greatswords in addition to their original preferred weapon type."
+        }
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": {
+      "class": "MonsterConditions",
+      "elements": [
+        "Water"
+      ]
+    }
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "CallenSwimsuit01",
+    "family": "CallenSwimsuit",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "CallenSwimsuit01",
+    "family": "CallenSwimsuit",
+    "class": "Monster",
+    "leaderBuff": "AttackUpWaterD",
+    "leaderBuffCondition": "IsWater",
+    "activeSkills": {
+      "0": "SleepAttackDoubleACallenSwimsuit",
+      "1": "BloodfuryDoubleACallenSwimsuit",
+      "2": "SwapEnemyForBadFriendACallenSwimsuit",
+      "3": "LifeFlipSleepACallenSwimsuit"
+    },
+    "passives": {
+      "0": "HoldGroundPlus",
+      "2": "PlusAttackBoostLv3",
+      "3": "AttackUpTargetEquippedSwordLv3",
+      "4": "PlusHPBoostLv3",
+      "5": "AddWeaponPrefGreatSword"
+    },
+    "cost": 28,
+    "baseAttack": 1146,
+    "baseMaxHp": 5480,
+    "speed": 290,
+    "element": "Water",
+    "weaponPref": "Katana",
+    "weaponPivotIndex": 0,
+    "secure": 1,
+    "superEvolve1": "CallenSwimsuit02",
+    "aiTargetPickWeight": 1,
+    "stars": 5,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 0,
+    "battleOrbImageFlip": 1,
+    "attackType": "Weapon",
+    "visible": 1,
+    "formTwitterShare": 1,
+    "summonableMonsters": [
+      "Imposter01"
+    ],
+    "summonableMatchSource": [
+      false
+    ],
+    "skillVoices": {
+      "0": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "1": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "2": [
+        9,
+        10,
+        11,
+        12
+      ],
+      "3": [
+        13,
+        14,
+        15,
+        16
+      ]
+    },
+    "damageVoices": [
+      17,
+      18,
+      19,
+      20
+    ],
+    "deathVoices": [
+      21,
+      22,
+      23,
+      24
+    ],
+    "victoryVoices": [
+      25,
+      26
+    ],
+    "lineupVoices": [
+      27,
+      28,
+      29,
+      30,
+      31,
+      32
+    ],
+    "evolutionVoices": [
+      33
+    ],
+    "trainVoices": [
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43
+    ],
+    "titleVoices": [
+      44
+    ],
+    "gachaVoices": [
+      45
+    ],
+    "loginVoices": [
+      46
+    ],
+    "tapVoices": [
+      47,
+      48,
+      49
+    ],
+    "idleVoices": [
+      50
+    ]
+  },
+  "_build": {
+    "scriptVersion": "6-character-family-states",
+    "sourceHash": "72385356d2901ab1104669c121164a3ee9a6249b2d37739c517b47ebe228afef",
+    "dependencyHash": "5a6237eee2bc8b5924fafde0615416a03a08974f87000406a3bbd7a564808753",
+    "generatedAt": 1778213414
+  }
+}

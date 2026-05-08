@@ -1,0 +1,831 @@
+{
+  "schemaVersion": 3,
+  "order": 285,
+  "id": "adena",
+  "name": "Adena",
+  "title": "Blue Hurricane",
+  "description": "Cap'n, it weren't me what hit you with the ball! It was Sis! C'mon, Sis, back me— huh?! Where'd she go?!\n\"......\"\n\"C'mon, Cap'n, calm down! Huh? Yer gettin' a bump on yer head? Nah, that's just what yer head always looks—Aaaaugh!\"\nSplash!\n\"Whew, he went far! Might be a new record. Ah, hey, land ho! Someone haul that sorry carcass outta the drink and make ready for landfall!\"",
+  "category": "character",
+  "rarity": null,
+  "stars": 5,
+  "evolvedStars": 5,
+  "element": "Water",
+  "weaponType": "Spear",
+  "stats": {
+    "atk": 898,
+    "hp": 4304,
+    "spd": 279,
+    "cost": 28
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/WaterLancerGirl02.png",
+  "refs": {
+    "activeSkills": [
+      "GainAttackSingleA",
+      "StealthAllyWaterA",
+      "SneakAttackA",
+      "TimeStrikeA"
+    ],
+    "passives": [
+      "StealthEntrance",
+      "PoisonImmunityWhenStealthed",
+      "FireMinusDamageLv2",
+      "PlusHPBoostLv2",
+      "PlusAttackBoostLv2",
+      "AddWeaponPrefGreatAxe"
+    ],
+    "activeSkillsAI": {
+      "3": "SmarterTimeStrike_AI"
+    },
+    "aiSequence": null,
+    "leaderBuff": "AttackUpWaterC",
+    "leaderBuffCondition": "IsWater",
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "GainAttackSingleA": {
+        "id": "GainAttackSingleA",
+        "found": true,
+        "localization": {
+          "name": "Attack",
+          "description": "Damage to 1 enemy and allies gain 2 Spirit.",
+          "selected": "Damage to 1 enemy and gains 2 Spirit"
+        },
+        "ability": {
+          "name": "GainAttackSingleA",
+          "class": "Ability",
+          "abilityScalor": 0,
+          "config": "GainAttackSingleA",
+          "tuCost": 130,
+          "useLimit": 0,
+          "spiritGain": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ]
+            }
+          ],
+          "enemyEventType": "Hit",
+          "axeAbilityEffect": "SmallSlash1",
+          "greatSwordAbilityEffect": "SmallSlash1",
+          "greatAxeAbilityEffect": "SmallSlash1",
+          "hammerAbilityEffect": "SmallBlunt1",
+          "katanaAbilityEffect": "SmallSlash1",
+          "maceAbilityEffect": "SmallBlunt1",
+          "spearAbilityEffect": "SmallSpear1",
+          "staffAbilityEffect": "SmallBlunt1",
+          "swordAbilityEffect": "SmallSlash1",
+          "clawAbilityEffect": "SmallClaw1",
+          "biteAbilityEffect": "SmallBite1",
+          "bashAbilityEffect": "SmallBlunt1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": null,
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {},
+        "conditions": {}
+      },
+      "StealthAllyWaterA": {
+        "id": "StealthAllyWaterA",
+        "found": true,
+        "localization": {
+          "name": "Stealth Charge",
+          "description": "Grants the Stealth status effect to 1 ally. Usable only if there is at least 1 other Water ally. Stealth will overwrite other status effects on target unit. Stealthed units ignore the next enemy attack that would damage more than 1 target. Any damage will remove stealth.",
+          "selected": "Grants stealth to target\n(Will overwrite other status effects)"
+        },
+        "ability": {
+          "name": "StealthAllyWaterA",
+          "class": "Ability",
+          "config": "StealthAllyWaterA",
+          "tuCost": 70,
+          "useLimit": 0,
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Ally",
+          "components": [
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "ActiveStealthJustGained",
+                "Stealth"
+              ]
+            }
+          ],
+          "immuneSuggestionCondition": "IsStatusImmune",
+          "friendlyEventType": "Finish",
+          "useCondition": "AtLeast2WaterAllies",
+          "abilityEffect": "Stealth1",
+          "flags": [
+            "Stealth"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "friendlyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.3,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_casting7/batfx_casting7",
+            "batfx_stealth1/batfx_stealth1",
+            "batsfx_prefab/batsfx_stealth1"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -2,
+            2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            true
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "ActiveStealthJustGained": {
+            "class": "Buff",
+            "stackName": "ActiveStealthJustGained",
+            "duration": 1,
+            "isHiddenFromPlayers": true,
+            "applyConditions": "IsNotStealth"
+          },
+          "Stealth": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "ManipulateTargeting",
+              "RemoveOnHurt",
+              "Immunity",
+              "Immunity"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "LockHideSkills"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "dodgeMultitarget": true,
+                "forceAllowAllEnemiesAChanceToManipulate": true,
+                "removeAfterTriggers": 1,
+                "abilityFlagsToIgnore": [
+                  "Stun",
+                  "NoDamage",
+                  "Sneak",
+                  "IgnoreStealth"
+                ]
+              },
+              {},
+              {
+                "stackNamesToBlock": [
+                  "Stealth"
+                ],
+                "dontShowText": true
+              },
+              {
+                "stackNamesToBlock": [
+                  "Placeholder"
+                ],
+                "dontShowText": true,
+                "activateCondition": "MissingStealthOrStealthShield"
+              }
+            ],
+            "tags": [
+              "Stealth"
+            ],
+            "duration": -1,
+            "showAsTimer": true,
+            "iconSpriteName": "IconBlackStealth01",
+            "stackName": "Stealth",
+            "useCount": 1
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "AtLeast2WaterAllies": {
+            "class": "MonsterConditions",
+            "myTeamMonsterConditionMatchesNeeded": {
+              "IsWater": 2
+            }
+          },
+          "IsStatusImmune": {
+            "class": "MonsterConditions",
+            "monsterTags": [
+              "StatusImmune"
+            ],
+            "or": {
+              "class": "MonsterConditions",
+              "monsterTags": [
+                "LethalPoison"
+              ]
+            }
+          }
+        }
+      },
+      "SneakAttackA": {
+        "id": "SneakAttackA",
+        "found": true,
+        "localization": {
+          "name": "Stealth Fury",
+          "description": "400% damage to 1 enemy. Usable if the user has the Stealth status effect. This attack ignores any enemy status effects, damage reduction effects, revenge passive skills, and skin passive skills.",
+          "selected": "400% damage, usable while stealthed"
+        },
+        "ability": {
+          "name": "SneakAttackA",
+          "class": "Ability",
+          "abilityScalor": 3,
+          "config": "SneakAttackA",
+          "tuCost": 160,
+          "useLimit": 0,
+          "spiritCost": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "SkipRevengeDamage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "SneakAttackDamageBoost"
+              ],
+              "damageFlags": [
+                "Sneak"
+              ]
+            }
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "SneakAttackSpecial1R",
+          "useCondition": "IsStealth",
+          "flags": [
+            "Sneak"
+          ],
+          "recommendEffectWhenUsable": 1,
+          "axeAbilityEffect": "SneakAttackSpecial1R",
+          "greatAxeAbilityEffect": "SneakAttackSpecial1R",
+          "greatSwordAbilityEffect": "SneakAttackSpecial1R",
+          "swordAbilityEffect": "SneakAttackSpecial1R",
+          "spearAbilityEffect": "SneakAttackSpecial1SpearR",
+          "katanaAbilityEffect": "SneakAttackSpecial1R",
+          "hammerAbilityEffect": "SneakAttackSpecial1BluntR",
+          "staffAbilityEffect": "SneakAttackSpecial1BluntR",
+          "maceAbilityEffect": "SneakAttackSpecial1BluntR",
+          "biteAbilityEffect": "SneakAttackSpecial1BiteR",
+          "bashAbilityEffect": "SneakAttackSpecial1BluntR",
+          "clawAbilityEffect": "SneakAttackSpecial1ClawR"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.4,
+            0.35,
+            0,
+            0,
+            0.6
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_timestrike1",
+            "batfx_shadowstrike1/batfx_shadowstrike1",
+            "batfx_jumpsmoke1/batfx_jumpsmoke1",
+            "batfx_slash2/batfx_slash2",
+            "batfx_groundimpact/batfx_groundimpact",
+            "batsfx_prefab/batsfx_slash1",
+            "batfx_jumpsmoke1/batfx_jumpsmoke1"
+          ],
+          "sortOrderOffset": [
+            2,
+            -2,
+            1,
+            1,
+            -2,
+            2,
+            1
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            false,
+            false,
+            true,
+            true
+          ]
+        },
+        "components": {
+          "SkipRevengeDamage": {
+            "class": "DamageAbilityComponent",
+            "revengeEffectsToSkip": [
+              "AddJeanneDarkAngel02Next",
+              "AddJeanneDarkAngel01Next",
+              "CloneSourceToBackIfNotSummoned",
+              "MegaElixirEffect",
+              "HasteUp20Percent",
+              "Armor",
+              "200PercentDamageForRevenge",
+              "KeepBurningStuff",
+              "SleepAfterDelay",
+              "AttackPlus50Percent1TurnOnly",
+              "BurnAfterTurn",
+              "RemoveBuffsAfterDelay",
+              "HealAfterDelay",
+              "AddSkeletonToEnd",
+              "SpiritGainBContra",
+              "Stun200Revenge",
+              "Stun150Revenge",
+              "Stun100Revenge",
+              "Stun75Revenge",
+              "TUMinus50",
+              "TUMinus100",
+              "HealHalf",
+              "RemoveBuffs",
+              "SendToFrontOfReinforcements",
+              "SendToBackOfReinforcements",
+              "SpiritGainAContra",
+              "SpiritGainCContra",
+              "SpiritLossD",
+              "SpiritLossC",
+              "MegaPoison",
+              "Poison",
+              "Sleep",
+              "TUMinusRevengeA",
+              "TUMinusRevengeB",
+              "HealFull",
+              "Explosive",
+              "TUMinusAfterDelayA",
+              "HealFullAfterDelay",
+              "Add1DeathMinionToEndForRevenge",
+              "Add1FireMinionToEndForRevenge",
+              "Add1EarthMinionToEndForRevenge",
+              "Stealth",
+              "StealthAfterDelay",
+              "TUMinus300",
+              "CloneSourceToRandomIfNotSummoned",
+              "SpiritSiphonDContra",
+              "Burn",
+              "Heal800PercentAfterDelay"
+            ]
+          }
+        },
+        "buffs": {},
+        "attackScalors": {},
+        "conditions": {
+          "IsStealth": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "Stealth"
+            ]
+          }
+        }
+      },
+      "TimeStrikeA": {
+        "id": "TimeStrikeA",
+        "found": true,
+        "localization": {
+          "name": "Time Strike",
+          "description": "500% damage to 1 enemy if they have 130TU or more in the turn order. 600% damage if the target has 200TU or more.",
+          "selected": "500%+ damage against target with 130+ TU"
+        },
+        "ability": {
+          "name": "TimeStrikeA",
+          "class": "Ability",
+          "abilityScalor": -2,
+          "conditionalAbilityScalors": [
+            4,
+            5
+          ],
+          "config": "TimeStrikeA",
+          "tuCost": 100,
+          "useLimit": 0,
+          "spiritCost": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "TimestrikeDamageBoost"
+              ]
+            }
+          ],
+          "attackScalors": [
+            "GoodVs130Tu",
+            "GoodVs200Tu"
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "SmallHit1",
+          "flags": [
+            "Timestrike",
+            "StealthWorthy"
+          ],
+          "conditionedAbilityEffects": [
+            "TimeStrikeSpecial1R",
+            "TimeStrikeSpecial1R"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.4,
+            0
+          ],
+          "prefabs": [
+            "batfx_bluntimpact1/batfx_bluntimpact1",
+            "batsfx_prefab/batsfx_impactsmall1"
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            true
+          ],
+          "scale": [
+            0.4,
+            1
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {
+          "GoodVs130Tu": {
+            "class": "AttackScalor",
+            "targetCondition": "CurrentTUGreaterThan130"
+          },
+          "GoodVs200Tu": {
+            "class": "AttackScalor",
+            "targetCondition": "CurrentTUGreaterThan200"
+          }
+        },
+        "conditions": {}
+      }
+    },
+    "passives": {
+      "StealthEntrance": {
+        "id": "StealthEntrance",
+        "found": true,
+        "localization": {
+          "name": "Stealthy Entry",
+          "description": "This unit gains the Stealth status effect. Triggered when this unit enters the battlefield from reinforcements. Stealthed units ignore the next enemy attack that would damage more than 1 target. Any damage will remove stealth."
+        }
+      },
+      "PoisonImmunityWhenStealthed": {
+        "id": "PoisonImmunityWhenStealthed",
+        "found": true,
+        "localization": {
+          "name": "Evade Poison",
+          "description": "Poison cannot be applied to this unit while it has the Stealth status effect."
+        }
+      },
+      "FireMinusDamageLv2": {
+        "id": "FireMinusDamageLv2",
+        "found": true,
+        "localization": {
+          "name": "Fire Resist Lv2",
+          "description": "7% less damage from attacks by Fire units."
+        }
+      },
+      "PlusHPBoostLv2": {
+        "id": "PlusHPBoostLv2",
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv2",
+          "description": "Adds 800 to this unit's max HP."
+        }
+      },
+      "PlusAttackBoostLv2": {
+        "id": "PlusAttackBoostLv2",
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv2",
+          "description": "Adds 200 to this unit's Attack."
+        }
+      },
+      "AddWeaponPrefGreatAxe": {
+        "id": "AddWeaponPrefGreatAxe",
+        "found": true,
+        "localization": {
+          "name": "Greataxe Mastery",
+          "description": "Can use weapon skills of Greataxes in addition to their original preferred weapon type."
+        }
+      }
+    },
+    "activeSkillsAI": {
+      "3": {
+        "id": "SmarterTimeStrike_AI",
+        "found": true,
+        "ai": {
+          "class": "AbilityAI",
+          "baseAITargetingWeight": 1.5,
+          "globalScalorsToIgnore": [
+            "CurrentTULessThan200"
+          ],
+          "aiTargetingMonsterConditions": {
+            "HasProtectorLessThan130TUInTeam": 0.05
+          }
+        }
+      }
+    },
+    "aiSequence": null,
+    "leaderCondition": {
+      "class": "MonsterConditions",
+      "elements": [
+        "Water"
+      ]
+    }
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "WaterLancerGirl02",
+    "family": "WaterLancerGirl",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "WaterLancerGirl02",
+    "family": "WaterLancerGirl",
+    "class": "Monster",
+    "leaderBuff": "AttackUpWaterC",
+    "leaderBuffCondition": "IsWater",
+    "activeSkills": {
+      "0": "GainAttackSingleA",
+      "1": "StealthAllyWaterA",
+      "2": "SneakAttackA",
+      "3": "TimeStrikeA"
+    },
+    "passives": {
+      "0": "StealthEntrance",
+      "1": "PoisonImmunityWhenStealthed",
+      "2": "FireMinusDamageLv2",
+      "3": "PlusHPBoostLv2",
+      "4": "PlusAttackBoostLv2",
+      "5": "AddWeaponPrefGreatAxe"
+    },
+    "cost": 28,
+    "baseAttack": 898,
+    "baseMaxHp": 4304,
+    "speed": 279,
+    "element": "Water",
+    "weaponPref": "Spear",
+    "weaponPivotIndex": 1,
+    "secure": 1,
+    "evolveFrom": "WaterLancerGirl01",
+    "aiTargetPickWeight": 1,
+    "stars": 5,
+    "evolvedStars": 5,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 0,
+    "battleOrbImageFlip": 1,
+    "attackType": "Weapon",
+    "formTwitterShare": 1,
+    "activeSkillsAI": {
+      "3": "SmarterTimeStrike_AI"
+    },
+    "skillVoices": {
+      "0": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "1": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "2": [
+        9,
+        10,
+        11,
+        12
+      ],
+      "3": [
+        13,
+        14,
+        15,
+        16
+      ]
+    },
+    "damageVoices": [
+      17,
+      18,
+      19,
+      20
+    ],
+    "deathVoices": [
+      21,
+      22,
+      23,
+      24
+    ],
+    "victoryVoices": [
+      25,
+      26
+    ],
+    "lineupVoices": [
+      27,
+      28,
+      29,
+      30
+    ],
+    "trainVoices": [
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39
+    ],
+    "titleVoices": [
+      40
+    ],
+    "gachaVoices": [
+      41
+    ]
+  },
+  "_build": {
+    "scriptVersion": "6-character-family-states",
+    "sourceHash": "3c2843c88b0f07c9b372ec5885a7ed6502009f5e16faeadb45b30bcbdca25038",
+    "dependencyHash": "0e1e32cd5433e9c27ca1abff0e3749d07ae23594169f7abf909bf48fac825f4d",
+    "generatedAt": 1778213412
+  }
+}

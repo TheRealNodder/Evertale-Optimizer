@@ -1,0 +1,1350 @@
+{
+  "schemaVersion": 3,
+  "order": 119,
+  "id": "bahamut",
+  "name": "Bahamut",
+  "title": "",
+  "description": "",
+  "category": "bosse",
+  "rarity": null,
+  "stars": 6,
+  "evolvedStars": 6,
+  "element": "Earth",
+  "weaponType": "Axe",
+  "stats": {
+    "atk": 1300,
+    "hp": 75000,
+    "spd": 150,
+    "cost": 999
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/Bahamut01.png",
+  "refs": {
+    "activeSkills": [
+      "PoisonAttackABahamutBoss",
+      "PoisonEaterDoubleABahamutBoss",
+      "NullifyDrainSingleABahamutBoss",
+      "MaxAnnihilatorBahamutBoss",
+      "ZeroAnnihilatorBahamutBoss"
+    ],
+    "passives": [
+      "FudgeSuperPoisonIsAPassive",
+      "SuperPoisonSkinA",
+      "StunImmunity",
+      "SleepImmunity"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": "BahamutBoss01Seq",
+    "leaderBuff": null,
+    "leaderBuffCondition": null,
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "PoisonAttackABahamutBoss": {
+        "id": "PoisonAttackABahamutBoss",
+        "found": true,
+        "localization": {
+          "name": "Poison Blast",
+          "description": "300% damage to 1 enemy and then poisons them. User gains 3 Spirit.",
+          "selected": "300% damage and poisons target. Gains 3 Spirit\n(Will overwrite other status effects)"
+        },
+        "ability": {
+          "name": "PoisonAttackABahamutBoss",
+          "class": "Ability",
+          "abilityScalor": 2,
+          "config": "PoisonAttackABahamutBoss",
+          "tuCost": 50,
+          "useLimit": 0,
+          "spiritGain": 3,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "SuperPoison",
+                "BurnImmunityTempForRevenge"
+              ],
+              "applyToTargetOnly": true
+            }
+          ],
+          "immuneSuggestionCondition": "PoisonImmunityNotFromStealth",
+          "enemyEventType": "Hit",
+          "abilityEffect": "PoisonAttackBahamut"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.3,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_charge1",
+            "batfx_chargefire8/batfx_chargefire8",
+            "batfx_impactmagic5/batfx_impactmagic5",
+            "batfx_slashtrail1/batfx_slashtrail1",
+            "batsfx_prefab/batsfx_slash1"
+          ],
+          "sortOrderOffset": [
+            0,
+            2,
+            2,
+            2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            false,
+            false
+          ],
+          "boneToAttachTo": [
+            "",
+            "effectbone",
+            "",
+            "",
+            ""
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "BurnImmunityTempForRevenge": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Burn",
+                  "BurnAfterTurn",
+                  "BurnAtEndOfTurn"
+                ],
+                "dontShowText": true
+              },
+              {
+                "name": "BurnAfterTurn"
+              },
+              {
+                "name": "BurnSelfOnHit"
+              }
+            ],
+            "duration": 1,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "tags": [
+              "BurnImmune"
+            ],
+            "stackName": "BurnImmunityTempForRevenge",
+            "isHiddenFromPlayers": true
+          },
+          "SuperPoison": {
+            "class": "Buff",
+            "stackName": "Poison",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "DamageOverTime"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "percentOfAttack": 0.01,
+                "damageColor": "Green",
+                "abilityEffect": "SuperPoisonDamage",
+                "extraDamageFlag": "SuperPoison"
+              }
+            ],
+            "tags": [
+              "Poison",
+              "SuperPoison"
+            ],
+            "canBePurified": true,
+            "duration": -1,
+            "showAsTimer": false,
+            "statusEffect": "SuperPoisonStatus",
+            "applyConditions": "NotMegaPoisoned",
+            "statusEffectOffset": 0.1,
+            "damageType": "Poison",
+            "noIconShownOnBattleStatus": true,
+            "iconSpriteName": "IconPurplePoison01"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "PoisonImmunityNotFromStealth": {
+            "class": "MonsterConditions",
+            "monsterTags": [
+              "PoisonImmune"
+            ],
+            "or": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "PoisonImmunity"
+              ],
+              "or": {
+                "class": "MonsterConditions",
+                "monsterTags": [
+                  "LethalPoison"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "PoisonEaterDoubleABahamutBoss": {
+        "id": "PoisonEaterDoubleABahamutBoss",
+        "found": true,
+        "localization": {
+          "name": "Poison Devour",
+          "description": "600% damage to 2 enemies if they are poisoned. User loses 3 Spirit.",
+          "selected": "600% damage to poisoned targets. Loses 3 Spirit"
+        },
+        "ability": {
+          "name": "PoisonEaterDoubleABahamutBoss",
+          "class": "Ability",
+          "abilityScalor": -2,
+          "conditionalAbilityScalors": [
+            5
+          ],
+          "config": "PoisonEaterDoubleABahamutBoss",
+          "tuCost": 70,
+          "useLimit": 0,
+          "spiritGain": 0,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "PoisonEaterDamageBoost"
+              ],
+              "damageFlags": [
+                "PoisonEater"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "SpiritLossA"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "attackScalors": [
+            "GoodVsPoisoned"
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "SmallHit1",
+          "conditionedAbilityEffects": [
+            "PoisonEaterAbility2SSR",
+            "PoisonEaterAbility2SSR"
+          ],
+          "flags": [
+            "PoisonEater",
+            "StealthWorthy",
+            "PoisonEaterDouble"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.4,
+            0
+          ],
+          "prefabs": [
+            "batfx_bluntimpact1/batfx_bluntimpact1",
+            "batsfx_prefab/batsfx_impactsmall1"
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            true
+          ],
+          "scale": [
+            0.4,
+            1
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "SpiritLossA": {
+            "class": "Buff",
+            "behaviors": [
+              "AddSpirit"
+            ],
+            "behaviorOverrides": [
+              {
+                "percentOfMax": -0.3
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {
+          "GoodVsPoisoned": {
+            "class": "AttackScalor",
+            "targetCondition": "IsPoisoned"
+          }
+        },
+        "conditions": {}
+      },
+      "NullifyDrainSingleABahamutBoss": {
+        "id": "NullifyDrainSingleABahamutBoss",
+        "found": true,
+        "localization": {
+          "name": "NullifyDrainSingleABahamutBoss",
+          "description": ""
+        },
+        "ability": {
+          "name": "NullifyDrainSingleABahamutBoss",
+          "class": "Ability",
+          "abilityScalor": 0,
+          "conditionalAbilityScalors": [
+            0
+          ],
+          "config": "NullifyDrainSingleABahamutBoss",
+          "tuCost": 1,
+          "useLimit": 0,
+          "nameKey": "NullifyDrainSingleA",
+          "descriptionKey": "NullifyDrainSingleA",
+          "spiritGain": 0,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "SlightHeal"
+              ],
+              "applyConditions": "HasStatusEffectExceptUnRemovalStatusEffect",
+              "applyToTargetOnly": true,
+              "buffBackMode": true,
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "RemoveBuffs",
+                "RemoveStealth",
+                "RemoveArmor",
+                "RemoveStance",
+                "RemoveHealingBurn"
+              ],
+              "applyToTargetOnly": true,
+              "applyConditions": "HasStatusEffectExceptUnRemovalStatusEffect"
+            }
+          ],
+          "attackScalors": [
+            "GoodVsStatusEffect"
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "Bahabuff3",
+          "flags": [
+            "Purify",
+            "NoDamage"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.2,
+            0,
+            0.3,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_timestrike1",
+            "batfx_bluehalocenter1/batfx_bluehalocenter1",
+            "batfx_bahabuff1/batfx_bahabuff1",
+            "batsfx_prefab/batsfx_charge1",
+            "batfx_ripplebluelow/batfx_ripplebluelow",
+            "batfx_statdrain1/batfx_statdrain1"
+          ],
+          "sortOrderOffset": [
+            2,
+            -2,
+            2,
+            2,
+            -2,
+            2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            1,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "RemoveArmor": {
+            "class": "Buff",
+            "stackName": "RemoveArmor",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "Armor"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "RemoveBuffs": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "RemoveHealingBurn": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "Burn"
+              }
+            ],
+            "duration": 0,
+            "applyConditions": "HasHealingBurn",
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "RemoveStance": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "Stance"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "RemoveStealth": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "SlightHeal": {
+            "class": "Buff",
+            "behaviors": [
+              "AdjustHp"
+            ],
+            "behaviorOverrides": [
+              {
+                "percent": 0.1,
+                "abilityEffect": "Blank",
+                "hpboosts": [
+                  "HealBoost"
+                ]
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {
+          "GoodVsStatusEffect": {
+            "class": "AttackScalor",
+            "targetCondition": "HasStatusEffect"
+          }
+        },
+        "conditions": {
+          "HasStatusEffectExceptUnRemovalStatusEffect": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "Explosive"
+            ],
+            "or": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "Poison"
+              ],
+              "not": {
+                "class": "MonsterConditions",
+                "monsterTags": [
+                  "LethalPoison"
+                ]
+              },
+              "or": {
+                "class": "MonsterConditions",
+                "buffStackNames": [
+                  "Sleep"
+                ],
+                "or": {
+                  "class": "MonsterConditions",
+                  "buffStackNames": [
+                    "StunSkinStatus"
+                  ],
+                  "or": {
+                    "class": "MonsterConditions",
+                    "buffStackNames": [
+                      "Freeze"
+                    ],
+                    "or": {
+                      "class": "MonsterConditions",
+                      "buffStackNames": [
+                        "Armor"
+                      ],
+                      "or": {
+                        "class": "MonsterConditions",
+                        "buffStackNames": [
+                          "Stealth"
+                        ],
+                        "or": {
+                          "class": "MonsterConditions",
+                          "buffStackNames": [
+                            "Stance"
+                          ],
+                          "or": {
+                            "class": "MonsterConditions",
+                            "buffStackNames": [
+                              "SpiritLeaking"
+                            ],
+                            "or": {
+                              "class": "MonsterConditions",
+                              "buffStackNames": [
+                                "SpiritLeakReady"
+                              ],
+                              "or": {
+                                "class": "MonsterConditions",
+                                "buffStackNames": [
+                                  "Condemn"
+                                ],
+                                "or": {
+                                  "class": "MonsterConditions",
+                                  "buffStackNames": [
+                                    "Slowed"
+                                  ],
+                                  "or": {
+                                    "class": "MonsterConditions",
+                                    "buffStackNames": [
+                                      "Burn"
+                                    ],
+                                    "not": {
+                                      "class": "MonsterConditions",
+                                      "monsterTags": [
+                                        "SilentBurn"
+                                      ]
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "MaxAnnihilatorBahamutBoss": {
+        "id": "MaxAnnihilatorBahamutBoss",
+        "found": true,
+        "localization": {
+          "name": "Max Rend",
+          "description": "1000% damage to all enemies. Ignores the Stealth status effect and Hold Ground. Usable only if the user's party has exactly 10 Spirit.",
+          "selected": "1000% damage to all enemies when at 10 Spirit"
+        },
+        "ability": {
+          "name": "MaxAnnihilatorBahamutBoss",
+          "class": "Ability",
+          "abilityScalor": 9,
+          "config": "MaxAnnihilatorBahamutBoss",
+          "tuCost": 100,
+          "useLimit": 0,
+          "spiritCost": 5,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "AllEnemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "forceAllowDeath": true,
+              "damageFlags": [
+                "Sneak"
+              ],
+              "applyToTargetType": "Enemy"
+            }
+          ],
+          "useCondition": "AllySpirit10OrMore",
+          "enemyEventType": "Hit",
+          "abilityEffect": "LimitBreakBahamut1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "allEnemies": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0.1,
+            0,
+            0.7,
+            0,
+            0,
+            0.4,
+            0,
+            0.8,
+            0,
+            0.2,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_charge1",
+            "batfx_chargefire7/batfx_chargefire7",
+            "batsfx_prefab/batsfx_charge1",
+            "batfx_bahamut1/batfx_bahamut1",
+            "batfx_bahamutimpact1/batfx_bahamutimpact1",
+            "batsfx_prefab/batsfx_fire4",
+            "batfx_bahamut2/batfx_bahamut2-01",
+            "batsfx_prefab/batsfx_fire4",
+            "batfx_bahamut2/batfx_bahamut2-02",
+            "batsfx_prefab/batsfx_fire4",
+            "batfx_bluntimpact2/batfx_bluntimpact2",
+            "batsfx_prefab/batsfx_bomb1"
+          ],
+          "sortOrderOffset": [
+            -2,
+            2,
+            20,
+            3,
+            3,
+            0,
+            3,
+            0,
+            3,
+            3,
+            2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0.2,
+            0,
+            0,
+            0,
+            0.8,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "boneToAttachTo": [
+            "",
+            "effectbone",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {},
+        "conditions": {
+          "AllySpirit10OrMore": {
+            "class": "MonsterConditions",
+            "teamSpiritGreaterThan": 900
+          }
+        }
+      },
+      "ZeroAnnihilatorBahamutBoss": {
+        "id": "ZeroAnnihilatorBahamutBoss",
+        "found": true,
+        "localization": {
+          "name": "Zero Rend",
+          "description": "1000% damage to all enemies. Ignores the Stealth status effect and Hold Ground. Usable only if the user's party has exactly 0 Spirit.",
+          "selected": "1000% damage to all enemies when at 0 Spirit"
+        },
+        "ability": {
+          "name": "ZeroAnnihilatorBahamutBoss",
+          "class": "Ability",
+          "abilityScalor": 9,
+          "config": "ZeroAnnihilatorBahamutBoss",
+          "tuCost": 100,
+          "useLimit": 0,
+          "spiritGain": 5,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "AllEnemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "forceAllowDeath": true,
+              "damageFlags": [
+                "Sneak"
+              ],
+              "applyToTargetType": "Enemy"
+            }
+          ],
+          "useCondition": "AllySpirit0",
+          "enemyEventType": "Hit",
+          "abilityEffect": "LimitBreakBahamut1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "allEnemies": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0.1,
+            0,
+            0.7,
+            0,
+            0,
+            0.4,
+            0,
+            0.8,
+            0,
+            0.2,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_charge1",
+            "batfx_chargefire7/batfx_chargefire7",
+            "batsfx_prefab/batsfx_charge1",
+            "batfx_bahamut1/batfx_bahamut1",
+            "batfx_bahamutimpact1/batfx_bahamutimpact1",
+            "batsfx_prefab/batsfx_fire4",
+            "batfx_bahamut2/batfx_bahamut2-01",
+            "batsfx_prefab/batsfx_fire4",
+            "batfx_bahamut2/batfx_bahamut2-02",
+            "batsfx_prefab/batsfx_fire4",
+            "batfx_bluntimpact2/batfx_bluntimpact2",
+            "batsfx_prefab/batsfx_bomb1"
+          ],
+          "sortOrderOffset": [
+            -2,
+            2,
+            20,
+            3,
+            3,
+            0,
+            3,
+            0,
+            3,
+            3,
+            2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0.2,
+            0,
+            0,
+            0,
+            0.8,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "boneToAttachTo": [
+            "",
+            "effectbone",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {},
+        "conditions": {
+          "AllySpirit0": {
+            "class": "MonsterConditions",
+            "teamSpiritLessThan": 100
+          }
+        }
+      }
+    },
+    "passives": {
+      "FudgeSuperPoisonIsAPassive": {
+        "id": "FudgeSuperPoisonIsAPassive",
+        "found": true,
+        "localization": {
+          "name": "Super Poison",
+          "description": "Poison applied by this unit deals 4 times the normal damage, and cannot be overwritten by normal Poison."
+        }
+      },
+      "SuperPoisonSkinA": {
+        "id": "SuperPoisonSkinA",
+        "found": true,
+        "localization": {
+          "name": "Poison Skin",
+          "description": "Enemy units that deal damage to this unit get poisoned. This will overwrite other status effects on the attacker."
+        }
+      },
+      "StunImmunity": {
+        "id": "StunImmunity",
+        "found": true,
+        "localization": {
+          "name": "Stun Immunity",
+          "description": "This unit is not affected by stun effects."
+        }
+      },
+      "SleepImmunity": {
+        "id": "SleepImmunity",
+        "found": true,
+        "localization": {
+          "name": "Sleep Immunity",
+          "description": "This unit is not affected by sleep effects."
+        }
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": {
+      "id": "BahamutBoss01Seq",
+      "found": true,
+      "sequence": {
+        "class": "AbilityAISequence",
+        "sequence": [
+          [
+            "0",
+            "1",
+            "2",
+            "3",
+            "4"
+          ],
+          [
+            "0",
+            "1",
+            "3",
+            "4"
+          ]
+        ]
+      }
+    },
+    "leaderCondition": null
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "BahamutBoss01",
+    "family": "BahamutBoss",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "BahamutBoss01",
+    "class": "Monster",
+    "family": "BahamutBoss",
+    "activeSkills": {
+      "0": "PoisonAttackABahamutBoss",
+      "1": "PoisonEaterDoubleABahamutBoss",
+      "2": "NullifyDrainSingleABahamutBoss",
+      "3": "MaxAnnihilatorBahamutBoss",
+      "4": "ZeroAnnihilatorBahamutBoss"
+    },
+    "passives": {
+      "0": "FudgeSuperPoisonIsAPassive",
+      "1": "SuperPoisonSkinA",
+      "2": "StunImmunity",
+      "3": "SleepImmunity"
+    },
+    "aiSequence": "BahamutBoss01Seq",
+    "cost": 999,
+    "baseAttack": 1300,
+    "baseMaxHp": 75000,
+    "speed": 150,
+    "element": "Earth",
+    "weaponPref": "Axe",
+    "weaponPivotIndex": 0,
+    "walkSound": "TestSound",
+    "secure": 1,
+    "aiTargetPickWeight": 1,
+    "stars": 6,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 1,
+    "battleOrbImageFlip": 0,
+    "skillVoices": {
+      "0": [
+        1,
+        2
+      ],
+      "1": [
+        3,
+        4
+      ],
+      "2": [
+        7,
+        8
+      ],
+      "3": [
+        9,
+        10
+      ],
+      "4": [
+        11
+      ]
+    },
+    "damageVoices": [
+      5
+    ],
+    "deathVoices": [
+      6
+    ]
+  },
+  "_build": {
+    "scriptVersion": "6-character-family-states",
+    "sourceHash": "7429656f0f321be6e32fd3fe0d8981dc9c1e2c1b667b786ba227124a499a794a",
+    "dependencyHash": "66238fd5a744b268505f272a5c43aff860ee6844f0fbb60205c0247e19c0f958",
+    "generatedAt": 1778213444
+  }
+}

@@ -1,0 +1,794 @@
+{
+  "schemaVersion": 3,
+  "order": 221,
+  "id": "le-fay",
+  "name": "Le Fay",
+  "title": "The Witch of Avalon",
+  "description": "Le Fay can show one who has consumed the Fruit of Wisdom what glories their future holds. However, for most this path is paved with slaughter and ends in tyranny. Once the choice is made to consume the fruit, there is no turning back.\n\nLe Fay well knows the ultimate fate of those who choose to do so. No matter what they decide to do with their gained wisdom, they will seek to return to Avalon once more at the end of their days.",
+  "category": "character",
+  "rarity": null,
+  "stars": 6,
+  "evolvedStars": 6,
+  "element": "Dark",
+  "weaponType": "Sword",
+  "stats": {
+    "atk": 1411,
+    "hp": 7358,
+    "spd": 211,
+    "cost": 34
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/GoldAppleGirl02.png",
+  "refs": {
+    "activeSkills": [
+      "GainAttackSingleA",
+      "PoisonEaterAGoldAppleGirl",
+      "KillGiveTurnA",
+      "SlayerbaneAGoldAppleGirl"
+    ],
+    "passives": [
+      "PoisonSkinA",
+      "HoldGround",
+      "GreatSwordMinusDamageLv3",
+      "PlusHPBoostLv3",
+      "PlusAttackBoostLv3",
+      "AddWeaponPrefMace"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": "AttackAndHPUp6Death",
+    "leaderBuffCondition": "IsDeath",
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "GainAttackSingleA": {
+        "id": "GainAttackSingleA",
+        "found": true,
+        "localization": {
+          "name": "Attack",
+          "description": "Damage to 1 enemy and allies gain 2 Spirit.",
+          "selected": "Damage to 1 enemy and gains 2 Spirit"
+        },
+        "ability": {
+          "name": "GainAttackSingleA",
+          "class": "Ability",
+          "abilityScalor": 0,
+          "config": "GainAttackSingleA",
+          "tuCost": 130,
+          "useLimit": 0,
+          "spiritGain": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ]
+            }
+          ],
+          "enemyEventType": "Hit",
+          "axeAbilityEffect": "SmallSlash1",
+          "greatSwordAbilityEffect": "SmallSlash1",
+          "greatAxeAbilityEffect": "SmallSlash1",
+          "hammerAbilityEffect": "SmallBlunt1",
+          "katanaAbilityEffect": "SmallSlash1",
+          "maceAbilityEffect": "SmallBlunt1",
+          "spearAbilityEffect": "SmallSpear1",
+          "staffAbilityEffect": "SmallBlunt1",
+          "swordAbilityEffect": "SmallSlash1",
+          "clawAbilityEffect": "SmallClaw1",
+          "biteAbilityEffect": "SmallBite1",
+          "bashAbilityEffect": "SmallBlunt1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": null,
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {},
+        "conditions": {}
+      },
+      "PoisonEaterAGoldAppleGirl": {
+        "id": "PoisonEaterAGoldAppleGirl",
+        "found": true,
+        "localization": {
+          "name": "Poison Devour",
+          "description": "400% damage to 1 enemy if they are poisoned.",
+          "selected": "400% damage to poisoned target"
+        },
+        "ability": {
+          "name": "PoisonEaterAGoldAppleGirl",
+          "class": "Ability",
+          "abilityScalor": -2,
+          "conditionalAbilityScalors": [
+            3
+          ],
+          "config": "PoisonEaterAGoldAppleGirl",
+          "tuCost": 130,
+          "useLimit": 0,
+          "spiritCost": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "PoisonEaterDamageBoost"
+              ]
+            }
+          ],
+          "attackScalors": [
+            "GoodVsPoisoned"
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "SmallHit1",
+          "conditionedAbilityEffects": [
+            "PoisonEaterAGoldAppleGirl",
+            "PoisonEaterAGoldAppleGirl"
+          ],
+          "flags": [
+            "PoisonEater",
+            "StealthWorthy"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.4,
+            0
+          ],
+          "prefabs": [
+            "batfx_bluntimpact1/batfx_bluntimpact1",
+            "batsfx_prefab/batsfx_impactsmall1"
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            true
+          ],
+          "scale": [
+            0.4,
+            1
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {
+          "GoodVsPoisoned": {
+            "class": "AttackScalor",
+            "targetCondition": "IsPoisoned"
+          }
+        },
+        "conditions": {}
+      },
+      "KillGiveTurnA": {
+        "id": "KillGiveTurnA",
+        "found": true,
+        "localization": {
+          "name": "Avalon's Fruit",
+          "description": "Immediately give 1 ally the next turn by reducing their current TU to 0, and give them the Poison status effect. This will overwrite other status effects on that unit. Unlocked each time the user defeats another unit with an attack. This skill is locked again after each use or if the user leaves the battlefield. Active skills that grant turns cannot be used on turns given by this skill.",
+          "selected": "Reduce 1 ally's TU to 0 but poisons them\n(Will overwrite other status effects)"
+        },
+        "ability": {
+          "name": "KillGiveTurnA",
+          "class": "Ability",
+          "config": "KillGiveTurnA",
+          "tuCost": 50,
+          "useLimit": 0,
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "oneAllyNotMe",
+          "components": [
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "applyToTargetType": "Friendly",
+              "buffs": [
+                "GiveTurn",
+                "OnExtraTurn",
+                "JustGivenTurn",
+                "Poison"
+              ]
+            },
+            {
+              "buffs": [
+                "FudgeUsed"
+              ],
+              "applyToTargetType": "Source",
+              "chance": 1.0,
+              "skipAbilityEffect": true
+            }
+          ],
+          "friendlyEventType": "Finish",
+          "sourceEventType": "Hit",
+          "abilityEffect": "GiveTurn",
+          "flags": [
+            "StealthWorthy",
+            "GiveTurn",
+            "KillLock"
+          ],
+          "useCondition": "KillsMoreThanSkillUsed",
+          "killLockSkillIcon": "IconRedEx01",
+          "killLockUnlockedSkillIcon": "IconGreenCircle01",
+          "killLockUnlockedKey": "SkillReadyToUseKey",
+          "killLockLockedKey": "KillGiveTurnALockLockedKey",
+          "recommendEffectWhenUsable": 1
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "friendlyTargets": 1,
+          "oneAllyNotMe": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0.7,
+            0,
+            0
+          ],
+          "prefabs": [
+            "",
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_casting4/batfx_casting4",
+            "batfx_bluehelix1/batfx_bluehelix1",
+            "batsfx_prefab/batsfx_knockback1",
+            "batfx_ripplebluelow/batfx_ripplebluelow"
+          ],
+          "sortOrderOffset": [
+            0,
+            -2,
+            -2,
+            1,
+            -2,
+            -2
+          ],
+          "assetBundles": [
+            "",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            true,
+            true,
+            false,
+            true,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "FudgeUsed": {
+            "class": "Buff",
+            "duration": 0,
+            "behaviors": [
+              "AddBattleProperty"
+            ],
+            "behaviorOverrides": [
+              {
+                "properties": {
+                  "fudgeSkillUses": 1
+                },
+                "replace": true,
+                "setToKills": true
+              }
+            ],
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "GiveTurn": {
+            "class": "Buff",
+            "behaviors": [
+              "GiveTurn"
+            ],
+            "behaviorOverrides": [
+              {}
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "textKeyToShowWhenApplied": "TurnGivenKey",
+            "isHiddenFromPlayers": true
+          },
+          "JustGivenTurn": {
+            "class": "Buff",
+            "duration": 1,
+            "stackName": "JustGivenTurnBuff",
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "isHiddenFromPlayers": true,
+            "noIconShownOnBattleStatus": true
+          },
+          "OnExtraTurn": {
+            "class": "Buff",
+            "stackName": "OnExtraTurn",
+            "duration": 1,
+            "isHiddenFromPlayers": true
+          },
+          "Poison": {
+            "class": "Buff",
+            "stackName": "Poison",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "DamageOverTime"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "percentOfAttack": 0.0025,
+                "damageColor": "Green",
+                "abilityEffect": "PoisonDamage",
+                "extraDamageFlag": "Poison"
+              }
+            ],
+            "tags": [
+              "Poison"
+            ],
+            "canBePurified": true,
+            "duration": -1,
+            "applyConditions": "NotSuperOrMegaPoisoned",
+            "showAsTimer": false,
+            "statusEffect": "PoisonStatus",
+            "statusEffectOffset": 0.1,
+            "damageType": "Poison",
+            "noIconShownOnBattleStatus": true,
+            "iconSpriteName": "IconPurplePoison01"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "KillsMoreThanSkillUsed": {
+            "class": "MonsterConditions",
+            "propertyToCompareToField": "fudgeSkillUses",
+            "fieldToCompareToProperty": "killsMade",
+            "propertyFieldCompareStyle": "LessThan"
+          },
+          "OnExtraTurn": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "OnExtraTurn"
+            ]
+          }
+        }
+      },
+      "SlayerbaneAGoldAppleGirl": {
+        "id": "SlayerbaneAGoldAppleGirl",
+        "found": true,
+        "localization": {
+          "name": "Vengeance Strike",
+          "description": "300% damage to 1 enemy if they have defeated 1+ units with attacks while on the battlefield.",
+          "selected": "300% damage to targets that have defeated 1+ units"
+        },
+        "ability": {
+          "name": "SlayerbaneAGoldAppleGirl",
+          "class": "Ability",
+          "abilityScalor": -2,
+          "conditionalAbilityScalors": [
+            2
+          ],
+          "config": "SlayerbaneAGoldAppleGirl",
+          "tuCost": 130,
+          "useLimit": 0,
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "SlayerbaneDamageBoost"
+              ]
+            }
+          ],
+          "attackScalors": [
+            "GoodVsKiller1"
+          ],
+          "flags": [
+            "Slayerbane"
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "SmallHit1",
+          "conditionedAbilityEffects": [
+            "SlayerbaneAGoldAppleGirl",
+            "SlayerbaneAGoldAppleGirl"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.4,
+            0
+          ],
+          "prefabs": [
+            "batfx_bluntimpact1/batfx_bluntimpact1",
+            "batsfx_prefab/batsfx_impactsmall1"
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            true
+          ],
+          "scale": [
+            0.4,
+            1
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {
+          "GoodVsKiller1": {
+            "class": "AttackScalor",
+            "targetCondition": "Kills1"
+          }
+        },
+        "conditions": {}
+      }
+    },
+    "passives": {
+      "PoisonSkinA": {
+        "id": "PoisonSkinA",
+        "found": true,
+        "localization": {
+          "name": "Poison Skin",
+          "description": "Enemy units that deal damage to this unit get poisoned. This will overwrite other status effects on the attacker."
+        }
+      },
+      "HoldGround": {
+        "id": "HoldGround",
+        "found": true,
+        "localization": {
+          "name": "Hold Ground",
+          "description": "If this unit would be defeated by an enemy attack or a status effect while having more than 1 HP, it instead survives with 1 HP."
+        }
+      },
+      "GreatSwordMinusDamageLv3": {
+        "id": "GreatSwordMinusDamageLv3",
+        "found": true,
+        "localization": {
+          "name": "G.sword Resist Lv3",
+          "description": "10% less damage from attacks by units equipped with Greatswords."
+        }
+      },
+      "PlusHPBoostLv3": {
+        "id": "PlusHPBoostLv3",
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv3",
+          "description": "Adds 1200 to this unit's max HP."
+        }
+      },
+      "PlusAttackBoostLv3": {
+        "id": "PlusAttackBoostLv3",
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv3",
+          "description": "Adds 300 to this unit's Attack."
+        }
+      },
+      "AddWeaponPrefMace": {
+        "id": "AddWeaponPrefMace",
+        "found": true,
+        "localization": {
+          "name": "Mace Mastery",
+          "description": "Can use weapon skills of Maces in addition to their original preferred weapon type."
+        }
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": {
+      "class": "MonsterConditions",
+      "elements": [
+        "Death"
+      ]
+    }
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "GoldAppleGirl02",
+    "family": "GoldAppleGirl",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "GoldAppleGirl02",
+    "family": "GoldAppleGirl",
+    "class": "Monster",
+    "leaderBuff": "AttackAndHPUp6Death",
+    "leaderBuffCondition": "IsDeath",
+    "activeSkills": {
+      "0": "GainAttackSingleA",
+      "1": "PoisonEaterAGoldAppleGirl",
+      "2": "KillGiveTurnA",
+      "3": "SlayerbaneAGoldAppleGirl"
+    },
+    "passives": {
+      "0": "PoisonSkinA",
+      "1": "HoldGround",
+      "2": "GreatSwordMinusDamageLv3",
+      "3": "PlusHPBoostLv3",
+      "4": "PlusAttackBoostLv3",
+      "5": "AddWeaponPrefMace"
+    },
+    "cost": 34,
+    "baseAttack": 1411,
+    "baseMaxHp": 7358,
+    "speed": 211,
+    "element": "Death",
+    "weaponPref": "Sword",
+    "weaponPivotIndex": 0,
+    "secure": 1,
+    "evolveFrom": "GoldAppleGirl01",
+    "aiTargetPickWeight": 1,
+    "stars": 6,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 0,
+    "battleOrbImageFlip": 0,
+    "attackType": "Weapon",
+    "formTwitterShare": 1,
+    "cosmoName": "GoldAppleGirl03",
+    "cosmoBattleOrbImageFlip": 0,
+    "skillVoices": {
+      "0": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "1": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "2": [
+        9,
+        10,
+        11,
+        12
+      ],
+      "3": [
+        13,
+        14,
+        15,
+        16
+      ]
+    },
+    "damageVoices": [
+      17,
+      18,
+      19,
+      20
+    ],
+    "deathVoices": [
+      21,
+      22,
+      23,
+      24
+    ],
+    "victoryVoices": [
+      25,
+      26
+    ],
+    "lineupVoices": [
+      27,
+      28,
+      29,
+      30,
+      31,
+      32
+    ],
+    "evolutionVoices": [
+      33
+    ],
+    "trainVoices": [
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43
+    ],
+    "titleVoices": [
+      44
+    ],
+    "gachaVoices": [
+      45
+    ],
+    "loginVoices": [
+      46
+    ],
+    "tapVoices": [
+      47,
+      48,
+      49
+    ],
+    "idleVoices": [
+      50
+    ]
+  },
+  "_build": {
+    "scriptVersion": "6-character-family-states",
+    "sourceHash": "9df59caa65d10f9a9aad36340012bea005391dd12865d3c626ae3bb557f73847",
+    "dependencyHash": "f712d03f29080bb35817e64c6673b0170cebeae454bb4bc16d7c9cfd0b58d275",
+    "generatedAt": 1778213411
+  }
+}

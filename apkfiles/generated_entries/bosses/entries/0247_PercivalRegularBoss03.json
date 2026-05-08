@@ -1,0 +1,1262 @@
+{
+  "schemaVersion": 3,
+  "order": 247,
+  "id": "mega-percival",
+  "name": "Mega Percival",
+  "title": "",
+  "description": "",
+  "category": "bosse",
+  "rarity": null,
+  "stars": 6,
+  "evolvedStars": 6,
+  "element": "Light",
+  "weaponType": "GreatSword",
+  "stats": {
+    "atk": 3600,
+    "hp": 165000,
+    "spd": 554,
+    "cost": 999
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/PercivalRegular03.png",
+  "refs": {
+    "activeSkills": [
+      "IgnoreSkinSweepPercivalRegularBoss",
+      "TeamBuffsPercivalRegularBoss",
+      "ChampionSlayerBanePercivalRegularBoss",
+      "SurvivorDoublePercivalRegularBoss"
+    ],
+    "passives": [
+      "DefeatedEnemyBuffPercivalRegularBoss",
+      "StunImmunity",
+      "SleepImmunity"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": null,
+    "leaderBuffCondition": null,
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "IgnoreSkinSweepPercivalRegularBoss": {
+        "id": "IgnoreSkinSweepPercivalRegularBoss",
+        "found": true,
+        "localization": {
+          "name": "Blastwave",
+          "description": "100% damage to all enemies. 250% damage instead and stuns each enemy for 100TU if they are dealt damage every second time this skill is activated while on the battlefield. Heals the user for 100% of total damage dealt. This attack ignores the Counter Stance Status Effect, and the effects of Skin passive skills.",
+          "selected": "100+ damage and may Stun enemies, heals user"
+        },
+        "ability": {
+          "name": "IgnoreSkinSweepPercivalRegularBoss",
+          "class": "Ability",
+          "abilityScalor": 0,
+          "conditionalAbilityScalors": [
+            1.5
+          ],
+          "config": "IgnoreSkinSweepPercivalRegularBoss",
+          "tuCost": 50,
+          "useLimit": 0,
+          "spiritGain": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "AllEnemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageFlags": [
+                "IgnoreSkin",
+                "PercivalStunEnemies"
+              ],
+              "applyToTargetType": "Enemy",
+              "drainPercent": 1.0,
+              "drainEffect": "VampireDrain1"
+            },
+            {
+              "buffs": [
+                "LoseMomentum",
+                "GainMomentumEnemyStunReadyBoss",
+                "RemoveLockSurvivorDoublePercivalRegularBoss"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "attackScalors": [
+            "GoodWithMomentum"
+          ],
+          "conditionedAbilityEffects": [
+            "PercivalAbility1"
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "PercivalAbility1Weak",
+          "recommendEffectWhenUsable": 1
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "allEnemies": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.9,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_casting3/batfx_casting3",
+            "batfx_holymid1/batfx_holymid1",
+            "batsfx_prefab/batsfx_life1",
+            "batfx_rippleyellowlow/batfx_rippleyellowlow"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -2,
+            1,
+            -2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            true,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "GainMomentumEnemyStunReadyBoss": {
+            "class": "Buff",
+            "stackName": "MomentumReady",
+            "behaviors": [
+              "BuffOnMonsterTurn"
+            ],
+            "behaviorOverrides": [
+              {
+                "enemyBuffs": [
+                  "TriggerStunEnemies100RandomPercivalRegularBoss"
+                ]
+              }
+            ],
+            "duration": -1,
+            "tags": [
+              "Stun"
+            ],
+            "isHiddenFromPlayers": true,
+            "applyConditions": "NotLostMomentum"
+          },
+          "LoseMomentum": {
+            "class": "Buff",
+            "stackName": "LoseMomentum",
+            "duration": 0,
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "MomentumReady"
+              }
+            ],
+            "isHiddenFromPlayers": true,
+            "applyConditions": "HasDamagedWithAttack"
+          },
+          "RemoveLockSurvivorDoublePercivalRegularBoss": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "LockSurvivorDoublePercivalRegularBoss"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {
+          "GoodWithMomentum": {
+            "class": "AttackScalor",
+            "sourceCondition": "HasDamagedWithAttack"
+          }
+        },
+        "conditions": {}
+      },
+      "TeamBuffsPercivalRegularBoss": {
+        "id": "TeamBuffsPercivalRegularBoss",
+        "found": true,
+        "localization": {
+          "name": "Royal Blightburst",
+          "description": "The user becomes Enraged, and is granted either a Stun Ward or Sleep Ward at random. Heals all allies for 200% of the user's Attack and Weakens all enemies. This skill becomes locked for 100TU after use.\n\nEnraged units have their Attack increased to 1.5x until the end of their next turn. Weakened units have their Attack reduced to 0.75x until the end of their next turn. These effects will overwrite any existing Weak or Enrage effects on affected units. The effect of Weakening may be diminished if the affected unit's Attack is increased by other effects and it can be overwritten by Enrage effects.",
+          "selected": "Enrages user, heals all allies, weakens enemies"
+        },
+        "ability": {
+          "name": "TeamBuffsPercivalRegularBoss",
+          "class": "Ability",
+          "config": "TeamBuffsPercivalRegularBoss",
+          "tuCost": 1,
+          "useLimit": 0,
+          "spiritGain": 0,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "AllFriendsAndEnemies",
+          "components": [
+            "ApplyBuff",
+            "Heal",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "AttackMinus25Percent1TurnOnly"
+              ],
+              "showMissConditions": "ShowNoMiss",
+              "buffAppliedEffects": [
+                "Weak1Fast"
+              ],
+              "skipAbilityEffect": true,
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "healthPerAttack": 2.0,
+              "applyToTargetType": "Friendly",
+              "abilityEffect": "VampireDrain1"
+            },
+            {
+              "buffs": [
+                "AttackPlus50Percent1TurnOnly",
+                "PercivalRegularBossCooldown100"
+              ],
+              "applyToSourceOnly": true
+            },
+            {
+              "randomBuffFromList": [
+                "StunImmunityOnce",
+                "SleepImmunityOnce"
+              ],
+              "applyToSourceOnly": true,
+              "showMissConditions": "ShowNoMiss",
+              "skipAbilityEffect": true
+            }
+          ],
+          "useCondition": "NotInstantCooldown",
+          "enemyEventType": "Finish",
+          "friendlyEventType": "Finish",
+          "sourceEventType": "Finish",
+          "flags": [
+            "Heal",
+            "NoDamage"
+          ],
+          "abilityEffect": "PercivalAbility1B"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "all": true,
+          "allEnemies": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0.9,
+            0,
+            0,
+            0,
+            0.7,
+            0
+          ],
+          "prefabs": [
+            "batfx_percivalgrail1/batfx_bluebase1",
+            "batfx_CrescentEnrage1/batfx_CrescentEnrage1",
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_ripplebluelow/batfx_ripplebluelow",
+            "batfx_castingyellow2/batfx_castingyellow2",
+            "batfx_rippleyellowlow/batfx_rippleyellowlow",
+            "batsfx_prefab/batsfx_accelerate1"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -2,
+            -2,
+            -2,
+            2,
+            -2,
+            -2
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            true
+          ],
+          "boneToAttachTo": [
+            "",
+            "spiral",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          },
+          "Heal": {
+            "class": "HealAbilityComponent"
+          }
+        },
+        "buffs": {
+          "AttackMinus25Percent1TurnOnly": {
+            "class": "Buff",
+            "stackName": "AttackMinus25Percent",
+            "behaviors": [
+              "RemoveAfterTurnsBehavior",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "turnCount": 1,
+                "scalorStatBonuses": {
+                  "Attack": -0.3333333
+                }
+              },
+              {
+                "name": "AttackPlus50Percent"
+              },
+              {
+                "name": "RageCount1Icon"
+              },
+              {
+                "name": "RageCount2Icon"
+              },
+              {
+                "name": "RageCount3Icon"
+              }
+            ],
+            "iconSpriteName": "IconRedWeak01",
+            "showAsTimer": true,
+            "duration": -1
+          },
+          "AttackPlus50Percent1TurnOnly": {
+            "class": "Buff",
+            "stackName": "AttackPlus50Percent",
+            "behaviors": [
+              "RemoveAfterTurnsBehavior",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "turnCount": 1,
+                "scalorStatBonuses": {
+                  "Attack": 0.5
+                }
+              },
+              {
+                "name": "AttackMinus25Percent"
+              }
+            ],
+            "iconSpriteName": "IconRedRage01",
+            "showAsTimer": true,
+            "duration": -1
+          },
+          "Heal": {
+            "class": "Buff",
+            "behaviors": [
+              "AdjustHp"
+            ],
+            "behaviorOverrides": [
+              {
+                "percent": 0.3,
+                "abilityEffect": "Blank",
+                "hpboosts": [
+                  "HealBoost"
+                ]
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "PercivalRegularBossCooldown100": {
+            "class": "Buff",
+            "duration": 100,
+            "stackName": "InstantCooldown",
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "iconSpriteName": "IconBlueCountdownClock3"
+          },
+          "SleepImmunityOnce": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity"
+            ],
+            "stackName": "SleepImmunityOnce",
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Sleep"
+                ],
+                "useLimit": 1
+              }
+            ],
+            "duration": -1,
+            "showAsTimer": true,
+            "tags": [
+              "SleepImmuneTemp"
+            ],
+            "iconSpriteName": "IconRedSleepInvalidZs01"
+          },
+          "StunImmunityOnce": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity"
+            ],
+            "stackName": "StunImmunityOnce",
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Stun",
+                  "StunNoAbsorb"
+                ],
+                "useLimit": 1
+              }
+            ],
+            "duration": -1,
+            "showAsTimer": true,
+            "tags": [
+              "StunImmuneTemp"
+            ],
+            "iconSpriteName": "IconRedStunInvalidLightning01"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "NotInstantCooldown": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "InstantCooldown"
+              ]
+            }
+          }
+        }
+      },
+      "ChampionSlayerBanePercivalRegularBoss": {
+        "id": "ChampionSlayerBanePercivalRegularBoss",
+        "found": true,
+        "localization": {
+          "name": "Piercing Void",
+          "description": "Targets 1 enemy. 500% damage to targets that have survived on the battlefield for 200TU, or to any target if the user has defeated 2+ units with attacks while on the battlefield. This attack ignores the Counter Stance Status Effect, the effects of Skin passive skills and will ignore any effects of non-boss enemies that would prevent the target from being defeated.",
+          "selected": "Up to 500% damage, ignores defeat prevention"
+        },
+        "ability": {
+          "name": "ChampionSlayerBanePercivalRegularBoss",
+          "class": "Ability",
+          "abilityScalor": -1,
+          "conditionalAbilityScalors": [
+            4,
+            4
+          ],
+          "config": "ChampionSlayerBanePercivalRegularBoss",
+          "tuCost": 50,
+          "useLimit": 0,
+          "spiritGain": 0,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "SlayerbaneDamageBoost"
+              ],
+              "damageFlags": [
+                "IgnoreSkin",
+                "HardIgnoreBlockDeath"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "RemoveLockSurvivorDoublePercivalRegularBoss"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "attackScalors": [
+            "GoodVsTimeInCombat200",
+            "GoodForKiller2"
+          ],
+          "flags": [
+            "SurvivorBane"
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "PercivalAbility1Weak",
+          "conditionedAbilityEffects": [
+            "PercivalSpecial1",
+            "PercivalSpecial1B"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.9,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_casting3/batfx_casting3",
+            "batfx_holymid1/batfx_holymid1",
+            "batsfx_prefab/batsfx_life1",
+            "batfx_rippleyellowlow/batfx_rippleyellowlow"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -2,
+            1,
+            -2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            true,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "RemoveLockSurvivorDoublePercivalRegularBoss": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "LockSurvivorDoublePercivalRegularBoss"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {
+          "GoodForKiller2": {
+            "class": "AttackScalor",
+            "sourceCondition": "Kills2"
+          },
+          "GoodVsTimeInCombat200": {
+            "class": "AttackScalor",
+            "targetCondition": "TimeInCombat200"
+          }
+        },
+        "conditions": {}
+      },
+      "SurvivorDoublePercivalRegularBoss": {
+        "id": "SurvivorDoublePercivalRegularBoss",
+        "found": true,
+        "localization": {
+          "name": "Elemental Explosion",
+          "description": "500% damage to 2 enemies. This attack ignores damage reduction effects.\n\nEnemies damaged by this attack will be randomly granted either Sleep for 200TU (even if they have already slept while on the battlefield), Mega Poison for 200TU or Stun for 200TU.\n\nLocked for 200TU after the user has entered the battlefield, and locks again after each use. After the first use, unlocks each time the user damages an enemy with a different attack. Sleep and Mega Poison will overwrite other status effects on that enemy. Mega Poison deals 20 times the damage of normal Poison and cannot be overwritten by normal Poison or Super Poison. This is not considered a Combo Burst type active skill.",
+          "selected": "500% damage, ignores damage reduction"
+        },
+        "ability": {
+          "name": "SurvivorDoublePercivalRegularBoss",
+          "class": "Ability",
+          "abilityScalor": 4,
+          "config": "SurvivorDoublePercivalRegularBoss",
+          "tuCost": 1,
+          "useLimit": 0,
+          "spiritCost": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageFlags": [
+                "IgnoreArmor",
+                "PercivalBossStunEnemies"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "randomBuffFromList": [
+                "MegaPoison",
+                "SleepForced"
+              ],
+              "randomBuffListEffects": [
+                "MidPoison1",
+                "MidSleep1"
+              ],
+              "checkBuffConditionBeforeApply": true,
+              "applyToTargetType": "Enemy",
+              "showMissConditions": "ShowNoMiss",
+              "applyConditions": "NotHavePercivalRegularBossMarkerBuff"
+            },
+            {
+              "buffs": [
+                "LockSurvivorDoublePercivalRegularBoss"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "useCondition": "TimeInCombat200SurvivorDoublePercivalRegularBossNotLocked",
+          "immuneSuggestionCondition": "IsStatusImmune",
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "flags": [
+            "IgnoreStealth",
+            "Survivor",
+            "PoisonChance",
+            "StunChance",
+            "SleepChance"
+          ],
+          "abilityEffect": "PercivalAbility2",
+          "ignoreEffectForSourceEvent": true
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            1.1,
+            0,
+            0.7,
+            0,
+            0.3,
+            0.6,
+            0,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_survivor1",
+            "batfx_percivalgrail1/batfx_bluebase1",
+            "batfx_percivalgrail1/batfx_percivalgrail1",
+            "batsfx_prefab/batsfx_frost1",
+            "batfx_percivalgrail1/batfx_percivalstrike1",
+            "batsfx_prefab/batsfx_electric2",
+            "batfx_percivalgrail1/batfx_yellowfloor2",
+            "batfx_percivalgrail1/batfx_tailwindrocks4",
+            "batfx_astridnew1/batfx_firepillar1",
+            "batsfx_prefab/batsfx_earth1",
+            "batsfx_prefab/batsfx_fire2"
+          ],
+          "sortOrderOffset": [
+            0,
+            -2,
+            3,
+            0,
+            3,
+            0,
+            -2,
+            100,
+            50,
+            2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            true,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            false,
+            true,
+            false,
+            false,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "LockSurvivorDoublePercivalRegularBoss": {
+            "class": "Buff",
+            "stackName": "LockSurvivorDoublePercivalRegularBoss",
+            "iconSpriteName": "IconRedEx01",
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "isHiddenFromPlayers": false,
+            "duration": -1
+          },
+          "MegaPoison": {
+            "class": "Buff",
+            "stackName": "Poison",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "DamageOverTime"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "percentOfAttack": 0.05,
+                "damageColor": "Green",
+                "abilityEffect": "MidDeath1MegaPoison",
+                "extraDamageFlag": "MegaPoison"
+              }
+            ],
+            "tags": [
+              "Poison",
+              "MegaPoison"
+            ],
+            "canBePurified": true,
+            "duration": 200,
+            "showAsTimer": true,
+            "statusEffect": "MegaPoisonStatus",
+            "statusEffectOffset": 0.1,
+            "damageType": "Poison",
+            "iconSpriteName": "IconPurplePoison01"
+          },
+          "SleepForced": {
+            "class": "Buff",
+            "stackName": "Sleep",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "LoseTurn",
+              "RemoveOnHurt"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "PurifyChain"
+              },
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "name": "AutoPurifyAfterTurnNoSleep"
+              },
+              {},
+              {
+                "ignoreIfHurtBySelf": true,
+                "cancelFromDamageFlags": [
+                  "DoNotWake"
+                ]
+              }
+            ],
+            "duration": 200,
+            "showAsTimer": true,
+            "statusEffect": "SleepStatus",
+            "statusEffectOffset": 0.1,
+            "iconSpriteName": "IconWhiteSleepZs01",
+            "textKeyToShowWhenApplied": "SleepKey",
+            "canBePurified": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "IsStatusImmune": {
+            "class": "MonsterConditions",
+            "monsterTags": [
+              "StatusImmune"
+            ],
+            "or": {
+              "class": "MonsterConditions",
+              "monsterTags": [
+                "LethalPoison"
+              ]
+            }
+          },
+          "NotHavePercivalRegularBossMarkerBuff": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "PercivalRegularBossMarkerBuff"
+              ]
+            }
+          },
+          "TimeInCombat200SurvivorDoublePercivalRegularBossNotLocked": {
+            "class": "MonsterConditions",
+            "timeInCombat": 200,
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "LockSurvivorDoublePercivalRegularBoss"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "passives": {
+      "DefeatedEnemyBuffPercivalRegularBoss": {
+        "id": "DefeatedEnemyBuffPercivalRegularBoss",
+        "found": true,
+        "localization": {
+          "name": "Unyielding Champion",
+          "description": "This unit cannot be sent to the reinforcements from the battlefield, and cannot be defeated by damage from the Poison or Burn status effects.\n\nIf this unit would be defeated by an enemy attack or other status effect while having more than 1 HP, it instead survives with 1 HP.\n\nWhen this unit defeats an enemy with an attack, grants 2 random enemies the Mega Poison status effect for 200TU."
+        }
+      },
+      "StunImmunity": {
+        "id": "StunImmunity",
+        "found": true,
+        "localization": {
+          "name": "Stun Immunity",
+          "description": "This unit is not affected by stun effects."
+        }
+      },
+      "SleepImmunity": {
+        "id": "SleepImmunity",
+        "found": true,
+        "localization": {
+          "name": "Sleep Immunity",
+          "description": "This unit is not affected by sleep effects."
+        }
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": null
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "PercivalRegularBoss03",
+    "family": "PercivalRegularBoss",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "PercivalRegularBoss03",
+    "class": "Monster",
+    "family": "PercivalRegularBoss",
+    "activeSkills": {
+      "0": "IgnoreSkinSweepPercivalRegularBoss",
+      "1": "TeamBuffsPercivalRegularBoss",
+      "2": "ChampionSlayerBanePercivalRegularBoss",
+      "3": "SurvivorDoublePercivalRegularBoss"
+    },
+    "passives": {
+      "0": "DefeatedEnemyBuffPercivalRegularBoss",
+      "1": "StunImmunity",
+      "2": "SleepImmunity"
+    },
+    "cost": 999,
+    "baseAttack": 3600,
+    "baseMaxHp": 165000,
+    "speed": 554,
+    "element": "Life",
+    "weaponPref": "GreatSword",
+    "weaponPivotIndex": 0,
+    "walkSound": "TestSound",
+    "secure": 1,
+    "aiTargetPickWeight": 1,
+    "stars": 6,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 1,
+    "battleOrbImageFlip": 0,
+    "skillVoices": {
+      "0": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "1": [
+        5,
+        6,
+        8,
+        9
+      ],
+      "2": [
+        7,
+        10,
+        11,
+        12
+      ],
+      "3": [
+        13,
+        14,
+        15,
+        16
+      ]
+    },
+    "damageVoices": [
+      17,
+      18,
+      19,
+      20
+    ],
+    "deathVoices": [
+      21,
+      22,
+      23,
+      24
+    ]
+  },
+  "_build": {
+    "scriptVersion": "6-character-family-states",
+    "sourceHash": "b0dfb6f18d0fda97a26064ea39a919cacaf3ebdd5d4c3784daca6cfe370e2fb7",
+    "dependencyHash": "95eaebe2a99252de0970d995027101414acd12c35455adaeac702b57ad22fdcd",
+    "generatedAt": 1778213447
+  }
+}

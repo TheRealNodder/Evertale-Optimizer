@@ -1,0 +1,365 @@
+{
+  "schemaVersion": 3,
+  "order": 17,
+  "id": "volcatfish",
+  "name": "Volcatfish",
+  "title": "Volcatfish",
+  "description": "Volcatfish are considered a symbol of long life and enduring health. Ironically, those who stumble upon them don't tend to live long.",
+  "category": "character",
+  "rarity": null,
+  "stars": 2,
+  "evolvedStars": 2,
+  "element": "Fire",
+  "weaponType": "GreatSword",
+  "stats": {
+    "atk": 281,
+    "hp": 1636,
+    "spd": 103,
+    "cost": 12
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/FourLeggedCatfish02.png",
+  "refs": {
+    "activeSkills": [
+      "GainAttackSingleB",
+      "ProtectTeammatesA"
+    ],
+    "passives": [
+      "StunAbsorber"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": null,
+    "leaderBuffCondition": null,
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "GainAttackSingleB": {
+        "id": "GainAttackSingleB",
+        "found": true,
+        "localization": {
+          "name": "Attack",
+          "description": "Damage to 1 enemy and allies gain 1 Spirit.",
+          "selected": "Damage to 1 enemy and gains 1 Spirit"
+        },
+        "ability": {
+          "name": "GainAttackSingleB",
+          "class": "Ability",
+          "abilityScalor": 0,
+          "config": "GainAttackSingleB",
+          "tuCost": 100,
+          "useLimit": 0,
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ]
+            }
+          ],
+          "enemyEventType": "Hit",
+          "axeAbilityEffect": "SmallSlash1",
+          "greatSwordAbilityEffect": "SmallSlash1",
+          "greatAxeAbilityEffect": "SmallSlash1",
+          "hammerAbilityEffect": "SmallBlunt1",
+          "katanaAbilityEffect": "SmallSlash1",
+          "maceAbilityEffect": "SmallBlunt1",
+          "spearAbilityEffect": "SmallSpear1",
+          "staffAbilityEffect": "SmallBlunt1",
+          "swordAbilityEffect": "SmallSlash1",
+          "clawAbilityEffect": "SmallClaw1",
+          "biteAbilityEffect": "SmallBite1",
+          "bashAbilityEffect": "SmallBlunt1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": null,
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {},
+        "conditions": {}
+      },
+      "ProtectTeammatesA": {
+        "id": "ProtectTeammatesA",
+        "found": true,
+        "localization": {
+          "name": "Guard Allies",
+          "description": "The user becomes a Guardian. For any enemy attack that would hit 1 or 2 other allies, 1 of the hits is instead redirected to this unit. This unit will not redirect skills that don't deal damage. Usable only if this unit is not already a Guardian.",
+          "selected": "User becomes a Guardian and protects allies"
+        },
+        "ability": {
+          "name": "ProtectTeammatesA",
+          "class": "Ability",
+          "config": "ProtectTeammatesA",
+          "tuCost": 70,
+          "useLimit": 0,
+          "spiritCost": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "SelfOnly",
+          "components": [
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "ProtectSource"
+              ],
+              "buffBackMode": true,
+              "applyToSourceOnly": true
+            }
+          ],
+          "useCondition": "NotProtecting",
+          "sourceEventType": "Hit",
+          "friendlyEventType": "Hit",
+          "abilityEffect": "Protect1",
+          "flags": [
+            "Protect"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "selfOnly": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "sortOrderOffset": [
+            2,
+            1,
+            0,
+            0,
+            -2,
+            -2
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_protect1",
+            "batfx_protector1/batfx_protector1",
+            "batfx_rainbowiris/batfx_rainbowiris",
+            "batfx_lightray1/batfx_lightray1",
+            "batfx_spotblue/batfx_spotblue",
+            "batfx_ripplebluelow/batfx_ripplebluelow"
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "ProtectSource": {
+            "class": "Buff",
+            "behaviors": [
+              "ManipulateTargeting",
+              "RemoveOnSourceDeath"
+            ],
+            "behaviorOverrides": [
+              {
+                "redirectToMe": true,
+                "redirectAlways": true,
+                "chanceToBlock": 1.0,
+                "consumeRedirectCountEvenOnSelf": true,
+                "failOnAllSkills": true,
+                "abilityFlagsToIgnore": [
+                  "Stun",
+                  "NoDamage"
+                ]
+              },
+              {}
+            ],
+            "stackName": "Protector",
+            "duration": -1,
+            "showAsTimer": true,
+            "iconSpriteName": "IconBlueDefenseShield01"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "NotProtecting": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "Protector"
+              ],
+              "or": {
+                "class": "MonsterConditions",
+                "buffStackNames": [
+                  "AutoProtect"
+                ],
+                "or": {
+                  "class": "MonsterConditions",
+                  "buffStackNames": [
+                    "TimedProtector"
+                  ],
+                  "or": {
+                    "class": "MonsterConditions",
+                    "buffStackNames": [
+                      "ConditionedProtector"
+                    ],
+                    "or": {
+                      "class": "MonsterConditions",
+                      "buffStackNames": [
+                        "Taunting"
+                      ],
+                      "checkEnemyTeamOfMonster": true,
+                      "enemyTeamMonsterConditionMatchesNeeded": {
+                        "IsTauntedTakingTurn": 1
+                      },
+                      "or": {
+                        "class": "MonsterConditions",
+                        "buffStackNames": [
+                          "SleepThorns",
+                          "ThornProtector"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "passives": {
+      "StunAbsorber": {
+        "id": "StunAbsorber",
+        "found": true,
+        "localization": {
+          "name": "Stun Absorb",
+          "description": "Whenever any ally would be affected by stun, this unit takes the stun instead."
+        }
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": null
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "FourLeggedCatfish02",
+    "family": "FourLeggedCatfish",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "FourLeggedCatfish02",
+    "family": "FourLeggedCatfish",
+    "class": "Monster",
+    "activeSkills": {
+      "0": "GainAttackSingleB",
+      "1": "ProtectTeammatesA"
+    },
+    "passives": {
+      "0": "StunAbsorber"
+    },
+    "cost": 12,
+    "baseAttack": 281,
+    "baseMaxHp": 1636,
+    "speed": 103,
+    "element": "Fire",
+    "weaponPref": "GreatSword",
+    "weaponPivotIndex": 0,
+    "secure": 0,
+    "evolveFrom": "FourLeggedCatfish01",
+    "aiTargetPickWeight": 1,
+    "stars": 2,
+    "evolvedStars": 2,
+    "goldMultiplier": 0,
+    "consolationMultiplier": 0,
+    "battleOrbImageFlip": 1,
+    "attackType": "Bash",
+    "formTwitterShare": 1,
+    "skillVoices": {
+      "0": [
+        1
+      ],
+      "1": [
+        3
+      ]
+    },
+    "damageVoices": [
+      5
+    ],
+    "deathVoices": [
+      6
+    ],
+    "victoryVoices": [
+      7
+    ],
+    "lineupVoices": [
+      8
+    ],
+    "evolutionVoices": [
+      7
+    ],
+    "trainVoices": [
+      8
+    ]
+  },
+  "_build": {
+    "scriptVersion": "6-character-family-states",
+    "sourceHash": "a501a656e22faf15cbcb19f35d97c13f9eb59bda29ea07d2f4fea36c4cad3d86",
+    "dependencyHash": "6f4f938da484f770fc2bc523553b1749ad255cf00c7709fd560d643f640c9835",
+    "generatedAt": 1778213407
+  }
+}

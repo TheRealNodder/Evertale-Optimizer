@@ -1,0 +1,816 @@
+{
+  "schemaVersion": 3,
+  "order": 80,
+  "id": "endless-knight",
+  "name": "Endless Knight",
+  "title": "",
+  "description": "",
+  "category": "bosse",
+  "rarity": null,
+  "stars": 4,
+  "evolvedStars": 4,
+  "element": "Dark",
+  "weaponType": "GreatAxe",
+  "stats": {
+    "atk": 579,
+    "hp": 3535,
+    "spd": 392,
+    "cost": 999
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/GhostKnightB01.png",
+  "refs": {
+    "activeSkills": [
+      "PoisonAttackA",
+      "DesperateStrikeA2",
+      "StealthAllyA",
+      "TimeStrikeA2"
+    ],
+    "passives": [
+      "HoldGround"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": null,
+    "leaderBuffCondition": null,
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "PoisonAttackA": {
+        "id": "PoisonAttackA",
+        "found": true,
+        "localization": {
+          "name": "Poison Attack",
+          "description": "Damages 1 enemy and then poisons them.",
+          "selected": "Damage and poisons target\n(Will overwrite other status effects)"
+        },
+        "ability": {
+          "name": "PoisonAttackA",
+          "class": "Ability",
+          "abilityScalor": 0,
+          "config": "PoisonAttackA",
+          "tuCost": 130,
+          "useLimit": 0,
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {},
+            {
+              "buffs": [
+                "Poison",
+                "BurnImmunityTempForRevenge"
+              ]
+            }
+          ],
+          "immuneSuggestionCondition": "PoisonImmunityNotFromStealth",
+          "enemyEventType": "Hit",
+          "abilityEffect": "PoisonAttackMeleeBasic"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.3,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batfx_slash6/batfx_slash6",
+            "batfx_slashtrail1/batfx_slashtrail1",
+            "batsfx_prefab/batsfx_slash1"
+          ],
+          "sortOrderOffset": [
+            2,
+            2,
+            -2
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            true,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "BurnImmunityTempForRevenge": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Burn",
+                  "BurnAfterTurn",
+                  "BurnAtEndOfTurn"
+                ],
+                "dontShowText": true
+              },
+              {
+                "name": "BurnAfterTurn"
+              },
+              {
+                "name": "BurnSelfOnHit"
+              }
+            ],
+            "duration": 1,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "tags": [
+              "BurnImmune"
+            ],
+            "stackName": "BurnImmunityTempForRevenge",
+            "isHiddenFromPlayers": true
+          },
+          "Poison": {
+            "class": "Buff",
+            "stackName": "Poison",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "DamageOverTime"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "percentOfAttack": 0.0025,
+                "damageColor": "Green",
+                "abilityEffect": "PoisonDamage",
+                "extraDamageFlag": "Poison"
+              }
+            ],
+            "tags": [
+              "Poison"
+            ],
+            "canBePurified": true,
+            "duration": -1,
+            "applyConditions": "NotSuperOrMegaPoisoned",
+            "showAsTimer": false,
+            "statusEffect": "PoisonStatus",
+            "statusEffectOffset": 0.1,
+            "damageType": "Poison",
+            "noIconShownOnBattleStatus": true,
+            "iconSpriteName": "IconPurplePoison01"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "PoisonImmunityNotFromStealth": {
+            "class": "MonsterConditions",
+            "monsterTags": [
+              "PoisonImmune"
+            ],
+            "or": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "PoisonImmunity"
+              ],
+              "or": {
+                "class": "MonsterConditions",
+                "monsterTags": [
+                  "LethalPoison"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "DesperateStrikeA2": {
+        "id": "DesperateStrikeA2",
+        "found": true,
+        "localization": {
+          "name": "Desperate Strike",
+          "description": "400% damage to 1 enemy. Usable only if the user's HP is at 50% or less. 500% damage if the user's HP is at 25% or less.",
+          "selected": "400%+ damage, usable if user HP is 50% or less"
+        },
+        "ability": {
+          "name": "DesperateStrikeA2",
+          "class": "Ability",
+          "abilityScalor": 3,
+          "conditionalAbilityScalors": [
+            4
+          ],
+          "config": "DesperateStrikeA2",
+          "tuCost": 130,
+          "useLimit": 0,
+          "spiritCost": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "DesperateDamageBoost"
+              ]
+            }
+          ],
+          "useCondition": "HPBelow50Percent",
+          "flags": [
+            "Desperate"
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "DesperateAbility2",
+          "attackScalors": [
+            "HPBelow25Percent"
+          ],
+          "conditionedAbilityEffects": [
+            "DesperateAbility2"
+          ],
+          "recommendEffectWhenUsable": 1
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.75,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_timestrike1",
+            "batfx_desperatestrike1/batfx_desperatestrike1",
+            "batfx_bluntimpact3/batfx_bluntimpact3",
+            "batsfx_prefab/batsfx_bomb1"
+          ],
+          "sortOrderOffset": [
+            2,
+            -2,
+            1,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            true,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            true
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {
+          "HPBelow25Percent": {
+            "class": "AttackScalor",
+            "sourceCondition": "HPBelow25Percent"
+          },
+          "HPBelow50Percent": {
+            "class": "AttackScalor",
+            "sourceCondition": "HPBelow50Percent"
+          }
+        },
+        "conditions": {
+          "HPBelow25Percent": {
+            "class": "MonsterConditions",
+            "hpLessThanPercent": 0.2500001
+          },
+          "HPBelow50Percent": {
+            "class": "MonsterConditions",
+            "hpLessThanPercent": 0.5000001
+          }
+        }
+      },
+      "StealthAllyA": {
+        "id": "StealthAllyA",
+        "found": true,
+        "localization": {
+          "name": "Grant Stealth",
+          "description": "Grants the Stealth status effect to 1 ally. This will overwrite other status effects on that unit. Stealthed units ignore the next enemy attack that would damage more than 1 target. Any damage will remove stealth.",
+          "selected": "Grants stealth to target\n(Will overwrite other status effects)"
+        },
+        "ability": {
+          "name": "StealthAllyA",
+          "class": "Ability",
+          "config": "StealthAllyA",
+          "tuCost": 100,
+          "useLimit": 0,
+          "spiritCost": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Ally",
+          "components": [
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "ActiveStealthJustGained",
+                "Stealth"
+              ]
+            }
+          ],
+          "immuneSuggestionCondition": "IsStatusImmune",
+          "friendlyEventType": "Finish",
+          "abilityEffect": "Stealth1",
+          "flags": [
+            "Stealth",
+            "Purify"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "friendlyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.3,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_casting7/batfx_casting7",
+            "batfx_stealth1/batfx_stealth1",
+            "batsfx_prefab/batsfx_stealth1"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -2,
+            2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            true
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "ActiveStealthJustGained": {
+            "class": "Buff",
+            "stackName": "ActiveStealthJustGained",
+            "duration": 1,
+            "isHiddenFromPlayers": true,
+            "applyConditions": "IsNotStealth"
+          },
+          "Stealth": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "ManipulateTargeting",
+              "RemoveOnHurt",
+              "Immunity",
+              "Immunity"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "LockHideSkills"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "dodgeMultitarget": true,
+                "forceAllowAllEnemiesAChanceToManipulate": true,
+                "removeAfterTriggers": 1,
+                "abilityFlagsToIgnore": [
+                  "Stun",
+                  "NoDamage",
+                  "Sneak",
+                  "IgnoreStealth"
+                ]
+              },
+              {},
+              {
+                "stackNamesToBlock": [
+                  "Stealth"
+                ],
+                "dontShowText": true
+              },
+              {
+                "stackNamesToBlock": [
+                  "Placeholder"
+                ],
+                "dontShowText": true,
+                "activateCondition": "MissingStealthOrStealthShield"
+              }
+            ],
+            "tags": [
+              "Stealth"
+            ],
+            "duration": -1,
+            "showAsTimer": true,
+            "iconSpriteName": "IconBlackStealth01",
+            "stackName": "Stealth",
+            "useCount": 1
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "IsStatusImmune": {
+            "class": "MonsterConditions",
+            "monsterTags": [
+              "StatusImmune"
+            ],
+            "or": {
+              "class": "MonsterConditions",
+              "monsterTags": [
+                "LethalPoison"
+              ]
+            }
+          }
+        }
+      },
+      "TimeStrikeA2": {
+        "id": "TimeStrikeA2",
+        "found": true,
+        "localization": {
+          "name": "Time Strike",
+          "description": "500% damage to 1 enemy if they have 130TU or more in the turn order. 600% damage if the target has 200TU or more.",
+          "selected": "500%+ damage against target with 130+ TU"
+        },
+        "ability": {
+          "name": "TimeStrikeA2",
+          "class": "Ability",
+          "abilityScalor": -2,
+          "conditionalAbilityScalors": [
+            4,
+            5
+          ],
+          "config": "TimeStrikeA2",
+          "tuCost": 100,
+          "useLimit": 0,
+          "spiritCost": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "TimestrikeDamageBoost"
+              ]
+            }
+          ],
+          "attackScalors": [
+            "GoodVs130Tu",
+            "GoodVs200Tu"
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "SmallHit1",
+          "flags": [
+            "Timestrike",
+            "StealthWorthy"
+          ],
+          "conditionedAbilityEffects": [
+            "TimeStrikeAbility2",
+            "TimeStrikeAbility2"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.4,
+            0
+          ],
+          "prefabs": [
+            "batfx_bluntimpact1/batfx_bluntimpact1",
+            "batsfx_prefab/batsfx_impactsmall1"
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            true
+          ],
+          "scale": [
+            0.4,
+            1
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {
+          "GoodVs130Tu": {
+            "class": "AttackScalor",
+            "targetCondition": "CurrentTUGreaterThan130"
+          },
+          "GoodVs200Tu": {
+            "class": "AttackScalor",
+            "targetCondition": "CurrentTUGreaterThan200"
+          }
+        },
+        "conditions": {}
+      }
+    },
+    "passives": {
+      "HoldGround": {
+        "id": "HoldGround",
+        "found": true,
+        "localization": {
+          "name": "Hold Ground",
+          "description": "If this unit would be defeated by an enemy attack or a status effect while having more than 1 HP, it instead survives with 1 HP."
+        }
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": null
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "GhostKnightB01",
+    "family": "GhostKnightB",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "GhostKnightB01",
+    "class": "Monster",
+    "family": "GhostKnightB",
+    "activeSkills": {
+      "0": "PoisonAttackA",
+      "1": "DesperateStrikeA2",
+      "2": "StealthAllyA",
+      "3": "TimeStrikeA2"
+    },
+    "passives": {
+      "0": "HoldGround"
+    },
+    "cost": 999,
+    "baseAttack": 579,
+    "baseMaxHp": 3535,
+    "speed": 392,
+    "element": "Death",
+    "weaponPref": "GreatAxe",
+    "weaponPivotIndex": 0,
+    "walkSound": "TestSound",
+    "secure": 1,
+    "aiTargetPickWeight": 1,
+    "stars": 4,
+    "evolvedStars": 4,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 1,
+    "battleOrbImageFlip": 0,
+    "skillVoices": {
+      "0": [
+        1
+      ],
+      "1": [
+        2
+      ],
+      "2": [
+        3
+      ],
+      "3": [
+        4
+      ]
+    },
+    "damageVoices": [
+      9,
+      10
+    ],
+    "deathVoices": [
+      10
+    ],
+    "victoryVoices": [
+      11
+    ]
+  },
+  "_build": {
+    "scriptVersion": "6-character-family-states",
+    "sourceHash": "e36ae7897762bdf1a60bbc31b805e3b5cf0ba58ea3a59a47b10832f2d933ee35",
+    "dependencyHash": "8db4803f2712d83fd29cceeddc190dacd58023346c71de109983222e67f1ad39",
+    "generatedAt": 1778213444
+  }
+}

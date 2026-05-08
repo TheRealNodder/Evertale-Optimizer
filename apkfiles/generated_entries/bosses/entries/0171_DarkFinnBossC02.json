@@ -1,0 +1,894 @@
+{
+  "schemaVersion": 3,
+  "order": 171,
+  "id": "fullmetal-knight",
+  "name": "Fullmetal Knight",
+  "title": "",
+  "description": "",
+  "category": "bosse",
+  "rarity": null,
+  "stars": 6,
+  "evolvedStars": 6,
+  "element": "Dark",
+  "weaponType": "GreatSword",
+  "stats": {
+    "atk": 1650,
+    "hp": 180000,
+    "spd": 900,
+    "cost": 999
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/DarkFinnBossC02.png",
+  "refs": {
+    "activeSkills": [
+      "BerserkAttackSingleBDarkFinn",
+      "SummonTokenADarkFinn",
+      "ThrowDoubleADarkFinn",
+      "LastStandAllADarkFinn"
+    ],
+    "passives": [
+      "MoveFrontReinforcementToLastWhenHurt",
+      "ThrottleMinions",
+      "HoldGroundUnlessOtherAlly1HP",
+      "AutoLastStand",
+      "BlockDeathByBuffDamage",
+      "KnockbackImmunity",
+      "StunImmunity",
+      "SleepImmunity"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": null,
+    "leaderBuffCondition": null,
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "BerserkAttackSingleBDarkFinn": {
+        "id": "BerserkAttackSingleBDarkFinn",
+        "found": true,
+        "localization": {
+          "name": "BerserkAttackSingleBDarkFinn",
+          "description": ""
+        },
+        "ability": {
+          "name": "BerserkAttackSingleBDarkFinn",
+          "class": "Ability",
+          "abilityScalor": 0.5,
+          "config": "BerserkAttackSingleBDarkFinn",
+          "tuCost": 30,
+          "useLimit": 0,
+          "nameKey": "BerserkAttackSingleADarkFinn",
+          "descriptionKey": "BerserkAttackSingleADarkFinn",
+          "spiritGain": 1,
+          "blockTargetManipulation": 1,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "RandomEnemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "MoveFrontReinforcementToLast"
+              ],
+              "applyToSourceOnly": true,
+              "showMissConditions": "ShowNoMiss",
+              "skipAbilityEffect": true
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "LargeSlash1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "randomEnemy": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0.4,
+            0,
+            0.5
+          ],
+          "prefabs": [
+            "batfx_jumpsmoke1/batfx_jumpsmoke1",
+            "batsfx_prefab/batsfx_slash1",
+            "batfx_slash2/batfx_slash2",
+            "batfx_jumpsmoke1/batfx_jumpsmoke1"
+          ],
+          "sortOrderOffset": [
+            1,
+            2,
+            2,
+            1
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            true,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            true,
+            false
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            true
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "MoveFrontReinforcementToLast": {
+            "class": "Buff",
+            "behaviors": [
+              "AdjustReinforcements"
+            ],
+            "behaviorOverrides": [
+              {
+                "lastToFront": false
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {}
+      },
+      "SummonTokenADarkFinn": {
+        "id": "SummonTokenADarkFinn",
+        "found": true,
+        "localization": {
+          "name": "Call Minion x8",
+          "description": "Adds 8 Kuromori to the very end of the allied reinforcements.",
+          "selected": "Adds 8 Kuromori to back of allied reinforcements"
+        },
+        "ability": {
+          "name": "SummonTokenADarkFinn",
+          "class": "Ability",
+          "config": "SummonTokenADarkFinn",
+          "tuCost": 70,
+          "useLimit": 1,
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "SelfOnly",
+          "components": [
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "Add1DeathMinionToEnd",
+                "Add1DeathMinionToEnd",
+                "Add1DeathMinionToEnd",
+                "Add1DeathMinionToEnd",
+                "Add1DeathMinionToEnd",
+                "Add1DeathMinionToEnd",
+                "Add1DeathMinionToEnd",
+                "Add1DeathMinionToEnd"
+              ]
+            }
+          ],
+          "flags": [
+            "Summon",
+            "StealthWorthy"
+          ],
+          "sourceEventType": "Finish",
+          "abilityEffect": "SummonNoNumberNeutral"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "selfOnly": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0.3,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting2",
+            "batfx_castingblue1/batfx_castingblue1",
+            "batfx_castingblue2/batfx_castingblue2",
+            "batfx_summonneutral1/batfx_summonneutral1",
+            "batsfx_prefab/batsfx_summon1"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -2,
+            2,
+            1,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            false,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "isSummonParticleFX": [
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "Add1DeathMinionToEnd": {
+            "class": "Buff",
+            "behaviors": [
+              "SummonMonster"
+            ],
+            "behaviorOverrides": [
+              {
+                "monsterType": "DeathMinion01"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {}
+      },
+      "ThrowDoubleADarkFinn": {
+        "id": "ThrowDoubleADarkFinn",
+        "found": true,
+        "localization": {
+          "name": "Blood Meteor",
+          "description": "Sacrifices the last unit in the allied reinforcements for 500% damage to 2 enemies. Usable only if there are 1 or more allied reinforcements left.",
+          "selected": "Sacrifices 1 ally for 500% damage to 2 enemies"
+        },
+        "ability": {
+          "name": "ThrowDoubleADarkFinn",
+          "class": "Ability",
+          "abilityScalor": 4,
+          "config": "ThrowDoubleADarkFinn",
+          "tuCost": 100,
+          "useLimit": 0,
+          "spiritCost": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "Sacrifice",
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "applyToTargetType": "Source",
+              "overrideAbilityEffect": "ThrowBloodCrest1"
+            },
+            {
+              "applyToTargetType": "Enemy",
+              "damageBoosts": [
+                "ThrowDamageBoost"
+              ]
+            },
+            {
+              "buffs": [
+                "MoveFrontReinforcementToLast"
+              ],
+              "applyToSourceOnly": true,
+              "showMissConditions": "ShowNoMiss",
+              "skipAbilityEffect": true
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "flags": [
+            "Devour",
+            "StealthWorthy"
+          ],
+          "abilityEffect": "DarkFinnAllThrow1",
+          "useCondition": "AllyHasReinforcementsNotGoodMonsterInBack",
+          "requiredReplacementMonsterMustBeLast": true
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0.1,
+            0,
+            0.7,
+            0,
+            0,
+            0.6,
+            0,
+            0.2,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_charge1",
+            "batfx_powerupred/batfx_powerupred",
+            "batsfx_prefab/batsfx_charge1",
+            "batfx_darkfinnmeteo1/batfx_darkfinnmeteo1",
+            "batfx_darkfinnimpact1/batfx_darkfinnimpact1",
+            "batsfx_prefab/batsfx_fire4",
+            "batfx_darkfinnimpact1/batfx_darkfinnimpact1",
+            "batsfx_prefab/batsfx_fire4",
+            "batfx_bluntimpact2/batfx_bluntimpact2",
+            "batsfx_prefab/batsfx_bomb1"
+          ],
+          "sortOrderOffset": [
+            -2,
+            2,
+            20,
+            3,
+            3,
+            0,
+            3,
+            0,
+            2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0.2,
+            0,
+            0,
+            0,
+            0.8,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Sacrifice": {
+            "class": "SacrificeAbilityComponent"
+          },
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "MoveFrontReinforcementToLast": {
+            "class": "Buff",
+            "behaviors": [
+              "AdjustReinforcements"
+            ],
+            "behaviorOverrides": [
+              {
+                "lastToFront": false
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "AllyHasReinforcementsNotGoodMonsterInBack": {
+            "class": "MonsterConditions",
+            "allyReinforcements": 1,
+            "not": {
+              "class": "MonsterConditions",
+              "myTeamLastReplacementMonsterCondition": "RarityGreaterThan2"
+            }
+          }
+        }
+      },
+      "LastStandAllADarkFinn": {
+        "id": "LastStandAllADarkFinn",
+        "found": true,
+        "localization": {
+          "name": "Final Annihilator",
+          "description": "1000% damage to all enemies. This attack ignores the Stealth status effect, enemy damage reduction effects and passive skill effects that would prevent units from being defeated. Usable only if the user has no allies on the battlefield.",
+          "selected": "1000% damage, usable if user is last alive"
+        },
+        "ability": {
+          "name": "LastStandAllADarkFinn",
+          "class": "Ability",
+          "abilityScalor": 9,
+          "config": "LastStandAllADarkFinn",
+          "tuCost": 1,
+          "useLimit": 0,
+          "spiritGain": 3,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "AllEnemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "damageFlags": [
+                "IgnoreArmor",
+                "IgnoreBlockDeath"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "MoveFrontReinforcementToLast"
+              ],
+              "applyToSourceOnly": true,
+              "showMissConditions": "ShowNoMiss",
+              "skipAbilityEffect": true
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "useCondition": "IsAlone",
+          "flags": [
+            "StealthWorthy",
+            "LastStand",
+            "IgnoreStealth"
+          ],
+          "recommendEffectWhenUsable": 1,
+          "abilityEffect": "LastStandSpecial1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "allEnemies": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0,
+            0.4,
+            0.35,
+            0,
+            0,
+            0.6
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_timestrike1",
+            "batfx_rainbowiris/batfx_rainbowiris",
+            "batfx_lightray1/batfx_lightray1",
+            "batfx_laststand1/batfx_laststand1",
+            "batfx_jumpsmoke1/batfx_jumpsmoke1",
+            "batfx_slash2/batfx_slash2",
+            "batfx_groundimpact/batfx_groundimpact",
+            "batsfx_prefab/batsfx_slash1",
+            "batfx_jumpsmoke1/batfx_jumpsmoke1"
+          ],
+          "sortOrderOffset": [
+            2,
+            -2,
+            -2,
+            -2,
+            1,
+            1,
+            -2,
+            2,
+            1
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            true,
+            true
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "IgnoreBlockDeath": {
+            "class": "Buff",
+            "behaviors": [
+              "DamageFlagContributor"
+            ],
+            "behaviorOverrides": [
+              {
+                "flags": [
+                  "IgnoreBlockDeath"
+                ]
+              }
+            ],
+            "duration": -1,
+            "showAsTimer": false,
+            "iconSpriteName": "IconRedHoldIgnore01",
+            "isHiddenFromPlayers": true
+          },
+          "MoveFrontReinforcementToLast": {
+            "class": "Buff",
+            "behaviors": [
+              "AdjustReinforcements"
+            ],
+            "behaviorOverrides": [
+              {
+                "lastToFront": false
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "IsAlone": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "allyTeamSize": 2
+            }
+          }
+        }
+      }
+    },
+    "passives": {
+      "MoveFrontReinforcementToLastWhenHurt": {
+        "id": "MoveFrontReinforcementToLastWhenHurt",
+        "found": true,
+        "localization": {
+          "name": "Endless Cycle+",
+          "description": "Whenever this unit uses any active skills or is dealt damage by an attack, it moves the front ally in reinforcements to the back of ally reinforcements."
+        }
+      },
+      "ThrottleMinions": {
+        "id": "ThrottleMinions",
+        "found": true,
+        "localization": {
+          "name": "Anti-Mori Field",
+          "description": "Allied \"Mori\" units cannot enter the battlefield from reinforcements."
+        }
+      },
+      "HoldGroundUnlessOtherAlly1HP": {
+        "id": "HoldGroundUnlessOtherAlly1HP",
+        "found": true,
+        "localization": {
+          "name": "Snake Eyes",
+          "description": "This unit cannot be defeated unless at least 1 other ally on the battlefield is at 1HP."
+        }
+      },
+      "AutoLastStand": {
+        "id": "AutoLastStand",
+        "found": true,
+        "localization": {
+          "name": "Final Turn",
+          "description": "This unit will immediately get the turn by having its TU reduced to 0 when this unit's last ally on the battlefield is defeated."
+        }
+      },
+      "BlockDeathByBuffDamage": {
+        "id": "BlockDeathByBuffDamage",
+        "found": true,
+        "localization": {
+          "name": "Unflinching",
+          "description": "This unit cannot be defeated by damage from the Poison or Burn status effects."
+        }
+      },
+      "KnockbackImmunity": {
+        "id": "KnockbackImmunity",
+        "found": true,
+        "localization": {
+          "name": "Immovable",
+          "description": "This unit cannot be sent to the reinforcements from the battlefield."
+        }
+      },
+      "StunImmunity": {
+        "id": "StunImmunity",
+        "found": true,
+        "localization": {
+          "name": "Stun Immunity",
+          "description": "This unit is not affected by stun effects."
+        }
+      },
+      "SleepImmunity": {
+        "id": "SleepImmunity",
+        "found": true,
+        "localization": {
+          "name": "Sleep Immunity",
+          "description": "This unit is not affected by sleep effects."
+        }
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": null
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "DarkFinnBossC02",
+    "family": "DarkFinnBoss",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "DarkFinnBossC02",
+    "class": "Monster",
+    "family": "DarkFinnBoss",
+    "activeSkills": {
+      "0": "BerserkAttackSingleBDarkFinn",
+      "1": "SummonTokenADarkFinn",
+      "2": "ThrowDoubleADarkFinn",
+      "3": "LastStandAllADarkFinn"
+    },
+    "passives": {
+      "0": "MoveFrontReinforcementToLastWhenHurt",
+      "1": "ThrottleMinions",
+      "2": "HoldGroundUnlessOtherAlly1HP",
+      "3": "AutoLastStand",
+      "4": "BlockDeathByBuffDamage",
+      "5": "KnockbackImmunity",
+      "6": "StunImmunity",
+      "7": "SleepImmunity"
+    },
+    "cost": 999,
+    "baseAttack": 1650,
+    "baseMaxHp": 180000,
+    "speed": 900,
+    "element": "Death",
+    "weaponPref": "GreatSword",
+    "weaponPivotIndex": 0,
+    "walkSound": "TestSound",
+    "secure": 1,
+    "aiTargetPickWeight": 1,
+    "stars": 6,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 1,
+    "battleOrbImageFlip": 0,
+    "skillVoices": {
+      "0": [
+        1
+      ],
+      "1": [
+        3
+      ],
+      "2": [
+        5
+      ],
+      "3": [
+        7
+      ]
+    },
+    "damageVoices": [
+      9,
+      10
+    ],
+    "deathVoices": [
+      9
+    ]
+  },
+  "_build": {
+    "scriptVersion": "6-character-family-states",
+    "sourceHash": "9975840916548652f3291b3d65b5d72f4c7fc115ca92e7598b5f5a5bff5d20e9",
+    "dependencyHash": "b491e8bf6b047bd6e6e83679e6c559d70efdb8e648eb345e27fb2a9bd84b7060",
+    "generatedAt": 1778213445
+  }
+}

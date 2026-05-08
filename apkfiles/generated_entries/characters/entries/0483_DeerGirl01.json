@@ -1,0 +1,1024 @@
+{
+  "schemaVersion": 3,
+  "order": 483,
+  "id": "haku",
+  "name": "Haku",
+  "title": "Sacred Deer Onmyoji",
+  "description": "If you happen to hear a noise in the woods after dark, and catch a glimpse of a girl surrounded by soft white glow, that would be Haku Urushido. Her aura alone can separate darkness from light; her brush draws the line between this life and the next one. And her smile can cleanse whatever impurity dwells in your heart.",
+  "category": "character",
+  "rarity": null,
+  "stars": 5,
+  "evolvedStars": 6,
+  "element": "Light",
+  "weaponType": "Katana",
+  "stats": {
+    "atk": 1062,
+    "hp": 5900,
+    "spd": 105,
+    "cost": 28
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/DeerGirl01.png",
+  "refs": {
+    "activeSkills": [
+      "EmptyAttackSingleSDeerGirl",
+      "PurifyHealElixirADeerGirl",
+      "GiveTurnPotionADeerGirl",
+      "SurvivorAllADeerGirl"
+    ],
+    "passives": [
+      "SuperHasteOneTurnOnly",
+      "PlusHPBoostLv3",
+      "GreatAxeMinusDamageLv3",
+      "PlusAttackBoostLv3",
+      "AddWeaponPrefHammer"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": "HPUpLifeD",
+    "leaderBuffCondition": "IsLife",
+    "summonableMonsters": [
+      "LifeMinion01"
+    ]
+  },
+  "resolved": {
+    "activeSkills": {
+      "EmptyAttackSingleSDeerGirl": {
+        "id": "EmptyAttackSingleSDeerGirl",
+        "found": true,
+        "localization": {
+          "name": "Masterstroke",
+          "description": "Damage to 1 enemy. If the user's Ink of Restoration or Ink of Command active skills have reached their usage limit, heals the user for 25% of their max HP and adds 1 Shiromori next in line of allied reinforcements. Double the healing and Shiromori's added if both skills have reached their usage limit.",
+          "selected": "Damage to 1 enemy, may heal user & add Shiromori"
+        },
+        "ability": {
+          "name": "EmptyAttackSingleSDeerGirl",
+          "class": "Ability",
+          "abilityScalor": 0,
+          "config": "EmptyAttackSingleSDeerGirl",
+          "tuCost": 100,
+          "useLimit": 0,
+          "spiritGain": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "Add1LifeMinionToFront",
+                "QuarterHealNoFx"
+              ],
+              "applyConditions": "DeerGirl1SkillExhausted",
+              "applyToTargetType": "Source",
+              "showMissConditions": "ShowNoMiss",
+              "skipAbilityEffect": true,
+              "buffAppliedEffects": [
+                "DeerGirlSummonHeal1"
+              ]
+            },
+            {
+              "buffs": [
+                "Add1LifeMinionToFront",
+                "QuarterHealNoFx"
+              ],
+              "applyConditions": "DeerGirlSkillsExhausted",
+              "applyToTargetType": "Source",
+              "showMissConditions": "ShowNoMiss",
+              "skipAbilityEffect": true
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Hit",
+          "abilityEffect": "DeerGirlBasic1",
+          "flags": [
+            "Summon"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0,
+            0.3,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batfx_deergirl1/batfx_throwliquid1",
+            "batfx_deergirl1/batfx_tailwindwhite4",
+            "batsfx_prefab/batsfx_dodge",
+            "batfx_deergirl1/batfx_swooshink1",
+            "batfx_deergirl1/batfx_splatter2",
+            "batfx_bluntimpact0/batfx_bluntimpact0",
+            "batsfx_prefab/batsfx_bluntimpact1"
+          ],
+          "sortOrderOffset": [
+            0,
+            -150,
+            0,
+            10,
+            2,
+            1,
+            0
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            true
+          ],
+          "isProjectileFX": [
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "projectileFlightDuration": [
+            0.3,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "projectileStartOffsetX": [
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "projectileStartOffsetY": [
+            200,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "boneToAttachTo": [
+            "root",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "Add1LifeMinionToFront": {
+            "class": "Buff",
+            "behaviors": [
+              "SummonMonster"
+            ],
+            "behaviorOverrides": [
+              {
+                "monsterType": "LifeMinion01",
+                "frontOfLineup": true
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "QuarterHealNoFx": {
+            "class": "Buff",
+            "behaviors": [
+              "AdjustHp"
+            ],
+            "behaviorOverrides": [
+              {
+                "percent": 0.25,
+                "hpboosts": [
+                  "HealBoost"
+                ]
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "DeerGirl1SkillExhausted": {
+            "class": "MonsterConditions",
+            "activeSkillFlagReachedUseLimit": "GiveTurn",
+            "or": {
+              "class": "MonsterConditions",
+              "activeSkillFlagReachedUseLimit": "Purify"
+            }
+          },
+          "DeerGirlSkillsExhausted": {
+            "class": "MonsterConditions",
+            "activeSkillFlagReachedUseLimit": "GiveTurn",
+            "and": {
+              "class": "MonsterConditions",
+              "activeSkillFlagReachedUseLimit": "Purify"
+            }
+          }
+        }
+      },
+      "PurifyHealElixirADeerGirl": {
+        "id": "PurifyHealElixirADeerGirl",
+        "found": true,
+        "localization": {
+          "name": "Ink of Restoration",
+          "description": "Removes negative status effects like sleep, burn or poison from 1 ally, and heals them for HP equal to 500% of the user's Attack. Usable 3 times per battle.",
+          "selected": "Removes bad effects and heals target greatly"
+        },
+        "ability": {
+          "name": "PurifyHealElixirADeerGirl",
+          "class": "Ability",
+          "config": "PurifyHealElixirADeerGirl",
+          "tuCost": 50,
+          "useLimit": 3,
+          "spiritGain": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Ally",
+          "components": [
+            "Heal",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "healthPerAttack": 5,
+              "abilityEffect": "DeerGirlPurify1"
+            },
+            {
+              "buffs": [
+                "RemoveBuffs"
+              ],
+              "skipAbilityEffect": true
+            }
+          ],
+          "flags": [
+            "Purify",
+            "Healer"
+          ],
+          "friendlyEventType": "Finish"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "friendlyTargets": 1
+        },
+        "abilityEffect": null,
+        "components": {
+          "Heal": {
+            "class": "HealAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "Heal": {
+            "class": "Buff",
+            "behaviors": [
+              "AdjustHp"
+            ],
+            "behaviorOverrides": [
+              {
+                "percent": 0.3,
+                "abilityEffect": "Blank",
+                "hpboosts": [
+                  "HealBoost"
+                ]
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "RemoveBuffs": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {}
+      },
+      "GiveTurnPotionADeerGirl": {
+        "id": "GiveTurnPotionADeerGirl",
+        "found": true,
+        "localization": {
+          "name": "Ink of Command",
+          "description": "Immediately give 1 other ally the next turn by reducing their current TU to 0. Usable 3 times per battle. Active skills that grant turns cannot be used on turns given by this skill.",
+          "selected": "Reduce TU of 1 ally to 0"
+        },
+        "ability": {
+          "name": "GiveTurnPotionADeerGirl",
+          "class": "Ability",
+          "config": "GiveTurnPotionADeerGirl",
+          "tuCost": 100,
+          "useLimit": 3,
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "oneAllyNotMe",
+          "components": [
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "GiveTurn",
+                "OnExtraTurn",
+                "JustGivenTurn"
+              ]
+            }
+          ],
+          "friendlyEventType": "Finish",
+          "abilityEffect": "DeerGirlGiveTurn1",
+          "flags": [
+            "StealthWorthy",
+            "GiveTurn"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "friendlyTargets": 1,
+          "oneAllyNotMe": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            1.4,
+            0,
+            0.5,
+            0
+          ],
+          "prefabs": [
+            "batfx_deergirl1/batfx_tailwindwhite3",
+            "batsfx_prefab/batsfx_timestrike1",
+            "batfx_inugamiregular1/batfx_dimensionfloor1",
+            "batfx_theo1/batfx_theobuff2",
+            "batfx_deergirl1/batfx_kanjigiveturn1",
+            "batsfx_prefab/batsfx_heal1",
+            "batfx_deergirl1/batfx_kanjigiveturn2",
+            "batfx_bluehelix1/batfx_bluehelix1",
+            "batsfx_prefab/batsfx_knockback1"
+          ],
+          "sortOrderOffset": [
+            -150,
+            0,
+            -2,
+            -2,
+            10,
+            0,
+            10,
+            2,
+            1
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false
+          ],
+          "isProjectileFX": [
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            true,
+            false,
+            false
+          ],
+          "projectileFlightDuration": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "projectileStartOffsetX": [
+            0,
+            0,
+            0,
+            0,
+            140,
+            0,
+            140,
+            0,
+            0
+          ],
+          "projectileStartOffsetY": [
+            0,
+            0,
+            0,
+            0,
+            20,
+            0,
+            20,
+            0,
+            0
+          ],
+          "boneToAttachTo": [
+            "",
+            "",
+            "",
+            "",
+            "root",
+            "",
+            "root",
+            "",
+            ""
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "GiveTurn": {
+            "class": "Buff",
+            "behaviors": [
+              "GiveTurn"
+            ],
+            "behaviorOverrides": [
+              {}
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "textKeyToShowWhenApplied": "TurnGivenKey",
+            "isHiddenFromPlayers": true
+          },
+          "JustGivenTurn": {
+            "class": "Buff",
+            "duration": 1,
+            "stackName": "JustGivenTurnBuff",
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "isHiddenFromPlayers": true,
+            "noIconShownOnBattleStatus": true
+          },
+          "OnExtraTurn": {
+            "class": "Buff",
+            "stackName": "OnExtraTurn",
+            "duration": 1,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "OnExtraTurn": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "OnExtraTurn"
+            ]
+          }
+        }
+      },
+      "SurvivorAllADeerGirl": {
+        "id": "SurvivorAllADeerGirl",
+        "found": true,
+        "localization": {
+          "name": "Survivor's Wrath",
+          "description": "300% damage to all enemies. This attack ignores the Stealth and Counter Stance Status Effects, and the effects of skin passive skills. Locked for 300TU after the user has entered the battlefield.",
+          "selected": "300% damage, usable if user survived 300TU"
+        },
+        "ability": {
+          "name": "SurvivorAllADeerGirl",
+          "class": "Ability",
+          "abilityScalor": 2,
+          "config": "SurvivorAllADeerGirl",
+          "tuCost": 200,
+          "useLimit": 0,
+          "spiritCost": 3,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "AllEnemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "SurvivorDamageBoost"
+              ],
+              "damageFlags": [
+                "IgnoreSkin"
+              ]
+            }
+          ],
+          "useCondition": "TimeInCombat300",
+          "bombSkillIcon": "IconBrownCountdownClock01",
+          "bombSkillIconDescriptionKey": "SurvivorAllADeerGirlCountdownKey",
+          "flags": [
+            "Survivor",
+            "Duration",
+            "IgnoreStealth"
+          ],
+          "enemyEventType": "Hit",
+          "recommendEffectWhenUsable": 1,
+          "abilityEffect": "DeerGirlSurvivor1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "allEnemies": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            1,
+            0,
+            0.1,
+            0.7,
+            0.1
+          ],
+          "prefabs": [
+            "batfx_deergirl1/batfx_tailwindwhite1",
+            "batfx_deergirl1/batfx_deerbuff1",
+            "batsfx_prefab/batsfx_timestrike1",
+            "batfx_deergirl1/batfx_inkcircle1",
+            "batsfx_prefab/batsfx_earth1",
+            "batfx_deergirl1/batfx_impactseal1",
+            "batfx_deergirl1/batfx_impactseal2",
+            "batfx_inugamiregular1/batfx_purpleimpact1"
+          ],
+          "sortOrderOffset": [
+            -150,
+            2,
+            0,
+            -20,
+            0,
+            2,
+            2,
+            2
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            false,
+            true,
+            false,
+            false,
+            false
+          ],
+          "positionInBattlefieldCenter": [
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useTeamEffectPosition": [
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {
+          "TimeInCombat300": {
+            "class": "AttackScalor",
+            "sourceCondition": "TimeInCombat300"
+          }
+        },
+        "conditions": {
+          "TimeInCombat300": {
+            "class": "MonsterConditions",
+            "timeInCombat": 300
+          }
+        }
+      }
+    },
+    "passives": {
+      "SuperHasteOneTurnOnly": {
+        "id": "SuperHasteOneTurnOnly",
+        "found": true,
+        "localization": {
+          "name": "Quick Draw",
+          "description": "This unit's active skills all cost 50% less TU on its first turn on the battlefield. Effects that further reduce TU will have diminishing returns while this is in effect."
+        }
+      },
+      "PlusHPBoostLv3": {
+        "id": "PlusHPBoostLv3",
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv3",
+          "description": "Adds 1200 to this unit's max HP."
+        }
+      },
+      "GreatAxeMinusDamageLv3": {
+        "id": "GreatAxeMinusDamageLv3",
+        "found": true,
+        "localization": {
+          "name": "G.axe Resist Lv3",
+          "description": "10% less damage from attacks by units equipped with Greataxes."
+        }
+      },
+      "PlusAttackBoostLv3": {
+        "id": "PlusAttackBoostLv3",
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv3",
+          "description": "Adds 300 to this unit's Attack."
+        }
+      },
+      "AddWeaponPrefHammer": {
+        "id": "AddWeaponPrefHammer",
+        "found": true,
+        "localization": {
+          "name": "Hammer Mastery",
+          "description": "Can use weapon skills of Hammers in addition to their original preferred weapon type."
+        }
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": {
+      "class": "MonsterConditions",
+      "elements": [
+        "Life"
+      ]
+    }
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "DeerGirl01",
+    "family": "DeerGirl",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "DeerGirl01",
+    "family": "DeerGirl",
+    "class": "Monster",
+    "leaderBuff": "HPUpLifeD",
+    "leaderBuffCondition": "IsLife",
+    "activeSkills": {
+      "0": "EmptyAttackSingleSDeerGirl",
+      "1": "PurifyHealElixirADeerGirl",
+      "2": "GiveTurnPotionADeerGirl",
+      "3": "SurvivorAllADeerGirl"
+    },
+    "passives": {
+      "0": "SuperHasteOneTurnOnly",
+      "2": "PlusHPBoostLv3",
+      "3": "GreatAxeMinusDamageLv3",
+      "4": "PlusAttackBoostLv3",
+      "5": "AddWeaponPrefHammer"
+    },
+    "cost": 28,
+    "baseAttack": 1062,
+    "baseMaxHp": 5900,
+    "speed": 105,
+    "element": "Life",
+    "weaponPref": "Katana",
+    "weaponPivotIndex": 0,
+    "secure": 1,
+    "superEvolve1": "DeerGirl02",
+    "aiTargetPickWeight": 1,
+    "stars": 5,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 0,
+    "battleOrbImageFlip": 0,
+    "attackType": "Bash",
+    "visible": 1,
+    "formTwitterShare": 1,
+    "summonableMonsters": [
+      "LifeMinion01"
+    ],
+    "summonableMatchSource": [
+      false
+    ],
+    "skillVoices": {
+      "0": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "1": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "2": [
+        9,
+        10,
+        11,
+        12
+      ],
+      "3": [
+        13,
+        14,
+        15,
+        16
+      ]
+    },
+    "damageVoices": [
+      17,
+      18,
+      19,
+      20
+    ],
+    "deathVoices": [
+      21,
+      22,
+      23,
+      24
+    ],
+    "victoryVoices": [
+      25,
+      26
+    ],
+    "lineupVoices": [
+      27,
+      28,
+      29,
+      30,
+      31,
+      32
+    ],
+    "evolutionVoices": [
+      33
+    ],
+    "trainVoices": [
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43
+    ],
+    "titleVoices": [
+      44
+    ],
+    "gachaVoices": [
+      45
+    ],
+    "loginVoices": [
+      46
+    ],
+    "tapVoices": [
+      47,
+      48,
+      49
+    ],
+    "idleVoices": [
+      50
+    ]
+  },
+  "_build": {
+    "scriptVersion": "6-character-family-states",
+    "sourceHash": "89ff51d9ef87688c033bb0a09d5f275c6ca294d7f56dc4db41a5d4d7e64af757",
+    "dependencyHash": "246a785d2cecf99f236841309af60488f76e5213b490ab10eb5255d1d30f9c18",
+    "generatedAt": 1778213415
+  }
+}

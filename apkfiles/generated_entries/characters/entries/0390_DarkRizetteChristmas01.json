@@ -1,0 +1,943 @@
+{
+  "schemaVersion": 3,
+  "order": 390,
+  "id": "endless-rizette",
+  "name": "Endless Rizette",
+  "title": "Maid of Midwinter",
+  "description": "Rizette always enjoyed helping out around the house. As trivial as that memory seems now, she holds it close to her heart. There was a time she couldn't remember anything of herself. Not her past, not her friends, nothing beyond Orcanix's latest orders. Sometimes, she's afraid she'll slip back into that horrific void.\n\nSo she remembers how it felt to tidy up her family's meager home. How her heart raced as she nursed Finn back to health. Perhaps she wasn't heroic before her fall, but she refuses to think those little acts of kindness meant nothing.\n\nKeeping her loved ones safe and happy was the only life she ever wanted.",
+  "category": "character",
+  "rarity": null,
+  "stars": 5,
+  "evolvedStars": 6,
+  "element": "Earth",
+  "weaponType": "Hammer",
+  "stats": {
+    "atk": 1000,
+    "hp": 6201,
+    "spd": 324,
+    "cost": 28
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/DarkRizetteChristmas01.png",
+  "refs": {
+    "activeSkills": [
+      "PoisonTouchDoubleADarkRizetteChristmas",
+      "PoisonDrainDoubleADarkRizetteChristmas",
+      "SlayerbaneDoubleADarkRizetteChristmas",
+      "SwapSelfForTokenChristmas"
+    ],
+    "passives": [
+      "PoisonLowLowEntranceA",
+      "PlusAttackBoostLv3",
+      "PlusHPBoostLv3",
+      "GreatSwordMinusDamageLv3",
+      "AddWeaponPrefSpear"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": "AttackAndHPUp6Earth",
+    "leaderBuffCondition": "IsEarth",
+    "summonableMonsters": [
+      "ChristmasMinion01"
+    ]
+  },
+  "resolved": {
+    "activeSkills": {
+      "PoisonTouchDoubleADarkRizetteChristmas": {
+        "id": "PoisonTouchDoubleADarkRizetteChristmas",
+        "found": true,
+        "localization": {
+          "name": "PoisonTouchDoubleADarkRizetteChristmas",
+          "description": ""
+        },
+        "ability": {
+          "name": "PoisonTouchDoubleADarkRizetteChristmas",
+          "class": "Ability",
+          "config": "PoisonTouchDoubleADarkRizetteChristmas",
+          "tuCost": 130,
+          "useLimit": 0,
+          "nameKey": "PoisonTouchDoubleA",
+          "descriptionKey": "PoisonTouchDoubleA",
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "Poison",
+                "BurnImmunityTempForRevenge"
+              ]
+            }
+          ],
+          "immuneSuggestionCondition": "AnyPoisonImmunity",
+          "enemyEventType": "Hit",
+          "abilityEffect": "PoisonCDR2",
+          "flags": [
+            "Poisoner",
+            "NoDamage"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.2,
+            0.2,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_castinggreen1/batfx_castinggreen1",
+            "_fix/batfx_christmaspoison1",
+            "batfx_poisondamage/batfx_poisondamage",
+            "batsfx_prefab/batsfx_poison1"
+          ],
+          "sortOrderOffset": [
+            -2,
+            2,
+            4,
+            2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            false,
+            true
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "BurnImmunityTempForRevenge": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Burn",
+                  "BurnAfterTurn",
+                  "BurnAtEndOfTurn"
+                ],
+                "dontShowText": true
+              },
+              {
+                "name": "BurnAfterTurn"
+              },
+              {
+                "name": "BurnSelfOnHit"
+              }
+            ],
+            "duration": 1,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "tags": [
+              "BurnImmune"
+            ],
+            "stackName": "BurnImmunityTempForRevenge",
+            "isHiddenFromPlayers": true
+          },
+          "Poison": {
+            "class": "Buff",
+            "stackName": "Poison",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "DamageOverTime"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "percentOfAttack": 0.0025,
+                "damageColor": "Green",
+                "abilityEffect": "PoisonDamage",
+                "extraDamageFlag": "Poison"
+              }
+            ],
+            "tags": [
+              "Poison"
+            ],
+            "canBePurified": true,
+            "duration": -1,
+            "applyConditions": "NotSuperOrMegaPoisoned",
+            "showAsTimer": false,
+            "statusEffect": "PoisonStatus",
+            "statusEffectOffset": 0.1,
+            "damageType": "Poison",
+            "noIconShownOnBattleStatus": true,
+            "iconSpriteName": "IconPurplePoison01"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "AnyPoisonImmunity": {
+            "class": "MonsterConditions",
+            "monsterTags": [
+              "PoisonImmuneWhenStealth"
+            ],
+            "buffStackNames": [
+              "Stealth"
+            ],
+            "or": {
+              "class": "MonsterConditions",
+              "monsterTags": [
+                "PoisonImmune"
+              ],
+              "or": {
+                "class": "MonsterConditions",
+                "buffStackNames": [
+                  "PoisonImmunity"
+                ],
+                "or": {
+                  "class": "MonsterConditions",
+                  "buffStackNames": [
+                    "PoisonImmunityOnce"
+                  ],
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "LethalPoison"
+                    ],
+                    "or": {
+                      "class": "MonsterConditions",
+                      "monsterTags": [
+                        "NegativeStatusImmunityFromThorns"
+                      ],
+                      "buffStackNames": [
+                        "SleepThorns"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "PoisonDrainDoubleADarkRizetteChristmas": {
+        "id": "PoisonDrainDoubleADarkRizetteChristmas",
+        "found": true,
+        "localization": {
+          "name": "PoisonDrainDoubleADarkRizetteChristmas",
+          "description": ""
+        },
+        "ability": {
+          "name": "PoisonDrainDoubleADarkRizetteChristmas",
+          "class": "Ability",
+          "abilityScalor": -2,
+          "conditionalAbilityScalors": [
+            3
+          ],
+          "config": "PoisonDrainDoubleADarkRizetteChristmas",
+          "tuCost": 200,
+          "useLimit": 0,
+          "nameKey": "PoisonDrainDoubleA",
+          "descriptionKey": "PoisonDrainDoubleA",
+          "spiritCost": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "ApplyBuff",
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "HealHalfStack"
+              ],
+              "buffBackMode": true,
+              "applyConditions": "IsPoisoned",
+              "applyToTargetOnly": true,
+              "skipAbilityEffect": true
+            },
+            {
+              "damageBoosts": [
+                "PoisonEaterDamageBoost"
+              ],
+              "applyToTargetType": "Enemy",
+              "damageFlags": [
+                "PoisonEater"
+              ]
+            }
+          ],
+          "attackScalors": [
+            "GoodVsPoisoned"
+          ],
+          "enemyEventType": "Finish",
+          "sourceEventType": "Hit",
+          "abilityEffect": "SmallHitRanged1",
+          "conditionedAbilityEffects": [
+            "PoisonDrainChristmasDarkRizette1",
+            "PoisonDrainChristmasDarkRizette1"
+          ],
+          "flags": [
+            "PoisonEater",
+            "StealthWorthy",
+            "PoisonEaterDoubleAlt"
+          ],
+          "ignoreEffectForSourceEvent": true
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.8,
+            0
+          ],
+          "prefabs": [
+            "batfx_bluntimpact1/batfx_bluntimpact1",
+            "batsfx_prefab/batsfx_impactsmall1"
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            true
+          ],
+          "scale": [
+            0.4,
+            1
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          },
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {
+          "HealHalfStack": {
+            "class": "Buff",
+            "stackName": "Healing",
+            "behaviors": [
+              "AdjustHp"
+            ],
+            "behaviorOverrides": [
+              {
+                "percent": 0.5,
+                "abilityEffect": "SmallHeal1"
+              }
+            ],
+            "duration": 0,
+            "applyConditions": "IsNotHealing",
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {
+          "GoodVsPoisoned": {
+            "class": "AttackScalor",
+            "targetCondition": "IsPoisoned"
+          }
+        },
+        "conditions": {
+          "IsPoisoned": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "Poison"
+            ]
+          }
+        }
+      },
+      "SlayerbaneDoubleADarkRizetteChristmas": {
+        "id": "SlayerbaneDoubleADarkRizetteChristmas",
+        "found": true,
+        "localization": {
+          "name": "SlayerbaneDoubleADarkRizetteChristmas",
+          "description": ""
+        },
+        "ability": {
+          "name": "SlayerbaneDoubleADarkRizetteChristmas",
+          "class": "Ability",
+          "abilityScalor": -2,
+          "conditionalAbilityScalors": [
+            2
+          ],
+          "config": "SlayerbaneDoubleADarkRizetteChristmas",
+          "tuCost": 130,
+          "useLimit": 0,
+          "nameKey": "SlayerbaneA2",
+          "descriptionKey": "SlayerbaneDoubleA2",
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "SlayerbaneDamageBoost"
+              ]
+            }
+          ],
+          "attackScalors": [
+            "GoodVsKiller1"
+          ],
+          "flags": [
+            "Slayerbane",
+            "SlayerbaneDouble"
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "SmallMiss1",
+          "conditionedAbilityEffects": [
+            "SlayerChristmasDarkRizette1",
+            "SlayerChristmasDarkRizette1"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.85,
+            0
+          ],
+          "prefabs": [
+            "batfx_bluntimpact1/batfx_bluntimpact1",
+            "batsfx_prefab/batsfx_impactsmall1"
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            true
+          ],
+          "scale": [
+            0.4,
+            1
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {
+          "GoodVsKiller1": {
+            "class": "AttackScalor",
+            "targetCondition": "Kills1"
+          }
+        },
+        "conditions": {}
+      },
+      "SwapSelfForTokenChristmas": {
+        "id": "SwapSelfForTokenChristmas",
+        "found": true,
+        "localization": {
+          "name": "Christmas Gift",
+          "description": "Exchanges the user with 1 Jinglemori. The user is sent to the next in line of allied reinforcements. Cannot be used if there are 3 or fewer allies left, or if there already is a Jinglemori among allies on the battlefield.",
+          "selected": "Swaps user for Jinglemori"
+        },
+        "ability": {
+          "name": "SwapSelfForTokenChristmas",
+          "class": "Ability",
+          "config": "SwapSelfForTokenChristmas",
+          "useLimit": 0,
+          "spiritCost": 0,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "SelfOnly",
+          "components": [
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "Add1ChristmasMinionToFront",
+                "SendToFrontOfReinforcements",
+                "RemoveBuffs"
+              ]
+            }
+          ],
+          "sourceEventType": "Finish",
+          "abilityEffect": "SwapSelfForChristmasDarkRizette2",
+          "useCondition": "ChristmasTokenNotInBattleAnd4AlliesLeft"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "selfOnly": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0.2,
+            0,
+            0,
+            0.2,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "_fix/batfx_christmasswap2",
+            "_fix/batfx_christmasswap1",
+            "batsfx_prefab/batsfx_knockback1",
+            "batfx_christmasswap2/batfx_christmasswap2",
+            "batfx_ripplebluelow/batfx_ripplebluelow"
+          ],
+          "sortOrderOffset": [
+            -2,
+            2,
+            4,
+            -2,
+            2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            1,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            true,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "Add1ChristmasMinionToFront": {
+            "class": "Buff",
+            "stackName": "Add1ChristmasMinionToFront",
+            "behaviors": [
+              "SummonMonster"
+            ],
+            "behaviorOverrides": [
+              {
+                "monsterType": "ChristmasMinion01",
+                "frontOfLineup": true
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "RemoveBuffs": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "SendToFrontOfReinforcements": {
+            "class": "Buff",
+            "stackName": "Pushback",
+            "behaviors": [
+              "SendToReinforcements"
+            ],
+            "behaviorOverrides": [
+              {
+                "frontOfLineup": true
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "ChristmasTokenNotInBattleAnd4AlliesLeft": {
+            "class": "MonsterConditions",
+            "allyTeamSize": 4,
+            "not": {
+              "class": "MonsterConditions",
+              "myTeamMonsterConditionMatchesNeeded": {
+                "IsChristmasToken": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "passives": {
+      "PoisonLowLowEntranceA": {
+        "id": "PoisonLowLowEntranceA",
+        "found": true,
+        "localization": {
+          "name": "Poison Entry",
+          "description": "Poisons the 2 enemies with the lowest current TU. Triggered when this unit enters the battlefield from reinforcements. This will overwrite other status effects on those units."
+        }
+      },
+      "PlusAttackBoostLv3": {
+        "id": "PlusAttackBoostLv3",
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv3",
+          "description": "Adds 300 to this unit's Attack."
+        }
+      },
+      "PlusHPBoostLv3": {
+        "id": "PlusHPBoostLv3",
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv3",
+          "description": "Adds 1200 to this unit's max HP."
+        }
+      },
+      "GreatSwordMinusDamageLv3": {
+        "id": "GreatSwordMinusDamageLv3",
+        "found": true,
+        "localization": {
+          "name": "G.sword Resist Lv3",
+          "description": "10% less damage from attacks by units equipped with Greatswords."
+        }
+      },
+      "AddWeaponPrefSpear": {
+        "id": "AddWeaponPrefSpear",
+        "found": true,
+        "localization": {
+          "name": "Spear Mastery",
+          "description": "Can use weapon skills of Spears in addition to their original preferred weapon type."
+        }
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": {
+      "class": "MonsterConditions",
+      "elements": [
+        "Earth"
+      ]
+    }
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "DarkRizetteChristmas01",
+    "family": "DarkRizetteChristmas",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "DarkRizetteChristmas01",
+    "family": "DarkRizetteChristmas",
+    "class": "Monster",
+    "leaderBuff": "AttackAndHPUp6Earth",
+    "leaderBuffCondition": "IsEarth",
+    "activeSkills": {
+      "0": "PoisonTouchDoubleADarkRizetteChristmas",
+      "1": "PoisonDrainDoubleADarkRizetteChristmas",
+      "2": "SlayerbaneDoubleADarkRizetteChristmas",
+      "3": "SwapSelfForTokenChristmas"
+    },
+    "passives": {
+      "0": "PoisonLowLowEntranceA",
+      "2": "PlusAttackBoostLv3",
+      "3": "PlusHPBoostLv3",
+      "4": "GreatSwordMinusDamageLv3",
+      "5": "AddWeaponPrefSpear"
+    },
+    "cost": 28,
+    "baseAttack": 1000,
+    "baseMaxHp": 6201,
+    "speed": 324,
+    "element": "Earth",
+    "weaponPref": "Hammer",
+    "weaponPivotIndex": 0,
+    "secure": 1,
+    "superEvolve1": "DarkRizetteChristmas02",
+    "aiTargetPickWeight": 1,
+    "stars": 5,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 0,
+    "battleOrbImageFlip": 1,
+    "attackType": "Weapon",
+    "visible": 1,
+    "formTwitterShare": 1,
+    "summonableMonsters": [
+      "ChristmasMinion01"
+    ],
+    "summonableMatchSource": [
+      false
+    ],
+    "skillVoices": {
+      "0": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "1": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "2": [
+        9,
+        10,
+        11,
+        12
+      ],
+      "3": [
+        13,
+        14,
+        15,
+        16
+      ]
+    },
+    "damageVoices": [
+      17,
+      18,
+      19,
+      20
+    ],
+    "deathVoices": [
+      21,
+      22,
+      23,
+      24
+    ],
+    "victoryVoices": [
+      25,
+      26
+    ],
+    "lineupVoices": [
+      27,
+      28,
+      29,
+      30,
+      31,
+      32
+    ],
+    "evolutionVoices": [
+      33
+    ],
+    "trainVoices": [
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43
+    ],
+    "titleVoices": [
+      44
+    ],
+    "gachaVoices": [
+      45
+    ],
+    "loginVoices": [
+      46
+    ],
+    "tapVoices": [
+      47,
+      48,
+      49
+    ],
+    "idleVoices": [
+      50
+    ]
+  },
+  "_build": {
+    "scriptVersion": "6-character-family-states",
+    "sourceHash": "faad5452165f06952a932d48aee3463849c35c67378a15b29788eae5e099173c",
+    "dependencyHash": "cfa641b95b40313dd26af2315086ca4c00146d5895071bbdbb22c517b6e944cb",
+    "generatedAt": 1778213414
+  }
+}

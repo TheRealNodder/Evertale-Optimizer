@@ -1,0 +1,1637 @@
+{
+  "schemaVersion": 3,
+  "order": 674,
+  "id": "pinocchio",
+  "name": "Pinocchio",
+  "title": "Automaton of Memories",
+  "description": "\"Where are my mama and papa?\"\nBut no one would answer. Forced to delve into the memories of others over and over, Pinocchio's heart was gradually overwritten. Even so, she continued to believe that her parents were surely somewhere in her sealed memories.",
+  "category": "character",
+  "rarity": null,
+  "stars": 6,
+  "evolvedStars": 6,
+  "element": "Earth",
+  "weaponType": "Hammer",
+  "stats": {
+    "atk": 1199,
+    "hp": 8425,
+    "spd": 463,
+    "cost": 34
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/PinocchioRegular02.png",
+  "refs": {
+    "activeSkills": [
+      "WoodenKeyAttackAPinocchioRegular",
+      "CursedRootsBuffAPinocchioRegular",
+      "LethalAllBuffAPinocchioRegular",
+      "SpecialAllAttackAPinocchioRegular"
+    ],
+    "passives": [
+      "GrowingNosePassiveAPinocchioRegular",
+      "MagicWoodPassiveAPinocchioRegular",
+      "PlusAttackBoostLv3",
+      "PlusHPBoostLv3",
+      "AirMinusDamageLv3",
+      "AddWeaponPrefGreatSword"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": "AttackAndHPUp6Earth",
+    "leaderBuffCondition": "IsEarth",
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "WoodenKeyAttackAPinocchioRegular": {
+        "id": "WoodenKeyAttackAPinocchioRegular",
+        "found": true,
+        "localization": {
+          "name": "Lock Breaker",
+          "description": "200% damage to 1 enemy. 500% damage instead if the target does not have the Burn status effect. Grants the user Stealth, and a Stealth Shield. Randomly grants either Stun Wards, Sleep Wards, or Poison Wards to all allies. This attack ignores enemy damage reduction effects, the Counter Stance Status Effect, and the effects of Skin passive skills. Damage from this attack does not wake up sleeping enemies.\n\nStealth will overwrite other Status effects on the user. Stealth Shields prevent the next non-stealth status effect a unit would gain while Stealthed from applying. Stealthed units ignore the next enemy attack that would damage more than 1 target. Any damage will remove stealth. Each Ward prevents their named effect from being applied once, then is removed. Identical Wards cannot stack.",
+          "selected": "200%+ damage, grants Stealth, Shield & Wards\n(Will overwrite other status effects)"
+        },
+        "ability": {
+          "name": "WoodenKeyAttackAPinocchioRegular",
+          "class": "Ability",
+          "abilityScalor": 1,
+          "conditionalAbilityScalors": [
+            4
+          ],
+          "config": "WoodenKeyAttackAPinocchioRegular",
+          "tuCost": 80,
+          "useLimit": 0,
+          "spiritGain": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "applyToTargetType": "Enemy",
+              "damageFlags": [
+                "IgnoreArmor",
+                "IgnoreSkin",
+                "DoNotWake"
+              ],
+              "drainPercent": 1.0,
+              "drainEffect": "MerlinSelfHeal1"
+            },
+            {
+              "buffs": [
+                "Stealth",
+                "StealthShieldOnce"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            },
+            {
+              "randomBuffFromList": [
+                "AllAlliesPoisonWardsEBB",
+                "AllAlliesStunWardsEBB",
+                "AllAlliesSleepWardsEBB"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "attackScalors": [
+            "GoodVsNotBurning"
+          ],
+          "conditionedAbilityEffects": [
+            "PinocchioAttack"
+          ],
+          "abilityEffect": "PinocchioAttack",
+          "flags": [
+            "StealthWorthy"
+          ],
+          "recommendEffectWhenUsable": -1
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.4,
+            0.6,
+            0,
+            0,
+            0,
+            0.1
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_specialattacksfx1",
+            "batfx_cinderelladark1/batfx_quickcharge2",
+            "batfx_Murasaki/batfx_footJumpDash",
+            "batfx_crossswordknight1/batfx_vswoosh1",
+            "batfx_Pinocchio/batfx_toonstars8",
+            "batsfx_prefab/batsfx_bluntimpact1",
+            "batfx_goku1/batfx_groundimpact3",
+            "batfx_Gokubride/batfx_castingSmoke3"
+          ],
+          "sortOrderOffset": [
+            -2,
+            1,
+            1,
+            1,
+            5,
+            -2,
+            1,
+            1
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            true
+          ],
+          "forceHitReactions": [
+            false,
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            true
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            true,
+            true,
+            true,
+            false,
+            false,
+            false,
+            true
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "AllAlliesPoisonWardsEBB": {
+            "class": "Buff",
+            "stackName": "AllAlliesPoisonWardsEBB",
+            "behaviors": [
+              "EnterBattleBuff"
+            ],
+            "behaviorOverrides": [
+              {
+                "randomAllyBuffs": [
+                  "PoisonImmunityOnce"
+                ],
+                "numRandomToBuff": 4
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "isHiddenFromPlayers": true
+          },
+          "AllAlliesSleepWardsEBB": {
+            "class": "Buff",
+            "stackName": "AllAlliesStunWardsEBB",
+            "behaviors": [
+              "EnterBattleBuff"
+            ],
+            "behaviorOverrides": [
+              {
+                "randomAllyBuffs": [
+                  "SleepImmunityOnce"
+                ],
+                "numRandomToBuff": 4
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "isHiddenFromPlayers": true
+          },
+          "AllAlliesStunWardsEBB": {
+            "class": "Buff",
+            "stackName": "AllAlliesStunWardsEBB",
+            "behaviors": [
+              "EnterBattleBuff"
+            ],
+            "behaviorOverrides": [
+              {
+                "randomAllyBuffs": [
+                  "StunImmunityOnce"
+                ],
+                "numRandomToBuff": 4
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "isHiddenFromPlayers": true
+          },
+          "Stealth": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "ManipulateTargeting",
+              "RemoveOnHurt",
+              "Immunity",
+              "Immunity"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "LockHideSkills"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "dodgeMultitarget": true,
+                "forceAllowAllEnemiesAChanceToManipulate": true,
+                "removeAfterTriggers": 1,
+                "abilityFlagsToIgnore": [
+                  "Stun",
+                  "NoDamage",
+                  "Sneak",
+                  "IgnoreStealth"
+                ]
+              },
+              {},
+              {
+                "stackNamesToBlock": [
+                  "Stealth"
+                ],
+                "dontShowText": true
+              },
+              {
+                "stackNamesToBlock": [
+                  "Placeholder"
+                ],
+                "dontShowText": true,
+                "activateCondition": "MissingStealthOrStealthShield"
+              }
+            ],
+            "tags": [
+              "Stealth"
+            ],
+            "duration": -1,
+            "showAsTimer": true,
+            "iconSpriteName": "IconBlackStealth01",
+            "stackName": "Stealth",
+            "useCount": 1
+          },
+          "StealthShieldOnce": {
+            "class": "Buff",
+            "stackName": "StealthShieldOnce",
+            "behaviors": [
+              "Immunity"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Sleep",
+                  "Armor",
+                  "Poison",
+                  "Burn",
+                  "Stance",
+                  "SpiritLeaking",
+                  "SpiritLeakReady",
+                  "Condemn",
+                  "Slowed",
+                  "StunSkinStatus",
+                  "Decay"
+                ],
+                "activateCondition": "IsStealth",
+                "useLimit": 1
+              }
+            ],
+            "duration": -1,
+            "showAsTimer": true,
+            "iconSpriteName": "IconBlackStealthShield01"
+          }
+        },
+        "attackScalors": {
+          "GoodVsNotBurning": {
+            "class": "AttackScalor",
+            "targetCondition": "IsNotBurning"
+          }
+        },
+        "conditions": {}
+      },
+      "CursedRootsBuffAPinocchioRegular": {
+        "id": "CursedRootsBuffAPinocchioRegular",
+        "found": true,
+        "localization": {
+          "name": "Cursed Roots",
+          "description": "Steals up to 1 Spirit from the enemy team for each non-burning enemy on the battlefield, and all non-burning allies are granted Sleep Thorns. Then heals all allies for 500% of the user's attack, and Purifies them (removes negative status effects like sleep, burn or poison). This skill locks after use, and unlocks each time a non-conjured enemy on the battlefield is defeated or sacrificed by any source.\n\nWhen a unit with Sleep Thorns is dealt damage by an attack, that unit's Sleep Thorns will be consumed to immediately grant the Cursed Sleep status effect for 200TU to the attacker. Burn or attacks that grant Burn will remove Sleep Thorns and prevent Cursed Sleep from applying. Cursed Sleep will overwrite status effects other than Burn, cannot be overwritten by Poison, can be applied repeatedly to units that have already slept while on the battlefield, and will not end from damage caused by Dream Hunter type active skills.",
+          "selected": "Steals Spirit, Heals, Purifies & Grants Thorns"
+        },
+        "ability": {
+          "name": "CursedRootsBuffAPinocchioRegular",
+          "class": "Ability",
+          "config": "CursedRootsBuffAPinocchioRegular",
+          "tuCost": 1,
+          "useLimit": 0,
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "All",
+          "components": [
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "Empty"
+              ],
+              "applyToTargetType": "Friendly"
+            },
+            {
+              "applyConditions": "IsNotBurning",
+              "buffs": [
+                "SpiritDrainD"
+              ],
+              "applyToTargetOnly": true,
+              "skipAbilityEffect": true,
+              "showMissConditions": "IsBurning",
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "SleepThorns"
+              ],
+              "applyToTargetType": "Friendly",
+              "skipAbilityEffect": true,
+              "showMissConditions": "IsBurning",
+              "applyConditions": "IsNotBurning"
+            },
+            {
+              "buffs": [
+                "RemoveBuffs",
+                "Heal500Percent"
+              ],
+              "applyToTargetType": "Friendly",
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "PinocchioRegularLock"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "enemyEventType": "Hit",
+          "friendlyEventType": "Finish",
+          "sourceEventType": "Finish",
+          "abilityEffect": "PinocchioHeal1",
+          "flags": [
+            "NoDamage",
+            "Healer"
+          ],
+          "useCondition": "IsNotLOCKEDPinocchioRegular"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "all": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0,
+            0.9,
+            0.2,
+            0.2,
+            0
+          ],
+          "prefabs": [
+            "batfx_earthgoddess1/batfx_tailwindbutterflies",
+            "batfx_earthgoddess1/batfx_plantbase1",
+            "batsfx_prefab/batsfx_dreamhunt1",
+            "batfx_Pinocchio/batfx_FlowerCircle",
+            "batfx_Pinocchio/batfx_healtargetpoisonPinocchio",
+            "batfx_healbottom1/batfx_healbottom1",
+            "batfx_healtop2/batfx_healtop2",
+            "batsfx_prefab/batsfx_heal1"
+          ],
+          "sortOrderOffset": [
+            -100,
+            -2,
+            2,
+            -2,
+            -3,
+            -2,
+            2,
+            -2
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            false,
+            true
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "Empty": {
+            "class": "Buff",
+            "duration": -1,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "Heal500Percent": {
+            "class": "Buff",
+            "behaviors": [
+              "AdjustHp"
+            ],
+            "behaviorOverrides": [
+              {
+                "percentOfSourceAttack": 5.0,
+                "abilityEffect": "SmallHeal1",
+                "hpboosts": [
+                  "HealBoost"
+                ]
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "PinocchioRegularLock": {
+            "class": "Buff",
+            "stackName": "CursedRootsLOCKED",
+            "duration": -1,
+            "isHiddenFromPlayers": true,
+            "showAsPermanent": false,
+            "showAsTimer": false
+          },
+          "RemoveBuffs": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "SleepThorns": {
+            "class": "Buff",
+            "behaviors": [
+              "BuffWhenMonsterHurt",
+              "RemoveOnHurt"
+            ],
+            "stackName": "SleepThorns",
+            "behaviorOverrides": [
+              {
+                "contextBuffs": [
+                  "NonBurnStatImmunityTempForRevenge",
+                  "SleepForcedThorns",
+                  "RemoveBuffsStackImmunityTemp"
+                ],
+                "cancelFromDamageTypes": [
+                  "BuffDamage"
+                ],
+                "cancelFromDamageFlags": [
+                  "AttackerIgnition"
+                ],
+                "spreadCondition": "IsNotBurningOrBurnSelfOnHit",
+                "removeAfterTriggers": 1
+              },
+              {
+                "cancelFromDamageTypes": [
+                  "BuffDamage",
+                  "Poison"
+                ],
+                "ignoreIfHurtBySelf": true
+              }
+            ],
+            "duration": -1,
+            "tags": [
+              "SleepThorns"
+            ],
+            "applyConditions": "IsNotBurning",
+            "showAsTimer": true,
+            "iconSpriteName": "IconGreenThorn01"
+          },
+          "SpiritDrainD": {
+            "class": "Buff",
+            "behaviors": [
+              "AddSpirit",
+              "AddSpirit"
+            ],
+            "behaviorOverrides": [
+              {
+                "percentOfMax": -0.1
+              },
+              {
+                "percentOfMax": 0.1,
+                "toEnemyTeam": true
+              }
+            ],
+            "duration": 0,
+            "applyConditions": "AllySpirit1OrMore",
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "IsBurning": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "Burn"
+            ]
+          },
+          "IsNotBurning": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "Burn"
+              ]
+            }
+          },
+          "IsNotLOCKEDPinocchioRegular": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "CursedRootsLOCKED"
+              ]
+            }
+          }
+        }
+      },
+      "LethalAllBuffAPinocchioRegular": {
+        "id": "LethalAllBuffAPinocchioRegular",
+        "found": true,
+        "localization": {
+          "name": "Poison Memories",
+          "description": "Removes all Poison wards and Stealth Shields from enemy units on the battlefield. Then all non-sleeping enemies have a 50% chance each to be granted Lethal Poison for 999TU. Then all non-sleeping enemies are granted Mega Poison for 200TU. This skill becomes locked for 100TU after use.\n\nMega Poison will overwrite other status effects on those enemies. Mega Poison deals 20 times the damage of normal Poison and cannot be overwritten by normal Poison or Super Poison. Lethal Poison will overwrite other status effects on those enemies, cannot be overwritten by status effects other than Burn or Stealth, and cannot be Purified. Lethal Poison deals 2 times the damage of normal Poison and ignores passive skills or effects of active skills that would prevent the target from being defeated, other than those which specifically prevent defeat from Poison or non-attack damage. Lethal Poison cannot apply to Burning units or Boss units.",
+          "selected": "Removes Poison wards & Shields, may Poison\n(Will overwrite other status effects)"
+        },
+        "ability": {
+          "name": "LethalAllBuffAPinocchioRegular",
+          "class": "Ability",
+          "config": "LethalAllBuffAPinocchioRegular",
+          "tuCost": 1,
+          "useLimit": 0,
+          "spiritCost": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "AllEnemy",
+          "components": [
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "RemoveStealthShieldOnce",
+                "RemovePoisonImmunityOnce"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "50PercentChanceToApplyLethalPoison"
+              ],
+              "applyToTargetType": "Enemy",
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss",
+              "applyConditions": "IsNotBurningOrSleeping"
+            },
+            {
+              "buffs": [
+                "MegaPoison"
+              ],
+              "applyToTargetType": "Enemy",
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss",
+              "applyConditions": "IsNotSleeping"
+            },
+            {
+              "buffs": [
+                "PinocchioRegularCooldown100"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "PinocchioBigKey",
+          "flags": [
+            "Poisoner",
+            "NoDamage"
+          ],
+          "useCondition": "NotInstantCooldown"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "allEnemies": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0.2,
+            0,
+            0.5,
+            0,
+            0,
+            0,
+            0.8,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batfx_Pinocchio/batfx_tailwindbutterfliesPurple",
+            "batsfx_prefab/batsfx_timestrike1",
+            "batfx_alicedark1/batfx_castclock1",
+            "batfx_Pinocchio/batfx_Keyportal1",
+            "batsfx_prefab/batsfx_gravityball",
+            "batfx_Pinocchio/batfx_BigKey1",
+            "batfx_Pinocchio/batfx_BigKey2",
+            "batfx_common/batfx_empty",
+            "batsfx_prefab/batsfx_heartbeat1",
+            "batsfx_prefab/batsfx_impactsmall1"
+          ],
+          "sortOrderOffset": [
+            -100,
+            -2,
+            -2,
+            -2,
+            0,
+            5,
+            20,
+            2,
+            0,
+            0
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            false,
+            true,
+            false,
+            false,
+            false,
+            true,
+            true
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "50PercentChanceToApplyLethalPoison": {
+            "class": "Buff",
+            "behaviors": [
+              "EnterBattleBuff"
+            ],
+            "behaviorOverrides": [
+              {
+                "selfBuffs": [
+                  "LethalPoison"
+                ],
+                "forwardSource": true
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true,
+            "applyConditions": "50PercentChance"
+          },
+          "MegaPoison": {
+            "class": "Buff",
+            "stackName": "Poison",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "DamageOverTime"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "percentOfAttack": 0.05,
+                "damageColor": "Green",
+                "abilityEffect": "MidDeath1MegaPoison",
+                "extraDamageFlag": "MegaPoison"
+              }
+            ],
+            "tags": [
+              "Poison",
+              "MegaPoison"
+            ],
+            "canBePurified": true,
+            "duration": 200,
+            "showAsTimer": true,
+            "statusEffect": "MegaPoisonStatus",
+            "statusEffectOffset": 0.1,
+            "damageType": "Poison",
+            "iconSpriteName": "IconPurplePoison01"
+          },
+          "PinocchioRegularCooldown100": {
+            "class": "Buff",
+            "duration": 100,
+            "stackName": "InstantCooldown",
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "iconSpriteName": "IconBlueCountdownClock3"
+          },
+          "RemovePoisonImmunityOnce": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "PoisonImmunityOnce"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "RemoveStealthShieldOnce": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "StealthShieldOnce"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "IsNotBurningOrSleeping": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "Burn"
+              ],
+              "or": {
+                "class": "MonsterConditions",
+                "buffStackNames": [
+                  "Sleep"
+                ]
+              }
+            }
+          },
+          "IsNotSleeping": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "Sleep"
+              ]
+            }
+          },
+          "NotInstantCooldown": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "InstantCooldown"
+              ]
+            }
+          }
+        }
+      },
+      "SpecialAllAttackAPinocchioRegular": {
+        "id": "SpecialAllAttackAPinocchioRegular",
+        "found": true,
+        "localization": {
+          "name": "Memory Collapse",
+          "description": "200% damage to all enemies. 400% damage instead to targets that are poisoned. 600% damage instead to targets that have the Mega Poison status effect. 800% damage instead to targets that have the Lethal Poison status effect. All non-sleeping enemies hit are then granted Mega Poison for 200TU. This attack ignores enemy damage reduction effects, the Counter Stance Status Effect, and the effects of Skin passive skills. Damage from this attack does not wake up sleeping enemies.",
+          "selected": "200%+ damage, may spread Poison\n(Will overwrite other status effects)"
+        },
+        "ability": {
+          "name": "SpecialAllAttackAPinocchioRegular",
+          "class": "Ability",
+          "abilityScalor": 1,
+          "conditionalAbilityScalors": [
+            3,
+            5,
+            7
+          ],
+          "config": "SpecialAllAttackAPinocchioRegular",
+          "tuCost": 100,
+          "useLimit": 0,
+          "spiritCost": 3,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "AllEnemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "PoisonEaterDamageBoost"
+              ],
+              "damageFlags": [
+                "IgnoreArmor",
+                "IgnoreSkin",
+                "DoNotWake"
+              ],
+              "applyToTargetType": "Enemy",
+              "drainPercent": 1.0,
+              "drainEffect": "MerlinSelfHeal1"
+            },
+            {
+              "buffs": [
+                "MegaPoison",
+                "BurnImmunityTempForRevenge"
+              ],
+              "applyConditions": "IsNotSleeping",
+              "showMissConditions": "ShowNoMiss",
+              "applyToTargetType": "Enemy",
+              "skipAbilityEffect": true
+            }
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "PinocchioSpecial",
+          "attackScalors": [
+            "GoodVsPoisoned",
+            "GoodVsMegaPoisoned",
+            "GoodVsLethalPoison"
+          ],
+          "conditionedAbilityEffects": [
+            "PinocchioSpecial",
+            "PinocchioSpecial",
+            "PinocchioSpecial"
+          ],
+          "flags": [
+            "Poisoner",
+            "PoisonEater"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "allEnemies": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0.5,
+            0,
+            0.7,
+            0,
+            0,
+            1.1,
+            0.7,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batfx_Pinocchio/batfx_tailwindbutterflies2",
+            "batfx_Pinocchio/batfx_tailwindbutterflies3",
+            "batsfx_prefab/batsfx_ring2",
+            "batfx_roundtableknightDark/batfx_castingSmoke",
+            "batsfx_prefab/batsfx_gravityball",
+            "batfx_Pinocchio/batfx_darkimpactPinocchio",
+            "batsfx_prefab/batsfx_impactsmall1",
+            "batsfx_prefab/batsfx_dreamhunt1",
+            "batsfx_prefab/batsfx_heartbeat1",
+            "batfx_Pinocchio/batfx_purpleimpactPinocchio1",
+            "batsfx_prefab/batsfx_frost1",
+            "batsfx_prefab/batsfx_bomb1"
+          ],
+          "sortOrderOffset": [
+            -50,
+            50,
+            0,
+            2,
+            0,
+            80,
+            0,
+            0,
+            0,
+            2,
+            0,
+            0
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "audiobundle1",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            false,
+            true,
+            true,
+            true,
+            false,
+            true,
+            true,
+            true,
+            false,
+            true,
+            true
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "BurnImmunityTempForRevenge": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Burn",
+                  "BurnAfterTurn",
+                  "BurnAtEndOfTurn"
+                ],
+                "dontShowText": true
+              },
+              {
+                "name": "BurnAfterTurn"
+              },
+              {
+                "name": "BurnSelfOnHit"
+              }
+            ],
+            "duration": 1,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "tags": [
+              "BurnImmune"
+            ],
+            "stackName": "BurnImmunityTempForRevenge",
+            "isHiddenFromPlayers": true
+          },
+          "MegaPoison": {
+            "class": "Buff",
+            "stackName": "Poison",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "DamageOverTime"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "percentOfAttack": 0.05,
+                "damageColor": "Green",
+                "abilityEffect": "MidDeath1MegaPoison",
+                "extraDamageFlag": "MegaPoison"
+              }
+            ],
+            "tags": [
+              "Poison",
+              "MegaPoison"
+            ],
+            "canBePurified": true,
+            "duration": 200,
+            "showAsTimer": true,
+            "statusEffect": "MegaPoisonStatus",
+            "statusEffectOffset": 0.1,
+            "damageType": "Poison",
+            "iconSpriteName": "IconPurplePoison01"
+          }
+        },
+        "attackScalors": {
+          "GoodVsLethalPoison": {
+            "class": "AttackScalor",
+            "targetCondition": "IsLethalPoison"
+          },
+          "GoodVsMegaPoisoned": {
+            "class": "AttackScalor",
+            "targetCondition": "IsMegaPoisoned"
+          },
+          "GoodVsPoisoned": {
+            "class": "AttackScalor",
+            "targetCondition": "IsPoisoned"
+          }
+        },
+        "conditions": {
+          "IsNotSleeping": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "Sleep"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "passives": {
+      "GrowingNosePassiveAPinocchioRegular": {
+        "id": "GrowingNosePassiveAPinocchioRegular",
+        "found": true,
+        "localization": {
+          "name": "Cursed Automata",
+          "description": "This unit is immune to Poison status effects, and reduces the amount of any stun effects against this unit by 50TU.\n\nThis unit's attacks heal this unit for 100% of total damage dealt.\n\nWhenever another ally enters the battlefield from reinforcements, they are granted Sleep Thorns.\n\nWhenever a non-conjured enemy enters the battlefield from reinforcements, they are granted Super Poison. Super Poison will overwrite other status effects on those enemies. Super Poison deals 4 times the damage of normal poison, and cannot be overwritten by normal poison."
+        }
+      },
+      "MagicWoodPassiveAPinocchioRegular": {
+        "id": "MagicWoodPassiveAPinocchioRegular",
+        "found": true,
+        "localization": {
+          "name": "Imprinted Ego",
+          "description": "Each time a Poisoned or Sleeping unit gets the turn, this unit will be healed for 30% of its max HP.\n\nWhile a unit on the battlefield is Poisoned, this unit has:\n- A 100% chance to survive any attack that would defeat this unit with 1HP.\n- 50% damage reduction from attacks.\n- Active Skill TU Costs reduced by 40%. Quicken effects will not further reduce this unit's TU costs."
+        }
+      },
+      "PlusAttackBoostLv3": {
+        "id": "PlusAttackBoostLv3",
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv3",
+          "description": "Adds 300 to this unit's Attack."
+        }
+      },
+      "PlusHPBoostLv3": {
+        "id": "PlusHPBoostLv3",
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv3",
+          "description": "Adds 1200 to this unit's max HP."
+        }
+      },
+      "AirMinusDamageLv3": {
+        "id": "AirMinusDamageLv3",
+        "found": true,
+        "localization": {
+          "name": "Storm Resist Lv3",
+          "description": "10% less damage from attacks by Storm units."
+        }
+      },
+      "AddWeaponPrefGreatSword": {
+        "id": "AddWeaponPrefGreatSword",
+        "found": true,
+        "localization": {
+          "name": "Greatsword Mastery",
+          "description": "Can use weapon skills of Greatswords in addition to their original preferred weapon type."
+        }
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": {
+      "class": "MonsterConditions",
+      "elements": [
+        "Earth"
+      ]
+    }
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "PinocchioRegular02",
+    "family": "PinocchioRegular",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "PinocchioRegular02",
+    "family": "PinocchioRegular",
+    "class": "Monster",
+    "leaderBuff": "AttackAndHPUp6Earth",
+    "leaderBuffCondition": "IsEarth",
+    "activeSkills": {
+      "0": "WoodenKeyAttackAPinocchioRegular",
+      "1": "CursedRootsBuffAPinocchioRegular",
+      "2": "LethalAllBuffAPinocchioRegular",
+      "3": "SpecialAllAttackAPinocchioRegular"
+    },
+    "passives": {
+      "0": "GrowingNosePassiveAPinocchioRegular",
+      "1": "MagicWoodPassiveAPinocchioRegular",
+      "2": "PlusAttackBoostLv3",
+      "3": "PlusHPBoostLv3",
+      "4": "AirMinusDamageLv3",
+      "5": "AddWeaponPrefGreatSword"
+    },
+    "cost": 34,
+    "baseAttack": 1199,
+    "baseMaxHp": 8425,
+    "speed": 463,
+    "element": "Earth",
+    "weaponPref": "Hammer",
+    "weaponPivotIndex": 0,
+    "secure": 1,
+    "evolveFrom": "PinocchioRegular01",
+    "aiTargetPickWeight": 1,
+    "stars": 6,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 0,
+    "battleOrbImageFlip": 1,
+    "attackType": "Bash",
+    "cosmoName": "PinocchioRegular03",
+    "skillVoices": {
+      "0": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "1": [
+        5,
+        6,
+        7,
+        10
+      ],
+      "2": [
+        8,
+        9,
+        11,
+        12
+      ],
+      "3": [
+        13,
+        14,
+        15,
+        16
+      ]
+    },
+    "damageVoices": [
+      17,
+      18,
+      19,
+      20
+    ],
+    "deathVoices": [
+      21,
+      22,
+      23,
+      24
+    ],
+    "victoryVoices": [
+      25,
+      26
+    ],
+    "lineupVoices": [
+      27,
+      28,
+      29,
+      30,
+      31,
+      32
+    ],
+    "evolutionVoices": [
+      38
+    ],
+    "trainVoices": [
+      33,
+      34,
+      35,
+      36,
+      37,
+      39,
+      40,
+      41,
+      42,
+      43
+    ],
+    "titleVoices": [
+      44
+    ],
+    "gachaVoices": [
+      45
+    ],
+    "loginVoices": [
+      46
+    ],
+    "tapVoices": [
+      47,
+      48,
+      49
+    ],
+    "idleVoices": [
+      50
+    ]
+  },
+  "_build": {
+    "scriptVersion": "6-character-family-states",
+    "sourceHash": "3c216a8b0425f949128bf491022027874e9104919e221db4cf1df0ba50ec6a4b",
+    "dependencyHash": "cc896a3229afe6c13642a69cee3c003bea769ee511ce84ac77f1a6e141f1a1a8",
+    "generatedAt": 1778213419
+  }
+}

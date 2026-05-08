@@ -1,0 +1,1186 @@
+{
+  "schemaVersion": 3,
+  "order": 670,
+  "id": "clare",
+  "name": "Clare",
+  "title": "Knight of Silver",
+  "description": "From then on, Rizette would visit Clare's home, sometimes bringing her younger brother along with her. Clare admired the siblings. One, the brave sister and the other, the clever brother. Gradually, the two became irreplaceable family to her. However, a single misunderstanding tore the relationship to shreds.",
+  "category": "character",
+  "rarity": null,
+  "stars": 6,
+  "evolvedStars": 6,
+  "element": "Fire",
+  "weaponType": "Sword",
+  "stats": {
+    "atk": 1554,
+    "hp": 6650,
+    "spd": 486,
+    "cost": 34
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/RizKouhaiRegular02.png",
+  "refs": {
+    "activeSkills": [
+      "HeatingUpARizKouhai",
+      "PartyTimeBuffARizKouhai",
+      "DoubleAttackARizKouhai",
+      "SpecialAllAttackARizKouhai"
+    ],
+    "passives": [
+      "SchoolFriendsPassiveARizKouhai",
+      "KouhaiPassiveARizKouhai",
+      "PlusAttackBoostLv3",
+      "PlusHPBoostLv3",
+      "AxeMinusDamageLv3",
+      "AddWeaponPrefAxe"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": "AttackUpFireD",
+    "leaderBuffCondition": "IsFire",
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "HeatingUpARizKouhai": {
+        "id": "HeatingUpARizKouhai",
+        "found": true,
+        "localization": {
+          "name": "Heating Up",
+          "description": "200% damage to 1 enemy. 400% damage instead if the user has survived for 150TU on the battlefield. 600% damage instead if the user has survived for 300TU on the battlefield. 800% damage instead if the user has survived for 450TU on the battlefield. The user is then granted the Burn status effect. This attack ignores enemy damage reduction effects.\n\nBurn will overwrite other status effects on the user. Any unit that deals damage to or is dealt damage by a unit with burn will also become burned.",
+          "selected": "Damage to 1 enemy and burns user\n(Will overwrite other status effects)"
+        },
+        "ability": {
+          "name": "HeatingUpARizKouhai",
+          "class": "Ability",
+          "abilityScalor": 1,
+          "conditionalAbilityScalors": [
+            3,
+            5,
+            7
+          ],
+          "config": "HeatingUpARizKouhai",
+          "tuCost": 60,
+          "useLimit": 0,
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "applyToTargetType": "Enemy",
+              "damageFlags": [
+                "IgnoreArmor"
+              ]
+            },
+            {
+              "buffs": [
+                "Burn"
+              ],
+              "applyToTargetType": "Source",
+              "skipAbilityEffect": true
+            }
+          ],
+          "attackScalors": [
+            "TimeInCombat150",
+            "TimeInCombat300",
+            "TimeInCombat450"
+          ],
+          "conditionedAbilityEffects": [
+            "RizKouhaiAttack",
+            "RizKouhaiAttack",
+            "RizKouhaiAttack"
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "RizKouhaiAttack",
+          "flags": [
+            "Burn",
+            "ApplyStatusToSelf"
+          ],
+          "recommendEffectWhenUsable": 1
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.35,
+            0.2,
+            0.2,
+            0.1,
+            0,
+            0.1
+          ],
+          "prefabs": [
+            "batfx_Gokubride/batfx_castingSmoke3",
+            "batsfx_prefab/batsfx_fire4",
+            "batfx_RizKouhai/batfx_firewave3",
+            "batfx_common/batfx_empty",
+            "batsfx_prefab/batsfx_slash1",
+            "batfx_antaresregular1/batfx_firewaveup1"
+          ],
+          "sortOrderOffset": [
+            -2,
+            0,
+            2,
+            2,
+            0,
+            2
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            true,
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            true,
+            true,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            false,
+            false,
+            false
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "Burn": {
+            "class": "Buff",
+            "stackName": "Burn",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "DamageOverTime",
+              "BuffChanceOnHit",
+              "BuffWhenMonsterHurt"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "LockHasBurnedSkills"
+              },
+              {
+                "name": "SleepThorns"
+              },
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "percentOfTargetHp": 0.001,
+                "damageColor": "Red",
+                "abilityEffect": "BurnDamage1",
+                "bossDamageCap": 500,
+                "extraDamageFlag": "Burn"
+              },
+              {
+                "contextBuffs": [
+                  "BurnAfterTurn"
+                ],
+                "chance": 1.0
+              },
+              {
+                "contextBuffs": [
+                  "BurnAfterTurn",
+                  "RemovePoison"
+                ],
+                "spreadCondition": "IsNotBurnImmune",
+                "cancelFromDamageFlags": [
+                  "Sneak",
+                  "RemoveStatus"
+                ],
+                "cancelFromDamageTypes": [
+                  "BuffDamage"
+                ]
+              }
+            ],
+            "tags": [
+              "Burn"
+            ],
+            "canBePurified": true,
+            "duration": 300,
+            "statusEffect": "BurnStatus",
+            "statusEffectOffset": 0.1,
+            "damageType": "Burn",
+            "noIconShownOnBattleStatus": false,
+            "applyConditions": "IsNotBurning",
+            "showAsTimer": true,
+            "iconSpriteName": "IconRedBurn01"
+          }
+        },
+        "attackScalors": {
+          "TimeInCombat150": {
+            "class": "AttackScalor",
+            "sourceCondition": "TimeInCombat150"
+          },
+          "TimeInCombat300": {
+            "class": "AttackScalor",
+            "sourceCondition": "TimeInCombat300"
+          },
+          "TimeInCombat450": {
+            "class": "AttackScalor",
+            "sourceCondition": "TimeInCombat450"
+          }
+        },
+        "conditions": {
+          "TimeInCombat150": {
+            "class": "MonsterConditions",
+            "timeInCombat": 150
+          },
+          "TimeInCombat300": {
+            "class": "MonsterConditions",
+            "timeInCombat": 300
+          },
+          "TimeInCombat450": {
+            "class": "MonsterConditions",
+            "timeInCombat": 450
+          }
+        }
+      },
+      "PartyTimeBuffARizKouhai": {
+        "id": "PartyTimeBuffARizKouhai",
+        "found": true,
+        "localization": {
+          "name": "Blaze Onward",
+          "description": "Heals all allies for 800% of the user's attack. Then immediately give 2 other random burning allies the next turns by reducing their current TU. Active skills that grant turns cannot be used on turns given by this skill. This skill locks after use, and unlocks each time a non-conjured unit on the battlefield is defeated or sacrificed by any source.",
+          "selected": "Heals allies & gives 2 other burning allies a turn"
+        },
+        "ability": {
+          "name": "PartyTimeBuffARizKouhai",
+          "class": "Ability",
+          "config": "PartyTimeBuffARizKouhai",
+          "tuCost": 10,
+          "useLimit": 0,
+          "spiritGain": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "AllAlly",
+          "components": [
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "Heal800Percent"
+              ],
+              "applyToTargetType": "Friendly",
+              "showMissConditions": "ShowNoMiss"
+            },
+            {
+              "buffs": [
+                "2RandomAlliesNotSourceRizKouhaiGainExtraTurnEBB",
+                "LockRizKouhaiRegular"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "sourceEventType": "Finish",
+          "friendlyEventType": "Finish",
+          "abilityEffect": "GiveTurnRizKouhai",
+          "recommendEffectWhenUsable": 1,
+          "flags": [
+            "Healer",
+            "GiveTurn"
+          ],
+          "useCondition": "NotLockRizKouhaiRegular"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "allFriends": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.5,
+            0,
+            0,
+            0.3,
+            0.2,
+            0,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_fire1",
+            "batfx_RizKouhai/batfx_StarCastOrange",
+            "batfx_casting5/batfx_casting5",
+            "batfx_RizKouhai/batfx_basicfire3",
+            "batfx_rippleredlow/batfx_rippleredlow",
+            "batsfx_prefab/batsfx_heal1",
+            "batfx_RizKouhai/batfx_magicnuke1",
+            "batfx_burnspiral/batfx_burnspiral"
+          ],
+          "sortOrderOffset": [
+            2,
+            -2,
+            2,
+            -2,
+            -2,
+            -2,
+            2,
+            2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            true,
+            true,
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "2RandomAlliesNotSourceRizKouhaiGainExtraTurnEBB": {
+            "class": "Buff",
+            "stackName": "2RandomAlliesNotSourceRizKouhaiGainExtraTurnEBB",
+            "behaviors": [
+              "EnterBattleBuff"
+            ],
+            "behaviorOverrides": [
+              {
+                "randomAllyBuffs": [
+                  "GiveTurn",
+                  "OnExtraTurn",
+                  "JustGivenTurn"
+                ],
+                "numRandomToBuff": 2,
+                "spreadCondition": "IsBurningNotSourceRizKouhaiRegular"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "isHiddenFromPlayers": true
+          },
+          "GiveTurn": {
+            "class": "Buff",
+            "behaviors": [
+              "GiveTurn"
+            ],
+            "behaviorOverrides": [
+              {}
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "textKeyToShowWhenApplied": "TurnGivenKey",
+            "isHiddenFromPlayers": true
+          },
+          "Heal800Percent": {
+            "class": "Buff",
+            "behaviors": [
+              "AdjustHp"
+            ],
+            "behaviorOverrides": [
+              {
+                "percentOfSourceAttack": 8.0,
+                "hpboosts": [
+                  "HealBoost"
+                ]
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "LockRizKouhaiRegular": {
+            "class": "Buff",
+            "stackName": "LockRizKouhaiRegular",
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "isHiddenFromPlayers": true,
+            "duration": -1
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "NotLockRizKouhaiRegular": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "LockRizKouhaiRegular"
+              ]
+            }
+          }
+        }
+      },
+      "DoubleAttackARizKouhai": {
+        "id": "DoubleAttackARizKouhai",
+        "found": true,
+        "localization": {
+          "name": "Deadly Burn Blast",
+          "description": "300% damage to 2 enemies. This attack ignores enemy damage reduction effects and any effects of non-boss enemies that would prevent the target from being defeated. Usable if the user has the Burn status effect.",
+          "selected": "300% damage, ignores defeat prevention"
+        },
+        "ability": {
+          "name": "DoubleAttackARizKouhai",
+          "class": "Ability",
+          "abilityScalor": 2,
+          "config": "DoubleAttackARizKouhai",
+          "tuCost": 70,
+          "useLimit": 0,
+          "spiritCost": 0,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "applyToTargetType": "Enemy",
+              "damageFlags": [
+                "IgnoreArmor",
+                "HardIgnoreBlockDeath"
+              ]
+            }
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "RizKouhaiFirePillar",
+          "flags": [
+            "BurnBlast"
+          ],
+          "useCondition": "IsBurning"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0.6,
+            0,
+            1,
+            0
+          ],
+          "prefabs": [
+            "batfx_tailwindfire6/batfx_tailwindfire6",
+            "batfx_YandereDark/batfx_quickchargeRed",
+            "batsfx_prefab/batsfx_charge1",
+            "batfx_RizKouhai/batfx_FirePillarBeam",
+            "batsfx_prefab/batsfx_fire2",
+            "batfx_common/batfx_empty",
+            "batsfx_prefab/batsfx_bomb1"
+          ],
+          "sortOrderOffset": [
+            -100,
+            2,
+            0,
+            2,
+            0,
+            2,
+            0
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            true,
+            false,
+            true,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            true,
+            false,
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            false,
+            true,
+            false,
+            true,
+            false,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {},
+        "conditions": {
+          "IsBurning": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "Burn"
+            ]
+          }
+        }
+      },
+      "SpecialAllAttackARizKouhai": {
+        "id": "SpecialAllAttackARizKouhai",
+        "found": true,
+        "localization": {
+          "name": "Silver Sky Slash",
+          "description": "500% damage to all enemies. This attack ignores any effects of non-boss enemies that would prevent the targets from being defeated, the Counter Stance Status Effect, and the effects of Skin passive skills. Locked for 100TU after the user has entered the battlefield, and becomes locked for 100TU after use.",
+          "selected": "500% damage, ignores defeat prevention"
+        },
+        "ability": {
+          "name": "SpecialAllAttackARizKouhai",
+          "class": "Ability",
+          "abilityScalor": 4,
+          "config": "SpecialAllAttackARizKouhai",
+          "tuCost": 1,
+          "useLimit": 0,
+          "spiritCost": 3,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "AllEnemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "applyToTargetType": "Enemy",
+              "damageFlags": [
+                "IgnoreSkin",
+                "HardIgnoreBlockDeath"
+              ]
+            },
+            {
+              "buffs": [
+                "RizKouhaiRegularCooldown100"
+              ],
+              "applyToTargetType": "Source",
+              "skipAbilityEffect": true
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "RizKouhaiSpecial",
+          "flags": [
+            "Duration",
+            "Survivor"
+          ],
+          "useCondition": "TimeInCombat100NotInstantCooldown"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "allEnemies": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.3,
+            0,
+            1,
+            0,
+            0,
+            0.2,
+            0,
+            0.2,
+            0,
+            0.1,
+            0.2,
+            0
+          ],
+          "prefabs": [
+            "batfx_DragonGirl/batfx_tailwindfire8",
+            "batsfx_prefab/batsfx_superskill1",
+            "batsfx_prefab/batsfx_ring1",
+            "batfx_RizKouhai/batfx_chargeFireSpiral1",
+            "batfx_RizKouhai/batfx_vswooshRed1",
+            "batfx_RizKouhai/batfx_impactrock7",
+            "batfx_common/batfx_empty",
+            "batsfx_prefab/batsfx_fire2",
+            "batfx_RizKouhai/batfx_castingsmokeFloor1",
+            "batfx_RizKouhai/batfx_tailwindfirewall3",
+            "batfx_RizKouhai/batfx_firepillar2",
+            "batfx_common/batfx_empty",
+            "batfx_common/batfx_empty",
+            "batsfx_prefab/batsfx_bomb1"
+          ],
+          "sortOrderOffset": [
+            -50,
+            0,
+            0,
+            -2,
+            2,
+            2,
+            2,
+            0,
+            2,
+            50,
+            2,
+            2,
+            2,
+            0
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            true,
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            true,
+            true,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            true,
+            true,
+            false,
+            false,
+            false,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "RizKouhaiRegularCooldown100": {
+            "class": "Buff",
+            "duration": 100,
+            "stackName": "InstantCooldown",
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "iconSpriteName": "IconBlueCountdownClock3"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "TimeInCombat100NotInstantCooldown": {
+            "class": "MonsterConditions",
+            "timeInCombat": 100,
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "InstantCooldown"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "passives": {
+      "SchoolFriendsPassiveARizKouhai": {
+        "id": "SchoolFriendsPassiveARizKouhai",
+        "found": true,
+        "localization": {
+          "name": "Burning Bond",
+          "description": "This unit cannot be defeated by damage from Burn status effects. This unit is not affected by stun effects and cannot be sent to the reinforcements from the battlefield.\n\nWhenever there are 3 or more burning allies on the battlefield, this unit will survive any attack that would defeat this unit with 1HP.\n\nEach time this unit gets the turn, all allies will heal for 30% of their max HP.\n\nAt the end of each of this unit's turns:\n- If this unit has a Power Charge, all allies will become Enraged, then the Power Charge is removed from this unit.\n- Otherwise, this unit will gain a Power Charge.\n\nAn Enraged unit's attack is increased to 1.5x until the end of their next turn. Enrage will overwrite any existing Weak or Enrage effects on affected units. Power Charges cannot stack and will be removed when the user leaves the battlefield."
+        }
+      },
+      "KouhaiPassiveARizKouhai": {
+        "id": "KouhaiPassiveARizKouhai",
+        "found": true,
+        "localization": {
+          "name": "Explosive Drive",
+          "description": "This unit has 10% bonus to attacks for each burning unit on the battlefield (up to 80% max).\n\nTriggered when this unit enters the battlefield from the allied reinforcements:\n- This unit and another random ally are granted Instant Death Wards.\n- All units on the battlefield are granted the Burn status effect. This effect triggers 2 times.\n- Then all burning units on the battlefield are Stunned for 50TU. This effect triggers 2 times.\n\nAn Instant Death Ward prevents a unit from being immediately defeated without damage by a non-boss enemy once, then is removed. Instant Death Wards cannot be ignored and cannot stack."
+        }
+      },
+      "PlusAttackBoostLv3": {
+        "id": "PlusAttackBoostLv3",
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv3",
+          "description": "Adds 300 to this unit's Attack."
+        }
+      },
+      "PlusHPBoostLv3": {
+        "id": "PlusHPBoostLv3",
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv3",
+          "description": "Adds 1200 to this unit's max HP."
+        }
+      },
+      "AxeMinusDamageLv3": {
+        "id": "AxeMinusDamageLv3",
+        "found": true,
+        "localization": {
+          "name": "Axe Resist Lv3",
+          "description": "10% less damage from attacks by units equipped with Axes."
+        }
+      },
+      "AddWeaponPrefAxe": {
+        "id": "AddWeaponPrefAxe",
+        "found": true,
+        "localization": {
+          "name": "Axe Mastery",
+          "description": "Can use weapon skills of Axes in addition to their original preferred weapon type."
+        }
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": {
+      "class": "MonsterConditions",
+      "elements": [
+        "Fire"
+      ]
+    }
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "RizKouhaiRegular02",
+    "family": "RizKouhaiRegular",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "RizKouhaiRegular02",
+    "family": "RizKouhaiRegular",
+    "class": "Monster",
+    "leaderBuff": "AttackUpFireD",
+    "leaderBuffCondition": "IsFire",
+    "activeSkills": {
+      "0": "HeatingUpARizKouhai",
+      "1": "PartyTimeBuffARizKouhai",
+      "2": "DoubleAttackARizKouhai",
+      "3": "SpecialAllAttackARizKouhai"
+    },
+    "passives": {
+      "0": "SchoolFriendsPassiveARizKouhai",
+      "1": "KouhaiPassiveARizKouhai",
+      "2": "PlusAttackBoostLv3",
+      "3": "PlusHPBoostLv3",
+      "4": "AxeMinusDamageLv3",
+      "5": "AddWeaponPrefAxe"
+    },
+    "cost": 34,
+    "baseAttack": 1554,
+    "baseMaxHp": 6650,
+    "speed": 486,
+    "element": "Fire",
+    "weaponPref": "Sword",
+    "weaponPivotIndex": 0,
+    "secure": 1,
+    "evolveFrom": "RizKouhaiRegular01",
+    "aiTargetPickWeight": 1,
+    "stars": 6,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 0,
+    "battleOrbImageFlip": 0,
+    "attackType": "Bash",
+    "cosmoName": "RizKouhaiRegular03",
+    "skillVoices": {
+      "0": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "1": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "2": [
+        9,
+        10,
+        11,
+        12
+      ],
+      "3": [
+        13,
+        14,
+        15,
+        16
+      ]
+    },
+    "damageVoices": [
+      17,
+      18,
+      19,
+      20
+    ],
+    "deathVoices": [
+      21,
+      22,
+      23,
+      24
+    ],
+    "victoryVoices": [
+      25,
+      26
+    ],
+    "lineupVoices": [
+      27,
+      28,
+      29,
+      30,
+      31,
+      32
+    ],
+    "evolutionVoices": [
+      38
+    ],
+    "trainVoices": [
+      33,
+      34,
+      35,
+      36,
+      37,
+      39,
+      40,
+      41,
+      42,
+      43
+    ],
+    "titleVoices": [
+      44
+    ],
+    "gachaVoices": [
+      45
+    ],
+    "loginVoices": [
+      46
+    ],
+    "tapVoices": [
+      47,
+      48,
+      49
+    ],
+    "idleVoices": [
+      50
+    ]
+  },
+  "_build": {
+    "scriptVersion": "6-character-family-states",
+    "sourceHash": "dc28f5e2cf19172d0c053474d78bb0fcc7f357c6af0a8c917504e17dcb0d7a58",
+    "dependencyHash": "dd9a4d0953941c8a78b8e33e3734c45196b1f8dcd5f104c5f529e3f21fa6be67",
+    "generatedAt": 1778213419
+  }
+}

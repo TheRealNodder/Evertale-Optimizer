@@ -1,0 +1,1034 @@
+{
+  "schemaVersion": 3,
+  "order": 12,
+  "id": "norza",
+  "name": "Norza",
+  "title": "",
+  "description": "",
+  "category": "bosse",
+  "rarity": null,
+  "stars": 6,
+  "evolvedStars": 6,
+  "element": "Storm",
+  "weaponType": "GreatSword",
+  "stats": {
+    "atk": 810,
+    "hp": 34000,
+    "spd": 700,
+    "cost": 999
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/Norza01.png",
+  "refs": {
+    "activeSkills": [
+      "GainAttackSingleABoss",
+      "TimeStrikeDoubleANorza",
+      "OverwatchBoss1",
+      "KillStunDoubleBoss1",
+      "HighSpiritAttackA",
+      "ProtectorKillerA"
+    ],
+    "passives": [
+      "HoldGroundKnockbackImmunitySilent",
+      "StunImmunity"
+    ],
+    "activeSkillsAI": {
+      "4": "HighSpiritAttackANorza01_AI",
+      "5": "ProtectorKillerANorza_AI"
+    },
+    "aiSequence": "Norza01Seq",
+    "leaderBuff": null,
+    "leaderBuffCondition": null,
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "GainAttackSingleABoss": {
+        "id": "GainAttackSingleABoss",
+        "found": true,
+        "localization": {
+          "name": "Attack",
+          "description": "Damage to 1 enemy and allies gain 2 Spirit.",
+          "selected": "Damage to 1 enemy and gains 2 Spirit"
+        },
+        "ability": {
+          "name": "GainAttackSingleABoss",
+          "class": "Ability",
+          "abilityScalor": 0,
+          "config": "GainAttackSingleABoss",
+          "tuCost": 100,
+          "useLimit": 0,
+          "spiritGain": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ]
+            }
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "LargeSlash1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0.4,
+            0,
+            0.5
+          ],
+          "prefabs": [
+            "batfx_jumpsmoke1/batfx_jumpsmoke1",
+            "batsfx_prefab/batsfx_slash1",
+            "batfx_slash2/batfx_slash2",
+            "batfx_jumpsmoke1/batfx_jumpsmoke1"
+          ],
+          "sortOrderOffset": [
+            1,
+            2,
+            2,
+            1
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            true,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            true,
+            false
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            true
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {},
+        "conditions": {}
+      },
+      "TimeStrikeDoubleANorza": {
+        "id": "TimeStrikeDoubleANorza",
+        "found": true,
+        "localization": {
+          "name": "Time Strike",
+          "description": "500% damage to 2 enemies if they have 150TU or more in the turn order. 600% damage if the target has 200TU or more.",
+          "selected": "500%+ damage against targets with 150+ TU"
+        },
+        "ability": {
+          "name": "TimeStrikeDoubleANorza",
+          "class": "Ability",
+          "abilityScalor": -2,
+          "conditionalAbilityScalors": [
+            4,
+            5
+          ],
+          "config": "TimeStrikeDoubleANorza",
+          "tuCost": 160,
+          "useLimit": 0,
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "TimestrikeDamageBoost"
+              ]
+            }
+          ],
+          "attackScalors": [
+            "GoodVs150Tu",
+            "GoodVs200Tu"
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "SmallMiss1",
+          "conditionedAbilityEffects": [
+            "TimeStrikeSpecial1Norza",
+            "TimeStrikeSpecial1Norza"
+          ],
+          "flags": [
+            "Timestrike",
+            "StealthWorthy"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.85,
+            0
+          ],
+          "prefabs": [
+            "batfx_bluntimpact1/batfx_bluntimpact1",
+            "batsfx_prefab/batsfx_impactsmall1"
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            true
+          ],
+          "scale": [
+            0.4,
+            1
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {
+          "GoodVs150Tu": {
+            "class": "AttackScalor",
+            "targetCondition": "CurrentTUGreaterThan150"
+          },
+          "GoodVs200Tu": {
+            "class": "AttackScalor",
+            "targetCondition": "CurrentTUGreaterThan200"
+          }
+        },
+        "conditions": {}
+      },
+      "OverwatchBoss1": {
+        "id": "OverwatchBoss1",
+        "found": true,
+        "localization": {
+          "name": "Counter Master",
+          "description": "Grants the Counter Stance status effect to the user. This will overwrite other status effects on that unit. For 100TU, the next time the user takes damage from an enemy attack, it will become their turn. Cannot be used if the user already has the Counter Stance status effect.",
+          "selected": "User will get the next turn if damaged\n(Will overwrite other status effects) "
+        },
+        "ability": {
+          "name": "OverwatchBoss1",
+          "class": "Ability",
+          "config": "OverwatchBoss1",
+          "tuCost": 1,
+          "useLimit": 0,
+          "spiritGain": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "SelfOnly",
+          "components": [
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "OverwatchRemovePoison"
+              ]
+            }
+          ],
+          "sourceEventType": "Finish",
+          "abilityEffect": "OverwatchBoss1",
+          "useCondition": "IsNotOverwatch",
+          "flags": [
+            "Overwatch"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "selfOnly": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.75,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_norzaspike2/batfx_norzaspike2",
+            "batfx_castingpurple1/batfx_castingpurple1",
+            "batsfx_prefab/batsfx_stealth1"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -2,
+            2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            false,
+            true,
+            true
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "Overwatch": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "BuffWhenMonsterHurt",
+              "RemoveOnHurt"
+            ],
+            "stackName": "Stance",
+            "behaviorOverrides": [
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "selfBuffs": [
+                  "GiveTurnOverwatch",
+                  "AlreadyOverwatched"
+                ],
+                "cancelFromDamageTypes": [
+                  "BuffDamage"
+                ],
+                "cancelFromDamageFlags": [
+                  "IgnoreSkin",
+                  "Sneak",
+                  "RemoveStatus"
+                ]
+              },
+              {
+                "cancelFromDamageTypes": [
+                  "BuffDamage"
+                ],
+                "cancelFromDamageFlags": [
+                  "IgnoreSkin",
+                  "Sneak",
+                  "RemoveStatus"
+                ]
+              }
+            ],
+            "applyConditions": "IsNotOverwatch",
+            "duration": 150,
+            "showAsTimer": true,
+            "iconSpriteName": "IconOverwatch01"
+          },
+          "OverwatchRemovePoison": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "BuffWhenMonsterHurt",
+              "RemoveOnHurt"
+            ],
+            "stackName": "Stance",
+            "behaviorOverrides": [
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "selfBuffs": [
+                  "GiveTurnOverwatch",
+                  "AlreadyOverwatched"
+                ],
+                "cancelFromDamageFlags": [
+                  "IgnoreSkin",
+                  "Sneak",
+                  "RemoveStatus"
+                ],
+                "cancelFromDamageTypes": [
+                  "BuffDamage"
+                ]
+              },
+              {
+                "cancelFromDamageTypes": [
+                  "BuffDamage"
+                ],
+                "cancelFromDamageFlags": [
+                  "IgnoreSkin",
+                  "Sneak",
+                  "RemoveStatus"
+                ]
+              }
+            ],
+            "duration": 100,
+            "showAsTimer": true,
+            "iconSpriteName": "IconOverwatch01"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "IsNotOverwatch": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "Stance"
+              ]
+            }
+          }
+        }
+      },
+      "KillStunDoubleBoss1": {
+        "id": "KillStunDoubleBoss1",
+        "found": true,
+        "localization": {
+          "name": "Triumph Stun",
+          "description": "Stuns 2 enemies for 200TU. Unlocked each time the user defeats another unit with an attack. This skill is locked again after each use or if the user leaves the battlefield.",
+          "selected": "Stuns targets for 200TU"
+        },
+        "ability": {
+          "name": "KillStunDoubleBoss1",
+          "class": "Ability",
+          "config": "KillStunDoubleBoss1",
+          "tuCost": 50,
+          "useLimit": 0,
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "Stun200"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "FudgeUsed"
+              ],
+              "applyToTargetType": "Source",
+              "chance": 1.0
+            }
+          ],
+          "flags": [
+            "Stun",
+            "StealthWorthy",
+            "KillLock"
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "MidStun1",
+          "useCondition": "KillsMoreThanSkillUsed",
+          "recommendEffectWhenUsable": 1,
+          "killLockSkillIcon": "IconRedEx01",
+          "killLockUnlockedSkillIcon": "IconGreenCircle01",
+          "killLockUnlockedKey": "SkillReadyToUseKey",
+          "killLockLockedKey": "KillStunSingle200ALockLockedKey"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.5,
+            0.2,
+            0,
+            0.1,
+            0.2
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting2",
+            "batfx_casting3/batfx_casting3",
+            "batsfx_prefab/batsfx_stun2",
+            "batfx_stun2/batfx_stun2",
+            "batfx_ripplebluelow/batfx_ripplebluelow",
+            "batsfx_prefab/batsfx_stun2",
+            "batsfx_prefab/batsfx_stun2"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -2,
+            -2,
+            1,
+            -2,
+            -2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            false,
+            false,
+            true,
+            true
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "FudgeUsed": {
+            "class": "Buff",
+            "duration": 0,
+            "behaviors": [
+              "AddBattleProperty"
+            ],
+            "behaviorOverrides": [
+              {
+                "properties": {
+                  "fudgeSkillUses": 1
+                },
+                "replace": true,
+                "setToKills": true
+              }
+            ],
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "Stun200": {
+            "class": "Buff",
+            "stackName": "Stun",
+            "behaviors": [
+              "Stun"
+            ],
+            "behaviorOverrides": [
+              {
+                "stunTU": 200,
+                "abilityEffect": "StunStatus1"
+              }
+            ],
+            "tags": [
+              "Stun"
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "KillsMoreThanSkillUsed": {
+            "class": "MonsterConditions",
+            "propertyToCompareToField": "fudgeSkillUses",
+            "fieldToCompareToProperty": "killsMade",
+            "propertyFieldCompareStyle": "LessThan"
+          }
+        }
+      },
+      "HighSpiritAttackA": {
+        "id": "HighSpiritAttackA",
+        "found": true,
+        "localization": {
+          "name": "Over Drive",
+          "description": "500% damage to 1 enemy. Usable only if the user's party has 7 or more Spirit.",
+          "selected": "500% damage, usable if Spirit is 7 or more"
+        },
+        "ability": {
+          "name": "HighSpiritAttackA",
+          "class": "Ability",
+          "abilityScalor": 4,
+          "config": "HighSpiritAttackA",
+          "tuCost": 160,
+          "useLimit": 0,
+          "spiritCost": 3,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage"
+          ],
+          "enemyEventType": "Hit",
+          "useCondition": "AllySpirit7OrMore",
+          "flags": [
+            "HighSpirits",
+            "StealthWorthy"
+          ],
+          "recommendEffectWhenUsable": 1,
+          "axeAbilityEffect": "HighSpiritSpecial1R",
+          "greatAxeAbilityEffect": "HighSpiritSpecial1R",
+          "greatSwordAbilityEffect": "HighSpiritSpecial1R",
+          "swordAbilityEffect": "HighSpiritSpecial1R",
+          "spearAbilityEffect": "HighSpiritSpecial1SpearR",
+          "katanaAbilityEffect": "HighSpiritSpecial1R",
+          "hammerAbilityEffect": "HighSpiritSpecial1BluntR",
+          "staffAbilityEffect": "HighSpiritSpecial1BluntR",
+          "maceAbilityEffect": "HighSpiritSpecial1BluntR",
+          "biteAbilityEffect": "HighSpiritSpecial1BiteR",
+          "bashAbilityEffect": "HighSpiritSpecial1BluntR",
+          "clawAbilityEffect": "HighSpiritSpecial1ClawR"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": null,
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {},
+        "conditions": {
+          "AllySpirit7OrMore": {
+            "class": "MonsterConditions",
+            "teamSpiritGreaterThan": 600
+          }
+        }
+      },
+      "ProtectorKillerA": {
+        "id": "ProtectorKillerA",
+        "found": true,
+        "localization": {
+          "name": "Guard Destroyer",
+          "description": "500% damage to 1 enemy if they are a Guardian.",
+          "selected": "500% damage against Guardians"
+        },
+        "ability": {
+          "name": "ProtectorKillerA",
+          "class": "Ability",
+          "abilityScalor": -2,
+          "conditionalAbilityScalors": [
+            4
+          ],
+          "config": "ProtectorKillerA",
+          "tuCost": 100,
+          "useLimit": 0,
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage"
+          ],
+          "attackScalors": [
+            "GoodVsProtector"
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "SmallHit1",
+          "conditionedAbilityEffects": [
+            "ProtectorKillerSpecial1R",
+            "ProtectorKillerSpecial1R"
+          ],
+          "flags": [
+            "ProtectorKiller"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.4,
+            0
+          ],
+          "prefabs": [
+            "batfx_bluntimpact1/batfx_bluntimpact1",
+            "batsfx_prefab/batsfx_impactsmall1"
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            true
+          ],
+          "scale": [
+            0.4,
+            1
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {
+          "GoodVsProtector": {
+            "class": "AttackScalor",
+            "targetCondition": "IsProtecting"
+          }
+        },
+        "conditions": {}
+      }
+    },
+    "passives": {
+      "HoldGroundKnockbackImmunitySilent": {
+        "id": "HoldGroundKnockbackImmunitySilent",
+        "found": true,
+        "localization": {
+          "name": "Hold Ground",
+          "description": "If this unit would be defeated by an enemy attack or a status effect while having more than 1 HP, it instead survives with 1 HP."
+        }
+      },
+      "StunImmunity": {
+        "id": "StunImmunity",
+        "found": true,
+        "localization": {
+          "name": "Stun Immunity",
+          "description": "This unit is not affected by stun effects."
+        }
+      }
+    },
+    "activeSkillsAI": {
+      "4": {
+        "id": "HighSpiritAttackANorza01_AI",
+        "found": true,
+        "ai": {
+          "class": "AbilityAI",
+          "baseAITargetingWeight": 0.65
+        }
+      },
+      "5": {
+        "id": "ProtectorKillerANorza_AI",
+        "found": true,
+        "ai": {
+          "class": "AbilityAI",
+          "baseAITargetingWeight": 1.3,
+          "aiTargetingSourceMonsterConditions": {
+            "IsNotOverwatch": 0
+          }
+        }
+      }
+    },
+    "aiSequence": {
+      "id": "Norza01Seq",
+      "found": true,
+      "sequence": {
+        "class": "AbilityAISequence",
+        "sequence": [
+          [
+            "0",
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6"
+          ]
+        ]
+      }
+    },
+    "leaderCondition": null
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "Norza01",
+    "family": "Norza",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "Norza01",
+    "class": "Monster",
+    "family": "Norza",
+    "activeSkills": {
+      "0": "GainAttackSingleABoss",
+      "1": "TimeStrikeDoubleANorza",
+      "2": "OverwatchBoss1",
+      "3": "KillStunDoubleBoss1",
+      "4": "HighSpiritAttackA",
+      "5": "ProtectorKillerA"
+    },
+    "passives": {
+      "0": "HoldGroundKnockbackImmunitySilent",
+      "1": "StunImmunity"
+    },
+    "activeSkillsAI": {
+      "4": "HighSpiritAttackANorza01_AI",
+      "5": "ProtectorKillerANorza_AI"
+    },
+    "aiSequence": "Norza01Seq",
+    "cost": 999,
+    "baseAttack": 810,
+    "baseMaxHp": 34000,
+    "speed": 700,
+    "element": "Air",
+    "weaponPref": "GreatSword",
+    "weaponPivotIndex": 0,
+    "walkSound": "TestSound",
+    "secure": 1,
+    "aiTargetPickWeight": 1,
+    "stars": 6,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 1,
+    "battleOrbImageFlip": 0,
+    "skillVoices": {
+      "0": [
+        1,
+        2
+      ],
+      "1": [
+        3,
+        4
+      ],
+      "2": [
+        5,
+        6
+      ],
+      "3": [
+        7,
+        8
+      ]
+    },
+    "damageVoices": [
+      13,
+      14
+    ],
+    "deathVoices": [
+      15
+    ]
+  },
+  "_build": {
+    "scriptVersion": "6-character-family-states",
+    "sourceHash": "b3bc5e60c29477317f75700b0b15d9525da8e436c3fa8f3f666d392b07c81399",
+    "dependencyHash": "1a403a3599a14367badd17daef01e58cc9eb91156ec7ac84ce7d27dc1cef3863",
+    "generatedAt": 1778213442
+  }
+}

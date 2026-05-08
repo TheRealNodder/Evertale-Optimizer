@@ -1,0 +1,1518 @@
+{
+  "schemaVersion": 3,
+  "order": 684,
+  "id": "elmina",
+  "name": "Elmina",
+  "title": "Moonveiled Agent",
+  "description": "In the past, Elmina was taken in by the Church as an orphan, tasked with finding and bringing back vessels. Yet, as she came to learn the truth behind the Requiem, she began to feel sympathy for the girls. Eventually, she was taken in by Luther and the Red Dragon Organization, which proclaims the goal of creating a world without vessels. There, she began her path as a special agent.",
+  "category": "character",
+  "rarity": null,
+  "stars": 6,
+  "evolvedStars": 6,
+  "element": "Light",
+  "weaponType": "Hammer",
+  "stats": {
+    "atk": 1412,
+    "hp": 7360,
+    "spd": 498,
+    "cost": 34
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/ElminaModern02.png",
+  "refs": {
+    "activeSkills": [
+      "DoubleAttackAElminaModern",
+      "SuperModeAElminaModern",
+      "StrongSingleAttackAElminaModern",
+      "PushBackAElminaModern"
+    ],
+    "passives": [
+      "PlanAPassiveAElminaModern",
+      "PlanBPassiveAElminaModern",
+      "PlusHPBoostLv3",
+      "PlusAttackBoostLv3",
+      "GreatAxeMinusDamageLv3",
+      "AddWeaponPrefSpear"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": "AttackAndHPUp6Life",
+    "leaderBuffCondition": "IsLife",
+    "summonableMonsters": [
+      "ElminaModern02"
+    ]
+  },
+  "resolved": {
+    "activeSkills": {
+      "DoubleAttackAElminaModern": {
+        "id": "DoubleAttackAElminaModern",
+        "found": true,
+        "localization": {
+          "name": "Photon Splitter",
+          "description": "200% damage to 2 enemies, plus 150% for each Charge stored on the user (max of 650% total damage). This attack ignores any enemy status effects (including Stealth), damage reduction effects, and skin passive skills. Heals the user for 100% of total damage dealt. Damage from this attack does not wake up sleeping enemies.",
+          "selected": "Up to 650% damage, ignores damage reduction"
+        },
+        "ability": {
+          "name": "DoubleAttackAElminaModern",
+          "class": "Ability",
+          "abilityScalor": 1,
+          "conditionalAbilityScalors": [
+            2.5,
+            4,
+            5.5
+          ],
+          "config": "DoubleAttackAElminaModern",
+          "tuCost": 70,
+          "useLimit": 0,
+          "spiritGain": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "applyToTargetType": "Enemy",
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "drainPercent": 1.0,
+              "drainEffect": "MerlinSelfHeal1",
+              "damageFlags": [
+                "IgnoreArmor",
+                "IgnoreSkin",
+                "DoNotWake",
+                "Sneak"
+              ]
+            },
+            {
+              "buffs": [
+                "StoreEnergy"
+              ],
+              "showMissConditions": "ShowNoMiss",
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "ElminaModernAttack1",
+          "flags": [
+            "IgnoreStealth"
+          ],
+          "attackScalors": [
+            "GoodIfCharged1",
+            "GoodIfCharged2",
+            "GoodIfCharged3"
+          ],
+          "conditionedAbilityEffects": [
+            "ElminaModernAttack1",
+            "ElminaModernAttack1",
+            "ElminaModernAttack1"
+          ],
+          "recommendEffectWhenUsable": -1
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0.3,
+            0.4,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0.2,
+            0.4,
+            0,
+            0.1
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_specialattacksfx1",
+            "batfx_ElminaModern/batfx_quickcharge7",
+            "batfx_ElminaModern/batfx_smear5",
+            "batfx_deadlyvampire1/batfx_camerashake1",
+            "batsfx_prefab/batsfx_multislash1",
+            "batfx_ElminaModern/batfx_groundimpactMulti1",
+            "batsfx_prefab/batsfx_ring2",
+            "batfx_roundtableknightDark/batfx_castingSmoke",
+            "batfx_ElminaModern/batfx_groundimpactMulti2",
+            "batfx_ElminaModern/batfx_slashNoFlipRed1",
+            "batfx_ElminaModern/batfx_slashtrailGlich1",
+            "batsfx_prefab/batsfx_slash1"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -2,
+            2,
+            2,
+            0,
+            5,
+            5,
+            5,
+            5,
+            2,
+            1,
+            2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            true,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            false,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "StoreEnergy": {
+            "class": "Buff",
+            "stackLimit": 3,
+            "duration": -1,
+            "showAsTimer": false,
+            "stackName": "StoreEnergy",
+            "noIconShownOnBattleStatus": true,
+            "usesStackCountDescription": true,
+            "iconSpriteName": "IconPinkCharge01"
+          }
+        },
+        "attackScalors": {
+          "GoodIfCharged1": {
+            "class": "AttackScalor",
+            "sourceCondition": "IsCharged1"
+          },
+          "GoodIfCharged2": {
+            "class": "AttackScalor",
+            "sourceCondition": "IsCharged2"
+          },
+          "GoodIfCharged3": {
+            "class": "AttackScalor",
+            "sourceCondition": "IsCharged3"
+          }
+        },
+        "conditions": {}
+      },
+      "SuperModeAElminaModern": {
+        "id": "SuperModeAElminaModern",
+        "found": true,
+        "localization": {
+          "name": "Limiter Release",
+          "description": "The user will Overclock for 150TU. If the user is conjured, the user will Overclock for 75TU instead. While Overclocked, this unit heals for 25% of max HP at the end of each turn, cannot fall asleep, and has its Attack increased to 1.5x. This attack increase does not stack with Enrage effects. This skill can only be used once each time this unit is on the battlefield.",
+          "selected": "User Overclocks"
+        },
+        "ability": {
+          "name": "SuperModeAElminaModern",
+          "class": "Ability",
+          "config": "SuperModeAElminaModern",
+          "tuCost": 1,
+          "useLimit": 0,
+          "spiritGain": 3,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "SelfOnly",
+          "components": [
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "EmptyPlaceholder"
+              ],
+              "applyToTargetType": "Source"
+            },
+            {
+              "buffs": [
+                "150TUSuperModeElminaModern",
+                "LockSuperModeAElminaModern"
+              ],
+              "applyConditions": "IsNotSummoned",
+              "showMissConditions": "ShowNoMiss",
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "75TUSuperModeElminaModern",
+                "LockSuperModeAElminaModern"
+              ],
+              "applyConditions": "IsSummoned",
+              "showMissConditions": "ShowNoMiss",
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "AllAlliesPurifyFullHealAndGetTurnEBB",
+                "LockActive2ExtraTurnAElminaModern"
+              ],
+              "applyConditions": "ExtraTurnNotLockedActive2ElminaModern",
+              "showMissConditions": "ShowNoMiss",
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "sourceEventType": "Finish",
+          "abilityEffect": "ElminaModernPowerUp",
+          "useCondition": "NotLockedActive2ElminaModern"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "selfOnly": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.4,
+            0,
+            0,
+            1
+          ],
+          "prefabs": [
+            "batfx_ElminaModern/batfx_FootSquare",
+            "batfx_ElminaModern/batfx_FootSquare1",
+            "batsfx_prefab/batsfx_charge1",
+            "batsfx_prefab/batsfx_computersound1"
+          ],
+          "sortOrderOffset": [
+            -2,
+            4,
+            5,
+            5
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "150TUSuperModeElminaModern": {
+            "class": "Buff",
+            "behaviors": [
+              "BuffOnMonsterTurnEnd",
+              "Immunity",
+              "StatOnly"
+            ],
+            "behaviorOverrides": [
+              {
+                "selfBuffs": [
+                  "25PercentHealMaxHP"
+                ],
+                "activeMonsterConditions": "AlwaysTrue"
+              },
+              {
+                "stackNamesToBlock": [
+                  "Sleep",
+                  "SleepDelayed"
+                ]
+              },
+              {
+                "conditions": "NotEnraged",
+                "scalorStatBonuses": {
+                  "Attack": 0.5
+                }
+              }
+            ],
+            "stackName": "150TUSuperModeElminaModern",
+            "duration": 150,
+            "showAsPermanent": false,
+            "showAsTimer": true,
+            "tags": [
+              "SleepImmune"
+            ],
+            "statusEffect": "ElminaModernStatusNeon",
+            "iconSpriteName": "IconRedSleepInvalidZs01"
+          },
+          "75TUSuperModeElminaModern": {
+            "class": "Buff",
+            "behaviors": [
+              "BuffOnMonsterTurnEnd",
+              "Immunity",
+              "StatOnly"
+            ],
+            "behaviorOverrides": [
+              {
+                "selfBuffs": [
+                  "25PercentHealMaxHP"
+                ],
+                "activeMonsterConditions": "AlwaysTrue"
+              },
+              {
+                "stackNamesToBlock": [
+                  "Sleep",
+                  "SleepDelayed"
+                ]
+              },
+              {
+                "conditions": "NotEnraged",
+                "scalorStatBonuses": {
+                  "Attack": 0.5
+                }
+              }
+            ],
+            "stackName": "75TUSuperModeElminaModern",
+            "duration": 75,
+            "showAsPermanent": false,
+            "showAsTimer": true,
+            "tags": [
+              "SleepImmune"
+            ],
+            "statusEffect": "ElminaModernStatusNeon",
+            "iconSpriteName": "IconRedSleepInvalidZs01"
+          },
+          "AllAlliesPurifyFullHealAndGetTurnEBB": {
+            "class": "Buff",
+            "stackName": "AllAlliesPurifyFullHealAndGetTurnEBB",
+            "behaviors": [
+              "EnterBattleBuff",
+              "EnterBattleBuff"
+            ],
+            "behaviorOverrides": [
+              {
+                "randomAllyBuffs": [
+                  "RemoveBuffs",
+                  "HealFull"
+                ],
+                "numRandomToBuff": 4
+              },
+              {
+                "allAlliesButSelfBuffs": [
+                  "GiveTurn",
+                  "OnExtraTurn",
+                  "JustGivenTurn"
+                ]
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "isHiddenFromPlayers": true
+          },
+          "EmptyPlaceholder": {
+            "class": "Buff",
+            "isHiddenFromPlayers": true,
+            "duration": 0,
+            "showAsTimer": false,
+            "showAsPermanent": false
+          },
+          "LockActive2ExtraTurnAElminaModern": {
+            "class": "Buff",
+            "stackName": "LockExtraTurnAElminaModern",
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "isHiddenFromPlayers": true,
+            "duration": -1
+          },
+          "LockSuperModeAElminaModern": {
+            "class": "Buff",
+            "stackName": "LockSuperModeAElminaModern",
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "isHiddenFromPlayers": true,
+            "duration": -1
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "ExtraTurnNotLockedActive2ElminaModern": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "LockExtraTurnAElminaModern"
+              ]
+            }
+          },
+          "IsNotSummoned": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "summoned": true
+            }
+          },
+          "IsSummoned": {
+            "class": "MonsterConditions",
+            "summoned": true
+          },
+          "NotLockedActive2ElminaModern": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "LockSuperModeAElminaModern"
+              ]
+            }
+          }
+        }
+      },
+      "StrongSingleAttackAElminaModern": {
+        "id": "StrongSingleAttackAElminaModern",
+        "found": true,
+        "localization": {
+          "name": "CODE: DELETE",
+          "description": "300% damage to 1 enemy, plus 150% for each Charge stored on the user (max of 750% total damage). This attack ignores enemy damage reduction effects and any effects of non-boss enemies that would prevent the target from being defeated.",
+          "selected": "300%+ damage, ignores defeat prevention"
+        },
+        "ability": {
+          "name": "StrongSingleAttackAElminaModern",
+          "class": "Ability",
+          "abilityScalor": 2,
+          "conditionalAbilityScalors": [
+            3.5,
+            5,
+            6.5
+          ],
+          "config": "StrongSingleAttackAElminaModern",
+          "tuCost": 50,
+          "useLimit": 0,
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "applyToTargetType": "Enemy",
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "damageFlags": [
+                "IgnoreArmor",
+                "HardIgnoreBlockDeath"
+              ]
+            },
+            {
+              "buffs": [
+                "StoreEnergy"
+              ],
+              "showMissConditions": "ShowNoMiss",
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "batfx_ElminaModernSpecial",
+          "attackScalors": [
+            "GoodIfCharged1",
+            "GoodIfCharged2",
+            "GoodIfCharged3"
+          ],
+          "conditionedAbilityEffects": [
+            "batfx_ElminaModernSpecial",
+            "batfx_ElminaModernSpecial",
+            "batfx_ElminaModernSpecial"
+          ],
+          "recommendEffectWhenUsable": -1
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.1,
+            1.2,
+            0,
+            0,
+            0.3,
+            0,
+            0.3,
+            0,
+            0.2,
+            0,
+            0,
+            0.8,
+            0.1,
+            0,
+            0,
+            0,
+            0.1
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_glitchcrest1",
+            "batfx_ElminaModern/batfx_FootSquare2",
+            "batsfx_prefab/batsfx_purify1",
+            "batsfx_prefab/batsfx_slash1",
+            "batfx_ElminaModern/batfx_slashtrailGlich1",
+            "batfx_ElminaModern/batfx_GoemonSlash1",
+            "batfx_ElminaModern/batfx_slashtrailGlich1",
+            "batsfx_prefab/batsfx_slash1",
+            "batfx_ElminaModern/batfx_slashtrailGlich1",
+            "batsfx_prefab/batsfx_slash1",
+            "batfx_berserkstun1/batfx_berserkstun1",
+            "batfx_ElminaModern/batfx_timestrikeantares3",
+            "batsfx_prefab/batsfx_computersound1",
+            "batfx_rizetteyoungimpact1/batfx_rizetteyoungimpact1",
+            "batfx_ElminaModern/batfx_slashtrailGlich1",
+            "batsfx_prefab/batsfx_bomb1",
+            "batfx_ElminaModern/batfx_Glich4",
+            "batsfx_prefab/batsfx_noise",
+            "batfx_ElminaModern/batfx_slashtrailGlich1"
+          ],
+          "sortOrderOffset": [
+            10,
+            1,
+            0,
+            0,
+            1,
+            2,
+            1,
+            0,
+            1,
+            0,
+            50,
+            -2,
+            0,
+            50,
+            1,
+            10,
+            1,
+            10,
+            1
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            true,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            true,
+            false,
+            true
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            false,
+            true,
+            false,
+            true,
+            false,
+            false,
+            true,
+            false,
+            false,
+            true,
+            false,
+            true,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "StoreEnergy": {
+            "class": "Buff",
+            "stackLimit": 3,
+            "duration": -1,
+            "showAsTimer": false,
+            "stackName": "StoreEnergy",
+            "noIconShownOnBattleStatus": true,
+            "usesStackCountDescription": true,
+            "iconSpriteName": "IconPinkCharge01"
+          }
+        },
+        "attackScalors": {
+          "GoodIfCharged1": {
+            "class": "AttackScalor",
+            "sourceCondition": "IsCharged1"
+          },
+          "GoodIfCharged2": {
+            "class": "AttackScalor",
+            "sourceCondition": "IsCharged2"
+          },
+          "GoodIfCharged3": {
+            "class": "AttackScalor",
+            "sourceCondition": "IsCharged3"
+          }
+        },
+        "conditions": {}
+      },
+      "PushBackAElminaModern": {
+        "id": "PushBackAElminaModern",
+        "found": true,
+        "localization": {
+          "name": "Phase Out",
+          "description": "Exchanges 1 random enemy with an Imposter. The exchanged enemy will be sent to the front of the enemy reinforcements. This exchange will fail if the target is Immovable or if there are less than 4 enemies on the battlefield (no imposter will be added).\n\nThen pulls the user away from the battlefield to the front of your reinforcements. If there are no ally reinforcements, adds enough Elmina's (max 3) to the ally team to still pull the user away to reinforcements.\n\nUsable if the user has defeated 1+ units with attacks while on the battlefield, and there are 2 non-conjured allies on the battlefield.",
+          "selected": "User steps back, may exchange enemy with imposter"
+        },
+        "ability": {
+          "name": "PushBackAElminaModern",
+          "class": "Ability",
+          "config": "PushBackAElminaModern",
+          "tuCost": 0,
+          "useLimit": 0,
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "RandomEnemy",
+          "components": [
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "EmptyPlaceholder"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "AddImposterNext",
+                "SendToFrontOfReinforcements",
+                "RemoveBuffs"
+              ],
+              "applyConditions": "AtLeast4AlliesLeftNotKnockbackImmune",
+              "applyToTargetType": "Enemy",
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "SendToFrontOfReinforcements",
+                "RemoveBuffs"
+              ],
+              "applyConditions": "AllyHasReinforcements",
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss"
+            },
+            {
+              "buffs": [
+                "Add3ElminaModernCloneToFront"
+              ],
+              "applyConditions": "2AlliesLeftNot3",
+              "showMissConditions": "ShowNoMiss",
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "Add2ElminaModernCloneToFront"
+              ],
+              "applyConditions": "3AlliesLeftNot4",
+              "showMissConditions": "ShowNoMiss",
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "Add1ElminaModernCloneToFront"
+              ],
+              "applyConditions": "4AlliesLeftNoReinforcements",
+              "showMissConditions": "ShowNoMiss",
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "SendToBackOfReinforcements",
+                "RemoveBuffsIfNotKnockbackImmune"
+              ],
+              "showMissConditions": "ShowNoMiss",
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "batfx_ElminaModernGlich",
+          "flags": [
+            "Summon",
+            "NoDamage",
+            "AddBadFriend"
+          ],
+          "useCondition": "IsKills1AndAtLeast2NonSummonedAllies"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "randomEnemy": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            1,
+            0,
+            0.1,
+            0,
+            1,
+            0,
+            0,
+            0,
+            1
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_charge1",
+            "batfx_ElminaModern/batfx_timestrikeantares2",
+            "batfx_ElminaModern/batfx_Glich2",
+            "batsfx_prefab/batsfx_buff1",
+            "batsfx_prefab/batsfx_glitchcrest1",
+            "batfx_ElminaModern/batfx_cloneGlich",
+            "batfx_ElminaModern/batfx_Glich1",
+            "batfx_ElminaModern/batfx_Glich1",
+            "batfx_ElminaModern/batfx_Glich3",
+            "batfx_ElminaModern/batfx_Glich1",
+            "batsfx_prefab/batsfx_noise",
+            "batsfx_prefab/batsfx_glitchcrest1"
+          ],
+          "sortOrderOffset": [
+            0,
+            -2,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            true,
+            true,
+            true
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "Add1ElminaModernCloneToFront": {
+            "class": "Buff",
+            "behaviors": [
+              "SummonMonster"
+            ],
+            "behaviorOverrides": [
+              {
+                "cloneSource": true,
+                "cloneSourceStats": true,
+                "cloneSourceWeapon": true,
+                "cloneSourceEquipment": true,
+                "frontOfLineup": true
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "Add2ElminaModernCloneToFront": {
+            "class": "Buff",
+            "behaviors": [
+              "SummonMonster",
+              "SummonMonster"
+            ],
+            "behaviorOverrides": [
+              {
+                "cloneSource": true,
+                "cloneSourceStats": true,
+                "cloneSourceWeapon": true,
+                "cloneSourceEquipment": true,
+                "frontOfLineup": true
+              },
+              {
+                "cloneSource": true,
+                "cloneSourceStats": true,
+                "cloneSourceWeapon": true,
+                "cloneSourceEquipment": true,
+                "frontOfLineup": true
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "Add3ElminaModernCloneToFront": {
+            "class": "Buff",
+            "behaviors": [
+              "SummonMonster",
+              "SummonMonster",
+              "SummonMonster"
+            ],
+            "behaviorOverrides": [
+              {
+                "cloneSource": true,
+                "cloneSourceStats": true,
+                "cloneSourceWeapon": true,
+                "cloneSourceEquipment": true,
+                "frontOfLineup": true
+              },
+              {
+                "cloneSource": true,
+                "cloneSourceStats": true,
+                "cloneSourceWeapon": true,
+                "cloneSourceEquipment": true,
+                "frontOfLineup": true
+              },
+              {
+                "cloneSource": true,
+                "cloneSourceStats": true,
+                "cloneSourceWeapon": true,
+                "cloneSourceEquipment": true,
+                "frontOfLineup": true
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "AddImposterNext": {
+            "class": "Buff",
+            "behaviors": [
+              "SummonMonster"
+            ],
+            "behaviorOverrides": [
+              {
+                "monsterType": "Imposter01",
+                "frontOfLineup": true
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "EmptyPlaceholder": {
+            "class": "Buff",
+            "isHiddenFromPlayers": true,
+            "duration": 0,
+            "showAsTimer": false,
+            "showAsPermanent": false
+          },
+          "RemoveBuffs": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "RemoveBuffsIfNotKnockbackImmune": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true,
+            "applyConditions": "NotKnockbackImmune"
+          },
+          "SendToBackOfReinforcements": {
+            "class": "Buff",
+            "stackName": "Knockback",
+            "behaviors": [
+              "SendToReinforcements"
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "SendToFrontOfReinforcements": {
+            "class": "Buff",
+            "stackName": "Pushback",
+            "behaviors": [
+              "SendToReinforcements"
+            ],
+            "behaviorOverrides": [
+              {
+                "frontOfLineup": true
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "2AlliesLeftNot3": {
+            "class": "MonsterConditions",
+            "allyTeamSize": 2,
+            "not": {
+              "class": "MonsterConditions",
+              "allyTeamSize": 3
+            }
+          },
+          "3AlliesLeftNot4": {
+            "class": "MonsterConditions",
+            "allyTeamSize": 3,
+            "not": {
+              "class": "MonsterConditions",
+              "allyTeamSize": 4
+            }
+          },
+          "4AlliesLeftNoReinforcements": {
+            "class": "MonsterConditions",
+            "allyTeamSize": 4,
+            "not": {
+              "class": "MonsterConditions",
+              "allyReinforcements": 1
+            }
+          },
+          "AllyHasReinforcements": {
+            "class": "MonsterConditions",
+            "allyReinforcements": 1
+          },
+          "AtLeast4AlliesLeftNotKnockbackImmune": {
+            "class": "MonsterConditions",
+            "allyTeamSize": 4,
+            "not": {
+              "class": "MonsterConditions",
+              "monsterTags": [
+                "KnockbackImmune"
+              ]
+            }
+          },
+          "IsKills1AndAtLeast2NonSummonedAllies": {
+            "class": "MonsterConditions",
+            "killsMade": 1,
+            "myTeamMonsterConditionMatchesNeeded": {
+              "IsNotSummoned": 2
+            }
+          }
+        }
+      }
+    },
+    "passives": {
+      "PlanAPassiveAElminaModern": {
+        "id": "PlanAPassiveAElminaModern",
+        "found": true,
+        "localization": {
+          "name": "Cyber Doubles",
+          "description": "This unit is not affected by stun effects.\n\nWhen this unit enters battle:\n- If this unit is not conjured, it will have Hold Ground (If this unit would be defeated by an enemy attack or a status effect while having more than 1 HP, it instead survives with 1 HP).\n- If this unit is not conjured and if there are 4 allies on the battlefield, an Elmina will be added to the front of allied reinforcements.\n- If this unit is conjured, this unit will Endure the next damage that would defeat it with 1HP. Endure effects cannot stack.\n\nThis unit will gain a Charge each time it attacks and does not defeat any non-conjured enemies.\n\nWhenever this unit defeats any number of non-conjured enemies with an attack:\n- An Elmina will be added to the front of allied reinforcements. This effect cannot trigger if there are 8 or more \"Elmina, Moonveiled Agent\" in the ally team.\n- Then all charges are removed from this unit.\n\nCertain skills are affected by and may consume charges. A unit can store up to 3 charges and all charges are removed from a unit that leaves the battlefield. All Elmina's created by this unit will have matching Levels, Limit Breaks, Awakenings, Boosts, Potential, Mastery, Weapons, and Accessories."
+        }
+      },
+      "PlanBPassiveAElminaModern": {
+        "id": "PlanBPassiveAElminaModern",
+        "found": true,
+        "localization": {
+          "name": "Hyper Drive",
+          "description": "If this unit entered from reinforcements, the following effects are triggered when this unit activates Limiter Release, and the first time this unit takes damage from an attack and survives until after the end of the turn:\n- All allies will be Purified (any negative status effects like sleep, burn or poison are removed), and heal for 100% of max HP.\n- Then all other ally units will be given the next turns by having their TU reduced. Active skills that grant turns cannot be used by those allies until after they have had the turn.\n\nEach time this unit damages at least one enemy with an attack and leaves them on or below 25% of max HP (even if they are defeated by the attack), this unit will get another turn. Damaged targets cannot trigger this effect again until TU advances.\n\nEffects that influence TU order may interrupt extra turns (e.g. Stuns targeting the lowest TU target)."
+        }
+      },
+      "PlusHPBoostLv3": {
+        "id": "PlusHPBoostLv3",
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv3",
+          "description": "Adds 1200 to this unit's max HP."
+        }
+      },
+      "PlusAttackBoostLv3": {
+        "id": "PlusAttackBoostLv3",
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv3",
+          "description": "Adds 300 to this unit's Attack."
+        }
+      },
+      "GreatAxeMinusDamageLv3": {
+        "id": "GreatAxeMinusDamageLv3",
+        "found": true,
+        "localization": {
+          "name": "G.axe Resist Lv3",
+          "description": "10% less damage from attacks by units equipped with Greataxes."
+        }
+      },
+      "AddWeaponPrefSpear": {
+        "id": "AddWeaponPrefSpear",
+        "found": true,
+        "localization": {
+          "name": "Spear Mastery",
+          "description": "Can use weapon skills of Spears in addition to their original preferred weapon type."
+        }
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": {
+      "class": "MonsterConditions",
+      "elements": [
+        "Life"
+      ]
+    }
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "ElminaModern02",
+    "family": "ElminaModern",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "ElminaModern02",
+    "family": "ElminaModern",
+    "class": "Monster",
+    "leaderBuff": "AttackAndHPUp6Life",
+    "leaderBuffCondition": "IsLife",
+    "activeSkills": {
+      "0": "DoubleAttackAElminaModern",
+      "1": "SuperModeAElminaModern",
+      "2": "StrongSingleAttackAElminaModern",
+      "3": "PushBackAElminaModern"
+    },
+    "passives": {
+      "0": "PlanAPassiveAElminaModern",
+      "1": "PlanBPassiveAElminaModern",
+      "2": "PlusHPBoostLv3",
+      "3": "PlusAttackBoostLv3",
+      "4": "GreatAxeMinusDamageLv3",
+      "5": "AddWeaponPrefSpear"
+    },
+    "cost": 34,
+    "baseAttack": 1412,
+    "baseMaxHp": 7360,
+    "speed": 498,
+    "element": "Life",
+    "weaponPref": "Hammer",
+    "weaponPivotIndex": 0,
+    "secure": 1,
+    "evolveFrom": "ElminaModern01",
+    "aiTargetPickWeight": 1,
+    "stars": 6,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 0,
+    "battleOrbImageFlip": 1,
+    "attackType": "Bash",
+    "cosmoName": "ElminaModern03",
+    "summonableMonsters": [
+      "ElminaModern02"
+    ],
+    "summonableMatchSource": [
+      true
+    ],
+    "skillVoices": {
+      "0": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "1": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "2": [
+        9,
+        10,
+        11,
+        12
+      ],
+      "3": [
+        13,
+        14,
+        15,
+        16
+      ]
+    },
+    "damageVoices": [
+      17,
+      18,
+      19,
+      20
+    ],
+    "deathVoices": [
+      21,
+      22,
+      23,
+      24
+    ],
+    "victoryVoices": [
+      25,
+      26
+    ],
+    "lineupVoices": [
+      27,
+      28,
+      29,
+      30,
+      31,
+      32
+    ],
+    "evolutionVoices": [
+      38
+    ],
+    "trainVoices": [
+      33,
+      34,
+      35,
+      36,
+      37,
+      39,
+      40,
+      41,
+      42,
+      43
+    ],
+    "titleVoices": [
+      44
+    ],
+    "gachaVoices": [
+      45
+    ],
+    "loginVoices": [
+      46
+    ],
+    "tapVoices": [
+      47,
+      48,
+      49
+    ],
+    "idleVoices": [
+      50
+    ]
+  },
+  "_build": {
+    "scriptVersion": "6-character-family-states",
+    "sourceHash": "c0899e8fd68d2fa031c8ff494ab74c3d3d40200ac3ccd6a917078b6167e8894d",
+    "dependencyHash": "2cb4122e065efd0f7ceba4e2ec8f72731fcba5b28c75e65a4fdae678ecb33746",
+    "generatedAt": 1778213419
+  }
+}

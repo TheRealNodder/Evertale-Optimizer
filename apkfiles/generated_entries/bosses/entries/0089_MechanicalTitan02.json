@@ -1,0 +1,776 @@
+{
+  "schemaVersion": 3,
+  "order": 89,
+  "id": "endless-titan",
+  "name": "Endless Titan",
+  "title": "Soul of Iron",
+  "description": "According to one legend, the TETSU come from a possible future, where a lone TETSU-01 was destroyed. The only part of it to remain intact, a metal gauntlet, was studied by powerful sorcerers, who created the later TETSUs. How this connects to the Best Possible Future they speak of remains unclear.",
+  "category": "bosse",
+  "rarity": null,
+  "stars": 6,
+  "evolvedStars": 6,
+  "element": "Dark",
+  "weaponType": "Hammer",
+  "stats": {
+    "atk": 1050,
+    "hp": 35000,
+    "spd": 500,
+    "cost": 999
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/MechanicalTitan02.png",
+  "refs": {
+    "activeSkills": [
+      "GainAttackSingleAKnockback",
+      "DesperateBiteAllBoss",
+      "ArmorStrikeAInstant",
+      "BlockDeathA"
+    ],
+    "passives": [
+      "ArmorSkinA",
+      "GiveTurnTrapAlliesA",
+      "PoisonImmunity",
+      "KnockbackImmunity",
+      "BurnImmunity"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": "MechanicalTitan02Seq",
+    "leaderBuff": null,
+    "leaderBuffCondition": null,
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "GainAttackSingleAKnockback": {
+        "id": "GainAttackSingleAKnockback",
+        "found": true,
+        "localization": {
+          "name": "Banish Strike",
+          "description": "150% damage to 1 enemy. If this attack doesn't defeat the enemy, they are sent to the very back of the enemy reinforcements",
+          "selected": "150% damage & send to back of reinforcements"
+        },
+        "ability": {
+          "name": "GainAttackSingleAKnockback",
+          "class": "Ability",
+          "abilityScalor": 0.5,
+          "config": "GainAttackSingleAKnockback",
+          "tuCost": 100,
+          "useLimit": 0,
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "SendToBackOfReinforcements"
+              ],
+              "buffAppliedEffects": [
+                "KnockbackEffect"
+              ],
+              "applyConditions": "AllyHasReinforcements"
+            }
+          ],
+          "enemyEventType": "Finish",
+          "abilityEffect": "HighSpiritSpecial1BluntMechTitan"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.4,
+            0,
+            0,
+            0,
+            0.6
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_timestrike1",
+            "batfx_spiritcrest1/batfx_spiritcrest1",
+            "batfx_jumpsmoke1/batfx_jumpsmoke1",
+            "batfx_groundimpact/batfx_groundimpact",
+            "batfx_bluntimpact2/batfx_bluntimpact2",
+            "batsfx_prefab/batsfx_bluntimpact1",
+            "batfx_jumpsmoke1/batfx_jumpsmoke1"
+          ],
+          "sortOrderOffset": [
+            2,
+            -2,
+            1,
+            -2,
+            2,
+            2,
+            1
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            true
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "SendToBackOfReinforcements": {
+            "class": "Buff",
+            "stackName": "Knockback",
+            "behaviors": [
+              "SendToReinforcements"
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "AllyHasReinforcements": {
+            "class": "MonsterConditions",
+            "allyReinforcements": 1
+          }
+        }
+      },
+      "DesperateBiteAllBoss": {
+        "id": "DesperateBiteAllBoss",
+        "found": true,
+        "localization": {
+          "name": "DesperateBiteAllBoss",
+          "description": ""
+        },
+        "ability": {
+          "name": "DesperateBiteAllBoss",
+          "class": "Ability",
+          "abilityScalor": 3,
+          "config": "DesperateBiteAllBoss",
+          "tuCost": 250,
+          "useLimit": 0,
+          "nameKey": "DesperateBiteAllABoss",
+          "descriptionKey": "DesperateBiteAllABoss",
+          "spiritCost": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "AllEnemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "DesperateDamageBoost"
+              ],
+              "drainPercent": 0.05,
+              "drainEffect": "SmallHeal1"
+            }
+          ],
+          "flags": [
+            "Desperate"
+          ],
+          "useCondition": "HPBelow25Percent",
+          "enemyEventType": "Hit",
+          "abilityEffect": "DesperateSpecial1BluntR",
+          "recommendEffectWhenUsable": 1
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "allEnemies": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.4,
+            0.35,
+            0,
+            0,
+            0.6
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_timestrike1",
+            "batfx_desperatestrike1/batfx_desperatestrike1",
+            "batfx_jumpsmoke1/batfx_jumpsmoke1",
+            "batfx_bluntimpact1/batfx_bluntimpact1",
+            "batfx_groundimpact/batfx_groundimpact",
+            "batsfx_prefab/batsfx_bluntimpact1",
+            "batfx_jumpsmoke1/batfx_jumpsmoke1"
+          ],
+          "sortOrderOffset": [
+            2,
+            -2,
+            1,
+            1,
+            -2,
+            2,
+            1
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            false,
+            false,
+            true,
+            true
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {
+          "HPBelow25Percent": {
+            "class": "AttackScalor",
+            "sourceCondition": "HPBelow25Percent"
+          }
+        },
+        "conditions": {
+          "HPBelow25Percent": {
+            "class": "MonsterConditions",
+            "hpLessThanPercent": 0.2500001
+          }
+        }
+      },
+      "ArmorStrikeAInstant": {
+        "id": "ArmorStrikeAInstant",
+        "found": true,
+        "localization": {
+          "name": "ArmorStrikeAInstant",
+          "description": ""
+        },
+        "ability": {
+          "name": "ArmorStrikeAInstant",
+          "class": "Ability",
+          "abilityScalor": 2,
+          "config": "ArmorStrikeAInstant",
+          "tuCost": 1,
+          "useLimit": 0,
+          "nameKey": "ArmorStrikeA",
+          "descriptionKey": "ArmorStrikeA",
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "useCondition": "HasArmor",
+          "recommendEffectWhenUsable": 1,
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "RangedMagic2",
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "ArmorStrike"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "RemoveArmor"
+              ],
+              "applyToTargetType": "Source",
+              "skipAbilityEffect": true
+            }
+          ],
+          "flags": [
+            "ArmorStrike"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.3,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_rangedmagic2/batfx_rangedmagic2",
+            "batfx_impactmagic2/batfx_impactmagic2",
+            "batsfx_prefab/batsfx_bluntimpact1",
+            "batfx_rippleredlow/batfx_rippleredlow"
+          ],
+          "sortOrderOffset": [
+            -2,
+            3,
+            1,
+            -2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            true,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "RemoveArmor": {
+            "class": "Buff",
+            "stackName": "RemoveArmor",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "Armor"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "HasArmor": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "Armor"
+            ]
+          }
+        }
+      },
+      "BlockDeathA": {
+        "id": "BlockDeathA",
+        "found": true,
+        "localization": {
+          "name": "Endure",
+          "description": "The user cannot be defeated until the end of their next turn.",
+          "selected": "Prevents defeat until users next turn"
+        },
+        "ability": {
+          "name": "BlockDeathA",
+          "class": "Ability",
+          "config": "BlockDeathA",
+          "tuCost": 160,
+          "useLimit": 0,
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "SelfOnly",
+          "components": [
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "BlockDeathUntilNextTurn"
+              ]
+            }
+          ],
+          "sourceEventType": "Finish",
+          "abilityEffect": "HealArmor1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "selfOnly": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.2,
+            0.2,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_ringing1",
+            "batfx_healarmor1/batfx_healarmor1",
+            "batfx_healbottom1/batfx_healbottom1",
+            "batfx_healtop3/batfx_healtop3",
+            "batsfx_prefab/batsfx_heal1"
+          ],
+          "sortOrderOffset": [
+            2,
+            3,
+            2,
+            2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            false,
+            true
+          ],
+          "noHitReactionVoice": true
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "BlockDeathUntilNextTurn": {
+            "class": "Buff",
+            "stackName": "BlockDeathUntilNextTurn",
+            "behaviors": [
+              "RemoveAfterTurnsBehavior",
+              "BlockDeath"
+            ],
+            "behaviorOverrides": [
+              {
+                "turnCount": 1
+              },
+              {
+                "conditions": "AlwaysTrue",
+                "cancelFromDamageFlags": [
+                  "IgnoreBlockDeath"
+                ]
+              }
+            ],
+            "iconSpriteName": "IconWhiteFightSword01",
+            "duration": -1,
+            "showAsTimer": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {}
+      }
+    },
+    "passives": {
+      "ArmorSkinA": {
+        "id": "ArmorSkinA",
+        "found": true,
+        "localization": {
+          "name": "Armor Skin",
+          "description": "This unit gains the Armor status effect after taking damage from an attack while it does not have Armor. This will overwrite other status effects on the unit. Armor grants 50% damage reduction from the next attack, then the effect is removed."
+        }
+      },
+      "GiveTurnTrapAlliesA": {
+        "id": "GiveTurnTrapAlliesA",
+        "found": true,
+        "localization": {
+          "name": "Auto Command",
+          "description": "New allies entering the battlefield are immediately given a turn by reducing their TU to 0."
+        }
+      },
+      "PoisonImmunity": {
+        "id": "PoisonImmunity",
+        "found": true,
+        "localization": {
+          "name": "Poison Immunity",
+          "description": "Poison cannot be applied to this unit."
+        }
+      },
+      "KnockbackImmunity": {
+        "id": "KnockbackImmunity",
+        "found": true,
+        "localization": {
+          "name": "Immovable",
+          "description": "This unit cannot be sent to the reinforcements from the battlefield."
+        }
+      },
+      "BurnImmunity": {
+        "id": "BurnImmunity",
+        "found": true,
+        "localization": {
+          "name": "Burn Immunity",
+          "description": "This unit is not affected by burn."
+        }
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": {
+      "id": "MechanicalTitan02Seq",
+      "found": true,
+      "sequence": {
+        "class": "AbilityAISequence",
+        "sequence": [
+          [
+            "0",
+            "1",
+            "2"
+          ],
+          [
+            "1",
+            "2",
+            "3"
+          ],
+          [
+            "1",
+            "2",
+            "3"
+          ],
+          [
+            "1",
+            "2",
+            "3"
+          ]
+        ]
+      }
+    },
+    "leaderCondition": null
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "MechanicalTitan02",
+    "family": "MechanicalTitan",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "MechanicalTitan02",
+    "class": "Monster",
+    "family": "MechanicalTitan",
+    "activeSkills": {
+      "0": "GainAttackSingleAKnockback",
+      "1": "DesperateBiteAllBoss",
+      "2": "ArmorStrikeAInstant",
+      "3": "BlockDeathA"
+    },
+    "passives": {
+      "0": "ArmorSkinA",
+      "1": "GiveTurnTrapAlliesA",
+      "2": "PoisonImmunity",
+      "3": "KnockbackImmunity",
+      "4": "BurnImmunity"
+    },
+    "aiSequence": "MechanicalTitan02Seq",
+    "cost": 999,
+    "baseAttack": 1050,
+    "baseMaxHp": 35000,
+    "speed": 500,
+    "element": "Death",
+    "weaponPref": "Hammer",
+    "weaponPivotIndex": 0,
+    "walkSound": "TestSound",
+    "secure": 1,
+    "aiTargetPickWeight": 1,
+    "stars": 6,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 1,
+    "battleOrbImageFlip": 0,
+    "skillVoices": {
+      "0": [
+        1
+      ],
+      "1": [
+        1,
+        3
+      ],
+      "2": [
+        1,
+        3
+      ],
+      "3": [
+        1,
+        3
+      ]
+    },
+    "damageVoices": [
+      19
+    ],
+    "deathVoices": [
+      22
+    ]
+  },
+  "_build": {
+    "scriptVersion": "6-character-family-states",
+    "sourceHash": "6cf1423d4ce4a2250bfa7b9dd6d00b68b4f4f45e69b2065f3d6f84887fc0d4a7",
+    "dependencyHash": "94c5e6be8d030fd9b889491bbd64e6eaabe597f625b7695f378a24372901f7d0",
+    "generatedAt": 1778213444
+  }
+}

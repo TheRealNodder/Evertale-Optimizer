@@ -1,0 +1,939 @@
+{
+  "schemaVersion": 3,
+  "order": 209,
+  "id": "rei",
+  "name": "Rei",
+  "title": "Goddess of Bounty",
+  "description": "Her father, a great water dragon, was once the guardian deity of Kisenkyo, but when he left, the duty fell to her. She's spent her life since then striving to protect her people, and though her devotion is respected by most, there are those who view her in a less favorable light.",
+  "category": "character",
+  "rarity": null,
+  "stars": 6,
+  "evolvedStars": 6,
+  "element": "Water",
+  "weaponType": "Staff",
+  "stats": {
+    "atk": 1302,
+    "hp": 7176,
+    "spd": 101,
+    "cost": 34
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/ReiRegular02.png",
+  "refs": {
+    "activeSkills": [
+      "GainAttackSingleAReiRegular",
+      "SleepSingleAReiRegular",
+      "DreamHuntAReiRegular",
+      "PullbackSelfAReiRegular"
+    ],
+    "passives": [
+      "SleepLowestTUEntranceA",
+      "RegenerationOnMyTurnSleep",
+      "FireMinusDamageLv3",
+      "PlusHPBoostLv3",
+      "PlusAttackBoostLv3",
+      "AddWeaponPrefSword"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": "HPUpWaterD",
+    "leaderBuffCondition": "IsWater",
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "GainAttackSingleAReiRegular": {
+        "id": "GainAttackSingleAReiRegular",
+        "found": true,
+        "localization": {
+          "name": "Attack",
+          "description": "Damage to 1 enemy and allies gain 2 Spirit.",
+          "selected": "Damage to 1 enemy and gains 2 Spirit"
+        },
+        "ability": {
+          "name": "GainAttackSingleAReiRegular",
+          "class": "Ability",
+          "abilityScalor": 0,
+          "config": "GainAttackSingleAReiRegular",
+          "tuCost": 130,
+          "useLimit": 0,
+          "spiritGain": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ]
+            }
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "ReiWater1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.7,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_casting4/batfx_casting4",
+            "batfx_watermid1/batfx_watermid1",
+            "batsfx_prefab/batsfx_water1",
+            "batfx_ripplebluelow/batfx_ripplebluelow"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -2,
+            1,
+            -2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            true,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {},
+        "conditions": {}
+      },
+      "SleepSingleAReiRegular": {
+        "id": "SleepSingleAReiRegular",
+        "found": true,
+        "localization": {
+          "name": "Sleep",
+          "description": "Grants 1 enemy the Sleep status effect for 200TU. This will overwrite other status effects on that unit. Sleep cannot be applied to a unit that Has Slept while on the battlefield.",
+          "selected": "Puts the target to sleep\n(Will overwrite other status effects)"
+        },
+        "ability": {
+          "name": "SleepSingleAReiRegular",
+          "class": "Ability",
+          "config": "SleepSingleAReiRegular",
+          "tuCost": 130,
+          "useLimit": 0,
+          "spiritCost": 3,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "Sleep",
+                "BurnImmunityTempForRevengeSleepAttack"
+              ],
+              "chance": 1.0,
+              "applyConditions": "HasNotSlept"
+            }
+          ],
+          "immuneSuggestionCondition": "IsSleepImmune",
+          "enemyEventType": "Hit",
+          "abilityEffect": "ReiSleep1",
+          "flags": [
+            "Sleep",
+            "NoDamage",
+            "StealthWorthy"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.4,
+            0.6,
+            0,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_reiseal/batfx_reiseal",
+            "batfx_castingpurple1/batfx_castingpurple1",
+            "batfx_sleep1/batfx_sleep1",
+            "batsfx_prefab/batsfx_sleep1",
+            "batfx_spotpurple/batfx_spotpurple",
+            "batfx_ripplepurplelow/batfx_ripplepurplelow"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -2,
+            2,
+            1,
+            -2,
+            -2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            false,
+            true,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "BurnImmunityTempForRevengeSleepAttack": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Burn",
+                  "BurnAfterTurn",
+                  "BurnAtEndOfTurn"
+                ],
+                "dontShowText": true
+              },
+              {
+                "name": "BurnAfterTurn"
+              },
+              {
+                "name": "BurnSelfOnHit"
+              }
+            ],
+            "duration": 1,
+            "showAsTimer": false,
+            "applyConditions": "IsNotAnySleepImmune",
+            "showAsPermanent": false,
+            "tags": [
+              "BurnImmune"
+            ],
+            "stackName": "BurnImmunityTempForRevenge",
+            "isHiddenFromPlayers": true
+          },
+          "Sleep": {
+            "class": "Buff",
+            "stackName": "Sleep",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "LoseTurn",
+              "RemoveOnHurt"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "PurifyChain"
+              },
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "name": "AutoPurifyAfterTurnNoSleep"
+              },
+              {},
+              {
+                "ignoreIfHurtBySelf": true,
+                "cancelFromDamageFlags": [
+                  "DoNotWake"
+                ]
+              }
+            ],
+            "applyConditions": "HasNotSlept",
+            "duration": 200,
+            "showAsTimer": true,
+            "statusEffect": "SleepStatus",
+            "statusEffectOffset": 0.1,
+            "iconSpriteName": "IconWhiteSleepZs01",
+            "textKeyToShowWhenApplied": "SleepKey",
+            "canBePurified": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "HasNotSlept": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "properties": {
+                "hasSlept": 1
+              }
+            }
+          },
+          "IsSleepImmune": {
+            "class": "MonsterConditions",
+            "monsterTags": [
+              "SleepImmune"
+            ],
+            "or": {
+              "class": "MonsterConditions",
+              "monsterTags": [
+                "LethalPoison"
+              ],
+              "or": {
+                "class": "MonsterConditions",
+                "monsterTags": [
+                  "SleepImmuneIfBeastAlly"
+                ],
+                "checkReinforcementsForTeamConditionMatches": true,
+                "myTeamMonsterConditionMatchesNeeded": {
+                  "IsBeastRegular": 1
+                },
+                "or": {
+                  "class": "MonsterConditions",
+                  "monsterTags": [
+                    "SleepImmuneVsWater"
+                  ],
+                  "checkEnemyTeamOfMonster": true,
+                  "enemyTeamMonsterConditionMatchesNeeded": {
+                    "IsWater": 1
+                  },
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "SleepImmuneVs2Enemies"
+                    ],
+                    "enemyTeamSize": 2,
+                    "or": {
+                      "class": "MonsterConditions",
+                      "monsterTags": [
+                        "NegativeStatusImmunityFromThorns"
+                      ],
+                      "buffStackNames": [
+                        "SleepThorns"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "DreamHuntAReiRegular": {
+        "id": "DreamHuntAReiRegular",
+        "found": true,
+        "localization": {
+          "name": "Dream Hunter",
+          "description": "600% damage to 1 enemy if they are sleeping. Allies gain 4 Spirit if the target is asleep.",
+          "selected": "600% damage & gain 4 Spirit against sleeping target"
+        },
+        "ability": {
+          "name": "DreamHuntAReiRegular",
+          "class": "Ability",
+          "abilityScalor": -2,
+          "conditionalAbilityScalors": [
+            5
+          ],
+          "config": "DreamHuntAReiRegular",
+          "tuCost": 130,
+          "useLimit": 0,
+          "spiritCost": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "AddSpirit"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "DreamhuntDamageBoost"
+              ],
+              "damageFlags": [
+                "DreamDamage"
+              ]
+            },
+            {
+              "spiritCondition": "IsSleeping",
+              "spiritToAdd": 400
+            }
+          ],
+          "attackScalors": [
+            "GoodVsSleeping"
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "SmallHit1",
+          "conditionedAbilityEffects": [
+            "DreamHuntAReiRegular",
+            "DreamHuntAReiRegular"
+          ],
+          "flags": [
+            "Dreamhunt",
+            "StealthWorthy"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.4,
+            0
+          ],
+          "prefabs": [
+            "batfx_bluntimpact1/batfx_bluntimpact1",
+            "batsfx_prefab/batsfx_impactsmall1"
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            true
+          ],
+          "scale": [
+            0.4,
+            1
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "AddSpirit": {
+            "class": "AddSpiritAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {
+          "GoodVsSleeping": {
+            "class": "AttackScalor",
+            "targetCondition": "IsSleeping"
+          }
+        },
+        "conditions": {
+          "IsSleeping": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "Sleep"
+            ]
+          }
+        }
+      },
+      "PullbackSelfAReiRegular": {
+        "id": "PullbackSelfAReiRegular",
+        "found": true,
+        "localization": {
+          "name": "Step Back",
+          "description": "Pulls the user away from the battlefield to be next in line of your reinforcements. Usable once per battle, and only if there are 1 or more allied reinforcements left.",
+          "selected": "Sends user to be next in reinforcements"
+        },
+        "ability": {
+          "name": "PullbackSelfAReiRegular",
+          "class": "Ability",
+          "config": "PullbackSelfAReiRegular",
+          "useLimit": 1,
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "SelfOnly",
+          "components": [
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "SendToFrontOfReinforcements",
+                "RemoveBuffs"
+              ]
+            }
+          ],
+          "sourceEventType": "Finish",
+          "abilityEffect": "KnockbackEffectRei",
+          "useCondition": "AllyHasReinforcements"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "selfOnly": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.15,
+            0,
+            0.6,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_casting4/batfx_casting4",
+            "batfx_bluehelix1/batfx_bluehelix1",
+            "batsfx_prefab/batsfx_knockback1",
+            "batfx_ripplebluelow/batfx_ripplebluelow"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -2,
+            1,
+            -2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            true,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "RemoveBuffs": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "SendToFrontOfReinforcements": {
+            "class": "Buff",
+            "stackName": "Pushback",
+            "behaviors": [
+              "SendToReinforcements"
+            ],
+            "behaviorOverrides": [
+              {
+                "frontOfLineup": true
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "AllyHasReinforcements": {
+            "class": "MonsterConditions",
+            "allyReinforcements": 1
+          }
+        }
+      }
+    },
+    "passives": {
+      "SleepLowestTUEntranceA": {
+        "id": "SleepLowestTUEntranceA",
+        "found": true,
+        "localization": {
+          "name": "Dreamy Entry",
+          "description": "Grants the Sleep status effect to the enemy with the lowest TU for 200TU. Triggered when this unit enters the battlefield from reinforcements. Sleep cannot be applied to a unit that Has Slept while on the battlefield."
+        }
+      },
+      "RegenerationOnMyTurnSleep": {
+        "id": "RegenerationOnMyTurnSleep",
+        "found": true,
+        "localization": {
+          "name": "Sleep Regeneration",
+          "description": "When there is at least 1 enemy with the Sleep status effect and this unit gets the turn, this unit heals 30% of its max HP."
+        }
+      },
+      "FireMinusDamageLv3": {
+        "id": "FireMinusDamageLv3",
+        "found": true,
+        "localization": {
+          "name": "Fire Resist Lv3",
+          "description": "10% less damage from attacks by Fire units."
+        }
+      },
+      "PlusHPBoostLv3": {
+        "id": "PlusHPBoostLv3",
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv3",
+          "description": "Adds 1200 to this unit's max HP."
+        }
+      },
+      "PlusAttackBoostLv3": {
+        "id": "PlusAttackBoostLv3",
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv3",
+          "description": "Adds 300 to this unit's Attack."
+        }
+      },
+      "AddWeaponPrefSword": {
+        "id": "AddWeaponPrefSword",
+        "found": true,
+        "localization": {
+          "name": "Sword Mastery",
+          "description": "Can use weapon skills of Swords in addition to their original preferred weapon type."
+        }
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": {
+      "class": "MonsterConditions",
+      "elements": [
+        "Water"
+      ]
+    }
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "ReiRegular02",
+    "family": "ReiRegular",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "ReiRegular02",
+    "family": "ReiRegular",
+    "class": "Monster",
+    "leaderBuff": "HPUpWaterD",
+    "leaderBuffCondition": "IsWater",
+    "activeSkills": {
+      "0": "GainAttackSingleAReiRegular",
+      "1": "SleepSingleAReiRegular",
+      "2": "DreamHuntAReiRegular",
+      "3": "PullbackSelfAReiRegular"
+    },
+    "passives": {
+      "0": "SleepLowestTUEntranceA",
+      "1": "RegenerationOnMyTurnSleep",
+      "2": "FireMinusDamageLv3",
+      "3": "PlusHPBoostLv3",
+      "4": "PlusAttackBoostLv3",
+      "5": "AddWeaponPrefSword"
+    },
+    "cost": 34,
+    "baseAttack": 1302,
+    "baseMaxHp": 7176,
+    "speed": 101,
+    "element": "Water",
+    "weaponPref": "Staff",
+    "weaponPivotIndex": 1,
+    "secure": 1,
+    "evolveFrom": "ReiRegular01",
+    "aiTargetPickWeight": 1,
+    "stars": 6,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 0,
+    "battleOrbImageFlip": 0,
+    "attackType": "Weapon",
+    "formTwitterShare": 1,
+    "cosmoName": "ReiRegular03",
+    "cosmoBattleOrbImageFlip": 0,
+    "skillVoices": {
+      "0": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "1": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "2": [
+        9,
+        10,
+        11,
+        12
+      ],
+      "3": [
+        13,
+        14,
+        15,
+        16
+      ]
+    },
+    "damageVoices": [
+      17,
+      18,
+      19,
+      20
+    ],
+    "deathVoices": [
+      21,
+      22,
+      23,
+      24
+    ],
+    "victoryVoices": [
+      25,
+      26
+    ],
+    "lineupVoices": [
+      27,
+      28,
+      29,
+      30,
+      31,
+      32
+    ],
+    "evolutionVoices": [
+      33
+    ],
+    "trainVoices": [
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43
+    ],
+    "titleVoices": [
+      44
+    ],
+    "gachaVoices": [
+      45
+    ],
+    "loginVoices": [
+      46
+    ],
+    "tapVoices": [
+      47,
+      48,
+      49
+    ],
+    "idleVoices": [
+      50
+    ]
+  },
+  "_build": {
+    "scriptVersion": "6-character-family-states",
+    "sourceHash": "d61db1d7c02996b8b39bb656940dee65896906d996e50777a28e47df975b276e",
+    "dependencyHash": "db1557bfcf545c57a3d575552ef9e0044dd35812cde2cd875b9385faa2175744",
+    "generatedAt": 1778213411
+  }
+}

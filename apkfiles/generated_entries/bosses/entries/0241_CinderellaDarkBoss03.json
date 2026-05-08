@@ -1,0 +1,1190 @@
+{
+  "schemaVersion": 3,
+  "order": 241,
+  "id": "mega-cinderella",
+  "name": "Mega Cinderella ",
+  "title": "",
+  "description": "",
+  "category": "bosse",
+  "rarity": null,
+  "stars": 6,
+  "evolvedStars": 6,
+  "element": "Dark",
+  "weaponType": "Sword",
+  "stats": {
+    "atk": 2400,
+    "hp": 300000,
+    "spd": 705,
+    "cost": 999
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/CinderellaDark03.png",
+  "refs": {
+    "activeSkills": [
+      "AngryChargingBlastACinderellaDarkBoss",
+      "PowerBlastDoubleACinderellaDarkBoss",
+      "JealousSpiritLoss0ACinderellaDarkBoss",
+      "BloodfuryChargeStormACinderellaDarkBoss"
+    ],
+    "passives": [
+      "SpiritDrainDamageReduction",
+      "IgnoreHoldGroundSpiritDrainRevengeCinderellaDarkBoss",
+      "StunImmunity",
+      "SleepImmunity",
+      "KnockbackImmunity",
+      "HoldGround"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": null,
+    "leaderBuffCondition": null,
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "AngryChargingBlastACinderellaDarkBoss": {
+        "id": "AngryChargingBlastACinderellaDarkBoss",
+        "found": true,
+        "localization": {
+          "name": "Shatter Blast",
+          "description": "50% damage to 1 enemy. 300% damage instead and the user gains a Power Charge every second time this skill is activated while on the battlefield.\n\nAfter damage is dealt the user becomes enraged, having their attack increased to 1.5x until the end of their next turn, and has a 50% chance to immediately get the next turn. This attack ignores the Counter Stance Status Effect and the effects of Skin passive skills.\n\nPower Charges cannot stack and will be removed when the user leaves the battlefield.",
+          "selected": "50%+ damage, enrage self, 50% chance to act again"
+        },
+        "ability": {
+          "name": "AngryChargingBlastACinderellaDarkBoss",
+          "class": "Ability",
+          "abilityScalor": -1,
+          "conditionalAbilityScalors": [
+            2
+          ],
+          "config": "AngryChargingBlastACinderellaDarkBoss",
+          "tuCost": 50,
+          "useLimit": 0,
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "damageFlags": [
+                "IgnoreSkin",
+                "IgnoreBlockDeath"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "GiveTurn",
+                "OnExtraTurn",
+                "JustGivenTurn"
+              ],
+              "chance": 0.5,
+              "applyToTargetType": "Source",
+              "showMissConditions": "ShowNoMiss",
+              "skipAbilityEffect": true,
+              "buffAppliedEffects": [
+                "EnrageAllyNoDelay1"
+              ]
+            },
+            {
+              "buffs": [
+                "PowerCharge"
+              ],
+              "applyConditions": "HasDamagedWithAttack",
+              "showMissConditions": "ShowNoMiss",
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "LoseMomentum",
+                "GainMomentum",
+                "AttackPlus50Percent1TurnOnly"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "attackScalors": [
+            "GoodWithMomentum"
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "CinderellaDarkAbility1",
+          "conditionedAbilityEffects": [
+            "CinderellaDarkAbilityStrong1"
+          ],
+          "recommendEffectWhenUsable": -1,
+          "flags": [
+            "StealthWorthy"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.5,
+            0.45,
+            0.3,
+            0
+          ],
+          "prefabs": [
+            "batfx_common/batfx_purplebase1",
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_cinderelladark1/batfx_glassorb1",
+            "batfx_cinderelladark1/batfx_glassbeam1",
+            "batfx_cinderelladark1/batfx_glassdmg1",
+            "batsfx_prefab/batsfx_bluntimpact1"
+          ],
+          "sortOrderOffset": [
+            -2,
+            0,
+            2,
+            2,
+            2,
+            0
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            false,
+            false,
+            true
+          ],
+          "boneToAttachTo": [
+            "bone11",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "AttackPlus50Percent1TurnOnly": {
+            "class": "Buff",
+            "stackName": "AttackPlus50Percent",
+            "behaviors": [
+              "RemoveAfterTurnsBehavior",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "turnCount": 1,
+                "scalorStatBonuses": {
+                  "Attack": 0.5
+                }
+              },
+              {
+                "name": "AttackMinus25Percent"
+              }
+            ],
+            "iconSpriteName": "IconRedRage01",
+            "showAsTimer": true,
+            "duration": -1
+          },
+          "GainMomentum": {
+            "class": "Buff",
+            "stackName": "MomentumReady",
+            "duration": -1,
+            "isHiddenFromPlayers": true,
+            "applyConditions": "NotLostMomentum"
+          },
+          "GiveTurn": {
+            "class": "Buff",
+            "behaviors": [
+              "GiveTurn"
+            ],
+            "behaviorOverrides": [
+              {}
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "textKeyToShowWhenApplied": "TurnGivenKey",
+            "isHiddenFromPlayers": true
+          },
+          "IgnoreBlockDeath": {
+            "class": "Buff",
+            "behaviors": [
+              "DamageFlagContributor"
+            ],
+            "behaviorOverrides": [
+              {
+                "flags": [
+                  "IgnoreBlockDeath"
+                ]
+              }
+            ],
+            "duration": -1,
+            "showAsTimer": false,
+            "iconSpriteName": "IconRedHoldIgnore01",
+            "isHiddenFromPlayers": true
+          },
+          "JustGivenTurn": {
+            "class": "Buff",
+            "duration": 1,
+            "stackName": "JustGivenTurnBuff",
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "isHiddenFromPlayers": true,
+            "noIconShownOnBattleStatus": true
+          },
+          "LoseMomentum": {
+            "class": "Buff",
+            "stackName": "LoseMomentum",
+            "duration": 0,
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "MomentumReady"
+              }
+            ],
+            "isHiddenFromPlayers": true,
+            "applyConditions": "HasDamagedWithAttack"
+          },
+          "OnExtraTurn": {
+            "class": "Buff",
+            "stackName": "OnExtraTurn",
+            "duration": 1,
+            "isHiddenFromPlayers": true
+          },
+          "PowerCharge": {
+            "class": "Buff",
+            "stackName": "PowerCharge",
+            "duration": -1,
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "iconSpriteName": "IconPowerCharge01"
+          }
+        },
+        "attackScalors": {
+          "GoodWithMomentum": {
+            "class": "AttackScalor",
+            "sourceCondition": "HasDamagedWithAttack"
+          }
+        },
+        "conditions": {
+          "HasDamagedWithAttack": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "MomentumReady"
+            ]
+          },
+          "OnExtraTurn": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "OnExtraTurn"
+            ]
+          }
+        }
+      },
+      "PowerBlastDoubleACinderellaDarkBoss": {
+        "id": "PowerBlastDoubleACinderellaDarkBoss",
+        "found": true,
+        "localization": {
+          "name": "Demolition Raid",
+          "description": "Consumes a Power Charge for 600% damage to 2 enemies. This attack ignores enemy damage reduction effects. Usable only if the user has a Power Charge.",
+          "selected": "600% damage to 2 enemies using a Power Charge"
+        },
+        "ability": {
+          "name": "PowerBlastDoubleACinderellaDarkBoss",
+          "class": "Ability",
+          "abilityScalor": 5,
+          "config": "PowerBlastDoubleACinderellaDarkBoss",
+          "tuCost": 70,
+          "useLimit": 0,
+          "nameKey": "PowerBlastDoubleAMechaBride",
+          "descriptionKey": "PowerBlastDoubleAMechaBride",
+          "spiritCost": 0,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageFlags": [
+                "IgnoreArmor",
+                "IgnoreBlockDeath"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "RemovePowerCharge"
+              ],
+              "applyToTargetType": "Source",
+              "skipAbilityEffect": true
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "CinderellaDarkAbility2",
+          "useCondition": "HasPowerCharge",
+          "flags": [
+            "StealthWorthy"
+          ],
+          "ignoreEffectForSourceEvent": true
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            1.1,
+            0.4,
+            0,
+            0.1,
+            0,
+            0,
+            0.3,
+            0,
+            0.3,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batfx_cinderelladark1/batfx_purpleblocker1",
+            "batfx_cinderelladark1/batfx_tailwindcindark1",
+            "batfx_cinderelladark1/batfx_darkwrap1",
+            "batfx_cinderelladark1/batfx_clothchain1",
+            "batfx_cinderelladark1/batfx_clothchain2",
+            "batfx_roundtablebride1/batfx_chainhit1",
+            "batfx_cinderelladark1/batfx_impactglass3",
+            "batsfx_prefab/batsfx_chains1",
+            "batfx_elminaslash2/batfx_elminaslash2",
+            "batsfx_prefab/batsfx_slash1",
+            "batfx_elminaslash2/batfx_elminaslash2",
+            "batsfx_prefab/batsfx_slash1",
+            "batfx_cinderelladark1/batfx_impactglass2"
+          ],
+          "sortOrderOffset": [
+            -35,
+            -5,
+            -2,
+            2,
+            2,
+            3,
+            50,
+            3,
+            100,
+            -2,
+            100,
+            -2,
+            5
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle2"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            true,
+            false,
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "positionInBattlefieldCenter": [
+            true,
+            true,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "IgnoreBlockDeath": {
+            "class": "Buff",
+            "behaviors": [
+              "DamageFlagContributor"
+            ],
+            "behaviorOverrides": [
+              {
+                "flags": [
+                  "IgnoreBlockDeath"
+                ]
+              }
+            ],
+            "duration": -1,
+            "showAsTimer": false,
+            "iconSpriteName": "IconRedHoldIgnore01",
+            "isHiddenFromPlayers": true
+          },
+          "RemovePowerCharge": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "PowerCharge"
+              }
+            ],
+            "duration": 0,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "HasPowerCharge": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "PowerCharge"
+            ],
+            "or": {
+              "class": "MonsterConditions",
+              "monsterTags": [
+                "PowerCharge"
+              ]
+            }
+          }
+        }
+      },
+      "JealousSpiritLoss0ACinderellaDarkBoss": {
+        "id": "JealousSpiritLoss0ACinderellaDarkBoss",
+        "found": true,
+        "localization": {
+          "name": "Soul Fracture",
+          "description": "The Enemy team loses all Spirit. This skill becomes locked for 150TU after use.",
+          "selected": "Sets enemy Spirit to 0."
+        },
+        "ability": {
+          "name": "JealousSpiritLoss0ACinderellaDarkBoss",
+          "class": "Ability",
+          "config": "JealousSpiritLoss0ACinderellaDarkBoss",
+          "tuCost": 50,
+          "useLimit": 0,
+          "spiritCost": 0,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "SelfOnly",
+          "components": [
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "EnemySpiritLoss0",
+                "JealousSpiritLoss0ACooldown"
+              ],
+              "applyToSourceOnly": true
+            }
+          ],
+          "flags": [
+            "SpiritDrain",
+            "SpiritGain"
+          ],
+          "sourceEventType": "Hit",
+          "abilityEffect": "CinderellaDarkAttack1",
+          "useCondition": "NotJealousSpiritLoss0ACooldown"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "selfOnly": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.5,
+            0.45,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batfx_common/batfx_purplebase1",
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_cinderelladark1/batfx_glassorb1",
+            "batfx_cinderelladark1/batfx_glassbeam2",
+            "batfx_cinderelladark1/batfx_brokenspirit1",
+            "batsfx_prefab/batsfx_ring1"
+          ],
+          "sortOrderOffset": [
+            -2,
+            0,
+            2,
+            2,
+            2,
+            0
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1"
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            false,
+            false,
+            true,
+            true,
+            false
+          ],
+          "boneToAttachTo": [
+            "bone11",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "EnemySpiritLoss0": {
+            "class": "Buff",
+            "behaviors": [
+              "AddSpirit"
+            ],
+            "behaviorOverrides": [
+              {
+                "percentOfMax": -1,
+                "toEnemyTeam": true
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "JealousSpiritLoss0ACooldown": {
+            "class": "Buff",
+            "stackName": "JealousSpiritLoss0ACooldown",
+            "duration": 150,
+            "isHiddenFromPlayers": false,
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "iconSpriteName": "IconBlueCountdownClock3"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "NotJealousSpiritLoss0ACooldown": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "JealousSpiritLoss0ACooldown"
+              ]
+            }
+          }
+        }
+      },
+      "BloodfuryChargeStormACinderellaDarkBoss": {
+        "id": "BloodfuryChargeStormACinderellaDarkBoss",
+        "found": true,
+        "localization": {
+          "name": "Crimson Storm",
+          "description": "600% damage to 1 enemy. This attack ignores enemy damage reduction effects. The user will also gain a power charge. Usable if the user has defeated 1+ units with attacks while on the battlefield.\n\nThis skill becomes locked after use until the user deals damage with another attack.",
+          "selected": "600% damage to 1 enemy, + Power Charge"
+        },
+        "ability": {
+          "name": "BloodfuryChargeStormACinderellaDarkBoss",
+          "class": "Ability",
+          "abilityScalor": 5,
+          "config": "BloodfuryChargeStormACinderellaDarkBoss",
+          "tuCost": 1,
+          "useLimit": 0,
+          "spiritCost": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageFlags": [
+                "IgnoreArmor",
+                "IgnoreBlockDeath"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "PowerCharge"
+              ],
+              "applyConditions": "HasDamagedWithAttack",
+              "showMissConditions": "ShowNoMiss",
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "DamagePact"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "enemyEventType": "Finish",
+          "sourceEventType": "Hit",
+          "ignoreEffectForSourceEvent": true,
+          "useCondition": "Kills1NoDamagePact",
+          "flags": [
+            "Heal",
+            "1KillTrigger",
+            "StealthWorthy"
+          ],
+          "abilityEffect": "CinderellaDarkSpecial1",
+          "recommendEffectWhenUsable": 1
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.7,
+            0,
+            0,
+            0.6,
+            0,
+            0.5,
+            0,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batfx_cinderelladark1/batfx_tailwindcindark1",
+            "batfx_jumpsmoke1/batfx_jumpsmoke1",
+            "batfx_cinderelladark1/batfx_rapiercombo1",
+            "batsfx_prefab/batsfx_multislash2",
+            "batfx_common/batfx_empty",
+            "batfx_cinderelladark1/batfx_quickcharge2",
+            "batfx_cinderella1/batfx_whitefloorwave1",
+            "batfx_cinderelladark1/batfx_thrust3",
+            "batfx_cinderelladark1/batfx_finish5",
+            "batfx_common/batfx_empty",
+            "batsfx_prefab/batsfx_slash1"
+          ],
+          "sortOrderOffset": [
+            -5,
+            -2,
+            2,
+            0,
+            2,
+            50,
+            -2,
+            10,
+            10,
+            10,
+            0
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            true,
+            false,
+            false,
+            false,
+            true
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "DamagePact": {
+            "class": "Buff",
+            "behaviors": [
+              "BuffChanceOnHit"
+            ],
+            "stackName": "DamagePact",
+            "behaviorOverrides": [
+              {
+                "selfBuffs": [
+                  "RemoveDamagePact"
+                ],
+                "chance": 1.0
+              }
+            ],
+            "duration": -1,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "Heal": {
+            "class": "Buff",
+            "behaviors": [
+              "AdjustHp"
+            ],
+            "behaviorOverrides": [
+              {
+                "percent": 0.3,
+                "abilityEffect": "Blank",
+                "hpboosts": [
+                  "HealBoost"
+                ]
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "IgnoreBlockDeath": {
+            "class": "Buff",
+            "behaviors": [
+              "DamageFlagContributor"
+            ],
+            "behaviorOverrides": [
+              {
+                "flags": [
+                  "IgnoreBlockDeath"
+                ]
+              }
+            ],
+            "duration": -1,
+            "showAsTimer": false,
+            "iconSpriteName": "IconRedHoldIgnore01",
+            "isHiddenFromPlayers": true
+          },
+          "PowerCharge": {
+            "class": "Buff",
+            "stackName": "PowerCharge",
+            "duration": -1,
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "iconSpriteName": "IconPowerCharge01"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "HasDamagedWithAttack": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "MomentumReady"
+            ]
+          },
+          "Kills1NoDamagePact": {
+            "class": "MonsterConditions",
+            "killsMade": 1,
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "DamagePact"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "passives": {
+      "SpiritDrainDamageReduction": {
+        "id": "SpiritDrainDamageReduction",
+        "found": true,
+        "localization": {
+          "name": "Tempered Envy",
+          "description": "This unit steals 1 Spirit from the enemy team whenever this unit deals damage with an attack. Attacks that target multiple enemies will trigger this once for each enemy they damage.\n\nThis unit has 65% damage reduction from attacks unless this unit has defeated an enemy while on the battlefield."
+        }
+      },
+      "IgnoreHoldGroundSpiritDrainRevengeCinderellaDarkBoss": {
+        "id": "IgnoreHoldGroundSpiritDrainRevengeCinderellaDarkBoss",
+        "found": true,
+        "localization": {
+          "name": "Draining Revenge",
+          "description": "Whenever this unit is defeated by an enemy, steals Spirit from the enemy team until either ally Spirit reaches 10, or enemy Spirit reaches 0."
+        }
+      },
+      "StunImmunity": {
+        "id": "StunImmunity",
+        "found": true,
+        "localization": {
+          "name": "Stun Immunity",
+          "description": "This unit is not affected by stun effects."
+        }
+      },
+      "SleepImmunity": {
+        "id": "SleepImmunity",
+        "found": true,
+        "localization": {
+          "name": "Sleep Immunity",
+          "description": "This unit is not affected by sleep effects."
+        }
+      },
+      "KnockbackImmunity": {
+        "id": "KnockbackImmunity",
+        "found": true,
+        "localization": {
+          "name": "Immovable",
+          "description": "This unit cannot be sent to the reinforcements from the battlefield."
+        }
+      },
+      "HoldGround": {
+        "id": "HoldGround",
+        "found": true,
+        "localization": {
+          "name": "Hold Ground",
+          "description": "If this unit would be defeated by an enemy attack or a status effect while having more than 1 HP, it instead survives with 1 HP."
+        }
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": null
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "CinderellaDarkBoss03",
+    "family": "CinderellaDarkBoss",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "CinderellaDarkBoss03",
+    "class": "Monster",
+    "family": "CinderellaDarkBoss",
+    "activeSkills": {
+      "0": "AngryChargingBlastACinderellaDarkBoss",
+      "1": "PowerBlastDoubleACinderellaDarkBoss",
+      "2": "JealousSpiritLoss0ACinderellaDarkBoss",
+      "3": "BloodfuryChargeStormACinderellaDarkBoss"
+    },
+    "passives": {
+      "0": "SpiritDrainDamageReduction",
+      "1": "IgnoreHoldGroundSpiritDrainRevengeCinderellaDarkBoss",
+      "2": "StunImmunity",
+      "3": "SleepImmunity",
+      "4": "KnockbackImmunity",
+      "5": "HoldGround"
+    },
+    "cost": 999,
+    "baseAttack": 2400,
+    "baseMaxHp": 300000,
+    "speed": 705,
+    "element": "Death",
+    "weaponPref": "Sword",
+    "weaponPivotIndex": 0,
+    "walkSound": "TestSound",
+    "secure": 1,
+    "aiTargetPickWeight": 1,
+    "stars": 6,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 1,
+    "battleOrbImageFlip": 0,
+    "skillVoices": {
+      "0": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "1": [
+        13,
+        14,
+        15,
+        16
+      ],
+      "2": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "3": [
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    "damageVoices": [
+      17,
+      18,
+      19,
+      20
+    ],
+    "deathVoices": [
+      21,
+      22,
+      23,
+      24
+    ]
+  },
+  "_build": {
+    "scriptVersion": "6-character-family-states",
+    "sourceHash": "ec68711e8b4302de21aaba3381c4a5ca308d8cf748312865d89060beb7c69d23",
+    "dependencyHash": "d72cc3a33f72f76e9140ff5c956f8b99c59a12ac15e156708116c7706eb26b83",
+    "generatedAt": 1778213446
+  }
+}

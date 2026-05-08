@@ -1,0 +1,1256 @@
+{
+  "schemaVersion": 3,
+  "order": 579,
+  "id": "rapunzel",
+  "name": "Rapunzel",
+  "title": "Lady of the Tower",
+  "description": "She often climbs to the top of her tower. The night sky seems so close from there... But she still can't reach the stars, and with the additional distance from the ground, she feels even more lonely than usual; painfully aware that she won't be leaving this place, not today.\nShe wonders if her beloved stars watch her sometimes, just like she watches them.",
+  "category": "character",
+  "rarity": null,
+  "stars": 6,
+  "evolvedStars": 6,
+  "element": "Light",
+  "weaponType": "Sword",
+  "stats": {
+    "atk": 1387,
+    "hp": 7485,
+    "spd": 453,
+    "cost": 34
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/RapunzelRegular02.png",
+  "refs": {
+    "activeSkills": [
+      "SurgicalAttackARapunzelRegular",
+      "SuperPurifierARapunzelRegular",
+      "PowerBlastPurifyARapunzelRegular",
+      "HasSleptSlayerARapunzelRegular"
+    ],
+    "passives": [
+      "HardToKillRapunzelRegular",
+      "EnemyTakeDownBuffRapunzelRegular",
+      "PlusHPBoostLv3",
+      "PlusAttackBoostLv3",
+      "Stun20TUMinus",
+      "AddWeaponPrefAxe"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": "HPUpLifeD",
+    "leaderBuffCondition": "IsLife",
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "SurgicalAttackARapunzelRegular": {
+        "id": "SurgicalAttackARapunzelRegular",
+        "found": true,
+        "localization": {
+          "name": "Surgical Strike",
+          "description": "Targets 1 enemy and ignores Guardians. If no enemies are sleeping, deals 100% damage, and then grants that enemy the Sleep status effect for 200TU, even if they have already slept while on the battlefield. Sleep will overwrite other status effects on that enemy. If an enemy is sleeping, deals 400% damage instead, Weakens the target and grants the user a Power Charge.\n\nWeakened units have their Attack reduced to 0.75x until the end of their next turn. Weakening will overwrite any existing Weak or Enrage effects on the target and can be overwritten by Enrage effects. The effect of Weakening may be diminished if the affected unit's Attack is increased by other effects.\n\nPower Charges can be consumed by certain skills to activate or enhance their effects. Power Charges will be removed if this unit leaves the battlefield. Power Charges cannot stack.",
+          "selected": "100%+ damage to 1 enemy & charges user"
+        },
+        "ability": {
+          "name": "SurgicalAttackARapunzelRegular",
+          "class": "Ability",
+          "abilityScalor": 0,
+          "conditionalAbilityScalors": [
+            3
+          ],
+          "config": "SurgicalAttackARapunzelRegular",
+          "tuCost": 50,
+          "useLimit": 0,
+          "spiritGain": 1,
+          "blockTargetManipulation": 1,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "SleepForced"
+              ],
+              "applyToTargetType": "Enemy",
+              "applyConditions": "HasNoSleepingInTeam"
+            },
+            {
+              "buffs": [
+                "AttackMinus25Percent1TurnOnly"
+              ],
+              "applyToTargetType": "Enemy",
+              "applyConditions": "HasSleepingInTeam",
+              "showMissConditions": "ShowNoMiss"
+            },
+            {
+              "buffs": [
+                "PowerCharge"
+              ],
+              "applyToTargetType": "Source",
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss",
+              "applyConditions": "EnemyHasSleepingInTeam"
+            }
+          ],
+          "attackScalors": [
+            "GoodWithSleepingEnemy"
+          ],
+          "conditionedAbilityEffects": [
+            "RapunzelAbility1Strong"
+          ],
+          "sourceEventType": "Finish",
+          "enemyEventType": "Hit",
+          "abilityEffect": "RapunzelAbility1Weak",
+          "flags": [
+            "SleepChance"
+          ],
+          "recommendEffectWhenUsable": 1
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.3,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_rapunzelability1/batfx_holybombsmall2",
+            "batfx_rapunzelability1/batfx_impactmagic3",
+            "batsfx_prefab/batsfx_bluntimpact1",
+            "batfx_rapunzelability1/batfx_holybombsmall1"
+          ],
+          "sortOrderOffset": [
+            -2,
+            3,
+            1,
+            -2,
+            1
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            true,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "AttackMinus25Percent1TurnOnly": {
+            "class": "Buff",
+            "stackName": "AttackMinus25Percent",
+            "behaviors": [
+              "RemoveAfterTurnsBehavior",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "turnCount": 1,
+                "scalorStatBonuses": {
+                  "Attack": -0.3333333
+                }
+              },
+              {
+                "name": "AttackPlus50Percent"
+              },
+              {
+                "name": "RageCount1Icon"
+              },
+              {
+                "name": "RageCount2Icon"
+              },
+              {
+                "name": "RageCount3Icon"
+              }
+            ],
+            "iconSpriteName": "IconRedWeak01",
+            "showAsTimer": true,
+            "duration": -1
+          },
+          "PowerCharge": {
+            "class": "Buff",
+            "stackName": "PowerCharge",
+            "duration": -1,
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "iconSpriteName": "IconPowerCharge01"
+          },
+          "SleepForced": {
+            "class": "Buff",
+            "stackName": "Sleep",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "LoseTurn",
+              "RemoveOnHurt"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "PurifyChain"
+              },
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "name": "AutoPurifyAfterTurnNoSleep"
+              },
+              {},
+              {
+                "ignoreIfHurtBySelf": true,
+                "cancelFromDamageFlags": [
+                  "DoNotWake"
+                ]
+              }
+            ],
+            "duration": 200,
+            "showAsTimer": true,
+            "statusEffect": "SleepStatus",
+            "statusEffectOffset": 0.1,
+            "iconSpriteName": "IconWhiteSleepZs01",
+            "textKeyToShowWhenApplied": "SleepKey",
+            "canBePurified": true
+          }
+        },
+        "attackScalors": {
+          "GoodWithSleepingEnemy": {
+            "class": "AttackScalor",
+            "targetCondition": "HasSleepingInTeam"
+          }
+        },
+        "conditions": {
+          "EnemyHasSleepingInTeam": {
+            "class": "MonsterConditions",
+            "checkEnemyTeamOfMonster": true,
+            "enemyTeamMonsterConditionMatchesNeeded": {
+              "IsSleeping": 1
+            }
+          },
+          "HasNoSleepingInTeam": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "checkEnemyTeamOfMonster": true,
+              "myTeamMonsterConditionMatchesNeeded": {
+                "IsSleeping": 1
+              }
+            }
+          },
+          "HasSleepingInTeam": {
+            "class": "MonsterConditions",
+            "myTeamMonsterConditionMatchesNeeded": {
+              "IsSleeping": 1
+            }
+          }
+        }
+      },
+      "SuperPurifierARapunzelRegular": {
+        "id": "SuperPurifierARapunzelRegular",
+        "found": true,
+        "localization": {
+          "name": "Golden Purify",
+          "description": "Removes negative status effects like Sleep, Burn or Poison from 2 other allies and grants them either a Sleep Ward or Poison Ward at random. If a status effect is removed by this skill, the user is Enraged. Allies gain 1 Spirit for each status effect removed by this skill. This skill becomes locked for 50TU after use.\n\nAn Enraged unit's attack is increased to 1.5x until the end of their next turn. Enrage will overwrite any existing Weak or Enrage effects on the user. Each Ward prevents their named effect from being applied once, then is removed. Identical Wards cannot stack. Cannot be used if the user is alone on the battlefield, and will not remove negative status effects from the user if they are targeted.",
+          "selected": "Removes bad effects, may Enrage + add Spirit"
+        },
+        "ability": {
+          "name": "SuperPurifierARapunzelRegular",
+          "class": "Ability",
+          "config": "SuperPurifierARapunzelRegular",
+          "tuCost": 1,
+          "useLimit": 0,
+          "spiritGain": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Ally",
+          "components": [
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "AttackPlus50Percent1TurnOnly",
+                "SpiritGainD"
+              ],
+              "applyToTargetType": "Friendly",
+              "buffBackMode": true,
+              "applyConditions": "IsNotActingAndHasNegativeStatusEffect",
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "RemoveBuffs"
+              ],
+              "applyToTargetType": "Friendly",
+              "applyConditions": "IsNotActing"
+            },
+            {
+              "randomBuffFromList": [
+                "PoisonImmunityOnce",
+                "SleepImmunityOnce"
+              ],
+              "showMissConditions": "ShowNoMiss",
+              "skipAbilityEffect": true,
+              "applyToTargetType": "Friendly",
+              "applyConditions": "IsNotActing"
+            },
+            {
+              "buffs": [
+                "RapunzelRegularCooldown50"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "friendlyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "RapunzelPurify1",
+          "flags": [
+            "Purify",
+            "PurifyBonus"
+          ],
+          "useCondition": "NotInstantCooldownNotAlone",
+          "immuneSuggestionCondition": "IsActingAndHasImmuneFromPurifyStatusEffect"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "friendlyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.3,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_rapunzelability1/batfx_holybombsmall2",
+            "batsfx_prefab/batsfx_heal1",
+            "batfx_rapunzelability1/batfx_purifygold1"
+          ],
+          "sortOrderOffset": [
+            2,
+            3,
+            2,
+            2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "AttackPlus50Percent1TurnOnly": {
+            "class": "Buff",
+            "stackName": "AttackPlus50Percent",
+            "behaviors": [
+              "RemoveAfterTurnsBehavior",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "turnCount": 1,
+                "scalorStatBonuses": {
+                  "Attack": 0.5
+                }
+              },
+              {
+                "name": "AttackMinus25Percent"
+              }
+            ],
+            "iconSpriteName": "IconRedRage01",
+            "showAsTimer": true,
+            "duration": -1
+          },
+          "PoisonImmunityOnce": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity"
+            ],
+            "stackName": "PoisonImmunityOnce",
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Poison"
+                ],
+                "useLimit": 1
+              }
+            ],
+            "duration": -1,
+            "showAsTimer": true,
+            "tags": [
+              "PoisonImmuneTemp"
+            ],
+            "iconSpriteName": "IconRedPoisonInvalid01"
+          },
+          "RapunzelRegularCooldown50": {
+            "class": "Buff",
+            "duration": 50,
+            "stackName": "InstantCooldown",
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "iconSpriteName": "IconBlueCountdownClock3"
+          },
+          "RemoveBuffs": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "SleepImmunityOnce": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity"
+            ],
+            "stackName": "SleepImmunityOnce",
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Sleep"
+                ],
+                "useLimit": 1
+              }
+            ],
+            "duration": -1,
+            "showAsTimer": true,
+            "tags": [
+              "SleepImmuneTemp"
+            ],
+            "iconSpriteName": "IconRedSleepInvalidZs01"
+          },
+          "SpiritGainD": {
+            "class": "Buff",
+            "behaviors": [
+              "AddSpirit"
+            ],
+            "behaviorOverrides": [
+              {
+                "percentOfMax": 0.1
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "IsActingAndHasImmuneFromPurifyStatusEffect": {
+            "class": "MonsterConditions",
+            "currentTULessThan": 0,
+            "or": {
+              "class": "MonsterConditions",
+              "monsterTags": [
+                "HealingBurn"
+              ],
+              "or": {
+                "class": "MonsterConditions",
+                "monsterTags": [
+                  "SilentBurn"
+                ],
+                "or": {
+                  "class": "MonsterConditions",
+                  "monsterTags": [
+                    "LethalPoison"
+                  ]
+                }
+              }
+            }
+          },
+          "IsNotActing": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "currentTULessThan": 0
+            }
+          },
+          "IsNotActingAndHasNegativeStatusEffect": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "currentTULessThan": 0
+            },
+            "and": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "Freeze"
+              ],
+              "or": {
+                "class": "MonsterConditions",
+                "buffStackNames": [
+                  "Poison"
+                ],
+                "not": {
+                  "class": "MonsterConditions",
+                  "monsterTags": [
+                    "LethalPoison"
+                  ]
+                },
+                "or": {
+                  "class": "MonsterConditions",
+                  "buffStackNames": [
+                    "Sleep"
+                  ],
+                  "or": {
+                    "class": "MonsterConditions",
+                    "buffStackNames": [
+                      "Decay"
+                    ],
+                    "or": {
+                      "class": "MonsterConditions",
+                      "buffStackNames": [
+                        "SpiritLeaking"
+                      ],
+                      "or": {
+                        "class": "MonsterConditions",
+                        "buffStackNames": [
+                          "SpiritLeakReady"
+                        ],
+                        "or": {
+                          "class": "MonsterConditions",
+                          "buffStackNames": [
+                            "Burn"
+                          ],
+                          "not": {
+                            "class": "MonsterConditions",
+                            "monsterTags": [
+                              "HealingBurn"
+                            ],
+                            "or": {
+                              "class": "MonsterConditions",
+                              "monsterTags": [
+                                "SilentBurn"
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "NotInstantCooldownNotAlone": {
+            "class": "MonsterConditions",
+            "allyTeamSize": 2,
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "InstantCooldown"
+              ]
+            }
+          }
+        }
+      },
+      "PowerBlastPurifyARapunzelRegular": {
+        "id": "PowerBlastPurifyARapunzelRegular",
+        "found": true,
+        "localization": {
+          "name": "Golden Bolts",
+          "description": "500% damage to 2 enemies. If the user has a Power Charge, it will be consumed to deal 750% damage instead. This attack ignores damage reduction effects. Removes Burn and Poison status effects (including Lethal Poison) from the user and grants the user Recovery Mist for 100TU. Recovery Mist effects do not stack. Usable if the user has a Power Charge or a Burn or Poison status effect.\n\nA unit with Recovery Mist will heal for 5% of their max HP and have a 30% chance to be Purified after every turn.",
+          "selected": "500%+ damage, user gains Recovery Mist"
+        },
+        "ability": {
+          "name": "PowerBlastPurifyARapunzelRegular",
+          "class": "Ability",
+          "abilityScalor": 4,
+          "conditionalAbilityScalors": [
+            6.5
+          ],
+          "config": "PowerBlastPurifyARapunzelRegular",
+          "tuCost": 70,
+          "useLimit": 0,
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageFlags": [
+                "IgnoreArmor"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "RemovePowerCharge",
+                "RemovePoison",
+                "RemoveBurn",
+                "100TUHeal5PercentHPAnd30PercentChancePurify"
+              ],
+              "applyToTargetType": "Source",
+              "skipAbilityEffect": true
+            }
+          ],
+          "attackScalors": [
+            "GoodWithPowerCharge"
+          ],
+          "conditionedAbilityEffects": [
+            "RapunzelAbility2"
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "RapunzelAbility2",
+          "useCondition": "HasPowerChargeOrBurnOrPoison",
+          "flags": [
+            "StealthWorthy"
+          ],
+          "ignoreEffectForSourceEvent": true,
+          "recommendEffectWhenUsable": 1
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.1,
+            0,
+            0,
+            1.2,
+            0,
+            0,
+            0,
+            0.1
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_whoosh1",
+            "batfx_casting6/batfx_casting6",
+            "batfx_rapunzelability2/batfx_holythrow1",
+            "batfx_rapunzelability2/batfx_magicnuke8",
+            "batfx_rapunzelability2/batfx_thunderscissor1",
+            "batsfx_prefab/batsfx_slash1",
+            "batfx_rapunzelspecial1/batfx_holybomb1",
+            "batsfx_prefab/batsfx_bomb1"
+          ],
+          "sortOrderOffset": [
+            0,
+            -2,
+            2,
+            0,
+            2,
+            2,
+            1,
+            0
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            false,
+            false,
+            true,
+            false,
+            true
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "100TUHeal5PercentHPAnd30PercentChancePurify": {
+            "class": "Buff",
+            "behaviors": [
+              "BuffOnMonsterTurn",
+              "PurifySelfOnMonsterTurn"
+            ],
+            "behaviorOverrides": [
+              {
+                "selfBuffs": [
+                  "Heal5PercentHP"
+                ],
+                "activeMonsterConditions": "AlwaysTrue"
+              },
+              {
+                "spreadCondition": "30PercentChance",
+                "activeMonsterConditions": "AlwaysTrue"
+              }
+            ],
+            "stackName": "Heal5PercentHPAnd30PercentChancePurify",
+            "duration": 100,
+            "showAsPermanent": false,
+            "showAsTimer": true,
+            "iconSpriteName": "IconGreenPurify01"
+          },
+          "RemoveBurn": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "RemoveMegaHealingBurnApplyHealingBurn"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "RemovePoison": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "Poison"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "RemovePowerCharge": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "PowerCharge"
+              }
+            ],
+            "duration": 0,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {
+          "GoodWithPowerCharge": {
+            "class": "AttackScalor",
+            "sourceCondition": "HasPowerCharge"
+          }
+        },
+        "conditions": {
+          "HasPowerChargeOrBurnOrPoison": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "PowerCharge"
+            ],
+            "or": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "Burn"
+              ],
+              "or": {
+                "class": "MonsterConditions",
+                "buffStackNames": [
+                  "Poison"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "HasSleptSlayerARapunzelRegular": {
+        "id": "HasSleptSlayerARapunzelRegular",
+        "found": true,
+        "localization": {
+          "name": "Crackling Smite",
+          "description": "This attack ignores Guardians. 600% damage to 1 enemy if they are awake after having fallen asleep while on the battlefield. This attack ignores any effects of non-boss enemies that would prevent the target from being defeated.",
+          "selected": "600% damage to has slept targets\nIgnores Guardians & defeat prevention"
+        },
+        "ability": {
+          "name": "HasSleptSlayerARapunzelRegular",
+          "class": "Ability",
+          "abilityScalor": -1,
+          "conditionalAbilityScalors": [
+            5
+          ],
+          "config": "HasSleptSlayerARapunzelRegular",
+          "tuCost": 100,
+          "useLimit": 0,
+          "spiritCost": 2,
+          "blockTargetManipulation": 1,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage"
+          ],
+          "componentOverrides": [
+            {
+              "damageFlags": [
+                "HardIgnoreBlockDeath"
+              ],
+              "applyToTargetType": "Enemy"
+            }
+          ],
+          "attackScalors": [
+            "GoodVsHasSlept"
+          ],
+          "conditionedAbilityEffects": [
+            "RapunzelSpecial1",
+            "RapunzelSpecial1"
+          ],
+          "enemyEventType": "Hit",
+          "abilityEffect": "SmallHitRanged1",
+          "flags": [
+            "HasSleptEater"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.8,
+            0
+          ],
+          "prefabs": [
+            "batfx_bluntimpact1/batfx_bluntimpact1",
+            "batsfx_prefab/batsfx_impactsmall1"
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            true
+          ],
+          "scale": [
+            0.4,
+            1
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          }
+        },
+        "buffs": {},
+        "attackScalors": {
+          "GoodVsHasSlept": {
+            "class": "AttackScalor",
+            "targetCondition": "HasSleptButNotSleeping"
+          }
+        },
+        "conditions": {}
+      }
+    },
+    "passives": {
+      "HardToKillRapunzelRegular": {
+        "id": "HardToKillRapunzelRegular",
+        "found": true,
+        "localization": {
+          "name": "Golden Shield",
+          "description": "This unit cannot be defeated by damage from Burn status effects. If this unit would be defeated by an enemy attack or other status effect while having more than 1 HP, it instead survives with 1 HP.\n\nThis unit will heal 30% of max HP on every ally turn.\n\nEach time a sleeping enemy gets the turn, removes Sleep status effects from this unit and this unit is Enraged."
+        }
+      },
+      "EnemyTakeDownBuffRapunzelRegular": {
+        "id": "EnemyTakeDownBuffRapunzelRegular",
+        "found": true,
+        "localization": {
+          "name": "Grand Takedown",
+          "description": "When this unit defeats 1 or more enemy units with an attack, it grants:\n- This unit a Power Charge.\n- A random non-sleeping enemy the Sleep status effect for 200TU, even if they have already slept while on the battlefield.\n- Recovery Mist for 100TU to a random ally that doesn't already have Recovery Mist."
+        }
+      },
+      "PlusHPBoostLv3": {
+        "id": "PlusHPBoostLv3",
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv3",
+          "description": "Adds 1200 to this unit's max HP."
+        }
+      },
+      "PlusAttackBoostLv3": {
+        "id": "PlusAttackBoostLv3",
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv3",
+          "description": "Adds 300 to this unit's Attack."
+        }
+      },
+      "Stun20TUMinus": {
+        "id": "Stun20TUMinus",
+        "found": true,
+        "localization": {
+          "name": "Stun Resist Lv3",
+          "description": "Reduces the amount of any stun effects against this unit by 20TU."
+        }
+      },
+      "AddWeaponPrefAxe": {
+        "id": "AddWeaponPrefAxe",
+        "found": true,
+        "localization": {
+          "name": "Axe Mastery",
+          "description": "Can use weapon skills of Axes in addition to their original preferred weapon type."
+        }
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": {
+      "class": "MonsterConditions",
+      "elements": [
+        "Life"
+      ]
+    }
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "RapunzelRegular02",
+    "family": "RapunzelRegular",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "RapunzelRegular02",
+    "family": "RapunzelRegular",
+    "class": "Monster",
+    "leaderBuff": "HPUpLifeD",
+    "leaderBuffCondition": "IsLife",
+    "activeSkills": {
+      "0": "SurgicalAttackARapunzelRegular",
+      "1": "SuperPurifierARapunzelRegular",
+      "2": "PowerBlastPurifyARapunzelRegular",
+      "3": "HasSleptSlayerARapunzelRegular"
+    },
+    "passives": {
+      "0": "HardToKillRapunzelRegular",
+      "1": "EnemyTakeDownBuffRapunzelRegular",
+      "2": "PlusHPBoostLv3",
+      "3": "PlusAttackBoostLv3",
+      "4": "Stun20TUMinus",
+      "5": "AddWeaponPrefAxe"
+    },
+    "cost": 34,
+    "baseAttack": 1387,
+    "baseMaxHp": 7485,
+    "speed": 453,
+    "element": "Life",
+    "weaponPref": "Sword",
+    "weaponPivotIndex": 0,
+    "secure": 1,
+    "evolveFrom": "RapunzelRegular01",
+    "aiTargetPickWeight": 1,
+    "stars": 6,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 0,
+    "battleOrbImageFlip": 1,
+    "attackType": "Bash",
+    "formTwitterShare": 1,
+    "cosmoName": "RapunzelRegular03",
+    "cosmoBattleOrbImageFlip": 1,
+    "skillVoices": {
+      "0": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "1": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "2": [
+        9,
+        10,
+        11,
+        12
+      ],
+      "3": [
+        13,
+        14,
+        15,
+        16
+      ]
+    },
+    "damageVoices": [
+      17,
+      18,
+      19,
+      20
+    ],
+    "deathVoices": [
+      21,
+      22,
+      23,
+      24
+    ],
+    "victoryVoices": [
+      25,
+      26
+    ],
+    "lineupVoices": [
+      30,
+      31,
+      32
+    ],
+    "evolutionVoices": [
+      33
+    ],
+    "trainVoices": [
+      39,
+      40,
+      41,
+      42,
+      43
+    ],
+    "titleVoices": [
+      44
+    ],
+    "gachaVoices": [
+      45
+    ],
+    "loginVoices": [
+      46
+    ],
+    "tapVoices": [
+      47,
+      48,
+      49
+    ],
+    "idleVoices": [
+      50
+    ]
+  },
+  "_build": {
+    "scriptVersion": "6-character-family-states",
+    "sourceHash": "4e06357a5873646bc8265861ac2975960fce8edb72dd71cbabe0d56ff0a1a92c",
+    "dependencyHash": "28dc5ff3d7b97af77284d3be8031b7a95c4a5ad2bee2a50c88eff23945b8ac07",
+    "generatedAt": 1778213417
+  }
+}

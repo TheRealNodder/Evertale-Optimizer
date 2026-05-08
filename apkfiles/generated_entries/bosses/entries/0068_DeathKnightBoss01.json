@@ -1,0 +1,1591 @@
+{
+  "schemaVersion": 3,
+  "order": 68,
+  "id": "death-knight-boss-01",
+  "name": "DeathKnightBoss01",
+  "title": "",
+  "description": "",
+  "category": "bosse",
+  "rarity": null,
+  "stars": 6,
+  "evolvedStars": 4,
+  "element": "Dark",
+  "weaponType": "GreatSword",
+  "stats": {
+    "atk": 1700,
+    "hp": 95000,
+    "spd": 750,
+    "cost": 999
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/DeathKnight01.png",
+  "refs": {
+    "activeSkills": [
+      "PowerAttackSingleBoss1DeathKnight",
+      "BurnAllBoss1",
+      "PoisonTouchAllBoss2",
+      "StunAllButSelfBoss1",
+      "BurnForceBoss1",
+      "PoisonEaterDoubleBoss2",
+      "TimeStrikeDoubleBoss1",
+      "DesperateBiteBoss2"
+    ],
+    "passives": [
+      "HoldGroundBoss",
+      "Stun70TUMinus",
+      "Sleep50TUMinus",
+      "AttackUpIfBurningIconShowing",
+      "DamageReduceIfPoisoned"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": "DeathKnightBoss01Seq",
+    "leaderBuff": null,
+    "leaderBuffCondition": null,
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "PowerAttackSingleBoss1DeathKnight": {
+        "id": "PowerAttackSingleBoss1DeathKnight",
+        "found": true,
+        "localization": {
+          "name": "Power Blast",
+          "description": "300% damage to the target. Removes poison and burn from the user.",
+          "selected": "300% damage to the target"
+        },
+        "ability": {
+          "name": "PowerAttackSingleBoss1DeathKnight",
+          "class": "Ability",
+          "abilityScalor": 2,
+          "config": "PowerAttackSingleBoss1DeathKnight",
+          "tuCost": 1,
+          "useLimit": 0,
+          "nameKey": "PowerAttackSingleBoss1DeathKnight",
+          "descriptionKey": "PowerAttackSingleBoss1DeathKnight",
+          "spiritGain": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {},
+            {
+              "buffs": [
+                "RemoveBurnAndPoison"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Hit",
+          "abilityEffect": "MidDeath1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.3,
+            0.35,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_casting7/batfx_casting7",
+            "batfx_deathmid1/batfx_deathmid1",
+            "batsfx_prefab/batsfx_death1",
+            "batfx_ripplepurplelow/batfx_ripplepurplelow"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -2,
+            1,
+            -2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            true
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            true
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            true,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "RemoveBurnAndPoison": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Poison"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {}
+      },
+      "BurnAllBoss1": {
+        "id": "BurnAllBoss1",
+        "found": true,
+        "localization": {
+          "name": "Ignition",
+          "description": "Grants all units (enemy and ally) the Burn status effect. This will overwrite other status effects on those units. Any unit that deals damage to or is dealt damage by a unit with burn will also become burned.",
+          "selected": "Burns all allies and enemies\n(Will overwrite other status effects)"
+        },
+        "ability": {
+          "name": "BurnAllBoss1",
+          "class": "Ability",
+          "config": "BurnAllBoss1",
+          "tuCost": 70,
+          "useLimit": 0,
+          "nameKey": "BurnAllBoss1",
+          "descriptionKey": "BurnAllBoss1",
+          "spiritGain": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "All",
+          "components": [
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "Burn"
+              ]
+            }
+          ],
+          "enemyEventType": "Hit",
+          "friendlyEventType": "Hit",
+          "sourceEventType": "Hit",
+          "abilityEffect": "BurnSelf1",
+          "flags": [
+            "Burn"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "all": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_fire2",
+            "batfx_burnspiral/batfx_burnspiral"
+          ],
+          "sortOrderOffset": [
+            -2,
+            2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            1
+          ],
+          "damageHitReactions": [
+            false,
+            true
+          ],
+          "forceHitReactions": [
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "Burn": {
+            "class": "Buff",
+            "stackName": "Burn",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "DamageOverTime",
+              "BuffChanceOnHit",
+              "BuffWhenMonsterHurt"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "LockHasBurnedSkills"
+              },
+              {
+                "name": "SleepThorns"
+              },
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "percentOfTargetHp": 0.001,
+                "damageColor": "Red",
+                "abilityEffect": "BurnDamage1",
+                "bossDamageCap": 500,
+                "extraDamageFlag": "Burn"
+              },
+              {
+                "contextBuffs": [
+                  "BurnAfterTurn"
+                ],
+                "chance": 1.0
+              },
+              {
+                "contextBuffs": [
+                  "BurnAfterTurn",
+                  "RemovePoison"
+                ],
+                "spreadCondition": "IsNotBurnImmune",
+                "cancelFromDamageFlags": [
+                  "Sneak",
+                  "RemoveStatus"
+                ],
+                "cancelFromDamageTypes": [
+                  "BuffDamage"
+                ]
+              }
+            ],
+            "tags": [
+              "Burn"
+            ],
+            "canBePurified": true,
+            "duration": 300,
+            "statusEffect": "BurnStatus",
+            "statusEffectOffset": 0.1,
+            "damageType": "Burn",
+            "noIconShownOnBattleStatus": false,
+            "applyConditions": "IsNotBurning",
+            "showAsTimer": true,
+            "iconSpriteName": "IconRedBurn01"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {}
+      },
+      "PoisonTouchAllBoss2": {
+        "id": "PoisonTouchAllBoss2",
+        "found": true,
+        "localization": {
+          "name": "Poison",
+          "description": "Grants all units (enemy and ally) the Poison status effect. This will overwrite other status effects on those units.",
+          "selected": "Poisons all allies and enemies\n(Will overwrite other status effects)"
+        },
+        "ability": {
+          "name": "PoisonTouchAllBoss2",
+          "class": "Ability",
+          "config": "PoisonTouchAllBoss2",
+          "tuCost": 70,
+          "useLimit": 0,
+          "nameKey": "PoisonTouchAllBoss2",
+          "descriptionKey": "PoisonTouchAllBoss2",
+          "spiritGain": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "All",
+          "components": [
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "Poison",
+                "BurnImmunityTempForRevenge"
+              ]
+            }
+          ],
+          "enemyEventType": "Hit",
+          "friendlyEventType": "Hit",
+          "sourceEventType": "Hit",
+          "abilityEffect": "SmallPoison1",
+          "flags": [
+            "Poisoner",
+            "NoDamage"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "all": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.3,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_castinggreen1/batfx_castinggreen1",
+            "batfx_poisonsmall1/batfx_poisonsmall1",
+            "batsfx_prefab/batsfx_poison1"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -2,
+            1,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            true,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            true
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "BurnImmunityTempForRevenge": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Burn",
+                  "BurnAfterTurn",
+                  "BurnAtEndOfTurn"
+                ],
+                "dontShowText": true
+              },
+              {
+                "name": "BurnAfterTurn"
+              },
+              {
+                "name": "BurnSelfOnHit"
+              }
+            ],
+            "duration": 1,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "tags": [
+              "BurnImmune"
+            ],
+            "stackName": "BurnImmunityTempForRevenge",
+            "isHiddenFromPlayers": true
+          },
+          "Poison": {
+            "class": "Buff",
+            "stackName": "Poison",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "DamageOverTime"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "percentOfAttack": 0.0025,
+                "damageColor": "Green",
+                "abilityEffect": "PoisonDamage",
+                "extraDamageFlag": "Poison"
+              }
+            ],
+            "tags": [
+              "Poison"
+            ],
+            "canBePurified": true,
+            "duration": -1,
+            "applyConditions": "NotSuperOrMegaPoisoned",
+            "showAsTimer": false,
+            "statusEffect": "PoisonStatus",
+            "statusEffectOffset": 0.1,
+            "damageType": "Poison",
+            "noIconShownOnBattleStatus": true,
+            "iconSpriteName": "IconPurplePoison01"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {}
+      },
+      "StunAllButSelfBoss1": {
+        "id": "StunAllButSelfBoss1",
+        "found": true,
+        "localization": {
+          "name": "Stun Spark",
+          "description": "Stuns all units (enemy and ally) except the user for 150TU.",
+          "selected": "Stuns all other allies and enemies for 150TU"
+        },
+        "ability": {
+          "name": "StunAllButSelfBoss1",
+          "class": "Ability",
+          "config": "StunAllButSelfBoss1",
+          "tuCost": 70,
+          "useLimit": 0,
+          "nameKey": "StunAllButSelfBoss1",
+          "descriptionKey": "StunAllButSelfBoss1",
+          "spiritGain": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "AllButSelf",
+          "components": [
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "Stun150"
+              ]
+            }
+          ],
+          "flags": [
+            "Stun",
+            "StealthWorthy"
+          ],
+          "enemyEventType": "Hit",
+          "friendlyEventType": "Hit",
+          "abilityEffect": "SmallStun1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "allButSelf": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.3,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting2",
+            "batfx_casting3/batfx_casting3",
+            "batfx_stun1/batfx_stun1",
+            "batsfx_prefab/batsfx_stun1",
+            "batfx_ripplebluelow/batfx_ripplebluelow"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -2,
+            1,
+            -2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            true,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "Stun150": {
+            "class": "Buff",
+            "stackName": "Stun",
+            "behaviors": [
+              "Stun"
+            ],
+            "behaviorOverrides": [
+              {
+                "stunTU": 150,
+                "abilityEffect": "StunStatus1"
+              }
+            ],
+            "duration": 0,
+            "tags": [
+              "Stun"
+            ],
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {}
+      },
+      "BurnForceBoss1": {
+        "id": "BurnForceBoss1",
+        "found": true,
+        "localization": {
+          "name": "Burn Drive",
+          "description": "250% damage to 2 enemies. Usable only if there are at least 2 units with the Burn status effect. 300% damage if there at least 4 units with burn. Removes poison and burn from the user.",
+          "selected": "250%+ damage, requires 2+ burn"
+        },
+        "ability": {
+          "name": "BurnForceBoss1",
+          "class": "Ability",
+          "abilityScalor": 1.5,
+          "conditionalAbilityScalors": [
+            2
+          ],
+          "config": "BurnForceBoss1",
+          "tuCost": 1,
+          "useLimit": 0,
+          "nameKey": "BurnForceBoss1",
+          "descriptionKey": "BurnForceBoss1",
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "BurnForceDamageBoost"
+              ]
+            },
+            {
+              "buffs": [
+                "RemoveBurnAndPoison"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "useCondition": "AtLeast2BurningInBattle",
+          "attackScalors": [
+            "GoodWithAtLeast4Burning"
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Hit",
+          "conditionedAbilityEffects": [
+            "BurnForceA6Burned"
+          ],
+          "flags": [
+            "BurnForce"
+          ],
+          "recommendEffectWhenUsable": 1,
+          "axeAbilityEffect": "BurnForceA",
+          "greatAxeAbilityEffect": "BurnForceA",
+          "greatSwordAbilityEffect": "BurnForceA",
+          "swordAbilityEffect": "BurnForceA",
+          "spearAbilityEffect": "BurnForceASpear",
+          "katanaAbilityEffect": "BurnForceA",
+          "hammerAbilityEffect": "BurnForceABlunt",
+          "staffAbilityEffect": "BurnForceABlunt",
+          "maceAbilityEffect": "BurnForceABlunt",
+          "biteAbilityEffect": "BurnForceABite",
+          "bashAbilityEffect": "BurnForceABlunt",
+          "clawAbilityEffect": "BurnForceAClaw"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": null,
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "RemoveBurnAndPoison": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Poison"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {
+          "GoodWithAtLeast4Burning": {
+            "class": "AttackScalor",
+            "targetCondition": "AtLeast4BurningInBattle"
+          }
+        },
+        "conditions": {
+          "AtLeast2BurningInBattle": {
+            "class": "MonsterConditions",
+            "myTeamMonsterConditionMatchesNeeded": {
+              "IsBurning": 2
+            },
+            "or": {
+              "class": "MonsterConditions",
+              "checkEnemyTeamOfMonster": true,
+              "enemyTeamMonsterConditionMatchesNeeded": {
+                "IsBurning": 2
+              },
+              "or": {
+                "class": "MonsterConditions",
+                "myTeamMonsterConditionMatchesNeeded": {
+                  "IsBurning": 1
+                },
+                "and": {
+                  "class": "MonsterConditions",
+                  "checkEnemyTeamOfMonster": true,
+                  "enemyTeamMonsterConditionMatchesNeeded": {
+                    "IsBurning": 1
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "PoisonEaterDoubleBoss2": {
+        "id": "PoisonEaterDoubleBoss2",
+        "found": true,
+        "localization": {
+          "name": "Poison Eater",
+          "description": "300% damage to 2 enemies if they are poisoned. Removes poison and burn from the user.",
+          "selected": "300% damage to poisoned targets"
+        },
+        "ability": {
+          "name": "PoisonEaterDoubleBoss2",
+          "class": "Ability",
+          "abilityScalor": -2,
+          "conditionalAbilityScalors": [
+            2
+          ],
+          "config": "PoisonEaterDoubleBoss2",
+          "tuCost": 1,
+          "useLimit": 0,
+          "nameKey": "PoisonEaterDoubleBoss2",
+          "descriptionKey": "PoisonEaterDoubleBoss2",
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "PoisonEaterDamageBoost"
+              ]
+            },
+            {
+              "buffs": [
+                "RemoveBurnAndPoison"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "attackScalors": [
+            "GoodVsPoisoned"
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Hit",
+          "abilityEffect": "SmallMiss1",
+          "conditionedAbilityEffects": [
+            "PoisonEaterAbility2SSR",
+            "PoisonEaterAbility2SSR"
+          ],
+          "flags": [
+            "PoisonEater",
+            "StealthWorthy"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.85,
+            0
+          ],
+          "prefabs": [
+            "batfx_bluntimpact1/batfx_bluntimpact1",
+            "batsfx_prefab/batsfx_impactsmall1"
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            true
+          ],
+          "scale": [
+            0.4,
+            1
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "RemoveBurnAndPoison": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Poison"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {
+          "GoodVsPoisoned": {
+            "class": "AttackScalor",
+            "targetCondition": "IsPoisoned"
+          }
+        },
+        "conditions": {}
+      },
+      "TimeStrikeDoubleBoss1": {
+        "id": "TimeStrikeDoubleBoss1",
+        "found": true,
+        "localization": {
+          "name": "Time Bolt",
+          "description": "250% damage to 2 enemies if they have 150TU or more in the turn order. 300% damage if the target has 200TU or more. Removes poison and burn from the user.",
+          "selected": "250%+ damage against targets with 150+ TU"
+        },
+        "ability": {
+          "name": "TimeStrikeDoubleBoss1",
+          "class": "Ability",
+          "abilityScalor": -2,
+          "conditionalAbilityScalors": [
+            1.5,
+            2
+          ],
+          "config": "TimeStrikeDoubleBoss1",
+          "tuCost": 1,
+          "useLimit": 0,
+          "nameKey": "TimeStrikeDoubleBoss1",
+          "descriptionKey": "TimeStrikeDoubleBoss1",
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "TimestrikeDamageBoost"
+              ]
+            },
+            {
+              "buffs": [
+                "RemoveBurnAndPoison"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "attackScalors": [
+            "GoodVs150Tu",
+            "GoodVs200Tu"
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Hit",
+          "abilityEffect": "SmallHit1",
+          "flags": [
+            "Timestrike",
+            "StealthWorthy"
+          ],
+          "conditionedAbilityEffects": [
+            "TimeStrikeAbility2Boss",
+            "TimeStrikeAbility2Boss"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.4,
+            0
+          ],
+          "prefabs": [
+            "batfx_bluntimpact1/batfx_bluntimpact1",
+            "batsfx_prefab/batsfx_impactsmall1"
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            true
+          ],
+          "scale": [
+            0.4,
+            1
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "RemoveBurnAndPoison": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Poison"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {
+          "GoodVs150Tu": {
+            "class": "AttackScalor",
+            "targetCondition": "CurrentTUGreaterThan150"
+          },
+          "GoodVs200Tu": {
+            "class": "AttackScalor",
+            "targetCondition": "CurrentTUGreaterThan200"
+          }
+        },
+        "conditions": {}
+      },
+      "DesperateBiteBoss2": {
+        "id": "DesperateBiteBoss2",
+        "found": true,
+        "localization": {
+          "name": "Desperate Drain",
+          "description": "600% damage to 1 enemy, and the user recovers HP by 10% of their own max if damage is dealt. Usable only if the user's HP is at 25% or less. Removes poison and burn from the user.",
+          "selected": "600% damage, usable if user HP is 25% or less"
+        },
+        "ability": {
+          "name": "DesperateBiteBoss2",
+          "class": "Ability",
+          "abilityScalor": 5,
+          "config": "DesperateBiteBoss2",
+          "tuCost": 1,
+          "useLimit": 0,
+          "nameKey": "DesperateBiteBoss2",
+          "descriptionKey": "DesperateBiteBoss2",
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "applyToTargetType": "Enemy",
+              "damageBoosts": [
+                "DesperateDamageBoost"
+              ]
+            },
+            {
+              "buffs": [
+                "RemoveBurnAndPoison"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            },
+            {
+              "applyToTargetOnly": true,
+              "buffs": [
+                "SlightHeal"
+              ],
+              "skipAbilityEffect": true,
+              "buffBackMode": true
+            }
+          ],
+          "useCondition": "HPBelow25Percent",
+          "flags": [
+            "Desperate"
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Hit",
+          "abilityEffect": "DesperateBiteSpecial1",
+          "recommendEffectWhenUsable": 1
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0,
+            0.4,
+            0.35,
+            0,
+            0,
+            0.5,
+            0.1,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_timestrike1",
+            "batfx_rainbowiris/batfx_rainbowiris",
+            "batfx_lightray1/batfx_lightray1",
+            "batfx_desperatestrike1/batfx_desperatestrike1",
+            "batfx_jumpsmoke1/batfx_jumpsmoke1",
+            "batfx_slash2/batfx_slash2",
+            "batfx_groundimpact/batfx_groundimpact",
+            "batsfx_prefab/batsfx_slash1",
+            "batfx_jumpsmoke1/batfx_jumpsmoke1",
+            "batfx_healtop1/batfx_healtop1",
+            "batsfx_prefab/batsfx_heal1"
+          ],
+          "sortOrderOffset": [
+            2,
+            -2,
+            -2,
+            -2,
+            1,
+            1,
+            -2,
+            2,
+            1,
+            1,
+            1
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            true,
+            true,
+            true,
+            true
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "RemoveBurnAndPoison": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Poison"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "SlightHeal": {
+            "class": "Buff",
+            "behaviors": [
+              "AdjustHp"
+            ],
+            "behaviorOverrides": [
+              {
+                "percent": 0.1,
+                "abilityEffect": "Blank",
+                "hpboosts": [
+                  "HealBoost"
+                ]
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {
+          "HPBelow25Percent": {
+            "class": "AttackScalor",
+            "sourceCondition": "HPBelow25Percent"
+          }
+        },
+        "conditions": {
+          "HPBelow25Percent": {
+            "class": "MonsterConditions",
+            "hpLessThanPercent": 0.2500001
+          }
+        }
+      }
+    },
+    "passives": {
+      "HoldGroundBoss": {
+        "id": "HoldGroundBoss",
+        "found": true,
+        "localization": {
+          "name": "Hold Ground",
+          "description": "If this unit would be defeated by an enemy attack or a status effect while having more than 1 HP, it instead survives with 1 HP."
+        }
+      },
+      "Stun70TUMinus": {
+        "id": "Stun70TUMinus",
+        "found": true,
+        "localization": {
+          "name": "Stun Resist Lv6",
+          "description": "Reduces the amount of any stun effects against this unit by 70TU."
+        }
+      },
+      "Sleep50TUMinus": {
+        "id": "Sleep50TUMinus",
+        "found": true,
+        "localization": {
+          "name": "Sleep Resist Lv5",
+          "description": "Reduces the duration of any enemy sleep effects on this unit by 50TU."
+        }
+      },
+      "AttackUpIfBurningIconShowing": {
+        "id": "AttackUpIfBurningIconShowing",
+        "found": true,
+        "localization": {
+          "name": "Burning Power",
+          "description": "200% bonus to attacks while this unit has the Burn status effect."
+        }
+      },
+      "DamageReduceIfPoisoned": {
+        "id": "DamageReduceIfPoisoned",
+        "found": true,
+        "localization": {
+          "name": "Vigor Armor",
+          "description": "When this unit is dealt damage while at full HP, reduce that damage by 50%."
+        }
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": {
+      "id": "DeathKnightBoss01Seq",
+      "found": true,
+      "sequence": {
+        "class": "AbilityAISequence",
+        "sequence": [
+          [
+            "1"
+          ],
+          [
+            "0",
+            "4",
+            "5",
+            "6",
+            "7"
+          ],
+          [
+            "2"
+          ],
+          [
+            "0",
+            "4",
+            "5",
+            "6",
+            "7"
+          ],
+          [
+            "3"
+          ],
+          [
+            "0",
+            "4",
+            "5",
+            "6",
+            "7"
+          ]
+        ]
+      }
+    },
+    "leaderCondition": null
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "DeathKnightBoss01",
+    "family": "DeathKnightBoss",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "DeathKnightBoss01",
+    "class": "Monster",
+    "family": "DeathKnightBoss",
+    "activeSkills": {
+      "0": "PowerAttackSingleBoss1DeathKnight",
+      "1": "BurnAllBoss1",
+      "2": "PoisonTouchAllBoss2",
+      "3": "StunAllButSelfBoss1",
+      "4": "BurnForceBoss1",
+      "5": "PoisonEaterDoubleBoss2",
+      "6": "TimeStrikeDoubleBoss1",
+      "7": "DesperateBiteBoss2"
+    },
+    "passives": {
+      "0": "HoldGroundBoss",
+      "1": "Stun70TUMinus",
+      "2": "Sleep50TUMinus",
+      "3": "AttackUpIfBurningIconShowing",
+      "4": "DamageReduceIfPoisoned"
+    },
+    "aiSequence": "DeathKnightBoss01Seq",
+    "cost": 999,
+    "baseAttack": 1700,
+    "baseMaxHp": 95000,
+    "speed": 750,
+    "element": "Death",
+    "weaponPref": "GreatSword",
+    "weaponPivotIndex": 0,
+    "walkSound": "TestSound",
+    "secure": 1,
+    "aiTargetPickWeight": 1,
+    "stars": 6,
+    "evolvedStars": 4,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 1,
+    "battleOrbImageFlip": 0,
+    "skillVoices": {
+      "0": [
+        1,
+        2
+      ],
+      "1": [
+        3,
+        4
+      ],
+      "2": [
+        5,
+        6
+      ],
+      "3": [
+        7,
+        8
+      ],
+      "4": [
+        9,
+        10
+      ],
+      "5": [
+        11,
+        12
+      ],
+      "6": [
+        13,
+        14
+      ],
+      "7": [
+        15,
+        16
+      ]
+    },
+    "damageVoices": [
+      17,
+      18
+    ],
+    "deathVoices": [
+      19
+    ]
+  },
+  "_build": {
+    "scriptVersion": "6-character-family-states",
+    "sourceHash": "fae669961c224524f257215ce39e76e5a38f3d8e3db856091f70f112eab7be94",
+    "dependencyHash": "20f2ece31c105f18a119ae44ae46c43e2661d449cb11c6c78cf7a133f3245a32",
+    "generatedAt": 1778213443
+  }
+}

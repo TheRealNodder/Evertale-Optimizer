@@ -1,0 +1,1414 @@
+{
+  "schemaVersion": 3,
+  "order": 514,
+  "id": "astrid",
+  "name": "Astrid",
+  "title": "Red Dragon Heiress",
+  "description": "Just as expected, the dreaded question was asked during the interview: \"Is there anyone special in your life?\"\n\"Duty first,\" she answered, but the journalist wouldn't drop the topic. Just as she finally budged and revealed what her type is, the door opened and a certain young man entered the room.\n\"Astrid? I have the documents you asked for...\"\nThe sight of a flying teacup and spilled tea, undignified as it was, proved memorable, as later the journalist's article read, \"The young Commander remains single, <i>and yet—</i>\"",
+  "category": "character",
+  "rarity": null,
+  "stars": 6,
+  "evolvedStars": 6,
+  "element": "Fire",
+  "weaponType": "Sword",
+  "stats": {
+    "atk": 1489,
+    "hp": 6975,
+    "spd": 388,
+    "cost": 34
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/AstridNew02.png",
+  "refs": {
+    "activeSkills": [
+      "IgnitionAttackSpiritAAstridNew",
+      "InstantProtectorKillerBurnAAstridNew",
+      "BurnBlastDoublePlusAAstridNew",
+      "BurnAllyAccelerateAttackBoostBurningAlliesAAstridNew"
+    ],
+    "passives": [
+      "RegenerateWhenBurnAllyGetTurn",
+      "DamageReducStunImmunityAndHoldGroundIfBurn",
+      "AttackUpTargetEquippedMaceLv3",
+      "PlusAttackBoostLv3",
+      "PlusHPBoostLv3",
+      "AddWeaponPrefMace"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": "AttackUpFireD",
+    "leaderBuffCondition": "IsFire",
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "IgnitionAttackSpiritAAstridNew": {
+        "id": "IgnitionAttackSpiritAAstridNew",
+        "found": true,
+        "localization": {
+          "name": "Burning Spirit",
+          "description": "Damage to 1 Enemy. The user is then granted the Burn status effect. This will overwrite other status effects on the user. Allies gain Spirit equal to the number of burning units on the battlefield after this attack. Any unit that deals damage to or is dealt damage by a unit with burn will also become burned. ",
+          "selected": "Damages an enemy, burns user, adds Spirit\n(Will overwrite other status effects)"
+        },
+        "ability": {
+          "name": "IgnitionAttackSpiritAAstridNew",
+          "class": "Ability",
+          "abilityScalor": 0,
+          "config": "IgnitionAttackSpiritAAstridNew",
+          "tuCost": 100,
+          "useLimit": 0,
+          "spiritGain": 0,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "applyToTargetType": "Enemy",
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "damageFlags": [
+                "AttackerIgnition"
+              ]
+            },
+            {
+              "buffs": [
+                "Burn",
+                "AddSpiritEqualToBurning"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true,
+              "buffAppliedEffects": [
+                "BurnSelf1"
+              ]
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "flags": [
+            "Burn",
+            "ApplyStatusToSelf"
+          ],
+          "abilityEffect": "AstridNewAbility1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0.05,
+            0,
+            0.4,
+            0
+          ],
+          "prefabs": [
+            "batfx_common/batfx_empty",
+            "batfx_astridnew1/batfx_swordfire1",
+            "batfx_common/batfx_redbase1",
+            "batfx_firelarge2/batfx_firelarge2",
+            "batsfx_prefab/batsfx_bluntimpact1"
+          ],
+          "sortOrderOffset": [
+            0,
+            2,
+            -2,
+            2,
+            0
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            false,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "boneToAttachTo": [
+            "effectbone",
+            "effectbone",
+            "",
+            "",
+            ""
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "AddSpiritEqualToBurning": {
+            "class": "Buff",
+            "behaviors": [
+              "BuffOnMonsterTurnEnd",
+              "BuffOnMonsterTurnEnd"
+            ],
+            "behaviorOverrides": [
+              {
+                "allyBuffs": [
+                  "SpiritGainD"
+                ],
+                "selfBuffs": [
+                  "SpiritGainD"
+                ],
+                "spreadCondition": "IsBurning"
+              },
+              {
+                "enemyBuffs": [
+                  "SpiritGainDContra"
+                ],
+                "spreadCondition": "IsBurning"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "Burn": {
+            "class": "Buff",
+            "stackName": "Burn",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "DamageOverTime",
+              "BuffChanceOnHit",
+              "BuffWhenMonsterHurt"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "LockHasBurnedSkills"
+              },
+              {
+                "name": "SleepThorns"
+              },
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "percentOfTargetHp": 0.001,
+                "damageColor": "Red",
+                "abilityEffect": "BurnDamage1",
+                "bossDamageCap": 500,
+                "extraDamageFlag": "Burn"
+              },
+              {
+                "contextBuffs": [
+                  "BurnAfterTurn"
+                ],
+                "chance": 1.0
+              },
+              {
+                "contextBuffs": [
+                  "BurnAfterTurn",
+                  "RemovePoison"
+                ],
+                "spreadCondition": "IsNotBurnImmune",
+                "cancelFromDamageFlags": [
+                  "Sneak",
+                  "RemoveStatus"
+                ],
+                "cancelFromDamageTypes": [
+                  "BuffDamage"
+                ]
+              }
+            ],
+            "tags": [
+              "Burn"
+            ],
+            "canBePurified": true,
+            "duration": 300,
+            "statusEffect": "BurnStatus",
+            "statusEffectOffset": 0.1,
+            "damageType": "Burn",
+            "noIconShownOnBattleStatus": false,
+            "applyConditions": "IsNotBurning",
+            "showAsTimer": true,
+            "iconSpriteName": "IconRedBurn01"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {}
+      },
+      "InstantProtectorKillerBurnAAstridNew": {
+        "id": "InstantProtectorKillerBurnAAstridNew",
+        "found": true,
+        "localization": {
+          "name": "Guard Incinerator",
+          "description": "500% damage to 1 enemy if they are a Guardian. The user and the target are granted the Burn status effect if the target was a Guardian. This will overwrite other status effects on both units. This skill becomes locked for 100TU after use.",
+          "selected": "500% damage to a Guardian, burns user & target\n(Will overwrite other status effects)"
+        },
+        "ability": {
+          "name": "InstantProtectorKillerBurnAAstridNew",
+          "class": "Ability",
+          "abilityScalor": -2,
+          "conditionalAbilityScalors": [
+            4
+          ],
+          "config": "InstantProtectorKillerBurnAAstridNew",
+          "tuCost": 1,
+          "useLimit": 0,
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "applyToTargetType": "Enemy",
+              "damageFlags": [
+                "AttackerIgnition"
+              ]
+            },
+            {
+              "buffs": [
+                "Burn"
+              ],
+              "applyConditions": "IsProtecting",
+              "applyToTargetType": "Enemy",
+              "skipAbilityEffect": true,
+              "chance": 1.0,
+              "showMissConditions": "ShowNoMiss"
+            },
+            {
+              "buffs": [
+                "Burn"
+              ],
+              "applyConditions": "IsProtecting",
+              "buffBackMode": true,
+              "skipAbilityEffect": true,
+              "applyToTargetType": "Enemy",
+              "chance": 1.0,
+              "showMissConditions": "ShowNoMiss"
+            },
+            {
+              "buffs": [
+                "InstantProtectorKillerBurnCooldown"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "attackScalors": [
+            "GoodVsProtector"
+          ],
+          "useCondition": "NotInstantCooldown",
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "SmallHit1",
+          "conditionedAbilityEffects": [
+            "AstridNewAttack1",
+            "AstridNewAttack1"
+          ],
+          "flags": [
+            "ProtectorKiller",
+            "Burn",
+            "ApplyStatusToSelf"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.4,
+            0
+          ],
+          "prefabs": [
+            "batfx_bluntimpact1/batfx_bluntimpact1",
+            "batsfx_prefab/batsfx_impactsmall1"
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            true
+          ],
+          "scale": [
+            0.4,
+            1
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "Burn": {
+            "class": "Buff",
+            "stackName": "Burn",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "DamageOverTime",
+              "BuffChanceOnHit",
+              "BuffWhenMonsterHurt"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "LockHasBurnedSkills"
+              },
+              {
+                "name": "SleepThorns"
+              },
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "percentOfTargetHp": 0.001,
+                "damageColor": "Red",
+                "abilityEffect": "BurnDamage1",
+                "bossDamageCap": 500,
+                "extraDamageFlag": "Burn"
+              },
+              {
+                "contextBuffs": [
+                  "BurnAfterTurn"
+                ],
+                "chance": 1.0
+              },
+              {
+                "contextBuffs": [
+                  "BurnAfterTurn",
+                  "RemovePoison"
+                ],
+                "spreadCondition": "IsNotBurnImmune",
+                "cancelFromDamageFlags": [
+                  "Sneak",
+                  "RemoveStatus"
+                ],
+                "cancelFromDamageTypes": [
+                  "BuffDamage"
+                ]
+              }
+            ],
+            "tags": [
+              "Burn"
+            ],
+            "canBePurified": true,
+            "duration": 300,
+            "statusEffect": "BurnStatus",
+            "statusEffectOffset": 0.1,
+            "damageType": "Burn",
+            "noIconShownOnBattleStatus": false,
+            "applyConditions": "IsNotBurning",
+            "showAsTimer": true,
+            "iconSpriteName": "IconRedBurn01"
+          },
+          "InstantProtectorKillerBurnCooldown": {
+            "class": "Buff",
+            "stackName": "InstantCooldown",
+            "duration": 100,
+            "isHiddenFromPlayers": false,
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "iconSpriteName": "IconBlueCountdownClock3"
+          }
+        },
+        "attackScalors": {
+          "GoodVsProtector": {
+            "class": "AttackScalor",
+            "targetCondition": "IsProtecting"
+          }
+        },
+        "conditions": {
+          "IsProtecting": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "Protector"
+            ],
+            "or": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "AutoProtect"
+              ],
+              "or": {
+                "class": "MonsterConditions",
+                "buffStackNames": [
+                  "TimedProtector"
+                ],
+                "or": {
+                  "class": "MonsterConditions",
+                  "buffStackNames": [
+                    "ConditionedProtector"
+                  ],
+                  "or": {
+                    "class": "MonsterConditions",
+                    "buffStackNames": [
+                      "Taunting"
+                    ],
+                    "checkEnemyTeamOfMonster": true,
+                    "enemyTeamMonsterConditionMatchesNeeded": {
+                      "IsTauntedTakingTurn": 1
+                    },
+                    "or": {
+                      "class": "MonsterConditions",
+                      "buffStackNames": [
+                        "SleepThorns",
+                        "ThornProtector"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "NotInstantCooldown": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "InstantCooldown"
+              ]
+            }
+          }
+        }
+      },
+      "BurnBlastDoublePlusAAstridNew": {
+        "id": "BurnBlastDoublePlusAAstridNew",
+        "found": true,
+        "localization": {
+          "name": "Burning Blaze",
+          "description": "500% damage to 2 enemies. This attack ignores the Stealth and Counter Stance Status Effects, the effects of Skin passive skills, and Revenge passive skills. Usable if the user has the Burn status effect.",
+          "selected": "500% damage, usable while burned"
+        },
+        "ability": {
+          "name": "BurnBlastDoublePlusAAstridNew",
+          "class": "Ability",
+          "abilityScalor": 4,
+          "config": "BurnBlastDoublePlusAAstridNew",
+          "tuCost": 130,
+          "useLimit": 0,
+          "spiritCost": 3,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "SkipRevengeDamage"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "BurnBlastDamageBoost"
+              ],
+              "damageFlags": [
+                "IgnoreSkin"
+              ]
+            }
+          ],
+          "useCondition": "IsBurning",
+          "flags": [
+            "BurnBlast",
+            "IgnoreStealth"
+          ],
+          "enemyEventType": "Hit",
+          "recommendEffectWhenUsable": 1,
+          "ignoreEffectForSourceEvent": true,
+          "abilityEffect": "AstridNewSpecial1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.4,
+            0,
+            0,
+            0,
+            0.2,
+            0.5,
+            0,
+            0.2
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_fire4",
+            "batfx_tailwindfire6/batfx_tailwindfire6",
+            "batfx_shannahood1/batfx_shannahood1",
+            "batsfx_prefab/batsfx_fire2",
+            "batsfx_prefab/batsfx_earth1",
+            "batfx_astridnew1/batfx_firepillar1",
+            "batfx_astridnew1/batfx_firemulti2",
+            "batfx_common/batfx_whiteout1",
+            "batsfx_prefab/batsfx_bluntimpact1",
+            "batfx_slash2/batfx_slash2"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -50,
+            -2,
+            0,
+            0,
+            50,
+            50,
+            50,
+            -2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            true
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            true
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "SkipRevengeDamage": {
+            "class": "DamageAbilityComponent",
+            "revengeEffectsToSkip": [
+              "AddJeanneDarkAngel02Next",
+              "AddJeanneDarkAngel01Next",
+              "CloneSourceToBackIfNotSummoned",
+              "MegaElixirEffect",
+              "HasteUp20Percent",
+              "Armor",
+              "200PercentDamageForRevenge",
+              "KeepBurningStuff",
+              "SleepAfterDelay",
+              "AttackPlus50Percent1TurnOnly",
+              "BurnAfterTurn",
+              "RemoveBuffsAfterDelay",
+              "HealAfterDelay",
+              "AddSkeletonToEnd",
+              "SpiritGainBContra",
+              "Stun200Revenge",
+              "Stun150Revenge",
+              "Stun100Revenge",
+              "Stun75Revenge",
+              "TUMinus50",
+              "TUMinus100",
+              "HealHalf",
+              "RemoveBuffs",
+              "SendToFrontOfReinforcements",
+              "SendToBackOfReinforcements",
+              "SpiritGainAContra",
+              "SpiritGainCContra",
+              "SpiritLossD",
+              "SpiritLossC",
+              "MegaPoison",
+              "Poison",
+              "Sleep",
+              "TUMinusRevengeA",
+              "TUMinusRevengeB",
+              "HealFull",
+              "Explosive",
+              "TUMinusAfterDelayA",
+              "HealFullAfterDelay",
+              "Add1DeathMinionToEndForRevenge",
+              "Add1FireMinionToEndForRevenge",
+              "Add1EarthMinionToEndForRevenge",
+              "Stealth",
+              "StealthAfterDelay",
+              "TUMinus300",
+              "CloneSourceToRandomIfNotSummoned",
+              "SpiritSiphonDContra",
+              "Burn",
+              "Heal800PercentAfterDelay"
+            ]
+          }
+        },
+        "buffs": {},
+        "attackScalors": {},
+        "conditions": {
+          "IsBurning": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "Burn"
+            ]
+          }
+        }
+      },
+      "BurnAllyAccelerateAttackBoostBurningAlliesAAstridNew": {
+        "id": "BurnAllyAccelerateAttackBoostBurningAlliesAAstridNew",
+        "found": true,
+        "localization": {
+          "name": "Ignite All+",
+          "description": "All non-sleeping allies are granted the Burn status effect. This will overwrite other status effects on those units. All allies that already had the Burn status effect will have the TU costs for all of their skills reduced by 20%, and until the end of their next turn their Attack is increased to 1.5x. This will overwrite the effects of other Quicken and Enrage skills.",
+          "selected": "Burn allies, Quicken and Enrage burning allies\n(Will overwrite non-sleep status effects)"
+        },
+        "ability": {
+          "name": "BurnAllyAccelerateAttackBoostBurningAlliesAAstridNew",
+          "class": "Ability",
+          "config": "BurnAllyAccelerateAttackBoostBurningAlliesAAstridNew",
+          "tuCost": 50,
+          "useLimit": 0,
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "AllAlly",
+          "components": [
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "Burn"
+              ],
+              "applyConditions": "IsNotSleeping",
+              "buffAppliedEffects": [
+                "BurnSelf1"
+              ]
+            },
+            {
+              "buffs": [
+                "HasteUp20Percent",
+                "AttackPlus50Percent1TurnOnly"
+              ],
+              "applyConditions": "IsBurning",
+              "applyToTargetType": "Friendly",
+              "showMissConditions": "ShowNoMiss",
+              "buffAppliedEffects": [
+                "AccelerateAlly1",
+                "EnrageCrescentAlly1"
+              ]
+            }
+          ],
+          "friendlyEventType": "Hit",
+          "abilityEffect": "AstridNewAbility2",
+          "flags": [
+            "Burn",
+            "Purify",
+            "NoDamage"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "allFriends": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0.5,
+            0,
+            0.05,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batfx_common/batfx_chargeparticlesred1",
+            "batsfx_prefab/batsfx_fire2",
+            "batfx_common/batfx_empty",
+            "batfx_astridnew1/batfx_firenado2",
+            "batfx_common/batfx_empty",
+            "batfx_astridnew1/batfx_firenado1"
+          ],
+          "sortOrderOffset": [
+            -2,
+            0,
+            0,
+            -2,
+            0,
+            2
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "AttackPlus50Percent1TurnOnly": {
+            "class": "Buff",
+            "stackName": "AttackPlus50Percent",
+            "behaviors": [
+              "RemoveAfterTurnsBehavior",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "turnCount": 1,
+                "scalorStatBonuses": {
+                  "Attack": 0.5
+                }
+              },
+              {
+                "name": "AttackMinus25Percent"
+              }
+            ],
+            "iconSpriteName": "IconRedRage01",
+            "showAsTimer": true,
+            "duration": -1
+          },
+          "Burn": {
+            "class": "Buff",
+            "stackName": "Burn",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "DamageOverTime",
+              "BuffChanceOnHit",
+              "BuffWhenMonsterHurt"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "LockHasBurnedSkills"
+              },
+              {
+                "name": "SleepThorns"
+              },
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "percentOfTargetHp": 0.001,
+                "damageColor": "Red",
+                "abilityEffect": "BurnDamage1",
+                "bossDamageCap": 500,
+                "extraDamageFlag": "Burn"
+              },
+              {
+                "contextBuffs": [
+                  "BurnAfterTurn"
+                ],
+                "chance": 1.0
+              },
+              {
+                "contextBuffs": [
+                  "BurnAfterTurn",
+                  "RemovePoison"
+                ],
+                "spreadCondition": "IsNotBurnImmune",
+                "cancelFromDamageFlags": [
+                  "Sneak",
+                  "RemoveStatus"
+                ],
+                "cancelFromDamageTypes": [
+                  "BuffDamage"
+                ]
+              }
+            ],
+            "tags": [
+              "Burn"
+            ],
+            "canBePurified": true,
+            "duration": 300,
+            "statusEffect": "BurnStatus",
+            "statusEffectOffset": 0.1,
+            "damageType": "Burn",
+            "noIconShownOnBattleStatus": false,
+            "applyConditions": "IsNotBurning",
+            "showAsTimer": true,
+            "iconSpriteName": "IconRedBurn01"
+          },
+          "HasteUp20Percent": {
+            "class": "Buff",
+            "behaviors": [
+              "StatOnly"
+            ],
+            "behaviorOverrides": [
+              {
+                "flatStatBonuses": {
+                  "Haste": -250
+                }
+              }
+            ],
+            "duration": -1,
+            "showAsTimer": false,
+            "stackName": "Accelerated",
+            "tags": [
+              "Accelerated20Percent"
+            ],
+            "noIconShownOnBattleStatus": true,
+            "iconSpriteName": "IconBrownSpeedUpClock01"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "IsBurning": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "Burn"
+            ]
+          },
+          "IsNotSleeping": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "Sleep"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "passives": {
+      "RegenerateWhenBurnAllyGetTurn": {
+        "id": "RegenerateWhenBurnAllyGetTurn",
+        "found": true,
+        "localization": {
+          "name": "Blaze of Glory",
+          "description": "When this unit or a Burning ally gets a turn, this unit heals 30% of its max HP.\n\nOther allies with Burn Blast or Burn Drive type active skills gain the Burn status effect and a Stun Ward. Triggered at the very start of the battle if this unit is on the battlefield. This will overwrite other status effects on those allies. Stun Ward prevents Stun from being applied once, then is removed. Stun Wards cannot stack."
+        }
+      },
+      "DamageReducStunImmunityAndHoldGroundIfBurn": {
+        "id": "DamageReducStunImmunityAndHoldGroundIfBurn",
+        "found": true,
+        "localization": {
+          "name": "Heroic Focus",
+          "description": "This unit is not affected by stun effects.\n\n50% damage reduction from attacks if this unit has the Burn status effect.\n\nIf this unit would be defeated while it has the Burn status effect, it instead survives with 1 HP, then burn is removed from this unit."
+        }
+      },
+      "AttackUpTargetEquippedMaceLv3": {
+        "id": "AttackUpTargetEquippedMaceLv3",
+        "found": true,
+        "localization": {
+          "name": "Mace Hunter Lv3",
+          "description": "10% bonus to attacks against units equipped with Maces."
+        }
+      },
+      "PlusAttackBoostLv3": {
+        "id": "PlusAttackBoostLv3",
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv3",
+          "description": "Adds 300 to this unit's Attack."
+        }
+      },
+      "PlusHPBoostLv3": {
+        "id": "PlusHPBoostLv3",
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv3",
+          "description": "Adds 1200 to this unit's max HP."
+        }
+      },
+      "AddWeaponPrefMace": {
+        "id": "AddWeaponPrefMace",
+        "found": true,
+        "localization": {
+          "name": "Mace Mastery",
+          "description": "Can use weapon skills of Maces in addition to their original preferred weapon type."
+        }
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": {
+      "class": "MonsterConditions",
+      "elements": [
+        "Fire"
+      ]
+    }
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "AstridNew02",
+    "family": "AstridNew",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "AstridNew02",
+    "family": "AstridNew",
+    "class": "Monster",
+    "leaderBuff": "AttackUpFireD",
+    "leaderBuffCondition": "IsFire",
+    "activeSkills": {
+      "0": "IgnitionAttackSpiritAAstridNew",
+      "1": "InstantProtectorKillerBurnAAstridNew",
+      "2": "BurnBlastDoublePlusAAstridNew",
+      "3": "BurnAllyAccelerateAttackBoostBurningAlliesAAstridNew"
+    },
+    "passives": {
+      "0": "RegenerateWhenBurnAllyGetTurn",
+      "1": "DamageReducStunImmunityAndHoldGroundIfBurn",
+      "2": "AttackUpTargetEquippedMaceLv3",
+      "3": "PlusAttackBoostLv3",
+      "4": "PlusHPBoostLv3",
+      "5": "AddWeaponPrefMace"
+    },
+    "cost": 34,
+    "baseAttack": 1489,
+    "baseMaxHp": 6975,
+    "speed": 388,
+    "element": "Fire",
+    "weaponPref": "Sword",
+    "weaponPivotIndex": 0,
+    "secure": 1,
+    "evolveFrom": "AstridNew01",
+    "aiTargetPickWeight": 1,
+    "stars": 6,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 0,
+    "battleOrbImageFlip": 1,
+    "attackType": "Bash",
+    "formTwitterShare": 1,
+    "cosmoName": "AstridNew03",
+    "cosmoBattleOrbImageFlip": 0,
+    "skillVoices": {
+      "0": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "1": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "2": [
+        9,
+        10,
+        11,
+        12
+      ],
+      "3": [
+        13,
+        14,
+        15,
+        16
+      ]
+    },
+    "damageVoices": [
+      17,
+      18,
+      19,
+      20
+    ],
+    "deathVoices": [
+      21,
+      22,
+      23,
+      24
+    ],
+    "victoryVoices": [
+      25,
+      26
+    ],
+    "lineupVoices": [
+      27,
+      28,
+      29,
+      30,
+      31,
+      32
+    ],
+    "evolutionVoices": [
+      33
+    ],
+    "trainVoices": [
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43
+    ],
+    "titleVoices": [
+      44
+    ],
+    "gachaVoices": [
+      45
+    ],
+    "loginVoices": [
+      46
+    ],
+    "tapVoices": [
+      47,
+      48,
+      49
+    ],
+    "idleVoices": [
+      50
+    ]
+  },
+  "_build": {
+    "scriptVersion": "6-character-family-states",
+    "sourceHash": "037bd9c8cd8050c8f682eb4c195463ff609f41e07af1d30389482f25c4ef5a6c",
+    "dependencyHash": "6fd737e4c0c83d7f9bdc47cccbeeabea498c6412fe7b61b4ef3934cd08c3d924",
+    "generatedAt": 1778213416
+  }
+}

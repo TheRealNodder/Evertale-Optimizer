@@ -1,0 +1,1455 @@
+{
+  "schemaVersion": 3,
+  "order": 516,
+  "id": "cinderella",
+  "name": "Cinderella",
+  "title": "Princess in Glass Slippers",
+  "description": "Orphaned as a small child, she grew up in a poor household, under the eye of her wicked stepmother. She was forced to do everything around the house all by herself, and wasn't allowed to go out to play. The townsfolk always frowned at the dirty rags she wore, always gave her pointed looks. She was never loved by anyone—aside from one person.",
+  "category": "character",
+  "rarity": null,
+  "stars": 6,
+  "evolvedStars": 6,
+  "element": "Light",
+  "weaponType": "Sword",
+  "stats": {
+    "atk": 1466,
+    "hp": 7090,
+    "spd": 644,
+    "cost": 34
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/CinderellaRegular02.png",
+  "refs": {
+    "activeSkills": [
+      "SleepAttackPlusSingleACinderella",
+      "LifeFlipSendbackACinderella",
+      "InstantSurvivorSingleACinderella",
+      "MegaResetStrikeSingleACinderella"
+    ],
+    "passives": [
+      "HoldGroundPlusCinderella",
+      "StatusRemovalMomentumA",
+      "AirMinusDamageLv3",
+      "PlusAttackBoostLv3",
+      "PlusHPBoostLv3",
+      "AddWeaponPrefStaff"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": "AttackUpLifeD",
+    "leaderBuffCondition": "IsLife",
+    "summonableMonsters": [
+      "Imposter01"
+    ]
+  },
+  "resolved": {
+    "activeSkills": {
+      "SleepAttackPlusSingleACinderella": {
+        "id": "SleepAttackPlusSingleACinderella",
+        "found": true,
+        "localization": {
+          "name": "Hypno Blast",
+          "description": "50% damage to 1 enemy. 300% damage instead every second time this skill is activated while on the battlefield. 25% chance of granting that enemy the Sleep status effect for 200TU. If Sleep is applied, it will overwrite other status effects on that enemy. Sleep cannot be applied to a unit that Has Slept while on the battlefield. This attack ignores the Counter Stance Status Effect and the effects of Skin passive skills. Damage from this attack does not wake up sleeping enemies.",
+          "selected": "50%+ damage to 1 enemy, chance of applying Sleep\n(Can overwrite other status effects)"
+        },
+        "ability": {
+          "name": "SleepAttackPlusSingleACinderella",
+          "class": "Ability",
+          "abilityScalor": -1,
+          "conditionalAbilityScalors": [
+            2
+          ],
+          "config": "SleepAttackPlusSingleACinderella",
+          "tuCost": 50,
+          "useLimit": 0,
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "damageFlags": [
+                "IgnoreSkin",
+                "DoNotWake"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "BurnImmunityTempForRevengeSleepAttack",
+                "Sleep"
+              ],
+              "chance": 0.25,
+              "applyToTargetType": "Enemy",
+              "applyConditions": "HasNotSlept",
+              "buffAppliedEffects": [
+                "SleepRevenge"
+              ],
+              "showMissConditions": "ShowNoMiss",
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "LoseMomentum",
+                "GainMomentum"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "attackScalors": [
+            "GoodWithMomentum"
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "CinderellaHypno1",
+          "recommendEffectWhenUsable": -1,
+          "conditionedAbilityEffects": [
+            "CinderellaHypno2",
+            "CinderellaHypno2"
+          ],
+          "flags": [
+            "SleepChance",
+            "SleepWithDamage",
+            "StealthWorthy"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.7,
+            0.45,
+            0.3,
+            0
+          ],
+          "prefabs": [
+            "batfx_common/batfx_indigobase1",
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_cinderella1/batfx_hypnorb1",
+            "batfx_cinderella1/batfx_hypnobeam1",
+            "batfx_cinderella1/batfx_hypnodmg1",
+            "batsfx_prefab/batsfx_bluntimpact1"
+          ],
+          "sortOrderOffset": [
+            -2,
+            0,
+            2,
+            2,
+            2,
+            0
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            false,
+            false,
+            true
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "BurnImmunityTempForRevengeSleepAttack": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Burn",
+                  "BurnAfterTurn",
+                  "BurnAtEndOfTurn"
+                ],
+                "dontShowText": true
+              },
+              {
+                "name": "BurnAfterTurn"
+              },
+              {
+                "name": "BurnSelfOnHit"
+              }
+            ],
+            "duration": 1,
+            "showAsTimer": false,
+            "applyConditions": "IsNotAnySleepImmune",
+            "showAsPermanent": false,
+            "tags": [
+              "BurnImmune"
+            ],
+            "stackName": "BurnImmunityTempForRevenge",
+            "isHiddenFromPlayers": true
+          },
+          "GainMomentum": {
+            "class": "Buff",
+            "stackName": "MomentumReady",
+            "duration": -1,
+            "isHiddenFromPlayers": true,
+            "applyConditions": "NotLostMomentum"
+          },
+          "LoseMomentum": {
+            "class": "Buff",
+            "stackName": "LoseMomentum",
+            "duration": 0,
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "MomentumReady"
+              }
+            ],
+            "isHiddenFromPlayers": true,
+            "applyConditions": "HasDamagedWithAttack"
+          },
+          "Sleep": {
+            "class": "Buff",
+            "stackName": "Sleep",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "LoseTurn",
+              "RemoveOnHurt"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "PurifyChain"
+              },
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "name": "AutoPurifyAfterTurnNoSleep"
+              },
+              {},
+              {
+                "ignoreIfHurtBySelf": true,
+                "cancelFromDamageFlags": [
+                  "DoNotWake"
+                ]
+              }
+            ],
+            "applyConditions": "HasNotSlept",
+            "duration": 200,
+            "showAsTimer": true,
+            "statusEffect": "SleepStatus",
+            "statusEffectOffset": 0.1,
+            "iconSpriteName": "IconWhiteSleepZs01",
+            "textKeyToShowWhenApplied": "SleepKey",
+            "canBePurified": true
+          },
+          "SleepRevenge": {
+            "class": "Buff",
+            "behaviors": [
+              "Revenge"
+            ],
+            "behaviorOverrides": [
+              {
+                "contextBuffs": [
+                  "BurnImmunityTempForRevenge",
+                  "GoodStatImmunityTempForRevengeSleep",
+                  "SleepAfterDelay"
+                ],
+                "effectName": "SleepRevenge",
+                "spreadCondition": "HasNotSlept"
+              }
+            ],
+            "duration": -1,
+            "tags": [
+              "NastyRevenge"
+            ],
+            "showAsTimer": true,
+            "showAsPermanent": true,
+            "iconSpriteName": "IconWhiteSkullSleepRevenge01"
+          }
+        },
+        "attackScalors": {
+          "GoodWithMomentum": {
+            "class": "AttackScalor",
+            "sourceCondition": "HasDamagedWithAttack"
+          }
+        },
+        "conditions": {
+          "HasNotSlept": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "properties": {
+                "hasSlept": 1
+              }
+            }
+          }
+        }
+      },
+      "LifeFlipSendbackACinderella": {
+        "id": "LifeFlipSendbackACinderella",
+        "found": true,
+        "localization": {
+          "name": "LifeFlipSendbackACinderella",
+          "description": ""
+        },
+        "ability": {
+          "name": "LifeFlipSendbackACinderella",
+          "class": "Ability",
+          "config": "LifeFlipSendbackACinderella",
+          "tuCost": 100,
+          "useLimit": 1,
+          "nameKey": "LifeFlipSendbackA",
+          "descriptionKey": "LifeFlipSendbackA",
+          "spiritGain": 3,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "Add4ImposterNext"
+              ],
+              "applyToTargetType": "Enemy",
+              "applyConditions": "IsAlone",
+              "showMissConditions": "ShowNoMiss",
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "Add3ImposterNext"
+              ],
+              "applyToTargetType": "Enemy",
+              "applyConditions": "2AlliesLeftNot3",
+              "showMissConditions": "ShowNoMiss",
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "Add2ImposterNext"
+              ],
+              "applyToTargetType": "Enemy",
+              "applyConditions": "3AlliesLeftNot4",
+              "showMissConditions": "ShowNoMiss",
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "Add1ImposterNext"
+              ],
+              "applyToTargetType": "Enemy",
+              "applyConditions": "4AlliesLeftNoReinforcements",
+              "showMissConditions": "ShowNoMiss",
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "SendToBackOfReinforcementsIfAny",
+                "RemoveBuffs"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "LifeFlip"
+              ],
+              "buffAppliedEffects": [
+                "SmallHeal1"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Hit",
+          "abilityEffect": "CinderellaBanish1",
+          "flags": [
+            "Summon",
+            "StealthWorthy",
+            "AddBadFriend",
+            "NoDamage"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.7,
+            0.75,
+            0
+          ],
+          "prefabs": [
+            "batfx_common/batfx_indigobase1",
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_cinderella1/batfx_biglight1",
+            "batfx_bluehelix1/batfx_bluehelix1",
+            "batsfx_prefab/batsfx_knockback1"
+          ],
+          "sortOrderOffset": [
+            -2,
+            0,
+            2,
+            2,
+            0
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            false,
+            true
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "Add1ImposterNext": {
+            "class": "Buff",
+            "behaviors": [
+              "SummonMonster"
+            ],
+            "behaviorOverrides": [
+              {
+                "monsterType": "Imposter01",
+                "frontOfLineup": true
+              }
+            ],
+            "applyConditions": "NotKnockbackImmune",
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "Add2ImposterNext": {
+            "class": "Buff",
+            "behaviors": [
+              "SummonMonster",
+              "SummonMonster"
+            ],
+            "behaviorOverrides": [
+              {
+                "monsterType": "Imposter01",
+                "frontOfLineup": true
+              },
+              {
+                "monsterType": "Imposter01",
+                "frontOfLineup": true
+              }
+            ],
+            "applyConditions": "NotKnockbackImmune",
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "Add3ImposterNext": {
+            "class": "Buff",
+            "behaviors": [
+              "SummonMonster",
+              "SummonMonster",
+              "SummonMonster"
+            ],
+            "behaviorOverrides": [
+              {
+                "monsterType": "Imposter01",
+                "frontOfLineup": true
+              },
+              {
+                "monsterType": "Imposter01",
+                "frontOfLineup": true
+              },
+              {
+                "monsterType": "Imposter01",
+                "frontOfLineup": true
+              }
+            ],
+            "applyConditions": "NotKnockbackImmune",
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "Add4ImposterNext": {
+            "class": "Buff",
+            "behaviors": [
+              "SummonMonster",
+              "SummonMonster",
+              "SummonMonster",
+              "SummonMonster"
+            ],
+            "behaviorOverrides": [
+              {
+                "monsterType": "Imposter01",
+                "frontOfLineup": true
+              },
+              {
+                "monsterType": "Imposter01",
+                "frontOfLineup": true
+              },
+              {
+                "monsterType": "Imposter01",
+                "frontOfLineup": true
+              },
+              {
+                "monsterType": "Imposter01",
+                "frontOfLineup": true
+              }
+            ],
+            "applyConditions": "NotKnockbackImmune",
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "LifeFlip": {
+            "class": "Buff",
+            "behaviors": [
+              "AdjustHp"
+            ],
+            "behaviorOverrides": [
+              {
+                "lifeFlip": true,
+                "abilityEffect": "Blank"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "RemoveBuffs": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "SendToBackOfReinforcementsIfAny": {
+            "class": "Buff",
+            "stackName": "Knockback",
+            "behaviors": [
+              "SendToReinforcements"
+            ],
+            "applyConditions": "AllyHasReinforcements",
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "2AlliesLeftNot3": {
+            "class": "MonsterConditions",
+            "allyTeamSize": 2,
+            "not": {
+              "class": "MonsterConditions",
+              "allyTeamSize": 3
+            }
+          },
+          "3AlliesLeftNot4": {
+            "class": "MonsterConditions",
+            "allyTeamSize": 3,
+            "not": {
+              "class": "MonsterConditions",
+              "allyTeamSize": 4
+            }
+          },
+          "4AlliesLeftNoReinforcements": {
+            "class": "MonsterConditions",
+            "allyTeamSize": 4,
+            "not": {
+              "class": "MonsterConditions",
+              "allyReinforcements": 1
+            }
+          },
+          "IsAlone": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "allyTeamSize": 2
+            }
+          }
+        }
+      },
+      "InstantSurvivorSingleACinderella": {
+        "id": "InstantSurvivorSingleACinderella",
+        "found": true,
+        "localization": {
+          "name": "InstantSurvivorSingleACinderella",
+          "description": ""
+        },
+        "ability": {
+          "name": "InstantSurvivorSingleACinderella",
+          "class": "Ability",
+          "abilityScalor": 4,
+          "config": "InstantSurvivorSingleACinderella",
+          "tuCost": 1,
+          "useLimit": 0,
+          "nameKey": "InstantSurvivorSingleA",
+          "descriptionKey": "InstantSurvivorSingleA",
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "SurvivorDamageBoost"
+              ],
+              "damageFlags": [
+                "IgnoreArmor"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "HealFull",
+                "InstantSurvivorSingleACooldown",
+                "BlockDeathOnceWithHoldGroundPlusOK"
+              ],
+              "applyToSourceOnly": true,
+              "showMissConditions": "ShowNoMiss",
+              "skipAbilityEffect": true
+            }
+          ],
+          "useCondition": "TimeInCombat300NotInstantCooldown",
+          "flags": [
+            "Survivor",
+            "Duration"
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "recommendEffectWhenUsable": 1,
+          "abilityEffect": "CinderellaSpecial1"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.4,
+            0,
+            0,
+            1.5,
+            0.2,
+            0.1,
+            0.7,
+            0,
+            0.2
+          ],
+          "prefabs": [
+            "batfx_cinderella1/batfx_pixiewind1",
+            "batfx_jumpsmoke1/batfx_jumpsmoke1",
+            "batfx_cinderella1/batfx_rapier1",
+            "batsfx_prefab/batsfx_multislash2",
+            "batfx_common/batfx_empty",
+            "batfx_cinderella1/batfx_rapier2",
+            "batfx_cinderella1/batfx_whitefloorwave1",
+            "batfx_cinderella1/batfx_aftermath1",
+            "batfx_common/batfx_empty",
+            "batsfx_prefab/batsfx_multislash1",
+            "batfx_common/batfx_finalslash1"
+          ],
+          "sortOrderOffset": [
+            -5,
+            -2,
+            2,
+            0,
+            2,
+            50,
+            -2,
+            10,
+            10,
+            0,
+            2
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            true
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            true
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            true,
+            false,
+            false,
+            true,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "BlockDeathOnceWithHoldGroundPlusOK": {
+            "class": "Buff",
+            "behaviors": [
+              "BlockDeath"
+            ],
+            "behaviorOverrides": [
+              {
+                "cancelFromDamageFlags": [
+                  "IgnoreHoldGround",
+                  "IgnoreBlockDeath",
+                  "HardIgnoreBlockDeath",
+                  "LethalPoison"
+                ],
+                "conditions": "NotBlockDeathUntilNextTurn",
+                "removeAfterTriggers": 1
+              }
+            ],
+            "stackName": "BlockDeathOnceWithHoldGroundPlusOK",
+            "tags": [
+              "BlockDeathOnce"
+            ],
+            "duration": -1,
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "iconSpriteName": "IconWhiteFightSword01"
+          },
+          "HealFull": {
+            "class": "Buff",
+            "behaviors": [
+              "AdjustHp"
+            ],
+            "behaviorOverrides": [
+              {
+                "percent": 1.0,
+                "abilityEffect": "LargeHeal1"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "InstantSurvivorSingleACooldown": {
+            "class": "Buff",
+            "stackName": "InstantCooldown",
+            "duration": 50,
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "reverseTimerFill": true,
+            "iconSpriteName": "IconBlueCountdownClock3"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "TimeInCombat300NotInstantCooldown": {
+            "class": "MonsterConditions",
+            "timeInCombat": 300,
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "InstantCooldown"
+              ]
+            }
+          }
+        }
+      },
+      "MegaResetStrikeSingleACinderella": {
+        "id": "MegaResetStrikeSingleACinderella",
+        "found": true,
+        "localization": {
+          "name": "Calamity Phoenix",
+          "description": "1000% damage to 1 enemy. The Hold Ground+ passive skill is reset for the user and can be triggered again. The user is healed for 100% of max HP. Usable if the user's Hold Ground+ passive skill has been triggered while on the battlefield and only once per battle.",
+          "selected": "1000% damage, heals user & resets Hold Ground+"
+        },
+        "ability": {
+          "name": "MegaResetStrikeSingleACinderella",
+          "class": "Ability",
+          "abilityScalor": 9,
+          "config": "MegaResetStrikeSingleACinderella",
+          "tuCost": 100,
+          "useLimit": 1,
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "SurvivorDamageBoost"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "HealFull",
+                "HoldGroundOnceForHoldGroundPlus",
+                "BlockDeathUntilNextTurnForHoldGroundPlus"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true,
+              "buffAppliedEffects": [
+                "SmallHeal1"
+              ]
+            }
+          ],
+          "useCondition": "NotHoldGroundOnceForHoldGroundPlus",
+          "enemyEventType": "Hit",
+          "flags": [
+            "ResetHoldGroundPlus"
+          ],
+          "sourceEventType": "Finish",
+          "recommendEffectWhenUsable": 1,
+          "abilityEffect": "CinderellaAbility2"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0.3,
+            0.4,
+            0.1,
+            0,
+            0.1,
+            0.2,
+            0.1,
+            0.1
+          ],
+          "prefabs": [
+            "batfx_common/batfx_indigobase1",
+            "batsfx_prefab/batsfx_timestrike1",
+            "batfx_cinderella1/batfx_whitefloorwave1",
+            "batfx_cinderella1/batfx_cloth1",
+            "batfx_cinderella1/batfx_cloth2",
+            "batfx_cinderella1/batfx_cloth3",
+            "batsfx_prefab/batsfx_whoosh1",
+            "batfx_freyaregular1/batfx_firemulti1",
+            "batfx_cinderella1/batfx_clothnuke1",
+            "batfx_common/batfx_empty",
+            "batsfx_prefab/batsfx_bomb1"
+          ],
+          "sortOrderOffset": [
+            -2,
+            0,
+            2,
+            -2,
+            3,
+            -2,
+            0,
+            10,
+            20,
+            0,
+            0
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            true,
+            false
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            true,
+            false
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1"
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            true
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "BlockDeathUntilNextTurnForHoldGroundPlus": {
+            "class": "Buff",
+            "stackName": "BlockDeathUntilNextTurn",
+            "behaviors": [
+              "BuffOnMonsterTurn",
+              "BlockDeath",
+              "Immunity"
+            ],
+            "behaviorOverrides": [
+              {
+                "selfBuffs": [
+                  "RemoveBlockDeathUntilNextTurnForHoldGroundPlus"
+                ],
+                "spreadCondition": "NotHoldGroundOnceForHoldGroundPlus"
+              },
+              {
+                "conditions": "NotAlwaysEnemyTurn",
+                "cancelFromDamageFlags": [
+                  "IgnoreBlockDeath",
+                  "HardIgnoreBlockDeath",
+                  "LethalPoison"
+                ]
+              },
+              {
+                "stackNamesToBlock": [
+                  "BlockDeathUntilNextTurn"
+                ],
+                "activateCondition": "NotHoldGroundOnceForHoldGroundPlusNotMyTurn",
+                "dontShowText": true
+              }
+            ],
+            "hideFromPlayerCondition": "HoldGroundOnceForHoldGroundPlusOrMyTurn",
+            "iconSpriteName": "IconWhiteFightSwordPlus01",
+            "duration": -1,
+            "showAsTimer": true
+          },
+          "HealFull": {
+            "class": "Buff",
+            "behaviors": [
+              "AdjustHp"
+            ],
+            "behaviorOverrides": [
+              {
+                "percent": 1.0,
+                "abilityEffect": "LargeHeal1"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "HoldGroundOnceForHoldGroundPlus": {
+            "class": "Buff",
+            "stackName": "HoldGroundOnceForHoldGroundPlus",
+            "behaviors": [
+              "BlockDeath"
+            ],
+            "behaviorOverrides": [
+              {
+                "conditions": "AlwaysTrue",
+                "removeAfterTriggers": 1,
+                "cancelFromDamageFlags": [
+                  "IgnoreBlockDeath",
+                  "HardIgnoreBlockDeath",
+                  "LethalPoison"
+                ]
+              }
+            ],
+            "iconSpriteName": "IconWhiteFightSwordPlus01",
+            "duration": -1,
+            "showAsTimer": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "HoldGroundOnceForHoldGroundPlus": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "HoldGroundOnceForHoldGroundPlus"
+            ]
+          },
+          "NotHoldGroundOnceForHoldGroundPlus": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "HoldGroundOnceForHoldGroundPlus"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "passives": {
+      "HoldGroundPlusCinderella": {
+        "id": "HoldGroundPlusCinderella",
+        "found": true,
+        "localization": {
+          "name": "Hold Ground+",
+          "description": "If this unit would be defeated, it instead survives with 1 HP and then cannot be defeated until its next turn. This effect can trigger only once each time this unit enters the battlefield."
+        }
+      },
+      "StatusRemovalMomentumA": {
+        "id": "StatusRemovalMomentumA",
+        "found": true,
+        "localization": {
+          "name": "Veil Breaker",
+          "description": "Each time this unit damages an enemy that has the Stealth or Armor Status Effect with an attack, this unit will immediately get the next turn. This unit cannot be sent to the reinforcements from the battlefield.\n\n- The extra turn is granted after Counter Skin type effects triggered by this unit's attacks, and so this unit will act before a countering enemy.\n- Effects that influence TU order may interrupt the extra turn (e.g. Stuns targeting the lowest TU target).\n- This cannot trigger again against the same target until TU advances.\n"
+        }
+      },
+      "AirMinusDamageLv3": {
+        "id": "AirMinusDamageLv3",
+        "found": true,
+        "localization": {
+          "name": "Storm Resist Lv3",
+          "description": "10% less damage from attacks by Storm units."
+        }
+      },
+      "PlusAttackBoostLv3": {
+        "id": "PlusAttackBoostLv3",
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv3",
+          "description": "Adds 300 to this unit's Attack."
+        }
+      },
+      "PlusHPBoostLv3": {
+        "id": "PlusHPBoostLv3",
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv3",
+          "description": "Adds 1200 to this unit's max HP."
+        }
+      },
+      "AddWeaponPrefStaff": {
+        "id": "AddWeaponPrefStaff",
+        "found": true,
+        "localization": {
+          "name": "Staff Mastery",
+          "description": "Can use weapon skills of Staffs in addition to their original preferred weapon type."
+        }
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": {
+      "class": "MonsterConditions",
+      "elements": [
+        "Life"
+      ]
+    }
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "CinderellaRegular02",
+    "family": "CinderellaRegular",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "CinderellaRegular02",
+    "family": "CinderellaRegular",
+    "class": "Monster",
+    "leaderBuff": "AttackUpLifeD",
+    "leaderBuffCondition": "IsLife",
+    "activeSkills": {
+      "0": "SleepAttackPlusSingleACinderella",
+      "1": "LifeFlipSendbackACinderella",
+      "2": "InstantSurvivorSingleACinderella",
+      "3": "MegaResetStrikeSingleACinderella"
+    },
+    "passives": {
+      "0": "HoldGroundPlusCinderella",
+      "1": "StatusRemovalMomentumA",
+      "2": "AirMinusDamageLv3",
+      "3": "PlusAttackBoostLv3",
+      "4": "PlusHPBoostLv3",
+      "5": "AddWeaponPrefStaff"
+    },
+    "cost": 34,
+    "baseAttack": 1466,
+    "baseMaxHp": 7090,
+    "speed": 644,
+    "element": "Life",
+    "weaponPref": "Sword",
+    "weaponPivotIndex": 0,
+    "secure": 1,
+    "evolveFrom": "CinderellaRegular01",
+    "aiTargetPickWeight": 1,
+    "stars": 6,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 0,
+    "battleOrbImageFlip": 0,
+    "attackType": "Bash",
+    "formTwitterShare": 1,
+    "cosmoName": "CinderellaRegular03",
+    "cosmoBattleOrbImageFlip": 1,
+    "summonableMonsters": [
+      "Imposter01"
+    ],
+    "summonableMatchSource": [
+      false
+    ],
+    "skillVoices": {
+      "0": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "1": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "2": [
+        9,
+        10,
+        11,
+        12
+      ],
+      "3": [
+        13,
+        14,
+        15,
+        16
+      ]
+    },
+    "damageVoices": [
+      17,
+      18,
+      19,
+      20
+    ],
+    "deathVoices": [
+      21,
+      22,
+      23,
+      24
+    ],
+    "victoryVoices": [
+      25,
+      26
+    ],
+    "lineupVoices": [
+      27,
+      28,
+      29,
+      30,
+      31,
+      32
+    ],
+    "evolutionVoices": [
+      33
+    ],
+    "trainVoices": [
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43
+    ],
+    "titleVoices": [
+      44
+    ],
+    "gachaVoices": [
+      45
+    ],
+    "loginVoices": [
+      46
+    ],
+    "tapVoices": [
+      47,
+      48,
+      49
+    ],
+    "idleVoices": [
+      50
+    ]
+  },
+  "_build": {
+    "scriptVersion": "6-character-family-states",
+    "sourceHash": "47ea399de7fb4d1a8f151cb58eb856adeba5cbdf4cbad6f0a9cc66cd56053b3b",
+    "dependencyHash": "bab1ed068eddaf9118c9ce5800e268a8b317c2bcfc425bf406443be659a6dd79",
+    "generatedAt": 1778213416
+  }
+}
