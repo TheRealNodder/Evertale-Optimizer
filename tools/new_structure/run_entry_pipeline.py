@@ -10,13 +10,13 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 ROOT_MARKERS = ["apkfiles", "tools"]
-PIPELINE_VERSION = 1
+PIPELINE_VERSION = 2
 
 DEFAULT_STEPS = [
     "bookmark_before",
     "extract_entries",
     "extract_localization",
-    "sync_weapon_order",
+    "sync_category_order",
     "organize_entries",
     "build_character_image_map",
     "build_bundles",
@@ -29,7 +29,7 @@ SCRIPT_MAP = {
     "bookmark_after": "update_entry_bookmark.py",
     "extract_entries": "run_universal_apk_builder.py",
     "extract_localization": "extract_localizable_groups.py",
-    "sync_weapon_order": "sync_weapon_order_canonical.py",
+    "sync_category_order": "sync_category_order_canonical.py",
     "organize_entries": "organize_entries_from_toolbox.py",
     "build_character_image_map": "build_character_image_map.py",
     "build_bundles": "build_entry_bundles.py",
@@ -43,15 +43,6 @@ def find_repo_root(start: Path) -> Path:
         if all((folder / marker).exists() for marker in ROOT_MARKERS):
             return folder
     raise SystemExit("ERROR: Could not locate Evertale-Optimizer repo root. Run from anywhere inside the repo.")
-
-
-def load_json(path: Path, fallback: Any = None) -> Any:
-    try:
-        return json.loads(path.read_text(encoding="utf-8-sig"))
-    except FileNotFoundError:
-        return fallback
-    except Exception:
-        return fallback
 
 
 def write_json(path: Path, data: Any) -> None:
@@ -87,14 +78,17 @@ def run_step(repo_root: Path, tools_dir: Path, step: str, args: argparse.Namespa
             command.extend(["--limit", str(args.limit)])
         if args.start_after:
             command.extend(["--start-after", args.start_after])
-    elif step in {"bookmark_before", "bookmark_after", "build_character_image_map", "build_bundles", "validate"}:
-        # These scripts auto-detect the repo/entries root. Keep args minimal for cross-PC compatibility.
-        pass
+
+    elif step == "sync_category_order":
+        if args.category:
+            command.extend(["--category", args.category])
+        if args.dry_run:
+            command.append("--dry-run")
+
     elif step == "organize_entries":
         if args.dry_run:
             command.append("--dry-run")
-    elif step == "sync_weapon_order":
-        pass
+
     elif step == "extract_localization":
         if args.raw:
             command.extend(["--input", str(Path(args.raw).resolve())])
@@ -118,6 +112,7 @@ def run_step(repo_root: Path, tools_dir: Path, step: str, args: argparse.Namespa
     result = subprocess.run(command, cwd=str(repo_root))
     finished = int(time.time())
     status = "ok" if result.returncode == 0 else "failed"
+
     return {
         "step": step,
         "script": str(script_path),
@@ -141,7 +136,7 @@ def parse_steps(value: Optional[str]) -> List[str]:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Universal Evertale entry pipeline with bookmark support.")
+    parser = argparse.ArgumentParser(description="Universal Evertale entry pipeline with bookmark support and append-safe ordering.")
     parser.add_argument("--raw", default=None, help="Optional folder containing raw APK JSON files. Auto-detected by the builder when omitted.")
     parser.add_argument("--steps", default=None, help="Comma-separated step list. Default runs full pipeline.")
     parser.add_argument("--skip", default=None, help="Comma-separated steps to skip.")
@@ -149,7 +144,7 @@ def main() -> int:
     parser.add_argument("--limit", type=int, default=None)
     parser.add_argument("--start-after", default=None)
     parser.add_argument("--force", action="store_true", help="Force rebuild entry extraction step.")
-    parser.add_argument("--dry-run", action="store_true", help="Pass dry-run to organizer where supported.")
+    parser.add_argument("--dry-run", action="store_true", help="Pass dry-run to compatible steps.")
     parser.add_argument("--plan", action="store_true", help="Print planned commands without running them.")
     parser.add_argument("--continue-on-error", action="store_true", help="Continue remaining steps after a failed step.")
     args = parser.parse_args()
@@ -178,27 +173,27 @@ def main() -> int:
     }
 
     final_code = 0
+
     for step in steps:
         result = run_step(repo_root, tools_dir, step, args)
         report["steps"].append(result)
         write_json(reports_dir / "entry_pipeline_report.json", report)
-        if result["status"] == "failed":
+
+        if result["status"] in {"failed", "missing_script"}:
             final_code = result.get("returnCode") or 1
-            if not args.continue_on_error:
-                break
-        elif result["status"] == "missing_script":
-            final_code = 1
             if not args.continue_on_error:
                 break
 
     report["finishedAt"] = int(time.time())
     report["status"] = "ok" if final_code == 0 else "failed"
+
     write_json(reports_dir / "entry_pipeline_report.json", report)
 
     print("\n" + "=" * 72)
     print("Pipeline complete:", report["status"])
     print("Report:", reports_dir / "entry_pipeline_report.json")
     print("=" * 72)
+
     return final_code
 
 
