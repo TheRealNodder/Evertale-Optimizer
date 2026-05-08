@@ -20,6 +20,7 @@ CATEGORY_CONFIG = {
         "key_field": "family",
         "display_fields": ["name", "displayName", "title"],
         "fallback_key_field": "sourceId",
+        "collapse_numeric_forms": False,
     },
     "weapons": {
         "index": "apkfiles/entries/weapons/index.json",
@@ -29,6 +30,7 @@ CATEGORY_CONFIG = {
         "key_field": "sourceId",
         "display_fields": ["name", "displayName"],
         "fallback_key_field": "name",
+        "collapse_numeric_forms": True,
     },
     "accessories": {
         "index": "apkfiles/entries/accessories/index.json",
@@ -38,6 +40,7 @@ CATEGORY_CONFIG = {
         "key_field": "sourceId",
         "display_fields": ["name", "displayName"],
         "fallback_key_field": "name",
+        "collapse_numeric_forms": True,
     },
     "bosses": {
         "index": "apkfiles/entries/bosses/index.json",
@@ -47,6 +50,7 @@ CATEGORY_CONFIG = {
         "key_field": "sourceId",
         "display_fields": ["name", "displayName"],
         "fallback_key_field": "name",
+        "collapse_numeric_forms": False,
     },
 }
 
@@ -88,6 +92,11 @@ def strip_form_suffix(value: str) -> str:
     return re.sub(r"\d+$", "", str(value or ""))
 
 
+def collapse_key(value: str, config: Dict[str, Any]) -> str:
+    value = str(value or "").strip()
+    return strip_form_suffix(value) if config.get("collapse_numeric_forms") else value
+
+
 def parse_order_line(line: str) -> Optional[Tuple[str, str]]:
     line = line.strip()
     if not line or line.startswith("#"):
@@ -126,7 +135,7 @@ def row_key(row: Dict[str, Any], config: Dict[str, Any]) -> str:
         value = row.get(config.get("fallback_key_field", ""))
     if not value and row.get("file"):
         value = Path(str(row.get("file"))).stem
-    return strip_form_suffix(str(value or "").strip()) if config["key_field"] == "sourceId" else str(value or "").strip()
+    return collapse_key(value, config)
 
 
 def row_source_id(row: Dict[str, Any], config: Dict[str, Any], key: str) -> str:
@@ -147,7 +156,7 @@ def row_keys(row: Dict[str, Any], config: Dict[str, Any]) -> List[str]:
     name = str(row.get("name") or "")
     title = str(row.get("title") or "")
     key = row_key(row, config)
-    keys = [key, source_id, strip_form_suffix(source_id), family, name, title]
+    keys = [key, source_id, collapse_key(source_id, config), family, name, title]
     return [k for k in keys if k]
 
 
@@ -178,31 +187,37 @@ def sync_category(repo: Path, category: str, dry_run: bool) -> Dict[str, Any]:
     canonical = load_canonical(canonical_path)
     by_norm, index_rows = build_index_maps(index, config)
 
-    # If canonical does not exist yet, seed it from current index order.
     seeded = False
     if not canonical:
         seeded = True
         seen_seed = set()
         for row in index_rows:
             key = row.get("_canonicalKey") or row.get("_sourceId")
-            if not key or norm(key) in seen_seed:
+            nkey = norm(key)
+            if not key or nkey in seen_seed:
                 continue
-            seen_seed.add(norm(key))
+            seen_seed.add(nkey)
             canonical.append({"key": key, "displayName": row.get("_displayName") or key})
 
     ordered: List[Dict[str, Any]] = []
     seen_row_ids = set()
+    seen_canonical_keys = set()
     missing_canonical: List[Dict[str, str]] = []
 
     for canon in canonical:
-        matched = by_norm.get(norm(canon["key"]))
+        canon_key_norm = norm(canon["key"])
+        matched = by_norm.get(canon_key_norm)
         if not matched:
             missing_canonical.append(canon)
+            seen_canonical_keys.add(canon_key_norm)
             continue
         row_id = matched.get("_sourceId") or matched.get("_canonicalKey")
-        if row_id in seen_row_ids:
+        row_key_norm = norm(matched.get("_canonicalKey") or canon["key"])
+        if row_id in seen_row_ids or row_key_norm in seen_canonical_keys:
             continue
         seen_row_ids.add(row_id)
+        seen_canonical_keys.add(canon_key_norm)
+        seen_canonical_keys.add(row_key_norm)
         ordered.append({
             "key": canon["key"],
             "sourceId": row_id,
@@ -215,11 +230,13 @@ def sync_category(repo: Path, category: str, dry_run: bool) -> Dict[str, Any]:
     appended: List[Dict[str, str]] = []
     for row in index_rows:
         row_id = row.get("_sourceId") or row.get("_canonicalKey")
-        if not row_id or row_id in seen_row_ids:
-            continue
         key = row.get("_canonicalKey") or row_id
+        key_norm = norm(key)
+        if not row_id or row_id in seen_row_ids or key_norm in seen_canonical_keys:
+            continue
         display = row.get("_displayName") or key
         seen_row_ids.add(row_id)
+        seen_canonical_keys.add(key_norm)
         appended.append({"key": key, "displayName": display})
         ordered.append({
             "key": key,
@@ -261,7 +278,7 @@ def sync_category(repo: Path, category: str, dry_run: bool) -> Dict[str, Any]:
         "canonicalFile": str(canonical_path),
         "indexFile": str(index_path),
         "orderMap": str(order_map_path),
-        "canonicalExistingCount": len(canonical) - len(appended),
+        "canonicalExistingCount": len(canonical),
         "indexEntryCount": len(index_rows),
         "orderedCount": len(ordered),
         "appendedNewEntries": len(appended),
