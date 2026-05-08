@@ -4,18 +4,11 @@ Universal launcher for the Evertale APK entry builder.
 
 Use this when you do not want to worry about folder paths.
 
-Examples:
-  python tools/new_structure/run_universal_apk_builder.py
-  python C:\path\to\Evertale-Optimizer\tools\new_structure\run_universal_apk_builder.py
-  python run_universal_apk_builder.py
-
 What it does:
-- Uses the folder you run it from as the starting point.
-- Searches that folder and nearby folders for the raw APK files.
+- Auto-detects raw APK files.
 - Finds Monster.json, Weapon.json, Equipment.json, Boss.json automatically.
-- Finds resolver files automatically if they are nearby.
-- Writes output to the repo's apkfiles/generated_entries when it can find the repo.
-- Otherwise writes output to <detected input folder>/generated_entries.
+- Writes output to the active runtime folder: apkfiles/entries.
+- Keeps generated entries loadable by data-loader.js without hardwiring JS.
 """
 
 from __future__ import annotations
@@ -44,7 +37,6 @@ def find_repo_root(start: Path) -> Optional[Path]:
 
 
 def candidate_folders(start: Path) -> Iterable[Path]:
-    # Most likely locations first.
     yield start
     for name in ("raw", "apkfiles", "Full List", "full list"):
         p = start / name
@@ -54,8 +46,6 @@ def candidate_folders(start: Path) -> Iterable[Path]:
         p = start.parent / name
         if p.is_dir():
             yield p
-
-    # Then scan shallow descendants. This avoids crawling the whole drive.
     try:
         for p in start.rglob("*"):
             if p.is_dir():
@@ -98,15 +88,12 @@ def main() -> int:
     if not base.exists():
         print(f"ERROR: Base folder does not exist: {base}")
         return 1
-
-    # If a file path was provided, use its folder.
     if base.is_file():
         base = base.parent
 
     input_dir = find_best_input(base)
     if not input_dir:
         print("ERROR: Could not find raw APK files nearby.")
-        print("Looked for:")
         for name in CORE_FILES:
             print(f"  - {name}")
         print(f"Starting from: {base}")
@@ -116,25 +103,17 @@ def main() -> int:
 
     if repo_root:
         builder = repo_root / SCRIPT_RELATIVE
-        output_dir = Path(args.output).expanduser().resolve() if args.output else repo_root / "apkfiles" / "generated_entries"
+        # IMPORTANT: data-loader.js reads apkfiles/entries, not apkfiles/generated_entries.
+        output_dir = Path(args.output).expanduser().resolve() if args.output else repo_root / "apkfiles" / "entries"
     else:
-        # Fallback if someone copied only this launcher and the main builder is beside it.
         possible_builder = Path(__file__).resolve().parent / "build_apk_entry_folders.py"
         if not possible_builder.is_file():
             print("ERROR: Could not find build_apk_entry_folders.py.")
-            print("Keep this launcher in tools/new_structure/ beside build_apk_entry_folders.py, or run it from the repo.")
             return 1
         builder = possible_builder
-        output_dir = Path(args.output).expanduser().resolve() if args.output else input_dir / "generated_entries"
+        output_dir = Path(args.output).expanduser().resolve() if args.output else input_dir / "entries"
 
-    command = [
-        sys.executable,
-        str(builder),
-        "--input",
-        str(input_dir),
-        "--output",
-        str(output_dir),
-    ]
+    command = [sys.executable, str(builder), "--input", str(input_dir), "--output", str(output_dir)]
     if args.force:
         command.append("--force")
     if args.category:
@@ -148,7 +127,6 @@ def main() -> int:
     print("Output folder:", output_dir)
     print("Running builder:", builder)
     print()
-
     return subprocess.call(command)
 
 
