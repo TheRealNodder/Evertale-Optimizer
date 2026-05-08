@@ -1,0 +1,1442 @@
+{
+  "schemaVersion": 3,
+  "order": 731,
+  "id": "aigis",
+  "name": "Aigis",
+  "title": " ",
+  "description": "Aigis had no family either. As an infant, she was abandoned in the forest near a town. Though taken in by a local family who found her, she was treated as little more than labor—and in the end, she was cast aside once again.\nBecause of her distinct appearance and her timid nature, she remained alone for as long as she could remember.\n\nUntil she met Belle.",
+  "category": "character",
+  "rarity": null,
+  "stars": 6,
+  "evolvedStars": 6,
+  "element": "Dark",
+  "weaponType": "Spear",
+  "stats": {
+    "atk": 1438,
+    "hp": 10853,
+    "spd": 304,
+    "cost": 34
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/BeastRegular02.png",
+  "refs": {
+    "activeSkills": [
+      "SingleAttackABeastRegular",
+      "AllAttackABeastRegular",
+      "RevivalBuffABeastRegular02"
+    ],
+    "passives": [
+      "IamtheBEASTPassiveABeastRegular",
+      "StrongHidePassiveABeastRegular",
+      "PlusAttackBoostLv3",
+      "PlusHPBoostLv3",
+      "Stun20TUMinus",
+      "AddWeaponPrefGreatSword"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": null,
+    "leaderBuffCondition": "IsDeath",
+    "summonableMonsters": [
+      "BeautyRegular02"
+    ]
+  },
+  "resolved": {
+    "activeSkills": {
+      "SingleAttackABeastRegular": {
+        "id": "SingleAttackABeastRegular",
+        "found": true,
+        "localization": {
+          "name": "Beastly Uppercut",
+          "description": "700% damage to 1 enemy. Minus 100% damage for each non-poisoned enemy on the battlefield (max of -400% if there are 4 non-poisoned enemies). This attack ignores any effects of non-boss enemies that would prevent the target from being defeated, enemy damage reduction effects, the Counter Stance Status Effect, and the effects of Skin passive skills.\n\nThen the target hit has its burn removed (including Mega Healing Burn) and is randomly granted either Mega Poison for 200TU, or Lethal Poison for 999TU. This will overwrite other status effects on that enemy.",
+          "selected": "300%+ damage, apply poison\n(Will overwrite other status effects)"
+        },
+        "ability": {
+          "name": "SingleAttackABeastRegular",
+          "class": "Ability",
+          "abilityScalor": 6,
+          "conditionalAbilityScalors": [
+            5,
+            4,
+            3,
+            2
+          ],
+          "config": "SingleAttackABeastRegular",
+          "tuCost": 50,
+          "useLimit": 0,
+          "spiritGain": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "applyToTargetType": "Enemy",
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "damageFlags": [
+                "IgnoreArmor",
+                "IgnoreSkin",
+                "HardIgnoreBlockDeath"
+              ],
+              "drainPercent": 1.0,
+              "drainEffect": "MerlinSelfHeal1"
+            },
+            {
+              "buffs": [
+                "RemoveBurn",
+                "BurnImmunityTempForRevenge"
+              ],
+              "chance": 1.0,
+              "applyToTargetType": "Enemy",
+              "skipAbilityEffect": true
+            },
+            {
+              "randomBuffFromList": [
+                "MegaPoison",
+                "LethalPoison"
+              ],
+              "applyToTargetType": "Enemy",
+              "skipAbilityEffect": true
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "BeastAttack1",
+          "attackScalors": [
+            "GoodVs1NotPoisonedEnemy",
+            "GoodVs2NotPoisonedEnemies",
+            "GoodVs3NotPoisonedEnemies",
+            "GoodVs4NotPoisonedEnemies"
+          ],
+          "conditionedAbilityEffects": [
+            "BeastAttack1",
+            "BeastAttack1",
+            "BeastAttack1",
+            "BeastAttack1"
+          ],
+          "flags": [
+            "Poisoner"
+          ],
+          "recommendEffectWhenUsable": -1
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.4,
+            0,
+            0.4,
+            0.3,
+            0,
+            0,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batfx_Zoro/batfx_DashShock",
+            "batsfx_prefab/batsfx_whoosh1",
+            "batfx_common3/batfx_CommonSparkler1",
+            "batfx_Masamune/batfx_Greenslash1",
+            "batfx_Beast/batfx_slashRed2",
+            "batfx_Beast/batfx_newclaw2",
+            "batfx_groundimpact/batfx_groundimpact",
+            "batsfx_prefab/batsfx_slash1"
+          ],
+          "sortOrderOffset": [
+            4,
+            0,
+            3,
+            1,
+            1,
+            1,
+            3,
+            2
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            false,
+            false,
+            false,
+            false,
+            true
+          ],
+          "boneToAttachTo": [
+            "",
+            "",
+            "effectbone",
+            "effectbone",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "BurnImmunityTempForRevenge": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Burn",
+                  "BurnAfterTurn",
+                  "BurnAtEndOfTurn"
+                ],
+                "dontShowText": true
+              },
+              {
+                "name": "BurnAfterTurn"
+              },
+              {
+                "name": "BurnSelfOnHit"
+              }
+            ],
+            "duration": 1,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "tags": [
+              "BurnImmune"
+            ],
+            "stackName": "BurnImmunityTempForRevenge",
+            "isHiddenFromPlayers": true
+          },
+          "LethalPoison": {
+            "class": "Buff",
+            "stackName": "Poison",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "DamageOverTime"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Poison",
+                  "SuperPoison",
+                  "MegaPoison",
+                  "PoisonDelay",
+                  "PoisonDelayedMegaPoisonChance",
+                  "Sleep",
+                  "SleepDelayed",
+                  "Armor",
+                  "Stance",
+                  "Decay",
+                  "SpiritLeaking",
+                  "SpiritLeakReady"
+                ],
+                "dontShowText": true
+              },
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "percentOfAttack": 0.005,
+                "damageColor": "Green",
+                "abilityEffect": "PoisonDamageRed",
+                "extraDamageFlag": "LethalPoison"
+              }
+            ],
+            "tags": [
+              "Poison",
+              "LethalPoison"
+            ],
+            "duration": 999,
+            "showAsTimer": false,
+            "statusEffect": "PoisonStatusRed",
+            "statusEffectOffset": 0.1,
+            "damageType": "Poison",
+            "noIconShownOnBattleStatus": true,
+            "iconSpriteName": "IconPurplePoison01",
+            "applyConditions": "IsNotBurningNotBoss"
+          },
+          "MegaPoison": {
+            "class": "Buff",
+            "stackName": "Poison",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "DamageOverTime"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "percentOfAttack": 0.05,
+                "damageColor": "Green",
+                "abilityEffect": "MidDeath1MegaPoison",
+                "extraDamageFlag": "MegaPoison"
+              }
+            ],
+            "tags": [
+              "Poison",
+              "MegaPoison"
+            ],
+            "canBePurified": true,
+            "duration": 200,
+            "showAsTimer": true,
+            "statusEffect": "MegaPoisonStatus",
+            "statusEffectOffset": 0.1,
+            "damageType": "Poison",
+            "iconSpriteName": "IconPurplePoison01"
+          },
+          "RemoveBurn": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "RemoveMegaHealingBurnApplyHealingBurn"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {
+          "GoodVs1NotPoisonedEnemy": {
+            "class": "AttackScalor",
+            "sourceCondition": "1EnemyNotPoisoned"
+          },
+          "GoodVs2NotPoisonedEnemies": {
+            "class": "AttackScalor",
+            "sourceCondition": "2EnemiesNotPoisoned"
+          },
+          "GoodVs3NotPoisonedEnemies": {
+            "class": "AttackScalor",
+            "sourceCondition": "3EnemiesNotPoisoned"
+          },
+          "GoodVs4NotPoisonedEnemies": {
+            "class": "AttackScalor",
+            "sourceCondition": "4EnemiesNotPoisoned"
+          }
+        },
+        "conditions": {}
+      },
+      "AllAttackABeastRegular": {
+        "id": "AllAttackABeastRegular",
+        "found": true,
+        "localization": {
+          "name": "Briar Barrage",
+          "description": "500% damage to all enemies. This attack ignores damage reduction effects, skin passive skills and the Counter Stance status effect. All enemies hit are randomly granted either Mega Poison for 200TU, or Lethal Poison for 999TU.\n\nUsable if there are 0 or 1 poisoned enemies on the battlefield. This skill becomes locked for 30TU after use.",
+          "selected": "500% damage, may Poison\n(Will overwrite other status effects)"
+        },
+        "ability": {
+          "name": "AllAttackABeastRegular",
+          "class": "Ability",
+          "abilityScalor": 4,
+          "config": "AllAttackABeastRegular",
+          "tuCost": 1,
+          "useLimit": 0,
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "AllEnemy",
+          "components": [
+            "Damage",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "damageFlags": [
+                "IgnoreArmor",
+                "IgnoreSkin"
+              ],
+              "applyToTargetType": "Enemy",
+              "drainPercent": 1.0,
+              "drainEffect": "MerlinSelfHeal1"
+            },
+            {
+              "randomBuffFromList": [
+                "MegaPoison",
+                "LethalPoison"
+              ],
+              "buffs": [
+                "BurnImmunityTempForRevenge"
+              ],
+              "applyToTargetType": "Enemy",
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "BeastRegularActive2Cooldown30"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss"
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "flags": [
+            "Poisoner"
+          ],
+          "abilityEffect": "BeastRoseAttack1",
+          "useCondition": "LessThan2EnemiesPoisonedAndNotInstantCooldown"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "allEnemies": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0.2,
+            0,
+            0,
+            0,
+            0.9,
+            0,
+            0.2,
+            0.2,
+            0.8,
+            0.1,
+            0.2,
+            0
+          ],
+          "prefabs": [
+            "batfx_inugamiregular1/batfx_tailwindred3",
+            "batsfx_prefab/batsfx_charge1",
+            "batfx_LudmillaDark/batfx_BigCasting2",
+            "batfx_Zoro/batfx_petalswirlZoro1",
+            "batfx_inugamiregular1/batfx_tailwindred3",
+            "batsfx_prefab/batsfx_charge1",
+            "batfx_inugamiregular1/batfx_tailwindred3",
+            "batfx_Beast/batfx_RoseRain1",
+            "batsfx_prefab/batsfx_multislash1",
+            "batfx_Beast/batfx_groundRose1",
+            "batfx_groundimpact/batfx_groundimpact",
+            "batfx_Beauty/batfx_newclaw4",
+            "batfx_groundimpact/batfx_groundimpact",
+            "batfx_bluntimpact3/batfx_bluntimpact3",
+            "batsfx_prefab/batsfx_slash1"
+          ],
+          "sortOrderOffset": [
+            -100,
+            -2,
+            2,
+            2,
+            -100,
+            20,
+            -100,
+            3,
+            0,
+            2,
+            3,
+            30,
+            3,
+            10,
+            2
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            true,
+            false,
+            false,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            true,
+            false,
+            false,
+            false,
+            true,
+            false,
+            true,
+            true,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "BeastRegularActive2Cooldown30": {
+            "class": "Buff",
+            "duration": 30,
+            "stackName": "InstantCooldown",
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "iconSpriteName": "IconBlueCountdownClock3"
+          },
+          "BurnImmunityTempForRevenge": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Burn",
+                  "BurnAfterTurn",
+                  "BurnAtEndOfTurn"
+                ],
+                "dontShowText": true
+              },
+              {
+                "name": "BurnAfterTurn"
+              },
+              {
+                "name": "BurnSelfOnHit"
+              }
+            ],
+            "duration": 1,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "tags": [
+              "BurnImmune"
+            ],
+            "stackName": "BurnImmunityTempForRevenge",
+            "isHiddenFromPlayers": true
+          },
+          "LethalPoison": {
+            "class": "Buff",
+            "stackName": "Poison",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "DamageOverTime"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Poison",
+                  "SuperPoison",
+                  "MegaPoison",
+                  "PoisonDelay",
+                  "PoisonDelayedMegaPoisonChance",
+                  "Sleep",
+                  "SleepDelayed",
+                  "Armor",
+                  "Stance",
+                  "Decay",
+                  "SpiritLeaking",
+                  "SpiritLeakReady"
+                ],
+                "dontShowText": true
+              },
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "percentOfAttack": 0.005,
+                "damageColor": "Green",
+                "abilityEffect": "PoisonDamageRed",
+                "extraDamageFlag": "LethalPoison"
+              }
+            ],
+            "tags": [
+              "Poison",
+              "LethalPoison"
+            ],
+            "duration": 999,
+            "showAsTimer": false,
+            "statusEffect": "PoisonStatusRed",
+            "statusEffectOffset": 0.1,
+            "damageType": "Poison",
+            "noIconShownOnBattleStatus": true,
+            "iconSpriteName": "IconPurplePoison01",
+            "applyConditions": "IsNotBurningNotBoss"
+          },
+          "MegaPoison": {
+            "class": "Buff",
+            "stackName": "Poison",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "DamageOverTime"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "percentOfAttack": 0.05,
+                "damageColor": "Green",
+                "abilityEffect": "MidDeath1MegaPoison",
+                "extraDamageFlag": "MegaPoison"
+              }
+            ],
+            "tags": [
+              "Poison",
+              "MegaPoison"
+            ],
+            "canBePurified": true,
+            "duration": 200,
+            "showAsTimer": true,
+            "statusEffect": "MegaPoisonStatus",
+            "statusEffectOffset": 0.1,
+            "damageType": "Poison",
+            "iconSpriteName": "IconPurplePoison01"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "LessThan2EnemiesPoisonedAndNotInstantCooldown": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "InstantCooldown"
+              ],
+              "or": {
+                "class": "MonsterConditions",
+                "checkEnemyTeamOfMonster": true,
+                "enemyTeamMonsterConditionMatchesNeeded": {
+                  "IsPoisoned": 2
+                }
+              }
+            }
+          }
+        }
+      },
+      "RevivalBuffABeastRegular02": {
+        "id": "RevivalBuffABeastRegular02",
+        "found": true,
+        "localization": {
+          "name": "RevivalBuffABeastRegular02",
+          "description": ""
+        },
+        "ability": {
+          "name": "RevivalBuffABeastRegular02",
+          "class": "Ability",
+          "config": "RevivalBuffABeastRegular02",
+          "tuCost": 50,
+          "useLimit": 0,
+          "nameKey": "RevivalBuffABeastRegular01",
+          "descriptionKey": "RevivalBuffABeastRegular01",
+          "spiritCost": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "oneAllyNotMe",
+          "components": [
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "AddTheBeautyRegular02Next"
+              ],
+              "applyToTargetOnly": true,
+              "buffBackMode": true,
+              "skipAbilityEffect": true,
+              "applyConditions": "AtLeast4AlliesLeft",
+              "showMissConditions": "ShowNoMiss"
+            },
+            {
+              "buffs": [
+                "SendToFrontOfReinforcements",
+                "RemoveBuffs"
+              ],
+              "applyToTargetOnly": true,
+              "skipAbilityEffect": true,
+              "buffAppliedEffects": [
+                "StepBackEffect"
+              ],
+              "applyConditions": "AtLeast4AlliesLeftNotKnockbackImmune",
+              "showMissConditions": "ShowNoMiss"
+            },
+            {
+              "buffs": [
+                "AddTheBeautyRegular02Next"
+              ],
+              "applyConditions": "3OrFewerAlliesLeft",
+              "applyToTargetOnly": true,
+              "skipAbilityEffect": true,
+              "buffBackMode": true,
+              "showMissConditions": "ShowNoMiss"
+            },
+            {
+              "buffs": [
+                "Empty"
+              ],
+              "applyToSourceOnly": true
+            }
+          ],
+          "friendlyEventType": "Finish",
+          "sourceEventType": "Hit",
+          "recommendEffectWhenUsable": -1,
+          "useCondition": "NoTheBeautyRegularInTeam",
+          "abilityEffect": "BeastRevive",
+          "flags": [
+            "Summon",
+            "NoDamage"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "friendlyTargets": 1,
+          "oneAllyNotMe": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0.5,
+            0,
+            0,
+            0,
+            0,
+            0.3
+          ],
+          "prefabs": [
+            "batfx_Beast/batfx_tailwindBeastRose1",
+            "batfx_Ryoma/batfx_chargeboomOrange3",
+            "batsfx_prefab/batsfx_magic1",
+            "batsfx_prefab/batsfx_beautyring1",
+            "batfx_Kongming/batfx_chargeboomOrange3",
+            "batfx_Beast/batfx_BeastFlare1",
+            "batfx_Beast/batfx_RoseOpen1",
+            "batfx_Beast/batfx_tailwindBeastRose1",
+            "batsfx_prefab/batsfx_heartbeat1"
+          ],
+          "sortOrderOffset": [
+            50,
+            -1,
+            0,
+            0,
+            4,
+            4,
+            -1,
+            50,
+            0
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "AddTheBeautyRegular02Next": {
+            "class": "Buff",
+            "stackName": "AddTheBeautyRegular02Next",
+            "behaviors": [
+              "SummonMonster"
+            ],
+            "behaviorOverrides": [
+              {
+                "monsterType": "BeautyRegular02",
+                "cloneSourceStats": true,
+                "cloneSourceWeapon": true,
+                "cloneSourceEquipment": true,
+                "frontOfLineup": true
+              }
+            ],
+            "duration": 0,
+            "applyConditions": "NoTheBeautyRegularInTeam",
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "Empty": {
+            "class": "Buff",
+            "duration": -1,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "RemoveBuffs": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "SendToFrontOfReinforcements": {
+            "class": "Buff",
+            "stackName": "Pushback",
+            "behaviors": [
+              "SendToReinforcements"
+            ],
+            "behaviorOverrides": [
+              {
+                "frontOfLineup": true
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "3OrFewerAlliesLeft": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "allyTeamSize": 4
+            }
+          },
+          "AtLeast4AlliesLeft": {
+            "class": "MonsterConditions",
+            "allyTeamSize": 4
+          },
+          "AtLeast4AlliesLeftNotKnockbackImmune": {
+            "class": "MonsterConditions",
+            "allyTeamSize": 4,
+            "not": {
+              "class": "MonsterConditions",
+              "monsterTags": [
+                "KnockbackImmune"
+              ]
+            }
+          },
+          "NoTheBeautyRegularInTeam": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "checkReinforcementsForTeamConditionMatches": true,
+              "myTeamMonsterConditionMatchesNeeded": {
+                "IsTheBeautyRegular": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "passives": {
+      "IamtheBEASTPassiveABeastRegular": {
+        "id": "IamtheBEASTPassiveABeastRegular",
+        "found": true,
+        "localization": {
+          "name": "Belle's Protector",
+          "description": "This unit's attacks heal this unit for 100% of total damage dealt.\n\nThis unit cannot be sent to the reinforcements from the battlefield, or be immediately defeated without damage by a non-boss enemy.\n\nThis unit becomes a Guardian and cannot be defeated. These effects begin when this unit enters the battlefield, and end after this unit's third turn on the battlefield. While this unit is a Guardian, for any enemy attack that would hit 1 or 2 other allies, this unit has a 100% chance to redirect 1 hit to itself instead. This unit will not redirect skills that don't deal damage.\n\nThis unit has 30% damage reduction from attacks. While this unit is a Guardian, this unit has 60% damage reduction instead.\n\nIf this unit takes damage from an attack and survives until after the end of the turn, this unit will heal for 25% of max HP and be granted Super Stealth. This healing is increased to 100% of max HP for the first 3 times it triggers after entering the battlefield.\n\nSuper Stealthed units ignore enemy attacks that would damage more than 1 target. Super Stealth will be removed after ignoring 3 enemy attacks since applying, and can be overwritten by other status effects, except normal Stealth. Damage will not remove Super Stealth."
+        }
+      },
+      "StrongHidePassiveABeastRegular": {
+        "id": "StrongHidePassiveABeastRegular",
+        "found": true,
+        "localization": {
+          "name": "Morphean Dreamers",
+          "description": "This unit cannot fall asleep, or be stunned.\n\nWhenever this unit enters the battlefield from allied reinforcements:\n- All enemies on the battlefield are granted Mega Poison for 200TU.\n- All Earth allies named Belle or \"Beauty & Beast, Pair of Morphean Flowers\" on the battlefield will have their TU reduced to 0, and be Purified (negative status effects like sleep, burn or poison are removed).\n- Then this unit will immediately get the turn by having its TU reduced to 0, and be Purified.\n\nWhen this unit takes damage from an attack, all Earth allies named Belle or \"Beauty & Beast, Pair of Morphean Flowers\" on the battlefield will immediately have their TU reduced to 0. This is not a skin effect.\n\nWhen this unit defeats any number of enemies with an attack while on the battlefield, at the end of the turn:\n- This unit steals Spirit from the enemy team until enemy Spirit reaches 0.\n- All Earth allies named Belle or \"Beauty & Beast, Pair of Morphean Flowers\" on the battlefield will have their TU reduced to 0, and be Purified.\n- Then this unit will immediately get the turn by having its TU reduced to 0, and be Purified.\nEffects that influence TU order may interrupt these extra turns (e.g. Stuns targeting the lowest TU target)."
+        }
+      },
+      "PlusAttackBoostLv3": {
+        "id": "PlusAttackBoostLv3",
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv3",
+          "description": "Adds 300 to this unit's Attack."
+        }
+      },
+      "PlusHPBoostLv3": {
+        "id": "PlusHPBoostLv3",
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv3",
+          "description": "Adds 1200 to this unit's max HP."
+        }
+      },
+      "Stun20TUMinus": {
+        "id": "Stun20TUMinus",
+        "found": true,
+        "localization": {
+          "name": "Stun Resist Lv3",
+          "description": "Reduces the amount of any stun effects against this unit by 20TU."
+        }
+      },
+      "AddWeaponPrefGreatSword": {
+        "id": "AddWeaponPrefGreatSword",
+        "found": true,
+        "localization": {
+          "name": "Greatsword Mastery",
+          "description": "Can use weapon skills of Greatswords in addition to their original preferred weapon type."
+        }
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": {
+      "class": "MonsterConditions",
+      "elements": [
+        "Death"
+      ]
+    }
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "BeastRegular02",
+    "family": "BeastRegular",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "BeastRegular02",
+    "family": "BeastRegular",
+    "class": "Monster",
+    "leaderBuffCondition": "IsDeath",
+    "activeSkills": {
+      "0": "SingleAttackABeastRegular",
+      "1": "AllAttackABeastRegular",
+      "2": "RevivalBuffABeastRegular02"
+    },
+    "activeSkillsFamily": {
+      "2": "RevivalBuffABeastRegular"
+    },
+    "passives": {
+      "0": "IamtheBEASTPassiveABeastRegular",
+      "1": "StrongHidePassiveABeastRegular",
+      "2": "PlusAttackBoostLv3",
+      "3": "PlusHPBoostLv3",
+      "4": "Stun20TUMinus",
+      "5": "AddWeaponPrefGreatSword"
+    },
+    "cost": 34,
+    "baseAttack": 1438,
+    "baseMaxHp": 10853,
+    "speed": 304,
+    "element": "Death",
+    "weaponPref": "Spear",
+    "weaponPivotIndex": 0,
+    "secure": 1,
+    "evolveFrom": "BeastRegular01",
+    "aiTargetPickWeight": 1,
+    "stars": 6,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 0,
+    "battleOrbImageFlip": 1,
+    "attackType": "Bash",
+    "cosmoName": "BeastRegular03",
+    "summonableMonsters": [
+      "BeautyRegular02"
+    ],
+    "summonableMatchSource": [
+      true
+    ],
+    "skillVoices": {
+      "0": [
+        101,
+        102,
+        103,
+        104
+      ],
+      "1": [
+        105,
+        106,
+        107,
+        108
+      ],
+      "2": [
+        109,
+        110,
+        111,
+        112
+      ]
+    },
+    "damageVoices": [
+      113,
+      114,
+      115,
+      116
+    ],
+    "deathVoices": [
+      117,
+      118,
+      119,
+      120
+    ],
+    "victoryVoices": [
+      121,
+      122
+    ]
+  },
+  "_build": {
+    "scriptVersion": "6-character-family-states",
+    "sourceHash": "6654f8839fd93d73a8f2502261e17df2a4006b98494ba4acb3dc5185593d7351",
+    "dependencyHash": "4f4745abe57744a6272dcbbf32250894f3dd82bfa66af7f6b7b7a07be8669641",
+    "generatedAt": 1778218071
+  }
+}
