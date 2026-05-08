@@ -9,6 +9,7 @@ from typing import Any, Dict, List, Optional
 
 IMAGE_BASE = "https://ik.imagekit.io/r8fsa98s9/characters"
 STATE_ORDER = ["base", "evolved", "final"]
+OVERRIDES_RELATIVE = "apkfiles/entries/maps/character_image_overrides.json"
 
 
 def find_repo_root(start: Path) -> Path:
@@ -103,7 +104,6 @@ def build_from_family_file(path: Path, image_base: str) -> Optional[Dict[str, An
 def resolve_family_path(entries_root: Path, family_dir: Path, rel: str) -> Path:
     rel_path = Path(rel)
     candidates = []
-    # index.json may store either "SnowWhiteNew.json" or "families/SnowWhiteNew.json".
     candidates.append(family_dir / rel_path)
     candidates.append(entries_root / "characters" / rel_path)
     candidates.append(entries_root / rel_path)
@@ -113,6 +113,29 @@ def resolve_family_path(entries_root: Path, family_dir: Path, rel: str) -> Path:
         if candidate.exists():
             return candidate
     return candidates[0]
+
+
+def apply_overrides(repo_root: Path, payload: Dict[str, Any]) -> List[str]:
+    overrides_path = repo_root / OVERRIDES_RELATIVE
+    overrides = load_json(overrides_path, {}) or {}
+    families = overrides.get("families") if isinstance(overrides, dict) else {}
+    if not isinstance(families, dict):
+        return []
+
+    applied = []
+    for family, override in families.items():
+        if family not in payload:
+            continue
+        if not isinstance(override, dict):
+            continue
+
+        states = override.get("states")
+        if isinstance(states, list) and states:
+            payload[family]["states"] = states
+            payload[family]["image"] = states[0].get("url")
+            applied.append(family)
+
+    return applied
 
 
 def build_from_families(entries_root: Path, image_base: str) -> Dict[str, Any]:
@@ -151,6 +174,8 @@ def main() -> int:
     entries_root = Path(args.entries).resolve() if args.entries else (repo_root / "apkfiles" / "entries").resolve()
     built = build_from_families(entries_root, args.image_base)
 
+    applied_overrides = apply_overrides(repo_root, built["map"])
+
     payload = {
         "schemaVersion": 1,
         "generatedAt": int(time.time()),
@@ -169,6 +194,7 @@ def main() -> int:
         "sourceCount": built["sourceCount"],
         "missingCount": len(built["missing"]),
         "missing": built["missing"],
+        "appliedOverrides": applied_overrides,
     }
 
     write_json(entries_root / "maps" / "character_image_map.json", payload)
