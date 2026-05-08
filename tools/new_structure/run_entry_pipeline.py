@@ -7,15 +7,17 @@ import subprocess
 import sys
 import time
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict
 
 ROOT_MARKERS = ["apkfiles", "tools"]
-PIPELINE_VERSION = 3
+PIPELINE_VERSION = 4
 
 DEFAULT_STEPS = [
     "bookmark_before",
     "extract_entries",
     "extract_localization",
+    "sync_category_order",
+    "repair_character_order_tail",
     "sync_category_order",
     "build_character_image_map",
     "sync_character_tags",
@@ -30,6 +32,7 @@ SCRIPT_MAP = {
     "extract_entries": "run_universal_apk_builder.py",
     "extract_localization": "extract_localizable_groups.py",
     "sync_category_order": "sync_category_order_canonical.py",
+    "repair_character_order_tail": "repair_character_order_tail.py",
     "build_character_image_map": "build_character_image_map.py",
     "sync_character_tags": "sync_character_tags.py",
     "build_bundles": "build_entry_bundles.py",
@@ -51,10 +54,8 @@ def write_json(path: Path, data: Any) -> None:
 
 
 def run_step(repo_root: Path, tools_dir: Path, step: str, args: argparse.Namespace) -> Dict[str, Any]:
-    script_name = SCRIPT_MAP[step]
-    script_path = tools_dir / script_name
+    script_path = tools_dir / SCRIPT_MAP[step]
     started = int(time.time())
-
     command = [sys.executable, str(script_path)]
 
     if step == "extract_entries":
@@ -70,7 +71,6 @@ def run_step(repo_root: Path, tools_dir: Path, step: str, args: argparse.Namespa
 
     result = subprocess.run(command, cwd=str(repo_root))
     finished = int(time.time())
-
     return {
         "step": step,
         "script": str(script_path),
@@ -99,7 +99,6 @@ def main() -> int:
     }
 
     final_code = 0
-
     for step in DEFAULT_STEPS:
         result = run_step(repo_root, tools_dir, step, args)
         report["steps"].append(result)
@@ -109,9 +108,7 @@ def main() -> int:
 
     report["finishedAt"] = int(time.time())
     report["status"] = "ok" if final_code == 0 else "failed"
-
     write_json(reports_dir / "entry_pipeline_report.json", report)
-
     print("Pipeline complete:", report["status"])
     return final_code
 
