@@ -1,6 +1,6 @@
 {
 	"Version": 23,
-	"Time": 1777261330,
+	"Time": 1777355655,
 	"Buff": {
 	"RelationshipFlatAttack50": {
 		"class": "Buff",
@@ -85633,6 +85633,488 @@
 			"stackName": "InstantCooldown",
 			"duration": 50,
 			"isHiddenFromPlayers": false,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"iconSpriteName": "IconBlueCountdownClock3"
+		},
+		"AttackHasteUp4IfSummonedAllies": {
+			"class": "Buff",
+			"behaviors": ["ExtraAttackScalor", "StatOnly"],
+			"stackName": "AttackBoosted",
+			"behaviorOverrides": [{
+				"attackerCondition": "2ConjuredAllies",
+				"scalor": 0.07
+			}, {
+				"conditions": "2ConjuredAllies",
+				"flatStatBonuses": {
+					"Haste": -64
+				}
+			}],
+			"iconSpriteName": "IconYellowOffenseUpSwordClock01",
+			"noIconShownOnBattleStatus": true,
+			"duration": -1,
+			"showAsTimer": false,
+			"isWeaponBuff": true
+		},
+		"AttackHasteUp5IfSummonedAllies": {
+			"class": "Buff",
+			"behaviors": ["ExtraAttackScalor", "StatOnly"],
+			"stackName": "AttackBoosted",
+			"behaviorOverrides": [{
+				"attackerCondition": "2ConjuredAllies",
+				"scalor": 0.10
+			}, {
+				"conditions": "2ConjuredAllies",
+				"flatStatBonuses": {
+					"Haste": -87
+				}
+			}],
+			"iconSpriteName": "IconYellowOffenseUpSwordClock01",
+			"noIconShownOnBattleStatus": true,
+			"duration": -1,
+			"showAsTimer": false,
+			"isWeaponBuff": true
+		},
+		"AttackHasteUp6IfSummonedAllies": {
+			"class": "Buff",
+			"behaviors": ["ExtraAttackScalor", "StatOnly"],
+			"stackName": "AttackBoosted",
+			"behaviorOverrides": [{
+				"attackerCondition": "2ConjuredAllies",
+				"scalor": 0.15
+			}, {
+				"conditions": "2ConjuredAllies",
+				"flatStatBonuses": {
+					"Haste": -111
+				}
+			}],
+			"iconSpriteName": "IconYellowOffenseUpSwordClock01",
+			"noIconShownOnBattleStatus": true,
+			"duration": -1,
+			"showAsTimer": false,
+			"isWeaponBuff": true
+		},
+		"AddingMyHairyFriendPassiveABeautyRegular": {
+			"class": "Buff",
+			"stackName": "HoldGround",
+			"behaviors": ["EnterBattleBuff","BuffOnMonsterTurn","BuffWhenMonstersDie","BuffWhenMonstersDie","BuffWhenMonstersDie"],
+			"behaviorOverrides": [{
+				"selfBuffs": ["StunImmunityIfBeastAlly","SleepImmunityIfBeastAlly","TheBeautyRegularDamageReduction","HoldGroundOnceForHoldGroundPlus","BlockDeathUntilNextTurnForHoldGroundPlus"]
+			},{
+				"sourceBuffs": ["BeautyRegularActive4KillsMoreThanSkillsUsed","SourceTheBeautyRegular"],
+				"enemyBuffs": ["RemoveBeautyRegularExtraKillBuff"]
+			},{
+				"sourceBuffs": ["AddBeastRegularNextInReinforcementsEOT"],
+				"deadMonsterConditions": "IsNotSummonedOrTransformingOrMirage",
+				"sameTeam": true
+			},{
+				"sourceBuffs": ["AddBeastRegularNextInReinforcementsEOT","FudgeUsed"],
+				"sameTeam": false,
+				"spreadCondition": "KillsMoreThanSkillUsed",
+				"deadMonsterConditions": "IsNotSummonedOrTransformingOrMirage"
+			},{
+				"sourceBuffs": ["FudgeUsedAtEndOfTurn"],
+				"sameTeam": false,
+				"spreadCondition": "KillsMoreThanSkillUsed"	
+			}],
+			"isHiddenFromPlayers": true,
+			"tags": ["HoldGroundPlus"],
+			"duration": -1
+		},
+		"AddBeastRegularNextInReinforcementsEOT": {
+			"class": "Buff",
+			"stackName": "AddBeastNextInReinforcementsEOT",
+			"behaviors": ["BuffOnMonsterTurnEnd"],
+			"behaviorOverrides": [{
+				"sourceBuffs": ["AddBeastRegular02Next","AddBeastRegular01Next"],
+				"activeMonsterConditions": "AlwaysTrue"
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true,
+			"noIconShownOnBattleStatus": true
+		},
+		"SourceTheBeautyRegular":{
+			"class": "Buff",
+			"stackName": "SourceTheBeautyRegular",
+			"duration": 0,
+			"isHiddenFromPlayers": true,
+			"showAsPermanent": false,
+			"showAsTimer": false
+		},
+		"AddBeastRegular02Next": {
+			"class": "Buff",
+			"stackName": "AddBeastRegular02Next",
+			"behaviors": ["SummonMonster"],
+			"behaviorOverrides": [{
+				"monsterType": "BeastRegular02",
+				"cloneSourceStats": true,
+				"cloneSourceWeapon": true,
+				"cloneSourceEquipment": true,
+				"frontOfLineup": true
+			}],
+			"duration": 0,
+			"applyConditions": "IsTheBeautyRegular02NoBeastRegularInTeam",
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
+		"AddBeastRegular01Next": {
+			"class": "Buff",
+			"stackName": "AddBeastRegular01Next",
+			"behaviors": ["SummonMonster"],
+			"behaviorOverrides": [{
+				"monsterType": "BeastRegular01",
+				"cloneSourceStats": true,
+				"cloneSourceWeapon": true,
+				"cloneSourceEquipment": true,
+				"frontOfLineup": true
+			}],
+			"duration": 0,
+			"applyConditions": "IsTheBeautyRegular01NoBeastRegularInTeam",
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
+		"AddTheBeautyRegular02Next": {
+			"class": "Buff",
+			"stackName": "AddTheBeautyRegular02Next",
+			"behaviors": ["SummonMonster"],
+			"behaviorOverrides": [{
+				"monsterType": "BeautyRegular02",
+				"cloneSourceStats": true,
+				"cloneSourceWeapon": true,
+				"cloneSourceEquipment": true,
+				"frontOfLineup": true
+			}],
+			"duration": 0,
+			"applyConditions": "NoTheBeautyRegularInTeam",
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
+		"AddTheBeautyRegular01Next": {
+			"class": "Buff",
+			"stackName": "AddTheBeautyRegular01Next",
+			"behaviors": ["SummonMonster"],
+			"behaviorOverrides": [{
+				"monsterType": "BeautyRegular01",
+				"cloneSourceStats": true,
+				"cloneSourceWeapon": true,
+				"cloneSourceEquipment": true,
+				"frontOfLineup": true
+			}],
+			"duration": 0,
+			"applyConditions": "NoTheBeautyRegularInTeam",
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
+		"ICanDoStuffAlonePassiveABeautyRegular":{
+			"class": "Buff",
+			"stackName": "ICanDoStuffAlonePassiveABeautyRegular",
+			"behaviors": ["EnterBattleBuff","BuffChanceOnHit","BuffWhenMonsterHurt","BuffOnMonsterTurnEnd","PoisonImmunityFallback"],
+			"behaviorOverrides": [{
+				"selfBuffs": ["KnockbackImmunity","PoisonImmunity","InstantKillImmunityOnce","SleepImmunityOnce","StunImmunityOnce","DisableFallBackImmunity"]
+			},{
+				"selfBuffs": ["GiveTurn","OnExtraTurn","JustGivenTurn"],
+				"chance": 1.0,
+				"targetCondition": "IsPoisonedAndNotHitAlreadyCheck",
+				"contextBuffs": ["NotHitAlreadyAndPoisonedExtraTurnHitTrigger"]
+			},{
+				"selfBuffs": ["BrideHealOK"],
+				"cancelFromDamageTypes": ["BuffDamage"]
+			},{
+				"selfBuffs": ["BrideHeal50PercentBeautyRegular"],
+				"activeMonsterConditions": "NotAlwaysMyTurn",
+				"spreadCondition": "BrideHealReady"
+			},{}],
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"duration": -1
+		},
+		"BrideHeal50PercentBeautyRegular": {
+			"class": "Buff",
+			"behaviors": ["AdjustHp","RemoveBuffs"],
+			"behaviorOverrides": [{
+				"percent": 0.50,
+				"abilityEffect": "Blank",
+				"hpboosts": [
+					"HealBoost"
+				]
+			},{
+				"name": "BrideHealOK"
+			}],
+			"duration": 0,
+			"effectToShowWhenApplied": "LargeHeal1",
+			"textKeyToShowWhenApplied": "HealDoubleANameKey",
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
+		"BeautyRegularActive4KillsMoreThanSkillsUsed": {
+			"class": "Buff",
+			"stackName": "BeautyRegularActive4KillsMoreThanSkillsUsed",
+			"behaviors": ["BuffWhenMonstersDie", "BuffWhenMonstersDie"],
+			"behaviorOverrides": [{
+				"sourceBuffs": ["KillAllyAndCreditKillBeautyRegular"],
+				"sameTeam": false,
+				"spreadCondition": "KillsMoreThanSkillUsedAltAlt",
+				"deadMonsterConditions": "NotTransformingOrMirage"
+			},{
+				"sourceBuffs": ["FudgeUsedAltAlt"],
+				"sameTeam": false,
+				"spreadCondition": "KillsMoreThanSkillUsedAltAlt"
+			}],
+			"isHiddenFromPlayers": true,
+			"duration": 0
+		},
+		"KillAllyAndCreditKillBeautyRegular":{
+			"class": "Buff",
+			"behaviors": ["EnterBattleBuff"],
+			"behaviorOverrides": [{
+				"randomEnemyBuffs": ["PT2InstantKillAndCreditKillBeautyRegular"],
+				"numRandomToBuff": 1,
+				"spreadCondition": "IsNotBossAndNotMirage"
+			}],
+			"showAsPermanent": false,
+			"showAsTimer": false,
+			"duration": 0,
+			"isHiddenFromPlayers": true
+		},
+		"PT2InstantKillAndCreditKillBeautyRegular": {
+			"class": "Buff",
+			"stackName": "InstantKill",
+			"behaviors": ["EnterBattleBuff","InstantDeath"],
+			"behaviorOverrides": [{
+				"randomAllyBuffs": ["Add1Kill"],
+				"numRandomToBuff": 1,
+				"spreadCondition": "IsMarkedBeautyRegular"
+			},{}],
+			"duration": 0,
+			"effectToShowWhenApplied": "DavinciThrowOrb2",
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
+		"RemoveBeautyRegularExtraKillBuff":{
+			"class": "Buff",
+			"behaviors": ["BuffWhenMonsterHurt"],
+			"behaviorOverrides":[{
+				"allyBuffs": ["RemoveBeautyRegularActive4KillsMoreThanSkillsUsed"],
+				"onlyFromDamageFlags": ["RemoveBeautyExtraDefeat"]
+			}],
+			"duration": 0,
+			"isHiddenFromPlayers": true,
+			"allowBuffOnDeadTarget": true
+		},
+		"RemoveBeautyRegularActive4KillsMoreThanSkillsUsed":{
+			"class": "Buff",
+			"behaviors": ["RemoveBuffs"],
+			"behaviorOverrides": [{
+				"name": "BeautyRegularActive4KillsMoreThanSkillsUsed"
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
+		"BeautyRegularActive2Cooldown50": {
+			"class": "Buff",
+			"stackName": "InstantCooldown",
+			"duration": 50,
+			"isHiddenFromPlayers": false,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"iconSpriteName": "IconBlueCountdownClock3Numbered02"
+		},
+		"BeautyRegularActive3Cooldown25": {
+			"class": "Buff",
+			"stackName": "InstantCooldown2",
+			"duration": 25,
+			"isHiddenFromPlayers": false,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"iconSpriteName": "IconBlueCountdownClock3Numbered03"
+		},
+		"IamtheBEASTPassiveABeastRegular": {
+			"class": "Buff",
+			"stackName": "IamtheBEASTPassiveABeastRegular",
+			"behaviors": ["EnterBattleBuff","EnterBattleBuff","BuffWhenMonsterHurt","BuffOnMonsterTurnEnd","BuffOnMonsterTurnEnd","Immunity"],
+			"behaviorOverrides": [{
+				"selfBuffs": ["KnockbackImmunity","BlockInstantKill","ProtecterABeastRegular","IsGuardian2LevelsDamageReduction",
+					"BigHealStack","BigHealStack","BigHealStack","FullHeal1Icon","FullHeal2Icon","FullHeal3Icon"]
+			},{	
+				"allAlliesButSelfBuffs": ["HoldGroundOnceForHoldGroundPlus","BlockDeathUntilNextTurnForHoldGroundPlus"],
+				"spreadCondition": "IsTheBeautyRegular"
+			},{	
+				"selfBuffs": ["BrideHealOK"],
+				"cancelFromDamageTypes": ["BuffDamage"]
+			},{
+				"selfBuffs": ["SuperStealth","SuperBrideHealBeastRegular"],
+				"activeMonsterConditions": "NotAlwaysMyTurn",
+				"spreadCondition": "IsBigHealAtAllBrideHealOK"
+			},{
+				"selfBuffs": ["SuperStealth","NormalBrideHealBeastRegular"],
+				"activeMonsterConditions": "NotAlwaysMyTurn",
+				"spreadCondition": "BrideHealReady"
+			},{
+				"stackNamesToBlock": ["Empty"],
+				"activateCondition": "NotBigHealAtAll"
+			}],
+			"showAsPermanent": true,
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true,
+			"tags": ["KnockbackImmune","GuardianOnEntry"],
+			"duration": -1
+		},
+		"FullHeal1Icon": {
+			"class": "Buff",
+			"behaviors": ["Immunity"],
+			"behaviorOverrides": [{
+				"stackNamesToBlock": ["BigHeal1Icon"],
+				"activateCondition": "IsBigHeal1Exact"
+			}],
+			"duration": -1,
+			"showAsTimer": true,
+			"hideFromPlayerCondition": "NotBigHeal1Exact",
+			"iconSpriteName": "IconGreenRegenerationHeart01",
+			"showNameInRotation": false
+		},
+		"FullHeal2Icon": {
+			"class": "Buff",
+			"behaviors": ["Immunity"],
+			"behaviorOverrides": [{
+				"stackNamesToBlock": ["BigHeal2Icon"],
+				"activateCondition": "IsBigHeal2Exact"
+			}],
+			"duration": -1,
+			"showAsTimer": true,
+			"hideFromPlayerCondition": "NotBigHeal2Exact",
+			"iconSpriteName": "IconGreenRegenerationHeart01",
+			"showNameInRotation": false
+		},
+		"FullHeal3Icon": {
+			"class": "Buff",
+			"behaviors": ["Immunity"],
+			"behaviorOverrides": [{
+				"stackNamesToBlock": ["BigHeal3Icon"],
+				"activateCondition": "IsBigHeal3"
+			}],
+			"duration": -1,
+			"showAsTimer": true,
+			"hideFromPlayerCondition": "NotBigHeal3",
+			"iconSpriteName": "IconGreenRegenerationHeart01",
+			"showNameInRotation": false
+		},
+		"ProtecterABeastRegular":{
+			"class": "Buff",
+			"stackName": "TimedProtector",
+			"behaviors": ["ManipulateTargeting","RemoveOnSourceDeath","RemoveAfterTurnsBehavior","BlockDeath"],
+			"behaviorOverrides": [{
+				"redirectToMe": true,
+				"redirectAlways": true,
+				"chanceToBlock": 1.0,
+				"consumeRedirectCountEvenOnSelf": true,
+				"failOnAllSkills": true,
+				"abilityFlagsToIgnore": ["Stun", "NoDamage"]
+			},{},{
+				"turnCount": 3
+			},{
+				"cancelFromDamageFlags": ["IgnoreHoldGround","IgnoreBlockDeath","HardIgnoreBlockDeath","LethalPoison"],
+				"conditions": "AlwaysTrue"	
+			}],
+			"showAsPermanent": false,
+			"showAsTimer": true,
+			"duration": -1,
+			"tags": ["ProtectorBlockDeathUntilNextTurn"],
+			"iconSpriteName": "IconRedHoldTaunt01"
+		},
+		"IsGuardian2LevelsDamageReduction": {
+			"class": "Buff",
+			"behaviors": ["ModifyDamage","ModifyDamage"],
+			"behaviorOverrides": [{
+				"percent": 0.70,
+				"cancelFromDamageTypes": ["BuffDamage", "Poison", "Burn"],
+				"cancelFromDamageFlags": ["Sneak", "IgnoreArmor"],
+				"conditions": "NotProtecting"
+			},{
+				"percent": 0.40,
+				"cancelFromDamageTypes": ["BuffDamage", "Poison", "Burn"],
+				"cancelFromDamageFlags": ["Sneak", "IgnoreArmor"],
+				"conditions": "IsProtecting"
+			}],
+			"duration": -1,
+			"showAsPermanent": false,
+			"showAsTimer": true,
+			"isHiddenFromPlayers": true,
+			"tags": ["BigDamageMinus"],
+			"iconSpriteName": "IconPurpleDamageMinus01"
+		},
+		"SuperBrideHealBeastRegular": {
+			"class": "Buff",
+			"behaviors": ["AdjustHp", "RemoveBuffs", "RemoveBuffs"],
+			"behaviorOverrides": [{
+				"percent": 1.0,
+				"abilityEffect": "Blank",
+				"hpboosts": [
+					"HealBoost"
+				]
+				}, {
+				"name": "BrideHealOK"
+			},{
+				"name": "BigHealStack",
+				"decreaseCount": 1
+			}],
+			"duration": 0,
+			"effectToShowWhenApplied": "LageHealPassive1",
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
+		"NormalBrideHealBeastRegular": {
+			"class": "Buff",
+				"behaviors": ["AdjustHp", "RemoveBuffs"],
+			"behaviorOverrides": [{
+				"percent": 0.25,
+				"abilityEffect": "Blank",
+				"hpboosts": [
+					"HealBoost"
+				]
+				}, {
+				"name": "BrideHealOK"
+			}],
+			"duration": 0,
+			"effectToShowWhenApplied": "SmallHeal1",
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
+		"StrongHidePassiveABeastRegular": {
+			"class": "Buff",
+			"stackName": "StrongHidePassiveABeastRegular",
+			"behaviors": ["EnterBattleBuff","EnterBattleBuff","BuffWhenMonsterHurt","BuffWhenMonstersDie","BuffWhenMonstersDie","SleepImmunityFallback","StunImmunityFallback"],
+			"behaviorOverrides": [{
+				"selfBuffs": ["StunImmunity","SleepImmunity","DisableFallBackImmunity"]
+			},{	
+				"enemyBuffs": ["MegaPoison"],
+				"selfBuffs": ["PurifiyAndGiveAllBeautyAndSelfAnExtraTurn"],
+				"spreadCondition": "BattleTimeOver1OrAnyDeadMonster"
+			},{
+				"allyBuffs": ["GiveTurn","OnExtraTurn","JustGivenTurn"],
+				"spreadCondition": "IsTheBeautyRegular",
+				"cancelFromDamageTypes": ["BuffDamage"]
+			},{
+				"sourceBuffs": ["GetKillBuffBeastRegularEOT","FudgeUsedAlt"],
+				"sameTeam": false,
+				"spreadCondition": "KillsMoreThanSkillUsedAlt",
+				"deadMonsterConditions": "NotTransformingOrMirage"
+			},{
+				"sourceBuffs": ["FudgeUsedAltEndOfTurn"],
+				"sameTeam": false,
+				"spreadCondition": "KillsMoreThanSkillUsedAlt"
+			},{},{
+			}],
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true,
+			"duration": -1
+		},
+		"BeastRegularActive2Cooldown30":{
+			"class": "Buff",
+			"duration": 30,
+			"stackName": "InstantCooldown",
 			"showAsTimer": true,
 			"showAsPermanent": false,
 			"iconSpriteName": "IconBlueCountdownClock3"
