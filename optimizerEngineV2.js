@@ -30,14 +30,7 @@
 
     Object.entries(tags).forEach(([key, row]) => {
       if (!row || typeof row !== 'object') return;
-      const keys = [
-        key,
-        row.id,
-        row.internalMonsterId,
-        row.sourceId,
-        row.family,
-        row.name,
-      ];
+      const keys = [key,row.id,row.internalMonsterId,row.sourceId,row.family,row.name];
       keys.map(norm).filter(Boolean).forEach(k => {
         if (!out.has(k)) out.set(k, row);
       });
@@ -81,7 +74,6 @@
     const keys = [unit.id, unit.sourceId, unit.family, unit.name, unit.title]
       .map(norm)
       .filter(Boolean);
-    if (!keys.length) return [];
 
     const tags = new Set();
     const add = (tag) => tags.add(tag);
@@ -91,10 +83,11 @@
       for (const rows of Object.values(categories)) {
         for (const rawPath of asArray(rows)) {
           const pNorm = norm(rawPath);
-          if (!keys.some(k => k && pNorm.includes(k))) continue;
-          const p = String(rawPath || '').toLowerCase();
+          if (!keys.some(k => pNorm.includes(k))) continue;
 
+          const p = String(rawPath || '').toLowerCase();
           add('runtime_ai_known');
+
           if (p.includes('baseaitargetingweight')) add('ai_weighted_skill');
           if (p.includes('aitargetingmonsterconditions')) add('ai_target_conditions');
           if (p.includes('aitargetingsourcemonsterconditions')) add('ai_source_conditions');
@@ -115,13 +108,12 @@
 
   function tagsFromRuntimeRow(row){
     if (!row || typeof row !== 'object') return [];
-    const tags = [
+    return [
       ...asArray(row.derivedTags),
       ...asArray(row.tags),
       ...asArray(row.manualTags),
       ...asArray(row.runtimeTags),
-    ];
-    return tags.map(String).filter(Boolean);
+    ].map(String).filter(Boolean);
   }
 
   function mergeUnique(...lists){
@@ -142,23 +134,32 @@
     const runtimeRow = keys.map(k => indexes.characters.get(k)).find(Boolean) || null;
     const aiTags = conditionTagsFromKnowledge(unit, runtime);
 
+    let abilityEnriched = unit;
+    if (global.AbilityScoreEngine && typeof global.AbilityScoreEngine.enrichUnitWithAbilityPower === 'function') {
+      abilityEnriched = global.AbilityScoreEngine.enrichUnitWithAbilityPower(unit);
+    }
+
     const mergedTags = mergeUnique(
-      asArray(unit.derivedTags),
-      asArray(unit.tags),
+      asArray(abilityEnriched.derivedTags),
+      asArray(abilityEnriched.tags),
       tagsFromRuntimeRow(tagRow),
       aiTags
     );
 
+    const abilityScore = Number(abilityEnriched?.__abilityPower?.score || 0);
+
     return {
-      ...unit,
+      ...abilityEnriched,
       family: unit.family || runtimeRow?.family || tagRow?.family || unit.id,
       sourceId: unit.sourceId || runtimeRow?.sourceId || tagRow?.sourceId || unit.id,
       derivedTags: mergedTags,
       tags: mergedTags,
+      optimizerPowerScore: abilityScore,
       __runtimeV2: {
         hasRuntimeCharacter: !!runtimeRow,
         hasRuntimeTags: !!tagRow,
         aiTags,
+        abilityScore,
       },
     };
   }
@@ -166,16 +167,21 @@
   function enrichOwnedUnits(ownedUnits){
     const runtime = getRuntime();
     if (!runtime) return ownedUnits || [];
+
     const indexes = {
       tags: indexRuntimeTags(runtime),
       characters: indexRuntimeCharacters(runtime),
     };
-    return (ownedUnits || []).map(u => enrichUnit(u, indexes, runtime));
+
+    return (ownedUnits || [])
+      .map(u => enrichUnit(u, indexes, runtime))
+      .sort((a, b) => (Number(b.optimizerPowerScore || 0) - Number(a.optimizerPowerScore || 0)));
   }
 
   function run(ownedUnits, options){
     const runtime = getRuntime();
     const enriched = enrichOwnedUnits(ownedUnits || []);
+
     const enrichedOptions = {
       ...(options || {}),
       runtimeV2: {
@@ -196,9 +202,12 @@
     }
 
     return {
-      story: { main: enriched.slice(0, 5).map(u => u.id), back: enriched.slice(5, 8).map(u => u.id) },
+      story: {
+        main: enriched.slice(0, 5).map(u => u.id),
+        back: enriched.slice(5, 8).map(u => u.id)
+      },
       platoons: [],
-      totalScore: 0,
+      totalScore: enriched.reduce((sum, u) => sum + Number(u.optimizerPowerScore || 0), 0),
       engineVersion: 'optimizerEngineV2-runtime-fallback',
       runtimeEnabled: !!runtime,
       runtimeFlags: runtime?.runtimeFlags || {},
