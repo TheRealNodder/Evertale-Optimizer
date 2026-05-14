@@ -20,6 +20,10 @@ CHUNKS = {
     "optimizerKnowledge": "optimizer_runtime_knowledge.json",
 }
 
+EXTERNAL_CHUNKS = {
+    "abilityGraph": "optimizer_ability_graph.json",
+}
+
 
 def find_repo_root(start: Path) -> Path:
     cur = start.resolve()
@@ -80,6 +84,17 @@ def main() -> int:
         manifest["chunks"][key] = {
             "file": filename,
             "count": chunk["count"],
+        }
+
+    for key, filename in EXTERNAL_CHUNKS.items():
+        external_path = runtime_dir / filename
+        if not external_path.exists():
+            continue
+
+        payload = load_json(external_path)
+        manifest["chunks"][key] = {
+            "file": filename,
+            "count": count_payload(payload),
         }
 
     write_json(runtime_dir / "optimizer_runtime_manifest.json", manifest, compact=False)
