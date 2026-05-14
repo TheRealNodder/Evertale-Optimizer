@@ -20,9 +20,44 @@ IGNORE_DIRS = {
 }
 ENTRYPOINTS = [
     "index.html", "roster.html", "optimizer.html",
-    "catalog.js", "roster.js", "optimizer.js",
+    "catalog.js", "roster.js", "app.js", "optimizer.js",
     "data-loader.js", "site-menu.js", "seasonal-theme.js",
 ]
+
+# Files that intentionally keep the current hybrid live site working.
+HYBRID_REQUIRED_FILES = {
+    "optimizerEngine.js",
+    "optimizer_doctrine.js",
+    "optimizer-hook.js",
+    "optimizerRuntimeLoader.js",
+    "optimizerRuntimeBootstrap.js",
+    "optimizerEngineV2.js",
+    "abilityScoreEngine.js",
+    "data-loader.js",
+}
+
+# Files/chunks expected to be part of the new raw-game/runtime site.
+NEW_RUNTIME_REQUIRED_FILES = {
+    "apkfiles/entries/runtime/optimizer_runtime_manifest.json",
+    "apkfiles/entries/runtime/optimizer_runtime_model.json",
+    "apkfiles/entries/runtime/optimizer_runtime_characters.json",
+    "apkfiles/entries/runtime/optimizer_runtime_character_entries.json",
+    "apkfiles/entries/runtime/optimizer_runtime_weapons.json",
+    "apkfiles/entries/runtime/optimizer_runtime_accessories.json",
+    "apkfiles/entries/runtime/optimizer_runtime_bosses.json",
+    "apkfiles/entries/runtime/optimizer_runtime_tags.json",
+    "apkfiles/entries/runtime/optimizer_runtime_knowledge.json",
+    "apkfiles/entries/runtime/optimizer_ability_graph.json",
+}
+
+LEGACY_DATA_FILES = {
+    "data/characters.json",
+    "data/character_tags.json",
+    "data/character_tags_additions.json",
+    "data/character_actives.json",
+    "data/character_passives.json",
+}
+
 GENERATED_HINTS = [
     "apkfiles/entries/bundles/",
     "apkfiles/entries/runtime/",
@@ -34,7 +69,16 @@ PROTECTED_HINTS = [
     "apkfiles/entries/accessories/",
     "apkfiles/entries/bosses/",
     "apkfiles/entries/maps/",
+    "apkfiles/entries/localization/",
     "tools/new_structure/",
+]
+RAW_GAME_SOURCE_HINTS = [
+    "apkfiles/entries/characters/",
+    "apkfiles/entries/weapons/",
+    "apkfiles/entries/accessories/",
+    "apkfiles/entries/bosses/",
+    "apkfiles/entries/maps/",
+    "apkfiles/entries/localization/",
 ]
 
 PATTERNS = [
@@ -126,7 +170,6 @@ def direct_name_hits(path: Path, all_names: Dict[str, List[str]], repo: Path) ->
     hits: Set[str] = set()
     if not text:
         return hits
-    # Limit direct-name matching to useful file names to avoid excessive false positives.
     for name, paths in all_names.items():
         if len(name) < 8:
             continue
@@ -147,7 +190,53 @@ def classify_file(path_rel: str, referenced: Set[str], reverse_refs: Dict[str, L
     return "unused_candidate_review_before_delete"
 
 
-def risk_reason(path_rel: str, classification: str) -> str:
+def migration_role(path_rel: str, classification: str, reachable: Set[str], reverse_refs: Dict[str, List[str]]) -> str:
+    if path_rel in NEW_RUNTIME_REQUIRED_FILES:
+        return "GREEN_NEW_RUNTIME_REQUIRED"
+    if any(path_rel.startswith(h) for h in RAW_GAME_SOURCE_HINTS):
+        return "GREEN_RAW_GAME_SOURCE_KEEP"
+    if path_rel.startswith("apkfiles/entries/bundles/"):
+        return "GREEN_SITE_BUNDLE_KEEP"
+    if path_rel.startswith("apkfiles/entries/runtime/"):
+        return "GREEN_RUNTIME_ARTIFACT_KEEP"
+    if path_rel.startswith("tools/new_structure/"):
+        return "GREEN_PIPELINE_TOOL_KEEP"
+    if path_rel in HYBRID_REQUIRED_FILES:
+        return "YELLOW_HYBRID_REQUIRED_KEEP_FOR_NOW"
+    if path_rel in LEGACY_DATA_FILES:
+        return "YELLOW_LEGACY_DATA_SOURCE_KEEP_UNTIL_RUNTIME_FULLY_REPLACES"
+    if classification == "actively_used":
+        return "YELLOW_LIVE_DEPENDENCY_KEEP_FOR_NOW"
+    if classification == "referenced_indirectly":
+        return "ORANGE_REFERENCED_INDIRECTLY_REVIEW"
+    if classification == "unused_candidate_review_before_delete":
+        if path_rel.startswith(("apkfiles/", "tools/")):
+            return "ORANGE_PROJECT_INTERNAL_REVIEW_BEFORE_QUARANTINE"
+        return "RED_QUARANTINE_CANDIDATE"
+    return "ORANGE_REVIEW_MANUALLY"
+
+
+def action_for_role(role: str) -> str:
+    if role.startswith("GREEN_"):
+        return "KEEP: part of new raw-game/runtime site or rebuild pipeline."
+    if role.startswith("YELLOW_"):
+        return "KEEP FOR NOW: still supports current hybrid live site or legacy fallback."
+    if role.startswith("ORANGE_"):
+        return "REVIEW: do not move until manually verified."
+    if role == "RED_QUARANTINE_CANDIDATE":
+        return "QUARANTINE FIRST: move to legacy_unused/, test site, re-run audit, then consider deletion later."
+    return "REVIEW: unknown migration role."
+
+
+def risk_reason(path_rel: str, classification: str, role: str) -> str:
+    if role.startswith("GREEN_"):
+        return "Greenlit for the new runtime/raw-game site. Preserve this file."
+    if role.startswith("YELLOW_"):
+        return "Still needed by the current hybrid live site or legacy fallback path. Preserve until replacement is verified."
+    if role.startswith("ORANGE_"):
+        return "Possible dependency or protected project file. Review manually before moving."
+    if role == "RED_QUARANTINE_CANDIDATE":
+        return "No direct or indirect reference found by audit. Move to quarantine first, not delete immediately."
     if classification == "actively_used":
         return "Referenced by an entrypoint, script/link/fetch/import, or known live page. Do not move."
     if classification == "protected_source":
@@ -162,6 +251,7 @@ def risk_reason(path_rel: str, classification: str) -> str:
 def main() -> int:
     parser = argparse.ArgumentParser(description="Deep dependency audit for safe legacy cleanup/migration.")
     parser.add_argument("--include-name-hits", action="store_true", help="Also scan text for exact filename mentions; slower but deeper.")
+    parser.add_argument("--mode", choices=["hybrid", "runtime"], default="runtime", help="Report perspective. runtime highlights new-site greenlit files while preserving hybrid dependencies.")
     args = parser.parse_args()
 
     repo = find_repo_root(Path.cwd())
@@ -215,11 +305,14 @@ def main() -> int:
     for path_rel in file_rels:
         ref_sources = sorted(set(reverse_refs.get(path_rel, [])))
         classification = classify_file(path_rel, reachable, reverse_refs)
+        role = migration_role(path_rel, classification, reachable, reverse_refs)
         rows.append({
             "path": path_rel,
             "extension": Path(path_rel).suffix.lower(),
             "classification": classification,
-            "riskReason": risk_reason(path_rel, classification),
+            "migrationRole": role,
+            "recommendedAction": action_for_role(role),
+            "riskReason": risk_reason(path_rel, classification, role),
             "referencedBy": ref_sources[:50],
             "referencedByCount": len(ref_sources),
             "reachableFromLiveEntrypoint": path_rel in reachable,
@@ -227,14 +320,15 @@ def main() -> int:
         })
 
     summary = defaultdict(int)
+    migration_summary = defaultdict(int)
     for row in rows:
         summary[row["classification"]] += 1
+        migration_summary[row["migrationRole"]] += 1
 
-    safe_move_candidates = [
-        row for row in rows
-        if row["classification"] == "unused_candidate_review_before_delete"
-        and not row["path"].startswith(("apkfiles/", "tools/"))
-    ]
+    greenlit_new_site_files = [row for row in rows if row["migrationRole"].startswith("GREEN_")]
+    keep_for_hybrid_files = [row for row in rows if row["migrationRole"].startswith("YELLOW_")]
+    manual_review_files = [row for row in rows if row["migrationRole"].startswith("ORANGE_")]
+    quarantine_candidates = [row for row in rows if row["migrationRole"] == "RED_QUARANTINE_CANDIDATE"]
 
     quarantine_plan = [
         {
@@ -242,26 +336,43 @@ def main() -> int:
             "to": f"legacy_unused/{row['path']}",
             "reason": row["riskReason"],
         }
-        for row in safe_move_candidates
+        for row in quarantine_candidates
     ]
 
+    missing_new_runtime_required = sorted(path for path in NEW_RUNTIME_REQUIRED_FILES if path not in existing)
+    missing_hybrid_required = sorted(path for path in HYBRID_REQUIRED_FILES if path not in existing)
+
     report = {
-        "schemaVersion": 1,
+        "schemaVersion": 2,
         "generatedAt": int(time.time()),
+        "mode": args.mode,
         "repoRoot": str(repo),
         "entrypoints": ENTRYPOINTS,
         "includeNameHits": args.include_name_hits,
         "summary": dict(summary),
+        "migrationSummary": dict(migration_summary),
         "totalFiles": len(rows),
         "reachableCount": len(reachable),
-        "safeMoveCandidateCount": len(safe_move_candidates),
+        "greenlitNewSiteFileCount": len(greenlit_new_site_files),
+        "keepForHybridFileCount": len(keep_for_hybrid_files),
+        "manualReviewFileCount": len(manual_review_files),
+        "quarantineCandidateCount": len(quarantine_candidates),
+        "missingNewRuntimeRequired": missing_new_runtime_required,
+        "missingHybridRequired": missing_hybrid_required,
+        "greenlitNewSiteFiles": greenlit_new_site_files,
+        "keepForHybridFiles": keep_for_hybrid_files,
+        "manualReviewFiles": manual_review_files,
+        "quarantineCandidates": quarantine_candidates,
         "files": rows,
         "refsByFile": refs_by_file,
+        "nameHitRefs": dict(name_hit_refs),
         "quarantinePlan": quarantine_plan,
         "instructions": [
-            "Do not delete files directly from this report.",
-            "First move safe candidates to legacy_unused/ and test the live site.",
-            "Only delete after a successful deploy and a second audit confirms no references."
+            "GREEN files are part of the new raw-game/runtime site or rebuild pipeline. Keep them.",
+            "YELLOW files still support the current hybrid live site or fallback behavior. Keep until replacement is verified.",
+            "ORANGE files require manual review. Do not move them automatically.",
+            "RED files are quarantine candidates only. Move to legacy_unused/ first; do not delete directly.",
+            "After quarantine, test GitHub Pages, run this audit again, and only then consider deletion."
         ]
     }
 
@@ -271,10 +382,17 @@ def main() -> int:
 
     print(json.dumps({
         "status": "ok",
+        "mode": args.mode,
         "totalFiles": len(rows),
         "reachableCount": len(reachable),
         "summary": dict(summary),
-        "safeMoveCandidateCount": len(safe_move_candidates),
+        "migrationSummary": dict(migration_summary),
+        "greenlitNewSiteFileCount": len(greenlit_new_site_files),
+        "keepForHybridFileCount": len(keep_for_hybrid_files),
+        "manualReviewFileCount": len(manual_review_files),
+        "quarantineCandidateCount": len(quarantine_candidates),
+        "missingNewRuntimeRequired": missing_new_runtime_required,
+        "missingHybridRequired": missing_hybrid_required,
         "report": str(out),
     }, ensure_ascii=False, indent=2))
     return 0
