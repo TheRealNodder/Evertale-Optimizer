@@ -24,6 +24,19 @@ CATEGORY_FILES = {
     "bosses": "apkfiles/entries/maps/explorer_boss_order.json",
 }
 
+WEAPON_SUFFIXES = (
+    "axe", "greataxe", "greatsword", "sword", "staff", "mace", "spear", "lance",
+    "katana", "dagger", "bow", "hammer", "pike", "halberd", "wand", "gun",
+)
+ACCESSORY_SUFFIXES = (
+    "ring", "bracelet", "necklace", "pendant", "crown", "helm", "helmet", "armor",
+    "amulet", "charm", "earring", "brooch", "badge", "orb", "gem",
+)
+CHARACTER_HINT_SUFFIXES = (
+    "regular", "new", "band", "bride", "swimsuit", "dark", "light", "yukata", "maid",
+    "idol", "modern", "schoolgirl", "racequeen", "racequeen", "raven", "angel",
+)
+
 
 def find_repo_root(start: Path) -> Path:
     cur = start.resolve()
@@ -42,8 +55,12 @@ def norm(value: Any) -> str:
     return re.sub(r"[^a-z0-9]+", "", str(value or "").lower())
 
 
+def camel_tokens(value: str) -> List[str]:
+    return [t.lower() for t in re.findall(r"[A-Z]?[a-z]+|[A-Z]+(?=[A-Z]|$)|\d+", str(value or ""))]
+
+
 def fetch_text(url: str) -> str:
-    req = urllib.request.Request(url, headers={"User-Agent": "EvertaleOptimizerOrderImporter/2.0"})
+    req = urllib.request.Request(url, headers={"User-Agent": "EvertaleOptimizerOrderImporter/3.0"})
     with urllib.request.urlopen(req, timeout=45) as res:
         raw = res.read()
     return raw.decode("utf-8", errors="replace")
@@ -84,16 +101,40 @@ def parse_entry(line: str) -> Tuple[int | None, str, str] | None:
     return file_handle_order, key, display
 
 
+def looks_like_weapon_key(key: str) -> bool:
+    tokens = camel_tokens(key)
+    return bool(tokens and tokens[-1] in WEAPON_SUFFIXES)
+
+
+def looks_like_accessory_key(key: str) -> bool:
+    tokens = camel_tokens(key)
+    return bool(tokens and tokens[-1] in ACCESSORY_SUFFIXES)
+
+
+def looks_like_character_key(key: str) -> bool:
+    key_l = key.lower()
+    if "boss" in key_l:
+        return False
+    tokens = camel_tokens(key)
+    if not tokens:
+        return False
+    if tokens[-1] in CHARACTER_HINT_SUFFIXES:
+        return True
+    if key_l.endswith(("regular", "new")):
+        return True
+    return not looks_like_weapon_key(key) and not looks_like_accessory_key(key)
+
+
 def classify_entry(key: str, active_section: str) -> str | None:
     key_l = key.lower()
     if "boss" in key_l:
         return "bosses"
-    if active_section == "weapon":
+    if looks_like_character_key(key):
+        return "characters"
+    if active_section == "weapon" or looks_like_weapon_key(key):
         return "weapons"
-    if active_section == "accessory":
+    if active_section == "accessory" or looks_like_accessory_key(key):
         return "accessories"
-    if active_section == "boss":
-        return "bosses"
     if active_section == "character":
         return "characters"
     return None
@@ -142,6 +183,7 @@ def extract_orders_from_lines(lines: List[str], source_url: str) -> Dict[str, Li
             "sortName": display or key,
             "sourceUrl": source_url,
             "sourceLine": idx,
+            "activeSection": active,
         })
     return buckets
 
@@ -198,7 +240,7 @@ def main() -> int:
     outputs = {}
     for category, rel in CATEGORY_FILES.items():
         payload = {
-            "schemaVersion": 2,
+            "schemaVersion": 3,
             "source": "Evertale Toolbox Explorer numeric file-handle order",
             "generatedAt": generated_at,
             "category": category,
@@ -217,7 +259,7 @@ def main() -> int:
             write_json(repo / rel, payload)
 
     report = {
-        "schemaVersion": 2,
+        "schemaVersion": 3,
         "generatedAt": generated_at,
         "dryRun": args.dry_run,
         "urls": urls,
@@ -226,6 +268,8 @@ def main() -> int:
         "rules": [
             "Explorer numeric prefix/file-handle order is category-specific display authority.",
             "Order 1 means newest/top item.",
+            "Non-Boss rows such as KintaroRegular and BeautyBeastRegular are character order rows even if the Explorer section label is ambiguous.",
+            "Boss rows are only rows with Boss in the internal key.",
             "A-Z must use visible displayName/sortName from the beginning of the name, not internal IDs.",
             "Existing project entries are not deleted or overwritten by this importer.",
             "This creates separate explorer_*_order.json files used as display-order authority."
