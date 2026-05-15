@@ -5,7 +5,7 @@ import argparse
 import json
 import time
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 IMAGE_BASE = "https://ik.imagekit.io/r8fsa98s9/characters"
 STATE_ORDER = ["base", "evolved", "final"]
@@ -115,14 +115,27 @@ def resolve_family_path(entries_root: Path, family_dir: Path, rel: str) -> Path:
     return candidates[0]
 
 
-def apply_overrides(repo_root: Path, payload: Dict[str, Any]) -> List[str]:
+def safe_override_states(family: str, rarity: str, current_states: List[Dict[str, Any]], override_states: List[Dict[str, Any]]) -> Tuple[bool, str]:
+    rarity = str(rarity or "").upper()
+    if rarity == "SSR" and len(current_states or []) >= 3 and len(override_states or []) < 3:
+        return False, "blocked_single_state_ssr_override"
+    for state in override_states or []:
+        source_id = str(state.get("sourceId") or "")
+        file_name = str(state.get("file") or "")
+        if rarity == "SSR" and source_id == family and file_name == f"{family}.png":
+            return False, "blocked_unsuffixed_ssr_override"
+    return True, "ok"
+
+
+def apply_overrides(repo_root: Path, payload: Dict[str, Any]) -> Tuple[List[str], List[Dict[str, str]]]:
     overrides_path = repo_root / OVERRIDES_RELATIVE
     overrides = load_json(overrides_path, {}) or {}
     families = overrides.get("families") if isinstance(overrides, dict) else {}
     if not isinstance(families, dict):
-        return []
+        return [], []
 
-    applied = []
+    applied: List[str] = []
+    blocked: List[Dict[str, str]] = []
     for family, override in families.items():
         if family not in payload:
             continue
@@ -131,11 +144,20 @@ def apply_overrides(repo_root: Path, payload: Dict[str, Any]) -> List[str]:
 
         states = override.get("states")
         if isinstance(states, list) and states:
+            ok, reason = safe_override_states(
+                family,
+                str(payload[family].get("rarity") or ""),
+                payload[family].get("states") or [],
+                states,
+            )
+            if not ok:
+                blocked.append({"family": family, "reason": reason})
+                continue
             payload[family]["states"] = states
             payload[family]["image"] = states[0].get("url")
             applied.append(family)
 
-    return applied
+    return applied, blocked
 
 
 def build_from_families(entries_root: Path, image_base: str) -> Dict[str, Any]:
@@ -174,10 +196,10 @@ def main() -> int:
     entries_root = Path(args.entries).resolve() if args.entries else (repo_root / "apkfiles" / "entries").resolve()
     built = build_from_families(entries_root, args.image_base)
 
-    applied_overrides = apply_overrides(repo_root, built["map"])
+    applied_overrides, blocked_overrides = apply_overrides(repo_root, built["map"])
 
     payload = {
-        "schemaVersion": 1,
+        "schemaVersion": 2,
         "generatedAt": int(time.time()),
         "imageBase": args.image_base.rstrip("/"),
         "source": built["source"],
@@ -186,7 +208,7 @@ def main() -> int:
     }
 
     report = {
-        "schemaVersion": 1,
+        "schemaVersion": 2,
         "generatedAt": payload["generatedAt"],
         "entriesRoot": str(entries_root),
         "output": str(entries_root / "maps" / "character_image_map.json"),
@@ -195,6 +217,7 @@ def main() -> int:
         "missingCount": len(built["missing"]),
         "missing": built["missing"],
         "appliedOverrides": applied_overrides,
+        "blockedOverrides": blocked_overrides,
     }
 
     write_json(entries_root / "maps" / "character_image_map.json", payload)
