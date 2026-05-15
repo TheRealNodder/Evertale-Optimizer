@@ -43,7 +43,7 @@ def norm(value: Any) -> str:
 
 
 def fetch_text(url: str) -> str:
-    req = urllib.request.Request(url, headers={"User-Agent": "EvertaleOptimizerOrderImporter/1.0"})
+    req = urllib.request.Request(url, headers={"User-Agent": "EvertaleOptimizerOrderImporter/2.0"})
     with urllib.request.urlopen(req, timeout=45) as res:
         raw = res.read()
     return raw.decode("utf-8", errors="replace")
@@ -63,23 +63,25 @@ def visible_lines(markup: str) -> List[str]:
     return out
 
 
-def clean_entry_line(line: str) -> str:
-    line = re.sub(r"^\*\s*", "", line).strip()
+def split_numeric_prefix(line: str) -> Tuple[int | None, str]:
+    line = re.sub(r"^\*\s*", "", str(line or "")).strip()
     line = re.sub(r"^(?:Image\s*)+", "", line).strip()
-    line = re.sub(r"^\d+\s+", "", line).strip()
-    return line
+    match = re.match(r"^(\d+)\s*[.):-]?\s*(.+)$", line)
+    if not match:
+        return None, line
+    return int(match.group(1)), match.group(2).strip()
 
 
-def parse_entry(line: str) -> Tuple[str, str] | None:
-    line = clean_entry_line(line)
-    match = re.match(r"^([A-Za-z0-9_]+)\s*\((.*?)\)\s*$", line)
+def parse_entry(line: str) -> Tuple[int | None, str, str] | None:
+    file_handle_order, clean_line = split_numeric_prefix(line)
+    match = re.match(r"^([A-Za-z0-9_]+)\s*\((.*?)\)\s*$", clean_line)
     if not match:
         return None
     key = match.group(1).strip()
     display = match.group(2).strip()
     if not key:
         return None
-    return key, display
+    return file_handle_order, key, display
 
 
 def classify_entry(key: str, active_section: str) -> str | None:
@@ -122,7 +124,7 @@ def extract_orders_from_lines(lines: List[str], source_url: str) -> Dict[str, Li
         parsed = parse_entry(raw)
         if not parsed:
             continue
-        key, display = parsed
+        file_handle_order, key, display = parsed
         category = classify_entry(key, active)
         if not category:
             continue
@@ -130,10 +132,14 @@ def extract_orders_from_lines(lines: List[str], source_url: str) -> Dict[str, Li
         if nkey in seen[category]:
             continue
         seen[category].add(nkey)
+        visual_order = len(buckets[category]) + 1
         buckets[category].append({
-            "order": len(buckets[category]) + 1,
+            "order": file_handle_order if file_handle_order is not None else visual_order,
+            "visualOrder": visual_order,
+            "fileHandleOrder": file_handle_order,
             "key": key,
             "displayName": display,
+            "sortName": display or key,
             "sourceUrl": source_url,
             "sourceLine": idx,
         })
@@ -145,13 +151,19 @@ def merge_orders(source_orders: List[Dict[str, List[Dict[str, Any]]]]) -> Dict[s
     seen = {k: set() for k in CATEGORY_FILES}
     for buckets in source_orders:
         for category, rows in buckets.items():
-            for row in rows:
+            ordered_rows = sorted(rows, key=lambda row: (
+                row.get("fileHandleOrder") is None,
+                int(row.get("fileHandleOrder") or row.get("visualOrder") or 999999),
+                int(row.get("visualOrder") or 999999),
+            ))
+            for row in ordered_rows:
                 nkey = norm(row.get("key"))
                 if not nkey or nkey in seen[category]:
                     continue
                 seen[category].add(nkey)
                 new_row = dict(row)
                 new_row["order"] = len(merged[category]) + 1
+                new_row["sourceOrder"] = row.get("fileHandleOrder") or row.get("visualOrder")
                 merged[category].append(new_row)
     return merged
 
@@ -176,6 +188,7 @@ def main() -> int:
             "url": url,
             "visibleLineCount": len(lines),
             "counts": {category: len(rows) for category, rows in buckets.items()},
+            "numericPrefixCounts": {category: sum(1 for row in rows if row.get("fileHandleOrder") is not None) for category, rows in buckets.items()},
             "firstEntries": {category: rows[:10] for category, rows in buckets.items()},
         })
 
@@ -185,12 +198,18 @@ def main() -> int:
     outputs = {}
     for category, rel in CATEGORY_FILES.items():
         payload = {
-            "schemaVersion": 1,
-            "source": "Evertale Toolbox Explorer visible order",
+            "schemaVersion": 2,
+            "source": "Evertale Toolbox Explorer numeric file-handle order",
             "generatedAt": generated_at,
             "category": category,
             "count": len(merged[category]),
-            "orderDirection": "1 = newest/top of Explorer list",
+            "orderDirection": "1 = newest/top authority; sourceOrder preserves numeric prefix/file-handle when available",
+            "sortRules": {
+                "newest": "lowest order number first",
+                "oldest": "highest order number first",
+                "az": "visible displayName/sortName alphabetical from beginning of name",
+                "za": "visible displayName/sortName reverse alphabetical from beginning of name"
+            },
             "order": merged[category],
         }
         outputs[category] = {"path": rel, "count": len(merged[category]), "firstEntries": merged[category][:10]}
@@ -198,15 +217,16 @@ def main() -> int:
             write_json(repo / rel, payload)
 
     report = {
-        "schemaVersion": 1,
+        "schemaVersion": 2,
         "generatedAt": generated_at,
         "dryRun": args.dry_run,
         "urls": urls,
         "sourceReports": source_reports,
         "outputs": outputs,
         "rules": [
-            "Explorer order is numeric and category-specific.",
-            "Order 1 means newest/top of the Explorer list.",
+            "Explorer numeric prefix/file-handle order is category-specific display authority.",
+            "Order 1 means newest/top item.",
+            "A-Z must use visible displayName/sortName from the beginning of the name, not internal IDs.",
             "Existing project entries are not deleted or overwritten by this importer.",
             "This creates separate explorer_*_order.json files used as display-order authority."
         ],
