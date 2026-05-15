@@ -1,0 +1,287 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Single safe runner for append-only new game data ingest and post-ingest checks.",
+  "startedAt": 1778815995,
+  "finishedAt": 1778816915,
+  "status": "ok",
+  "dryRun": false,
+  "raw": null,
+  "force": false,
+  "rules": [
+    "Existing canonical order is preserved.",
+    "New entries are appended by sync_category_order_canonical.py.",
+    "This wrapper does not delete, quarantine, or overwrite unrelated data.",
+    "Runtime outputs are rebuilt after ingest so the site uses the new extracted data.",
+    "Generated reports must be reviewed before committing new game data."
+  ],
+  "steps": [
+    {
+      "label": "safe_entry_pipeline",
+      "command": "C:\\Python314\\python.exe C:\\Users\\josue\\Documents\\GitHub\\Evertale-Optimizer\\tools\\new_structure\\run_entry_pipeline.py",
+      "status": "ok",
+      "returnCode": 0,
+      "startedAt": 1778815995,
+      "finishedAt": 1778816099,
+      "durationSeconds": 104
+    },
+    {
+      "label": "build_optimizer_runtime_model.py",
+      "command": "C:\\Python314\\python.exe C:\\Users\\josue\\Documents\\GitHub\\Evertale-Optimizer\\tools\\new_structure\\build_optimizer_runtime_model.py",
+      "status": "ok",
+      "returnCode": 0,
+      "startedAt": 1778816099,
+      "finishedAt": 1778816100,
+      "durationSeconds": 1
+    },
+    {
+      "label": "split_optimizer_runtime_model.py",
+      "command": "C:\\Python314\\python.exe C:\\Users\\josue\\Documents\\GitHub\\Evertale-Optimizer\\tools\\new_structure\\split_optimizer_runtime_model.py",
+      "status": "ok",
+      "returnCode": 0,
+      "startedAt": 1778816100,
+      "finishedAt": 1778816100,
+      "durationSeconds": 0
+    },
+    {
+      "label": "deep_dependency_audit.py",
+      "command": "C:\\Python314\\python.exe C:\\Users\\josue\\Documents\\GitHub\\Evertale-Optimizer\\tools\\new_structure\\deep_dependency_audit.py --include-name-hits",
+      "status": "ok",
+      "returnCode": 0,
+      "startedAt": 1778816100,
+      "finishedAt": 1778816913,
+      "durationSeconds": 813
+    },
+    {
+      "label": "export_quarantine_plan.py",
+      "command": "C:\\Python314\\python.exe C:\\Users\\josue\\Documents\\GitHub\\Evertale-Optimizer\\tools\\new_structure\\export_quarantine_plan.py",
+      "status": "ok",
+      "returnCode": 0,
+      "startedAt": 1778816913,
+      "finishedAt": 1778816914,
+      "durationSeconds": 1
+    },
+    {
+      "label": "runtime_optimizer_trace.py",
+      "command": "C:\\Python314\\python.exe C:\\Users\\josue\\Documents\\GitHub\\Evertale-Optimizer\\tools\\new_structure\\runtime_optimizer_trace.py",
+      "status": "ok",
+      "returnCode": 0,
+      "startedAt": 1778816914,
+      "finishedAt": 1778816915,
+      "durationSeconds": 1
+    }
+  ],
+  "entryPipelineReport": {
+    "pipelineVersion": 4,
+    "startedAt": 1778815995,
+    "steps": [
+      {
+        "step": "bookmark_before",
+        "script": "C:\\Users\\josue\\Documents\\GitHub\\Evertale-Optimizer\\tools\\new_structure\\update_entry_bookmark.py",
+        "status": "ok",
+        "returnCode": 0,
+        "startedAt": 1778815995,
+        "finishedAt": 1778816005,
+        "durationSeconds": 10
+      },
+      {
+        "step": "extract_entries",
+        "script": "C:\\Users\\josue\\Documents\\GitHub\\Evertale-Optimizer\\tools\\new_structure\\run_universal_apk_builder.py",
+        "status": "ok",
+        "returnCode": 0,
+        "startedAt": 1778816005,
+        "finishedAt": 1778816062,
+        "durationSeconds": 57
+      },
+      {
+        "step": "extract_localization",
+        "script": "C:\\Users\\josue\\Documents\\GitHub\\Evertale-Optimizer\\tools\\new_structure\\extract_localizable_groups.py",
+        "status": "ok",
+        "returnCode": 0,
+        "startedAt": 1778816062,
+        "finishedAt": 1778816063,
+        "durationSeconds": 1
+      },
+      {
+        "step": "sync_category_order",
+        "script": "C:\\Users\\josue\\Documents\\GitHub\\Evertale-Optimizer\\tools\\new_structure\\sync_category_order_canonical.py",
+        "status": "ok",
+        "returnCode": 0,
+        "startedAt": 1778816063,
+        "finishedAt": 1778816064,
+        "durationSeconds": 1
+      },
+      {
+        "step": "repair_character_order_tail",
+        "script": "C:\\Users\\josue\\Documents\\GitHub\\Evertale-Optimizer\\tools\\new_structure\\repair_character_order_tail.py",
+        "status": "ok",
+        "returnCode": 0,
+        "startedAt": 1778816064,
+        "finishedAt": 1778816064,
+        "durationSeconds": 0
+      },
+      {
+        "step": "sync_category_order",
+        "script": "C:\\Users\\josue\\Documents\\GitHub\\Evertale-Optimizer\\tools\\new_structure\\sync_category_order_canonical.py",
+        "status": "ok",
+        "returnCode": 0,
+        "startedAt": 1778816064,
+        "finishedAt": 1778816064,
+        "durationSeconds": 0
+      },
+      {
+        "step": "build_character_image_map",
+        "script": "C:\\Users\\josue\\Documents\\GitHub\\Evertale-Optimizer\\tools\\new_structure\\build_character_image_map.py",
+        "status": "ok",
+        "returnCode": 0,
+        "startedAt": 1778816064,
+        "finishedAt": 1778816068,
+        "durationSeconds": 4
+      },
+      {
+        "step": "sync_character_tags",
+        "script": "C:\\Users\\josue\\Documents\\GitHub\\Evertale-Optimizer\\tools\\new_structure\\sync_character_tags.py",
+        "status": "ok",
+        "returnCode": 0,
+        "startedAt": 1778816068,
+        "finishedAt": 1778816068,
+        "durationSeconds": 0
+      },
+      {
+        "step": "build_bundles",
+        "script": "C:\\Users\\josue\\Documents\\GitHub\\Evertale-Optimizer\\tools\\new_structure\\build_entry_bundles.py",
+        "status": "ok",
+        "returnCode": 0,
+        "startedAt": 1778816068,
+        "finishedAt": 1778816080,
+        "durationSeconds": 12
+      },
+      {
+        "step": "validate",
+        "script": "C:\\Users\\josue\\Documents\\GitHub\\Evertale-Optimizer\\tools\\new_structure\\validate_entries.py",
+        "status": "ok",
+        "returnCode": 0,
+        "startedAt": 1778816080,
+        "finishedAt": 1778816089,
+        "durationSeconds": 9
+      },
+      {
+        "step": "bookmark_after",
+        "script": "C:\\Users\\josue\\Documents\\GitHub\\Evertale-Optimizer\\tools\\new_structure\\update_entry_bookmark.py",
+        "status": "ok",
+        "returnCode": 0,
+        "startedAt": 1778816089,
+        "finishedAt": 1778816099,
+        "durationSeconds": 10
+      }
+    ],
+    "finishedAt": 1778816099,
+    "status": "ok"
+  },
+  "orderSummary": {
+    "characters": {
+      "report": "apkfiles/entries/reports/character_order_sync_report.json",
+      "appendedNewEntries": 1,
+      "missingCanonicalEntries": 0,
+      "orderedCount": 419,
+      "canonicalExistingCount": 419,
+      "indexEntryCount": 419,
+      "appended": [
+        {
+          "key": "Crescent",
+          "displayName": "Diabolos"
+        }
+      ]
+    },
+    "weapons": {
+      "report": "apkfiles/entries/reports/weapon_order_sync_report.json",
+      "appendedNewEntries": 1,
+      "missingCanonicalEntries": 27,
+      "orderedCount": 325,
+      "canonicalExistingCount": 352,
+      "indexEntryCount": 325,
+      "appended": [
+        {
+          "key": "IronGreatsword",
+          "displayName": "IronGreatsword01"
+        }
+      ]
+    },
+    "accessories": {
+      "report": "apkfiles/entries/reports/accessory_order_sync_report.json",
+      "appendedNewEntries": 0,
+      "missingCanonicalEntries": 0,
+      "orderedCount": 105,
+      "canonicalExistingCount": 105,
+      "indexEntryCount": 105,
+      "appended": []
+    },
+    "bosses": {
+      "report": "apkfiles/entries/reports/boss_order_sync_report.json",
+      "appendedNewEntries": 0,
+      "missingCanonicalEntries": 213,
+      "orderedCount": 405,
+      "canonicalExistingCount": 618,
+      "indexEntryCount": 405,
+      "appended": []
+    }
+  },
+  "runtimeSummary": {
+    "manifest": "apkfiles/entries/runtime/optimizer_runtime_manifest.json",
+    "runtimeFlags": {
+      "usesAI": true,
+      "usesScalers": true,
+      "usesStatuses": true,
+      "usesPassives": true,
+      "usesLeaderSkills": true,
+      "usesSummons": true,
+      "usesTags": true
+    },
+    "chunks": {
+      "characters": {
+        "file": "optimizer_runtime_characters.json",
+        "count": 419
+      },
+      "characterEntries": {
+        "file": "optimizer_runtime_character_entries.json",
+        "count": 319
+      },
+      "weapons": {
+        "file": "optimizer_runtime_weapons.json",
+        "count": 325
+      },
+      "accessories": {
+        "file": "optimizer_runtime_accessories.json",
+        "count": 105
+      },
+      "bosses": {
+        "file": "optimizer_runtime_bosses.json",
+        "count": 290
+      },
+      "tags": {
+        "file": "optimizer_runtime_tags.json",
+        "count": 958
+      },
+      "optimizerKnowledge": {
+        "file": "optimizer_runtime_knowledge.json",
+        "count": 3
+      },
+      "abilityGraph": {
+        "file": "optimizer_ability_graph.json",
+        "count": 5
+      }
+    }
+  },
+  "validationSummary": {
+    "report": "apkfiles/entries/reports/validation_report.json",
+    "status": null,
+    "errors": [],
+    "warnings": []
+  },
+  "nextSteps": [
+    "Review this report first.",
+    "Confirm appendedNewEntries counts match the new game data you intended to inject.",
+    "Run local server from repo root: python -m http.server 8000.",
+    "Test index.html, roster.html, and optimizer.html.",
+    "Only commit/push after local pages work."
+  ]
+}
