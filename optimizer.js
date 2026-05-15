@@ -31,6 +31,8 @@ const STORY_BACK = 3;
 const PLATOON_COUNT = 20;
 const PLATOON_SIZE = 5;
 
+const EQUIPMENT_AFFINITY_TERMS = ["burn","poison","sleep","stun","heal","turn","tu","cleanse","defense","guard","stealth","spirit","charge","blood","crisis","survivor","revenge","ward","armor","attack","damage","hp","speed"];
+
 const state = {
   all: [],
   ownedIds: new Set(),
@@ -39,11 +41,13 @@ const state = {
   locks: null, // { storyMain:bool[5], storyBack:bool[3], platoons:bool[20][5] }
   mode: "story",
   exampleMode: false, // when true, slots can show units not owned (greyed out)
+  equipmentRuntime: { weapons: [], accessories: [], counts: {} },
 };
 
 function el(id) { return document.getElementById(id); }
 function safeJsonParse(raw, fallback) { try { return JSON.parse(raw); } catch { return fallback; } }
 function normId(v) { return (v == null || v === "") ? "" : String(v); }
+function escapeHtml(value) { return String(value ?? "").replace(/[&<>"']/g, ch => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[ch])); }
 
 function getTeamTypePref() {
   const v = localStorage.getItem(LS_TEAMTYPE_KEY);
@@ -201,6 +205,137 @@ async function loadCharacters() {
   return deduped;
 }
 
+function normalizeRuntimeArray(chunk) {
+  if (Array.isArray(chunk)) return chunk;
+  if (Array.isArray(chunk?.entries)) return chunk.entries;
+  if (Array.isArray(chunk?.items)) return chunk.items;
+  if (Array.isArray(chunk?.data)) return chunk.data;
+  if (chunk && typeof chunk === "object") return Object.values(chunk).filter(v => v && typeof v === "object");
+  return [];
+}
+
+async function loadOptimizerRuntimeIfAvailable() {
+  if (window.loadOptimizerRuntime && !window.OptimizerRuntime?.loaded) {
+    try { await window.loadOptimizerRuntime(); } catch (err) { console.warn("[Optimizer] Runtime load failed; equipment pairing disabled.", err); }
+  }
+  const chunks = window.OptimizerRuntime?.chunks || {};
+  const weapons = normalizeRuntimeArray(chunks.weapons);
+  const accessories = normalizeRuntimeArray(chunks.accessories);
+  state.equipmentRuntime = {
+    weapons,
+    accessories,
+    counts: Object.fromEntries(Object.entries(chunks).map(([key, value]) => [key, normalizeRuntimeArray(value).length || (value && typeof value === "object" ? Object.keys(value).length : 0)])),
+  };
+  updateOptimizerRuntimeStatus();
+}
+
+function updateOptimizerRuntimeStatus() {
+  const status = el("optimizerRuntimeStatus");
+  if (!status) return;
+  const chunks = window.OptimizerRuntime?.chunks || {};
+  const counts = state.equipmentRuntime?.counts || {};
+  const parts = [
+    `characters ${counts.characters || normalizeRuntimeArray(chunks.characters).length || state.all.length || 0}`,
+    `weapons ${state.equipmentRuntime?.weapons?.length || 0}`,
+    `accessories ${state.equipmentRuntime?.accessories?.length || 0}`,
+    `tags ${counts.tags || normalizeRuntimeArray(chunks.tags).length || 0}`,
+  ];
+  status.textContent = `Runtime: ${parts.join(" • ")}`;
+}
+
+function textBlobFor(value) {
+  const parts = [];
+  const seen = new Set();
+  const walk = (obj, depth = 0) => {
+    if (obj == null || depth > 4) return;
+    if (typeof obj === "string" || typeof obj === "number") {
+      const text = String(obj);
+      if (text && !seen.has(text)) { seen.add(text); parts.push(text); }
+      return;
+    }
+    if (Array.isArray(obj)) { obj.forEach(v => walk(v, depth + 1)); return; }
+    if (typeof obj === "object") Object.values(obj).forEach(v => walk(v, depth + 1));
+  };
+  walk(value);
+  return parts.join(" ").toLowerCase();
+}
+
+function tagSetFor(value) {
+  const tags = new Set();
+  const add = (v) => { const s = String(v || "").trim().toLowerCase(); if (s) tags.add(s.replace(/^elem_/, "")); };
+  for (const key of ["tags", "derivedTags", "passiveTags", "roles", "archetypes"]) {
+    const arr = value?.[key];
+    if (Array.isArray(arr)) arr.forEach(add);
+  }
+  const text = textBlobFor(value);
+  EQUIPMENT_AFFINITY_TERMS.forEach(term => { if (text.includes(term)) tags.add(term); });
+  ["fire","water","storm","earth","light","dark"].forEach(term => { if (text.includes(term)) tags.add(term); });
+  return tags;
+}
+
+function equipmentName(eq) { return String(eq?.displayName || eq?.name || eq?.title || eq?.id || eq?.sourceId || "Unknown"); }
+function equipmentImage(eq, type) {
+  if (eq?.image) return eq.image;
+  if (Array.isArray(eq?.imageVariants) && eq.imageVariants[0]?.url) return eq.imageVariants[0].url;
+  const sourceId = eq?.sourceId || eq?.id || eq?.internal?.sourceId;
+  if (!sourceId) return "";
+  return `https://ik.imagekit.io/r8fsa98s9/${type === "accessory" ? "accessories" : "weapons"}/${sourceId}.png`;
+}
+
+function scoreEquipmentForUnit(eq, unit, type) {
+  const unitTags = tagSetFor(unit);
+  const eqTags = tagSetFor(eq);
+  const unitText = textBlobFor(unit);
+  const eqText = textBlobFor(eq);
+  let score = 0;
+  for (const tag of eqTags) if (unitTags.has(tag)) score += 12;
+  const element = String(unit?.element || "").toLowerCase();
+  if (element && eqText.includes(element)) score += 8;
+  const roleText = unitText + " " + Array.from(unitTags).join(" ");
+  if (/attack|damage|dps|survivor|blood|crisis/.test(roleText) && /attack|damage|atk|critical|crit/.test(eqText)) score += 10;
+  if (/guard|tank|defense|hp|armor|ward/.test(roleText) && /hp|guard|defense|armor|reduction|survive|ward/.test(eqText)) score += 10;
+  if (/turn|tu|speed|spirit|tempo|charge/.test(roleText) && /turn|tu|speed|spirit|charge|cost/.test(eqText)) score += 10;
+  EQUIPMENT_AFFINITY_TERMS.forEach(term => { if (roleText.includes(term) && eqText.includes(term)) score += 5; });
+  const stats = eq?.stats || eq?.raw || {};
+  if (Number(stats.atk || stats.attack || stats.flatAttack || 0) > 0 && /attack|damage|dps/.test(roleText)) score += 4;
+  if (Number(stats.hp || stats.maxHp || stats.flatMaxHp || 0) > 0 && /guard|tank|defense|hp/.test(roleText)) score += 4;
+  if (Number(stats.spd || stats.speed || stats.flatSpeed || 0) > 0 && /turn|tu|speed|tempo/.test(roleText)) score += 4;
+  if (type === "weapon" && String(unit?.weaponType || unit?.raw?.weaponPref || "").toLowerCase()) {
+    const pref = String(unit?.weaponType || unit?.raw?.weaponPref || "").toLowerCase();
+    if (eqText.includes(pref) || String(eq?.weaponType || eq?.raw?.weaponType || "").toLowerCase().includes(pref)) score += 15;
+  }
+  return score;
+}
+
+function recommendBestEquipment(unit, type) {
+  if (!unit) return null;
+  const rows = type === "accessory" ? state.equipmentRuntime.accessories : state.equipmentRuntime.weapons;
+  let best = null;
+  let bestScore = -Infinity;
+  for (const eq of rows || []) {
+    const score = scoreEquipmentForUnit(eq, unit, type);
+    if (score > bestScore) { best = eq; bestScore = score; }
+  }
+  return best ? { item: best, score: bestScore, type } : null;
+}
+
+function equipmentMiniHTML(rec) {
+  if (!rec?.item) return "";
+  const name = equipmentName(rec.item);
+  const img = equipmentImage(rec.item, rec.type);
+  const label = rec.type === "accessory" ? "Accessory" : "Weapon";
+  const title = `${label}: ${name} | Match ${Math.max(0, Math.round(rec.score || 0))}`;
+  return `<div class="equipmentMini equipment-${rec.type}" title="${escapeHtml(title)}">${img ? `<img src="${escapeHtml(img)}" alt="${escapeHtml(name)}" loading="lazy" decoding="async">` : `<span class="equipmentMiniFallback">${label[0]}</span>`}<span class="equipmentMiniName">${escapeHtml(name)}</span></div>`;
+}
+
+function equipmentPairHTML(unit) {
+  if (!unit) return "";
+  const weapon = recommendBestEquipment(unit, "weapon");
+  const accessory = recommendBestEquipment(unit, "accessory");
+  if (!weapon && !accessory) return "";
+  return `<div class="equipmentPair" data-equipment-repeatable="true">${equipmentMiniHTML(weapon)}${equipmentMiniHTML(accessory)}</div>`;
+}
+
 function optionList(units) {
   const opts = [`<option value="">(empty)</option>`];
   for (const u of units) {
@@ -225,6 +360,7 @@ function slotCardHTML(slotKey, idx, currentId, poolUnits, locked, ownedIdSet){
   }
 
   const selectedUnit = (poolUnits || []).find(u => normId(u?.id) === currentNorm) || null;
+  const equipmentHtml = equipmentPairHTML(selectedUnit);
   const name = selectedUnit?.name || "?";
   const title = selectedUnit?.title || (isPlatoon ? "Select a unit" : "");
   const element = selectedUnit?.element || "";
@@ -267,6 +403,7 @@ function slotCardHTML(slotKey, idx, currentId, poolUnits, locked, ownedIdSet){
             ${element ? `<span class="tag element ${String(element).toLowerCase()}">${element}</span>` : ``}
             ${rarity ? `<span class="tag rarity ${String(rarity).toLowerCase()}">${rarity}</span>` : ``}
           </div>
+          ${equipmentHtml}
         </div>
 
         <div class="slotBottom">
@@ -285,7 +422,7 @@ function slotCardHTML(slotKey, idx, currentId, poolUnits, locked, ownedIdSet){
         <div class="slotImg">${selectedUnit?.image ? `<img src="${selectedUnit.image}" alt="${name}" loading="lazy" decoding="async">` : ""}</div>
         <div class="slotName">${name}</div>
       </div>
-      <div class="slotMid">${title}${badges}${stats}</div>
+      <div class="slotMid">${title}${badges}${stats}${equipmentHtml}</div>
       <div class="slotBottom">${selectHtml}${lockHtml}</div>
     </div>`;
 }
@@ -398,6 +535,7 @@ function renderStorage() {
 
   grid.innerHTML = remaining.map(u => {
     const img = u.image ? `<img src="${u.image}" alt="">` : `<div class="ph">?</div>`;
+    const equipmentHtml = equipmentPairHTML(u);
     return `
       <div class="slotCard">
         <div class="slotTop">
@@ -411,6 +549,7 @@ function renderStorage() {
           <span class="slotChip">${u.rarity || ""}</span>
           <span class="slotChip">${u.element || ""}</span>
         </div>
+        ${equipmentHtml}
       </div>
     `;
   }).join("");
@@ -419,6 +558,7 @@ function renderStorage() {
 function renderAll() {
   el("ownedCount") && (el("ownedCount").textContent = `${state.ownedUnits.length} selected`);
   el("ownedPoolText") && (el("ownedPoolText").textContent = `${state.ownedUnits.length} owned units available`);
+  updateOptimizerRuntimeStatus();
 
   const storySection = el("storySection");
   const platoonsSection = el("platoonsSection");
@@ -659,6 +799,7 @@ window.runOptimizer = function runOptimizer() {
 async function init() {
   initSharedOptimizerFiltersUI();
 
+  await loadOptimizerRuntimeIfAvailable();
   state.all = await loadCharacters();
   state.layout = loadLayout();
   state.locks = loadLocks();
@@ -676,6 +817,7 @@ async function init() {
   el("unlockAllLocks")?.addEventListener("click", unlockAllLocks);
 
   installModeButtons();
+  updateOptimizerRuntimeStatus();
   renderAll();
 }
 
