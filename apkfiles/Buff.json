@@ -1,6 +1,6 @@
 {
 	"Version": 23,
-	"Time": 1777355655,
+	"Time": 1778472101,
 	"Buff": {
 	"RelationshipFlatAttack50": {
 		"class": "Buff",
@@ -85699,16 +85699,16 @@
 			"stackName": "HoldGround",
 			"behaviors": ["EnterBattleBuff","BuffOnMonsterTurn","BuffWhenMonstersDie","BuffWhenMonstersDie","BuffWhenMonstersDie"],
 			"behaviorOverrides": [{
-				"selfBuffs": ["StunImmunityIfBeastAlly","SleepImmunityIfBeastAlly","TheBeautyRegularDamageReduction","HoldGroundOnceForHoldGroundPlus","BlockDeathUntilNextTurnForHoldGroundPlus"]
+				"selfBuffs": ["StunImmunityIfBeastAlly","SleepImmunityIfBeastAlly","TheBeautyRegularDamageReduction","HoldGroundOnceForHoldGroundPlus","BlockDeathUntilNextTurnForHoldGroundPlus","AddBeastRegularNextInReinforcementsEOT"]
 			},{
 				"sourceBuffs": ["BeautyRegularActive4KillsMoreThanSkillsUsed","SourceTheBeautyRegular"],
 				"enemyBuffs": ["RemoveBeautyRegularExtraKillBuff"]
 			},{
-				"sourceBuffs": ["AddBeastRegularNextInReinforcementsEOT"],
+				"sourceBuffs": ["ShouldSummonBeastRegularBuff"],
 				"deadMonsterConditions": "IsNotSummonedOrTransformingOrMirage",
 				"sameTeam": true
 			},{
-				"sourceBuffs": ["AddBeastRegularNextInReinforcementsEOT","FudgeUsed"],
+				"sourceBuffs": ["ShouldSummonBeastRegularBuff","FudgeUsed"],
 				"sameTeam": false,
 				"spreadCondition": "KillsMoreThanSkillUsed",
 				"deadMonsterConditions": "IsNotSummonedOrTransformingOrMirage"
@@ -85724,15 +85724,54 @@
 		"AddBeastRegularNextInReinforcementsEOT": {
 			"class": "Buff",
 			"stackName": "AddBeastNextInReinforcementsEOT",
-			"behaviors": ["BuffOnMonsterTurnEnd"],
+			"behaviors": ["BuffOnMonsterTurn","BuffOnMonsterTurnEnd","BuffOnMonsterTurnEnd"],
+			"behaviorOverrides": [{
+				"sourceBuffs": ["RemoveBeastRegularSummonFallBack"],
+				"activeMonsterConditions": "AlwaysTrue"
+			},{	
+				"sourceBuffs": ["AddBeastRegular02Next","AddBeastRegular01Next"],
+				"activeMonsterConditions": "AlwaysTrue",
+				"spreadCondition": "ShouldSummonBeastTriggered"
+			},{
+				"sourceBuffs": ["BeastRegularSummonFallBack"],
+				"activeMonsterConditions": "AlwaysTrue"
+			}],
+			"duration": -1,
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true,
+			"noIconShownOnBattleStatus": true
+		},
+		"ShouldSummonBeastRegularBuff":{
+			"class": "Buff",
+			"stackName": "ShouldSummonBeast",
+			"duration": 0,
+			"isHiddenFromPlayers": true,
+			"showAsPermanent": false,
+			"showAsTimer": false
+		},
+		"BeastRegularSummonFallBack":{
+			"class": "Buff",
+			"stackName": "BeastSummonFallBack",
+			"behaviors": ["BuffWhenMonstersDie"],
 			"behaviorOverrides": [{
 				"sourceBuffs": ["AddBeastRegular02Next","AddBeastRegular01Next"],
-				"activeMonsterConditions": "AlwaysTrue"
+				"deadMonsterConditions": "IsNotSummonedOrTransformingOrMirage",
+				"sameTeam": true
 			}],
 			"duration": 0,
 			"showAsTimer": false,
 			"isHiddenFromPlayers": true,
 			"noIconShownOnBattleStatus": true
+		},
+		"RemoveBeastRegularSummonFallBack": {
+			"class": "Buff",
+			"behaviors": ["RemoveBuffs"],
+			"behaviorOverrides": [{
+				"name": "BeastSummonFallBack"
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
 		},
 		"SourceTheBeautyRegular":{
 			"class": "Buff",
@@ -86114,6 +86153,195 @@
 		"BeastRegularActive2Cooldown30":{
 			"class": "Buff",
 			"duration": 30,
+			"stackName": "InstantCooldown",
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"iconSpriteName": "IconBlueCountdownClock3"
+		},
+		"AttackUp4TargetProtectingOrHPBelow50Percent": {
+			"class": "Buff",
+			"behaviors": ["ExtraAttackScalor"],
+			"behaviorOverrides": [{
+				"targetCondition": "HPBelow50PercentOrIsProtecting",
+				"scalor": 0.07
+			}],
+			"iconSpriteName": "IconYellowAttackUpSword01",
+			"noIconShownOnBattleStatus": true,
+			"duration": -1,
+			"showAsTimer": false,
+			"isWeaponBuff": true
+		},
+		"AttackUp5TargetProtectingOrHPBelow50Percent": {
+			"class": "Buff",
+			"behaviors": ["ExtraAttackScalor"],
+			"behaviorOverrides": [{
+				"targetCondition": "HPBelow50PercentOrIsProtecting",
+				"scalor": 0.1
+			}],
+			"iconSpriteName": "IconYellowAttackUpSword01",
+			"noIconShownOnBattleStatus": true,
+			"duration": -1,
+			"showAsTimer": false,
+			"isWeaponBuff": true
+		},
+		"AttackUp6TargetProtectingOrHPBelow50Percent": {
+			"class": "Buff",
+			"behaviors": ["ExtraAttackScalor"],
+			"behaviorOverrides": [{
+				"targetCondition": "HPBelow50PercentOrIsProtecting",
+				"scalor": 0.15
+			}],
+			"iconSpriteName": "IconYellowAttackUpSword01",
+			"noIconShownOnBattleStatus": true,
+			"duration": -1,
+			"showAsTimer": false,
+			"isWeaponBuff": true
+		},
+		"BigStrongKintaroAKintaroRegular": {
+			"class": "Buff",
+			"stackName": "BigStrongKintaroAKintaroRegular",
+			"behaviors": ["EnterBattleBuff","BuffWhenMonstersDie","BuffWhenMonstersDie","BuffWhenMonsterHurt","BuffOnMonsterTurnEnd"],
+			"behaviorOverrides": [{
+				"sourceBuffs": ["InstantKillImmunityOnce","BlockDeathFor100TU","4LevelsOfDamageReductionBasedOnKills","Active3LOCKKintaroRegular","Active4LOCKKintaroRegular","StoreEnergy","StoreEnergy","StoreEnergy","Charged1Icon","Charged2Icon","Charged3Icon"]
+			},{
+				"sourceBuffs": ["RemoveActive3LOCKKintaroRegular","FudgeUsedAlt"],
+				"sameTeam": false,
+				"spreadCondition": "KillsMoreThanSkillUsedAlt",
+				"deadMonsterConditions": "NotTransformingOrMirage"
+			},{
+				"sourceBuffs": ["FudgeUsedAltEndOfTurn"],
+				"sameTeam": false,
+				"spreadCondition": "KillsMoreThanSkillUsedAlt"
+			},{
+				"selfBuffs": ["RemoveActive4LOCKKintaroRegular","BrideHealOK"],
+				"cancelFromDamageTypes": ["BuffDamage"]
+			},{
+				"selfBuffs": ["Overwatch","BrideHeal50PercentKintaroRegular"],
+				"activeMonsterConditions": "NotAlwaysMyTurn",
+				"spreadCondition": "BrideHealReady"
+			}],
+			"duration": -1,
+			"isHiddenFromPlayers": true,
+			"showAsPermanent": false,
+			"showAsTimer": false
+		},
+		"BrideHeal50PercentKintaroRegular": {
+			"class": "Buff",
+			"behaviors": ["AdjustHp","RemoveBuffs","RemoveBuffs"],
+			"behaviorOverrides": [{
+				"percent": 0.50,
+				"abilityEffect": "Blank",
+				"hpboosts": [
+					"HealBoost"
+				]
+			},{
+				"name": "BrideHealOK"
+			},{}],
+			"duration": 0,
+			"effectToShowWhenApplied": "LargeHeal1",
+			"textKeyToShowWhenApplied": "HealDoubleANameKey",
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
+		"ShowOfStrengthPassiveAKintaroRegular": {
+			"class": "Buff",
+			"stackName": "ShowOfStrengthPassiveAKintaroRegular",
+			"behaviors": ["EnterBattleBuff","BuffChanceOnHit","OthersEnterBattle","StunImmunityFallback"],
+			"behaviorOverrides": [{
+				"sourceBuffs": ["KnockbackImmunity","StunImmunity","SleepImmunityIf2OrMoreEnemies","DisableFallBackImmunity"]
+			},{
+				"selfBuffs": ["GiveTurn","OnExtraTurn","JustGivenTurn","LoseChargeAtEndOfTurn"],
+				"chance": 1.0,
+				"targetCondition": "IsNotBurning",
+				"spreadCondition": "IsChargedAtAll"
+			},{
+				"sameTeam": false,
+				"chance": 1.0,
+				"selfBuffs": ["AttackBoostCounterStackLV3","AttackBoostCounterStackLV2","AttackBoostCounterStackLV1"],
+				"spreadCondition": "BattleTimeOver1OrAnyDeadMonster"	
+			},{}],
+			"duration": -1,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true
+		},
+		"BlockDeathFor100TU": {
+			"class": "Buff",
+			"behaviors": ["BlockDeath"],
+			"behaviorOverrides": [{
+				"cancelFromDamageFlags": ["IgnoreBlockDeath", "HardIgnoreBlockDeath", "LethalPoison"],
+				"conditions": "NotAlwaysEnemyTurn"
+			}],
+			"stackName": "BlockDeathFor100TU",
+			"iconSpriteName": "IconWhiteFightSwordTime01",
+			"duration": 100,
+			"showAsTimer": true,
+			"showAsPermanent": false
+		},
+		"HasteUp50PercentFor100TU": {
+			"class": "Buff",
+			"stackName": "HasteUp50PercentFor100TU",
+			"behaviors": ["StatOnly", "StatOnly", "StatOnly"],
+			"behaviorOverrides": [{
+				"conditions": "IsNotAccelerated",
+				"flatStatBonuses": {
+					"Haste": -999
+				}
+			},{
+				"conditions": "IsAccelerated20Percent",
+				"flatStatBonuses": {
+					"Haste": -749
+				}
+			},{
+				"conditions": "IsAccelerated30Percent",
+				"flatStatBonuses": {
+					"Haste": -570
+				}
+			}],
+			"duration": 100,
+			"showAsTimer": false,
+			"noIconShownOnBattleStatus": true,
+			"iconSpriteName": "IconBrownSpeedUpClock01"
+		},
+		"Active3LOCKKintaroRegular":{
+			"class": "Buff",
+			"stackName": "Active3LOCKKintaroRegular",
+			"duration": -1,
+			"isHiddenFromPlayers": true,
+			"showAsPermanent": false,
+			"showAsTimer": false
+		},
+		"RemoveActive3LOCKKintaroRegular": {
+			"class": "Buff",
+			"behaviors": ["RemoveBuffs"],
+			"behaviorOverrides": [{
+				"name": "Active3LOCKKintaroRegular"
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
+		"Active4LOCKKintaroRegular":{
+			"class": "Buff",
+			"stackName": "Active4LOCKKintaroRegular",
+			"duration": -1,
+			"isHiddenFromPlayers": true,
+			"showAsPermanent": false,
+			"showAsTimer": false
+		},
+		"RemoveActive4LOCKKintaroRegular": {
+			"class": "Buff",
+			"behaviors": ["RemoveBuffs"],
+			"behaviorOverrides": [{
+				"name": "Active4LOCKKintaroRegular"
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
+		"KintaroRegularActive2Cooldown50":{
+			"class": "Buff",
+			"duration": 50,
 			"stackName": "InstantCooldown",
 			"showAsTimer": true,
 			"showAsPermanent": false,
