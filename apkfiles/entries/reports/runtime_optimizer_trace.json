@@ -1,0 +1,2351 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Trace remaining optimizer hybrid dependencies before migrating to runtime-only optimizer flow.",
+  "optimizerFilesScanned": [
+    "optimizer.html",
+    "optimizer.js",
+    "optimizerEngine.js",
+    "optimizer_doctrine.js",
+    "optimizer-hook.js",
+    "optimizerEngineV2.js",
+    "abilityScoreEngine.js",
+    "optimizerRuntimeLoader.js",
+    "optimizerRuntimeBootstrap.js",
+    "data-loader.js"
+  ],
+  "missingFiles": [],
+  "scriptChain": {
+    "optimizerHtmlScriptOrder": [
+      "seasonal-theme.js",
+      "site-menu.js",
+      "data-loader.js",
+      "optimizerRuntimeLoader.js",
+      "optimizer_doctrine.js",
+      "optimizerEngine.js",
+      "abilityScoreEngine.js",
+      "optimizerEngineV2.js",
+      "optimizer-hook.js",
+      "optimizerRuntimeBootstrap.js",
+      "optimizer.js"
+    ],
+    "legacyFilesInScriptChain": [
+      "optimizer_doctrine.js",
+      "optimizerEngine.js",
+      "optimizer-hook.js"
+    ],
+    "runtimeFilesInScriptChain": [
+      "optimizerRuntimeLoader.js",
+      "abilityScoreEngine.js",
+      "optimizerEngineV2.js",
+      "optimizerRuntimeBootstrap.js"
+    ],
+    "isHybrid": true
+  },
+  "isHybridOptimizerStack": true,
+  "blockerCount": 5,
+  "blockers": [
+    {
+      "type": "legacy_script_loaded_by_optimizer_html",
+      "path": "optimizer_doctrine.js",
+      "reason": "optimizer.html still loads this legacy script directly. It cannot be quarantined until runtime V2 fully replaces or no longer needs it."
+    },
+    {
+      "type": "legacy_script_loaded_by_optimizer_html",
+      "path": "optimizerEngine.js",
+      "reason": "optimizer.html still loads this legacy script directly. It cannot be quarantined until runtime V2 fully replaces or no longer needs it."
+    },
+    {
+      "type": "legacy_script_loaded_by_optimizer_html",
+      "path": "optimizer-hook.js",
+      "reason": "optimizer.html still loads this legacy script directly. It cannot be quarantined until runtime V2 fully replaces or no longer needs it."
+    },
+    {
+      "type": "legacy_global_without_runtime_replacement",
+      "path": "optimizer_doctrine.js",
+      "reason": "window.OPTIMIZER_DOCTRINE is assigned by legacy code and no runtime assignment was detected."
+    },
+    {
+      "type": "legacy_global_without_runtime_replacement",
+      "path": "optimizerEngine.js",
+      "reason": "window.OptimizerEngine is assigned by legacy code and no runtime assignment was detected."
+    }
+  ],
+  "legacyGlobalDependencies": [
+    {
+      "global": "OPTIMIZER_DOCTRINE",
+      "legacyAssigners": [
+        "optimizer_doctrine.js"
+      ],
+      "runtimeAssigners": [],
+      "readers": [
+        "optimizerEngine.js",
+        "optimizer_doctrine.js"
+      ],
+      "hasRuntimeReplacement": false,
+      "risk": "legacy_global_still_active"
+    },
+    {
+      "global": "OptimizerEngine",
+      "legacyAssigners": [
+        "optimizerEngine.js"
+      ],
+      "runtimeAssigners": [],
+      "readers": [
+        "optimizer.js",
+        "optimizerEngine.js"
+      ],
+      "hasRuntimeReplacement": false,
+      "risk": "legacy_global_still_active"
+    },
+    {
+      "global": "OptimizerRuntime",
+      "legacyAssigners": [],
+      "runtimeAssigners": [
+        "optimizerRuntimeLoader.js"
+      ],
+      "readers": [
+        "optimizerRuntimeLoader.js"
+      ],
+      "hasRuntimeReplacement": true,
+      "risk": "runtime_owned_global"
+    },
+    {
+      "global": "__optimizerRuntimeReady",
+      "legacyAssigners": [],
+      "runtimeAssigners": [
+        "optimizerRuntimeBootstrap.js"
+      ],
+      "readers": [
+        "optimizerRuntimeBootstrap.js"
+      ],
+      "hasRuntimeReplacement": true,
+      "risk": "runtime_owned_global"
+    },
+    {
+      "global": "__optimizerRuntimeReadyPromise",
+      "legacyAssigners": [],
+      "runtimeAssigners": [
+        "optimizerRuntimeBootstrap.js"
+      ],
+      "readers": [
+        "optimizerRuntimeBootstrap.js"
+      ],
+      "hasRuntimeReplacement": true,
+      "risk": "runtime_owned_global"
+    },
+    {
+      "global": "loadOptimizerRuntime",
+      "legacyAssigners": [],
+      "runtimeAssigners": [
+        "optimizerRuntimeBootstrap.js",
+        "optimizerRuntimeLoader.js"
+      ],
+      "readers": [
+        "optimizerRuntimeBootstrap.js",
+        "optimizerRuntimeLoader.js"
+      ],
+      "hasRuntimeReplacement": true,
+      "risk": "runtime_owned_global"
+    }
+  ],
+  "functionUsage": [
+    {
+      "function": "runOptimizerSafe",
+      "definedIn": "optimizer-hook.js",
+      "category": "legacy",
+      "totalCallMentions": 3,
+      "externalCallMentions": 0,
+      "candidateStatus": "legacy_function_no_external_call_detected"
+    },
+    {
+      "function": "aiTeamCohesionScore",
+      "definedIn": "optimizerEngine.js",
+      "category": "legacy",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "legacy_function_no_external_call_detected"
+    },
+    {
+      "function": "anyTag",
+      "definedIn": "optimizerEngine.js",
+      "category": "legacy",
+      "totalCallMentions": 12,
+      "externalCallMentions": 0,
+      "candidateStatus": "legacy_function_no_external_call_detected"
+    },
+    {
+      "function": "archetypeCohesionScore",
+      "definedIn": "optimizerEngine.js",
+      "category": "legacy",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "legacy_function_no_external_call_detected"
+    },
+    {
+      "function": "assignStoryMainBack",
+      "definedIn": "optimizerEngine.js",
+      "category": "legacy",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "legacy_function_no_external_call_detected"
+    },
+    {
+      "function": "buildPlatoons",
+      "definedIn": "optimizerEngine.js",
+      "category": "legacy",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "legacy_function_no_external_call_detected"
+    },
+    {
+      "function": "buildStory",
+      "definedIn": "optimizerEngine.js",
+      "category": "legacy",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "legacy_function_no_external_call_detected"
+    },
+    {
+      "function": "buildTeamFixedSize",
+      "definedIn": "optimizerEngine.js",
+      "category": "legacy",
+      "totalCallMentions": 3,
+      "externalCallMentions": 0,
+      "candidateStatus": "legacy_function_no_external_call_detected"
+    },
+    {
+      "function": "canonicalTag",
+      "definedIn": "optimizerEngine.js",
+      "category": "legacy",
+      "totalCallMentions": 3,
+      "externalCallMentions": 0,
+      "candidateStatus": "legacy_function_no_external_call_detected"
+    },
+    {
+      "function": "chooseAutoPreset",
+      "definedIn": "optimizerEngine.js",
+      "category": "legacy",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "legacy_function_no_external_call_detected"
+    },
+    {
+      "function": "clamp01",
+      "definedIn": "optimizerEngine.js",
+      "category": "legacy",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "legacy_function_no_external_call_detected"
+    },
+    {
+      "function": "coverageBonus",
+      "definedIn": "optimizerEngine.js",
+      "category": "legacy",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "legacy_function_no_external_call_detected"
+    },
+    {
+      "function": "deepMerge",
+      "definedIn": "optimizerEngine.js",
+      "category": "legacy",
+      "totalCallMentions": 3,
+      "externalCallMentions": 0,
+      "candidateStatus": "legacy_function_no_external_call_detected"
+    },
+    {
+      "function": "deriveAITags",
+      "definedIn": "optimizerEngine.js",
+      "category": "legacy",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "legacy_function_no_external_call_detected"
+    },
+    {
+      "function": "engineScore",
+      "definedIn": "optimizerEngine.js",
+      "category": "legacy",
+      "totalCallMentions": 5,
+      "externalCallMentions": 0,
+      "candidateStatus": "legacy_function_no_external_call_detected"
+    },
+    {
+      "function": "expandUnitTags",
+      "definedIn": "optimizerEngine.js",
+      "category": "legacy",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "legacy_function_no_external_call_detected"
+    },
+    {
+      "function": "extractTeamFeatures",
+      "definedIn": "optimizerEngine.js",
+      "category": "legacy",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "legacy_function_no_external_call_detected"
+    },
+    {
+      "function": "fillTeamToSizeRelaxed",
+      "definedIn": "optimizerEngine.js",
+      "category": "legacy",
+      "totalCallMentions": 3,
+      "externalCallMentions": 0,
+      "candidateStatus": "legacy_function_no_external_call_detected"
+    },
+    {
+      "function": "filterCandidatesForArchetypes",
+      "definedIn": "optimizerEngine.js",
+      "category": "legacy",
+      "totalCallMentions": 3,
+      "externalCallMentions": 0,
+      "candidateStatus": "legacy_function_no_external_call_detected"
+    },
+    {
+      "function": "forcedFromLocks",
+      "definedIn": "optimizerEngine.js",
+      "category": "legacy",
+      "totalCallMentions": 4,
+      "externalCallMentions": 0,
+      "candidateStatus": "legacy_function_no_external_call_detected"
+    },
+    {
+      "function": "getArchetypeDefs",
+      "definedIn": "optimizerEngine.js",
+      "category": "legacy",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "legacy_function_no_external_call_detected"
+    },
+    {
+      "function": "getArchetypeTier",
+      "definedIn": "optimizerEngine.js",
+      "category": "legacy",
+      "totalCallMentions": 7,
+      "externalCallMentions": 0,
+      "candidateStatus": "legacy_function_no_external_call_detected"
+    },
+    {
+      "function": "getDoctrineMerged",
+      "definedIn": "optimizerEngine.js",
+      "category": "legacy",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "legacy_function_no_external_call_detected"
+    },
+    {
+      "function": "getElement",
+      "definedIn": "optimizerEngine.js",
+      "category": "legacy",
+      "totalCallMentions": 6,
+      "externalCallMentions": 0,
+      "candidateStatus": "legacy_function_no_external_call_detected"
+    },
+    {
+      "function": "getUnitTags",
+      "definedIn": "optimizerEngine.js",
+      "category": "legacy",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "legacy_function_no_external_call_detected"
+    },
+    {
+      "function": "lc",
+      "definedIn": "optimizerEngine.js",
+      "category": "legacy",
+      "totalCallMentions": 6,
+      "externalCallMentions": 0,
+      "candidateStatus": "legacy_function_no_external_call_detected"
+    },
+    {
+      "function": "mergeTagSets",
+      "definedIn": "optimizerEngine.js",
+      "category": "legacy",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "legacy_function_no_external_call_detected"
+    },
+    {
+      "function": "n",
+      "definedIn": "optimizerEngine.js",
+      "category": "legacy",
+      "totalCallMentions": 58,
+      "externalCallMentions": 0,
+      "candidateStatus": "legacy_function_no_external_call_detected"
+    },
+    {
+      "function": "pickAnchorElementForTeam",
+      "definedIn": "optimizerEngine.js",
+      "category": "legacy",
+      "totalCallMentions": 3,
+      "externalCallMentions": 0,
+      "candidateStatus": "legacy_function_no_external_call_detected"
+    },
+    {
+      "function": "presetCohesionScore",
+      "definedIn": "optimizerEngine.js",
+      "category": "legacy",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "legacy_function_no_external_call_detected"
+    },
+    {
+      "function": "pushTag",
+      "definedIn": "optimizerEngine.js",
+      "category": "legacy",
+      "totalCallMentions": 44,
+      "externalCallMentions": 0,
+      "candidateStatus": "legacy_function_no_external_call_detected"
+    },
+    {
+      "function": "redundancyPenalty",
+      "definedIn": "optimizerEngine.js",
+      "category": "legacy",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "legacy_function_no_external_call_detected"
+    },
+    {
+      "function": "scoreResult",
+      "definedIn": "optimizerEngine.js",
+      "category": "legacy",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "legacy_function_no_external_call_detected"
+    },
+    {
+      "function": "scoreUnitForArchetype",
+      "definedIn": "optimizerEngine.js",
+      "category": "legacy",
+      "totalCallMentions": 6,
+      "externalCallMentions": 0,
+      "candidateStatus": "legacy_function_no_external_call_detected"
+    },
+    {
+      "function": "scoreUnitForPreset",
+      "definedIn": "optimizerEngine.js",
+      "category": "legacy",
+      "totalCallMentions": 3,
+      "externalCallMentions": 0,
+      "candidateStatus": "legacy_function_no_external_call_detected"
+    },
+    {
+      "function": "sortByStrictArchetypes",
+      "definedIn": "optimizerEngine.js",
+      "category": "legacy",
+      "totalCallMentions": 5,
+      "externalCallMentions": 0,
+      "candidateStatus": "legacy_function_no_external_call_detected"
+    },
+    {
+      "function": "stats",
+      "definedIn": "optimizerEngine.js",
+      "category": "legacy",
+      "totalCallMentions": 3,
+      "externalCallMentions": 0,
+      "candidateStatus": "legacy_function_no_external_call_detected"
+    },
+    {
+      "function": "teamScore",
+      "definedIn": "optimizerEngine.js",
+      "category": "legacy",
+      "totalCallMentions": 6,
+      "externalCallMentions": 0,
+      "candidateStatus": "legacy_function_no_external_call_detected"
+    },
+    {
+      "function": "teamSynergyScore",
+      "definedIn": "optimizerEngine.js",
+      "category": "legacy",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "legacy_function_no_external_call_detected"
+    },
+    {
+      "function": "textBlobForUnit",
+      "definedIn": "optimizerEngine.js",
+      "category": "legacy",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "legacy_function_no_external_call_detected"
+    },
+    {
+      "function": "topCandidates",
+      "definedIn": "optimizerEngine.js",
+      "category": "legacy",
+      "totalCallMentions": 6,
+      "externalCallMentions": 0,
+      "candidateStatus": "legacy_function_no_external_call_detected"
+    },
+    {
+      "function": "unitBase",
+      "definedIn": "optimizerEngine.js",
+      "category": "legacy",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "legacy_function_no_external_call_detected"
+    },
+    {
+      "function": "add",
+      "definedIn": "optimizerEngine.js",
+      "category": "legacy",
+      "totalCallMentions": 80,
+      "externalCallMentions": 50,
+      "candidateStatus": "legacy_function_possible_replacement_review"
+    },
+    {
+      "function": "asArray",
+      "definedIn": "optimizerEngine.js",
+      "category": "legacy",
+      "totalCallMentions": 27,
+      "externalCallMentions": 20,
+      "candidateStatus": "legacy_function_possible_replacement_review"
+    },
+    {
+      "function": "has",
+      "definedIn": "optimizerEngine.js",
+      "category": "legacy",
+      "totalCallMentions": 124,
+      "externalCallMentions": 31,
+      "candidateStatus": "legacy_function_possible_replacement_review"
+    },
+    {
+      "function": "normId",
+      "definedIn": "optimizerEngine.js",
+      "category": "legacy",
+      "totalCallMentions": 52,
+      "externalCallMentions": 11,
+      "candidateStatus": "legacy_function_possible_replacement_review"
+    },
+    {
+      "function": "normalizeElementValue",
+      "definedIn": "optimizerEngine.js",
+      "category": "legacy",
+      "totalCallMentions": 6,
+      "externalCallMentions": 4,
+      "candidateStatus": "legacy_function_possible_replacement_review"
+    },
+    {
+      "function": "run",
+      "definedIn": "optimizerEngine.js",
+      "category": "legacy",
+      "totalCallMentions": 8,
+      "externalCallMentions": 6,
+      "candidateStatus": "legacy_function_possible_replacement_review"
+    },
+    {
+      "function": "structuredCloneSafe",
+      "definedIn": "optimizerEngine.js",
+      "category": "legacy",
+      "totalCallMentions": 6,
+      "externalCallMentions": 3,
+      "candidateStatus": "legacy_function_possible_replacement_review"
+    },
+    {
+      "function": "asArray",
+      "definedIn": "abilityScoreEngine.js",
+      "category": "runtime",
+      "totalCallMentions": 27,
+      "externalCallMentions": 18,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "effectPowerFromNode",
+      "definedIn": "abilityScoreEngine.js",
+      "category": "runtime",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "enrichUnitWithAbilityPower",
+      "definedIn": "abilityScoreEngine.js",
+      "category": "runtime",
+      "totalCallMentions": 2,
+      "externalCallMentions": 1,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "getAbilityGraph",
+      "definedIn": "abilityScoreEngine.js",
+      "category": "runtime",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "getAbilityNodeByRecordId",
+      "definedIn": "abilityScoreEngine.js",
+      "category": "runtime",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "getCharacterLinks",
+      "definedIn": "abilityScoreEngine.js",
+      "category": "runtime",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "getRuntime",
+      "definedIn": "abilityScoreEngine.js",
+      "category": "runtime",
+      "totalCallMentions": 5,
+      "externalCallMentions": 3,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "linkedAbilityNodes",
+      "definedIn": "abilityScoreEngine.js",
+      "category": "runtime",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "norm",
+      "definedIn": "abilityScoreEngine.js",
+      "category": "runtime",
+      "totalCallMentions": 8,
+      "externalCallMentions": 2,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "numericPowerFromNode",
+      "definedIn": "abilityScoreEngine.js",
+      "category": "runtime",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "scoreUnitAbilityPower",
+      "definedIn": "abilityScoreEngine.js",
+      "category": "runtime",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "add",
+      "definedIn": "data-loader.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 80,
+      "externalCallMentions": 51,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "bossImageName",
+      "definedIn": "data-loader.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "buildImageVariants",
+      "definedIn": "data-loader.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "buildImageVariantsFromFamily",
+      "definedIn": "data-loader.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 3,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "characterImageUrl",
+      "definedIn": "data-loader.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 4,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "dedupeById",
+      "definedIn": "data-loader.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 5,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "deriveTags",
+      "definedIn": "data-loader.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "familyOrderIndex",
+      "definedIn": "data-loader.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 3,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "fetchJson",
+      "definedIn": "data-loader.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 15,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "formRank",
+      "definedIn": "data-loader.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 6,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "formRuntimeData",
+      "definedIn": "data-loader.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 3,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "getCatalogBundle",
+      "definedIn": "data-loader.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 3,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "getCategoryBundle",
+      "definedIn": "data-loader.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "getCharacterFamiliesMap",
+      "definedIn": "data-loader.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "getCharacterImageMap",
+      "definedIn": "data-loader.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 3,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "getCharacterOrderMap",
+      "definedIn": "data-loader.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "getFamily",
+      "definedIn": "data-loader.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 3,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "getLocalizationGroupsMap",
+      "definedIn": "data-loader.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "imageSourceForState",
+      "definedIn": "data-loader.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "inferRarity",
+      "definedIn": "data-loader.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 4,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "loadAllEntries",
+      "definedIn": "data-loader.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 1,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "loadCharactersMerged",
+      "definedIn": "data-loader.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 2,
+      "externalCallMentions": 1,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "loadCharactersMergedLegacy",
+      "definedIn": "data-loader.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "loadEntryCategory",
+      "definedIn": "data-loader.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 6,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "loadRawEntryCategory",
+      "definedIn": "data-loader.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "localizationForEntry",
+      "definedIn": "data-loader.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "mapLimit",
+      "definedIn": "data-loader.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 3,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "mergeCharacterForms",
+      "definedIn": "data-loader.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "nearestForm",
+      "definedIn": "data-loader.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 1,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "normalizeElementTag",
+      "definedIn": "data-loader.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "normalizeElementValue",
+      "definedIn": "data-loader.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 6,
+      "externalCallMentions": 2,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "normalizeEntryForOldSite",
+      "definedIn": "data-loader.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "passiveNamesFromArray",
+      "definedIn": "data-loader.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "sortCharactersByMap",
+      "definedIn": "data-loader.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "starsForState",
+      "definedIn": "data-loader.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "stateNameForForm",
+      "definedIn": "data-loader.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "stripFormSuffix",
+      "definedIn": "data-loader.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 8,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "titleFromInternalId",
+      "definedIn": "data-loader.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 3,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "toArray",
+      "definedIn": "data-loader.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 5,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "variantsFromCharacterImageMap",
+      "definedIn": "data-loader.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "applyEngineResult",
+      "definedIn": "optimizer.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 3,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "buildEngineOptions",
+      "definedIn": "optimizer.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 4,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "buildExampleOptions",
+      "definedIn": "optimizer.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "buildExampleTeam",
+      "definedIn": "optimizer.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 1,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "clearTeams",
+      "definedIn": "optimizer.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 1,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "defaultLocks",
+      "definedIn": "optimizer.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 3,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "el",
+      "definedIn": "optimizer.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 34,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "getLockFor",
+      "definedIn": "optimizer.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 4,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "getOwnedIds",
+      "definedIn": "optimizer.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 3,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "getPresetPref",
+      "definedIn": "optimizer.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 4,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "getPrimaryArchetypePref",
+      "definedIn": "optimizer.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 3,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "getSecondaryArchetypePref",
+      "definedIn": "optimizer.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 3,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "getTeamTypePref",
+      "definedIn": "optimizer.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 4,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "init",
+      "definedIn": "optimizer.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "initSharedOptimizerFiltersUI",
+      "definedIn": "optimizer.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "installModeButtons",
+      "definedIn": "optimizer.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "loadCharacters",
+      "definedIn": "optimizer.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "loadLayout",
+      "definedIn": "optimizer.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "loadLocks",
+      "definedIn": "optimizer.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "lockFilledPlatoons",
+      "definedIn": "optimizer.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 1,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "lockFilledStorySlots",
+      "definedIn": "optimizer.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 1,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "normId",
+      "definedIn": "optimizer.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 52,
+      "externalCallMentions": 41,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "optionList",
+      "definedIn": "optimizer.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 1,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "refreshOptimizerFromOwned",
+      "definedIn": "optimizer.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 1,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "renderAll",
+      "definedIn": "optimizer.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 12,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "renderImageStateControls",
+      "definedIn": "optimizer.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "renderPlatoons",
+      "definedIn": "optimizer.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 4,
+      "externalCallMentions": 2,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "renderStorage",
+      "definedIn": "optimizer.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "renderStory",
+      "definedIn": "optimizer.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 4,
+      "externalCallMentions": 2,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "runEngine",
+      "definedIn": "optimizer.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "runOptimizer",
+      "definedIn": "optimizer.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 2,
+      "externalCallMentions": 1,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "safeJsonParse",
+      "definedIn": "optimizer.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 5,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "saveLayout",
+      "definedIn": "optimizer.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 4,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "saveLocks",
+      "definedIn": "optimizer.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 5,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "setLockFor",
+      "definedIn": "optimizer.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "setPresetPref",
+      "definedIn": "optimizer.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 3,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "setPrimaryArchetypePref",
+      "definedIn": "optimizer.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "setSecondaryArchetypePref",
+      "definedIn": "optimizer.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "setTeamTypePref",
+      "definedIn": "optimizer.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 3,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "slotCardHTML",
+      "definedIn": "optimizer.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 4,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "structuredCloneSafe",
+      "definedIn": "optimizer.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 6,
+      "externalCallMentions": 3,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "syncArchetypeDropdowns",
+      "definedIn": "optimizer.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 4,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "unlockAllLocks",
+      "definedIn": "optimizer.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 1,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "wireSelects",
+      "definedIn": "optimizer.js",
+      "category": "ui_or_loader",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "add",
+      "definedIn": "optimizerEngineV2.js",
+      "category": "runtime",
+      "totalCallMentions": 80,
+      "externalCallMentions": 66,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "addRow",
+      "definedIn": "optimizerEngineV2.js",
+      "category": "runtime",
+      "totalCallMentions": 3,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "asArray",
+      "definedIn": "optimizerEngineV2.js",
+      "category": "runtime",
+      "totalCallMentions": 27,
+      "externalCallMentions": 16,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "conditionTagsFromKnowledge",
+      "definedIn": "optimizerEngineV2.js",
+      "category": "runtime",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "enrichOwnedUnits",
+      "definedIn": "optimizerEngineV2.js",
+      "category": "runtime",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "enrichUnit",
+      "definedIn": "optimizerEngineV2.js",
+      "category": "runtime",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "getRuntime",
+      "definedIn": "optimizerEngineV2.js",
+      "category": "runtime",
+      "totalCallMentions": 5,
+      "externalCallMentions": 2,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "indexRuntimeCharacters",
+      "definedIn": "optimizerEngineV2.js",
+      "category": "runtime",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "indexRuntimeTags",
+      "definedIn": "optimizerEngineV2.js",
+      "category": "runtime",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "mergeUnique",
+      "definedIn": "optimizerEngineV2.js",
+      "category": "runtime",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "norm",
+      "definedIn": "optimizerEngineV2.js",
+      "category": "runtime",
+      "totalCallMentions": 8,
+      "externalCallMentions": 6,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "run",
+      "definedIn": "optimizerEngineV2.js",
+      "category": "runtime",
+      "totalCallMentions": 8,
+      "externalCallMentions": 6,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "tagsFromRuntimeRow",
+      "definedIn": "optimizerEngineV2.js",
+      "category": "runtime",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "loadRuntimeSafe",
+      "definedIn": "optimizerRuntimeBootstrap.js",
+      "category": "runtime",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "setStatus",
+      "definedIn": "optimizerRuntimeBootstrap.js",
+      "category": "runtime",
+      "totalCallMentions": 5,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "wrapped",
+      "definedIn": "optimizerRuntimeBootstrap.js",
+      "category": "runtime",
+      "totalCallMentions": 0,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "loadOptimizerRuntime",
+      "definedIn": "optimizerRuntimeLoader.js",
+      "category": "runtime",
+      "totalCallMentions": 2,
+      "externalCallMentions": 1,
+      "candidateStatus": "runtime_or_ui_function"
+    },
+    {
+      "function": "loadOptimizerRuntimeChunk",
+      "definedIn": "optimizerRuntimeLoader.js",
+      "category": "runtime",
+      "totalCallMentions": 2,
+      "externalCallMentions": 0,
+      "candidateStatus": "runtime_or_ui_function"
+    }
+  ],
+  "symbolIndex": {
+    "functionDefinitions": {
+      "add": [
+        "data-loader.js",
+        "optimizerEngine.js",
+        "optimizerEngineV2.js"
+      ],
+      "addRow": [
+        "optimizerEngineV2.js"
+      ],
+      "aiTeamCohesionScore": [
+        "optimizerEngine.js"
+      ],
+      "anyTag": [
+        "optimizerEngine.js"
+      ],
+      "applyEngineResult": [
+        "optimizer.js"
+      ],
+      "archetypeCohesionScore": [
+        "optimizerEngine.js"
+      ],
+      "asArray": [
+        "abilityScoreEngine.js",
+        "optimizerEngine.js",
+        "optimizerEngineV2.js"
+      ],
+      "assignStoryMainBack": [
+        "optimizerEngine.js"
+      ],
+      "bossImageName": [
+        "data-loader.js"
+      ],
+      "buildEngineOptions": [
+        "optimizer.js"
+      ],
+      "buildExampleOptions": [
+        "optimizer.js"
+      ],
+      "buildExampleTeam": [
+        "optimizer.js"
+      ],
+      "buildImageVariants": [
+        "data-loader.js"
+      ],
+      "buildImageVariantsFromFamily": [
+        "data-loader.js"
+      ],
+      "buildPlatoons": [
+        "optimizerEngine.js"
+      ],
+      "buildStory": [
+        "optimizerEngine.js"
+      ],
+      "buildTeamFixedSize": [
+        "optimizerEngine.js"
+      ],
+      "canonicalTag": [
+        "optimizerEngine.js"
+      ],
+      "characterImageUrl": [
+        "data-loader.js"
+      ],
+      "chooseAutoPreset": [
+        "optimizerEngine.js"
+      ],
+      "clamp01": [
+        "optimizerEngine.js"
+      ],
+      "clearTeams": [
+        "optimizer.js"
+      ],
+      "conditionTagsFromKnowledge": [
+        "optimizerEngineV2.js"
+      ],
+      "coverageBonus": [
+        "optimizerEngine.js"
+      ],
+      "dedupeById": [
+        "data-loader.js"
+      ],
+      "deepMerge": [
+        "optimizerEngine.js"
+      ],
+      "defaultLocks": [
+        "optimizer.js"
+      ],
+      "deriveAITags": [
+        "optimizerEngine.js"
+      ],
+      "deriveTags": [
+        "data-loader.js"
+      ],
+      "effectPowerFromNode": [
+        "abilityScoreEngine.js"
+      ],
+      "el": [
+        "optimizer.js"
+      ],
+      "engineScore": [
+        "optimizerEngine.js"
+      ],
+      "enrichOwnedUnits": [
+        "optimizerEngineV2.js"
+      ],
+      "enrichUnit": [
+        "optimizerEngineV2.js"
+      ],
+      "enrichUnitWithAbilityPower": [
+        "abilityScoreEngine.js"
+      ],
+      "expandUnitTags": [
+        "optimizerEngine.js"
+      ],
+      "extractTeamFeatures": [
+        "optimizerEngine.js"
+      ],
+      "familyOrderIndex": [
+        "data-loader.js"
+      ],
+      "fetchJson": [
+        "data-loader.js"
+      ],
+      "fillTeamToSizeRelaxed": [
+        "optimizerEngine.js"
+      ],
+      "filterCandidatesForArchetypes": [
+        "optimizerEngine.js"
+      ],
+      "forcedFromLocks": [
+        "optimizerEngine.js"
+      ],
+      "formRank": [
+        "data-loader.js"
+      ],
+      "formRuntimeData": [
+        "data-loader.js"
+      ],
+      "getAbilityGraph": [
+        "abilityScoreEngine.js"
+      ],
+      "getAbilityNodeByRecordId": [
+        "abilityScoreEngine.js"
+      ],
+      "getArchetypeDefs": [
+        "optimizerEngine.js"
+      ],
+      "getArchetypeTier": [
+        "optimizerEngine.js"
+      ],
+      "getCatalogBundle": [
+        "data-loader.js"
+      ],
+      "getCategoryBundle": [
+        "data-loader.js"
+      ],
+      "getCharacterFamiliesMap": [
+        "data-loader.js"
+      ],
+      "getCharacterImageMap": [
+        "data-loader.js"
+      ],
+      "getCharacterLinks": [
+        "abilityScoreEngine.js"
+      ],
+      "getCharacterOrderMap": [
+        "data-loader.js"
+      ],
+      "getDoctrineMerged": [
+        "optimizerEngine.js"
+      ],
+      "getElement": [
+        "optimizerEngine.js"
+      ],
+      "getFamily": [
+        "data-loader.js"
+      ],
+      "getLocalizationGroupsMap": [
+        "data-loader.js"
+      ],
+      "getLockFor": [
+        "optimizer.js"
+      ],
+      "getOwnedIds": [
+        "optimizer.js"
+      ],
+      "getPresetPref": [
+        "optimizer.js"
+      ],
+      "getPrimaryArchetypePref": [
+        "optimizer.js"
+      ],
+      "getRuntime": [
+        "abilityScoreEngine.js",
+        "optimizerEngineV2.js"
+      ],
+      "getSecondaryArchetypePref": [
+        "optimizer.js"
+      ],
+      "getTeamTypePref": [
+        "optimizer.js"
+      ],
+      "getUnitTags": [
+        "optimizerEngine.js"
+      ],
+      "has": [
+        "optimizerEngine.js"
+      ],
+      "imageSourceForState": [
+        "data-loader.js"
+      ],
+      "indexRuntimeCharacters": [
+        "optimizerEngineV2.js"
+      ],
+      "indexRuntimeTags": [
+        "optimizerEngineV2.js"
+      ],
+      "inferRarity": [
+        "data-loader.js"
+      ],
+      "init": [
+        "optimizer.js"
+      ],
+      "initSharedOptimizerFiltersUI": [
+        "optimizer.js"
+      ],
+      "installModeButtons": [
+        "optimizer.js"
+      ],
+      "lc": [
+        "optimizerEngine.js"
+      ],
+      "linkedAbilityNodes": [
+        "abilityScoreEngine.js"
+      ],
+      "loadAllEntries": [
+        "data-loader.js"
+      ],
+      "loadCharacters": [
+        "optimizer.js"
+      ],
+      "loadCharactersMerged": [
+        "data-loader.js"
+      ],
+      "loadCharactersMergedLegacy": [
+        "data-loader.js"
+      ],
+      "loadEntryCategory": [
+        "data-loader.js"
+      ],
+      "loadLayout": [
+        "optimizer.js"
+      ],
+      "loadLocks": [
+        "optimizer.js"
+      ],
+      "loadOptimizerRuntime": [
+        "optimizerRuntimeLoader.js"
+      ],
+      "loadOptimizerRuntimeChunk": [
+        "optimizerRuntimeLoader.js"
+      ],
+      "loadRawEntryCategory": [
+        "data-loader.js"
+      ],
+      "loadRuntimeSafe": [
+        "optimizerRuntimeBootstrap.js"
+      ],
+      "localizationForEntry": [
+        "data-loader.js"
+      ],
+      "lockFilledPlatoons": [
+        "optimizer.js"
+      ],
+      "lockFilledStorySlots": [
+        "optimizer.js"
+      ],
+      "mapLimit": [
+        "data-loader.js"
+      ],
+      "mergeCharacterForms": [
+        "data-loader.js"
+      ],
+      "mergeTagSets": [
+        "optimizerEngine.js"
+      ],
+      "mergeUnique": [
+        "optimizerEngineV2.js"
+      ],
+      "n": [
+        "optimizerEngine.js"
+      ],
+      "nearestForm": [
+        "data-loader.js"
+      ],
+      "norm": [
+        "abilityScoreEngine.js",
+        "optimizerEngineV2.js"
+      ],
+      "normId": [
+        "optimizer.js",
+        "optimizerEngine.js"
+      ],
+      "normalizeElementTag": [
+        "data-loader.js"
+      ],
+      "normalizeElementValue": [
+        "data-loader.js",
+        "optimizerEngine.js"
+      ],
+      "normalizeEntryForOldSite": [
+        "data-loader.js"
+      ],
+      "numericPowerFromNode": [
+        "abilityScoreEngine.js"
+      ],
+      "optionList": [
+        "optimizer.js"
+      ],
+      "passiveNamesFromArray": [
+        "data-loader.js"
+      ],
+      "pickAnchorElementForTeam": [
+        "optimizerEngine.js"
+      ],
+      "presetCohesionScore": [
+        "optimizerEngine.js"
+      ],
+      "pushTag": [
+        "optimizerEngine.js"
+      ],
+      "redundancyPenalty": [
+        "optimizerEngine.js"
+      ],
+      "refreshOptimizerFromOwned": [
+        "optimizer.js"
+      ],
+      "renderAll": [
+        "optimizer.js"
+      ],
+      "renderImageStateControls": [
+        "optimizer.js"
+      ],
+      "renderPlatoons": [
+        "optimizer.js"
+      ],
+      "renderStorage": [
+        "optimizer.js"
+      ],
+      "renderStory": [
+        "optimizer.js"
+      ],
+      "run": [
+        "optimizerEngine.js",
+        "optimizerEngineV2.js"
+      ],
+      "runEngine": [
+        "optimizer.js"
+      ],
+      "runOptimizer": [
+        "optimizer.js"
+      ],
+      "runOptimizerSafe": [
+        "optimizer-hook.js"
+      ],
+      "safeJsonParse": [
+        "optimizer.js"
+      ],
+      "saveLayout": [
+        "optimizer.js"
+      ],
+      "saveLocks": [
+        "optimizer.js"
+      ],
+      "scoreResult": [
+        "optimizerEngine.js"
+      ],
+      "scoreUnitAbilityPower": [
+        "abilityScoreEngine.js"
+      ],
+      "scoreUnitForArchetype": [
+        "optimizerEngine.js"
+      ],
+      "scoreUnitForPreset": [
+        "optimizerEngine.js"
+      ],
+      "setLockFor": [
+        "optimizer.js"
+      ],
+      "setPresetPref": [
+        "optimizer.js"
+      ],
+      "setPrimaryArchetypePref": [
+        "optimizer.js"
+      ],
+      "setSecondaryArchetypePref": [
+        "optimizer.js"
+      ],
+      "setStatus": [
+        "optimizerRuntimeBootstrap.js"
+      ],
+      "setTeamTypePref": [
+        "optimizer.js"
+      ],
+      "slotCardHTML": [
+        "optimizer.js"
+      ],
+      "sortByStrictArchetypes": [
+        "optimizerEngine.js"
+      ],
+      "sortCharactersByMap": [
+        "data-loader.js"
+      ],
+      "starsForState": [
+        "data-loader.js"
+      ],
+      "stateNameForForm": [
+        "data-loader.js"
+      ],
+      "stats": [
+        "optimizerEngine.js"
+      ],
+      "stripFormSuffix": [
+        "data-loader.js"
+      ],
+      "structuredCloneSafe": [
+        "optimizer.js",
+        "optimizerEngine.js"
+      ],
+      "syncArchetypeDropdowns": [
+        "optimizer.js"
+      ],
+      "tagsFromRuntimeRow": [
+        "optimizerEngineV2.js"
+      ],
+      "teamScore": [
+        "optimizerEngine.js"
+      ],
+      "teamSynergyScore": [
+        "optimizerEngine.js"
+      ],
+      "textBlobForUnit": [
+        "optimizerEngine.js"
+      ],
+      "titleFromInternalId": [
+        "data-loader.js"
+      ],
+      "toArray": [
+        "data-loader.js"
+      ],
+      "topCandidates": [
+        "optimizerEngine.js"
+      ],
+      "unitBase": [
+        "optimizerEngine.js"
+      ],
+      "unlockAllLocks": [
+        "optimizer.js"
+      ],
+      "variantsFromCharacterImageMap": [
+        "data-loader.js"
+      ],
+      "wireSelects": [
+        "optimizer.js"
+      ],
+      "wrapped": [
+        "optimizerRuntimeBootstrap.js"
+      ]
+    },
+    "classDefinitions": {},
+    "globalAssignments": {
+      "EvertaleData": [
+        "data-loader.js"
+      ],
+      "OPTIMIZER_DOCTRINE": [
+        "optimizer_doctrine.js"
+      ],
+      "OptimizerEngine": [
+        "optimizerEngine.js"
+      ],
+      "OptimizerRuntime": [
+        "optimizerRuntimeLoader.js"
+      ],
+      "__optimizerOwnedUnits": [
+        "optimizer.js"
+      ],
+      "__optimizerRuntimeReady": [
+        "optimizerRuntimeBootstrap.js"
+      ],
+      "__optimizerRuntimeReadyPromise": [
+        "optimizerRuntimeBootstrap.js"
+      ],
+      "loadOptimizerRuntime": [
+        "optimizerRuntimeBootstrap.js",
+        "optimizerRuntimeLoader.js"
+      ],
+      "refreshOptimizerFromOwned": [
+        "optimizer.js"
+      ],
+      "runOptimizer": [
+        "optimizer.js"
+      ]
+    },
+    "globalReads": {
+      "EvertaleData": [
+        "data-loader.js",
+        "optimizer.js"
+      ],
+      "OPTIMIZER_DOCTRINE": [
+        "optimizerEngine.js",
+        "optimizer_doctrine.js"
+      ],
+      "OptimizerEngine": [
+        "optimizer.js",
+        "optimizerEngine.js"
+      ],
+      "OptimizerRuntime": [
+        "optimizerRuntimeLoader.js"
+      ],
+      "__optimizerOwnedUnits": [
+        "optimizer.js"
+      ],
+      "__optimizerRuntimeReady": [
+        "optimizerRuntimeBootstrap.js"
+      ],
+      "__optimizerRuntimeReadyPromise": [
+        "optimizerRuntimeBootstrap.js"
+      ],
+      "loadOptimizerRuntime": [
+        "optimizerRuntimeBootstrap.js",
+        "optimizerRuntimeLoader.js"
+      ],
+      "refreshOptimizerFromOwned": [
+        "optimizer.js"
+      ],
+      "runOptimizer": [
+        "optimizer-hook.js",
+        "optimizer.js"
+      ]
+    }
+  },
+  "fileScans": [
+    {
+      "path": "optimizer.html",
+      "exists": true,
+      "sizeBytes": 6582,
+      "lineCount": 138,
+      "category": "ui_or_loader",
+      "functions": [],
+      "classes": [],
+      "assignedGlobals": [],
+      "readGlobals": [],
+      "fetches": [],
+      "scriptOrder": [
+        "seasonal-theme.js",
+        "site-menu.js",
+        "data-loader.js",
+        "optimizerRuntimeLoader.js",
+        "optimizer_doctrine.js",
+        "optimizerEngine.js",
+        "abilityScoreEngine.js",
+        "optimizerEngineV2.js",
+        "optimizer-hook.js",
+        "optimizerRuntimeBootstrap.js",
+        "optimizer.js"
+      ]
+    },
+    {
+      "path": "optimizer.js",
+      "exists": true,
+      "sizeBytes": 25898,
+      "lineCount": 688,
+      "category": "ui_or_loader",
+      "functions": [
+        "applyEngineResult",
+        "buildEngineOptions",
+        "buildExampleOptions",
+        "buildExampleTeam",
+        "clearTeams",
+        "defaultLocks",
+        "el",
+        "getLockFor",
+        "getOwnedIds",
+        "getPresetPref",
+        "getPrimaryArchetypePref",
+        "getSecondaryArchetypePref",
+        "getTeamTypePref",
+        "init",
+        "initSharedOptimizerFiltersUI",
+        "installModeButtons",
+        "loadCharacters",
+        "loadLayout",
+        "loadLocks",
+        "lockFilledPlatoons",
+        "lockFilledStorySlots",
+        "normId",
+        "optionList",
+        "refreshOptimizerFromOwned",
+        "renderAll",
+        "renderImageStateControls",
+        "renderPlatoons",
+        "renderStorage",
+        "renderStory",
+        "runEngine",
+        "runOptimizer",
+        "safeJsonParse",
+        "saveLayout",
+        "saveLocks",
+        "setLockFor",
+        "setPresetPref",
+        "setPrimaryArchetypePref",
+        "setSecondaryArchetypePref",
+        "setTeamTypePref",
+        "slotCardHTML",
+        "structuredCloneSafe",
+        "syncArchetypeDropdowns",
+        "unlockAllLocks",
+        "wireSelects"
+      ],
+      "classes": [],
+      "assignedGlobals": [
+        "__optimizerOwnedUnits",
+        "refreshOptimizerFromOwned",
+        "runOptimizer"
+      ],
+      "readGlobals": [
+        "EvertaleData",
+        "OptimizerEngine",
+        "__optimizerOwnedUnits",
+        "refreshOptimizerFromOwned",
+        "runOptimizer"
+      ],
+      "fetches": [],
+      "scriptOrder": []
+    },
+    {
+      "path": "optimizerEngine.js",
+      "exists": true,
+      "sizeBytes": 45582,
+      "lineCount": 1055,
+      "category": "legacy",
+      "functions": [
+        "add",
+        "aiTeamCohesionScore",
+        "anyTag",
+        "archetypeCohesionScore",
+        "asArray",
+        "assignStoryMainBack",
+        "buildPlatoons",
+        "buildStory",
+        "buildTeamFixedSize",
+        "canonicalTag",
+        "chooseAutoPreset",
+        "clamp01",
+        "coverageBonus",
+        "deepMerge",
+        "deriveAITags",
+        "engineScore",
+        "expandUnitTags",
+        "extractTeamFeatures",
+        "fillTeamToSizeRelaxed",
+        "filterCandidatesForArchetypes",
+        "forcedFromLocks",
+        "getArchetypeDefs",
+        "getArchetypeTier",
+        "getDoctrineMerged",
+        "getElement",
+        "getUnitTags",
+        "has",
+        "lc",
+        "mergeTagSets",
+        "n",
+        "normId",
+        "normalizeElementValue",
+        "pickAnchorElementForTeam",
+        "presetCohesionScore",
+        "pushTag",
+        "redundancyPenalty",
+        "run",
+        "scoreResult",
+        "scoreUnitForArchetype",
+        "scoreUnitForPreset",
+        "sortByStrictArchetypes",
+        "stats",
+        "structuredCloneSafe",
+        "teamScore",
+        "teamSynergyScore",
+        "textBlobForUnit",
+        "topCandidates",
+        "unitBase"
+      ],
+      "classes": [],
+      "assignedGlobals": [
+        "OptimizerEngine"
+      ],
+      "readGlobals": [
+        "OPTIMIZER_DOCTRINE",
+        "OptimizerEngine"
+      ],
+      "fetches": [],
+      "scriptOrder": []
+    },
+    {
+      "path": "optimizer_doctrine.js",
+      "exists": true,
+      "sizeBytes": 3365,
+      "lineCount": 81,
+      "category": "legacy",
+      "functions": [],
+      "classes": [],
+      "assignedGlobals": [
+        "OPTIMIZER_DOCTRINE"
+      ],
+      "readGlobals": [
+        "OPTIMIZER_DOCTRINE"
+      ],
+      "fetches": [],
+      "scriptOrder": []
+    },
+    {
+      "path": "optimizer-hook.js",
+      "exists": true,
+      "sizeBytes": 1849,
+      "lineCount": 50,
+      "category": "legacy",
+      "functions": [
+        "runOptimizerSafe"
+      ],
+      "classes": [],
+      "assignedGlobals": [],
+      "readGlobals": [
+        "runOptimizer"
+      ],
+      "fetches": [],
+      "scriptOrder": []
+    },
+    {
+      "path": "optimizerEngineV2.js",
+      "exists": true,
+      "sizeBytes": 7443,
+      "lineCount": 219,
+      "category": "runtime",
+      "functions": [
+        "add",
+        "addRow",
+        "asArray",
+        "conditionTagsFromKnowledge",
+        "enrichOwnedUnits",
+        "enrichUnit",
+        "getRuntime",
+        "indexRuntimeCharacters",
+        "indexRuntimeTags",
+        "mergeUnique",
+        "norm",
+        "run",
+        "tagsFromRuntimeRow"
+      ],
+      "classes": [],
+      "assignedGlobals": [],
+      "readGlobals": [],
+      "fetches": [],
+      "scriptOrder": []
+    },
+    {
+      "path": "abilityScoreEngine.js",
+      "exists": true,
+      "sizeBytes": 5071,
+      "lineCount": 151,
+      "category": "runtime",
+      "functions": [
+        "asArray",
+        "effectPowerFromNode",
+        "enrichUnitWithAbilityPower",
+        "getAbilityGraph",
+        "getAbilityNodeByRecordId",
+        "getCharacterLinks",
+        "getRuntime",
+        "linkedAbilityNodes",
+        "norm",
+        "numericPowerFromNode",
+        "scoreUnitAbilityPower"
+      ],
+      "classes": [],
+      "assignedGlobals": [],
+      "readGlobals": [],
+      "fetches": [],
+      "scriptOrder": []
+    },
+    {
+      "path": "optimizerRuntimeLoader.js",
+      "exists": true,
+      "sizeBytes": 1689,
+      "lineCount": 59,
+      "category": "runtime",
+      "functions": [
+        "loadOptimizerRuntime",
+        "loadOptimizerRuntimeChunk"
+      ],
+      "classes": [],
+      "assignedGlobals": [
+        "OptimizerRuntime",
+        "loadOptimizerRuntime"
+      ],
+      "readGlobals": [
+        "OptimizerRuntime",
+        "loadOptimizerRuntime"
+      ],
+      "fetches": [
+        "${basePath}/optimizer_runtime_manifest.json"
+      ],
+      "scriptOrder": []
+    },
+    {
+      "path": "optimizerRuntimeBootstrap.js",
+      "exists": true,
+      "sizeBytes": 1832,
+      "lineCount": 48,
+      "category": "runtime",
+      "functions": [
+        "loadRuntimeSafe",
+        "setStatus",
+        "wrapped"
+      ],
+      "classes": [],
+      "assignedGlobals": [
+        "__optimizerRuntimeReady",
+        "__optimizerRuntimeReadyPromise",
+        "loadOptimizerRuntime"
+      ],
+      "readGlobals": [
+        "__optimizerRuntimeReady",
+        "__optimizerRuntimeReadyPromise",
+        "loadOptimizerRuntime"
+      ],
+      "fetches": [],
+      "scriptOrder": []
+    },
+    {
+      "path": "data-loader.js",
+      "exists": true,
+      "sizeBytes": 24735,
+      "lineCount": 71,
+      "category": "ui_or_loader",
+      "functions": [
+        "add",
+        "bossImageName",
+        "buildImageVariants",
+        "buildImageVariantsFromFamily",
+        "characterImageUrl",
+        "dedupeById",
+        "deriveTags",
+        "familyOrderIndex",
+        "fetchJson",
+        "formRank",
+        "formRuntimeData",
+        "getCatalogBundle",
+        "getCategoryBundle",
+        "getCharacterFamiliesMap",
+        "getCharacterImageMap",
+        "getCharacterOrderMap",
+        "getFamily",
+        "getLocalizationGroupsMap",
+        "imageSourceForState",
+        "inferRarity",
+        "loadAllEntries",
+        "loadCharactersMerged",
+        "loadCharactersMergedLegacy",
+        "loadEntryCategory",
+        "loadRawEntryCategory",
+        "localizationForEntry",
+        "mapLimit",
+        "mergeCharacterForms",
+        "nearestForm",
+        "normalizeElementTag",
+        "normalizeElementValue",
+        "normalizeEntryForOldSite",
+        "passiveNamesFromArray",
+        "sortCharactersByMap",
+        "starsForState",
+        "stateNameForForm",
+        "stripFormSuffix",
+        "titleFromInternalId",
+        "toArray",
+        "variantsFromCharacterImageMap"
+      ],
+      "classes": [],
+      "assignedGlobals": [
+        "EvertaleData"
+      ],
+      "readGlobals": [
+        "EvertaleData"
+      ],
+      "fetches": [],
+      "scriptOrder": []
+    }
+  ],
+  "nextSteps": [
+    "Review blocker list first.",
+    "Do not remove optimizerEngine.js, optimizer_doctrine.js, or optimizer-hook.js while they appear in optimizer.html script chain.",
+    "Map legacy globals/functions to runtime replacements before changing optimizer.html.",
+    "After any patch, test index.html, roster.html, and optimizer.html locally."
+  ]
+}
