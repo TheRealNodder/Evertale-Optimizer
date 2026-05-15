@@ -1,6 +1,6 @@
 {
 	"Version": 23,
-	"Time": 1778198595,
+	"Time": 1778736927,
 	"AbilityConfig": {
 		"StunSingle200A": {
 			"class": "AbilityConfig",
@@ -45019,7 +45019,8 @@
 				"applyConditions": "On1HPIsNotBossAndNotMirage",
 				"applyToTargetType": "Enemy",
 				"showMissConditions": "ShowNoMiss",
-				"skipAbilityEffect": true
+				"skipAbilityEffect": true,
+				"buffAppliedEffects": ["KintaroInstantdeath1"]
 			},{
 				"buffs": ["MegaPoison","BurnImmunityTempForRevenge"],
 				"applyToTargetType": "Enemy",
@@ -45521,6 +45522,118 @@
 			"useCondition": "NoTheBeautyRegularInTeam",
 			"abilityEffect": "BeastRevive",
 			"flags": ["Summon", "NoDamage"]
+		},
+		"SingleAttackAKintaroRegular":{
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"damageBoosts": ["GenericDamageBoost"],
+				"damageFlags": ["IgnoreArmor","IgnoreSkin","DoNotWake"],
+				"applyToTargetType": "Enemy",
+				"drainPercent": 1.0,
+				"drainEffect": "VampireDrain1"
+			},{
+				"buffs": ["InstantKillAndCreditSource"],
+				"applyConditions": "On1HPIsNotBossAndNotMirage",
+				"applyToTargetType": "Enemy",
+				"showMissConditions": "ShowNoMiss",
+				"skipAbilityEffect": true,
+				"buffAppliedEffects": ["KintaroInstantdeath1"]
+			},{
+				"buffs": ["MegaPoison","BurnImmunityTempForRevenge"],
+				"applyToTargetType": "Enemy",
+				"showMissConditions": "ShowNoMiss",
+				"skipAbilityEffect": true,
+				"applyConditions": "IsNotSleeping"
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "KintaroAttack1",
+			"attackScalors": ["GoodWith1BadHealthAlly","GoodWith2BadHealthAllies","GoodWith3BadHealthAllies","GoodWith4BadHealthAllies"],
+			"conditionedAbilityEffects": ["KintaroAttack1","KintaroAttack1","KintaroAttack1","KintaroAttack1"],
+			"flags": ["Poisoner"],
+			"recommendEffectWhenUsable": 1
+		},
+		"IntimidateBuffAKintaroRegular":{
+			"class": "AbilityConfig",
+			"targetingData": "AllEnemy",
+			"components": ["ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides":[{
+				"buffs": ["RemoveStealth","AttackMinus25Percent1TurnOnly"],
+				"applyToTargetType": "Enemy",
+				"buffAppliedEffects": ["Weak1"]
+			},{
+				"buffs": ["AttackPlus50Percent1TurnOnly","KintaroRegularActive2Cooldown50"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs": ["SpiritLossEContra"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"applyConditions": "EnemySpiritLower",
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs": ["SpiritGainI","SpiritGainI"],
+				"buffBackMode": true,
+				"applyConditions": "EnemySpiritLower",
+				"applyToTargetOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			}],
+			"enemyEventType": "Finish",
+			"sourceEventType": "Finish",
+			"flags": ["NoDamage"],
+			"abilityEffect": "KintaroHorror",
+			"useCondition": "NotInstantCooldown"
+		},
+		"BigBuffAKintaroRegular":{
+			"class": "AbilityConfig",
+			"targetingData": "AllAlly",
+			"components": ["ApplyBuff","ApplyBuff"],
+			"componentOverrides":[{
+				"buffs": ["BlockDeathFor100TU","HasteUp50PercentFor100TU","Active3LOCKKintaroRegular","StoreEnergy","StoreEnergy","StoreEnergy"],
+				"applyToTargetType": "Source"
+			},{
+				"buffs": ["Heal500Percent","SleepThorns","PoisonImmunityOnce","SleepImmunityOnce"],
+				"applyToTargetType": "Friendly",
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			}],
+			"friendlyEventType": "Finish",
+			"sourceEventType": "Finish",
+			"flags": ["Healer","NoDamage"],
+			"abilityEffect": "KintaroBuff",
+			"useCondition": "IsNotActive3LOCKKintaroRegular"
+		},
+		"MultiAttackAKintaroRegular":{
+			"class": "AbilityConfig",
+			"targetingData": "2Enemy",
+			"components": ["Damage","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"damageBoosts": ["GenericDamageBoost"],
+				"applyToTargetType": "Enemy",
+				"damageFlags": ["HardIgnoreBlockDeath","IgnoreArmor","DoNotWake"],
+				"drainPercent": 1.0,
+				"drainEffect": "VampireDrain1"
+			},{
+				"buffs": ["MegaPoison","BurnImmunityTempForRevenge"],
+				"applyToTargetType": "Enemy",
+				"showMissConditions": "ShowNoMiss",
+				"skipAbilityEffect": true,
+				"applyConditions": "IsNotSleeping"	
+			},{
+				"buffs":["Active4LOCKKintaroRegular"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Hit",
+			"abilityEffect": "KintaroSpecial",
+			"attackScalors": ["GoodVsNotBurning"],
+			"conditionedAbilityEffects": ["KintaroSpecial","KintaroSpecial"],
+			"useCondition": "IsNotActive4LOCKKintaroRegular"
 		}
 	}
 }
