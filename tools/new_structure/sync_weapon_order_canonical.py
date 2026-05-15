@@ -102,7 +102,8 @@ def row_keys(row: Dict[str, Any]) -> List[str]:
     family = strip_form_suffix(source_id)
     name = str(row.get("name") or "")
     image = str(row.get("image") or "")
-    image_base = re.sub(r"\.[a-z0-9]+$", "", image.split(/[?#]/)[0].split("/")[-1]) if image else ""
+    image_clean = re.split(r"[?#]", image, maxsplit=1)[0] if image else ""
+    image_base = re.sub(r"\.[a-z0-9]+$", "", image_clean.split("/")[-1]) if image_clean else ""
     return [k for k in [source_id, family, name, image_base] if k]
 
 
