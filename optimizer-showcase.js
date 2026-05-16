@@ -1,5 +1,5 @@
-/* optimizer-showcase.js — visual enhancer for optimizer platoon showcase
-   Idempotent and throttled so optimizer rerenders stay smooth.
+/* optimizer-showcase.js — platoon showcase transformer
+   Converts optimizer platoon slot markup into a full-width, five-card showcase row.
 */
 (function(){
   "use strict";
@@ -27,58 +27,6 @@
     return text.replace(/\s*\([^)]*\)\s*$/g, "") || "Select a unit";
   }
 
-  function ensureChangeButton(card){
-    const select = card.querySelector(".slotSelect");
-    if (!select) return;
-    let button = card.querySelector(".slotChangeButton");
-    if (!button) {
-      button = document.createElement("button");
-      button.type = "button";
-      button.className = "slotChangeButton";
-      button.addEventListener("click", (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        select.focus();
-        try { select.showPicker && select.showPicker(); } catch (_) {}
-      });
-      select.insertAdjacentElement("afterend", button);
-    }
-    setText(button, isFilledCard(card) ? "Change" : "Select");
-  }
-
-  function ensureSlotNumber(card, index){
-    let badge = card.querySelector(".slotNumberBadge");
-    if (!badge) {
-      badge = document.createElement("div");
-      badge.className = "slotNumberBadge";
-      card.appendChild(badge);
-    }
-    setText(badge, String(index + 1));
-  }
-
-  function ensureEmptyVisual(card){
-    const filled = isFilledCard(card);
-    if (card.classList.contains("is-filled") !== filled) card.classList.toggle("is-filled", filled);
-    if (card.classList.contains("is-empty") === filled) card.classList.toggle("is-empty", !filled);
-
-    const placeholder = card.querySelector(".unitPortraitPlaceholder");
-    if (placeholder) setText(placeholder, filled ? "" : "+");
-
-    const title = card.querySelector(".slotTitle");
-    if (title) setText(title, filled ? parseUnitName(card) : "Select a unit");
-  }
-
-  function ensureLevelStars(card){
-    let meta = card.querySelector(".slotShowcaseMeta");
-    if (!meta) {
-      meta = document.createElement("div");
-      meta.className = "slotShowcaseMeta";
-      const title = card.querySelector(".slotTitle");
-      if (title) title.insertAdjacentElement("afterend", meta);
-    }
-    setText(meta, isFilledCard(card) ? "Lv. 200  ★★★★★" : "");
-  }
-
   function ensureEmptyEquipment(card){
     if (card.querySelector(".equipmentPair")) return;
     const mid = card.querySelector(".slotMid");
@@ -89,12 +37,29 @@
     mid.appendChild(pair);
   }
 
-  function enhanceCard(card, index){
-    ensureSlotNumber(card, index);
-    ensureEmptyVisual(card);
-    ensureLevelStars(card);
+  function ensureSelectUnderPortrait(card){
+    const select = card.querySelector(".slotSelect");
+    const top = card.querySelector(".slotTop");
+    if (select && top && select.parentElement !== top) top.appendChild(select);
+  }
+
+  function normalizeCard(card){
+    const filled = isFilledCard(card);
+    card.classList.toggle("is-filled", filled);
+    card.classList.toggle("is-empty", !filled);
+
+    const placeholder = card.querySelector(".unitPortraitPlaceholder");
+    if (placeholder) setText(placeholder, filled ? "" : "+");
+
+    const title = card.querySelector(".slotTitle");
+    if (title) setText(title, filled ? parseUnitName(card) : "Select a unit");
+
+    const kind = card.querySelector(".slotBadges .tag.kind");
+    if (kind) kind.remove();
+
+    $all(".slotNumberBadge,.slotShowcaseMeta,.slotChangeButton", card).forEach(n => n.remove());
     ensureEmptyEquipment(card);
-    ensureChangeButton(card);
+    ensureSelectUnderPortrait(card);
   }
 
   function platoonPower(panel){
@@ -119,8 +84,12 @@
   function enhance(){
     const grid = document.getElementById("platoonsGrid");
     if (!grid) return;
+    grid.classList.add("platoonShowcaseGrid");
     $all(".platoonPanel", grid).forEach(panel => {
-      $all(".platoonSlotCard", panel).forEach(enhanceCard);
+      panel.classList.add("platoonShowcasePanel");
+      const slots = panel.querySelector(".platoonSlots");
+      if (slots) slots.classList.add("platoonShowcaseSlots");
+      $all(".platoonSlotCard", panel).forEach(normalizeCard);
       enhancePanel(panel);
     });
   }
@@ -139,11 +108,7 @@
     enhance();
     const grid = document.getElementById("platoonsGrid");
     if (grid) {
-      new MutationObserver((mutations) => {
-        if (mutations.some(m => m.type === "childList" && Array.from(m.addedNodes).some(n => n.nodeType === 1 && !n.classList?.contains("slotNumberBadge") && !n.classList?.contains("slotShowcaseMeta") && !n.classList?.contains("slotChangeButton")))) {
-          schedule();
-        }
-      }).observe(grid, { childList:true, subtree:true });
+      new MutationObserver(schedule).observe(grid, { childList:true, subtree:true });
     }
   });
 })();
