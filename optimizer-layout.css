@@ -35,20 +35,21 @@ body.page-optimizer .platoonsGrid{
 }
 
 body.page-optimizer .platoonPanel{
-  padding:12px;
+  padding:14px;
   border-radius:16px;
   overflow:hidden;
+  background:linear-gradient(180deg, rgba(18,21,34,.94), rgba(12,15,26,.96));
 }
 
 body.page-optimizer .platoonPanel > .panelTitle{
   font-size:22px;
-  margin-bottom:8px;
+  margin-bottom:10px;
 }
 
 body.page-optimizer .platoonSlots{
   display:grid;
   grid-template-columns:repeat(5,minmax(0,1fr));
-  gap:8px;
+  gap:10px;
   width:100%;
   overflow:visible;
 }
@@ -61,9 +62,11 @@ body.page-optimizer .slotCard{
 body.page-optimizer .platoonSlotCard{
   min-height:0;
   padding:8px;
-  gap:6px;
-  border-radius:13px;
+  gap:7px;
+  border-radius:12px;
   align-content:start;
+  background:rgba(7,10,18,.68);
+  border-color:rgba(255,255,255,.14);
 }
 
 body.page-optimizer .platoonSlotCard .slotTop{
@@ -72,8 +75,9 @@ body.page-optimizer .platoonSlotCard .slotTop{
 
 body.page-optimizer .platoonSlotCard .slotImg{
   width:100%;
-  height:82px;
-  border-radius:12px;
+  height:clamp(150px, 18vw, 235px);
+  border-radius:7px;
+  box-shadow:0 10px 24px rgba(0,0,0,.22);
 }
 
 body.page-optimizer .platoonSlotCard .unitPortrait,
@@ -89,47 +93,42 @@ body.page-optimizer .platoonSlotCard .unitPortraitPlaceholder{
   height:100%;
   display:grid;
   place-items:center;
-  font-size:24px;
+  font-size:36px;
   font-weight:900;
   color:var(--muted);
   border:1px solid rgba(255,255,255,.10);
-  border-radius:12px;
+  border-radius:7px;
   background:rgba(255,255,255,.05);
 }
 
 body.page-optimizer .platoonSlotCard .slotMid{
   display:grid;
-  gap:5px;
+  gap:6px;
 }
 
 body.page-optimizer .platoonSlotCard .slotSelect{
-  min-height:32px;
-  padding:5px 6px;
-  font-size:12px;
-  border-radius:9px;
+  min-height:30px;
+  padding:4px 6px;
+  font-size:11px;
+  border-radius:8px;
+  opacity:.92;
 }
 
 body.page-optimizer .platoonSlotCard .slotTitle{
-  font-size:12px;
+  order:-1;
+  min-height:18px;
+  font-size:15px;
+  font-weight:900;
   line-height:1.15;
   text-align:center;
-  color:var(--muted);
+  color:var(--text);
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
 }
 
 body.page-optimizer .platoonSlotCard .slotBadges{
-  display:flex;
-  flex-wrap:wrap;
-  justify-content:center;
-  gap:4px;
-}
-
-body.page-optimizer .platoonSlotCard .slotBadges .tag{
-  padding:3px 7px;
-  font-size:10px;
-  min-height:20px;
+  display:none;
 }
 
 body.page-optimizer .platoonSlotCard .slotBottom{
@@ -142,7 +141,7 @@ body.page-optimizer .platoonSlotCard .lockRow{
   display:flex;
   align-items:center;
   justify-content:center;
-  gap:5px;
+  gap:6px;
   font-size:12px;
   color:var(--muted);
 }
@@ -150,40 +149,52 @@ body.page-optimizer .platoonSlotCard .lockRow{
 body.page-optimizer .equipmentPair{
   display:grid;
   grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:5px;
+  gap:10px;
   width:100%;
-  margin-top:3px;
+  margin-top:4px;
 }
 
 body.page-optimizer .equipmentMini{
   min-width:0;
   display:grid;
-  grid-template-columns:26px minmax(0,1fr);
+  grid-template-columns:1fr;
   align-items:center;
-  gap:5px;
+  justify-items:center;
+  gap:3px;
   padding:4px;
-  border-radius:9px;
-  border:1px solid rgba(255,255,255,.10);
-  background:rgba(255,255,255,.055);
+  min-height:48px;
+  border-radius:5px;
+  background:rgba(255,255,255,.045);
+}
+
+body.page-optimizer .equipment-weapon{
+  border:2px solid rgba(255,45,45,.86);
+  box-shadow:0 0 0 1px rgba(0,0,0,.26) inset, 0 0 14px rgba(255,45,45,.12);
+}
+
+body.page-optimizer .equipment-accessory{
+  border:2px solid rgba(35,220,75,.86);
+  box-shadow:0 0 0 1px rgba(0,0,0,.26) inset, 0 0 14px rgba(35,220,75,.12);
 }
 
 body.page-optimizer .equipmentMini img,
 body.page-optimizer .equipmentMiniFallback{
-  width:26px;
-  height:26px;
-  border-radius:7px;
+  width:36px;
+  height:36px;
+  border-radius:4px;
   display:grid;
   place-items:center;
   object-fit:cover;
   background:rgba(255,255,255,.08);
-  font-size:11px;
+  font-size:12px;
   font-weight:900;
 }
 
 body.page-optimizer .equipmentMiniName{
   min-width:0;
-  font-size:10px;
-  line-height:1.1;
+  max-width:100%;
+  font-size:9px;
+  line-height:1.05;
   color:var(--muted);
   white-space:nowrap;
   overflow:hidden;
@@ -192,21 +203,22 @@ body.page-optimizer .equipmentMiniName{
 
 body.page-optimizer .storySlotCard .equipmentPair,
 body.page-optimizer #storageGrid .equipmentPair{
-  grid-template-columns:1fr;
+  grid-template-columns:repeat(2,minmax(0,1fr));
 }
 
 @media (min-width:900px){
   body.page-optimizer .page{
-    max-width:1280px;
+    max-width:1320px;
   }
 
   body.page-optimizer .platoonSlots{
-    grid-template-columns:repeat(5,minmax(130px,1fr));
+    grid-template-columns:repeat(5,minmax(145px,1fr));
     gap:10px;
   }
 
-  body.page-optimizer .platoonSlotCard .slotImg{
-    height:120px;
+  body.page-optimizer .platoonSlotCard .slotSelect{
+    max-width:92%;
+    justify-self:center;
   }
 }
 
@@ -246,11 +258,25 @@ body.page-optimizer #storageGrid .equipmentPair{
   }
 
   body.page-optimizer .platoonSlotCard .slotImg{
-    height:96px;
+    height:170px;
   }
 
-  body.page-optimizer .platoonSlotCard .slotBadges .tag.kind{
-    display:none;
+  body.page-optimizer .platoonSlotCard .slotTitle{
+    font-size:13px;
+  }
+
+  body.page-optimizer .equipmentPair{
+    gap:7px;
+  }
+
+  body.page-optimizer .equipmentMini{
+    min-height:44px;
+  }
+
+  body.page-optimizer .equipmentMini img,
+  body.page-optimizer .equipmentMiniFallback{
+    width:32px;
+    height:32px;
   }
 }
 
@@ -261,21 +287,21 @@ body.page-optimizer #storageGrid .equipmentPair{
   }
 
   body.page-optimizer .platoonSlotCard .slotImg{
-    height:88px;
+    height:150px;
   }
 
   body.page-optimizer .equipmentMini{
-    grid-template-columns:24px minmax(0,1fr);
     padding:3px;
+    min-height:40px;
   }
 
   body.page-optimizer .equipmentMini img,
   body.page-optimizer .equipmentMiniFallback{
-    width:24px;
-    height:24px;
+    width:30px;
+    height:30px;
   }
 
   body.page-optimizer .equipmentMiniName{
-    font-size:9px;
+    display:none;
   }
 }
