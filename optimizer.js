@@ -397,7 +397,8 @@ function slotCardHTML(slotKey, idx, currentId, poolUnits, locked, ownedIdSet){
 
         <div class="slotMid">
           ${selectHtml}
-          <div class="slotTitle">${title}</div>
+          <div class="slotTitle">${name}</div>
+          <div class="slotSub">${title}</div>
           <div class="slotBadges">
             <span class="tag kind">Platoon</span>
             ${element ? `<span class="tag element ${String(element).toLowerCase()}">${element}</span>` : ``}
@@ -646,6 +647,26 @@ function buildExampleTeam() {
   // when the user's normal optimizer locks are enabled.
   const unlockedLocks = defaultLocks();
 
+  const poolSig = examplePool.map(u => normId(u?.id)).filter(Boolean).join("|");
+  const cacheKey = [
+    style,
+    el("teamTypeSelect")?.value || getTeamTypePref(),
+    el("presetSelect")?.value || getPresetPref(),
+    el("primaryArchetypeSelect")?.value || getPrimaryArchetypePref() || "",
+    el("secondaryArchetypeSelect")?.value || getSecondaryArchetypePref() || "none",
+    poolSig
+  ].join("::");
+  const exampleCache = buildExampleTeam._cache || (buildExampleTeam._cache = new Map());
+  const cachedResult = exampleCache.get(cacheKey);
+  if (cachedResult && cachedResult.story) {
+    state.locks = unlockedLocks;
+    applyEngineResult(structuredCloneSafe(cachedResult));
+    state.locks = savedLocks;
+    saveLocks();
+    showOptimizerNotice(`Example Team loaded instantly from ${examplePool.length} ${ssrPool.length >= STORY_MAIN ? "SSR" : "available"} units.`);
+    return;
+  }
+
   const makeExampleOptions = (presetKey = "") => {
     const options = buildEngineOptions();
     options.currentLayout = structuredCloneSafe({
@@ -713,6 +734,11 @@ function buildExampleTeam() {
     state.locks = savedLocks;
     renderAll();
     return;
+  }
+
+  if (exampleCache) {
+    exampleCache.set(cacheKey, structuredCloneSafe(result));
+    if (exampleCache.size > 8) exampleCache.delete(exampleCache.keys().next().value);
   }
 
   state.locks = unlockedLocks;
