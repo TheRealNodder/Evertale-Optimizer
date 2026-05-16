@@ -9,7 +9,7 @@ Incremental design:
 - Only changed entries are resolved and rewritten unless --force is used.
 
 Run from repo root:
-  python tools/new_structure/build_apk_entry_folders.py --input apkfiles --output apkfiles/generated_entries
+  python tools/new_structure/build_apk_entry_folders.py --input apkfiles --output apkfiles/entries
 """
 from __future__ import annotations
 
@@ -596,46 +596,39 @@ def build_category(input_dir: Path, output_dir: Path, category: str, resolvers: 
             entry_name = entry.get("name")
             is_placeholder = bool(entry.get("placeholder"))
             image = entry.get("image")
-        processed_this_run += 1
-        checkpoint.update({"lastCompletedSourceId": internal_id, "lastCompletedOrder": order_index, "updatedAt": now_int(), "written": written, "skipped": skipped})
-        update_checkpoint(output_dir, checkpoint)
         index_entries.append({"order": order_index, "sourceId": internal_id, "name": entry_name, "file": f"entries/{filename}", "placeholder": is_placeholder, "image": image})
-    write_json_if_changed(category_dir / "index.json", {"schemaVersion": 3, "category": category, "sourceFile": str(raw_path.relative_to(input_dir)), "count": len(index_entries), "placeholders": placeholders, "entries": index_entries})
-    family_report = build_character_family_files(output_dir, ordered, by_id, resolvers) if category == "characters" else None
-    checkpoint.update({"status": "complete", "completedAt": now_int()})
+        processed_this_run += 1
+        checkpoint.update({"lastCompletedSourceId": internal_id, "lastCompletedOrder": order_index, "updatedAt": now_int(), "written": written, "skipped": skipped, "placeholders": placeholders})
+        update_checkpoint(output_dir, checkpoint)
+    write_json_if_changed(category_dir / "index.json", {"schemaVersion": 2, "category": category, "count": len(index_entries), "source": str(raw_path), "entries": index_entries})
+    family_report = None
+    if category == "characters":
+        family_report = build_character_family_files(output_dir, ordered, by_id, resolvers)
+    checkpoint.update({"status": "complete", "finishedAt": now_int(), "written": written, "skipped": skipped, "placeholders": placeholders})
     update_checkpoint(output_dir, checkpoint)
-    return {"category": category, "status": "ok", "rawFile": str(raw_path), "rawEntries": len(items), "totalEntries": len(ordered), "entriesWritten": written, "entriesSkipped": skipped, "processedThisRun": processed_this_run, "placeholdersWritten": placeholders, "familyReport": family_report, "output": str(category_dir)}
-
-
-def write_resolver_indexes(output_dir: Path, resolvers: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
-    resolver_dir = output_dir / "resolvers"
-    summary = {}
-    for name, mapping in resolvers.items():
-        write_json_if_changed(resolver_dir / f"{name}.index.json", {"schemaVersion": 3, "count": len(mapping), "keys": sorted(mapping.keys())})
-        summary[name] = len(mapping)
-    return summary
+    return {"category": category, "status": "ok", "rawFile": str(raw_path), "rawEntries": len(items), "totalEntries": len(ordered), "entriesWritten": written, "entriesSkipped": skipped, "processedThisRun": processed_this_run, "placeholdersWrittenOrUpdated": placeholders, "familyReport": family_report}
 
 
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--input", default="apkfiles")
-    parser.add_argument("--output", default="apkfiles/generated_entries")
-    parser.add_argument("--category", choices=["characters", "weapons", "accessories", "bosses"], default=None)
+    parser.add_argument("--output", default="apkfiles/entries")
     parser.add_argument("--force", action="store_true")
+    parser.add_argument("--category", choices=["characters", "weapons", "accessories", "bosses"], default=None)
     parser.add_argument("--limit", type=int, default=None)
     parser.add_argument("--start-after", default=None)
     args = parser.parse_args()
     input_dir = Path(args.input).resolve()
     output_dir = Path(args.output).resolve()
-    output_dir.mkdir(parents=True, exist_ok=True)
     resolvers = load_resolvers(input_dir)
-    resolver_summary = write_resolver_indexes(output_dir, resolvers)
     categories = [args.category] if args.category else ["characters", "weapons", "accessories", "bosses"]
-    reports = [build_category(input_dir, output_dir, c, resolvers, args.force, args.limit, args.start_after) for c in categories]
-    report = {"schemaVersion": 3, "scriptVersion": SCRIPT_VERSION, "input": str(input_dir), "output": str(output_dir), "resolverCounts": resolver_summary, "categories": reports}
+    report = {"schemaVersion": 2, "scriptVersion": SCRIPT_VERSION, "generatedAt": now_int(), "input": str(input_dir), "output": str(output_dir), "categories": []}
+    for category in categories:
+        report["categories"].append(build_category(input_dir, output_dir, category, resolvers, args.force, args.limit, args.start_after))
     write_json_if_changed(output_dir / "reports" / "build_report.json", report)
     print(json.dumps(report, ensure_ascii=False, indent=2))
     return 0
+
 
 if __name__ == "__main__":
     raise SystemExit(main())
