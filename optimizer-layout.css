@@ -20,7 +20,7 @@ body.page-optimizer{
 
 body.page-optimizer .page{
   width:100%;
-  max-width:1320px;
+  max-width:1480px;
   padding-left:12px;
   padding-right:12px;
 }
@@ -32,11 +32,13 @@ body.page-optimizer .panel{
 body.page-optimizer .platoonsGrid{
   display:grid;
   grid-template-columns:1fr;
-  gap:18px;
+  gap:24px;
+  width:100%;
 }
 
 body.page-optimizer .platoonPanel{
-  padding:14px;
+  width:100%;
+  padding:16px;
   border-radius:16px;
   overflow:hidden;
   background:linear-gradient(180deg, rgba(14,18,30,.96), rgba(8,12,22,.98));
@@ -50,12 +52,32 @@ body.page-optimizer .platoonPanel > .panelTitle{
   letter-spacing:.2px;
 }
 
+body.page-optimizer .platoonShowcaseHead{
+  margin-bottom:12px;
+}
+
 body.page-optimizer .platoonSlots{
   display:grid;
-  grid-template-columns:repeat(5,minmax(0,1fr));
-  gap:10px;
+  grid-template-columns:repeat(5, minmax(210px, 1fr));
+  gap:14px;
   width:100%;
+  min-width:1120px;
   overflow:visible;
+}
+
+body.page-optimizer .platoonPanel{
+  overflow-x:auto;
+  overscroll-behavior-x:contain;
+  scrollbar-width:thin;
+}
+
+body.page-optimizer .platoonPanel::-webkit-scrollbar{
+  height:8px;
+}
+
+body.page-optimizer .platoonPanel::-webkit-scrollbar-thumb{
+  background:rgba(255,255,255,.20);
+  border-radius:999px;
 }
 
 body.page-optimizer .slotCard{
@@ -65,9 +87,10 @@ body.page-optimizer .slotCard{
 
 /* DESKTOP/TABLET SHOWCASE CARD */
 body.page-optimizer .platoonSlotCard{
+  min-width:210px;
   min-height:0;
-  padding:8px;
-  gap:7px;
+  padding:9px;
+  gap:8px;
   border-radius:10px;
   align-content:start;
   background:rgba(5,9,17,.72);
@@ -81,7 +104,7 @@ body.page-optimizer .platoonSlotCard .slotTop{
 
 body.page-optimizer .platoonSlotCard .slotImg{
   width:100%;
-  height:clamp(175px, 18vw, 260px);
+  height:clamp(220px, 18vw, 300px);
   border-radius:6px;
   overflow:hidden;
   box-shadow:0 10px 24px rgba(0,0,0,.25);
@@ -110,7 +133,7 @@ body.page-optimizer .platoonSlotCard .unitPortraitPlaceholder{
 
 body.page-optimizer .platoonSlotCard .slotMid{
   display:grid;
-  gap:6px;
+  gap:7px;
 }
 
 body.page-optimizer .platoonSlotCard .slotTitle{
@@ -146,7 +169,7 @@ body.page-optimizer .platoonSlotCard .slotBottom{
   justify-content:center;
   align-items:center;
   border-top:1px solid rgba(255,255,255,.08);
-  padding-top:5px;
+  padding-top:6px;
 }
 
 body.page-optimizer .platoonSlotCard .lockRow{
@@ -161,9 +184,9 @@ body.page-optimizer .platoonSlotCard .lockRow{
 body.page-optimizer .equipmentPair{
   display:grid;
   grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:10px;
+  gap:12px;
   width:100%;
-  margin-top:3px;
+  margin-top:4px;
 }
 
 body.page-optimizer .equipmentMini{
@@ -173,8 +196,8 @@ body.page-optimizer .equipmentMini{
   align-items:center;
   justify-items:center;
   gap:3px;
-  padding:4px;
-  min-height:54px;
+  padding:5px;
+  min-height:60px;
   border-radius:5px;
   background:rgba(255,255,255,.035);
 }
@@ -191,8 +214,8 @@ body.page-optimizer .equipment-accessory{
 
 body.page-optimizer .equipmentMini img,
 body.page-optimizer .equipmentMiniFallback{
-  width:38px;
-  height:38px;
+  width:42px;
+  height:42px;
   border-radius:4px;
   display:grid;
   place-items:center;
@@ -218,14 +241,14 @@ body.page-optimizer #storageGrid .equipmentPair{
   grid-template-columns:repeat(2,minmax(0,1fr));
 }
 
-@media (min-width:900px){
+@media (min-width:1200px){
   body.page-optimizer .platoonSlots{
-    grid-template-columns:repeat(5,minmax(145px,1fr));
-    gap:10px;
+    min-width:0;
+    grid-template-columns:repeat(5, minmax(210px, 1fr));
   }
 }
 
-/* MOBILE: same scheme, but transformed into compact roster rows like the mockup */
+/* MOBILE: one platoon per line; keep boxes from compressing */
 @media (max-width:700px){
   body.page-optimizer .topbar-inner{
     justify-content:flex-start;
@@ -247,6 +270,7 @@ body.page-optimizer #storageGrid .equipmentPair{
   body.page-optimizer .platoonPanel{
     padding:10px;
     border-radius:13px;
+    overflow-x:auto;
   }
 
   body.page-optimizer .platoonPanel > .panelTitle{
@@ -256,132 +280,113 @@ body.page-optimizer #storageGrid .equipmentPair{
 
   body.page-optimizer .platoonSlots{
     display:grid;
-    grid-template-columns:1fr;
-    gap:8px;
+    grid-template-columns:repeat(5, 220px);
+    gap:10px;
+    min-width:1140px;
   }
 
   body.page-optimizer .platoonSlotCard{
+    min-width:220px;
     display:grid;
-    grid-template-columns:86px minmax(0,1fr) 104px;
-    grid-template-areas:
-      "portrait info equipment"
-      "portrait info controls";
-    align-items:center;
+    grid-template-columns:1fr;
+    grid-template-areas:none;
+    align-items:start;
     gap:8px;
-    padding:7px;
+    padding:8px;
     border-radius:10px;
-    min-height:92px;
+    min-height:0;
   }
 
   body.page-optimizer .platoonSlotCard .slotTop{
-    grid-area:portrait;
+    grid-area:auto;
   }
 
   body.page-optimizer .platoonSlotCard .slotImg{
-    height:78px;
+    height:230px;
     border-radius:7px;
   }
 
   body.page-optimizer .platoonSlotCard .unitPortraitPlaceholder{
-    font-size:28px;
+    font-size:36px;
   }
 
   body.page-optimizer .platoonSlotCard .slotMid{
-    grid-area:info;
+    grid-area:auto;
     display:grid;
-    gap:4px;
+    gap:6px;
     min-width:0;
   }
 
   body.page-optimizer .platoonSlotCard .slotTitle{
     order:-3;
     font-size:14px;
-    text-align:left;
+    text-align:center;
     min-height:0;
   }
 
   body.page-optimizer .platoonSlotCard .slotTitle::after{
-    content:"\A Lv. 200 ★★★★★";
-    white-space:pre;
-    display:block;
-    margin-top:3px;
-    font-size:11px;
-    line-height:1.2;
-    color:var(--muted);
-    font-weight:700;
+    content:"";
   }
 
   body.page-optimizer .platoonSlotCard .slotSelect{
     order:4;
-    grid-area:controls;
+    grid-area:auto;
     align-self:center;
     width:100%;
-    min-height:36px;
+    min-height:34px;
     padding:5px 8px;
     font-size:11px;
     border-radius:8px;
   }
 
   body.page-optimizer .platoonSlotCard .equipmentPair{
-    grid-area:equipment;
+    grid-area:auto;
     align-self:center;
     display:grid;
-    grid-template-columns:repeat(2,46px);
-    justify-content:end;
-    gap:6px;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    justify-content:stretch;
+    gap:10px;
     margin:0;
-    width:auto;
+    width:100%;
   }
 
   body.page-optimizer .platoonSlotCard .equipmentMini{
-    width:46px;
-    min-height:46px;
-    padding:3px;
+    width:100%;
+    min-height:56px;
+    padding:4px;
   }
 
   body.page-optimizer .platoonSlotCard .equipmentMini img,
   body.page-optimizer .platoonSlotCard .equipmentMiniFallback{
-    width:34px;
-    height:34px;
+    width:38px;
+    height:38px;
   }
 
   body.page-optimizer .platoonSlotCard .equipmentMiniName{
-    display:none;
+    display:block;
   }
 
   body.page-optimizer .platoonSlotCard .slotBottom{
-    display:none;
+    display:flex;
   }
 
   body.page-optimizer .platoonSlotCard .lockRow{
-    display:none;
+    display:flex;
   }
 }
 
 @media (max-width:430px){
+  body.page-optimizer .platoonSlots{
+    grid-template-columns:repeat(5, 210px);
+    min-width:1090px;
+    gap:9px;
+  }
+
   body.page-optimizer .platoonSlotCard{
-    grid-template-columns:76px minmax(0,1fr) 96px;
-    gap:7px;
-    min-height:86px;
+    min-width:210px;
   }
 
   body.page-optimizer .platoonSlotCard .slotImg{
-    height:72px;
-  }
-
-  body.page-optimizer .platoonSlotCard .equipmentPair{
-    grid-template-columns:repeat(2,42px);
-    gap:5px;
-  }
-
-  body.page-optimizer .platoonSlotCard .equipmentMini{
-    width:42px;
-    min-height:42px;
-  }
-
-  body.page-optimizer .platoonSlotCard .equipmentMini img,
-  body.page-optimizer .platoonSlotCard .equipmentMiniFallback{
-    width:30px;
-    height:30px;
+    height:220px;
   }
 }
