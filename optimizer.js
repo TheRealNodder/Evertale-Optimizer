@@ -42,7 +42,6 @@ const state = {
   mode: "story",
   exampleMode: false, // when true, slots can show units not owned (greyed out)
   equipmentRuntime: { weapons: [], accessories: [], counts: {} },
-  exampleCache: new Map(),
 };
 
 function el(id) { return document.getElementById(id); }
@@ -621,23 +620,6 @@ function buildExampleOptions() {
   return options;
 }
 
-function getExampleCacheKey(pool, style) {
-  const teamType = el("teamTypeSelect")?.value || getTeamTypePref();
-  const preset = el("presetSelect")?.value || getPresetPref();
-  const primary = el("primaryArchetypeSelect")?.value || getPrimaryArchetypePref() || "";
-  const secondary = el("secondaryArchetypeSelect")?.value || getSecondaryArchetypePref() || "none";
-  const poolSig = (pool || []).map(u => normId(u?.id)).filter(Boolean).join("|");
-  return [style, teamType, preset, primary, secondary, poolSig].join("::");
-}
-
-function cloneEmptyExampleLayout() {
-  return {
-    storyMain: Array(STORY_MAIN).fill(""),
-    storyBack: Array(STORY_BACK).fill(""),
-    platoons: Array.from({ length: PLATOON_COUNT }, () => Array(PLATOON_SIZE).fill("")),
-  };
-}
-
 function buildExampleTeam() {
   if (!window.OptimizerEngine || typeof window.OptimizerEngine.run !== "function") {
     showOptimizerNotice("Example Team: optimizer engine is not available.");
@@ -658,28 +640,57 @@ function buildExampleTeam() {
   }
 
   const style = (el("exampleStyleSelect")?.value || "best");
-  const cacheKey = getExampleCacheKey(examplePool, style);
   const savedLocks = structuredCloneSafe(state.locks);
+
+  // Example teams are previews, so they must be able to fill empty slots even
+  // when the user's normal optimizer locks are enabled.
   const unlockedLocks = defaultLocks();
 
-  if (state.exampleCache && state.exampleCache.has(cacheKey)) {
-    state.locks = unlockedLocks;
-    applyEngineResult(structuredCloneSafe(state.exampleCache.get(cacheKey)));
-    state.locks = savedLocks;
-    saveLocks();
-    showOptimizerNotice(`Example Team loaded instantly from ${examplePool.length} ${ssrPool.length >= STORY_MAIN ? "SSR" : "available"} units.`);
-    return;
-  }
-
-  const baseOptions = buildExampleOptions();
-  baseOptions.currentLayout = cloneEmptyExampleLayout();
-  baseOptions.slotLocks = unlockedLocks;
-  baseOptions.exampleMode = true;
+  const makeExampleOptions = (presetKey = "") => {
+    const options = buildEngineOptions();
+    options.currentLayout = structuredCloneSafe({
+      storyMain: Array(STORY_MAIN).fill(""),
+      storyBack: Array(STORY_BACK).fill(""),
+      platoons: Array.from({ length: PLATOON_COUNT }, () => Array(PLATOON_SIZE).fill("")),
+    });
+    options.slotLocks = structuredCloneSafe(unlockedLocks);
+    options.exampleMode = true;
+    if (presetKey) {
+      options.presetTag = presetKey;
+      options.presetMode = "hard";
+    }
+    return options;
+  };
 
   let result = null;
 
   try {
-    result = window.OptimizerEngine.run(examplePool, baseOptions);
+    if (style === "best") {
+      const candidatePresets = ["burn","poison","sleep","stun","heal","turn","cleanse","atkBuff","hpBuff"];
+      let best = null;
+      let bestScore = -Infinity;
+
+      for (const presetKey of candidatePresets) {
+        const candidate = window.OptimizerEngine.run(examplePool, makeExampleOptions(presetKey));
+        const storyCount = resultUnitIds(candidate?.story?.main).length + resultUnitIds(candidate?.story?.back).length;
+        const platoonCount = Array.isArray(candidate?.platoons)
+          ? candidate.platoons.reduce((sum, p) => sum + resultUnitIds(p?.units || p || []).length, 0)
+          : 0;
+        const score = Number(candidate?.totalScore || 0) + storyCount * 1000 + platoonCount;
+        if (candidate?.story && score > bestScore) {
+          best = candidate;
+          bestScore = score;
+        }
+      }
+
+      result = best;
+    } else {
+      const options = buildExampleOptions();
+      options.currentLayout = makeExampleOptions().currentLayout;
+      options.slotLocks = makeExampleOptions().slotLocks;
+      options.exampleMode = true;
+      result = window.OptimizerEngine.run(examplePool, options);
+    }
   } catch (err) {
     console.error("[Optimizer] Example team build failed.", err);
     showOptimizerNotice(`Example Team error: ${String(err.message || err)}`);
@@ -693,10 +704,6 @@ function buildExampleTeam() {
     renderAll();
     return;
   }
-
-  if (!state.exampleCache) state.exampleCache = new Map();
-  state.exampleCache.set(cacheKey, structuredCloneSafe(result));
-  if (state.exampleCache.size > 12) state.exampleCache.delete(state.exampleCache.keys().next().value);
 
   state.locks = unlockedLocks;
   applyEngineResult(result);
@@ -821,17 +828,14 @@ function installModeButtons() {
   });
 }
 
-function installControls() {
-  el("clearBtn")?.addEventListener("click", clearTeams);
-  el("saveBtn")?.addEventListener("click", () => alert("Layout is saved locally in this browser."));
-  el("optimizeBtn")?.addEventListener("click", runEngine);
-  el("buildExampleBtn")?.addEventListener("click", buildExampleTeam);
-  el("lockFilledPlatoonsBtn")?.addEventListener("click", lockFilledPlatoonSlots);
-  installModeButtons();
+function lockFilledStorySlots() {
+  for (let i=0;i<STORY_MAIN;i++) state.locks.storyMain[i] = !!state.layout.storyMain[i];
+  for (let i=0;i<STORY_BACK;i++) state.locks.storyBack[i] = !!state.layout.storyBack[i];
+  saveLocks();
+  renderAll();
 }
 
-function lockFilledPlatoonSlots() {
-  if (!state.layout?.platoons) return;
+function lockFilledPlatoons() {
   for (let p=0;p<PLATOON_COUNT;p++) {
     for (let i=0;i<PLATOON_SIZE;i++) {
       state.locks.platoons[p][i] = !!state.layout.platoons[p][i];
@@ -841,31 +845,54 @@ function lockFilledPlatoonSlots() {
   renderAll();
 }
 
-async function init() {
-  try {
-    initSharedOptimizerFiltersUI();
-    state.all = await loadCharacters();
-    state.ownedIds = getOwnedIds();
-    state.ownedUnits = state.all.filter(u => state.ownedIds.has(normId(u.id)));
-    state.layout = loadLayout();
-    state.locks = loadLocks();
-    await loadOptimizerRuntimeIfAvailable();
-
-    installControls();
-    renderAll();
-
-    // If we have owned units and an empty layout, generate once.
-    const hasAnyLayout = [
-      ...state.layout.storyMain,
-      ...state.layout.storyBack,
-      ...state.layout.platoons.flat(),
-    ].some(Boolean);
-
-    if (!hasAnyLayout && state.ownedUnits.length) runEngine();
-  } catch (err) {
-    console.error(err);
-    el("ownedPoolText") && (el("ownedPoolText").textContent = "Optimizer failed to load. Check console.");
-  }
+function unlockAllLocks() {
+  state.locks = defaultLocks();
+  saveLocks();
+  renderAll();
 }
 
-document.addEventListener("DOMContentLoaded", init);
+// Hook entrypoint
+window.refreshOptimizerFromOwned = function refreshOptimizerFromOwned() {
+  state.exampleMode = false;
+  state.ownedIds = getOwnedIds();
+  state.ownedUnits = state.all.filter(u => state.ownedIds.has(normId(u.id)));
+  window.__optimizerOwnedUnits = state.ownedUnits;
+  renderAll();
+};
+
+window.runOptimizer = function runOptimizer() {
+  runEngine();
+};
+
+async function init() {
+  initSharedOptimizerFiltersUI();
+
+  await loadOptimizerRuntimeIfAvailable();
+  state.all = await loadCharacters();
+  state.layout = loadLayout();
+  state.locks = loadLocks();
+
+  state.ownedIds = getOwnedIds();
+  state.ownedUnits = state.all.filter(u => state.ownedIds.has(normId(u.id)));
+  window.__optimizerOwnedUnits = state.ownedUnits;
+
+  el("buildBest")?.addEventListener("click", runEngine);
+  el("buildExample")?.addEventListener("click", buildExampleTeam);
+  el("clearTeams")?.addEventListener("click", clearTeams);
+
+  el("lockFilledStory")?.addEventListener("click", lockFilledStorySlots);
+  el("lockFilledPlatoons")?.addEventListener("click", lockFilledPlatoons);
+  el("unlockAllLocks")?.addEventListener("click", unlockAllLocks);
+
+  installModeButtons();
+  updateOptimizerRuntimeStatus();
+  renderAll();
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  init().catch(err => {
+    console.error(err);
+    const owned = el("ownedCount");
+    if (owned) owned.textContent = `Error: ${String(err.message || err)}`;
+  });
+});
