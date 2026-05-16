@@ -621,42 +621,95 @@ function buildExampleOptions() {
 }
 
 function buildExampleTeam() {
-  if (!window.OptimizerEngine || typeof window.OptimizerEngine.run !== "function") return;
-  if (!state.all || !state.all.length) return;
+  if (!window.OptimizerEngine || typeof window.OptimizerEngine.run !== "function") {
+    showOptimizerNotice("Example Team: optimizer engine is not available.");
+    return;
+  }
+  if (!state.all || !state.all.length) {
+    showOptimizerNotice("Example Team: no runtime characters loaded.");
+    return;
+  }
 
   state.exampleMode = true;
-  // Example teams should only suggest SSRs and can include units not owned.
+
   const ssrPool = state.all.filter(u => String(u?.rarity || "").toUpperCase() === "SSR");
+  const examplePool = ssrPool.length >= STORY_MAIN ? ssrPool : state.all;
+  if (!examplePool.length) {
+    showOptimizerNotice("Example Team: no eligible units available.");
+    return;
+  }
+
   const style = (el("exampleStyleSelect")?.value || "best");
+  const savedLocks = structuredCloneSafe(state.locks);
+
+  // Example teams are previews, so they must be able to fill empty slots even
+  // when the user's normal optimizer locks are enabled.
+  const unlockedLocks = defaultLocks();
+
+  const makeExampleOptions = (presetKey = "") => {
+    const options = buildEngineOptions();
+    options.currentLayout = structuredCloneSafe({
+      storyMain: Array(STORY_MAIN).fill(""),
+      storyBack: Array(STORY_BACK).fill(""),
+      platoons: Array.from({ length: PLATOON_COUNT }, () => Array(PLATOON_SIZE).fill("")),
+    });
+    options.slotLocks = structuredCloneSafe(unlockedLocks);
+    options.exampleMode = true;
+    if (presetKey) {
+      options.presetTag = presetKey;
+      options.presetMode = "hard";
+    }
+    return options;
+  };
 
   let result = null;
 
-  // For "best", actually try all practical preset families and keep the
-  // highest-scoring example instead of relying on the generic auto path.
-  if (style === "best") {
-    const candidatePresets = ["burn","poison","sleep","stun","heal","turn","cleanse","atkBuff","hpBuff"];
-    let best = null;
-    let bestScore = -Infinity;
+  try {
+    if (style === "best") {
+      const candidatePresets = ["burn","poison","sleep","stun","heal","turn","cleanse","atkBuff","hpBuff"];
+      let best = null;
+      let bestScore = -Infinity;
 
-    for (const presetKey of candidatePresets) {
-      const options = buildEngineOptions();
-      options.presetTag = presetKey;
-      options.presetMode = "hard";
-      const candidate = window.OptimizerEngine.run(ssrPool, options);
-      const score = Number(candidate?.totalScore || 0);
-      if (score > bestScore) {
-        best = candidate;
-        bestScore = score;
+      for (const presetKey of candidatePresets) {
+        const candidate = window.OptimizerEngine.run(examplePool, makeExampleOptions(presetKey));
+        const storyCount = resultUnitIds(candidate?.story?.main).length + resultUnitIds(candidate?.story?.back).length;
+        const platoonCount = Array.isArray(candidate?.platoons)
+          ? candidate.platoons.reduce((sum, p) => sum + resultUnitIds(p?.units || p || []).length, 0)
+          : 0;
+        const score = Number(candidate?.totalScore || 0) + storyCount * 1000 + platoonCount;
+        if (candidate?.story && score > bestScore) {
+          best = candidate;
+          bestScore = score;
+        }
       }
-    }
 
-    result = best;
-  } else {
-    const options = buildExampleOptions();
-    result = window.OptimizerEngine.run(ssrPool, options);
+      result = best;
+    } else {
+      const options = buildExampleOptions();
+      options.currentLayout = makeExampleOptions().currentLayout;
+      options.slotLocks = makeExampleOptions().slotLocks;
+      options.exampleMode = true;
+      result = window.OptimizerEngine.run(examplePool, options);
+    }
+  } catch (err) {
+    console.error("[Optimizer] Example team build failed.", err);
+    showOptimizerNotice(`Example Team error: ${String(err.message || err)}`);
+    state.locks = savedLocks;
+    return;
   }
 
+  if (!result || !result.story) {
+    showOptimizerNotice("Example Team: no valid result returned.");
+    state.locks = savedLocks;
+    renderAll();
+    return;
+  }
+
+  state.locks = unlockedLocks;
   applyEngineResult(result);
+  state.locks = savedLocks;
+  saveLocks();
+  showOptimizerNotice(`Example Team loaded from ${examplePool.length} ${ssrPool.length >= STORY_MAIN ? "SSR" : "available"} units.`);
 }
 
 function clearTeams() {
@@ -670,12 +723,27 @@ function clearTeams() {
   renderAll();
 }
 
+function resultUnitId(value) {
+  if (value == null || value === "") return "";
+  if (typeof value === "object") return normId(value.id || value.sourceId || value.family || value.name || "");
+  return normId(value);
+}
+
+function resultUnitIds(values) {
+  return Array.isArray(values) ? values.map(resultUnitId).filter(Boolean) : [];
+}
+
+function showOptimizerNotice(message) {
+  const status = el("optimizerRuntimeStatus") || el("ownedCount");
+  if (status && message) status.textContent = message;
+}
+
 function applyEngineResult(result) {
   if (!result || !result.story) return;
 
   // Apply only into unlocked slots. Locked slots keep what user has.
-  const main = Array.isArray(result.story.main) ? result.story.main.map(normId) : [];
-  const back = Array.isArray(result.story.back) ? result.story.back.map(normId) : [];
+  const main = resultUnitIds(result.story.main);
+  const back = resultUnitIds(result.story.back);
 
   for (let i=0;i<STORY_MAIN;i++) {
     if (!state.locks.storyMain[i]) state.layout.storyMain[i] = main[i] || "";
@@ -686,7 +754,7 @@ function applyEngineResult(result) {
 
   if (Array.isArray(result.platoons)) {
     for (let p=0;p<PLATOON_COUNT;p++) {
-      const row = (result.platoons[p]?.units || []).map(normId);
+      const row = resultUnitIds(result.platoons[p]?.units || result.platoons[p] || []);
       for (let i=0;i<PLATOON_SIZE;i++) {
         if (!state.locks.platoons[p][i]) state.layout.platoons[p][i] = row[i] || "";
       }
