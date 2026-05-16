@@ -666,7 +666,17 @@ function buildExampleTeam() {
 
   try {
     if (style === "best") {
-      const candidatePresets = ["burn","poison","sleep","stun","heal","turn","cleanse","atkBuff","hpBuff"];
+      const preferredPreset = (el("presetSelect")?.value || getPresetPref() || "auto");
+      const primaryArchetype = (el("primaryArchetypeSelect")?.value || getPrimaryArchetypePref() || "");
+      const secondaryArchetype = (el("secondaryArchetypeSelect")?.value || getSecondaryArchetypePref() || "none");
+      const candidatePresets = [
+        preferredPreset !== "auto" ? preferredPreset : "",
+        primaryArchetype && primaryArchetype !== "none" ? primaryArchetype : "",
+        secondaryArchetype && secondaryArchetype !== "none" ? secondaryArchetype : "",
+        "burn",
+        "poison",
+        "sleep"
+      ].filter((v, i, arr) => v && arr.indexOf(v) === i);
       let best = null;
       let bestScore = -Infinity;
 
