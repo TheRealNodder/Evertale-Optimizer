@@ -1,12 +1,11 @@
 /* duo-display.js — collapse duo/summon/switch/transform child units in UI.
    Uses apkfiles/DuoDisplay.json as the UI-facing canonical map.
-   Catalog: hide child cards and add a form button on parent cards.
-   Roster/Optimizer: filter child units out of loadCharactersMerged pools.
 */
 (function(){
   const DUO_URL = './apkfiles/DuoDisplay.json';
   let duoPromise = null;
   let characterPromise = null;
+  let renderQueued = false;
 
   function pageName(){
     const p = String(location.pathname || '').toLowerCase();
@@ -14,30 +13,20 @@
     if (p.includes('optimizer')) return 'optimizer';
     return 'catalog';
   }
-
-  function safeText(v){
-    return String(v ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
-  }
-
+  function safeText(v){ return String(v ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch])); }
   function normId(v){ return String(v ?? '').trim(); }
 
   async function fetchJsonOptional(url){
-    try{
-      const res = await fetch(url, { cache: 'no-store' });
-      if(!res.ok) return null;
-      return await res.json();
-    }catch(err){
-      console.warn('[DuoDisplay] Optional load failed:', url, err);
-      return null;
-    }
+    try{ const res = await fetch(url, { cache:'no-store' }); return res.ok ? await res.json() : null; }
+    catch(err){ console.warn('[DuoDisplay] Optional load failed:', url, err); return null; }
   }
 
   async function loadDuoDisplay(){
     if(!duoPromise){
       duoPromise = fetchJsonOptional(DUO_URL).then(json => {
         const parentCards = json?.parentCards || {};
-        const childToParent = new Map();
         const childSet = new Set();
+        const childToParent = new Map();
         for(const [parentId, cfg] of Object.entries(parentCards)){
           for(const childId of (Array.isArray(cfg?.children) ? cfg.children : [])){
             const child = normId(childId);
@@ -46,7 +35,7 @@
             if(!childToParent.has(child)) childToParent.set(child, parentId);
           }
         }
-        return { raw: json || {}, parentCards, childToParent, childSet };
+        return { raw: json || {}, parentCards, childSet, childToParent };
       });
     }
     return duoPromise;
@@ -57,11 +46,21 @@
     return units.filter(u => !duo.childSet.has(normId(u?.id || u?.sourceId || u?.family)));
   }
 
-  function installDataFilter(){
+  function scheduleCatalogRender(){
+    if(pageName() !== 'catalog') return;
+    if(renderQueued) return;
+    if(typeof window.render !== 'function') return;
+    renderQueued = true;
+    requestAnimationFrame(() => {
+      renderQueued = false;
+      try{ window.render(); }catch(err){ console.warn('[DuoDisplay] render refresh failed', err); }
+    });
+  }
+
+  async function installDataFilter(){
     const data = window.EvertaleData;
     if(!data || data.__duoDisplayPatched) return;
     data.__duoDisplayPatched = true;
-
     const originalMerged = data.loadCharactersMerged;
     if(typeof originalMerged === 'function'){
       data.loadCharactersMerged = async function(...args){
@@ -82,16 +81,13 @@
   async function loadCharactersForCatalog(){
     if(characterPromise) return characterPromise;
     characterPromise = (async () => {
-      const data = window.EvertaleData;
       let rows = [];
       try{
-        if(data && typeof data.loadAllEntries === 'function'){
-          const entries = await data.loadAllEntries();
+        if(window.EvertaleData?.loadAllEntries){
+          const entries = await window.EvertaleData.loadAllEntries();
           rows = Array.isArray(entries?.characters) ? entries.characters : [];
         }
-        if(!rows.length && data && typeof data.loadCharactersMerged === 'function'){
-          rows = await data.loadCharactersMerged();
-        }
+        if(!rows.length && window.EvertaleData?.loadCharactersMerged) rows = await window.EvertaleData.loadCharactersMerged();
       }catch(err){ console.warn('[DuoDisplay] Character load fallback failed:', err); }
       const map = new Map();
       for(const u of rows || []){
@@ -123,10 +119,7 @@
     }).join('')}</div></div>`;
   }
 
-  function normalizeElementDisplay(el){
-    const raw = String(el || '').trim();
-    return raw ? raw.replace(/[_-]+/g,' ').replace(/\b\w/g,c=>c.toUpperCase()) : '';
-  }
+  function normalizeElementDisplay(el){ const raw = String(el || '').trim(); return raw ? raw.replace(/[_-]+/g,' ').replace(/\b\w/g,c=>c.toUpperCase()) : ''; }
 
   function updateCatalogCard(card, unit){
     if(!card || !unit) return;
@@ -135,36 +128,24 @@
     const imgs = imageUrlsFromCharacter(unit);
     const imgUrl = imgs[0] || unit.image || '';
     const thumb = card.querySelector('.unitThumb');
-    if(thumb){
-      thumb.innerHTML = imgUrl ? `<img src="${safeText(imgUrl)}" alt="${safeText(name)}" loading="lazy" decoding="async">` : `<div class="ph">?</div>`;
-    }
-    const nameEl = card.querySelector('.unitName');
-    if(nameEl) nameEl.textContent = name;
-    const titleEl = card.querySelector('.unitTitle');
-    if(titleEl) titleEl.textContent = title;
+    if(thumb) thumb.innerHTML = imgUrl ? `<img src="${safeText(imgUrl)}" alt="${safeText(name)}" loading="lazy" decoding="async">` : `<div class="ph">?</div>`;
+    const nameEl = card.querySelector('.unitName'); if(nameEl) nameEl.textContent = name;
+    const titleEl = card.querySelector('.unitTitle'); if(titleEl) titleEl.textContent = title;
     const chipCol = card.querySelector('.chipCol');
-    if(chipCol){
-      chipCol.innerHTML = `<span class="tag kind">Character</span>${unit.element?`<span class="tag element">${safeText(normalizeElementDisplay(unit.element))}</span>`:''}${unit.rarity?`<span class="tag rarity">${safeText(unit.rarity)}</span>`:''}`;
-    }
+    if(chipCol) chipCol.innerHTML = `<span class="tag kind">Character</span>${unit.element?`<span class="tag element">${safeText(normalizeElementDisplay(unit.element))}</span>`:''}${unit.rarity?`<span class="tag rarity">${safeText(unit.rarity)}</span>`:''}`;
     const statLine = card.querySelector('.statLine');
-    const atk = unit.atk ?? unit.stats?.atk ?? '';
-    const hp = unit.hp ?? unit.stats?.hp ?? '';
-    const spd = unit.spd ?? unit.stats?.spd ?? '';
-    const cost = unit.cost ?? unit.stats?.cost ?? '';
+    const atk = unit.atk ?? unit.stats?.atk ?? '', hp = unit.hp ?? unit.stats?.hp ?? '', spd = unit.spd ?? unit.stats?.spd ?? '', cost = unit.cost ?? unit.stats?.cost ?? '';
     if(statLine){
-      const parts = [];
+      const parts=[];
       if(atk !== '' && atk != null) parts.push(`<div class="stat"><span class="statLabel">ATK</span><span class="statVal">${safeText(atk)}</span></div>`);
       if(hp !== '' && hp != null) parts.push(`<div class="stat"><span class="statLabel">HP</span><span class="statVal">${safeText(hp)}</span></div>`);
       if(spd !== '' && spd != null) parts.push(`<div class="stat"><span class="statLabel">SPD</span><span class="statVal">${safeText(spd)}</span></div>`);
       if(cost !== '' && cost != null) parts.push(`<div class="stat"><span class="statLabel">COST</span><span class="statVal">${safeText(cost)}</span></div>`);
       statLine.innerHTML = parts.join('');
     }
-    const leaderName = card.querySelector('.leaderName');
-    if(leaderName) leaderName.textContent = unit.leaderSkill?.name || 'No Leader Skill';
-    const leaderDesc = card.querySelector('.leaderDesc');
-    if(leaderDesc) leaderDesc.textContent = unit.leaderSkill?.description || 'This unit does not provide a leader skill.';
-    const descText = card.querySelector('.descriptionText');
-    if(descText) descText.textContent = unit.description || unit.flavorText || '';
+    const leaderName = card.querySelector('.leaderName'); if(leaderName) leaderName.textContent = unit.leaderSkill?.name || 'No Leader Skill';
+    const leaderDesc = card.querySelector('.leaderDesc'); if(leaderDesc) leaderDesc.textContent = unit.leaderSkill?.description || 'This unit does not provide a leader skill.';
+    const descText = card.querySelector('.descriptionText'); if(descText) descText.textContent = unit.description || unit.flavorText || '';
     const details = card.querySelector('.unitDetails');
     if(details){
       details.querySelectorAll('.activeSkillPanel,.passiveSkillPanel').forEach(el => el.remove());
@@ -173,18 +154,41 @@
     }
   }
 
+  async function applyCatalogDuoState(){
+    if(pageName() !== 'catalog') return;
+    const st = window.state;
+    if(!st || !Array.isArray(st.items)) return;
+    const duo = await loadDuoDisplay();
+    if(!duo?.childSet?.size) return;
+    let changed = false;
+    for(const item of st.items){
+      if(item?.kind !== 'characters') continue;
+      const id = normId(item.id || item.sourceId || item.family);
+      if(duo.childSet.has(id) && !item.__duoHiddenChild){ item.__duoHiddenChild = true; changed = true; }
+      const cfg = duo.parentCards[id];
+      if(cfg && !item.__duoParent){
+        item.__duoParent = true;
+        item.duoChildren = Array.isArray(cfg.children) ? cfg.children.slice() : [];
+        item.duoGroup = cfg.group || '';
+        item.duoButtonLabel = cfg.buttonLabel || 'Forms';
+        changed = true;
+      }
+    }
+    if(changed) scheduleCatalogRender();
+  }
+
   async function enhanceCatalog(){
     if(pageName() !== 'catalog') return;
+    await applyCatalogDuoState();
     const grid = document.getElementById('catalogGrid');
     if(!grid) return;
     const duo = await loadDuoDisplay();
-    if(!duo?.parentCards) return;
     const characters = await loadCharactersForCatalog();
-
     grid.querySelectorAll('.unitCard[data-kind="characters"]').forEach(card => {
       const id = normId(card.getAttribute('data-id'));
       if(duo.childSet.has(id)){
         card.hidden = true;
+        card.style.display = 'none';
         card.setAttribute('data-duo-hidden-child','true');
         return;
       }
@@ -193,8 +197,6 @@
       if(card.querySelector('.duoFormBtn')) return;
       const forms = [id, ...cfg.children].filter(Boolean);
       card.setAttribute('data-duo-parent','true');
-      card.setAttribute('data-duo-forms', JSON.stringify(forms));
-      card.setAttribute('data-duo-index','0');
       const host = card.querySelector('.metaMain') || card.querySelector('.metaHeader') || card.querySelector('.meta');
       if(!host) return;
       const btn = document.createElement('button');
@@ -203,29 +205,48 @@
       btn.textContent = cfg.buttonLabel || 'Forms';
       btn.title = cfg.group || 'Linked forms';
       btn.addEventListener('click', evt => {
-        evt.preventDefault();
-        evt.stopPropagation();
+        evt.preventDefault(); evt.stopPropagation();
         let idx = Number.parseInt(card.getAttribute('data-duo-index') || '0', 10);
         idx = (Number.isFinite(idx) ? idx + 1 : 1) % forms.length;
         card.setAttribute('data-duo-index', String(idx));
-        const activeId = forms[idx];
-        const unit = characters.get(activeId);
-        updateCatalogCard(card, unit);
+        updateCatalogCard(card, characters.get(forms[idx]));
         btn.textContent = `${cfg.buttonLabel || 'Forms'} ${idx + 1}/${forms.length}`;
       });
       host.appendChild(btn);
     });
   }
 
+  function patchCatalogRendererWhenReady(){
+    if(pageName() !== 'catalog') return;
+    const tryPatch = () => {
+      if(typeof window.render !== 'function' || !window.state || window.__duoRenderPatched) return false;
+      window.__duoRenderPatched = true;
+      const originalRender = window.render;
+      window.render = function(...args){
+        if(window.state && Array.isArray(window.state.items)){
+          window.state.items.forEach(item => { if(item?.__duoHiddenChild) item.__duoWasHidden = true; });
+        }
+        return originalRender.apply(this, args);
+      };
+      applyCatalogDuoState().then(() => enhanceCatalog());
+      return true;
+    };
+    if(!tryPatch()){
+      const timer = setInterval(() => { if(tryPatch()) clearInterval(timer); }, 100);
+      setTimeout(() => clearInterval(timer), 8000);
+    }
+  }
+
   function installCatalogObserver(){
     if(pageName() !== 'catalog') return;
     const run = () => enhanceCatalog().catch(err => console.warn('[DuoDisplay] Catalog enhance failed:', err));
     document.addEventListener('DOMContentLoaded', () => {
+      patchCatalogRendererWhenReady();
       run();
       const grid = document.getElementById('catalogGrid');
       if(!grid) return;
       const obs = new MutationObserver(() => run());
-      obs.observe(grid, { childList: true });
+      obs.observe(grid, { childList:true });
     });
   }
 
@@ -233,7 +254,7 @@
     if(document.getElementById('duoDisplayStyle')) return;
     const style = document.createElement('style');
     style.id = 'duoDisplayStyle';
-    style.textContent = `.duoFormBtn{margin-top:6px;justify-self:start;align-self:start;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.065);color:var(--text,#f6f7ff);border-radius:999px;padding:5px 9px;font-size:11px;font-weight:850;cursor:pointer}.duoFormBtn:hover{background:rgba(255,255,255,.12)}.unitCard[data-duo-parent="true"]{outline:1px solid rgba(109,231,183,.14)}`;
+    style.textContent = `.duoFormBtn{margin-top:6px;justify-self:start;align-self:start;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.065);color:var(--text,#f6f7ff);border-radius:999px;padding:5px 9px;font-size:11px;font-weight:850;cursor:pointer}.duoFormBtn:hover{background:rgba(255,255,255,.12)}.unitCard[data-duo-parent="true"]{outline:1px solid rgba(109,231,183,.14)}.unitCard[data-duo-hidden-child="true"]{display:none!important}`;
     document.head.appendChild(style);
   }
 
