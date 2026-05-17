@@ -1,9 +1,10 @@
 /* catalog-duo.js — post-render collapse for duo/summon/switch/transform catalog cards.
-   Runs after catalog.js/catalog-sort.js so it works with the current page renderer.
+   Runs after catalog.js/catalog-sort.js and maps APK source IDs to rendered catalog IDs.
 */
 (function(){
   const DISPLAY_URL='./apkfiles/DuoDisplay.json';
   const DUO_URL='./apkfiles/Duo.json';
+  const BUNDLE_URL='./apkfiles/entries/bundles/characters.bundle.json';
   let dataPromise=null;
   let busy=false;
   let timer=null;
@@ -12,31 +13,52 @@
   function scoreText(v){return String(v||'').toLowerCase();}
   function makeUF(){const p=new Map();const f=x=>{x=norm(x);if(!p.has(x))p.set(x,x);const r=p.get(x);if(r!==x)p.set(x,f(r));return p.get(x)};return{p,find:f,union:(a,b)=>{a=norm(a);b=norm(b);if(!a||!b)return;const ra=f(a),rb=f(b);if(ra!==rb)p.set(rb,ra)}}}
   async function j(url){try{const r=await fetch(url,{cache:'no-store'});return r.ok?await r.json():null}catch{return null}}
-  function addMap(uf,map){if(!map||typeof map!=='object')return;for(const [a,bs] of Object.entries(map)){if(Array.isArray(bs))bs.forEach(b=>uf.union(a,b));}}
+
+  function addAlias(alias, key, value){key=norm(key);value=norm(value);if(key&&value&&!alias.has(key))alias.set(key,value)}
+  function buildAlias(bundle){
+    const alias=new Map();
+    const rows=Array.isArray(bundle?.entries)?bundle.entries:(Array.isArray(bundle?.characters)?bundle.characters:[]);
+    for(const row of rows){
+      const id=norm(row?.id);
+      if(!id)continue;
+      addAlias(alias,row?.id,id);
+      addAlias(alias,row?.sourceId,id);
+      addAlias(alias,row?.family,id);
+      addAlias(alias,row?.internal?.sourceId,id);
+      addAlias(alias,row?.internal?.family,id);
+      addAlias(alias,row?.raw?.name,id);
+      addAlias(alias,row?.raw?.family,id);
+    }
+    return alias;
+  }
+  function canonical(alias,id){id=norm(id);return alias.get(id)||id}
+  function addMap(uf,map,alias){if(!map||typeof map!=='object')return;for(const [a,bs] of Object.entries(map)){if(Array.isArray(bs))bs.forEach(b=>uf.union(canonical(alias,a),canonical(alias,b)));}}
 
   async function load(){
     if(dataPromise)return dataPromise;
-    dataPromise=Promise.all([j(DISPLAY_URL),j(DUO_URL)]).then(([display,duo])=>{
+    dataPromise=Promise.all([j(DISPLAY_URL),j(DUO_URL),j(BUNDLE_URL)]).then(([display,duo,bundle])=>{
+      const alias=buildAlias(bundle);
       const uf=makeUF();
       const label=new Map();
       const group=new Map();
       const pc=display?.parentCards||{};
       for(const [parent,cfg] of Object.entries(pc)){
+        const p=canonical(alias,parent);
         const kids=Array.isArray(cfg?.children)?cfg.children:[];
-        kids.forEach(k=>uf.union(parent,k));
-        [parent,...kids].forEach(id=>{if(cfg?.buttonLabel)label.set(norm(id),cfg.buttonLabel);if(cfg?.group)group.set(norm(id),cfg.group);});
+        kids.forEach(k=>uf.union(p,canonical(alias,k)));
+        [p,...kids.map(k=>canonical(alias,k))].forEach(id=>{if(cfg?.buttonLabel)label.set(norm(id),cfg.buttonLabel);if(cfg?.group)group.set(norm(id),cfg.group);});
       }
-      addMap(uf,duo?.directSpecificLinks);
-      addMap(uf,duo?.genericHelperSummons);
-      addMap(uf,duo?.enemyImposterExchangeUnits);
-      addMap(uf,duo?.selfCloneOrDuplicateUnits);
+      addMap(uf,duo?.directSpecificLinks,alias);
+      addMap(uf,duo?.genericHelperSummons,alias);
+      addMap(uf,duo?.enemyImposterExchangeUnits,alias);
+      addMap(uf,duo?.selfCloneOrDuplicateUnits,alias);
       const groups=new Map();
       for(const id of uf.p.keys()){
         const root=uf.find(id);
         if(!groups.has(root))groups.set(root,new Set());
         groups.get(root).add(id);
       }
-      return{groups,label,group};
+      return{groups,label,group,alias};
     });
     return dataPromise;
   }
@@ -45,7 +67,7 @@
   function cardName(c){return c?.querySelector('.unitName')?.textContent?.trim()||'';}
   function cardTitle(c){return c?.querySelector('.unitTitle')?.textContent?.trim()||'';}
   function payload(c){return{id:cardId(c),html:c.innerHTML,className:c.className,kind:c.getAttribute('data-kind')||'',name:cardName(c),title:cardTitle(c)}}
-  function parentScore(c){const id=scoreText(cardId(c));const name=scoreText(cardName(c));const title=scoreText(cardTitle(c));const all=`${id} ${name} ${title}`;let s=0;if(/beautybeast|beauty.*beast|beast.*beauty|beauty\s*&\s*beast/.test(all))s+=1000;if(/snowwhitenew|snow white/.test(all)&&!/black/.test(all))s+=800;if(/regular|new|bride/.test(id))s+=50;if(/&| and /.test(name))s+=90;if(/minion|imposter|clone|rabbit|angel|raven|shadow|doll|summon|shiromori/.test(all))s-=300;return s;}
+  function parentScore(c){const id=scoreText(cardId(c));const name=scoreText(cardName(c));const title=scoreText(cardTitle(c));const all=`${id} ${name} ${title}`;let s=0;if(/beauty-beast|beautybeast|beauty.*beast|beast.*beauty|beauty\s*&\s*beast/.test(all))s+=1000;if(/snow-white|snowwhitenew|snow white/.test(all)&&!/black/.test(all))s+=800;if(/regular|new|bride/.test(id))s+=50;if(/&| and /.test(name))s+=90;if(/minion|imposter|clone|rabbit|angel|raven|shadow|doll|summon|shiromori|belle|aigis/.test(all))s-=300;return s;}
   function choose(cards){return cards.slice().sort((a,b)=>parentScore(b)-parentScore(a))[0]||cards[0];}
   function firstLabel(ids,data){for(const id of ids){const l=data.label.get(norm(id));if(l)return l;}return'Forms';}
   function installBtn(parent,payloads,label){
