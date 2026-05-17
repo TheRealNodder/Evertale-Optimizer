@@ -1,63 +1,118 @@
-/* duo-display.js — collapse duo/summon/switch/transform child units in UI.
-   Uses apkfiles/DuoDisplay.json as the UI-facing canonical map.
+/* duo-display.js — robust duo/summon/switch/transform card collapse.
+   Uses:
+   - apkfiles/DuoDisplay.json for preferred UI labels/groups
+   - apkfiles/Duo.json for broader summon/switch/transform child visibility
 */
 (function(){
-  const DUO_URL = './apkfiles/DuoDisplay.json';
-  let duoPromise = null;
-  let characterPromise = null;
-  let renderQueued = false;
+  const DISPLAY_URL = './apkfiles/DuoDisplay.json';
+  const DUO_URL = './apkfiles/Duo.json';
+  let dataPromise = null;
+  let renderTimer = null;
 
   function pageName(){
     const p = String(location.pathname || '').toLowerCase();
-    if (p.includes('roster')) return 'roster';
-    if (p.includes('optimizer')) return 'optimizer';
+    if(p.includes('roster')) return 'roster';
+    if(p.includes('optimizer')) return 'optimizer';
     return 'catalog';
   }
-  function safeText(v){ return String(v ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch])); }
   function normId(v){ return String(v ?? '').trim(); }
+  function safeText(v){ return String(v ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch])); }
+  function normName(v){ return String(v || '').toLowerCase().replace(/[\u2019']/g,'').replace(/[^a-z0-9]+/g,' ').trim(); }
 
   async function fetchJsonOptional(url){
-    try{ const res = await fetch(url, { cache:'no-store' }); return res.ok ? await res.json() : null; }
-    catch(err){ console.warn('[DuoDisplay] Optional load failed:', url, err); return null; }
-  }
-
-  async function loadDuoDisplay(){
-    if(!duoPromise){
-      duoPromise = fetchJsonOptional(DUO_URL).then(json => {
-        const parentCards = json?.parentCards || {};
-        const childSet = new Set();
-        const childToParent = new Map();
-        for(const [parentId, cfg] of Object.entries(parentCards)){
-          for(const childId of (Array.isArray(cfg?.children) ? cfg.children : [])){
-            const child = normId(childId);
-            if(!child) continue;
-            childSet.add(child);
-            if(!childToParent.has(child)) childToParent.set(child, parentId);
-          }
-        }
-        return { raw: json || {}, parentCards, childSet, childToParent };
-      });
+    try{
+      const res = await fetch(url, { cache:'no-store' });
+      if(!res.ok) return null;
+      return await res.json();
+    }catch(err){
+      console.warn('[DuoDisplay] optional JSON skipped:', url, err);
+      return null;
     }
-    return duoPromise;
   }
 
-  function filterDuoChildren(units, duo){
-    if(!Array.isArray(units) || !duo?.childSet?.size) return units;
-    return units.filter(u => !duo.childSet.has(normId(u?.id || u?.sourceId || u?.family)));
+  function makeUF(){
+    const parent = new Map();
+    const find = (x) => {
+      x = normId(x);
+      if(!parent.has(x)) parent.set(x, x);
+      const p = parent.get(x);
+      if(p !== x) parent.set(x, find(p));
+      return parent.get(x);
+    };
+    const union = (a,b) => {
+      a = normId(a); b = normId(b);
+      if(!a || !b) return;
+      const ra = find(a), rb = find(b);
+      if(ra !== rb) parent.set(rb, ra);
+    };
+    return { parent, find, union };
   }
 
-  function scheduleCatalogRender(){
-    if(pageName() !== 'catalog') return;
-    if(renderQueued) return;
-    if(typeof window.render !== 'function') return;
-    renderQueued = true;
-    requestAnimationFrame(() => {
-      renderQueued = false;
-      try{ window.render(); }catch(err){ console.warn('[DuoDisplay] render refresh failed', err); }
-    });
+  function addLinksFromMap(uf, map){
+    if(!map || typeof map !== 'object') return;
+    for(const [parent, kids] of Object.entries(map)){
+      if(!Array.isArray(kids)) continue;
+      for(const kid of kids) uf.union(parent, kid);
+    }
   }
 
-  async function installDataFilter(){
+  function buildDuoData(display, duo){
+    const uf = makeUF();
+    const displayParentCards = display?.parentCards || {};
+    const buttonById = new Map();
+    const groupById = new Map();
+    const explicitChildren = new Set();
+
+    for(const [parent, cfg] of Object.entries(displayParentCards)){
+      const children = Array.isArray(cfg?.children) ? cfg.children : [];
+      if(cfg?.buttonLabel) buttonById.set(parent, cfg.buttonLabel);
+      if(cfg?.group) groupById.set(parent, cfg.group);
+      for(const child of children){
+        uf.union(parent, child);
+        explicitChildren.add(normId(child));
+        if(cfg?.buttonLabel) buttonById.set(normId(child), cfg.buttonLabel);
+        if(cfg?.group) groupById.set(normId(child), cfg.group);
+      }
+    }
+
+    // Broad mechanics: include these so summon/switch/transform helper entries do not show as standalone.
+    addLinksFromMap(uf, duo?.directSpecificLinks);
+    addLinksFromMap(uf, duo?.genericHelperSummons);
+    addLinksFromMap(uf, duo?.enemyImposterExchangeUnits);
+    addLinksFromMap(uf, duo?.selfCloneOrDuplicateUnits);
+
+    const groups = new Map();
+    for(const id of uf.parent.keys()){
+      const root = uf.find(id);
+      if(!groups.has(root)) groups.set(root, new Set());
+      groups.get(root).add(id);
+    }
+
+    const childSet = new Set();
+    for(const [parent, kids] of Object.entries(displayParentCards)){
+      (Array.isArray(kids?.children) ? kids.children : []).forEach(k => childSet.add(normId(k)));
+    }
+    for(const map of [duo?.directSpecificLinks, duo?.genericHelperSummons, duo?.enemyImposterExchangeUnits, duo?.selfCloneOrDuplicateUnits]){
+      if(!map || typeof map !== 'object') continue;
+      for(const kids of Object.values(map)) if(Array.isArray(kids)) kids.forEach(k => childSet.add(normId(k)));
+    }
+
+    return { display: display || {}, duo: duo || {}, groups, childSet, buttonById, groupById, displayParentCards };
+  }
+
+  async function loadDuoData(){
+    if(!dataPromise){
+      dataPromise = Promise.all([fetchJsonOptional(DISPLAY_URL), fetchJsonOptional(DUO_URL)]).then(([display, duo]) => buildDuoData(display, duo));
+    }
+    return dataPromise;
+  }
+
+  function filterDuoChildren(units, data){
+    if(!Array.isArray(units) || !data?.childSet?.size) return units;
+    return units.filter(u => !data.childSet.has(normId(u?.id || u?.sourceId || u?.family)));
+  }
+
+  function installDataFilter(){
     const data = window.EvertaleData;
     if(!data || data.__duoDisplayPatched) return;
     data.__duoDisplayPatched = true;
@@ -66,187 +121,154 @@
       data.loadCharactersMerged = async function(...args){
         const units = await originalMerged.apply(this, args);
         if(pageName() === 'catalog') return units;
-        const duo = await loadDuoDisplay();
-        return filterDuoChildren(units, duo);
+        const duoData = await loadDuoData();
+        return filterDuoChildren(units, duoData);
       };
     }
   }
 
-  function imageUrlsFromCharacter(u){
-    const variants = Array.isArray(u?.imageVariants) ? u.imageVariants.map(v => v && v.url).filter(Boolean) : [];
-    const large = Array.isArray(u?.imagesLarge) ? u.imagesLarge.filter(Boolean) : [];
-    return variants.length ? variants : (large.length ? large : (u?.image ? [u.image] : []));
+  function cardId(card){ return normId(card?.getAttribute('data-id') || card?.getAttribute('data-unit-id') || ''); }
+  function cardName(card){ return card?.querySelector('.unitName')?.textContent?.trim() || ''; }
+  function cardTitle(card){ return card?.querySelector('.unitTitle')?.textContent?.trim() || ''; }
+
+  function cloneCardPayload(card){
+    return {
+      id: cardId(card),
+      html: card.innerHTML,
+      className: card.className,
+      dataKind: card.getAttribute('data-kind') || '',
+      name: cardName(card),
+      title: cardTitle(card),
+    };
   }
 
-  async function loadCharactersForCatalog(){
-    if(characterPromise) return characterPromise;
-    characterPromise = (async () => {
-      let rows = [];
-      try{
-        if(window.EvertaleData?.loadAllEntries){
-          const entries = await window.EvertaleData.loadAllEntries();
-          rows = Array.isArray(entries?.characters) ? entries.characters : [];
-        }
-        if(!rows.length && window.EvertaleData?.loadCharactersMerged) rows = await window.EvertaleData.loadCharactersMerged();
-      }catch(err){ console.warn('[DuoDisplay] Character load fallback failed:', err); }
-      const map = new Map();
-      for(const u of rows || []){
-        const id = normId(u?.id || u?.sourceId || u?.family);
-        if(id && !map.has(id)) map.set(id, u);
-      }
-      return map;
-    })();
-    return characterPromise;
-  }
+  function choosePreferredCard(cards, data){
+    if(!cards.length) return null;
+    if(cards.length === 1) return cards[0];
 
-  function skillMetaText(skill){
-    const parts=[];
-    if(skill && skill.tu !== undefined && skill.tu !== null && skill.tu !== '') parts.push(String(skill.tu)+' TU');
-    const sp = skill ? (skill.sp ?? skill.spirit) : null;
-    if(sp !== undefined && sp !== null && sp !== '') parts.push((Number(sp)>0?'+':'')+String(sp)+' SP');
-    if(skill && skill.targeting) parts.push(String(skill.targeting));
-    return parts.join(' • ');
-  }
-
-  function skillBoxes(title, rows, kindClass){
-    const skills = Array.isArray(rows) ? rows.filter(Boolean) : [];
-    if(!skills.length) return '';
-    return `<div class="panel skillPanel ${safeText(kindClass || '')}"><div class="panelTitle">${safeText(title)}</div><div class="skillBoxList">${skills.map(s => {
-      const name = safeText(s?.name || 'Unnamed');
-      const meta = safeText(skillMetaText(s));
-      const desc = safeText(s?.description || '').replace(/\n/g,'<br>');
-      return `<div class="skillBox"><div class="skillBoxHead"><strong>${name}</strong>${meta?`<span>${meta}</span>`:''}</div>${desc?`<div class="skillBoxText">${desc}</div>`:''}</div>`;
-    }).join('')}</div></div>`;
-  }
-
-  function normalizeElementDisplay(el){ const raw = String(el || '').trim(); return raw ? raw.replace(/[_-]+/g,' ').replace(/\b\w/g,c=>c.toUpperCase()) : ''; }
-
-  function updateCatalogCard(card, unit){
-    if(!card || !unit) return;
-    const name = unit.name || unit.id || '';
-    const title = unit.title || unit.subtitle || '';
-    const imgs = imageUrlsFromCharacter(unit);
-    const imgUrl = imgs[0] || unit.image || '';
-    const thumb = card.querySelector('.unitThumb');
-    if(thumb) thumb.innerHTML = imgUrl ? `<img src="${safeText(imgUrl)}" alt="${safeText(name)}" loading="lazy" decoding="async">` : `<div class="ph">?</div>`;
-    const nameEl = card.querySelector('.unitName'); if(nameEl) nameEl.textContent = name;
-    const titleEl = card.querySelector('.unitTitle'); if(titleEl) titleEl.textContent = title;
-    const chipCol = card.querySelector('.chipCol');
-    if(chipCol) chipCol.innerHTML = `<span class="tag kind">Character</span>${unit.element?`<span class="tag element">${safeText(normalizeElementDisplay(unit.element))}</span>`:''}${unit.rarity?`<span class="tag rarity">${safeText(unit.rarity)}</span>`:''}`;
-    const statLine = card.querySelector('.statLine');
-    const atk = unit.atk ?? unit.stats?.atk ?? '', hp = unit.hp ?? unit.stats?.hp ?? '', spd = unit.spd ?? unit.stats?.spd ?? '', cost = unit.cost ?? unit.stats?.cost ?? '';
-    if(statLine){
-      const parts=[];
-      if(atk !== '' && atk != null) parts.push(`<div class="stat"><span class="statLabel">ATK</span><span class="statVal">${safeText(atk)}</span></div>`);
-      if(hp !== '' && hp != null) parts.push(`<div class="stat"><span class="statLabel">HP</span><span class="statVal">${safeText(hp)}</span></div>`);
-      if(spd !== '' && spd != null) parts.push(`<div class="stat"><span class="statLabel">SPD</span><span class="statVal">${safeText(spd)}</span></div>`);
-      if(cost !== '' && cost != null) parts.push(`<div class="stat"><span class="statLabel">COST</span><span class="statVal">${safeText(cost)}</span></div>`);
-      statLine.innerHTML = parts.join('');
+    // Prefer combined/compound cards such as Beauty & Beast over individual cards.
+    let best = null;
+    let bestScore = -Infinity;
+    for(const card of cards){
+      const id = cardId(card);
+      const name = normName(cardName(card));
+      const title = normName(cardTitle(card));
+      const group = normName(data.groupById.get(id) || '');
+      let score = 0;
+      if(/[&]/.test(cardName(card)) || /\band\b/.test(name)) score += 100;
+      if(/beauty.*beast|beast.*beauty/.test(id.toLowerCase()) || /beauty.*beast|beast.*beauty/.test(name)) score += 90;
+      if(/snowwhite|snow white/.test(id.toLowerCase()) || /snow white/.test(name)) score += 70;
+      if(/new|bride|regular/.test(id.toLowerCase())) score += 8;
+      if(group && (group.includes(name) || name.includes(group.split(' ')[0] || ''))) score += 5;
+      if(title.includes('pair') || title.includes('duo')) score += 20;
+      if(score > bestScore){ bestScore = score; best = card; }
     }
-    const leaderName = card.querySelector('.leaderName'); if(leaderName) leaderName.textContent = unit.leaderSkill?.name || 'No Leader Skill';
-    const leaderDesc = card.querySelector('.leaderDesc'); if(leaderDesc) leaderDesc.textContent = unit.leaderSkill?.description || 'This unit does not provide a leader skill.';
-    const descText = card.querySelector('.descriptionText'); if(descText) descText.textContent = unit.description || unit.flavorText || '';
-    const details = card.querySelector('.unitDetails');
-    if(details){
-      details.querySelectorAll('.activeSkillPanel,.passiveSkillPanel').forEach(el => el.remove());
-      details.insertAdjacentHTML('beforeend', skillBoxes('Active Skills', unit.activeSkills, 'activeSkillPanel'));
-      details.insertAdjacentHTML('beforeend', skillBoxes('Passive Skills', unit.passiveSkillDetails, 'passiveSkillPanel'));
-    }
+    return best || cards[0];
   }
 
-  async function applyCatalogDuoState(){
+  function buttonLabelFor(ids, data){
+    for(const id of ids){
+      const label = data.buttonById.get(id);
+      if(label) return label;
+    }
+    return 'Forms';
+  }
+
+  function installButton(parentCard, payloads, label){
+    if(parentCard.querySelector('.duoFormBtn')) return;
+    const ids = payloads.map(p => p.id).filter(Boolean);
+    parentCard.setAttribute('data-duo-parent', 'true');
+    parentCard.setAttribute('data-duo-index', '0');
+    parentCard.setAttribute('data-duo-ids', JSON.stringify(ids));
+    window.__duoPayloads = window.__duoPayloads || new Map();
+    window.__duoPayloads.set(cardId(parentCard), payloads);
+
+    const host = parentCard.querySelector('.metaMain') || parentCard.querySelector('.metaHeader') || parentCard.querySelector('.meta') || parentCard;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'duoFormBtn';
+    btn.textContent = label;
+    btn.addEventListener('click', evt => {
+      evt.preventDefault();
+      evt.stopPropagation();
+      const parentId = cardId(parentCard) || ids[0];
+      const list = window.__duoPayloads?.get(parentId) || payloads;
+      if(!list.length) return;
+      let idx = Number.parseInt(parentCard.getAttribute('data-duo-index') || '0', 10);
+      idx = (Number.isFinite(idx) ? idx + 1 : 1) % list.length;
+      const chosen = list[idx];
+      const keepBtn = btn;
+      parentCard.innerHTML = chosen.html;
+      parentCard.className = chosen.className;
+      parentCard.setAttribute('data-duo-parent', 'true');
+      parentCard.setAttribute('data-duo-index', String(idx));
+      parentCard.setAttribute('data-duo-ids', JSON.stringify(ids));
+      const newHost = parentCard.querySelector('.metaMain') || parentCard.querySelector('.metaHeader') || parentCard.querySelector('.meta') || parentCard;
+      keepBtn.textContent = `${label} ${idx + 1}/${list.length}`;
+      newHost.appendChild(keepBtn);
+    });
+    host.appendChild(btn);
+  }
+
+  async function collapseCatalogCards(){
     if(pageName() !== 'catalog') return;
-    const st = window.state;
-    if(!st || !Array.isArray(st.items)) return;
-    const duo = await loadDuoDisplay();
-    if(!duo?.childSet?.size) return;
-    let changed = false;
-    for(const item of st.items){
-      if(item?.kind !== 'characters') continue;
-      const id = normId(item.id || item.sourceId || item.family);
-      if(duo.childSet.has(id) && !item.__duoHiddenChild){ item.__duoHiddenChild = true; changed = true; }
-      const cfg = duo.parentCards[id];
-      if(cfg && !item.__duoParent){
-        item.__duoParent = true;
-        item.duoChildren = Array.isArray(cfg.children) ? cfg.children.slice() : [];
-        item.duoGroup = cfg.group || '';
-        item.duoButtonLabel = cfg.buttonLabel || 'Forms';
-        changed = true;
-      }
-    }
-    if(changed) scheduleCatalogRender();
-  }
-
-  async function enhanceCatalog(){
-    if(pageName() !== 'catalog') return;
-    await applyCatalogDuoState();
     const grid = document.getElementById('catalogGrid');
     if(!grid) return;
-    const duo = await loadDuoDisplay();
-    const characters = await loadCharactersForCatalog();
-    grid.querySelectorAll('.unitCard[data-kind="characters"]').forEach(card => {
-      const id = normId(card.getAttribute('data-id'));
-      if(duo.childSet.has(id)){
-        card.hidden = true;
-        card.style.display = 'none';
-        card.setAttribute('data-duo-hidden-child','true');
-        return;
+    const data = await loadDuoData();
+    const allCards = Array.from(grid.querySelectorAll('.unitCard[data-kind="characters"]'));
+    if(!allCards.length) return;
+
+    const cardsById = new Map();
+    for(const card of allCards){
+      const id = cardId(card);
+      if(id) cardsById.set(id, card);
+      card.hidden = false;
+      card.style.display = '';
+      card.removeAttribute('data-duo-hidden-child');
+    }
+
+    const used = new Set();
+    for(const groupSet of data.groups.values()){
+      const ids = Array.from(groupSet).filter(Boolean);
+      const cards = ids.map(id => cardsById.get(id)).filter(Boolean);
+      if(cards.length < 2) continue;
+      if(cards.some(c => used.has(c))) continue;
+      const parent = choosePreferredCard(cards, data);
+      if(!parent) continue;
+      const parentId = cardId(parent);
+      const ordered = [parent, ...cards.filter(c => c !== parent)];
+      const payloads = ordered.map(cloneCardPayload);
+      const label = buttonLabelFor(ids, data);
+      for(const card of cards){
+        used.add(card);
+        if(card !== parent){
+          card.hidden = true;
+          card.style.display = 'none';
+          card.setAttribute('data-duo-hidden-child','true');
+        }
       }
-      const cfg = duo.parentCards[id];
-      if(!cfg || !Array.isArray(cfg.children) || !cfg.children.length) return;
-      if(card.querySelector('.duoFormBtn')) return;
-      const forms = [id, ...cfg.children].filter(Boolean);
-      card.setAttribute('data-duo-parent','true');
-      const host = card.querySelector('.metaMain') || card.querySelector('.metaHeader') || card.querySelector('.meta');
-      if(!host) return;
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'duoFormBtn';
-      btn.textContent = cfg.buttonLabel || 'Forms';
-      btn.title = cfg.group || 'Linked forms';
-      btn.addEventListener('click', evt => {
-        evt.preventDefault(); evt.stopPropagation();
-        let idx = Number.parseInt(card.getAttribute('data-duo-index') || '0', 10);
-        idx = (Number.isFinite(idx) ? idx + 1 : 1) % forms.length;
-        card.setAttribute('data-duo-index', String(idx));
-        updateCatalogCard(card, characters.get(forms[idx]));
-        btn.textContent = `${cfg.buttonLabel || 'Forms'} ${idx + 1}/${forms.length}`;
-      });
-      host.appendChild(btn);
-    });
+      installButton(parent, payloads, label);
+      parent.setAttribute('data-duo-root-id', parentId);
+    }
   }
 
-  function patchCatalogRendererWhenReady(){
+  function scheduleCollapse(){
     if(pageName() !== 'catalog') return;
-    const tryPatch = () => {
-      if(typeof window.render !== 'function' || !window.state || window.__duoRenderPatched) return false;
-      window.__duoRenderPatched = true;
-      const originalRender = window.render;
-      window.render = function(...args){
-        if(window.state && Array.isArray(window.state.items)){
-          window.state.items.forEach(item => { if(item?.__duoHiddenChild) item.__duoWasHidden = true; });
-        }
-        return originalRender.apply(this, args);
-      };
-      applyCatalogDuoState().then(() => enhanceCatalog());
-      return true;
-    };
-    if(!tryPatch()){
-      const timer = setInterval(() => { if(tryPatch()) clearInterval(timer); }, 100);
-      setTimeout(() => clearInterval(timer), 8000);
-    }
+    clearTimeout(renderTimer);
+    renderTimer = setTimeout(() => collapseCatalogCards().catch(err => console.warn('[DuoDisplay] collapse failed:', err)), 80);
   }
 
   function installCatalogObserver(){
     if(pageName() !== 'catalog') return;
-    const run = () => enhanceCatalog().catch(err => console.warn('[DuoDisplay] Catalog enhance failed:', err));
     document.addEventListener('DOMContentLoaded', () => {
-      patchCatalogRendererWhenReady();
-      run();
+      scheduleCollapse();
       const grid = document.getElementById('catalogGrid');
       if(!grid) return;
-      const obs = new MutationObserver(() => run());
-      obs.observe(grid, { childList:true });
+      const obs = new MutationObserver(() => scheduleCollapse());
+      obs.observe(grid, { childList:true, subtree:false });
+      document.getElementById('catalogSearch')?.addEventListener('input', scheduleCollapse);
+      document.getElementById('catalogType')?.addEventListener('change', scheduleCollapse);
+      document.getElementById('catalogSort')?.addEventListener('change', scheduleCollapse);
     });
   }
 
@@ -254,12 +276,12 @@
     if(document.getElementById('duoDisplayStyle')) return;
     const style = document.createElement('style');
     style.id = 'duoDisplayStyle';
-    style.textContent = `.duoFormBtn{margin-top:6px;justify-self:start;align-self:start;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.065);color:var(--text,#f6f7ff);border-radius:999px;padding:5px 9px;font-size:11px;font-weight:850;cursor:pointer}.duoFormBtn:hover{background:rgba(255,255,255,.12)}.unitCard[data-duo-parent="true"]{outline:1px solid rgba(109,231,183,.14)}.unitCard[data-duo-hidden-child="true"]{display:none!important}`;
+    style.textContent = `.duoFormBtn{margin-top:6px;justify-self:start;align-self:start;border:1px solid rgba(255,255,255,.22);background:rgba(28,224,154,.12);color:var(--text,#f6f7ff);border-radius:999px;padding:5px 9px;font-size:11px;font-weight:900;cursor:pointer}.duoFormBtn:hover{background:rgba(28,224,154,.2)}.unitCard[data-duo-parent="true"]{outline:1px solid rgba(28,224,154,.35)}.unitCard[data-duo-hidden-child="true"]{display:none!important}`;
     document.head.appendChild(style);
   }
 
   injectStyle();
   installDataFilter();
   installCatalogObserver();
-  window.EvertaleDuoDisplay = { load: loadDuoDisplay, filterDuoChildren };
+  window.EvertaleDuoDisplay = { load: loadDuoData, filterDuoChildren };
 })();
