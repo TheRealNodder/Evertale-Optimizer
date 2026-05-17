@@ -1,42 +1,50 @@
 /* catalog-duo.js — post-render collapse for duo/summon/switch/transform catalog cards.
-   Runs after catalog.js/catalog-sort.js and maps APK source IDs to rendered catalog IDs.
+   Runs after catalog.js/catalog-sort.js and maps APK source IDs to rendered catalog family IDs.
 */
 (function(){
   const DISPLAY_URL='./apkfiles/DuoDisplay.json';
   const DUO_URL='./apkfiles/Duo.json';
-  const BUNDLE_URL='./apkfiles/entries/bundles/characters.bundle.json';
+  const FAMILY_BUNDLE_URL='./apkfiles/entries/bundles/character_families.bundle.json';
   let dataPromise=null;
   let busy=false;
   let timer=null;
 
   function norm(v){return String(v||'').trim();}
   function scoreText(v){return String(v||'').toLowerCase();}
+  function stripFormSuffix(v){return norm(v).replace(/\d+$/,'');}
   function makeUF(){const p=new Map();const f=x=>{x=norm(x);if(!p.has(x))p.set(x,x);const r=p.get(x);if(r!==x)p.set(x,f(r));return p.get(x)};return{p,find:f,union:(a,b)=>{a=norm(a);b=norm(b);if(!a||!b)return;const ra=f(a),rb=f(b);if(ra!==rb)p.set(rb,ra)}}}
   async function j(url){try{const r=await fetch(url,{cache:'no-store'});return r.ok?await r.json():null}catch{return null}}
 
   function addAlias(alias, key, value){key=norm(key);value=norm(value);if(key&&value&&!alias.has(key))alias.set(key,value)}
   function buildAlias(bundle){
     const alias=new Map();
-    const rows=Array.isArray(bundle?.entries)?bundle.entries:(Array.isArray(bundle?.characters)?bundle.characters:[]);
+    const rows=Array.isArray(bundle?.entries)?bundle.entries:[];
     for(const row of rows){
-      const id=norm(row?.id);
-      if(!id)continue;
-      addAlias(alias,row?.id,id);
-      addAlias(alias,row?.sourceId,id);
-      addAlias(alias,row?.family,id);
-      addAlias(alias,row?.internal?.sourceId,id);
-      addAlias(alias,row?.internal?.family,id);
-      addAlias(alias,row?.raw?.name,id);
-      addAlias(alias,row?.raw?.family,id);
+      const family=norm(row?.family);
+      if(!family)continue;
+      addAlias(alias,family,family);
+      addAlias(alias,row?.name,family);
+      addAlias(alias,row?.image?.split('/').pop()?.replace(/\.png$/i,''),family);
+      (Array.isArray(row?.rawFormSourceIds)?row.rawFormSourceIds:[]).forEach(src=>{
+        addAlias(alias,src,family);
+        addAlias(alias,stripFormSuffix(src),family);
+      });
+      (Array.isArray(row?.states)?row.states:[]).forEach(st=>{
+        addAlias(alias,st?.sourceId,family);
+        addAlias(alias,st?.dataSourceId,family);
+        addAlias(alias,stripFormSuffix(st?.sourceId),family);
+        addAlias(alias,stripFormSuffix(st?.dataSourceId),family);
+        addAlias(alias,st?.name,family);
+      });
     }
     return alias;
   }
-  function canonical(alias,id){id=norm(id);return alias.get(id)||id}
+  function canonical(alias,id){id=norm(id);return alias.get(id)||alias.get(stripFormSuffix(id))||id}
   function addMap(uf,map,alias){if(!map||typeof map!=='object')return;for(const [a,bs] of Object.entries(map)){if(Array.isArray(bs))bs.forEach(b=>uf.union(canonical(alias,a),canonical(alias,b)));}}
 
   async function load(){
     if(dataPromise)return dataPromise;
-    dataPromise=Promise.all([j(DISPLAY_URL),j(DUO_URL),j(BUNDLE_URL)]).then(([display,duo,bundle])=>{
+    dataPromise=Promise.all([j(DISPLAY_URL),j(DUO_URL),j(FAMILY_BUNDLE_URL)]).then(([display,duo,bundle])=>{
       const alias=buildAlias(bundle);
       const uf=makeUF();
       const label=new Map();
@@ -67,7 +75,7 @@
   function cardName(c){return c?.querySelector('.unitName')?.textContent?.trim()||'';}
   function cardTitle(c){return c?.querySelector('.unitTitle')?.textContent?.trim()||'';}
   function payload(c){return{id:cardId(c),html:c.innerHTML,className:c.className,kind:c.getAttribute('data-kind')||'',name:cardName(c),title:cardTitle(c)}}
-  function parentScore(c){const id=scoreText(cardId(c));const name=scoreText(cardName(c));const title=scoreText(cardTitle(c));const all=`${id} ${name} ${title}`;let s=0;if(/beauty-beast|beautybeast|beauty.*beast|beast.*beauty|beauty\s*&\s*beast/.test(all))s+=1000;if(/snow-white|snowwhitenew|snow white/.test(all)&&!/black/.test(all))s+=800;if(/regular|new|bride/.test(id))s+=50;if(/&| and /.test(name))s+=90;if(/minion|imposter|clone|rabbit|angel|raven|shadow|doll|summon|shiromori|belle|aigis/.test(all))s-=300;return s;}
+  function parentScore(c){const id=scoreText(cardId(c));const name=scoreText(cardName(c));const title=scoreText(cardTitle(c));const all=`${id} ${name} ${title}`;let s=0;if(/beautybeastregular|beauty.*beast|beast.*beauty|beauty\s*&\s*beast/.test(all))s+=1000;if(/snowwhitenew|snow white/.test(all)&&!/black/.test(all))s+=800;if(/regular|new|bride/.test(id))s+=50;if(/&| and /.test(name))s+=90;if(/minion|imposter|clone|rabbit|angel|raven|shadow|doll|summon|shiromori|belle|aigis/.test(all))s-=300;return s;}
   function choose(cards){return cards.slice().sort((a,b)=>parentScore(b)-parentScore(a))[0]||cards[0];}
   function firstLabel(ids,data){for(const id of ids){const l=data.label.get(norm(id));if(l)return l;}return'Forms';}
   function installBtn(parent,payloads,label){
