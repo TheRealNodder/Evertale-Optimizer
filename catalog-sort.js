@@ -110,6 +110,12 @@
       const kr = kindRank(a.card) - kindRank(b.card);
       if(kr) return kr;
 
+      // Characters are already sorted by data-loader + duo-source-collapse.
+      // Re-sorting by the visible parent ID moves merged cards back to the wrong slot.
+      if(kind(a.card) === 'characters' && kind(b.card) === 'characters'){
+        return mode === 'oldest' ? originalIndex(b.card) - originalIndex(a.card) : originalIndex(a.card) - originalIndex(b.card);
+      }
+
       const ao = Number.isFinite(a.order) ? a.order : null;
       const bo = Number.isFinite(b.order) ? b.order : null;
       if(ao !== null && bo !== null && ao !== bo){
