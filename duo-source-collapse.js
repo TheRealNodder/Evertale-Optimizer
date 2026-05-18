@@ -1,6 +1,7 @@
 /* duo-source-collapse.js — collapse linked summon/switch/transform entries before pages render.
    This patches EvertaleData so catalog/roster/optimizer receive parent-only character pools.
    Direct links are connected groups. Summon/helper/imposter/clone links are parent-scoped groups.
+   Merged cards keep the earliest order slot from any linked unit.
 */
 (function(){
   const DISPLAY_URL='./apkfiles/DuoDisplay.json';
@@ -49,17 +50,51 @@
 
   async function collapse(units){
     if(!Array.isArray(units)||!units.length)return units;
-    const data=await buildDuoData(units);const byId=new Map(units.map(u=>[norm(u.id),u]).filter(([id])=>id));const hidden=new Set();const formMap=new Map();const meta=new Map();
-    for(const g of data.groups){const items=(g.ids||[]).map(id=>byId.get(norm(id))).filter(Boolean);if(items.length<2)continue;const parent=choose(items);if(!parent)continue;const ordered=[parent,...items.filter(u=>u.id!==parent.id)];const label=ordered.map(u=>data.labels.get(u.id)).find(Boolean)||g.label||'Forms';
+    const data=await buildDuoData(units);
+    const byId=new Map(units.map((u,idx)=>[norm(u.id),{u,idx}]).filter(([id])=>id));
+    const hidden=new Set();const formMap=new Map();const meta=new Map();const placement=new Map();
+
+    for(const g of data.groups){
+      const records=(g.ids||[]).map(id=>byId.get(norm(id))).filter(Boolean);
+      const items=records.map(r=>r.u);
+      if(items.length<2)continue;
+      const parent=choose(items);
+      if(!parent)continue;
+      const ordered=[parent,...items.filter(u=>u.id!==parent.id)];
+      const earliest=Math.min(...records.map(r=>r.idx));
+      const label=ordered.map(u=>data.labels.get(u.id)).find(Boolean)||g.label||'Forms';
       if(formMap.has(parent.id)){
-        const existing=formMap.get(parent.id);const seen=new Set(existing.map(u=>u.id));ordered.forEach(u=>{if(!seen.has(u.id)){existing.push(u);seen.add(u.id)}});meta.set(parent.id,{label:meta.get(parent.id)?.label||label,ids:existing.map(u=>u.id)});
+        const existing=formMap.get(parent.id);const seen=new Set(existing.map(u=>u.id));
+        ordered.forEach(u=>{if(!seen.has(u.id)){existing.push(u);seen.add(u.id)}});
+        const current=meta.get(parent.id)||{};
+        meta.set(parent.id,{label:current.label||label,ids:existing.map(u=>u.id)});
+        placement.set(parent.id,Math.min(placement.get(parent.id)??earliest,earliest));
       }else{
-        formMap.set(parent.id,ordered);meta.set(parent.id,{label,ids:ordered.map(u=>u.id)});
+        formMap.set(parent.id,ordered);
+        meta.set(parent.id,{label,ids:ordered.map(u=>u.id)});
+        placement.set(parent.id,earliest);
       }
       ordered.forEach(u=>{if(u.id!==parent.id)hidden.add(u.id)});
     }
-    const out=[];const formsByRoot=new Map();
-    for(const u of units){if(hidden.has(u.id))continue;const m=meta.get(u.id);if(m){const forms=formMap.get(u.id)||[u];formsByRoot.set(u.id,forms);out.push({...u,duoRootId:u.id,duoForms:m.ids,duoButtonLabel:m.label,duoSearchText:forms.map(f=>`${f.name||''} ${f.title||f.subtitle||''} ${f.id||''} ${f.sourceId||''}`).join(' ')})}else out.push(u)}
+
+    const outputAt=new Map();const formsByRoot=new Map();
+    for(const [parentId,m] of meta.entries()){
+      const forms=formMap.get(parentId)||[];
+      const parent=forms[0];
+      if(!parent)continue;
+      formsByRoot.set(parentId,forms);
+      const merged={...parent,duoRootId:parentId,duoForms:m.ids,duoButtonLabel:m.label,duoSearchText:forms.map(f=>`${f.name||''} ${f.title||f.subtitle||''} ${f.id||''} ${f.sourceId||''}`).join(' ')};
+      outputAt.set(placement.get(parentId)??0,merged);
+    }
+
+    const out=[];
+    for(let idx=0;idx<units.length;idx++){
+      if(outputAt.has(idx)) out.push(outputAt.get(idx));
+      const u=units[idx];
+      if(hidden.has(u.id))continue;
+      if(meta.has(u.id))continue;
+      out.push(u);
+    }
     window.EvertaleDuoSource={formsByRoot};return out;
   }
 
