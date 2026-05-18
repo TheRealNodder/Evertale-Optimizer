@@ -1,5 +1,6 @@
 /* duo-source-collapse.js — collapse linked summon/switch/transform entries before pages render.
    This patches EvertaleData so catalog/roster/optimizer receive parent-only character pools.
+   Direct links are connected groups. Summon/helper/imposter/clone links are parent-scoped groups.
 */
 (function(){
   const DISPLAY_URL='./apkfiles/DuoDisplay.json';
@@ -17,6 +18,15 @@
   function aliasUnit(map,u){const root=norm(u?.id||u?.family||u?.sourceId);if(!root)return;[u?.id,u?.family,u?.sourceId,strip(u?.sourceId),strip(u?.family)].forEach(k=>addAlias(map,k,root));(u?.formSourceIds||[]).forEach(k=>{addAlias(map,k,root);addAlias(map,strip(k),root)});(u?.forms||[]).forEach(f=>[f?.sourceId,f?.dataSourceId,f?.imageSourceId,strip(f?.sourceId),strip(f?.dataSourceId)].forEach(k=>addAlias(map,k,root)));(u?.imageVariants||[]).forEach(f=>[f?.sourceId,f?.dataSourceId,f?.imageSourceId,strip(f?.sourceId),strip(f?.dataSourceId)].forEach(k=>addAlias(map,k,root)));}
   function canon(alias,id){id=norm(id);return alias.get(id)||alias.get(strip(id))||id}
   function addConnected(U,map,alias){if(!map)return;for(const [a,bs] of Object.entries(map)){if(Array.isArray(bs))bs.forEach(b=>U.union(canon(alias,a),canon(alias,b)))}}
+  function addDirected(out,map,alias,label){
+    if(!map)return;
+    for(const [a,bs] of Object.entries(map)){
+      if(!Array.isArray(bs)||!bs.length)continue;
+      const ids=[canon(alias,a),...bs.map(b=>canon(alias,b))].filter(Boolean);
+      const unique=[...new Set(ids)];
+      if(unique.length>1)out.push({ids:unique,label});
+    }
+  }
   function score(u){const all=`${u?.id||''} ${u?.sourceId||''} ${u?.name||''} ${u?.title||u?.subtitle||''}`.toLowerCase();let s=0;if(/beautybeastregular|beauty.*beast|beauty\s*&\s*beast/.test(all))s+=1000;if(/snowwhitenew|snow white/.test(all)&&!/black/.test(all))s+=800;if(/regular|new|bride/.test(String(u?.id||'').toLowerCase()))s+=50;if(/&| and /.test(String(u?.name||'').toLowerCase()))s+=90;if(/minion|imposter|clone|rabbit|angel|raven|shadow|doll|summon|shiromori|belle|aigis/.test(all))s-=300;return s}
   function choose(items){return items.slice().sort((a,b)=>score(b)-score(a))[0]||items[0]}
 
@@ -28,13 +38,26 @@
     addConnected(U,duo?.directSpecificLinks,alias);
     const byRoot=new Map();for(const id of U.p.keys()){const r=U.find(id);if(!byRoot.has(r))byRoot.set(r,new Set());byRoot.get(r).add(id)}
     for(const set of byRoot.values()){const ids=[...set].filter(Boolean);if(ids.length>1)groups.push({ids,label:null})}
+
+    // Parent-scoped helpers: attach summons/helpers to their summoner card without unioning shared helpers globally.
+    addDirected(groups,duo?.genericHelperSummons,alias,'Summon');
+    addDirected(groups,duo?.enemyImposterExchangeUnits,alias,'Exchange');
+    addDirected(groups,duo?.selfCloneOrDuplicateUnits,alias,'Clone');
+
     return{groups,labels};
   }
 
   async function collapse(units){
     if(!Array.isArray(units)||!units.length)return units;
     const data=await buildDuoData(units);const byId=new Map(units.map(u=>[norm(u.id),u]).filter(([id])=>id));const hidden=new Set();const formMap=new Map();const meta=new Map();
-    for(const g of data.groups){const items=(g.ids||[]).map(id=>byId.get(norm(id))).filter(Boolean);if(items.length<2)continue;const parent=choose(items);if(!parent||hidden.has(parent.id))continue;const ordered=[parent,...items.filter(u=>u.id!==parent.id)];const label=ordered.map(u=>data.labels.get(u.id)).find(Boolean)||g.label||'Forms';formMap.set(parent.id,ordered);meta.set(parent.id,{label,ids:ordered.map(u=>u.id)});ordered.forEach(u=>{if(u.id!==parent.id)hidden.add(u.id)})}
+    for(const g of data.groups){const items=(g.ids||[]).map(id=>byId.get(norm(id))).filter(Boolean);if(items.length<2)continue;const parent=choose(items);if(!parent)continue;const ordered=[parent,...items.filter(u=>u.id!==parent.id)];const label=ordered.map(u=>data.labels.get(u.id)).find(Boolean)||g.label||'Forms';
+      if(formMap.has(parent.id)){
+        const existing=formMap.get(parent.id);const seen=new Set(existing.map(u=>u.id));ordered.forEach(u=>{if(!seen.has(u.id)){existing.push(u);seen.add(u.id)}});meta.set(parent.id,{label:meta.get(parent.id)?.label||label,ids:existing.map(u=>u.id)});
+      }else{
+        formMap.set(parent.id,ordered);meta.set(parent.id,{label,ids:ordered.map(u=>u.id)});
+      }
+      ordered.forEach(u=>{if(u.id!==parent.id)hidden.add(u.id)});
+    }
     const out=[];const formsByRoot=new Map();
     for(const u of units){if(hidden.has(u.id))continue;const m=meta.get(u.id);if(m){const forms=formMap.get(u.id)||[u];formsByRoot.set(u.id,forms);out.push({...u,duoRootId:u.id,duoForms:m.ids,duoButtonLabel:m.label,duoSearchText:forms.map(f=>`${f.name||''} ${f.title||f.subtitle||''} ${f.id||''} ${f.sourceId||''}`).join(' ')})}else out.push(u)}
     window.EvertaleDuoSource={formsByRoot};return out;
