@@ -6,130 +6,201 @@
   <title>Evertale Optimizer • Stat System Test</title>
   <link rel="stylesheet" href="./style.css?v=1770583861" />
   <style>
-    body{background:#12081f;color:#f6f7ff;font-family:Inter,Arial,sans-serif}
-    .wrap{max-width:1200px;margin:24px auto;padding:16px}
-    .panel{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:18px}
+    :root{--bg:#12081f;--panel:rgba(255,255,255,.055);--panel2:rgba(255,255,255,.04);--line:rgba(255,255,255,.12);--cyan:#35f7ff;--purple:#8d57ff;--gold:#f5d36a}
+    body{background:var(--bg);color:#f6f7ff;font-family:Inter,Arial,sans-serif}
+    .wrap{max-width:1260px;margin:24px auto;padding:16px}
+    .panel{background:var(--panel);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:18px;margin-bottom:18px}
     .hero{display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap}
     .hero img{width:260px;max-width:100%;border-radius:16px;border:1px solid rgba(255,255,255,.1)}
-    .stats{display:grid;grid-template-columns:repeat(4,minmax(90px,1fr));gap:12px;margin-top:16px}
+    .stats{display:grid;grid-template-columns:repeat(5,minmax(90px,1fr));gap:12px;margin-top:16px}
     .stat{background:rgba(255,255,255,.06);padding:12px;border-radius:12px;text-align:center}
-    .label{font-size:12px;opacity:.7}
+    .label{font-size:12px;opacity:.7;text-transform:uppercase;letter-spacing:.04em}
     .value{font-size:22px;font-weight:800}
-    .controls{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:22px}
-    .sliderWrap,.awakeningWrap{background:rgba(255,255,255,.04);padding:16px;border-radius:14px}
+    .controls{display:grid;grid-template-columns:repeat(3,minmax(220px,1fr));gap:14px;margin-top:22px}
+    .box{background:var(--panel2);padding:16px;border-radius:14px;border:1px solid rgba(255,255,255,.07)}
     input[type=range]{width:100%}
+    input[type=number]{width:90px;background:rgba(0,0,0,.22);border:1px solid var(--line);border-radius:8px;color:#fff;padding:7px}
+    select{background:rgba(0,0,0,.22);border:1px solid var(--line);border-radius:8px;color:#fff;padding:7px;width:100%}
     .awakeningBtns{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
     .awkBtn{padding:10px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:#fff;cursor:pointer;font-weight:700}
-    .awkBtn.active{background:#8d57ff;border-color:#b79cff}
-    .muted{opacity:.7;font-size:14px;line-height:1.5}
+    .awkBtn.active{background:var(--purple);border-color:#b79cff}
+    .muted{opacity:.76;font-size:14px;line-height:1.5}
     .leader{margin-top:18px;background:rgba(141,87,255,.12);border:1px solid rgba(141,87,255,.3);padding:14px;border-radius:14px}
     .leader strong{display:block;margin-bottom:6px}
-    @media(max-width:700px){.controls{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,minmax(90px,1fr))}}
+    .smallGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+    .row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:8px 0}
+    .pill{display:inline-block;padding:4px 8px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.05);font-size:12px}
+    .formula{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:rgba(0,0,0,.24);border:1px solid var(--line);border-radius:12px;padding:12px;white-space:pre-wrap;line-height:1.45}
+    .warn{color:#ffe28a}.cyan{color:var(--cyan)}.gold{color:var(--gold)}
+    table{width:100%;border-collapse:collapse;margin-top:10px}td,th{border-bottom:1px solid rgba(255,255,255,.08);padding:8px;text-align:left}th{opacity:.8;font-size:12px;text-transform:uppercase}
+    @media(max-width:900px){.controls{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,minmax(90px,1fr))}}
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="panel">
-      <h1>Kintaro Stat System Prototype</h1>
-      <p class="muted">Isolated testing page. This does not modify the live optimizer. Current calculations use raw APK base stats, evolution stats, awakening boosts, and prototype level interpolation while the exact hidden runtime growth formula is still being researched.</p>
+      <h1>Kintaro Stat + Power Modifier Prototype</h1>
+      <p class="muted">Isolated testing page. This adds the newly confirmed APK findings: flat passive stat boosts, relationship/awakening scalars, boost/potential controls, and mastery as a combat-time power modifier layer.</p>
 
       <div class="hero">
-        <img id="portrait" src="https://ik.imagekit.io/r8fsa98s9/characters/KintaroRegular01.png" alt="Kintaro">
-
+        <img src="https://ik.imagekit.io/r8fsa98s9/characters/KintaroRegular02.png" alt="Kintaro">
         <div style="flex:1;min-width:260px;">
-          <h2 id="unitName">Kintaro</h2>
+          <h2>Kintaro <span class="pill">Earth • Axe • 6★</span></h2>
           <div>Sugar, Spice, and Brute Force</div>
-
-          <div class="leader">
-            <strong>Leader Skill — Earth HP Up</strong>
-            <div>Increases HP for Earth allies. Tier D.</div>
-          </div>
-
+          <div class="leader"><strong>Extracted passives</strong><div>PlusHPBoostLv3, PlusAttackBoostLv3, AirMinusDamageLv3, AddWeaponPrefMace</div></div>
           <div class="stats">
-            <div class="stat">
-              <div class="label">ATK</div>
-              <div class="value" id="atkVal">928</div>
-            </div>
-            <div class="stat">
-              <div class="label">HP</div>
-              <div class="value" id="hpVal">6570</div>
-            </div>
-            <div class="stat">
-              <div class="label">SPD</div>
-              <div class="value" id="spdVal">267</div>
-            </div>
-            <div class="stat">
-              <div class="label">POWER</div>
-              <div class="value" id="powerVal">7498</div>
-            </div>
+            <div class="stat"><div class="label">ATK</div><div class="value" id="atkVal">0</div></div>
+            <div class="stat"><div class="label">HP</div><div class="value" id="hpVal">0</div></div>
+            <div class="stat"><div class="label">SPD</div><div class="value" id="spdVal">267</div></div>
+            <div class="stat"><div class="label">Raw Power</div><div class="value" id="powerVal">0</div></div>
+            <div class="stat"><div class="label">Effective Power</div><div class="value" id="effectiveVal">0</div></div>
           </div>
         </div>
       </div>
 
       <div class="controls">
-        <div class="sliderWrap">
-          <h3>Level</h3>
-          <input id="levelSlider" type="range" min="1" max="200" value="200">
-          <div style="margin-top:10px;font-size:20px;font-weight:800;">Lv <span id="levelText">200</span></div>
-        </div>
-
-        <div class="awakeningWrap">
-          <h3>Awakening</h3>
-          <div class="awakeningBtns">
-            <button class="awkBtn" data-awk="0">0★</button>
-            <button class="awkBtn" data-awk="1">1★</button>
-            <button class="awkBtn" data-awk="2">2★</button>
-            <button class="awkBtn" data-awk="3">3★</button>
-            <button class="awkBtn active" data-awk="4">4★</button>
+        <div class="box">
+          <h3>Level + extracted base</h3>
+          <div class="row"><span>Level</span><strong>Lv <span id="levelText">80</span></strong></div>
+          <input id="levelSlider" type="range" min="1" max="200" value="80">
+          <div class="smallGrid">
+            <div><span class="label">APK ATK</span><br><strong>1007</strong></div>
+            <div><span class="label">APK HP</span><br><strong>9385</strong></div>
+            <div><span class="label">SPD</span><br><strong>267</strong></div>
+            <div><span class="label">Cost</span><br><strong>34</strong></div>
           </div>
         </div>
+
+        <div class="box">
+          <h3>Awakening / relationship scalar</h3>
+          <div class="awakeningBtns">
+            <button class="awkBtn active" data-awk="0">0 / 1.00</button>
+            <button class="awkBtn" data-awk="1">1 / 1.22</button>
+            <button class="awkBtn" data-awk="2">2 / 1.44</button>
+            <button class="awkBtn" data-awk="3">3 / 1.66</button>
+            <button class="awkBtn" data-awk="4">4 / 1.88</button>
+          </div>
+          <p class="muted">Anchored to RelationshipPercentAttack/Hp 122, 144, 166, 188.</p>
+        </div>
+
+        <div class="box">
+          <h3>Flat passive boosts</h3>
+          <label><input id="usePassive" type="checkbox" checked> Apply Kintaro Plus Lv3 passives</label>
+          <div class="formula" style="margin-top:10px">PlusAttackBoostLv3 = +300 ATK
+PlusHPBoostLv3 = +1200 HP</div>
+        </div>
+
+        <div class="box">
+          <h3>Boost system</h3>
+          <div class="row"><span>Boost count</span><input id="boostCount" type="number" value="0" min="0" max="300"></div>
+          <div class="row"><span>ATK per boost</span><input id="boostAtkEach" type="number" value="1" min="0"></div>
+          <div class="row"><span>HP per boost</span><input id="boostHpEach" type="number" value="10" min="0"></div>
+          <p class="muted warn">Per-boost values are editable until we confirm the exact runtime constants.</p>
+        </div>
+
+        <div class="box">
+          <h3>Potential / refine</h3>
+          <div class="row"><span>Potential %</span><input id="potentialPct" type="number" value="0" min="0" max="100" step="0.01"></div>
+          <p class="muted">Use this to test refine values. Example: 75 = 75%.</p>
+        </div>
+
+        <div class="box">
+          <h3>Mastery layer</h3>
+          <div class="row"><span>Bane %</span><input id="banePct" type="number" value="0" min="0" max="20"></div>
+          <div class="row"><span>Shield %</span><input id="shieldPct" type="number" value="0" min="0" max="20"></div>
+          <div class="row"><span>Element advantage %</span><input id="elementPct" type="number" value="25"></div>
+          <p class="muted">Bane/Shield modify combat power after displayed stats. Each category caps at 20% in game text.</p>
+        </div>
       </div>
+    </div>
+
+    <div class="panel">
+      <h2>Calculation trace</h2>
+      <div class="formula" id="trace"></div>
+      <table>
+        <thead><tr><th>System</th><th>Current finding</th></tr></thead>
+        <tbody>
+          <tr><td>Relationship / Awakening</td><td>1.00, 1.22, 1.44, 1.66, 1.88 via RelationshipPercentAttack/Hp.</td></tr>
+          <tr><td>Passive flat boosts</td><td>Lv1 +150/+600, Lv2 +200/+800, Lv3 +300/+1200, Lv4 +500/+2000.</td></tr>
+          <tr><td>Potential</td><td>Stored as refine; treated here as a multiplier layer on level/awakening/limit-break gain.</td></tr>
+          <tr><td>Mastery</td><td>Bane = attack up vs element; Shield = defense up vs element. Combat-time effective modifier, not displayed stat mutation.</td></tr>
+        </tbody>
+      </table>
     </div>
   </div>
 
   <script>
-    const base={atk:928,hp:6570,spd:267,cost:28};
-    const evolved={atk:1007,hp:9385,spd:267,cost:34};
-    const awkAtk=[0,150,200,300,450];
-    const awkHp=[0,600,800,1200,1800];
-    let currentAwk=4;
+    const unit={atk:1007,hp:9385,spd:267,cost:34};
+    const relationshipScalars=[1,1.22,1.44,1.66,1.88];
+    const passiveBoosts={atk:300,hp:1200};
+    const screenshotAnchor={level:80,atk:2553,hp:19263,spd:267,power:369924};
+    let currentAwk=0;
 
-    const atkEl=document.getElementById('atkVal');
-    const hpEl=document.getElementById('hpVal');
-    const spdEl=document.getElementById('spdVal');
-    const powerEl=document.getElementById('powerVal');
-    const levelEl=document.getElementById('levelText');
-    const slider=document.getElementById('levelSlider');
-
-    function lerp(a,b,t){return a+(b-a)*t}
-
-    function calc(){
-      const level=parseInt(slider.value,10);
-      const t=(level-1)/199;
-
-      const atk=Math.round(lerp(base.atk*0.42,evolved.atk,t)+awkAtk[currentAwk]);
-      const hp=Math.round(lerp(base.hp*0.38,evolved.hp,t)+awkHp[currentAwk]);
-      const spd=evolved.spd;
-      const power=Math.round(atk+(hp/10)+(spd*5));
-
-      atkEl.textContent=atk.toLocaleString();
-      hpEl.textContent=hp.toLocaleString();
-      spdEl.textContent=spd.toLocaleString();
-      powerEl.textContent=power.toLocaleString();
-      levelEl.textContent=level;
+    const $=id=>document.getElementById(id);
+    const fmt=n=>Math.round(n).toLocaleString();
+    function levelScalar(level){
+      // Temporary calibration curve: normalized by screenshot anchor until runtime constants are isolated.
+      const maxLevel=200;
+      const minScalar=.42;
+      return minScalar+(level-1)/(maxLevel-1)*(1-minScalar);
     }
+    function gameLikePower(atk,hp,spd){
+      // Calibrated placeholder so Kintaro's screenshot can be compared on-page.
+      const baseline=atk*52+hp*11+spd*128;
+      const anchorBaseline=screenshotAnchor.atk*52+screenshotAnchor.hp*11+screenshotAnchor.spd*128;
+      return baseline*(screenshotAnchor.power/anchorBaseline);
+    }
+    function calc(){
+      const level=parseInt($('levelSlider').value,10);
+      const scalar=relationshipScalars[currentAwk];
+      const passive=$('usePassive').checked?passiveBoosts:{atk:0,hp:0};
+      const boostCount=Number($('boostCount').value)||0;
+      const boostAtk=(Number($('boostAtkEach').value)||0)*boostCount;
+      const boostHp=(Number($('boostHpEach').value)||0)*boostCount;
+      const potential=(Number($('potentialPct').value)||0)/100;
+      const bane=(Number($('banePct').value)||0)/100;
+      const shield=(Number($('shieldPct').value)||0)/100;
+      const element=(Number($('elementPct').value)||0)/100;
+      const lvl=levelScalar(level);
 
-    slider.addEventListener('input',calc);
+      const levelAtk=unit.atk*lvl;
+      const levelHp=unit.hp*lvl;
+      const preScalarAtk=levelAtk+passive.atk+boostAtk;
+      const preScalarHp=levelHp+passive.hp+boostHp;
+      const atk=(preScalarAtk*scalar)*(1+potential);
+      const hp=(preScalarHp*scalar)*(1+potential);
+      const spd=unit.spd;
+      const rawPower=gameLikePower(atk,hp,spd);
+      const effectivePower=rawPower*(1+element+bane+shield);
 
-    document.querySelectorAll('.awkBtn').forEach(btn=>{
-      btn.addEventListener('click',()=>{
-        document.querySelectorAll('.awkBtn').forEach(b=>b.classList.remove('active'));
-        btn.classList.add('active');
-        currentAwk=parseInt(btn.dataset.awk,10);
-        calc();
-      });
-    });
+      $('levelText').textContent=level;
+      $('atkVal').textContent=fmt(atk);
+      $('hpVal').textContent=fmt(hp);
+      $('spdVal').textContent=fmt(spd);
+      $('powerVal').textContent=fmt(rawPower);
+      $('effectiveVal').textContent=fmt(effectivePower);
+      $('trace').textContent =
+`levelScalar(${level}) = ${lvl.toFixed(6)}
+level ATK/HP = ${levelAtk.toFixed(2)} / ${levelHp.toFixed(2)}
++ passive = +${passive.atk} ATK / +${passive.hp} HP
++ boost = +${boostAtk} ATK / +${boostHp} HP
+× relationship scalar = ${scalar}
+× potential = ${(1+potential).toFixed(4)}
+= displayed ATK/HP ${fmt(atk)} / ${fmt(hp)}
 
+rawPower calibrated index = ${fmt(rawPower)}
+effectivePower = rawPower × (1 + element ${element.toFixed(2)} + bane ${bane.toFixed(2)} + shield ${shield.toFixed(2)})
+= ${fmt(effectivePower)}
+
+Screenshot anchor for comparison: Lv80 ATK 2,553 / HP 19,263 / SPD 267 / Power 369,924`;
+    }
+    document.querySelectorAll('.awkBtn').forEach(btn=>btn.addEventListener('click',()=>{
+      document.querySelectorAll('.awkBtn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      currentAwk=parseInt(btn.dataset.awk,10);
+      calc();
+    }));
+    ['levelSlider','usePassive','boostCount','boostAtkEach','boostHpEach','potentialPct','banePct','shieldPct','elementPct'].forEach(id=>$(id).addEventListener('input',calc));
     calc();
   </script>
 </body>
