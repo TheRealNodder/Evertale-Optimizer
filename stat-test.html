@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Evertale Optimizer • Stat System Test</title>
+  <link rel="stylesheet" href="./style.css?v=1770583861" />
+  <style>
+    body{background:#12081f;color:#f6f7ff;font-family:Inter,Arial,sans-serif}
+    .wrap{max-width:1200px;margin:24px auto;padding:16px}
+    .panel{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:18px}
+    .hero{display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap}
+    .hero img{width:260px;max-width:100%;border-radius:16px;border:1px solid rgba(255,255,255,.1)}
+    .stats{display:grid;grid-template-columns:repeat(4,minmax(90px,1fr));gap:12px;margin-top:16px}
+    .stat{background:rgba(255,255,255,.06);padding:12px;border-radius:12px;text-align:center}
+    .label{font-size:12px;opacity:.7}
+    .value{font-size:22px;font-weight:800}
+    .controls{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:22px}
+    .sliderWrap,.awakeningWrap{background:rgba(255,255,255,.04);padding:16px;border-radius:14px}
+    input[type=range]{width:100%}
+    .awakeningBtns{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+    .awkBtn{padding:10px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:#fff;cursor:pointer;font-weight:700}
+    .awkBtn.active{background:#8d57ff;border-color:#b79cff}
+    .muted{opacity:.7;font-size:14px;line-height:1.5}
+    .leader{margin-top:18px;background:rgba(141,87,255,.12);border:1px solid rgba(141,87,255,.3);padding:14px;border-radius:14px}
+    .leader strong{display:block;margin-bottom:6px}
+    @media(max-width:700px){.controls{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,minmax(90px,1fr))}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="panel">
+      <h1>Kintaro Stat System Prototype</h1>
+      <p class="muted">Isolated testing page. This does not modify the live optimizer. Current calculations use raw APK base stats, evolution stats, awakening boosts, and prototype level interpolation while the exact hidden runtime growth formula is still being researched.</p>
+
+      <div class="hero">
+        <img id="portrait" src="https://ik.imagekit.io/r8fsa98s9/characters/KintaroRegular01.png" alt="Kintaro">
+
+        <div style="flex:1;min-width:260px;">
+          <h2 id="unitName">Kintaro</h2>
+          <div>Sugar, Spice, and Brute Force</div>
+
+          <div class="leader">
+            <strong>Leader Skill — Earth HP Up</strong>
+            <div>Increases HP for Earth allies. Tier D.</div>
+          </div>
+
+          <div class="stats">
+            <div class="stat">
+              <div class="label">ATK</div>
+              <div class="value" id="atkVal">928</div>
+            </div>
+            <div class="stat">
+              <div class="label">HP</div>
+              <div class="value" id="hpVal">6570</div>
+            </div>
+            <div class="stat">
+              <div class="label">SPD</div>
+              <div class="value" id="spdVal">267</div>
+            </div>
+            <div class="stat">
+              <div class="label">POWER</div>
+              <div class="value" id="powerVal">7498</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <div class="sliderWrap">
+          <h3>Level</h3>
+          <input id="levelSlider" type="range" min="1" max="200" value="200">
+          <div style="margin-top:10px;font-size:20px;font-weight:800;">Lv <span id="levelText">200</span></div>
+        </div>
+
+        <div class="awakeningWrap">
+          <h3>Awakening</h3>
+          <div class="awakeningBtns">
+            <button class="awkBtn" data-awk="0">0★</button>
+            <button class="awkBtn" data-awk="1">1★</button>
+            <button class="awkBtn" data-awk="2">2★</button>
+            <button class="awkBtn" data-awk="3">3★</button>
+            <button class="awkBtn active" data-awk="4">4★</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const base={atk:928,hp:6570,spd:267,cost:28};
+    const evolved={atk:1007,hp:9385,spd:267,cost:34};
+    const awkAtk=[0,150,200,300,450];
+    const awkHp=[0,600,800,1200,1800];
+    let currentAwk=4;
+
+    const atkEl=document.getElementById('atkVal');
+    const hpEl=document.getElementById('hpVal');
+    const spdEl=document.getElementById('spdVal');
+    const powerEl=document.getElementById('powerVal');
+    const levelEl=document.getElementById('levelText');
+    const slider=document.getElementById('levelSlider');
+
+    function lerp(a,b,t){return a+(b-a)*t}
+
+    function calc(){
+      const level=parseInt(slider.value,10);
+      const t=(level-1)/199;
+
+      const atk=Math.round(lerp(base.atk*0.42,evolved.atk,t)+awkAtk[currentAwk]);
+      const hp=Math.round(lerp(base.hp*0.38,evolved.hp,t)+awkHp[currentAwk]);
+      const spd=evolved.spd;
+      const power=Math.round(atk+(hp/10)+(spd*5));
+
+      atkEl.textContent=atk.toLocaleString();
+      hpEl.textContent=hp.toLocaleString();
+      spdEl.textContent=spd.toLocaleString();
+      powerEl.textContent=power.toLocaleString();
+      levelEl.textContent=level;
+    }
+
+    slider.addEventListener('input',calc);
+
+    document.querySelectorAll('.awkBtn').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        document.querySelectorAll('.awkBtn').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        currentAwk=parseInt(btn.dataset.awk,10);
+        calc();
+      });
+    });
+
+    calc();
+  </script>
+</body>
+</html>
