@@ -1,107 +1,355 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Evertale Optimizer • Formula Layer Lab</title>
-<link rel="stylesheet" href="./style.css?v=1770583861" />
-<style>
-:root{--bg:#12081f;--panel:rgba(255,255,255,.06);--panel2:rgba(255,255,255,.04);--line:rgba(255,255,255,.12);--purple:#8d57ff;--gold:#f5d36a;--good:#9cffc7;--bad:#ff9c9c}*{box-sizing:border-box}body{background:var(--bg);color:#f6f7ff;font-family:Inter,Arial,sans-serif;margin:0}.wrap{max-width:1280px;margin:24px auto;padding:16px}.panel{background:var(--panel);border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:18px;margin-bottom:18px}h1,h2,h3{margin-top:0}.muted{opacity:.76;font-size:14px;line-height:1.45}.pill{display:inline-block;padding:4px 9px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.05);font-size:12px}.grid{display:grid;gap:16px}.hero{grid-template-columns:280px 1fr}.cardShell{position:relative;width:260px;max-width:100%;border-radius:20px;overflow:hidden;border:1px solid rgba(255,255,255,.14);background:rgba(0,0,0,.25)}.portrait{display:block;width:100%;height:auto}.powerOverlay{position:absolute;left:10px;right:10px;bottom:10px;padding:8px 10px;border-radius:14px;background:linear-gradient(90deg,rgba(0,0,0,.78),rgba(0,0,0,.42));border:1px solid rgba(255,255,255,.18);backdrop-filter:blur(5px)}.overlayTop{font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.82}.overlayPower{font-size:25px;font-weight:1000;color:var(--gold);line-height:1.05}.overlayStats{display:flex;gap:8px;flex-wrap:wrap;font-size:11px;opacity:.9;margin-top:4px}.stats{display:grid;grid-template-columns:repeat(4,minmax(110px,1fr));gap:12px}.stat{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:14px;text-align:center}.label{font-size:12px;opacity:.7;text-transform:uppercase;letter-spacing:.04em}.value{font-size:26px;font-weight:900}.btn{border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.06);color:#fff;padding:10px 12px;cursor:pointer;font-weight:800}.btn.primary,.anchorBtn.active{background:var(--purple);border-color:#b79cff}.anchorBtn{margin:4px}.actionRow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:12px}.drawer{display:none;margin-top:14px;padding:14px;border-radius:16px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.08)}.drawer.open{display:block}.simpleGrid{display:grid;grid-template-columns:repeat(2,minmax(180px,1fr));gap:12px}.simpleControl{background:var(--panel2);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:12px}.simpleControl input[type=range]{width:100%}.simpleControl input[type=number]{width:96px;margin-left:8px}input[type=number]{background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:9px;color:#fff;padding:8px}.formula{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:rgba(0,0,0,.24);border:1px solid var(--line);border-radius:14px;padding:12px;white-space:pre-wrap;line-height:1.45}.good{color:var(--good)}.bad{color:var(--bad)}table{width:100%;border-collapse:collapse;margin-top:10px}th,td{padding:8px;border-bottom:1px solid rgba(255,255,255,.08);text-align:left;vertical-align:top}th{font-size:12px;text-transform:uppercase;opacity:.78}.right{text-align:right}.modalBackdrop{position:fixed;inset:0;background:rgba(0,0,0,.72);display:none;align-items:center;justify-content:center;padding:16px;z-index:1000}.modalBackdrop.open{display:flex}.modal{width:min(980px,100%);max-height:92vh;overflow:auto;background:#170b28;border:1px solid rgba(255,255,255,.14);border-radius:22px;padding:18px;box-shadow:0 20px 80px rgba(0,0,0,.55)}.modalGrid{display:grid;grid-template-columns:repeat(3,minmax(220px,1fr));gap:12px}.box{background:var(--panel2);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px}.row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:8px 0}.row input{width:96px}.closeRow{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:12px}.warning{border:1px solid rgba(245,211,106,.45);background:rgba(245,211,106,.09);padding:10px 12px;border-radius:14px;margin-top:12px;font-weight:800}@media(max-width:900px){.hero,.modalGrid,.simpleGrid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,minmax(110px,1fr))}}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evertale Optimizer • Formula Layer Lab</title>
+    <style>
+        :root {
+            --bg-dark: #0f141c;
+            --panel-dark: #161f2d;
+            --accent-blue: #3b82f6;
+            --text-light: #f3f4f6;
+            --text-muted: #9ca3af;
+            --border-color: #25354a;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 20px;
+        }
+
+        h1 { margin: 0; color: #fff; font-size: 1.8rem; }
+        p { color: var(--text-muted); margin: 5px 0 0 0; }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard { grid-template-columns: 1fr; }
+        }
+
+        .panel {
+            background-color: var(--panel-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .panel-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+            color: var(--accent-blue);
+        }
+
+        .macro-display {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .macro-power-val {
+            font-size: 3rem;
+            font-weight: 800;
+            color: #fff;
+            margin: 10px 0;
+        }
+
+        .macro-stats-row {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 15px;
+            background: rgba(0,0,0,0.2);
+            padding: 10px;
+            border-radius: 6px;
+        }
+
+        .form-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        label {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        input[type="number"], select {
+            background-color: var(--bg-dark);
+            border: 1px solid var(--border-color);
+            color: #fff;
+            padding: 6px 10px;
+            border-radius: 4px;
+            width: 120px;
+            font-size: 0.95rem;
+        }
+
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .formulas-note {
+            font-size: 0.85rem;
+            background: rgba(59, 130, 246, 0.05);
+            border-left: 3px solid var(--accent-blue);
+            padding: 15px;
+            border-radius: 0 4px 4px 0;
+            line-height: 1.5;
+        }
+
+        code {
+            background: rgba(0,0,0,0.3);
+            padding: 2px 5px;
+            border-radius: 3px;
+            color: #e4e4e7;
+            font-family: monospace;
+        }
+    </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="panel">
-    <h1>Formula Layer Lab</h1>
-    <p class="muted">Corrected staged engine: Lv200 reference anchors, bracketed LB scaling, awakening as a direct raw-stat multiplier, boosts inside potential compounding, character/equipment power split, mastery, equipment, fellowship, and account BP layers.</p>
-    <div id="anchorBtns"></div>
-  </div>
 
-  <div class="panel grid hero">
-    <div>
-      <div class="cardShell"><img class="portrait" id="portrait" alt="Selected unit"><div class="powerOverlay"><div class="overlayTop">Unit Power</div><div class="overlayPower" id="overlayPower">0</div><div class="overlayStats"><span id="overlayAtk">ATK 0</span><span id="overlayHp">HP 0</span><span id="overlaySpd">SPD 0</span></div></div></div>
-      <p class="muted" id="anchorNote"></p>
+<div class="container">
+    <header>
+        <h1>Formula Layer Lab</h1>
+        <p>Reverse-engineered live testing workspace for precise Evertale unit calculation streams.</p>
+    </header>
+
+    <div class="dashboard">
+        <div class="panel">
+            <h2 class="panel-title">Character Parameters</h2>
+            
+            <div class="form-group">
+                <label for="input-level">Current Level (80-200)</label>
+                <input type="number" id="input-level" value="80" min="1" max="200">
+            </div>
+
+            <div class="form-group">
+                <label for="input-awakening">Awakening Copies</label>
+                <select id="input-awakening">
+                    <option value="0">0 Copies (Base)</option>
+                    <option value="1">1 Copy</option>
+                    <option value="2">2 Copies</option>
+                    <option value="3">3 Copies</option>
+                    <option value="4">4 Copies (FA)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="input-boost">Boost Level (0-300)</label>
+                <input type="number" id="input-boost" value="0" min="0" max="300">
+            </div>
+
+            <div class="form-group">
+                <label for="input-potential">Potential % (0-100)</label>
+                <input type="number" id="input-potential" value="0" min="0" max="100">
+            </div>
+
+            <div class="form-group">
+                <label for="input-mastery">Mastery Mod % (0-40)</label>
+                <input type="number" id="input-mastery" value="0" min="0" max="40">
+            </div>
+
+            <h2 class="panel-title" style="margin-top: 25px;">Source Reference Stats (Lvl 200 Base)</h2>
+            <p style="font-size: 0.8rem; margin-bottom: 15px;">Input data pulled directly from game encyclopedia references.</p>
+
+            <div class="form-group">
+                <label for="ref-atk">Ref Max Base ATK</label>
+                <input type="number" id="ref-atk" value="16500">
+            </div>
+
+            <div class="form-group">
+                <label for="ref-hp">Ref Max Base HP</label>
+                <input type="number" id="ref-hp" value="92000">
+            </div>
+
+            <div class="form-group">
+                <label for="input-speed">Base Unit SPD</label>
+                <input type="number" id="input-speed" value="415">
+            </div>
+
+            <div class="form-group">
+                <label for="chk-ascended">Ascension Flat Premium Enabled</label>
+                <input type="checkbox" id="chk-ascended">
+            </div>
+        </div>
+
+        <div class="panel">
+            <h2 class="panel-title">Calculated Card Footprint</h2>
+            
+            <div class="macro-display">
+                <div>RAW CARD POWER</div>
+                <div class="macro-power-val" id="macro-power">0</div>
+                
+                <div class="macro-stats-row">
+                    <div><strong>ATK:</strong> <span id="macro-atk">0</span></div>
+                    <div><strong>HP:</strong> <span id="macro-hp">0</span></div>
+                    <div><strong>SPD:</strong> <span id="macro-spd">0</span></div>
+                </div>
+            </div>
+
+            <h2 class="panel-title" style="margin-top: 15px;">Calculation Architecture Summary</h2>
+            <div class="formulas-note">
+                <strong>Character Power Core Formula:</strong><br>
+                <code>Power = (FinalHP × 12) + (FinalATK × 60) + MasteryBonus</code><br><br>
+                <strong>Compounding Rule:</strong><br>
+                Boost values are parsed <em>before</em> potential calculations apply: <br>
+                <code>Potential = (Raw + Awakening + Ascension + Boost) × Potential%</code>
+            </div>
+        </div>
     </div>
-    <div>
-      <h2 id="unitName"></h2><div id="unitMeta"></div>
-      <div class="warning">Formula mode: Character power uses HP×12 and ATK×60. Equipment uses HP×6, ATK×30, SPD×180. Fellowship/account BP are optional Advanced layers.</div>
-      <div class="stats" style="margin-top:14px"><div class="stat"><div class="label">ATK</div><div class="value" id="atkVal">0</div></div><div class="stat"><div class="label">HP</div><div class="value" id="hpVal">0</div></div><div class="stat"><div class="label">SPD</div><div class="value" id="spdVal">0</div></div><div class="stat"><div class="label">Power</div><div class="value" id="powerVal">0</div></div></div>
-      <div class="actionRow"><button class="btn primary" id="toggleSimple">Simple Stats</button><button class="btn" id="openAdvanced">Advanced Modifiers</button><button class="btn" id="resetCache">Reset Saved</button><span class="pill">Saved locally</span><span class="pill">Error: <strong id="errorVal">0%</strong></span></div>
-      <div class="drawer open" id="simpleDrawer"><h3>Simple stat controls</h3><div class="simpleGrid"><div class="simpleControl"><div class="label">Level <span id="levelText"></span></div><input id="levelRange" type="range" min="1" max="200"><input id="level" type="number" min="1" max="200"></div><div class="simpleControl"><div class="label">Awakening <span id="awakeningText"></span></div><input id="awakeningRange" type="range" min="0" max="4"><input id="awakening" type="number" min="0" max="4"></div><div class="simpleControl"><div class="label">Boost Tab <span id="boostsText"></span></div><input id="boostsRange" type="range" min="0" max="300"><input id="boosts" type="number" min="0" max="300"></div><div class="simpleControl"><div class="label">Potential % <span id="potentialText"></span></div><input id="potentialRange" type="range" min="0" max="100" step="0.01"><input id="potential" type="number" min="0" max="100" step="0.01"></div><div class="simpleControl"><div class="label">Mastery <span id="masteryText"></span></div><input id="masteryRange" type="range" min="0" max="40"><input id="mastery" type="number" min="0" max="40"></div></div></div>
-    </div>
-  </div>
-
-  <div class="panel"><h2>Debug / engine layers</h2><div class="formula" id="trace"></div><table id="anchorTable"><thead><tr><th>Anchor</th><th class="right">Game ATK</th><th class="right">Game HP</th><th class="right">Game Power</th><th class="right">Projected</th><th class="right">Error</th></tr></thead><tbody></tbody></table></div>
-  <div class="panel"><h2>Corrected formulas now stored on page</h2><div class="formula">CharacterPower = A + B + C
-A = (CharacterHP - PassiveHPFromAwakening) × 12
-B = (CharacterATK - PassiveATKFromAwakening) × 60
-C = 0.005 × (A + B) × Mastery
-
-WeaponPower = WeaponHP × 6 + WeaponATK × 30
-AccessoryPower = AccessoryHP × 6 + AccessoryATK × 30 + AccessorySPD × 180
-TotalUnitPower = CharacterPower + WeaponPower + AccessoryPower
-
-LB multiplier by current level cap:
-≤80: 1.00, 81-100: 1.00, 101-120: 1.08, 121-140: 1.16, 141-160: 1.24, 161-180: 1.32, 181-200: 1.40
-
-RawStatPostLB = REF_STAT_LV200 / (1.4 × (10 + 200)) × (10 + CurrentLevel) × CurrentLBMultiplier
-AwakenedRaw = RawStatPostLB × AwakeningMultiplier
-AwakeningMultiplier = [1.00, 1.22, 1.44, 1.66, 1.88]
-AscensionStat = REF_STAT_LV200 × 0.05 if ascended
-Boosts are inside potential compounding:
-Baseline = AwakenedRaw + AscensionStat + BoostStat
-FinalStat = Baseline + (Baseline × PotentialPercentage / 100)
-
-BoostHP = BoostLevel × 14, if BoostLevel ≤ 90
-BoostHP = ((BoostLevel - 90) × 311) + 1260, if BoostLevel > 90
-BoostATK = BoostLevel × 3, if BoostLevel ≤ 90
-BoostATK = ((BoostLevel - 90) × 73) + 270, if BoostLevel > 90
-
-FellowshipMultiplier = 1 + (Σ FellowshipBonusPercentages / 100)
-AccountBP = rank ≤ 300 ? (2000000 / 300^3) × rank^3 : 2000000
-BattalionPower = AccountBP + Σ(TotalUnitPower × FellowshipMultiplier)</div></div>
 </div>
 
-<div class="modalBackdrop" id="modalBackdrop"><div class="modal"><div class="closeRow"><h2>Advanced modifiers</h2><button class="btn" id="closeAdvanced">Close</button></div><div class="warning">Advanced is for exact account matching and source-data recovery.</div><div class="modalGrid" style="margin-top:12px">
-  <div class="box"><h3>Lv200 reference anchors</h3><div class="row"><span>ATK Lv200 ref</span><input id="refAtk" type="number"></div><div class="row"><span>HP Lv200 ref</span><input id="refHp" type="number"></div><label><input id="isAscended" type="checkbox"> Ascended</label></div>
-  <div class="box"><h3>Passive from awakening</h3><p class="muted">Subtracted for standalone character power, but not removed from visible stats.</p><div class="row"><span>Passive ATK</span><input id="passiveAtk" type="number"></div><div class="row"><span>Passive HP</span><input id="passiveHp" type="number"></div></div>
-  <div class="box"><h3>Equipment</h3><label><input id="includeEquipment" type="checkbox" checked> Include equipment</label><div class="row"><span>Weapon ATK</span><input id="weaponAtk" type="number"></div><div class="row"><span>Weapon HP</span><input id="weaponHp" type="number"></div><div class="row"><span>Accessory ATK</span><input id="accessoryAtk" type="number"></div><div class="row"><span>Accessory HP</span><input id="accessoryHp" type="number"></div><div class="row"><span>Accessory SPD</span><input id="accessorySpd" type="number"></div></div>
-  <div class="box"><h3>Fellowship</h3><div class="row"><span>Bonus % total</span><input id="fellowPct" type="number" step="0.01"></div></div>
-  <div class="box"><h3>Account BP</h3><div class="row"><span>Rank</span><input id="accountRank" type="number"></div><label><input id="includeAccountBp" type="checkbox"> Include rank BP</label></div>
-  <div class="box"><h3>Debug note</h3><p class="muted">If exact Lv200 reference stats are blank, the page reverse-solves temporary refs from the selected screenshot anchor using this corrected order of operations.</p></div>
-</div></div></div>
-
 <script>
-const CACHE_KEY='evertale_stat_test_v5_corrected_power';
-const anchors=[
- {key:'venus145',name:'Venus',file:'VenusRegular03',title:'Goddess of Love',img:'https://ik.imagekit.io/r8fsa98s9/characters/VenusRegular03.png',element:'Light',weapon:'Staff',refAtk:0,refHp:0,isAscended:true,spd:406,level:120,awakening:4,boosts:145,potential:20.16,mastery:19,weaponAtk:0,weaponHp:0,accessoryAtk:0,accessoryHp:0,accessorySpd:0,passiveAtk:0,passiveHp:0,gameAtk:15835,gameHp:84019,gamePower:2108891,note:'Corrected engine active; Lv200 refs reverse-solved until source tables are found.'},
- {key:'venus146',name:'Venus +1 Boost',file:'VenusRegular03',title:'Goddess of Love',img:'https://ik.imagekit.io/r8fsa98s9/characters/VenusRegular03.png',element:'Light',weapon:'Staff',refAtk:0,refHp:0,isAscended:true,spd:406,level:120,awakening:4,boosts:146,potential:20.16,mastery:19,weaponAtk:0,weaponHp:0,accessoryAtk:0,accessoryHp:0,accessorySpd:0,passiveAtk:0,passiveHp:0,gameAtk:15908,gameHp:84330,gamePower:2117774,note:'Boost Tab 145→146.'},
- {key:'venus148',name:'Venus +3 Boost',file:'VenusRegular03',title:'Goddess of Love',img:'https://ik.imagekit.io/r8fsa98s9/characters/VenusRegular03.png',element:'Light',weapon:'Staff',refAtk:0,refHp:0,isAscended:true,spd:406,level:120,awakening:4,boosts:148,potential:20.16,mastery:19,weaponAtk:917,weaponHp:4875,accessoryAtk:0,accessoryHp:0,accessorySpd:0,passiveAtk:0,passiveHp:0,gameAtk:16054,gameHp:84952,gamePower:2135539,note:'Live screenshot Boost 148 with weapon visible; equipment can be toggled.'},
- {key:'callen200',name:'Callen',file:'CallenBride / DragonBride',title:'Dragon Bride',img:'https://ik.imagekit.io/r8fsa98s9/characters/CallenBride02.png',element:'Light',weapon:'Sword',refAtk:0,refHp:0,isAscended:true,spd:313,level:200,awakening:4,boosts:265,potential:100,mastery:40,weaponAtk:854,weaponHp:5190,accessoryAtk:0,accessoryHp:0,accessorySpd:0,passiveAtk:0,passiveHp:0,gameAtk:51135,gameHp:277044,gamePower:7632259,note:'Lv200, 100% potential. Weapon delta known.'},
- {key:'arthur200',name:'King Arthur',file:'KingArthurRegular',title:'Ruler of the Round Table',img:'https://ik.imagekit.io/r8fsa98s9/characters/KingArthurRegular02.png',element:'Dark',weapon:'Sword',refAtk:0,refHp:0,isAscended:true,spd:424,level:200,awakening:4,boosts:268,potential:78.78,mastery:40,weaponAtk:817,weaponHp:5320,accessoryAtk:0,accessoryHp:0,accessorySpd:0,passiveAtk:0,passiveHp:0,gameAtk:43287,gameHp:274907,gamePower:7036358,note:'Lv200, 78.78% potential. Weapon delta known.'}
-];
-const AWK=[1,1.22,1.44,1.66,1.88];
-const defaults={current:0,refAtk:0,refHp:0,fellowPct:0,accountRank:0,passiveAtk:0,passiveHp:0,weaponAtk:0,weaponHp:0,accessoryAtk:0,accessoryHp:0,accessorySpd:0};
-let current=0;const $=id=>document.getElementById(id);const fmt=n=>Math.round(n).toLocaleString();const ids=['level','awakening','boosts','potential','mastery','refAtk','refHp','passiveAtk','passiveHp','weaponAtk','weaponHp','accessoryAtk','accessoryHp','accessorySpd','fellowPct','accountRank'];
-function val(id){return Number($(id).value)||0}
-function lbMult(level){if(level<=80)return 1;if(level<=100)return 1;if(level<=120)return 1.08;if(level<=140)return 1.16;if(level<=160)return 1.24;if(level<=180)return 1.32;return 1.4}
-function boostAtk(b){return b<=90?b*3:((b-90)*73)+270}
-function boostHp(b){return b<=90?b*14:((b-90)*311)+1260}
-function rawFromLv200Ref(ref,level){return (ref/(1.4*(10+200)))*(10+level)*lbMult(level)}
-function finalStatFromRef(ref,level,awakening,boost,potential,isHp,isAsc){const raw=rawFromLv200Ref(ref,level);const awakened=raw*AWK[Math.max(0,Math.min(4,awakening))];const asc=isAsc?ref*.05:0;const boostStat=isHp?boostHp(boost):boostAtk(boost);const baseline=awakened+asc+boostStat;const pot=baseline*(potential/100);return{raw,awakened,asc,boost:boostStat,baseline,pot,total:baseline+pot}}
-function reverseRef(observed,level,awakening,boost,potential,isHp,isAsc,equip){const boostStat=isHp?boostHp(boost):boostAtk(boost);const denom=(lbMult(level)*(10+level)/(1.4*(10+200)))*AWK[awakening]+(isAsc?.05:0);return (((observed-equip)/(1+potential/100))-boostStat)/denom}
-function charPower(hp,atk,mastery,passiveHp,passiveAtk){const A=Math.max(0,hp-passiveHp)*12;const B=Math.max(0,atk-passiveAtk)*60;const C=.005*(A+B)*mastery;return{A,B,C,total:A+B+C}}
-function equipPower(a){if(!$('includeEquipment').checked)return{weapon:0,accessory:0,total:0};const weapon=val('weaponHp')*6+val('weaponAtk')*30;const accessory=val('accessoryHp')*6+val('accessoryAtk')*30+val('accessorySpd')*180;return{weapon,accessory,total:weapon+accessory}}
-function accountBp(){if(!$('includeAccountBp').checked)return 0;const r=val('accountRank');return r>300?2000000:(2000000/Math.pow(300,3))*Math.pow(Math.max(0,r),3)}
-function projected(a,override=true){const level=override?val('level'):a.level,awakening=override?val('awakening'):a.awakening,boosts=override?val('boosts'):a.boosts,potential=override?val('potential'):a.potential,mastery=override?val('mastery'):a.mastery;const isAsc=override?$('isAscended').checked:a.isAscended;const eqHp=override&&$('includeEquipment').checked?(val('weaponHp')+val('accessoryHp')):(a.weaponHp+a.accessoryHp);const eqAtk=override&&$('includeEquipment').checked?(val('weaponAtk')+val('accessoryAtk')):(a.weaponAtk+a.accessoryAtk);const refHp=(override?val('refHp'):a.refHp)||reverseRef(a.gameHp,level,awakening,boosts,potential,true,isAsc,eqHp);const refAtk=(override?val('refAtk'):a.refAtk)||reverseRef(a.gameAtk,level,awakening,boosts,potential,false,isAsc,eqAtk);const hpLayer=finalStatFromRef(refHp,level,awakening,boosts,potential,true,isAsc);const atkLayer=finalStatFromRef(refAtk,level,awakening,boosts,potential,false,isAsc);const hp=hpLayer.total+eqHp;const atk=atkLayer.total+eqAtk;const cp=charPower(hp,atk,mastery,override?val('passiveHp'):a.passiveHp,override?val('passiveAtk'):a.passiveAtk);const ep=override?equipPower(a):{weapon:a.weaponHp*6+a.weaponAtk*30,accessory:a.accessoryHp*6+a.accessoryAtk*30+a.accessorySpd*180,total:a.weaponHp*6+a.weaponAtk*30+a.accessoryHp*6+a.accessoryAtk*30+a.accessorySpd*180};const fellowship=1+(override?val('fellowPct'):0)/100;const power=(cp.total+ep.total)*fellowship+accountBp();return{hp,atk,spd:a.spd,power,refHp,refAtk,hpLayer,atkLayer,cp,ep,fellowship,account:accountBp()}}
-function save(){const d={current};ids.forEach(id=>d[id]=$(id).value);d.includeEquipment=$('includeEquipment').checked;d.isAscended=$('isAscended').checked;d.includeAccountBp=$('includeAccountBp').checked;localStorage.setItem(CACHE_KEY,JSON.stringify(d))}
-function load(){try{return JSON.parse(localStorage.getItem(CACHE_KEY)||'{}')}catch{return{}}}
-function selectAnchor(i,useSaved=false){current=i;const a=anchors[i];document.querySelectorAll('.anchorBtn').forEach((b,idx)=>b.classList.toggle('active',idx===i));$('portrait').src=a.img;$('unitName').innerHTML=`${a.name} <span class="pill">${a.file}</span>`;$('unitMeta').innerHTML=`${a.title} • ${a.element} • ${a.weapon}`;$('anchorNote').textContent=a.note;if(!useSaved){ids.forEach(id=>$(id).value=a[id]??0);$('isAscended').checked=!!a.isAscended;$('includeEquipment').checked=true;$('includeAccountBp').checked=false}calc()}
-function syncRanges(){[['level','levelRange','levelText'],['awakening','awakeningRange','awakeningText'],['boosts','boostsRange','boostsText'],['potential','potentialRange','potentialText'],['mastery','masteryRange','masteryText']].forEach(([n,r,t])=>{if(document.activeElement===$(n))$(r).value=$(n).value;else $(n).value=$(r).value;$(t).textContent=$(n).value})}
-function calc(){syncRanges();const a=anchors[current],p=projected(a,true),err=p.power-a.gamePower,pct=err/a.gamePower*100;$('atkVal').textContent=fmt(p.atk);$('hpVal').textContent=fmt(p.hp);$('spdVal').textContent=fmt(p.spd);$('powerVal').textContent=fmt(p.power);$('overlayPower').textContent=fmt(p.power);$('overlayAtk').textContent='ATK '+fmt(p.atk);$('overlayHp').textContent='HP '+fmt(p.hp);$('overlaySpd').textContent='SPD '+fmt(p.spd);$('errorVal').innerHTML=`<span class="${Math.abs(pct)<5?'good':'bad'}">${pct.toFixed(2)}%</span>`;$('trace').textContent=`Selected: ${a.name}\nProjected ATK/HP/SPD: ${fmt(p.atk)} / ${fmt(p.hp)} / ${fmt(p.spd)}\nProjected Unit Power: ${fmt(p.power)}\nGame Anchor: ${fmt(a.gamePower)}\nError: ${fmt(err)} (${pct.toFixed(2)}%)\n\nHP Layer:\nRaw ${p.hpLayer.raw.toFixed(2)} → Awakened ${fmt(p.hpLayer.awakened)} + Asc ${fmt(p.hpLayer.asc)} + Boost ${fmt(p.hpLayer.boost)} = Baseline ${fmt(p.hpLayer.baseline)} + Potential ${fmt(p.hpLayer.pot)}\n\nATK Layer:\nRaw ${p.atkLayer.raw.toFixed(2)} → Awakened ${fmt(p.atkLayer.awakened)} + Asc ${fmt(p.atkLayer.asc)} + Boost ${fmt(p.atkLayer.boost)} = Baseline ${fmt(p.atkLayer.baseline)} + Potential ${fmt(p.atkLayer.pot)}\n\nCharacter Power:\nHP A ${fmt(p.cp.A)} + ATK B ${fmt(p.cp.B)} + Mastery C ${fmt(p.cp.C)} = ${fmt(p.cp.total)}\nEquipment Power: Weapon ${fmt(p.ep.weapon)} + Accessory ${fmt(p.ep.accessory)} = ${fmt(p.ep.total)}\nFellowship Multiplier: ${p.fellowship.toFixed(4)} / Account BP: ${fmt(p.account)}\n\nReverse/current Lv200 reference estimate:\nREF_HP ${p.refHp.toFixed(2)} / REF_ATK ${p.refAtk.toFixed(2)}`;drawTable();save()}
-function drawTable(){const tbody=document.querySelector('#anchorTable tbody');tbody.innerHTML='';anchors.forEach(a=>{const p=projected(a,false),err=p.power-a.gamePower,pct=err/a.gamePower*100,tr=document.createElement('tr');tr.innerHTML=`<td>${a.name}<br><span class="muted">${a.file}</span></td><td class="right">${fmt(a.gameAtk)}</td><td class="right">${fmt(a.gameHp)}</td><td class="right">${fmt(a.gamePower)}</td><td class="right">${fmt(p.power)}</td><td class="right ${Math.abs(pct)<5?'good':'bad'}">${pct.toFixed(2)}%</td>`;tbody.appendChild(tr)})}
-function init(){Object.entries(defaults).forEach(([k,v])=>{if($(k))$(k).value=v});anchors.forEach((a,i)=>{const b=document.createElement('button');b.className='btn anchorBtn';b.textContent=`${a.name} B${a.boosts}`;b.onclick=()=>selectAnchor(i);$('anchorBtns').appendChild(b)});const saved=load();if(saved&&Object.keys(saved).length){ids.forEach(id=>{if(saved[id]!=null&&$(id))$(id).value=saved[id]});$('includeEquipment').checked=saved.includeEquipment??true;$('isAscended').checked=saved.isAscended??true;$('includeAccountBp').checked=saved.includeAccountBp??false;current=saved.current??0;selectAnchor(current,true)}else selectAnchor(0);ids.concat(['includeEquipment','isAscended','includeAccountBp']).forEach(id=>$(id).addEventListener('input',calc));['levelRange','awakeningRange','boostsRange','potentialRange','masteryRange'].forEach(id=>$(id).addEventListener('input',()=>{const n=id.replace('Range','');$(n).value=$(id).value;calc()}));['level','awakening','boosts','potential','mastery'].forEach(id=>$(id).addEventListener('input',()=>{$(id+'Range').value=$(id).value;calc()}));$('toggleSimple').onclick=()=>$('simpleDrawer').classList.toggle('open');$('openAdvanced').onclick=()=>$('modalBackdrop').classList.add('open');$('closeAdvanced').onclick=()=>$('modalBackdrop').classList.remove('open');$('modalBackdrop').addEventListener('click',e=>{if(e.target.id==='modalBackdrop')$('modalBackdrop').classList.remove('open')});$('resetCache').onclick=()=>{localStorage.removeItem(CACHE_KEY);location.reload()};calc()}
-init();
+// ==========================================
+// EVERTALE REVERSE-ENGINEERED CALCULATION CORE
+// ==========================================
+
+// 1. Level-Cap Multipliers for Limit Breaking (Tiers 1-6)
+function getLimitBreakMultiplier(level) {
+    if (level <= 80)  return 1.00;
+    if (level <= 100) return 1.00; // Tier 1
+    if (level <= 120) return 1.08; // Tier 2
+    if (level <= 140) return 1.16; // Tier 3
+    if (level <= 160) return 1.24; // Tier 4
+    if (level <= 180) return 1.32; // Tier 5
+    return 1.40;                   // Tier 6 (Levels 181-200)
+}
+
+// 2. Base Scale Curve Solver
+function calculateRawStat(refStatLB, currentLevel) {
+    const lbMultiplier = getLimitBreakMultiplier(currentLevel);
+    // Standardizes the baseline level anchor dynamically via game constant vectors
+    const baseSlope = refStatLB / (1.4 * (10 + 200)); 
+    return baseSlope * (10 + currentLevel) * lbMultiplier;
+}
+
+// 3. Piecewise Flat Boost Tab Gains Accumulator
+function calculateBoostBonus(boostLevel) {
+    let boostHP = 0;
+    let boostATK = 0;
+
+    if (boostLevel <= 90) {
+        boostHP = boostLevel * 14;
+        boostATK = boostLevel * 3;
+    } else {
+        // Levels 1-90 value thresholds carry forward structurally
+        boostHP = 1260 + ((boostLevel - 90) * 311);
+        boostATK = 270 + ((boostLevel - 90) * 73);
+    }
+    return { hp: boostHP, atk: boostATK };
+}
+
+// 4. Awakening Multiplier Matrix (0 to 4 Copies Fused)
+const AWAKENING_MULTIPLIERS = [1.00, 1.22, 1.44, 1.66, 1.88];
+
+// ==========================================
+// CENTRAL CALCULATOR CONTROLLER
+// ==========================================
+function updateCalculations() {
+    try {
+        // Collect primary user input data streams
+        const currentLevel = parseInt(document.getElementById('input-level').value) || 80;
+        const awakeningLevel = parseInt(document.getElementById('input-awakening').value) || 0;
+        const boostLevel = parseInt(document.getElementById('input-boost').value) || 0;
+        const potentialPct = parseFloat(document.getElementById('input-potential').value) || 0;
+        const masteryPct = parseFloat(document.getElementById('input-mastery').value) || 0;
+
+        // Collect parameters from reference controls
+        const refStatHP = parseFloat(document.getElementById('ref-hp').value) || 92000;
+        const refStatATK = parseFloat(document.getElementById('ref-atk').value) || 16500;
+        const baseSpeed = parseFloat(document.getElementById('input-speed').value) || 0;
+        const isAscended = document.getElementById('chk-ascended').checked;
+
+        // Step A: Calculate Basic Base Scaling Layers
+        const rawHP = calculateRawStat(refStatHP, currentLevel);
+        const rawATK = calculateRawStat(refStatATK, currentLevel);
+
+        // Step B: Structural Multiplier Applications
+        const awakeningBonusHP = rawHP * (AWAKENING_MULTIPLIERS[awakeningLevel] - 1);
+        const awakeningBonusATK = rawATK * (AWAKENING_MULTIPLIERS[awakeningLevel] - 1);
+
+        // Step C: Ascension Premium Core Evaluation
+        const ascensionHP = isAscended ? (refStatHP * 0.05) : 0;
+        const ascensionATK = isAscended ? (refStatATK * 0.05) : 0;
+
+        // Step D: Extract flat boosts via current bracket tier
+        const boostData = calculateBoostBonus(boostLevel);
+
+        // Step E: Core Order of Operations Modification (Compounding Potential)
+        const potentialBaselineHP = rawHP + awakeningBonusHP + ascensionHP + boostData.hp;
+        const potentialBaselineATK = rawATK + awakeningBonusATK + ascensionATK + boostData.atk;
+
+        const finalPotentialHP = potentialBaselineHP * (potentialPct / 100);
+        const finalPotentialATK = potentialBaselineATK * (potentialPct / 100);
+
+        // Step F: Build Consolidated Summary Output Data Elements
+        const finalCardHP = Math.round(potentialBaselineHP + finalPotentialHP);
+        const finalCardATK = Math.round(potentialBaselineATK + finalPotentialATK);
+        const finalCardSPD = Math.round(baseSpeed);
+
+        // Step G: Dynamic Character Card Power Weight Generation Formula
+        const characterHPWeight = finalCardHP * 12;
+        const characterATKWeight = finalCardATK * 60;
+        const masteryBonusPower = 0.005 * (characterHPWeight + characterATKWeight) * masteryPct;
+        
+        const absoluteCharacterPower = Math.round(characterHPWeight + characterATKWeight + masteryBonusPower);
+
+        // Step H: Update Display UI Components
+        document.getElementById('macro-power').textContent = absoluteCharacterPower.toLocaleString();
+        document.getElementById('macro-hp').textContent = finalCardHP.toLocaleString();
+        document.getElementById('macro-atk').textContent = finalCardATK.toLocaleString();
+        document.getElementById('macro-spd').textContent = finalCardSPD.toLocaleString();
+
+    } catch (calcError) {
+        console.error("Calculation execution stream halted:", calcError);
+    }
+}
+
+// Attach event tracking parameters across interaction cycles
+document.addEventListener('DOMContentLoaded', () => {
+    const interactiveInputs = [
+        'input-level', 'input-awakening', 'input-boost', 
+        'input-potential', 'input-mastery', 'ref-hp', 
+        'ref-atk', 'input-speed', 'chk-ascended'
+    ];
+    
+    interactiveInputs.forEach(id => {
+        const targetEl = document.getElementById(id);
+        if (targetEl) {
+            targetEl.addEventListener('input', updateCalculations);
+            targetEl.addEventListener('change', updateCalculations);
+        }
+    });
+
+    // Run baseline check immediately on init load
+    updateCalculations();
+});
 </script>
+
 </body>
 </html>
