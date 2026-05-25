@@ -16,7 +16,7 @@
     <h1>Evertale Stat / Power Test Lab</h1>
     <p class="muted">
       Refined model: <b>white HP/ATK</b> are character-only stats, <b>blue HP/ATK</b> are white stats plus locked equipment.
-      Use observed white stats to reverse hidden RefStat200. APK raw stats are shown as source data but are not forced into RefStat200.
+      Use observed white stats to reverse hidden RefStat200. The game card lists ATK first and HP second; this page keeps HP/ATK internally separated and auto-detects accidental swaps.
     </p>
     <span class="pill">Level 1–80 = Normal</span>
     <span class="pill">Level 81–200 = Limit Break tiers</span>
@@ -61,18 +61,23 @@
 
   <section class="panel">
     <h2>Observed In-Game Values</h2>
-    <p class="muted">Enter the game screenshots here. White stats reverse the hidden starting/reference stats. Blue stats verify locked equipment.</p>
+    <p class="muted">
+      Enter the card values exactly as the game shows them: <b>ATK first, HP second</b>.
+      White stats reverse the hidden RefStat200. Blue stats are only used to infer/verify locked equipment.
+    </p>
     <div class="grid">
-      <div class="col-3"><label>Observed WHITE HP</label><input id="obsWhiteHP" type="number" value="0"></div>
-      <div class="col-3"><label>Observed WHITE ATK</label><input id="obsWhiteATK" type="number" value="0"></div>
-      <div class="col-3"><label>Observed BLUE HP</label><input id="obsBlueHP" type="number" value="0"></div>
-      <div class="col-3"><label>Observed BLUE ATK</label><input id="obsBlueATK" type="number" value="0"></div>
+      <div class="col-3"><label>Observed WHITE ATK — game top stat line</label><input id="obsWhiteATK" type="number" value="0"></div>
+      <div class="col-3"><label>Observed WHITE HP — game second stat line</label><input id="obsWhiteHP" type="number" value="0"></div>
+      <div class="col-3"><label>Observed BLUE ATK — with weapon</label><input id="obsBlueATK" type="number" value="0"></div>
+      <div class="col-3"><label>Observed BLUE HP — with weapon</label><input id="obsBlueHP" type="number" value="0"></div>
       <div class="col-3"><label>Observed Unit Power</label><input id="obsUnitPower" type="number" value="0"></div>
       <div class="col-3"><label>Locked Platoon BP Offset</label><input id="lockedPlatoonOffset" type="number" value="0"></div>
       <div class="col-3"><label>Player Rank</label><input id="playerRank" type="number" min="0" max="300" value="0"></div>
       <div class="col-3"><label>Include Rank BP?</label><select id="includeRank"><option value="false">No</option><option value="true">Yes</option></select></div>
-      <div class="col-6"><button id="reverseBtn" type="button">Reverse RefStat200 from WHITE Stats</button></div>
-      <div class="col-6"><button id="deriveGearBtn" type="button" class="btn2">Derive Equipment from BLUE − WHITE</button></div>
+      <div class="col-4"><button id="reverseBtn" type="button">Reverse RefStat200 from WHITE Stats</button></div>
+      <div class="col-4"><button id="deriveGearBtn" type="button" class="btn2">Derive Equipment from BLUE − WHITE</button></div>
+      <div class="col-4"><button id="swapObservedBtn" type="button" class="btn2">Fix Swapped HP/ATK Inputs</button></div>
+      <div class="col-12"><div id="inputWarning" class="muted"></div></div>
     </div>
   </section>
 
@@ -284,7 +289,49 @@ function readConfig(){
   };
 }
 
+function setInputWarning(message, isBad=false){
+  const el = $('inputWarning');
+  if(!el) return;
+  el.textContent = message || '';
+  el.className = isBad ? 'bad' : 'muted';
+}
+
+function maybeSwapObservedPair(hpId, atkId, label){
+  const hp = n(hpId);
+  const atk = n(atkId);
+  if(hp > 0 && atk > 0 && hp < atk){
+    $(hpId).value = atk;
+    $(atkId).value = hp;
+    setInputWarning(`${label} HP/ATK looked swapped, so they were corrected. Game card order is ATK first, HP second.`, true);
+    return true;
+  }
+  return false;
+}
+
+function normalizeObservedInputs(){
+  const whiteSwapped = maybeSwapObservedPair('obsWhiteHP', 'obsWhiteATK', 'WHITE');
+  const blueSwapped = maybeSwapObservedPair('obsBlueHP', 'obsBlueATK', 'BLUE');
+  if(!whiteSwapped && !blueSwapped){
+    setInputWarning('');
+  }
+}
+
+function forceSwapObservedInputs(){
+  const pairs = [['obsWhiteHP','obsWhiteATK'], ['obsBlueHP','obsBlueATK']];
+  for(const [hpId, atkId] of pairs){
+    const hp = $(hpId).value;
+    const atk = $(atkId).value;
+    if(hp || atk){
+      $(hpId).value = atk;
+      $(atkId).value = hp;
+    }
+  }
+  setInputWarning('Observed HP/ATK fields were manually swapped. Remember: game card order is ATK first, HP second.', true);
+  calculateAndRender();
+}
+
 function reverseFromObserved(){
+  normalizeObservedInputs();
   const boostStats = boostFlat(n('boost'));
   const common = {
     level:n('level'), copies:n('copies'), potential:n('potential'), isAscended:$('isAscended').value === 'true'
@@ -309,6 +356,7 @@ function reverseFromObserved(){
 }
 
 function deriveGearFromBlueWhite(){
+  normalizeObservedInputs();
   const whiteHP = n('obsWhiteHP');
   const whiteATK = n('obsWhiteATK');
   const blueHP = n('obsBlueHP');
@@ -325,6 +373,9 @@ function signedDiff(calc, observed){
 }
 
 function calculateAndRender(){
+  if(n('obsWhiteHP') > 0 && n('obsWhiteATK') > 0 && n('obsWhiteHP') < n('obsWhiteATK')){
+    setInputWarning('Warning: observed WHITE HP is lower than observed WHITE ATK. These may be swapped. The game displays ATK first, HP second.', true);
+  }
   const cfg = readConfig();
   const result = calculateMasterUnitEngine(cfg);
 
@@ -412,6 +463,7 @@ async function init(){
   $('accessorySelect').addEventListener('change', () => selectEquipment('accessory'));
   $('reverseBtn').addEventListener('click', reverseFromObserved);
   $('deriveGearBtn').addEventListener('click', deriveGearFromBlueWhite);
+  $('swapObservedBtn').addEventListener('click', forceSwapObservedInputs);
   document.querySelectorAll('input,select').forEach(el => {
     if(!['characterSelect','weaponSelect','accessorySelect'].includes(el.id)){
       el.addEventListener('input', calculateAndRender);
