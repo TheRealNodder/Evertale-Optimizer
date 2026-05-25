@@ -2,7 +2,7 @@
    Adds slot-locks for Story + Platoons and passes to engine.
 */
 
-const DATA_CHARACTERS = "./data/characters.json";
+const DATA_CHARACTERS = "./apkfiles/entries/bundles/character_families.bundle.json";
 // Current + legacy keys (older builds used `evertale_owned`).
 const OWNED_KEY = "evertale_owned_units_v1";
 const OWNED_KEY_LEGACY = "evertale_owned";

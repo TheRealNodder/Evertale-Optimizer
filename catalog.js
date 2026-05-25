@@ -3,7 +3,7 @@
 const PLACEHOLDER_IMG = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='128' height='128'><rect width='100%' height='100%' fill='%23121522'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='%23aab1d6' font-family='Arial' font-size='14'>No Image</text></svg>";
 const BAD_IMG_CACHE_KEY = "evertale_bad_img_urls_v1";
 const BAD_IMG_CACHE = new Set(safeJsonParse(localStorage.getItem(BAD_IMG_CACHE_KEY), []));
-const DATA = { characters:"./data/characters.json", weapons:"./data/weapons.json", accessories:"./data/accessories.json", bosses:"./data/bosses.json" };
+const DATA = { characters:"./apkfiles/entries/bundles/character_families.bundle.json", weapons:"./apkfiles/entries/bundles/weapons.bundle.json", accessories:"./apkfiles/entries/bundles/accessories.bundle.json", bosses:"./apkfiles/entries/bundles/bosses.bundle.json" };
 const LS_MOBILE_VIEW_KEY = "evertale_mobile_view_v1";
 const state = { items: [], q: "", type: "all", listTokens: null };
 const $ = id => document.getElementById(id);
@@ -69,5 +69,35 @@ function stateDescriptionByIndex(card, idx){ const panel=card?.querySelector(".d
 function applyStateToCard(card, idx){ if(!card)return; const descRow=stateDescriptionByIndex(card, idx); const descEl=card.querySelector(".descriptionText"); if(descEl&&descRow&&typeof descRow.description==="string")descEl.textContent=descRow.description; const titleEl=card.querySelector(".unitTitle"); if(titleEl&&descRow&&descRow.title)titleEl.textContent=descRow.title; }
 function attachStateHandlers(root){ root.addEventListener("click",e=>{ const btn=e.target.closest(".stateBtn"); if(!btn)return; e.preventDefault(); e.stopPropagation(); const row=btn.closest(".stateRow"); const enc=row?.getAttribute("data-imgs")||""; let imgs=[]; try{imgs=JSON.parse(decodeURIComponent(enc))}catch{} if(!imgs.length)return; const card=btn.closest(".unitCard"); const imgEl=card?.querySelector(".unitThumb img"); if(!imgEl)return; const idx=parseInt(btn.getAttribute("data-idx")||"0",10); if(!Number.isFinite(idx)||idx<0||idx>=imgs.length)return; imgEl.src=imgs[idx]; imgEl.setAttribute("data-state",String(idx)); row.querySelectorAll(".stateBtn").forEach(b=>b.classList.remove("active")); btn.classList.add("active"); applyStateToCard(card, idx); }); root.addEventListener("click",e=>{ const img=e.target.closest(".unitThumb img"); if(!img)return; const card=img.closest(".unitCard"); if(!card)return; const enc=img.getAttribute("data-imgs")||card.querySelector(".stateRow")?.getAttribute("data-imgs")||""; let imgs=[]; try{imgs=JSON.parse(decodeURIComponent(enc))}catch{} if(!Array.isArray(imgs)||imgs.length<2)return; e.preventDefault(); e.stopPropagation(); const cur=parseInt(img.getAttribute("data-state")||"0",10); const next=(Number.isFinite(cur)?cur+1:1)%imgs.length; img.src=imgs[next]; img.setAttribute("data-state",String(next)); const row=card.querySelector(".stateRow"); if(row)row.querySelectorAll(".stateBtn").forEach((b,i)=>b.classList.toggle("active",i===next)); applyStateToCard(card, next); }); }
 
-async function init(){ applyMobileViewClass(getMobileViewPref()); syncViewToggleText(); const hasEntryLoader=!!(window.EvertaleData&&window.EvertaleData.loadAllEntries); const [entries,legacyCharsJson,weaponsJson,accJson,bossesJson]=await Promise.all([hasEntryLoader?window.EvertaleData.loadAllEntries():null,fetchJsonOptional(DATA.characters),fetchJsonOptional(DATA.weapons),fetchJsonOptional(DATA.accessories),fetchJsonOptional(DATA.bosses)]); const legacyChars=toArray(legacyCharsJson,"characters"); const legacyWeapons=toArray(weaponsJson,"weapons"); const legacyAccessories=toArray(accJson,"accessories"); const legacyBosses=toArray(bossesJson,"bosses"); const normalizedChars=entries?.characters?.length?normalizeCharacters(entries.characters):normalizeCharacters(legacyChars); const normalizedWeapons=sortWeaponsByWeaponsJson(entries?.weapons?.length?normalizeWeapons(entries.weapons):normalizeWeapons(legacyWeapons),legacyWeapons); const normalizedAccessories=sortByLegacyOrder(entries?.accessories?.length?normalizeAccessories(entries.accessories):normalizeAccessories(legacyAccessories),legacyAccessories); const normalizedBosses=sortByLegacyOrder(entries?.bosses?.length?normalizeBosses(entries.bosses):normalizeBosses(legacyBosses),legacyBosses); state.items=[...normalizedChars,...normalizedWeapons,...normalizedAccessories,...normalizedBosses]; const search=$("catalogSearch"),typeSel=$("catalogType"),viewBtn=$("viewToggle"); search?.addEventListener("input",()=>{ const v=search.value||""; const maybeList=parseListTokens(v); state.listTokens=maybeList; state.q=maybeList?"":v; render(); }); search?.addEventListener("paste",e=>{ const pasted=(e.clipboardData||window.clipboardData)?.getData("text")||""; setTimeout(()=>{ const tokens=parseListTokens(pasted); if(tokens){ state.listTokens=tokens; state.q=""; render(); }},0); }); typeSel?.addEventListener("change",()=>{ state.type=String(typeSel.value||"all"); render(); }); viewBtn?.addEventListener("click",()=>{ const cur=getMobileViewPref(); const next=cur==="compact"?"detailed":"compact"; setMobileViewPref(next); applyMobileViewClass(next); syncViewToggleText(); }); window.addEventListener("resize",()=>applyMobileViewClass(getMobileViewPref())); render(); const grid=$("catalogGrid"); if(grid)attachStateHandlers(grid); }
+async function init(){
+  applyMobileViewClass(getMobileViewPref());
+  syncViewToggleText();
+
+  if (!(window.EvertaleData && window.EvertaleData.loadAllEntries)) {
+    throw new Error("Live data loader missing. Ensure data-loader.js is loaded before catalog.js.");
+  }
+
+  const entries = await window.EvertaleData.loadAllEntries();
+
+  const normalizedChars = normalizeCharacters(entries.characters || []);
+  const normalizedWeapons = normalizeWeapons(entries.weapons || []);
+  const normalizedAccessories = normalizeAccessories(entries.accessories || []);
+  const normalizedBosses = normalizeBosses(entries.bosses || []);
+
+  state.items = [
+    ...normalizedChars,
+    ...normalizedWeapons,
+    ...normalizedAccessories,
+    ...normalizedBosses
+  ];
+
+  const search=$("catalogSearch"),typeSel=$("catalogType"),viewBtn=$("viewToggle");
+  search?.addEventListener("input",()=>{ const v=search.value||""; const maybeList=parseListTokens(v); state.listTokens=maybeList; state.q=maybeList?"":v; render(); });
+  search?.addEventListener("paste",e=>{ const pasted=(e.clipboardData||window.clipboardData)?.getData("text")||""; setTimeout(()=>{ const tokens=parseListTokens(pasted); if(tokens){ state.listTokens=tokens; state.q=""; render(); }},0); });
+  typeSel?.addEventListener("change",()=>{ state.type=String(typeSel.value||"all"); render(); });
+  viewBtn?.addEventListener("click",()=>{ const cur=getMobileViewPref(); const next=cur==="compact"?"detailed":"compact"; setMobileViewPref(next); applyMobileViewClass(next); syncViewToggleText(); });
+  window.addEventListener("resize",()=>applyMobileViewClass(getMobileViewPref()));
+  render();
+  const grid=$("catalogGrid"); if(grid)attachStateHandlers(grid);
+}
 document.addEventListener("DOMContentLoaded",()=>{ init().catch(err=>{ console.error(err); const status=$("statusText"); if(status)status.textContent=`Error: ${String(err.message||err)}`; }); });

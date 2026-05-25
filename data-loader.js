@@ -1,11 +1,6 @@
 (function(){
-  const ENTRY_BASE = './apkfiles/entries';
-  const LEGACY_DATA_FILES = {
-    characters: './data/characters.json',
-    tags: './data/character_tags.json',
-    actives: './data/character_actives.json',
-    passives: './data/character_passives.json'
-  };
+  const LIVE_CONFIG = window.EVERTALE_LIVE_CONFIG || {};
+  const ENTRY_BASE = LIVE_CONFIG.entryBase || './apkfiles/entries';
 
   const CONCURRENCY = 48;
   let catalogBundleCache = undefined;
@@ -65,7 +60,12 @@
   async function loadEntryCategory(category, optional = false) { const rawRows = await loadRawEntryCategory(category, optional); if (!rawRows.length) return []; const [localizationGroups, characterImageMap] = await Promise.all([getLocalizationGroupsMap(), category === 'characters' ? getCharacterImageMap() : Promise.resolve(null)]); let out = rawRows.map(entry => normalizeEntryForOldSite(entry, category, localizationGroups, characterImageMap)).filter(Boolean); if (category === 'characters') out = await sortCharactersByMap(await mergeCharacterForms(out)); return out; }
   async function loadAllEntries() { const [characters, weapons, accessories, bosses] = await Promise.all([loadEntryCategory('characters', false), loadEntryCategory('weapons', true), loadEntryCategory('accessories', true), loadEntryCategory('bosses', true)]); return { characters, weapons, accessories, bosses }; }
 
-  async function loadCharactersMergedLegacy() { const [baseJson, tagJson, activeJson, passiveJson] = await Promise.all([fetchJson(LEGACY_DATA_FILES.characters, false), fetchJson(LEGACY_DATA_FILES.tags, true), fetchJson(LEGACY_DATA_FILES.actives, true), fetchJson(LEGACY_DATA_FILES.passives, true)]); const baseRows = dedupeById(toArray(baseJson, 'characters')).map(row => ({ ...row })); const byId = new Map(baseRows.map(row => [String(row.id), row])); for (const tagRow of dedupeById(toArray(tagJson, 'character_tags'))) { const target = byId.get(String(tagRow.id)); if (!target) continue; if (Array.isArray(tagRow.derivedTags)) target.derivedTags = [...tagRow.derivedTags].map(normalizeElementTag); if (tagRow.tagEvidence && typeof tagRow.tagEvidence === 'object') target.tagEvidence = { ...tagRow.tagEvidence }; } for (const activeRow of dedupeById(toArray(activeJson, 'character_actives'))) { const target = byId.get(String(activeRow.id)); if (!target) continue; if (Array.isArray(activeRow.activeSkills)) target.activeSkills = [...activeRow.activeSkills]; } for (const passiveRow of dedupeById(toArray(passiveJson, 'character_passives'))) { const target = byId.get(String(passiveRow.id)); if (!target) continue; if (!Array.isArray(passiveRow.passiveSkills)) continue; const passives = [...passiveRow.passiveSkills]; target.passiveSkills = passiveNamesFromArray(passives); if (passives.some(p => p && typeof p === 'object')) target.passiveSkillDetails = passives; } return Array.from(byId.values()); }
-  async function loadCharactersMerged() { try { const entries = await loadEntryCategory('characters', false); if (entries.length) return entries; console.warn('[EvertaleData] Entry characters empty. Falling back to legacy data.'); } catch (err) { console.warn('[EvertaleData] Entry characters failed. Falling back to legacy data.', err); } return loadCharactersMergedLegacy(); }
-  window.EvertaleData = { fetchJson, toArray, normalizeElementValue, normalizeElementTag, loadCharactersMerged, loadCharactersMergedLegacy, loadEntryCategory, loadAllEntries };
+  async function loadCharactersMerged() {
+    const entries = await loadEntryCategory('characters', false);
+    if (!entries.length) {
+      throw new Error('Live APK character dataset is empty. Check apkfiles/entries/bundles/catalog.bundle.json or apkfiles/entries/characters/families/index.json.');
+    }
+    return entries;
+  }
+  window.EvertaleData = { fetchJson, toArray, normalizeElementValue, normalizeElementTag, loadCharactersMerged, loadEntryCategory, loadAllEntries };
 })();
