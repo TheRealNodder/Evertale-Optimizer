@@ -37,7 +37,8 @@ export function calculateMasterUnitEngine(config) {
     flatFellowshipHP = 4900,
     flatFellowshipATK = 750,
     includeRank = false,
-    playerRank = 0
+    playerRank = 0,
+    lockedBpOffset = 0
   } = config;
 
   const lbMul = limitBreakMultiplier(level);
@@ -68,7 +69,7 @@ export function calculateMasterUnitEngine(config) {
     (Number(gear.accATK) || 0) * 30 +
     (Number(gear.accSPD) || 0) * 180;
 
-  const unitPower = Math.round(characterPower + masteryPower + equipmentPower);
+  const unitPower = Math.round(characterPower + masteryPower + equipmentPower + (Number(lockedBpOffset) || 0));
   const accountRankPower = includeRank ? Math.round(accountRankBP(playerRank)) : 0;
 
   return {
@@ -78,51 +79,22 @@ export function calculateMasterUnitEngine(config) {
     battalionPower: unitPower + accountRankPower,
     accountRankPower,
     equipmentPower,
+    lockedBpOffset: Number(lockedBpOffset) || 0,
     masteryPower,
     characterPower
   };
 }
 
 
-/**
- * Solve the hidden RefStat200 anchor from an observed in-game card stat.
- * Monster.json baseMaxHp/baseAttack are APK raw stats, not guaranteed RefStat200.
- */
-export function solveRefStat200FromObserved({
-  observed,
-  stat = 'hp',
-  level,
-  copies,
-  boost,
-  potential,
-  mastery = 0,
-  isAscended = false,
-  flatFellowshipHP = 4900,
-  flatFellowshipATK = 750
-}) {
-  const isHP = stat === 'hp';
-  let lo = 0;
-  let hi = 500000;
+// APK raw stats are not guaranteed to be RefStat200. These seed multipliers are
+// validation-derived from Venus and should be treated as a starting estimate;
+// observed HP/ATK calibration is the exact workflow.
+export const APK_TO_REF_FACTORS = {
+  hp: 26832.823942 / 7700,
+  atk: 3707.548389 / 1344
+};
 
-  for (let i = 0; i < 90; i += 1) {
-    const mid = (lo + hi) / 2;
-    const result = calculateMasterUnitEngine({
-      level,
-      copies,
-      boost,
-      potential,
-      mastery,
-      refHP: isHP ? mid : 0,
-      refATK: isHP ? 0 : mid,
-      isAscended,
-      flatFellowshipHP,
-      flatFellowshipATK,
-      gear: {}
-    });
-    const value = isHP ? result.cardHP : result.cardATK;
-    if (value < observed) lo = mid;
-    else hi = mid;
-  }
-
-  return (lo + hi) / 2;
+export function deriveRefStat200FromApk(rawValue, kind) {
+  const factor = kind === 'hp' ? APK_TO_REF_FACTORS.hp : APK_TO_REF_FACTORS.atk;
+  return Math.max(0, (Number(rawValue) || 0) * factor);
 }
