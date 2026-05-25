@@ -4,233 +4,355 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>Evertale Optimizer • Stat Engine Test Lab</title>
-<link rel="stylesheet" href="./style.css?v=monster-stat-engine"/>
+<link rel="stylesheet" href="./style.css?v=live-stat-engine"/>
 <style>
-:root{--bg:#12081f;--panel:rgba(255,255,255,.075);--panel2:rgba(255,255,255,.045);--line:rgba(255,255,255,.16);--gold:#f5d36a;--green:#74ff68;--purple:#9b6dff;--bad:#ff9b9b;--muted:rgba(246,247,255,.72)}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 20% 0%,rgba(155,109,255,.30),transparent 38%),var(--bg);color:#f6f7ff;font-family:Inter,Arial,sans-serif}.wrap{max-width:1320px;margin:0 auto;padding:24px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:18px;margin:0 0 18px;box-shadow:0 12px 40px rgba(0,0,0,.18)}h1,h2,h3{margin:0 0 10px}.muted{color:var(--muted);line-height:1.5}.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}.col-2{grid-column:span 2}.col-3{grid-column:span 3}.col-4{grid-column:span 4}.col-6{grid-column:span 6}.col-8{grid-column:span 8}.col-12{grid-column:span 12}@media(max-width:850px){.col-2,.col-3,.col-4,.col-6,.col-8{grid-column:span 12}}label{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}input,select,button{width:100%;border-radius:12px;border:1px solid var(--line);background:rgba(0,0,0,.26);color:#fff;padding:10px;font-size:14px}button{cursor:pointer;background:linear-gradient(135deg,var(--purple),#5e35b1);font-weight:700}.btn2{background:rgba(255,255,255,.08)}.stat{background:var(--panel2);border:1px solid var(--line);border-radius:16px;padding:14px}.stat b{display:block;font-size:26px;color:var(--gold)}.match b{color:var(--green)}.pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:5px 9px;background:rgba(255,255,255,.06);font-size:12px;margin:3px}.bad{color:var(--bad)}.good{color:var(--green)}pre{white-space:pre-wrap;background:rgba(0,0,0,.28);border:1px solid var(--line);border-radius:16px;padding:14px;line-height:1.45;max-height:520px;overflow:auto}.portrait{width:96px;height:96px;object-fit:cover;border-radius:16px;border:1px solid var(--line)}.row{display:flex;gap:14px;align-items:center}.warn{border-color:rgba(255,180,80,.55);background:rgba(255,180,80,.08)}
+:root{--bg:#12081f;--panel:rgba(255,255,255,.07);--panel2:rgba(255,255,255,.045);--line:rgba(255,255,255,.14);--gold:#f5d36a;--purple:#9b6dff;--good:#8ff7bd;--bad:#ff9b9b;--muted:rgba(246,247,255,.72)}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 20% 0%,rgba(155,109,255,.28),transparent 38%),var(--bg);color:#f6f7ff;font-family:Inter,Arial,sans-serif}.wrap{max-width:1320px;margin:0 auto;padding:24px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:18px;margin:0 0 18px;box-shadow:0 12px 40px rgba(0,0,0,.18)}h1,h2,h3{margin:0 0 10px}.muted{color:var(--muted);line-height:1.5}.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}.col-3{grid-column:span 3}.col-4{grid-column:span 4}.col-6{grid-column:span 6}.col-8{grid-column:span 8}.col-12{grid-column:span 12}label{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}input,select,button{width:100%;border-radius:12px;border:1px solid var(--line);background:rgba(0,0,0,.26);color:#fff;padding:10px;font-size:14px}button{cursor:pointer;background:linear-gradient(135deg,var(--purple),#5e35b1);font-weight:700}.btn2{background:rgba(255,255,255,.08)}.stat{background:var(--panel2);border:1px solid var(--line);border-radius:16px;padding:14px}.stat b{display:block;font-size:26px;color:var(--gold)}.pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:5px 9px;background:rgba(255,255,255,.06);font-size:12px;margin:3px}.good{color:var(--good)}.bad{color:var(--bad)}pre{white-space:pre-wrap;background:rgba(0,0,0,.28);border:1px solid var(--line);border-radius:16px;padding:14px;line-height:1.45;max-height:520px;overflow:auto}.portrait{width:96px;height:96px;object-fit:contain;background:rgba(255,255,255,.06);border-radius:18px;border:1px solid var(--line)}@media(max-width:900px){.col-3,.col-4,.col-6,.col-8{grid-column:span 12}.wrap{padding:14px}}
 </style>
 </head>
-<body><div class="wrap">
-  <h1>Evertale Stat Engine Test Lab</h1>
-  <p class="muted">Live build reads raw characters from <b>/apkfiles/Monster.json</b>. Important: <code>baseMaxHp</code>/<code>baseAttack</code> from Monster.json are preserved as APK raw stats and are <b>not</b> automatically treated as RefStat200. Use observed in-game HP/ATK to calibrate the RefStat200 anchors.</p>
-
+<body>
+<div class="wrap">
   <section class="panel">
-    <div class="grid">
-      <div class="col-8">
-        <label>Character from /apkfiles/Monster.json</label>
-        <select id="characterSelect"></select>
-      </div>
-      <div class="col-4">
-        <label>Search</label>
-        <input id="characterSearch" placeholder="Type name, id, title, element, weapon..." />
-      </div>
-      <div class="col-12 row">
-        <img id="portrait" class="portrait" alt="portrait"/>
-        <div>
-          <h2 id="charName">Loading…</h2>
-          <div id="charMeta"></div>
-        </div>
-      </div>
-    </div>
+    <h1>Evertale Stat / Power Test Lab</h1>
+    <p class="muted">Live-ready calculator using the Ultimate Master Engine formulas. It loads character, weapon, and accessory data from <code>apkfiles/entries</code>, while still allowing manual RefStat200 overrides.</p>
+    <span class="pill">RawStat = RefStat200 ÷ 294 × (Level + 10) × MLB</span>
+    <span class="pill">Mastery uses unawakened anchor</span>
+    <span class="pill">Awakening uses separate card stat track</span>
   </section>
 
-  <section class="panel warn">
-    <h2>In-game observed calibration</h2>
-    <p class="muted">Enter the HP/ATK shown by the game card, then press calibrate. This solves the hidden RefStat200 anchors needed by the official stat formula.</p>
-    <div class="grid">
-      <div class="col-3"><label>Observed Game HP</label><input id="observedHP" type="number" value="89827"></div>
-      <div class="col-3"><label>Observed Game ATK</label><input id="observedATK" type="number" value="16971"></div>
-      <div class="col-3"><label>Observed Game Power</label><input id="observedPower" type="number" value="2155042"></div>
-      <div class="col-3"><label>&nbsp;</label><button id="calibrateBtn">Calibrate RefStat200</button></div>
+  <section class="panel grid">
+    <div class="col-8">
+      <label>Character from apkfiles/entries/characters</label>
+      <select id="characterSelect"><option>Loading characters...</option></select>
+    </div>
+    <div class="col-4">
+      <label>Search</label>
+      <input id="characterSearch" placeholder="Type name, title, element, weapon..."/>
+    </div>
+    <div class="col-12" style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">
+      <img id="portrait" class="portrait" alt="Character portrait"/>
+      <div>
+        <h2 id="charName">No character selected</h2>
+        <div id="charMeta" class="muted"></div>
+      </div>
     </div>
   </section>
 
   <section class="panel">
     <h2>Inputs</h2>
     <div class="grid">
-      <div class="col-3"><label>Level</label><input id="level" type="number" value="120"></div>
-      <div class="col-3"><label>Awakening copies / nodes</label><input id="copies" type="number" min="0" max="4" value="4"></div>
-      <div class="col-3"><label>Boost</label><input id="boost" type="number" min="0" max="300" value="148"></div>
-      <div class="col-3"><label>Potential %</label><input id="potential" type="number" step="0.01" value="20.16"></div>
-      <div class="col-3"><label>Mastery Level</label><input id="mastery" type="number" value="21"></div>
-      <div class="col-3"><label>Ascended?</label><select id="isAscended"><option value="yes" selected>Yes</option><option value="no">No</option></select></div>
-      <div class="col-3"><label>Flat Fellowship HP</label><input id="flatFellowshipHP" type="number" value="4900"></div>
-      <div class="col-3"><label>Flat Fellowship ATK</label><input id="flatFellowshipATK" type="number" value="750"></div>
-      <div class="col-3"><label>RefStat200 HP</label><input id="refHP" type="number" step="0.000001" value="0"></div>
-      <div class="col-3"><label>RefStat200 ATK</label><input id="refATK" type="number" step="0.000001" value="0"></div>
-      <div class="col-3"><label>APK raw HP</label><input id="apkHP" type="number" readonly value="0"></div>
-      <div class="col-3"><label>APK raw ATK</label><input id="apkATK" type="number" readonly value="0"></div>
+      <div class="col-3"><label>Level</label><input id="level" type="number" min="1" max="200" value="200"></div>
+      <div class="col-3"><label>Awakening copies / nodes</label><input id="copies" type="number" min="0" max="4" value="0"></div>
+      <div class="col-3"><label>Boost</label><input id="boost" type="number" min="0" max="300" value="0"></div>
+      <div class="col-3"><label>Potential %</label><input id="potential" type="number" min="0" max="100" step="0.01" value="0"></div>
+
+      <div class="col-3"><label>Mastery Level</label><input id="mastery" type="number" min="0" max="40" value="0"></div>
+      <div class="col-3"><label>Ascended?</label><select id="isAscended"><option value="false">No</option><option value="true">Yes</option></select></div>
+      <div class="col-3"><label>Flat Fellowship HP</label><input id="fellowHp" type="number" value="4900"></div>
+      <div class="col-3"><label>Flat Fellowship ATK</label><input id="fellowAtk" type="number" value="750"></div>
+
+      <div class="col-3"><label>RefStat200 HP</label><input id="refHP" type="number" step="0.01" value="0"></div>
+      <div class="col-3"><label>RefStat200 ATK</label><input id="refATK" type="number" step="0.01" value="0"></div>
+      <div class="col-3"><label>Player Rank</label><input id="playerRank" type="number" min="0" max="300" value="0"></div>
+      <div class="col-3"><label>Include Rank BP?</label><select id="includeRank"><option value="false">No</option><option value="true">Yes</option></select></div>
     </div>
   </section>
 
   <section class="panel">
-    <h2>Equipment / direct stat additions</h2>
-    <p class="muted">Use these only for visible equipment BP/stat additions. Character scaling stays isolated from equipment.</p>
+    <h2>Equipment / locked platoon additions</h2>
+    <p class="muted">In-game platoon cards keep their equipped weapon attached. Enter the visible weapon stats here; do not remove them unless you change the platoon/equipment in-game. Use the locked BP offset only when the visible HP/ATK match but Unit Power is still short.</p>
     <div class="grid">
+      <div class="col-6"><label>Weapon from apkfiles/entries/weapons</label><select id="weaponSelect"><option value="">No weapon</option></select></div>
+      <div class="col-6"><label>Accessory from apkfiles/entries/accessories</label><select id="accessorySelect"><option value="">No accessory</option></select></div>
       <div class="col-3"><label>Weapon HP</label><input id="wepHP" type="number" value="0"></div>
       <div class="col-3"><label>Weapon ATK</label><input id="wepATK" type="number" value="0"></div>
       <div class="col-2"><label>Accessory HP</label><input id="accHP" type="number" value="0"></div>
       <div class="col-2"><label>Accessory ATK</label><input id="accATK" type="number" value="0"></div>
       <div class="col-2"><label>Accessory SPD</label><input id="accSPD" type="number" value="0"></div>
+      <div class="col-3"><label>Observed in-game Unit Power</label><input id="observedPower" type="number" value="0"></div>
+      <div class="col-3"><label>Locked platoon BP offset</label><input id="lockedPowerOffset" type="number" value="0"></div>
+      <div class="col-6" style="display:flex;align-items:end;gap:10px;flex-wrap:wrap">
+        <button id="calibratePowerOffset" type="button">Calibrate BP Offset</button>
+        <span class="muted">Use when weapon is attached and only Power is still drifting.</span>
+      </div>
     </div>
   </section>
 
-  <section class="panel">
-    <h2>Results</h2>
-    <div class="grid">
-      <div class="col-3 stat match"><span>Card HP</span><b id="outHP">0</b><small id="diffHP"></small></div>
-      <div class="col-3 stat match"><span>Card ATK</span><b id="outATK">0</b><small id="diffATK"></small></div>
-      <div class="col-3 stat"><span>Unit Power</span><b id="outPower">0</b><small id="diffPower"></small></div>
-      <div class="col-3 stat"><span>Speed</span><b id="outSPD">0</b></div>
-      <div class="col-12"><pre id="trace"></pre></div>
-    </div>
+  <section class="panel grid">
+    <div class="col-3 stat"><span class="muted">Card HP</span><b id="outHP">0</b></div>
+    <div class="col-3 stat"><span class="muted">Card ATK</span><b id="outATK">0</b></div>
+    <div class="col-3 stat"><span class="muted">Unit Power</span><b id="outPower">0</b></div>
+    <div class="col-3 stat"><span class="muted">Battalion Power</span><b id="outBattalion">0</b></div>
+    <div class="col-12"><pre id="trace">Waiting for data...</pre></div>
   </section>
 </div>
 
-<script type="module">
+<script>
 const $ = id => document.getElementById(id);
-const fmt = n => Number(n||0).toLocaleString(undefined,{maximumFractionDigits:0});
-const num = id => Number($(id).value || 0);
+const APK = './apkfiles/entries';
 const AWK = [1.00, 1.22, 1.44, 1.66, 1.88];
-let monsters = [];
-let current = null;
 
-function lbMul(level){ if(level>180)return 1.40; if(level>160)return 1.32; if(level>140)return 1.24; if(level>120)return 1.16; if(level>100)return 1.08; return 1.00; }
-function boostFlat(boost){ return boost<=90 ? {hp:boost*14, atk:boost*3} : {hp:1260+((boost-90)*311), atk:270+((boost-90)*73)}; }
+let characters = [], weapons = [], accessories = [];
 
-function calculate(config){
-  const level = Number(config.level)||1;
-  const refHP = Number(config.refHP)||0;
-  const refATK = Number(config.refATK)||0;
-  const boost = Number(config.boost)||0;
-  const potential = Number(config.potential)||0;
-  const mastery = Number(config.mastery)||0;
-  const copies = Math.max(0, Math.min(4, Number(config.copies)||0));
-  const b = boostFlat(boost);
-  const lb = lbMul(level);
-  const potentialScalar = 1 + potential/100;
-  const rawHP = (refHP / 294) * (level + 10) * lb;
-  const rawATK = (refATK / 294) * (level + 10) * lb;
-  const baseStackHP = rawHP + b.hp + (Number(config.flatFellowshipHP)||0);
-  const baseStackATK = rawATK + b.atk + (Number(config.flatFellowshipATK)||0);
+function n(id){ return Number($(id).value || 0); }
+function fmt(x){ return Number(Math.round(x)).toLocaleString(); }
+function clamp(v,min,max){ return Math.min(max, Math.max(min, Number(v)||0)); }
 
-  // Track A: unawakened anchor for mastery. Awakening is intentionally excluded.
+function limitBreakMultiplier(level){
+  level = clamp(level,1,200);
+  if(level > 180) return 1.40;
+  if(level > 160) return 1.32;
+  if(level > 140) return 1.24;
+  if(level > 120) return 1.16;
+  if(level > 100) return 1.08;
+  return 1.00;
+}
+
+function boostFlat(boost){
+  boost = clamp(boost,0,300);
+  if(boost <= 90) return { hp: boost * 14, atk: boost * 3 };
+  return { hp: 1260 + ((boost - 90) * 311), atk: 270 + ((boost - 90) * 73) };
+}
+
+function rankBP(rank){
+  rank = clamp(rank,0,300);
+  return (2000000 / 27000000) * Math.pow(rank, 3);
+}
+
+function calculateMasterUnitEngine(config){
+  const level = clamp(config.level,1,200);
+  const copies = clamp(config.copies,0,4);
+  const boost = clamp(config.boost,0,300);
+  const potential = clamp(config.potential,0,100);
+  const mastery = Math.max(0, Number(config.mastery)||0);
+  const refHP = Math.max(0, Number(config.refHP)||0);
+  const refATK = Math.max(0, Number(config.refATK)||0);
+  const gear = Object.assign({wepHP:0,wepATK:0,accHP:0,accATK:0,accSPD:0}, config.gear || {});
+  const flatFellowshipHP = Number(config.flatFellowshipHP ?? 4900);
+  const flatFellowshipATK = Number(config.flatFellowshipATK ?? 750);
+
+  const lbMul = limitBreakMultiplier(level);
+  const rawHP = (refHP / 294.0) * (level + 10) * lbMul;
+  const rawATK = (refATK / 294.0) * (level + 10) * lbMul;
+  const boostStats = boostFlat(boost);
+
+  const baseStackHP = rawHP + boostStats.hp + flatFellowshipHP;
+  const baseStackATK = rawATK + boostStats.atk + flatFellowshipATK;
+  const potentialScalar = 1 + (potential / 100.0);
+
+  // Track A: Unawakened anchor timeline for Mastery. This intentionally ignores Awakening.
   const anchorHP = baseStackHP * potentialScalar;
   const anchorATK = baseStackATK * potentialScalar;
-  const masteryPower = ((anchorHP * 12) + (anchorATK * 60)) * 0.0025 * mastery;
+  const anchorBasePower = (anchorHP * 12) + (anchorATK * 60);
+  const masteryPower = anchorBasePower * 0.0025 * mastery;
 
-  // Track B: awakened visible card stats.
-  const awk = AWK[copies] || 1;
-  const ascensionHP = config.isAscended ? refHP * 0.05 : 0;
-  const ascensionATK = config.isAscended ? refATK * 0.05 : 0;
-  const cardHP = Math.round(baseStackHP * awk * potentialScalar) + ascensionHP;
-  const cardATK = Math.round(baseStackATK * awk * potentialScalar) + ascensionATK;
+  // Track B: Awakened card stat timeline.
+  const awkMul = AWK[copies] || 1.00;
+  const ascensionHP = config.isAscended ? (refHP * 0.05) : 0;
+  const ascensionATK = config.isAscended ? (refATK * 0.05) : 0;
+  const cardHP = Math.round(baseStackHP * awkMul * potentialScalar) + ascensionHP;
+  const cardATK = Math.round(baseStackATK * awkMul * potentialScalar) + ascensionATK;
+  const characterPower = (cardHP * 12) + (cardATK * 60);
 
-  const equipmentPower =
-    (Number(config.gear.wepHP)||0) * 6 + (Number(config.gear.wepATK)||0) * 30 +
-    (Number(config.gear.accHP)||0) * 6 + (Number(config.gear.accATK)||0) * 30 +
-    (Number(config.gear.accSPD)||0) * 180;
+  const equipmentPower = (Number(gear.wepHP)||0) * 6
+    + (Number(gear.wepATK)||0) * 30
+    + (Number(gear.accHP)||0) * 6
+    + (Number(gear.accATK)||0) * 30
+    + (Number(gear.accSPD)||0) * 180;
 
-  const unitPower = Math.round(cardHP * 12 + cardATK * 60 + masteryPower + equipmentPower);
-  return {cardHP, cardATK, unitPower, trace:{level, lb, refHP, refATK, rawHP, rawATK, boostFlat:b, baseStackHP, baseStackATK, potentialScalar, anchorHP, anchorATK, masteryPower, awakeningMultiplier:awk, ascensionHP, ascensionATK, equipmentPower}};
-}
+  const lockedPowerOffset = Number(config.lockedPowerOffset)||0;
+  const unitPowerBeforeOffset = Math.round(characterPower + masteryPower + equipmentPower);
+  const unitPower = Math.round(unitPowerBeforeOffset + lockedPowerOffset);
+  const accountRankPower = config.includeRank ? Math.round(rankBP(config.playerRank)) : 0;
 
-function solveRefForObserved(target, statKind){
-  // Inverts the final visible card-stat formula using binary search so rounding matches game screenshots.
-  const isHP = statKind === 'hp';
-  let lo = 0, hi = 500000;
-  for(let i=0;i<90;i++){
-    const mid = (lo+hi)/2;
-    const cfg = readConfig();
-    cfg.refHP = isHP ? mid : num('refHP');
-    cfg.refATK = isHP ? num('refATK') : mid;
-    const out = calculate(cfg);
-    const val = isHP ? out.cardHP : out.cardATK;
-    if(val < target) lo = mid; else hi = mid;
-  }
-  return (lo+hi)/2;
-}
-
-function readConfig(){
   return {
-    level:num('level'), copies:num('copies'), boost:num('boost'), potential:num('potential'), mastery:num('mastery'),
-    refHP:num('refHP'), refATK:num('refATK'), flatFellowshipHP:num('flatFellowshipHP'), flatFellowshipATK:num('flatFellowshipATK'),
-    isAscended:$('isAscended').value === 'yes',
-    gear:{wepHP:num('wepHP'), wepATK:num('wepATK'), accHP:num('accHP'), accATK:num('accATK'), accSPD:num('accSPD')}
+    cardHP, cardATK, unitPower,
+    battalionPower: unitPower + accountRankPower,
+    accountRankPower,
+    trace: { level, copies, boost, potential, mastery, refHP, refATK, lbMul, rawHP, rawATK, boostStats, baseStackHP, baseStackATK, anchorHP, anchorATK, anchorBasePower, masteryPower, awkMul, ascensionHP, ascensionATK, characterPower, equipmentPower, lockedPowerOffset, unitPowerBeforeOffset, observedPower: Number(config.observedPower)||0 }
   };
 }
 
-function diffText(out, obs, label){
-  if(!obs) return '';
-  const d = Math.round(out - obs);
-  if(d === 0) return `${label}: exact match`;
-  return `${label}: ${d>0?'+':''}${fmt(d)} vs observed`;
+async function loadIndex(category){
+  const index = await fetch(`${APK}/${category}/index.json`).then(r => {
+    if(!r.ok) throw new Error(`Failed to load ${category}/index.json`);
+    return r.json();
+  });
+  const rows = [];
+  for(const entry of index.entries || []){
+    rows.push({
+      category,
+      label: `${entry.name || entry.sourceId} (${entry.sourceId || ''})`,
+      name: entry.name || entry.sourceId,
+      sourceId: entry.sourceId,
+      file: entry.file,
+      image: entry.image
+    });
+  }
+  return rows;
 }
 
-function render(){
-  const out = calculate(readConfig());
-  $('outHP').textContent = fmt(out.cardHP);
-  $('outATK').textContent = fmt(out.cardATK);
-  $('outPower').textContent = fmt(out.unitPower);
-  $('outSPD').textContent = fmt(current?.speed || 0);
-  $('diffHP').textContent = diffText(out.cardHP, num('observedHP'), 'HP');
-  $('diffATK').textContent = diffText(out.cardATK, num('observedATK'), 'ATK');
-  $('diffPower').textContent = diffText(out.unitPower, num('observedPower'), 'Power');
-  $('trace').textContent = JSON.stringify(out.trace, null, 2);
+async function loadEntry(category, file){
+  return fetch(`${APK}/${category}/${file}`).then(r => r.json());
 }
 
-function selectCharacter(){
-  const i = Number($('characterSelect').value || 0);
-  current = monsters[i] || monsters[0];
-  if(!current) return;
-  $('charName').textContent = `${current.displayName || current.name}${current.title ? ' • ' + current.title : ''}`;
-  $('charMeta').innerHTML = [
-    current.element || 'Unknown element',
-    current.weaponPref || current.weaponType || 'Unknown weapon',
-    `APK raw HP ${fmt(current.baseMaxHp)}`,
-    `APK raw ATK ${fmt(current.baseAttack)}`,
-    `SPD ${fmt(current.speed)}`
-  ].map(x=>`<span class="pill">${x}</span>`).join(' ');
-  $('portrait').src = `https://ik.imagekit.io/r8fsa98s9/characters/${current.name}.png`;
-  $('apkHP').value = current.baseMaxHp || 0;
-  $('apkATK').value = current.baseAttack || 0;
-  $('outSPD').textContent = current.speed || 0;
-  render();
+function statOf(entry, key){
+  return Number(entry?.stats?.[key] ?? entry?.raw?.[key] ?? entry?.[key] ?? 0);
+}
+
+function fillSelect(select, rows, placeholder){
+  select.innerHTML = `<option value="">${placeholder}</option>` + rows.map((r,i)=>`<option value="${i}">${r.label}</option>`).join('');
 }
 
 function filterCharacters(){
   const q = $('characterSearch').value.trim().toLowerCase();
-  const rows = !q ? monsters : monsters.filter(m => `${m.name} ${m.displayName||''} ${m.title||''} ${m.element||''} ${m.weaponPref||''}`.toLowerCase().includes(q));
-  $('characterSelect').innerHTML = rows.map(m => `<option value="${monsters.indexOf(m)}">${m.displayName || m.name} (${m.name})</option>`).join('');
+  const rows = !q ? characters : characters.filter(c => `${c.name} ${c.sourceId}`.toLowerCase().includes(q));
+  $('characterSelect').innerHTML = rows.map(c => `<option value="${characters.indexOf(c)}">${c.label}</option>`).join('');
+}
+
+async function selectCharacter(){
+  const i = Number($('characterSelect').value || 0);
+  const row = characters[i]; if(!row) return;
+  const entry = await loadEntry('characters', row.file);
+  const hp = statOf(entry,'hp'), atk = statOf(entry,'atk'), spd = statOf(entry,'spd');
+  $('portrait').src = entry.image || row.image || '';
+  $('charName').textContent = `${entry.name || row.name}${entry.title ? ' • ' + entry.title : ''}`;
+  $('charMeta').innerHTML = [
+    entry.element || 'Unknown element',
+    entry.weaponType || 'Unknown weapon',
+    `APK HP ${fmt(hp)}`,
+    `APK ATK ${fmt(atk)}`,
+    `SPD ${fmt(spd)}`
+  ].map(x=>`<span class="pill">${x}</span>`).join(' ');
+  // Treat APK stats as RefStat200 defaults. User can override if APK source proves to be a different stat anchor.
+  $('refHP').value = hp || $('refHP').value;
+  $('refATK').value = atk || $('refATK').value;
+  calculateAndRender();
+}
+
+async function selectEquipment(kind){
+  const isWeapon = kind === 'weapon';
+  const select = isWeapon ? $('weaponSelect') : $('accessorySelect');
+  if(select.value === ''){
+    if(isWeapon){ $('wepHP').value=0; $('wepATK').value=0; }
+    else { $('accHP').value=0; $('accATK').value=0; $('accSPD').value=0; }
+    calculateAndRender(); return;
+  }
+  const row = (isWeapon ? weapons : accessories)[Number(select.value)];
+  const entry = await loadEntry(isWeapon ? 'weapons' : 'accessories', row.file);
+  if(isWeapon){
+    $('wepHP').value = statOf(entry,'hp');
+    $('wepATK').value = statOf(entry,'atk');
+  }else{
+    $('accHP').value = statOf(entry,'hp');
+    $('accATK').value = statOf(entry,'atk');
+    $('accSPD').value = statOf(entry,'spd');
+  }
+  calculateAndRender();
+}
+
+function readConfig(){
+  return {
+    level:n('level'), copies:n('copies'), boost:n('boost'), potential:n('potential'), mastery:n('mastery'),
+    refHP:n('refHP'), refATK:n('refATK'), isAscended:$('isAscended').value === 'true',
+    flatFellowshipHP:n('fellowHp'), flatFellowshipATK:n('fellowAtk'),
+    playerRank:n('playerRank'), includeRank:$('includeRank').value === 'true',
+    lockedPowerOffset:n('lockedPowerOffset'), observedPower:n('observedPower'),
+    gear:{ wepHP:n('wepHP'), wepATK:n('wepATK'), accHP:n('accHP'), accATK:n('accATK'), accSPD:n('accSPD') }
+  };
+}
+
+function calculateAndRender(){
+  const cfg = readConfig();
+  const result = calculateMasterUnitEngine(cfg);
+  $('outHP').textContent = fmt(result.cardHP);
+  $('outATK').textContent = fmt(result.cardATK);
+  $('outPower').textContent = fmt(result.unitPower);
+  $('outBattalion').textContent = fmt(result.battalionPower);
+
+  const t = result.trace;
+  $('trace').textContent =
+`Master Engine Trace
+===================
+Limit Break Multiplier: ${t.lbMul}
+Raw HP:  (${t.refHP} / 294) × (${t.level} + 10) × ${t.lbMul} = ${t.rawHP.toFixed(4)}
+Raw ATK: (${t.refATK} / 294) × (${t.level} + 10) × ${t.lbMul} = ${t.rawATK.toFixed(4)}
+
+Boost:
+HP +${t.boostStats.hp}
+ATK +${t.boostStats.atk}
+
+BaseStack:
+HP = RawHP + BoostHP + FellowshipHP = ${t.baseStackHP.toFixed(4)}
+ATK = RawATK + BoostATK + FellowshipATK = ${t.baseStackATK.toFixed(4)}
+
+Track A - Mastery Anchor, no Awakening:
+AnchorHP = BaseStackHP × PotentialScalar = ${t.anchorHP.toFixed(4)}
+AnchorATK = BaseStackATK × PotentialScalar = ${t.anchorATK.toFixed(4)}
+AnchorBasePower = AnchorHP×12 + AnchorATK×60 = ${t.anchorBasePower.toFixed(4)}
+MasteryPower = AnchorBasePower × 0.0025 × ${t.mastery} = ${t.masteryPower.toFixed(4)}
+
+Track B - Display Card Stats:
+Awakening Multiplier = ${t.awkMul}
+Ascension Premium HP/ATK = ${t.ascensionHP.toFixed(4)} / ${t.ascensionATK.toFixed(4)}
+CardHP = round(BaseStackHP × Awakening × PotentialScalar) + AscensionPremium = ${result.cardHP}
+CardATK = round(BaseStackATK × Awakening × PotentialScalar) + AscensionPremium = ${result.cardATK}
+CharacterPower = CardHP×12 + CardATK×60 = ${t.characterPower.toFixed(4)}
+
+Equipment:
+EquipmentPower = WepHP×6 + WepATK×30 + AccHP×6 + AccATK×30 + AccSPD×180 = ${t.equipmentPower.toFixed(4)}
+
+Locked Platoon / Hidden BP:
+LockedPowerOffset = ${t.lockedPowerOffset}
+ObservedPower = ${t.observedPower || 'not set'}
+ObservedDiffAfterOffset = ${t.observedPower ? (t.observedPower - result.unitPower) : 'not set'}
+
+Totals:
+UnitPowerBeforeOffset = round(CharacterPower + MasteryPower + EquipmentPower) = ${t.unitPowerBeforeOffset}
+UnitPower = round(UnitPowerBeforeOffset + LockedPowerOffset) = ${result.unitPower}
+AccountRankPower = ${result.accountRankPower}
+BattalionPower = ${result.battalionPower}`;
+}
+
+function calibratePowerOffset(){
+  // First calculate with current offset removed so the calibration is stable/repeatable.
+  const currentOffset = n('lockedPowerOffset');
+  const observed = n('observedPower');
+  if(!observed){
+    alert('Enter the in-game Unit Power first.');
+    return;
+  }
+  $('lockedPowerOffset').value = 0;
+  const base = calculateMasterUnitEngine(readConfig()).unitPower;
+  const inferred = observed - base;
+  $('lockedPowerOffset').value = inferred;
+  calculateAndRender();
 }
 
 async function init(){
-  const res = await fetch('./apkfiles/Monster.json');
-  if(!res.ok) throw new Error('Unable to load /apkfiles/Monster.json');
-  const payload = await res.json();
-  monsters = (payload.Monster || []).filter(m => m.visible !== 0).map(m => ({
-    ...m,
-    displayName: m.name.replace(/Regular\d+$/,'').replace(/([a-z])([A-Z])/g,'$1 $2')
-  }));
-  monsters.sort((a,b) => (a.displayName||a.name).localeCompare(b.displayName||b.name));
-  filterCharacters();
-  const venusIndex = monsters.findIndex(m => m.name === 'VenusRegular02');
-  if(venusIndex >= 0) $('characterSelect').value = String(venusIndex);
-  selectCharacter();
+  try{
+    [characters, weapons, accessories] = await Promise.all([
+      loadIndex('characters'), loadIndex('weapons'), loadIndex('accessories')
+    ]);
+    fillSelect($('characterSelect'), characters, 'Choose character');
+    fillSelect($('weaponSelect'), weapons, 'No weapon');
+    fillSelect($('accessorySelect'), accessories, 'No accessory');
+    await selectCharacter();
+  }catch(err){
+    $('trace').textContent = `Load error: ${err.message}\n\nRun through a local server, not file://, for fetch() to access apkfiles. Example:\nnpm run serve`;
+  }
+
   $('characterSearch').addEventListener('input', filterCharacters);
   $('characterSelect').addEventListener('change', selectCharacter);
-  document.querySelectorAll('input,select').forEach(el => el.addEventListener('input', render));
-  $('calibrateBtn').addEventListener('click', () => {
-    const hp = num('observedHP'), atk = num('observedATK');
-    if(hp > 0) $('refHP').value = solveRefForObserved(hp, 'hp').toFixed(6);
-    if(atk > 0) $('refATK').value = solveRefForObserved(atk, 'atk').toFixed(6);
-    render();
+  $('weaponSelect').addEventListener('change', () => selectEquipment('weapon'));
+  $('accessorySelect').addEventListener('change', () => selectEquipment('accessory'));
+  $('calibratePowerOffset').addEventListener('click', calibratePowerOffset);
+  document.querySelectorAll('input,select').forEach(el => {
+    if(!['characterSelect','weaponSelect','accessorySelect'].includes(el.id)) el.addEventListener('input', calculateAndRender);
+    if(!['characterSelect','weaponSelect','accessorySelect'].includes(el.id)) el.addEventListener('change', calculateAndRender);
   });
 }
-
-init().catch(err => {
-  $('charName').textContent = 'Load failed';
-  $('charMeta').innerHTML = `<span class="bad">${err.message}</span>`;
-});
+init();
 </script>
-</body></html>
+</body>
+</html>
