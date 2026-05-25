@@ -82,3 +82,47 @@ export function calculateMasterUnitEngine(config) {
     characterPower
   };
 }
+
+
+/**
+ * Solve the hidden RefStat200 anchor from an observed in-game card stat.
+ * Monster.json baseMaxHp/baseAttack are APK raw stats, not guaranteed RefStat200.
+ */
+export function solveRefStat200FromObserved({
+  observed,
+  stat = 'hp',
+  level,
+  copies,
+  boost,
+  potential,
+  mastery = 0,
+  isAscended = false,
+  flatFellowshipHP = 4900,
+  flatFellowshipATK = 750
+}) {
+  const isHP = stat === 'hp';
+  let lo = 0;
+  let hi = 500000;
+
+  for (let i = 0; i < 90; i += 1) {
+    const mid = (lo + hi) / 2;
+    const result = calculateMasterUnitEngine({
+      level,
+      copies,
+      boost,
+      potential,
+      mastery,
+      refHP: isHP ? mid : 0,
+      refATK: isHP ? 0 : mid,
+      isAscended,
+      flatFellowshipHP,
+      flatFellowshipATK,
+      gear: {}
+    });
+    const value = isHP ? result.cardHP : result.cardATK;
+    if (value < observed) lo = mid;
+    else hi = mid;
+  }
+
+  return (lo + hi) / 2;
+}
