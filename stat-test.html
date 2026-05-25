@@ -14,7 +14,7 @@
 <div class="wrap">
   <section class="panel">
     <h1>Evertale Stat / Power Test Lab</h1>
-    <p class="muted">Live-ready calculator using the Ultimate Master Engine formulas. It loads character, weapon, and accessory data from <code>apkfiles/entries</code>, while still allowing manual RefStat200 overrides.</p>
+    <p class="muted">Live-ready calculator using the Ultimate Master Engine formulas. APK raw HP/ATK are loaded from <code>apkfiles</code>, then converted/calibrated into RefStat200. Do not paste APK raw stats into RefStat200 unless you are intentionally testing the raw layer.</p>
     <span class="pill">RawStat = RefStat200 ÷ 294 × (Level + 10) × MLB</span>
     <span class="pill">Mastery uses unawakened anchor</span>
     <span class="pill">Awakening uses separate card stat track</span>
@@ -55,12 +55,20 @@
       <div class="col-3"><label>RefStat200 ATK</label><input id="refATK" type="number" step="0.01" value="0"></div>
       <div class="col-3"><label>Player Rank</label><input id="playerRank" type="number" min="0" max="300" value="0"></div>
       <div class="col-3"><label>Include Rank BP?</label><select id="includeRank"><option value="false">No</option><option value="true">Yes</option></select></div>
+
+      <div class="col-3"><label>APK raw HP</label><input id="apkHP" type="number" step="0.000001" value="0" readonly></div>
+      <div class="col-3"><label>APK raw ATK</label><input id="apkATK" type="number" step="0.000001" value="0" readonly></div>
+      <div class="col-3"><label>Observed in-game HP</label><input id="observedHP" type="number" value="0"></div>
+      <div class="col-3"><label>Observed in-game ATK</label><input id="observedATK" type="number" value="0"></div>
+
+      <div class="col-6"><button id="deriveRefBtn" type="button">Derive RefStat200 from APK estimate</button></div>
+      <div class="col-6"><button id="calibrateRefBtn" type="button">Calibrate RefStat200 from observed HP/ATK</button></div>
     </div>
   </section>
 
   <section class="panel">
     <h2>Equipment / locked platoon additions</h2>
-    <p class="muted">In-game platoon cards keep their equipped weapon attached. Enter the visible weapon stats here; do not remove them unless you change the platoon/equipment in-game. Use the locked BP offset only when the visible HP/ATK match but Unit Power is still short.</p>
+    <p class="muted">Weapon stats are part of the active platoon/unit power context. Keep them attached when comparing against the in-game platoon screen.</p>
     <div class="grid">
       <div class="col-6"><label>Weapon from apkfiles/entries/weapons</label><select id="weaponSelect"><option value="">No weapon</option></select></div>
       <div class="col-6"><label>Accessory from apkfiles/entries/accessories</label><select id="accessorySelect"><option value="">No accessory</option></select></div>
@@ -69,19 +77,16 @@
       <div class="col-2"><label>Accessory HP</label><input id="accHP" type="number" value="0"></div>
       <div class="col-2"><label>Accessory ATK</label><input id="accATK" type="number" value="0"></div>
       <div class="col-2"><label>Accessory SPD</label><input id="accSPD" type="number" value="0"></div>
-      <div class="col-3"><label>Observed in-game Unit Power</label><input id="observedPower" type="number" value="0"></div>
-      <div class="col-3"><label>Locked platoon BP offset</label><input id="lockedPowerOffset" type="number" value="0"></div>
-      <div class="col-6" style="display:flex;align-items:end;gap:10px;flex-wrap:wrap">
-        <button id="calibratePowerOffset" type="button">Calibrate BP Offset</button>
-        <span class="muted">Use when weapon is attached and only Power is still drifting.</span>
-      </div>
+      <div class="col-6"><label>Observed in-game Unit Power</label><input id="observedPower" type="number" value="0"></div>
+      <div class="col-6"><label>Locked platoon BP offset</label><input id="lockedBpOffset" type="number" value="0"></div>
+      <div class="col-12"><button id="calibrateBpBtn" type="button">Calibrate BP Offset</button></div>
     </div>
   </section>
 
   <section class="panel grid">
-    <div class="col-3 stat"><span class="muted">Card HP</span><b id="outHP">0</b></div>
-    <div class="col-3 stat"><span class="muted">Card ATK</span><b id="outATK">0</b></div>
-    <div class="col-3 stat"><span class="muted">Unit Power</span><b id="outPower">0</b></div>
+    <div class="col-3 stat"><span class="muted">Card HP</span><b id="outHP">0</b><small id="hpDelta" class="muted"></small></div>
+    <div class="col-3 stat"><span class="muted">Card ATK</span><b id="outATK">0</b><small id="atkDelta" class="muted"></small></div>
+    <div class="col-3 stat"><span class="muted">Unit Power</span><b id="outPower">0</b><small id="powerDelta" class="muted"></small></div>
     <div class="col-3 stat"><span class="muted">Battalion Power</span><b id="outBattalion">0</b></div>
     <div class="col-12"><pre id="trace">Waiting for data...</pre></div>
   </section>
@@ -93,6 +98,12 @@ const APK = './apkfiles/entries';
 const AWK = [1.00, 1.22, 1.44, 1.66, 1.88];
 
 let characters = [], weapons = [], accessories = [];
+let selectedCharacterEntry = null;
+
+// These are APK-raw -> RefStat200 seed multipliers discovered from Venus validation.
+// They are only an estimate. The observed HP/ATK calibration button is the exact path.
+const APK_TO_REF_HP_FACTOR = 26832.823942 / 7700;
+const APK_TO_REF_ATK_FACTOR = 3707.548389 / 1344;
 
 function n(id){ return Number($(id).value || 0); }
 function fmt(x){ return Number(Math.round(x)).toLocaleString(); }
@@ -160,16 +171,15 @@ function calculateMasterUnitEngine(config){
     + (Number(gear.accATK)||0) * 30
     + (Number(gear.accSPD)||0) * 180;
 
-  const lockedPowerOffset = Number(config.lockedPowerOffset)||0;
-  const unitPowerBeforeOffset = Math.round(characterPower + masteryPower + equipmentPower);
-  const unitPower = Math.round(unitPowerBeforeOffset + lockedPowerOffset);
+  const lockedBpOffset = Number(config.lockedBpOffset) || 0;
+  const unitPower = Math.round(characterPower + masteryPower + equipmentPower + lockedBpOffset);
   const accountRankPower = config.includeRank ? Math.round(rankBP(config.playerRank)) : 0;
 
   return {
     cardHP, cardATK, unitPower,
     battalionPower: unitPower + accountRankPower,
     accountRankPower,
-    trace: { level, copies, boost, potential, mastery, refHP, refATK, lbMul, rawHP, rawATK, boostStats, baseStackHP, baseStackATK, anchorHP, anchorATK, anchorBasePower, masteryPower, awkMul, ascensionHP, ascensionATK, characterPower, equipmentPower, lockedPowerOffset, unitPowerBeforeOffset, observedPower: Number(config.observedPower)||0 }
+    trace: { level, copies, boost, potential, mastery, refHP, refATK, lbMul, rawHP, rawATK, boostStats, baseStackHP, baseStackATK, anchorHP, anchorATK, anchorBasePower, masteryPower, awkMul, ascensionHP, ascensionATK, characterPower, equipmentPower, lockedBpOffset }
   };
 }
 
@@ -224,9 +234,14 @@ async function selectCharacter(){
     `APK ATK ${fmt(atk)}`,
     `SPD ${fmt(spd)}`
   ].map(x=>`<span class="pill">${x}</span>`).join(' ');
-  // Treat APK stats as RefStat200 defaults. User can override if APK source proves to be a different stat anchor.
-  $('refHP').value = hp || $('refHP').value;
-  $('refATK').value = atk || $('refATK').value;
+  selectedCharacterEntry = entry;
+  $('apkHP').value = hp || 0;
+  $('apkATK').value = atk || 0;
+
+  // APK raw stats are not RefStat200. Seed RefStat200 from the calibrated APK->Ref estimate
+  // only when the fields are empty; exact matching should use observed HP/ATK calibration.
+  if(!Number($('refHP').value)) $('refHP').value = deriveRefFromApk(hp, 'hp').toFixed(6);
+  if(!Number($('refATK').value)) $('refATK').value = deriveRefFromApk(atk, 'atk').toFixed(6);
   calculateAndRender();
 }
 
@@ -257,9 +272,78 @@ function readConfig(){
     refHP:n('refHP'), refATK:n('refATK'), isAscended:$('isAscended').value === 'true',
     flatFellowshipHP:n('fellowHp'), flatFellowshipATK:n('fellowAtk'),
     playerRank:n('playerRank'), includeRank:$('includeRank').value === 'true',
-    lockedPowerOffset:n('lockedPowerOffset'), observedPower:n('observedPower'),
-    gear:{ wepHP:n('wepHP'), wepATK:n('wepATK'), accHP:n('accHP'), accATK:n('accATK'), accSPD:n('accSPD') }
+    gear:{ wepHP:n('wepHP'), wepATK:n('wepATK'), accHP:n('accHP'), accATK:n('accATK'), accSPD:n('accSPD') },
+    lockedBpOffset:n('lockedBpOffset')
   };
+}
+
+
+function deriveRefFromApk(apkValue, kind){
+  const factor = kind === 'hp' ? APK_TO_REF_HP_FACTOR : APK_TO_REF_ATK_FACTOR;
+  return Math.max(0, Number(apkValue || 0) * factor);
+}
+
+function solveRefStatForObserved(kind, observed){
+  observed = Number(observed) || 0;
+  if(observed <= 0) return 0;
+
+  const cfg = readConfig();
+  const originalHP = cfg.refHP;
+  const originalATK = cfg.refATK;
+
+  let lo = 0;
+  let hi = Math.max(1000, kind === 'hp' ? (originalHP || n('apkHP') * APK_TO_REF_HP_FACTOR || 50000) : (originalATK || n('apkATK') * APK_TO_REF_ATK_FACTOR || 10000));
+  const calcWith = ref => {
+    const testCfg = Object.assign({}, cfg, {
+      refHP: kind === 'hp' ? ref : originalHP,
+      refATK: kind === 'atk' ? ref : originalATK
+    });
+    const out = calculateMasterUnitEngine(testCfg);
+    return kind === 'hp' ? Math.round(out.cardHP) : Math.round(out.cardATK);
+  };
+
+  while(calcWith(hi) < observed && hi < 1000000) hi *= 2;
+
+  for(let i=0; i<80; i++){
+    const mid = (lo + hi) / 2;
+    if(calcWith(mid) < observed) lo = mid;
+    else hi = mid;
+  }
+  return hi;
+}
+
+function calibrateRefFromObserved(){
+  const observedHP = n('observedHP');
+  const observedATK = n('observedATK');
+  if(observedHP > 0) $('refHP').value = solveRefStatForObserved('hp', observedHP).toFixed(6);
+  if(observedATK > 0) $('refATK').value = solveRefStatForObserved('atk', observedATK).toFixed(6);
+  calculateAndRender();
+}
+
+function deriveRefEstimate(){
+  const hp = deriveRefFromApk(n('apkHP'), 'hp');
+  const atk = deriveRefFromApk(n('apkATK'), 'atk');
+  if(hp) $('refHP').value = hp.toFixed(6);
+  if(atk) $('refATK').value = atk.toFixed(6);
+  calculateAndRender();
+}
+
+function calibrateBpOffset(){
+  const observed = n('observedPower');
+  if(observed <= 0) return;
+  const currentOffset = n('lockedBpOffset');
+  $('lockedBpOffset').value = 0;
+  const base = calculateMasterUnitEngine(readConfig()).unitPower;
+  $('lockedBpOffset').value = Math.round(observed - base);
+  calculateAndRender();
+}
+
+function deltaText(observed, actual, label){
+  observed = Number(observed)||0;
+  if(!observed) return '';
+  const delta = Math.round(actual) - observed;
+  if(delta === 0) return `${label}: exact match`;
+  return `${label}: ${delta > 0 ? '+' : ''}${delta.toLocaleString()} vs observed`;
 }
 
 function calculateAndRender(){
@@ -269,6 +353,9 @@ function calculateAndRender(){
   $('outATK').textContent = fmt(result.cardATK);
   $('outPower').textContent = fmt(result.unitPower);
   $('outBattalion').textContent = fmt(result.battalionPower);
+  $('hpDelta').textContent = deltaText(n('observedHP'), result.cardHP, 'HP');
+  $('atkDelta').textContent = deltaText(n('observedATK'), result.cardATK, 'ATK');
+  $('powerDelta').textContent = deltaText(n('observedPower'), result.unitPower, 'Power');
 
   const t = result.trace;
   $('trace').textContent =
@@ -299,34 +386,14 @@ CardHP = round(BaseStackHP × Awakening × PotentialScalar) + AscensionPremium =
 CardATK = round(BaseStackATK × Awakening × PotentialScalar) + AscensionPremium = ${result.cardATK}
 CharacterPower = CardHP×12 + CardATK×60 = ${t.characterPower.toFixed(4)}
 
-Equipment:
+Equipment / Platoon:
 EquipmentPower = WepHP×6 + WepATK×30 + AccHP×6 + AccATK×30 + AccSPD×180 = ${t.equipmentPower.toFixed(4)}
-
-Locked Platoon / Hidden BP:
-LockedPowerOffset = ${t.lockedPowerOffset}
-ObservedPower = ${t.observedPower || 'not set'}
-ObservedDiffAfterOffset = ${t.observedPower ? (t.observedPower - result.unitPower) : 'not set'}
+LockedPlatoonBPOffset = ${t.lockedBpOffset.toFixed(4)}
 
 Totals:
-UnitPowerBeforeOffset = round(CharacterPower + MasteryPower + EquipmentPower) = ${t.unitPowerBeforeOffset}
-UnitPower = round(UnitPowerBeforeOffset + LockedPowerOffset) = ${result.unitPower}
+UnitPower = round(CharacterPower + MasteryPower + EquipmentPower + LockedPlatoonBPOffset) = ${result.unitPower}
 AccountRankPower = ${result.accountRankPower}
 BattalionPower = ${result.battalionPower}`;
-}
-
-function calibratePowerOffset(){
-  // First calculate with current offset removed so the calibration is stable/repeatable.
-  const currentOffset = n('lockedPowerOffset');
-  const observed = n('observedPower');
-  if(!observed){
-    alert('Enter the in-game Unit Power first.');
-    return;
-  }
-  $('lockedPowerOffset').value = 0;
-  const base = calculateMasterUnitEngine(readConfig()).unitPower;
-  const inferred = observed - base;
-  $('lockedPowerOffset').value = inferred;
-  calculateAndRender();
 }
 
 async function init(){
@@ -346,7 +413,9 @@ async function init(){
   $('characterSelect').addEventListener('change', selectCharacter);
   $('weaponSelect').addEventListener('change', () => selectEquipment('weapon'));
   $('accessorySelect').addEventListener('change', () => selectEquipment('accessory'));
-  $('calibratePowerOffset').addEventListener('click', calibratePowerOffset);
+  $('deriveRefBtn').addEventListener('click', deriveRefEstimate);
+  $('calibrateRefBtn').addEventListener('click', calibrateRefFromObserved);
+  $('calibrateBpBtn').addEventListener('click', calibrateBpOffset);
   document.querySelectorAll('input,select').forEach(el => {
     if(!['characterSelect','weaponSelect','accessorySelect'].includes(el.id)) el.addEventListener('input', calculateAndRender);
     if(!['characterSelect','weaponSelect','accessorySelect'].includes(el.id)) el.addEventListener('change', calculateAndRender);
