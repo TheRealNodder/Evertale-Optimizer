@@ -2,7 +2,7 @@
  * Evertale Stat Engine
  *
  * Key model:
- * - White HP/ATK = character-only stats shown in-game.
+ * - White HP/ATK = character-only stats shown in-game. Note: the game card visually lists ATK first, then HP.
  * - Blue HP/ATK = white stats + locked weapon/accessory stats.
  * - APK raw stats are NOT treated as RefStat200 automatically.
  * - RefStat200 can be reversed from observed white stats.
