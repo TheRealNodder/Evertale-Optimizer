@@ -11,7 +11,7 @@
        - Prompts to auto-select Owned for matched units
 */
 
-const DATA_CHARACTERS = "./data/characters.json";
+const DATA_CHARACTERS = "./apkfiles/entries/bundles/character_families.bundle.json";
 // Current + legacy keys (older builds used `evertale_owned`).
 const LS_OWNED_KEY = "evertale_owned_units_v1";
 const LS_OWNED_KEY_LEGACY = "evertale_owned";
