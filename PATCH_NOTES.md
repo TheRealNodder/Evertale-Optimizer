@@ -53,3 +53,46 @@ For Venus:
 The blue-white equipment delta should be:
 - Weapon HP: `4875`
 - Weapon ATK: `917`
+
+
+## Retry patch applied
+
+This retry stops double-applying the level curve after reverse calibration.
+
+### Important correction
+
+The values shown in the page as hidden stats are now treated as **current-level RawBase anchors**:
+
+```text
+RawBase HP/ATK -> + Boost/Fellowship -> Potential -> Awakening -> Round -> White stats
+```
+
+The previous retry still treated the solved hidden values like literal `RefStat200` values and then applied:
+
+```text
+(ref / 294) * (level + 10) * limitBreakMultiplier
+```
+
+again. That under-scaled the character layer and forced a fake platoon offset.
+
+### Current forward model
+
+```js
+rawHP = hiddenRawBaseHP;
+rawATK = hiddenRawBaseATK;
+
+baseStackHP = rawHP + boostHP + fellowshipHP;
+baseStackATK = rawATK + boostATK + fellowshipATK;
+
+whiteHP = Math.round(baseStackHP * awakening * potential) + Math.round(rawHP * 0.05 if ascended);
+whiteATK = Math.round(baseStackATK * awakening * potential) + Math.round(rawATK * 0.05 if ascended);
+
+blueHP = whiteHP + weaponHP + accessoryHP;
+blueATK = whiteATK + weaponATK + accessoryATK;
+```
+
+### Added
+
+- `Calibrate Platoon BP Offset` button.
+- Trace now says `Hidden RawBase`, not `RefStat200`.
+- The level/limit-break state is preserved for dataset tracking, but it is not re-applied to an already-reversed RawBase.

@@ -16,7 +16,7 @@
     <h1>Evertale Stat / Power Test Lab</h1>
     <p class="muted">
       Refined model: <b>white HP/ATK</b> are character-only stats, <b>blue HP/ATK</b> are white stats plus locked equipment.
-      Use observed white stats to reverse hidden RefStat200. The game card lists ATK first and HP second; this page keeps HP/ATK internally separated and auto-detects accidental swaps.
+      Use observed white stats to reverse hidden RawBase. The game card lists ATK first and HP second; this page keeps HP/ATK internally separated and auto-detects accidental swaps.
     </p>
     <span class="pill">Level 1–80 = Normal</span>
     <span class="pill">Level 81–200 = Limit Break tiers</span>
@@ -54,8 +54,8 @@
 
       <div class="col-3"><label>Flat Fellowship HP</label><input id="fellowHp" type="number" value="4900"></div>
       <div class="col-3"><label>Flat Fellowship ATK</label><input id="fellowAtk" type="number" value="750"></div>
-      <div class="col-3"><label>Hidden RefStat200 HP</label><input id="refHP" type="number" step="0.000001" value="0"></div>
-      <div class="col-3"><label>Hidden RefStat200 ATK</label><input id="refATK" type="number" step="0.000001" value="0"></div>
+      <div class="col-3"><label>Hidden RawBase HP</label><input id="refHP" type="number" step="0.000001" value="0"></div>
+      <div class="col-3"><label>Hidden RawBase ATK</label><input id="refATK" type="number" step="0.000001" value="0"></div>
     </div>
   </section>
 
@@ -63,7 +63,7 @@
     <h2>Observed In-Game Values</h2>
     <p class="muted">
       Enter the card values exactly as the game shows them: <b>ATK first, HP second</b>.
-      White stats reverse the hidden RefStat200. Blue stats are only used to infer/verify locked equipment.
+      White stats reverse the hidden RawBase. Blue stats are only used to infer/verify locked equipment.
     </p>
     <div class="grid">
       <div class="col-3"><label>Observed WHITE ATK — game top stat line</label><input id="obsWhiteATK" type="number" value="0"></div>
@@ -74,9 +74,10 @@
       <div class="col-3"><label>Locked Platoon BP Offset</label><input id="lockedPlatoonOffset" type="number" value="0"></div>
       <div class="col-3"><label>Player Rank</label><input id="playerRank" type="number" min="0" max="300" value="0"></div>
       <div class="col-3"><label>Include Rank BP?</label><select id="includeRank"><option value="false">No</option><option value="true">Yes</option></select></div>
-      <div class="col-4"><button id="reverseBtn" type="button">Reverse RefStat200 from WHITE Stats</button></div>
-      <div class="col-4"><button id="deriveGearBtn" type="button" class="btn2">Derive Equipment from BLUE − WHITE</button></div>
-      <div class="col-4"><button id="swapObservedBtn" type="button" class="btn2">Fix Swapped HP/ATK Inputs</button></div>
+      <div class="col-3"><button id="reverseBtn" type="button">Reverse RawBase from WHITE Stats</button></div>
+      <div class="col-3"><button id="deriveGearBtn" type="button" class="btn2">Derive Equipment from BLUE − WHITE</button></div>
+      <div class="col-3"><button id="calibrateOffsetBtn" type="button" class="btn2">Calibrate Platoon BP Offset</button></div>
+      <div class="col-3"><button id="swapObservedBtn" type="button" class="btn2">Fix Swapped HP/ATK Inputs</button></div>
       <div class="col-12"><div id="inputWarning" class="muted"></div></div>
     </div>
   </section>
@@ -141,31 +142,26 @@ function rankBP(rank){
 }
 
 function projectWhiteStatFromRef({ refStat200, level, copies, potential, boostFlatValue, fellowshipFlat, isAscended }){
-  const ref = Math.max(0, Number(refStat200) || 0);
-  const lvl = clamp(level,1,200);
-  const lb = limitBreakState(lvl).multiplier;
+  const raw = Math.max(0, Number(refStat200) || 0);
   const awk = AWK[clamp(copies,0,4)] || 1.00;
   const potentialScalar = 1 + (clamp(potential,0,100) / 100);
-  const raw = (ref / 294.0) * (lvl + 10) * lb;
   const baseStack = raw + Number(boostFlatValue || 0) + Number(fellowshipFlat || 0);
-  return Math.round(baseStack * awk * potentialScalar) + Math.round(isAscended ? ref * 0.05 : 0);
+  return Math.round(baseStack * awk * potentialScalar) + Math.round(isAscended ? raw * 0.05 : 0);
 }
 
-function reverseRefStat200({ observedWhiteStat, level, copies, potential, boostFlatValue, fellowshipFlat, isAscended }){
+function reverseRawBase({ observedWhiteStat, level, copies, potential, boostFlatValue, fellowshipFlat, isAscended }){
   const observed = Math.max(0, Number(observedWhiteStat) || 0);
   if(!observed) return 0;
 
-  const lvl = clamp(level,1,200);
-  const lb = limitBreakState(lvl).multiplier;
   const awk = AWK[clamp(copies,0,4)] || 1.00;
   const potentialScalar = 1 + (clamp(potential,0,100) / 100);
   const ascensionRate = isAscended ? 0.05 : 0;
   const nonRefContribution = (Number(boostFlatValue || 0) + Number(fellowshipFlat || 0)) * awk * potentialScalar;
-  const refCoefficient = (((lvl + 10) / 294.0) * lb * awk * potentialScalar) + ascensionRate;
+  const refCoefficient = (awk * potentialScalar) + ascensionRate;
   const seed = refCoefficient ? Math.max(0, (observed - nonRefContribution) / refCoefficient) : 0;
 
   const forward = ref => projectWhiteStatFromRef({
-    refStat200: ref, level: lvl, copies, potential, boostFlatValue, fellowshipFlat, isAscended
+    refStat200: ref, level, copies, potential, boostFlatValue, fellowshipFlat, isAscended
   });
 
   let lo = 0;
@@ -193,8 +189,10 @@ function calculateMasterUnitEngine(config){
   const flatFellowshipATK = Number(config.flatFellowshipATK ?? 750);
 
   const lb = limitBreakState(level);
-  const rawHP = (refHP / 294.0) * (level + 10) * lb.multiplier;
-  const rawATK = (refATK / 294.0) * (level + 10) * lb.multiplier;
+  // Current calibrated hidden values are current-level RawBase anchors.
+  // Do not scale by the level curve again after reversing from white stats.
+  const rawHP = refHP;
+  const rawATK = refATK;
   const boostStats = boostFlat(boost);
   const baseStackHP = rawHP + boostStats.hp + flatFellowshipHP;
   const baseStackATK = rawATK + boostStats.atk + flatFellowshipATK;
@@ -366,7 +364,7 @@ function reverseFromObserved(){
     level:n('level'), copies:n('copies'), potential:n('potential'), isAscended:$('isAscended').value === 'true'
   };
   if(n('obsWhiteHP') > 0){
-    $('refHP').value = reverseRefStat200({
+    $('refHP').value = reverseRawBase({
       ...common,
       observedWhiteStat:n('obsWhiteHP'),
       boostFlatValue:boostStats.hp,
@@ -374,7 +372,7 @@ function reverseFromObserved(){
     }).toFixed(6);
   }
   if(n('obsWhiteATK') > 0){
-    $('refATK').value = reverseRefStat200({
+    $('refATK').value = reverseRawBase({
       ...common,
       observedWhiteStat:n('obsWhiteATK'),
       boostFlatValue:boostStats.atk,
@@ -392,6 +390,20 @@ function deriveGearFromBlueWhite(){
   const blueATK = n('obsBlueATK');
   if(blueHP && whiteHP) $('wepHP').value = Math.max(0, blueHP - whiteHP);
   if(blueATK && whiteATK) $('wepATK').value = Math.max(0, blueATK - whiteATK);
+  calculateAndRender();
+}
+
+function calibratePlatoonOffset(){
+  normalizeObservedInputs();
+  const observed = n('obsUnitPower');
+  if(!observed){
+    setInputWarning('Enter Observed Unit Power before calibrating the platoon BP offset.', true);
+    return;
+  }
+  const cfg = readConfig();
+  cfg.lockedPlatoonOffset = 0;
+  const base = calculateMasterUnitEngine(cfg);
+  $('lockedPlatoonOffset').value = Math.round(observed - base.unitPower);
   calculateAndRender();
 }
 
@@ -446,14 +458,15 @@ function calculateAndRender(){
 `Refined Engine Trace
 ====================
 APK raw HP/ATK: ${fmt(apkHP)} / ${fmt(apkATK)}
-Hidden RefStat200 HP/ATK: ${fmtRaw(t.refHP)} / ${fmtRaw(t.refATK)}
+Hidden RawBase HP/ATK: ${fmtRaw(t.refHP)} / ${fmtRaw(t.refATK)}
 
 Limit State:
 Level ${t.level} → ${t.lb.state}, tier ${t.lb.tier}, multiplier ${t.lb.multiplier}
 
-Raw Character Curve:
-Raw HP:  (${fmtRaw(t.refHP)} / 294) × (${t.level} + 10) × ${t.lb.multiplier} = ${fmtRaw(t.rawHP)}
-Raw ATK: (${fmtRaw(t.refATK)} / 294) × (${t.level} + 10) × ${t.lb.multiplier} = ${fmtRaw(t.rawATK)}
+Raw Character Layer:
+Raw HP:  hidden RawBase HP = ${fmtRaw(t.rawHP)}
+Raw ATK: hidden RawBase ATK = ${fmtRaw(t.rawATK)}
+Note: level normalization is upstream of this solved RawBase. Reapplying it here causes drift.
 
 Foundation:
 Boost HP/ATK: +${t.boostStats.hp} / +${t.boostStats.atk}
@@ -508,6 +521,7 @@ async function init(){
   $('reverseBtn').addEventListener('click', reverseFromObserved);
   $('deriveGearBtn').addEventListener('click', deriveGearFromBlueWhite);
   $('swapObservedBtn').addEventListener('click', forceSwapObservedInputs);
+  $('calibrateOffsetBtn').addEventListener('click', calibratePlatoonOffset);
   document.querySelectorAll('input,select').forEach(el => {
     if(!['characterSelect','weaponSelect','accessorySelect'].includes(el.id)){
       el.addEventListener('input', calculateAndRender);
