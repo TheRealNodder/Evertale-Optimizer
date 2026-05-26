@@ -49,6 +49,36 @@ export function accountRankBP(rank) {
  * Reverse the hidden RefStat200 from an observed in-game white stat.
  * Use white text only, never blue equipment-modified text.
  */
+export function projectWhiteStatFromRef({
+  refStat200,
+  level,
+  copies = 0,
+  potential = 0,
+  boostFlatValue = 0,
+  fellowshipFlat = 0,
+  isAscended = false
+}) {
+  const ref = Math.max(0, Number(refStat200) || 0);
+  const lvl = clampNumber(level, 1, 200);
+  const awk = AWAKENING_MULTIPLIERS[clampNumber(copies, 0, 4)] || 1.00;
+  const potentialScalar = 1 + (clampNumber(potential, 0, 100) / 100);
+  const lb = limitBreakMultiplier(lvl);
+  const raw = (ref / 294.0) * (lvl + 10) * lb;
+  const baseStack = raw + Number(boostFlatValue || 0) + Number(fellowshipFlat || 0);
+
+  // Engine checkpoint: visible card stat is rounded before BP conversion.
+  // Ascension is a flat 5% RefStat200 premium compiled after percentage scaling.
+  return Math.round(baseStack * awk * potentialScalar) + Math.round(isAscended ? ref * 0.05 : 0);
+}
+
+/**
+ * Reverse the hidden RefStat200 from an observed in-game WHITE stat.
+ * Use white text only, never blue equipment-modified text.
+ *
+ * This intentionally uses the same checkpoint rounding as the forward engine.
+ * The algebraic value is used only as a seed; the returned value is refined
+ * by monotonic binary search so it reproduces the observed integer stat.
+ */
 export function reverseRefStat200({
   observedWhiteStat,
   level,
@@ -58,18 +88,40 @@ export function reverseRefStat200({
   fellowshipFlat = 0,
   isAscended = false
 }) {
-  const observed = Number(observedWhiteStat) || 0;
+  const observed = Math.max(0, Number(observedWhiteStat) || 0);
+  if (!observed) return 0;
+
   const lvl = clampNumber(level, 1, 200);
   const awk = AWAKENING_MULTIPLIERS[clampNumber(copies, 0, 4)] || 1.00;
   const potentialScalar = 1 + (clampNumber(potential, 0, 100) / 100);
   const lb = limitBreakMultiplier(lvl);
   const ascensionRate = isAscended ? 0.05 : 0;
 
-  const nonRefContribution = (Number(boostFlatValue) + Number(fellowshipFlat)) * awk * potentialScalar;
+  const nonRefContribution = (Number(boostFlatValue || 0) + Number(fellowshipFlat || 0)) * awk * potentialScalar;
   const refCoefficient = (((lvl + 10) / 294.0) * lb * awk * potentialScalar) + ascensionRate;
+  const seed = refCoefficient ? Math.max(0, (observed - nonRefContribution) / refCoefficient) : 0;
 
-  if (!refCoefficient) return 0;
-  return (observed - nonRefContribution) / refCoefficient;
+  let lo = 0;
+  let hi = Math.max(seed * 2, observed * 2, 1000);
+  const forward = ref => projectWhiteStatFromRef({
+    refStat200: ref,
+    level: lvl,
+    copies,
+    potential,
+    boostFlatValue,
+    fellowshipFlat,
+    isAscended
+  });
+
+  while (forward(hi) < observed) hi *= 2;
+
+  for (let i = 0; i < 80; i += 1) {
+    const mid = (lo + hi) / 2;
+    if (forward(mid) >= observed) hi = mid;
+    else lo = mid;
+  }
+
+  return hi;
 }
 
 export function calculateMasterUnitEngine(config) {
