@@ -140,15 +140,44 @@ function rankBP(rank){
   return (2000000 / 27000000) * Math.pow(rank, 3);
 }
 
+function projectWhiteStatFromRef({ refStat200, level, copies, potential, boostFlatValue, fellowshipFlat, isAscended }){
+  const ref = Math.max(0, Number(refStat200) || 0);
+  const lvl = clamp(level,1,200);
+  const lb = limitBreakState(lvl).multiplier;
+  const awk = AWK[clamp(copies,0,4)] || 1.00;
+  const potentialScalar = 1 + (clamp(potential,0,100) / 100);
+  const raw = (ref / 294.0) * (lvl + 10) * lb;
+  const baseStack = raw + Number(boostFlatValue || 0) + Number(fellowshipFlat || 0);
+  return Math.round(baseStack * awk * potentialScalar) + Math.round(isAscended ? ref * 0.05 : 0);
+}
+
 function reverseRefStat200({ observedWhiteStat, level, copies, potential, boostFlatValue, fellowshipFlat, isAscended }){
-  const observed = Number(observedWhiteStat) || 0;
-  const lb = limitBreakState(level).multiplier;
+  const observed = Math.max(0, Number(observedWhiteStat) || 0);
+  if(!observed) return 0;
+
+  const lvl = clamp(level,1,200);
+  const lb = limitBreakState(lvl).multiplier;
   const awk = AWK[clamp(copies,0,4)] || 1.00;
   const potentialScalar = 1 + (clamp(potential,0,100) / 100);
   const ascensionRate = isAscended ? 0.05 : 0;
-  const nonRefContribution = (Number(boostFlatValue) + Number(fellowshipFlat)) * awk * potentialScalar;
-  const refCoefficient = (((clamp(level,1,200) + 10) / 294.0) * lb * awk * potentialScalar) + ascensionRate;
-  return refCoefficient ? (observed - nonRefContribution) / refCoefficient : 0;
+  const nonRefContribution = (Number(boostFlatValue || 0) + Number(fellowshipFlat || 0)) * awk * potentialScalar;
+  const refCoefficient = (((lvl + 10) / 294.0) * lb * awk * potentialScalar) + ascensionRate;
+  const seed = refCoefficient ? Math.max(0, (observed - nonRefContribution) / refCoefficient) : 0;
+
+  const forward = ref => projectWhiteStatFromRef({
+    refStat200: ref, level: lvl, copies, potential, boostFlatValue, fellowshipFlat, isAscended
+  });
+
+  let lo = 0;
+  let hi = Math.max(seed * 2, observed * 2, 1000);
+  while(forward(hi) < observed) hi *= 2;
+
+  for(let i = 0; i < 80; i++){
+    const mid = (lo + hi) / 2;
+    if(forward(mid) >= observed) hi = mid;
+    else lo = mid;
+  }
+  return hi;
 }
 
 function calculateMasterUnitEngine(config){
@@ -373,9 +402,24 @@ function signedDiff(calc, observed){
 }
 
 function calculateAndRender(){
+  const warnings = [];
   if(n('obsWhiteHP') > 0 && n('obsWhiteATK') > 0 && n('obsWhiteHP') < n('obsWhiteATK')){
-    setInputWarning('Warning: observed WHITE HP is lower than observed WHITE ATK. These may be swapped. The game displays ATK first, HP second.', true);
+    warnings.push('Observed WHITE HP is lower than observed WHITE ATK. These may be swapped. The game displays ATK first, HP second.');
   }
+
+  const observedGearHP = n('obsBlueHP') && n('obsWhiteHP') ? n('obsBlueHP') - n('obsWhiteHP') : null;
+  const observedGearATK = n('obsBlueATK') && n('obsWhiteATK') ? n('obsBlueATK') - n('obsWhiteATK') : null;
+  const enteredGearHP = n('wepHP') + n('accHP');
+  const enteredGearATK = n('wepATK') + n('accATK');
+
+  if(observedGearHP !== null && observedGearHP >= 0 && enteredGearHP > 0 && Math.round(observedGearHP) !== Math.round(enteredGearHP)){
+    warnings.push(`Observed blue-white HP delta is ${observedGearHP}, but entered equipment HP is ${enteredGearHP}.`);
+  }
+  if(observedGearATK !== null && observedGearATK >= 0 && enteredGearATK > 0 && Math.round(observedGearATK) !== Math.round(enteredGearATK)){
+    warnings.push(`Observed blue-white ATK delta is ${observedGearATK}, but entered equipment ATK is ${enteredGearATK}.`);
+  }
+  setInputWarning(warnings.join(' '), warnings.length > 0);
+
   const cfg = readConfig();
   const result = calculateMasterUnitEngine(cfg);
 
