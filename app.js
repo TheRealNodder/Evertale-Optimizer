@@ -25,6 +25,7 @@ const state = {
   rarity: "all",
   listTokens: null, // array of normalized tokens when user pastes list
 };
+window.__evertaleRosterState = state;
 
 // Drag-select state
 const drag = {

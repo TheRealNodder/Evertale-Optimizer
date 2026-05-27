@@ -408,6 +408,20 @@
 
   // ---------- STATS ----------
   function stats(u) {
+    if (window.EvertaleRosterProfiles && typeof window.EvertaleRosterProfiles.estimateUnitStats === "function") {
+      try {
+        const estimated = window.EvertaleRosterProfiles.estimateUnitStats(u);
+        return {
+          atk: +(estimated.atk || 0),
+          hp:  +(estimated.hp  || 0),
+          spd: +(estimated.spd || 0),
+          cost:+(estimated.cost || 1),
+        };
+      } catch (err) {
+        console.warn("[optimizerEngine] roster profile stat estimate failed:", err);
+      }
+    }
+
     const s = u.stats || {};
     return {
       atk: +((s.atk ?? u.atk) || 0),
