@@ -1,59 +1,79 @@
-/* optimizerRuntimeLoader.js */
+/* optimizerRuntimeLoader.js
+   Fast runtime chunk loader.
+   - Uses the existing apkfiles/entries/runtime files.
+   - Loads chunks in parallel instead of sequentially.
+   - Avoids Date.now cache busting so GitHub Pages/browser cache can work.
+   - Keeps the old window.loadOptimizerRuntime() API intact.
+*/
 
-window.OptimizerRuntime = {
-  loaded: false,
-  manifest: null,
-  chunks: {},
-  runtimeFlags: {},
-};
+(function(){
+  'use strict';
 
-async function loadOptimizerRuntimeChunk(basePath, chunkInfo) {
-  const url = `${basePath}/${chunkInfo.file}?v=${Date.now()}`;
-  const response = await fetch(url, { cache: 'no-store' });
-  if (!response.ok) {
-    throw new Error(`Failed runtime chunk: ${chunkInfo.file}`);
-  }
-  return response.json();
-}
+  const VERSION = (window.EVERTALE_LIVE_CONFIG && window.EVERTALE_LIVE_CONFIG.version) || 'live';
+  const BASE_PATH = './apkfiles/entries/runtime';
 
-window.loadOptimizerRuntime = async function loadOptimizerRuntime() {
-  if (window.OptimizerRuntime.loaded) {
-    return window.OptimizerRuntime;
-  }
+  window.OptimizerRuntime = window.OptimizerRuntime || {
+    loaded: false,
+    manifest: null,
+    chunks: {},
+    runtimeFlags: {},
+    errors: {}
+  };
 
-  const basePath = './apkfiles/entries/runtime';
-
-  const manifestResponse = await fetch(
-    `${basePath}/optimizer_runtime_manifest.json?v=${Date.now()}`,
-    { cache: 'no-store' }
-  );
-
-  if (!manifestResponse.ok) {
-    throw new Error('Failed optimizer runtime manifest');
+  function withVersion(url) {
+    return VERSION ? `${url}?v=${encodeURIComponent(VERSION)}` : url;
   }
 
-  const manifest = await manifestResponse.json();
+  async function fetchJson(url, optional = false) {
+    const response = await fetch(withVersion(url), { cache: 'default' });
+    if (!response.ok) {
+      if (optional) return null;
+      throw new Error(`Failed to fetch ${url}: ${response.status}`);
+    }
+    return response.json();
+  }
 
-  window.OptimizerRuntime.manifest = manifest;
-  window.OptimizerRuntime.runtimeFlags = manifest.runtimeFlags || {};
-
-  const chunkEntries = Object.entries(manifest.chunks || {});
-
-  for (const [key, chunkInfo] of chunkEntries) {
+  async function loadOptimizerRuntimeChunk(basePath, key, chunkInfo) {
+    const file = chunkInfo && chunkInfo.file;
+    if (!file) return null;
     try {
-      const chunk = await loadOptimizerRuntimeChunk(basePath, chunkInfo);
-      window.OptimizerRuntime.chunks[key] = chunk.data;
+      const payload = await fetchJson(`${basePath}/${file}`, true);
+      window.OptimizerRuntime.chunks[key] = payload && Object.prototype.hasOwnProperty.call(payload, 'data')
+        ? payload.data
+        : payload;
+      return window.OptimizerRuntime.chunks[key];
     } catch (err) {
-      console.error('[OptimizerRuntime]', key, err);
+      window.OptimizerRuntime.errors[key] = String(err && err.message ? err.message : err);
+      console.warn('[OptimizerRuntime] optional chunk failed:', key, err);
+      return null;
     }
   }
 
-  window.OptimizerRuntime.loaded = true;
+  window.loadOptimizerRuntime = async function loadOptimizerRuntime(options = {}) {
+    if (window.OptimizerRuntime.loaded) return window.OptimizerRuntime;
 
-  console.log('[OptimizerRuntime] Loaded runtime chunks', {
-    chunks: Object.keys(window.OptimizerRuntime.chunks),
-    flags: window.OptimizerRuntime.runtimeFlags,
-  });
+    const manifest = await fetchJson(`${BASE_PATH}/optimizer_runtime_manifest.json`);
+    window.OptimizerRuntime.manifest = manifest;
+    window.OptimizerRuntime.runtimeFlags = manifest.runtimeFlags || {};
 
-  return window.OptimizerRuntime;
-};
+    const chunks = Object.entries(manifest.chunks || {});
+    const skipHeavy = options.skipHeavy === true;
+    const heavy = new Set(['abilityGraph', 'optimizerKnowledge']);
+
+    const selected = chunks.filter(([key]) => !(skipHeavy && heavy.has(key)));
+
+    await Promise.all(selected.map(([key, info]) => loadOptimizerRuntimeChunk(BASE_PATH, key, info)));
+
+    window.OptimizerRuntime.loaded = true;
+
+    console.log('[OptimizerRuntime] loaded', {
+      chunks: Object.keys(window.OptimizerRuntime.chunks),
+      skippedHeavy: skipHeavy,
+      errors: window.OptimizerRuntime.errors
+    });
+
+    return window.OptimizerRuntime;
+  };
+
+  window.loadOptimizerRuntimeChunk = loadOptimizerRuntimeChunk;
+})();

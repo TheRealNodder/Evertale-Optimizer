@@ -14,7 +14,7 @@
     try {
       if (typeof window.loadOptimizerRuntime === 'function') {
         setStatus('Runtime: loading...');
-        const runtime = await window.loadOptimizerRuntime();
+        const runtime = await window.loadOptimizerRuntime({ skipHeavy: true });
         const chunks = Object.keys(runtime && runtime.chunks ? runtime.chunks : {}).length;
         setStatus('Runtime: loaded (' + chunks + ' chunks)');
         window.__optimizerRuntimeReady = true;
