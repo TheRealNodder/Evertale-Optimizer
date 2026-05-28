@@ -152,6 +152,17 @@
     const account = getAccount();
     const profile = { ...getProfile(id), ...(profileOverride || {}) };
 
+    // Preferred path: use the runtime-style engine that mirrors the decompiled
+    // MonsterInstance cached-stat architecture. Falls back to the legacy local
+    // estimator if the engine is unavailable.
+    if (global.EvertaleRuntimeStatEngine && typeof global.EvertaleRuntimeStatEngine.calculateUnit === "function") {
+      try {
+        return global.EvertaleRuntimeStatEngine.calculateUnit(unit, profile, account);
+      } catch (err) {
+        console.warn("[roster-profile-store] runtime stat engine failed; using fallback estimator", err);
+      }
+    }
+
     const level = clamp(profile.level, 1, 200);
     const lb = limitBreakMultiplier(level);
     const awk = AWAKENING[Math.round(clamp(profile.awakening, 0, 4))] || 1;
@@ -160,8 +171,6 @@
     const fellowshipHp = account.fellowshipEnabled ? Number(account.fellowshipHp || 0) : 0;
     const fellowshipAtk = account.fellowshipEnabled ? Number(account.fellowshipAtk || 0) : 0;
 
-    // Fallback approximation until a calibrated anchor exists.
-    // This intentionally favors stable optimizer ranking over pretending exact level math is solved.
     const seedHp = Number(profile.anchorHp ?? baseNumber(unit, "hp"));
     const seedAtk = Number(profile.anchorAtk ?? baseNumber(unit, "atk"));
     const spd = baseNumber(unit, "spd");
@@ -192,7 +201,8 @@
       potential: profile.potential,
       boost: profile.boost,
       mastery: profile.mastery,
-      isEstimated: !(profile.anchorHp && profile.anchorAtk)
+      isEstimated: !(profile.anchorHp && profile.anchorAtk),
+      source: "legacy-fallback"
     };
   }
 
