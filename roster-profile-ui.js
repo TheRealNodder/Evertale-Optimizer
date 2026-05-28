@@ -269,6 +269,12 @@
     ensureAccountPanel();
     enhanceCards();
 
+    if (global.EvertaleRuntimeStatEngine && typeof global.EvertaleRuntimeStatEngine.loadSeedIndex === "function") {
+      global.EvertaleRuntimeStatEngine.loadSeedIndex()
+        .then(() => refreshPreviews())
+        .catch(err => console.warn("[roster-profile-ui] seed index unavailable", err));
+    }
+
     const grid = $("unitGrid");
     if (grid) {
       const observer = new MutationObserver(() => {
