@@ -30,6 +30,8 @@
   function sortName(card){ return title(card).trim().toLowerCase(); }
 
   function orderIndex(card){
+    const explicit = Number(card.getAttribute('data-order') || '');
+    if(Number.isFinite(explicit) && explicit > 0) return explicit;
     const k = kind(card);
     const map = orderMaps[k];
     if(!map) return null;
@@ -110,16 +112,11 @@
       const kr = kindRank(a.card) - kindRank(b.card);
       if(kr) return kr;
 
-      // Characters are already sorted by data-loader + duo-source-collapse.
-      // Re-sorting by the visible parent ID moves merged cards back to the wrong slot.
-      if(kind(a.card) === 'characters' && kind(b.card) === 'characters'){
-        return mode === 'oldest' ? originalIndex(b.card) - originalIndex(a.card) : originalIndex(a.card) - originalIndex(b.card);
-      }
-
       const ao = Number.isFinite(a.order) ? a.order : null;
       const bo = Number.isFinite(b.order) ? b.order : null;
       if(ao !== null && bo !== null && ao !== bo){
-        return mode === 'oldest' ? bo - ao : ao - bo;
+        // Higher numeric entry handles are newer, e.g. 0737_* should sort above 0736_*.
+        return mode === 'oldest' ? ao - bo : bo - ao;
       }
       if(ao !== null && bo === null) return -1;
       if(ao === null && bo !== null) return 1;
