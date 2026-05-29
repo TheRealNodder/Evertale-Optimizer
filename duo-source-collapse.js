@@ -32,7 +32,7 @@
       if(unique.length>1)out.push({ids:unique,label});
     }
   }
-  function score(u){const all=`${u?.id||''} ${u?.sourceId||''} ${u?.name||''} ${u?.title||u?.subtitle||''}`.toLowerCase();let s=0;if(/beautybeastregular|beauty.*beast|beauty\s*&\s*beast/.test(all))s+=1000;if(/snowwhitenew|snow white/.test(all)&&!/black/.test(all))s+=800;if(/regular|new|bride/.test(String(u?.id||'').toLowerCase()))s+=50;if(/&| and /.test(String(u?.name||'').toLowerCase()))s+=90;if(/minion|imposter|clone|rabbit|angel|raven|shadow|doll|summon|shiromori|belle|aigis/.test(all))s-=300;return s}
+  function score(u){const all=`${u?.id||''} ${u?.sourceId||''} ${u?.name||''} ${u?.title||u?.subtitle||''}`.toLowerCase();let s=0;if(/ludmillaballet|red dragon dancer/.test(all))s+=1400;if(/yanderemaidballet|clarice/.test(all))s+=200;if(/beautybeastregular|beauty.*beast|beauty\s*&\s*beast/.test(all))s+=1000;if(/snowwhitenew|snow white/.test(all)&&!/black/.test(all))s+=800;if(/regular|new|bride/.test(String(u?.id||'').toLowerCase()))s+=50;if(/&| and /.test(String(u?.name||'').toLowerCase()))s+=90;if(/minion|imposter|clone|rabbit|angel|raven|shadow|doll|summon|shiromori|belle|aigis/.test(all))s-=300;return s}
   function choose(items){return items.slice().sort((a,b)=>score(b)-score(a))[0]||items[0]}
 
   async function buildDuoData(units){

@@ -98,7 +98,7 @@
   function cardName(c){return c?.querySelector('.unitName')?.textContent?.trim()||'';}
   function cardTitle(c){return c?.querySelector('.unitTitle')?.textContent?.trim()||'';}
   function payload(c){return{id:cardId(c),html:c.innerHTML,className:c.className,kind:c.getAttribute('data-kind')||'',name:cardName(c),title:cardTitle(c)}}
-  function parentScore(c){const id=scoreText(cardId(c));const name=scoreText(cardName(c));const title=scoreText(cardTitle(c));const all=`${id} ${name} ${title}`;let s=0;if(/beautybeastregular|beauty.*beast|beast.*beauty|beauty\s*&\s*beast/.test(all))s+=1000;if(/snowwhitenew|snow white/.test(all)&&!/black/.test(all))s+=800;if(/regular|new|bride/.test(id))s+=50;if(/&| and /.test(name))s+=90;if(/minion|imposter|clone|rabbit|angel|raven|shadow|doll|summon|shiromori|belle|aigis/.test(all))s-=300;return s;}
+  function parentScore(c){const id=scoreText(cardId(c));const name=scoreText(cardName(c));const title=scoreText(cardTitle(c));const all=`${id} ${name} ${title}`;let s=0;if(/ludmillaballet|red dragon dancer/.test(all))s+=1400;if(/yanderemaidballet|clarice/.test(all))s+=200;if(/beautybeastregular|beauty.*beast|beast.*beauty|beauty\s*&\s*beast/.test(all))s+=1000;if(/snowwhitenew|snow white/.test(all)&&!/black/.test(all))s+=800;if(/regular|new|bride/.test(id))s+=50;if(/&| and /.test(name))s+=90;if(/minion|imposter|clone|rabbit|angel|raven|shadow|doll|summon|shiromori|belle|aigis/.test(all))s-=300;return s;}
   function choose(cards){return cards.slice().sort((a,b)=>parentScore(b)-parentScore(a))[0]||cards[0];}
   function firstLabel(ids,data,fallback){for(const id of ids){const l=data.label.get(norm(id));if(l)return l;}return fallback||'Forms';}
   function installBtn(parent,payloads,label){
