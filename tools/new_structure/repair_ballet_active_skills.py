@@ -203,6 +203,68 @@ def repair_family_files(repo: Path, entries: List[tuple[Path, Dict[str, Any]]]) 
     return reports
 
 
+
+def repair_ballet_duo_links(repo: Path) -> Dict[str, Any]:
+    """Keep the ballet release as one visible merged card.
+
+    Ludmilla is the display parent; Clarice is attached as a switchable form/card.
+    This mirrors existing duo/card-collapse behavior and prevents stale DuoDisplay/Duo
+    data from rendering the two ballet units as separate catalog cards.
+    """
+    updated: Dict[str, Any] = {"duoDisplay": False, "duo": False}
+
+    display_path = repo / "apkfiles" / "DuoDisplay.json"
+    display = load_json(display_path, {}) or {}
+    parent_cards = display.setdefault("parentCards", {})
+    desired_cards = {
+        "LudmillaBallet": {
+            "children": ["YandereMaidBallet"],
+            "group": "Ludmilla & Clarice Ballet",
+            "buttonLabel": "Switch",
+        },
+        "LudmillaBallet01": {
+            "children": ["YandereMaidBallet01"],
+            "group": "Ludmilla & Clarice Ballet",
+            "buttonLabel": "Switch",
+        },
+        "LudmillaBallet02": {
+            "children": ["YandereMaidBallet02"],
+            "group": "Ludmilla & Clarice Ballet",
+            "buttonLabel": "Switch",
+        },
+    }
+    for key, value in desired_cards.items():
+        if parent_cards.get(key) != value:
+            parent_cards[key] = value
+            updated["duoDisplay"] = True
+    if updated["duoDisplay"]:
+        write_json(display_path, display)
+
+    duo_path = repo / "apkfiles" / "Duo.json"
+    duo = load_json(duo_path, {}) or {}
+    direct = duo.setdefault("directSpecificLinks", {})
+    desired_links = {
+        "LudmillaBallet": ["YandereMaidBallet"],
+        "LudmillaBallet01": ["YandereMaidBallet01"],
+        "LudmillaBallet02": ["YandereMaidBallet02"],
+        "LudmillaBallet03": ["YandereMaidBallet03"],
+    }
+    for key, values in desired_links.items():
+        existing = direct.get(key, [])
+        if not isinstance(existing, list):
+            existing = [existing]
+        merged: List[str] = []
+        for item in existing + values:
+            if item and item not in merged:
+                merged.append(item)
+        if direct.get(key) != merged:
+            direct[key] = merged
+            updated["duo"] = True
+    if updated["duo"]:
+        write_json(duo_path, duo)
+
+    return updated
+
 def run_tool(repo: Path, script_name: str) -> int:
     script = repo / "tools" / "new_structure" / script_name
     result = subprocess.run([sys.executable, str(script)], cwd=str(repo), text=True, capture_output=True)
@@ -226,6 +288,7 @@ def main() -> int:
     # reload after writes
     loaded = [(path, load_json(path)) for path, _entry in loaded]
     family_reports = repair_family_files(repo, loaded)
+    duo_link_report = repair_ballet_duo_links(repo)
 
     # Use the existing new_structure generators after repairing source data.
     ran = {}
@@ -238,6 +301,7 @@ def main() -> int:
         "targetFamilies": TARGET_FAMILIES,
         "localizedSkillAliases": localization_changes,
         "familyReports": family_reports,
+        "duoLinkReport": duo_link_report,
         "toolReturnCodes": ran,
     }
     report_path = repo / "apkfiles" / "entries" / "reports" / "ballet_active_skill_repair_report.json"
