@@ -69,18 +69,82 @@ def load_indexed_entries(category_dir: Path) -> tuple[List[Dict[str, Any]], List
     return rows, errors
 
 
+def source_id_from_entry(entry: Dict[str, Any], fallback: str = "") -> str:
+    internal = entry.get("internal") if isinstance(entry.get("internal"), dict) else {}
+    return str(internal.get("sourceId") or entry.get("sourceId") or entry.get("name") or entry.get("id") or fallback).strip()
+
+
+def discover_entry_files(category_dir: Path) -> List[Path]:
+    entries_dir = category_dir / "entries"
+    if not entries_dir.exists():
+        return []
+    return sorted(p for p in entries_dir.glob("*.json") if p.is_file())
+
+
+def load_entries_with_discovery(category_dir: Path) -> tuple[List[Dict[str, Any]], List[str], Dict[str, Any]]:
+    """Load indexed entries, then append any raw entry files not listed in index.json.
+
+    This prevents stale override/index files from hiding newly extracted content.
+    Existing index order remains authoritative; auto-discovered files append in filename order.
+    """
+    rows: List[Dict[str, Any]] = []
+    errors: List[str] = []
+    seen_files: set[str] = set()
+    seen_ids: set[str] = set()
+
+    for index_row in read_index_entries(category_dir):
+        rel_file = normalize_rel_path(index_row.get("file", ""))
+        if not rel_file:
+            continue
+        entry_path = resolve_entry_path(category_dir, rel_file)
+        seen_files.add(entry_path.name)
+        try:
+            entry = load_json(entry_path)
+            sid = source_id_from_entry(entry, entry_path.stem)
+            if sid:
+                seen_ids.add(sid)
+            rows.append(entry)
+        except Exception as exc:
+            errors.append(f"{rel_file}: {exc}")
+
+    discovered: List[str] = []
+    for entry_path in discover_entry_files(category_dir):
+        if entry_path.name in seen_files:
+            continue
+        try:
+            entry = load_json(entry_path)
+            sid = source_id_from_entry(entry, entry_path.stem)
+            # Do not drop same display id values; only prevent exact sourceId duplicates.
+            if sid and sid in seen_ids:
+                continue
+            if sid:
+                seen_ids.add(sid)
+            rows.append(entry)
+            discovered.append(entry_path.name)
+        except Exception as exc:
+            errors.append(f"entries/{entry_path.name}: {exc}")
+
+    meta = {
+        "indexedCount": len(seen_files),
+        "discoveredUnindexedCount": len(discovered),
+        "discoveredUnindexedFiles": discovered,
+    }
+    return rows, errors, meta
+
+
 def build_category(entries_root: Path, bundles_dir: Path, category: str) -> Dict[str, Any]:
     category_dir = entries_root / category
     index_path = category_dir / "index.json"
     if not index_path.exists():
         return {"category": category, "status": "missing_index", "count": 0}
     source_index_count = len(read_index_entries(category_dir))
-    rows, errors = load_indexed_entries(category_dir)
+    rows, errors, discovery = load_entries_with_discovery(category_dir)
     bundle = {
         "schemaVersion": 2,
         "category": category,
         "generatedAt": int(time.time()),
         "sourceIndexCount": source_index_count,
+        "discovery": discovery,
         "count": len(rows),
         "errors": errors,
         "contentHash": stable_hash(rows),
@@ -88,7 +152,7 @@ def build_category(entries_root: Path, bundles_dir: Path, category: str) -> Dict
     }
     out_path = bundles_dir / f"{category}.bundle.json"
     write_json(out_path, bundle)
-    return {"category": category, "status": "ok", "sourceIndexCount": source_index_count, "count": len(rows), "errors": len(errors), "contentHash": bundle["contentHash"], "output": str(out_path)}
+    return {"category": category, "status": "ok", "sourceIndexCount": source_index_count, "count": len(rows), "errors": len(errors), "discoveredUnindexedCount": discovery["discoveredUnindexedCount"], "contentHash": bundle["contentHash"], "output": str(out_path)}
 
 
 def resolve_family_path(family_dir: Path, rel_file: str) -> Path:
