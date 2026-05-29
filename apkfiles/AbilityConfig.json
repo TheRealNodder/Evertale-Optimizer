@@ -1,6 +1,6 @@
 {
 	"Version": 23,
-	"Time": 1778736927,
+	"Time": 1780015240,
 	"AbilityConfig": {
 		"StunSingle200A": {
 			"class": "AbilityConfig",
@@ -37192,7 +37192,6 @@
 			}],
 			"enemyEventType": "Hit",
 			"sourceEventType": "Finish",
-			"flags": ["StunChance", "PoisonChance", "SleepChance"],
 			"abilityEffect": "HokusaiInkUp"
 		},
 		"PaintSweepAHokusaiRegular":{
@@ -37226,7 +37225,7 @@
 			"enemyEventType": "Finish",
 			"sourceEventType": "Finish",
 			"abilityEffect": "HokusaiRainbowRain",
-			"flags": ["Healer","Momentum", "MomentumReadyUser","IgnoreStealth","StunChance", "PoisonChance", "SleepChance"],
+			"flags": ["Healer","Momentum", "MomentumReadyUser","IgnoreStealth"],
 			"useCondition": "HasDamagedWithAttack",
 			"killLockSkillIcon": "IconRedEx01",
 			"killLockUnlockedSkillIcon": "IconGreenCircle01",
@@ -37261,7 +37260,7 @@
 			"abilityEffect": "HokusaiDrawAttack",
 			"attackScalors": ["GoodForKiller1","GoodVsKiller1","GoodForKiller2","GoodVsKiller2"],
 			"conditionedAbilityEffects": ["HokusaiDrawAttack","HokusaiDrawAttack","HokusaiDrawAttack","HokusaiDrawAttack"],
-			"flags": ["Slayerbane","StunChance", "PoisonChance", "SleepChance"],
+			"flags": ["Slayerbane"],
 			"recommendEffectWhenUsable": -2
 		},
 		"AllElementsKillAHokusaiRegular": {
@@ -45634,6 +45633,446 @@
 			"attackScalors": ["GoodVsNotBurning"],
 			"conditionedAbilityEffects": ["KintaroSpecial","KintaroSpecial"],
 			"useCondition": "IsNotActive4LOCKKintaroRegular"
-		}
-	}
-}
+		},
+		"QuickSingleAttackALudmillaBalletBoss":{
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage", "ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides":[{
+				"damageFlags": ["BalletBossStunEnemies","IgnoreArmor","HardIgnoreBlockDeath","IgnoreSkin"],
+				"applyToTargetType": "Enemy"
+			},{
+				"buffs": ["HijikataCounter","HijikataCounterFuseAfterTime"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["BalletBossActive1Cooldown50"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"applyConditions": "IsHijikataCharged2",
+				"showMissConditions": "ShowNoMiss"	
+			},{
+				"buffs": ["TUMinus50","StoreEnergy"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["AttackMinus25Percent1TurnOnly","SleepForced100TU", "BurnImmunityTempForRevengeSleepAttack"],
+				"applyConditions": "IsFireOrAirOrLife",
+				"applyToTargetType": "Enemy",
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs": ["MegaPoison100TU", "BurnImmunityTempForRevenge"],
+				"applyConditions": "IsWaterOrEarthOrDeath",
+				"applyToTargetType": "Enemy",
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "LudmillaBalletAttack1",
+			"attackScalors": ["GoodIfCharged1","GoodIfCharged2","GoodIfCharged3"],
+			"conditionedAbilityEffects": ["LudmillaBalletAttack1","LudmillaBalletAttack1","LudmillaBalletAttack1"],
+			"useCondition": "NotInstantCooldown2"
+		},
+		"SingleAttackALudmillaBalletBoss":{
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage","ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides":[{
+				"damageFlags": ["BalletBossStunEnemies","IgnoreArmor","HardIgnoreBlockDeath","IgnoreSkin"],
+				"applyToTargetType": "Enemy"
+			},{
+				"buffs": ["Active3READYForUseBalletBoss"],
+				"applyConditions": "HasDamagedWithAttack",
+				"showMissConditions": "ShowNoMiss",
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["LoseMomentum","GainMomentum","StunImmunityOnce","SleepImmunityOnce","PoisonImmunityOnce","StoreEnergy"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["AttackMinus25Percent1TurnOnly","SleepForced100TU", "BurnImmunityTempForRevengeSleepAttack"],
+				"applyConditions": "IsFireOrAirOrLife",
+				"applyToTargetType": "Enemy",
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs": ["MegaPoison100TU", "BurnImmunityTempForRevenge"],
+				"applyConditions": "IsWaterOrEarthOrDeath",
+				"applyToTargetType": "Enemy",
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			}],
+			"enemyEventType": "Finish",
+			"sourceEventType": "Finish",
+			"abilityEffect": "LudmillaBalletAbility1",
+			"attackScalors": ["GoodIfCharged1","GoodIfCharged2","GoodIfCharged3"],
+			"conditionedAbilityEffects": ["LudmillaBalletAbility1","LudmillaBalletAbility1","LudmillaBalletAbility1"]
+		},
+		"BigSingleAttackALudmillaBalletBoss": {
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage", "ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"damageFlags": ["BalletBossStunEnemies","IgnoreArmor","HardIgnoreBlockDeath","IgnoreSkin"],
+				"applyToTargetType": "Enemy"
+			},{
+				"buffs": ["TUMinus50","RemoveActive3READYForUseBalletBoss","StoreEnergy"],
+				"applyToTargetType": "Source",
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["AttackMinus25Percent1TurnOnly","SleepForced100TU", "BurnImmunityTempForRevengeSleepAttack"],
+				"applyConditions": "IsFireOrAirOrLife",
+				"applyToTargetType": "Enemy",
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs": ["MegaPoison100TU", "BurnImmunityTempForRevenge"],
+				"applyConditions": "IsWaterOrEarthOrDeath",
+				"applyToTargetType": "Enemy",
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "LudmillaBalletSP",
+			"attackScalors": ["GoodIfCharged1","GoodIfCharged2","GoodIfCharged3"],
+			"conditionedAbilityEffects": ["LudmillaBalletSP","LudmillaBalletSP","LudmillaBalletSP"],
+			"recommendEffectWhenUsable": -2,
+			"useCondition": "IsActive3READYForUseBallet",
+			"killLockSkillIcon": "IconRedEx01",
+			"killLockUnlockedSkillIcon": "IconGreenCircle01",
+			"killLockUnlockedKey": "SkillReadyToUseKey",
+			"killLockLockedKey": "BalletLockLockedKey"
+		},
+		"AllyBuffALudmillaBalletBoss": {
+			"class": "AbilityConfig",
+			"targetingData": "AllAlly",
+			"components": ["ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"buffs": ["RemoveBuffs"],
+				"applyToTargetType": "Friendly",
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs": ["GainSpiritAndTurnBuffBalletBossEBB","BalletBossActive4Cooldown50"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			}],
+			"friendlyEventType": "Finish",
+			"sourceEventType": "Finish",
+			"flags": ["Purify","GiveTurn"],
+			"abilityEffect": "LudmillaBalletAbility2",
+			"useCondition": "NotInstantCooldown"
+		},
+		"QuickSingleAttackAYandereMaidBalletBoss":{
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage", "ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides":[{
+				"damageFlags": ["BalletBossStunEnemies","IgnoreArmor","HardIgnoreBlockDeath","IgnoreSkin"],
+				"applyToTargetType": "Enemy"
+			},{
+				"buffs": ["HijikataCounter","HijikataCounterFuseAfterTime"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["BalletBossActive1Cooldown50"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"applyConditions": "IsHijikataCharged2",
+				"showMissConditions": "ShowNoMiss"	
+			},{
+				"buffs": ["TUMinus50","StoreEnergy"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["AttackMinus25Percent1TurnOnly","SleepForced100TU", "BurnImmunityTempForRevengeSleepAttack"],
+				"applyConditions": "IsFireOrAirOrLife",
+				"applyToTargetType": "Enemy",
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs": ["MegaPoison100TU", "BurnImmunityTempForRevenge"],
+				"applyConditions": "IsWaterOrEarthOrDeath",
+				"applyToTargetType": "Enemy",
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "YandereBalletAttack1",
+			"attackScalors": ["GoodIfCharged1","GoodIfCharged2","GoodIfCharged3"],
+			"conditionedAbilityEffects": ["YandereBalletAttack1","YandereBalletAttack1","YandereBalletAttack1"],
+			"useCondition": "NotInstantCooldown2"
+		},
+		"SingleAttackAYandereMaidBalletBoss":{
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage","ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides":[{
+				"damageFlags": ["BalletBossStunEnemies","IgnoreArmor","HardIgnoreBlockDeath","IgnoreSkin"],
+				"applyToTargetType": "Enemy"
+			},{
+				"buffs": ["Active3READYForUseBalletBoss"],
+				"applyConditions": "HasDamagedWithAttack",
+				"showMissConditions": "ShowNoMiss",
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["LoseMomentum","GainMomentum","StunImmunityOnce","SleepImmunityOnce","PoisonImmunityOnce","StoreEnergy"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["AttackMinus25Percent1TurnOnly","SleepForced100TU", "BurnImmunityTempForRevengeSleepAttack"],
+				"applyConditions": "IsFireOrAirOrLife",
+				"applyToTargetType": "Enemy",
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs": ["MegaPoison100TU", "BurnImmunityTempForRevenge"],
+				"applyConditions": "IsWaterOrEarthOrDeath",
+				"applyToTargetType": "Enemy",
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			}],
+			"enemyEventType": "Finish",
+			"sourceEventType": "Finish",
+			"abilityEffect": "YandereBalletAbility1",
+			"attackScalors": ["GoodIfCharged1","GoodIfCharged2","GoodIfCharged3"],
+			"conditionedAbilityEffects": ["YandereBalletAbility1","YandereBalletAbility1","YandereBalletAbility1"]
+		},
+		"BigSingleAttackAYandereMaidBalletBoss": {
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage", "ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"damageFlags": ["BalletBossStunEnemies","IgnoreArmor","HardIgnoreBlockDeath","IgnoreSkin"],
+				"applyToTargetType": "Enemy"
+			},{
+				"buffs": ["TUMinus50","RemoveActive3READYForUseBalletBoss","StoreEnergy"],
+				"applyToTargetType": "Source",
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["AttackMinus25Percent1TurnOnly","SleepForced100TU", "BurnImmunityTempForRevengeSleepAttack"],
+				"applyConditions": "IsFireOrAirOrLife",
+				"applyToTargetType": "Enemy",
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs": ["MegaPoison100TU", "BurnImmunityTempForRevenge"],
+				"applyConditions": "IsWaterOrEarthOrDeath",
+				"applyToTargetType": "Enemy",
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "YandereBalletSP",
+			"attackScalors": ["GoodIfCharged1","GoodIfCharged2","GoodIfCharged3"],
+			"conditionedAbilityEffects": ["YandereBalletSP","YandereBalletSP","YandereBalletSP"],
+			"recommendEffectWhenUsable": -2,
+			"useCondition": "IsActive3READYForUseBallet",
+			"killLockSkillIcon": "IconRedEx01",
+			"killLockUnlockedSkillIcon": "IconGreenCircle01",
+			"killLockUnlockedKey": "SkillReadyToUseKey",
+			"killLockLockedKey": "BalletLockLockedKey"
+		},
+		"AllyBuffAYandereMaidBalletBoss": {
+			"class": "AbilityConfig",
+			"targetingData": "AllAlly",
+			"components": ["ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"buffs": ["RemoveBuffs"],
+				"applyToTargetType": "Friendly",
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs": ["GainSpiritAndTurnBuffBalletBossEBB","BalletBossActive4Cooldown50"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			}],
+			"friendlyEventType": "Finish",
+			"sourceEventType": "Finish",
+			"flags": ["Purify","GiveTurn"],
+			"abilityEffect": "YandereBalletAbility2",
+			"useCondition": "NotInstantCooldown"
+		},
+		"AllAttackAVictoriaRegularBoss":{
+			"class": "AbilityConfig",
+			"targetingData": "AllEnemy",
+			"components": ["Damage","ApplyBuff","ApplyBuff"],
+			"componentOverrides":[{
+				"applyToTargetType": "Enemy",
+				"damageFlags": ["IgnoreSkin","HardIgnoreBlockDeath","DoNotWake"],
+				"drainPercent": 0.01,
+				"drainEffect": "VampireDrain1"
+			},{
+				"buffs": ["GiveTurn","OnExtraTurn","JustGivenTurn"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"buffAppliedEffects": ["blank1"],
+				"applyConditions": "NoFreshNewMomentum",
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs": ["FreshNewMomentum"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "VictoriaRain1",
+			"attackScalors": ["NotGoodRandomDamage","Good50PercentChance","GoodOneThirdChance"],
+			"conditionedAbilityEffects": ["VictoriaRain1","VictoriaRain1","VictoriaRain1"],
+			"recommendEffectWhenUsable": -1
+		},
+		"EnemyBuffAVictoriaRegularBoss": {
+			"class": "AbilityConfig",
+			"targetingData": "RandomEnemy",
+			"components": ["ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"buffs": ["RemoveBurn","FrostBiteCounter","SpreadPlagueFrostBiteCounter"],
+				"applyToTargetType": "Enemy"
+			},{
+				"buffs": ["Gain2SpiritForEachNonSleepingEnemyOnBattlefieldEBB","VictoriaRegularBossActive2Cooldown50"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "VictoriaCrown",
+			"flags": ["NoDamage"],
+			"useCondition": "NotInstantCooldown"
+		},
+		"SingleAttackAVictoriaRegularBoss":{
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage","ApplyBuff"],
+			"componentOverrides":[{
+				"applyToTargetType": "Enemy",
+				"damageFlags": ["IgnoreArmor","HardIgnoreBlockDeath","DoNotWake"],
+				"drainPercent": 0.01,
+				"drainEffect": "VampireDrain1"
+			},{
+				"buffs": ["LosingFreshMomentum","UsedAbilityCounter"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "VictoriaSpecial",
+			"attackScalors": ["GoodIfUsedOnce","GoodIfUsedTwice","GoodIfUsedThrice"],
+			"conditionedAbilityEffects": ["VictoriaSpecial","VictoriaSpecial","VictoriaSpecial"],
+			"recommendEffectWhenUsable": -1
+		},
+		"AllyBuffAVictoriaRegularBoss": {
+			"class": "AbilityConfig",
+			"targetingData": "AllAlly",
+			"components": ["ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"buffs": ["Armor"],
+				"applyToTargetType": "Friendly"
+			},{
+				"buffs": ["GrantAllOtherAlliesTurnEBB","HoldGroundOnceForHoldGroundPlusForPowerChargeBoss","BlockDeathUntilNextTurnForHoldGroundPlusBoss"],
+				"applyToTargetType": "Source",
+				"skipAbilityEffect": true
+			}],
+			"friendlyEventType": "Finish",
+			"sourceEventType": "Hit",
+			"abilityEffect": "VictoriaPowerCharge1",
+			"flags": ["NoDamage","GiveTurn"],
+			"useCondition": "NoPowerCharge"
+		},
+		"EnemyBuffALupinRegularBoss": {
+			"class": "AbilityConfig",
+			"targetingData": "AllEnemy",
+			"components": ["ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"buffs": ["RemoveBurn","MegaPoison","BurnImmunityTempForRevenge"],
+				"applyToTargetType": "Enemy"
+			},{
+				"buffs": ["SuperStealth","StealthShieldOnce","StoreEnergy","Steal2SpiritForEachPoisonedEnemyEBB"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs": ["HijikataCounter","HijikataCounterFuseAfterTime"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["LupinRegularBossActive1Cooldown50"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"applyConditions": "IsHijikataCharged2",
+				"showMissConditions": "ShowNoMiss"	
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "LupinVenom",
+			"flags": ["NoDamage"],
+			"useCondition": "IsNotStealthNotInstantCooldown"
+		},
+		"SingleAttackALupinRegularBoss":{
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["SkipRevengeDamage","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"damageBoosts": ["SneakAttackDamageBoost"],
+				"applyToTargetType": "Enemy",
+				"damageFlags": ["IgnoreArmor","Sneak","DoNotWake"]
+			},{
+				"buffs": ["RemoveSleepImmunityOnce","RemovePoisonImmunityOnce","RemoveStunImmunityOnce"],
+				"applyToTargetType": "Enemy",
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"	
+			},{
+				"buffs": ["StoreEnergy"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "LupinShot1",
+			"flags": ["Sneak"],
+			"recommendEffectWhenUsable": 1,
+			"useCondition": "IsStealthOrInstantCooldown"
+		},
+		"AllAttackALupinRegularBoss":{
+			"class": "AbilityConfig",
+			"targetingData": "AllEnemy",
+			"components": ["Damage","ApplyBuff"],
+			"componentOverrides":[{
+				"applyToTargetType": "Enemy",
+				"damageFlags": ["IgnoreArmor","IgnoreSkin","HardIgnoreBlockDeath"]
+			},{
+				"buffs": ["RemoveEnergy","GrantAllOtherAlliesTurnEBB"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "LupinAllDamage",
+			"attackScalors": ["TimeInCombat100","TimeInCombat200"],
+			"conditionedAbilityEffects": ["LupinAllDamage","LupinAllDamage","LupinAllDamage"],
+			"flags": ["Duration","GiveTurn"],
+			"recommendEffectWhenUsable": -1,
+			"useCondition": "IsCharged3"
+		},
+		"BigSelfBuffALupinRegularBoss": {
+			"class": "AbilityConfig",
+			"targetingData": "SelfOnly",
+			"components": ["ApplyBuff"],
+			"componentOverrides": [{
+				"buffs": ["AttackAndHasteUp50PercentLupinRegularBoss","SleepImmunityOnce","StunImmunityOnce"],
+				"applyToTargetType": "Source"
+			}],
+			"sourceEventType": "Finish",
+			"abilityEffect": "LupinSearchlight",
+			"flags": ["NoDamage"],
+			"useCondition": "IsLupinActive4ReadyOr1AllyHPBelow50Percent"
+		},
+		"Q
