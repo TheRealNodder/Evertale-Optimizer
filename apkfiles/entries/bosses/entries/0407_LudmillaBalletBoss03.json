@@ -1,0 +1,2199 @@
+{
+  "schemaVersion": 3,
+  "order": 407,
+  "id": "mega-ludmilla",
+  "name": "Mega Ludmilla",
+  "title": "",
+  "description": "",
+  "category": "bosse",
+  "rarity": null,
+  "stars": 6,
+  "evolvedStars": 6,
+  "element": "Light",
+  "weaponType": "Hammer",
+  "stats": {
+    "atk": 3000,
+    "hp": 190500,
+    "spd": 612,
+    "cost": 999
+  },
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/LudmillaBallet03.png",
+  "refs": {
+    "activeSkills": [
+      "QuickSingleAttackALudmillaBalletBoss",
+      "SingleAttackALudmillaBalletBoss",
+      "BigSingleAttackALudmillaBalletBoss",
+      "AllyBuffALudmillaBalletBoss"
+    ],
+    "passives": [
+      "WatchMeDancePassiveABalletBoss",
+      "PeakPerformancePassiveABalletBoss"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": null,
+    "leaderBuffCondition": null,
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "QuickSingleAttackALudmillaBalletBoss": {
+        "id": "QuickSingleAttackALudmillaBalletBoss",
+        "found": true,
+        "localization": {
+          "name": "Quick Strike",
+          "description": "300% damage to 1 enemy. Then the user has their current TU reduced by 50TU. If this skill is used 3 times within 10TU, it becomes locked for 50TU.",
+          "selected": "300% damage, reduce user TU"
+        },
+        "ability": {
+          "name": "QuickSingleAttackALudmillaBalletBoss",
+          "class": "Ability",
+          "abilityScalor": 2,
+          "conditionalAbilityScalors": [
+            3,
+            4,
+            5
+          ],
+          "config": "QuickSingleAttackALudmillaBalletBoss",
+          "tuCost": 50,
+          "useLimit": 0,
+          "spiritCost": 2,
+          "blockTargetManipulation": 1,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageFlags": [
+                "BalletBossStunEnemies",
+                "IgnoreArmor",
+                "HardIgnoreBlockDeath",
+                "IgnoreSkin"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "HijikataCounter",
+                "HijikataCounterFuseAfterTime"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "BalletBossActive1Cooldown50"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true,
+              "applyConditions": "IsHijikataCharged2",
+              "showMissConditions": "ShowNoMiss"
+            },
+            {
+              "buffs": [
+                "TUMinus50",
+                "StoreEnergy"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "AttackMinus25Percent1TurnOnly",
+                "SleepForced100TU",
+                "BurnImmunityTempForRevengeSleepAttack"
+              ],
+              "applyConditions": "IsFireOrAirOrLife",
+              "applyToTargetType": "Enemy",
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss"
+            },
+            {
+              "buffs": [
+                "MegaPoison100TU",
+                "BurnImmunityTempForRevenge"
+              ],
+              "applyConditions": "IsWaterOrEarthOrDeath",
+              "applyToTargetType": "Enemy",
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss"
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "LudmillaBalletAttack1",
+          "attackScalors": [
+            "GoodIfCharged1",
+            "GoodIfCharged2",
+            "GoodIfCharged3"
+          ],
+          "conditionedAbilityEffects": [
+            "LudmillaBalletAttack1",
+            "LudmillaBalletAttack1",
+            "LudmillaBalletAttack1"
+          ],
+          "useCondition": "NotInstantCooldown2"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.3,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_slash1",
+            "batfx_ElmKouhai/batfx_slashlifeBlue03"
+          ],
+          "sortOrderOffset": [
+            -2,
+            2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle3"
+          ],
+          "damagePercents": [
+            0,
+            1
+          ],
+          "damageHitReactions": [
+            false,
+            true
+          ],
+          "forceHitReactions": [
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            false
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "AttackMinus25Percent1TurnOnly": {
+            "class": "Buff",
+            "stackName": "AttackMinus25Percent",
+            "behaviors": [
+              "RemoveAfterTurnsBehavior",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "turnCount": 1,
+                "scalorStatBonuses": {
+                  "Attack": -0.3333333
+                }
+              },
+              {
+                "name": "AttackPlus50Percent"
+              },
+              {
+                "name": "RageCount1Icon"
+              },
+              {
+                "name": "RageCount2Icon"
+              },
+              {
+                "name": "RageCount3Icon"
+              }
+            ],
+            "iconSpriteName": "IconRedWeak01",
+            "showAsTimer": true,
+            "duration": -1
+          },
+          "BalletBossActive1Cooldown50": {
+            "class": "Buff",
+            "stackName": "InstantCooldown2",
+            "duration": 50,
+            "isHiddenFromPlayers": false,
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "iconSpriteName": "IconBlueCountdownClock3Numbered01"
+          },
+          "BurnImmunityTempForRevenge": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Burn",
+                  "BurnAfterTurn",
+                  "BurnAtEndOfTurn"
+                ],
+                "dontShowText": true
+              },
+              {
+                "name": "BurnAfterTurn"
+              },
+              {
+                "name": "BurnSelfOnHit"
+              }
+            ],
+            "duration": 1,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "tags": [
+              "BurnImmune"
+            ],
+            "stackName": "BurnImmunityTempForRevenge",
+            "isHiddenFromPlayers": true
+          },
+          "BurnImmunityTempForRevengeSleepAttack": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Burn",
+                  "BurnAfterTurn",
+                  "BurnAtEndOfTurn"
+                ],
+                "dontShowText": true
+              },
+              {
+                "name": "BurnAfterTurn"
+              },
+              {
+                "name": "BurnSelfOnHit"
+              }
+            ],
+            "duration": 1,
+            "showAsTimer": false,
+            "applyConditions": "IsNotAnySleepImmune",
+            "showAsPermanent": false,
+            "tags": [
+              "BurnImmune"
+            ],
+            "stackName": "BurnImmunityTempForRevenge",
+            "isHiddenFromPlayers": true
+          },
+          "HijikataCounter": {
+            "class": "Buff",
+            "stackName": "StealthOverdriveCounter",
+            "stackLimit": 3,
+            "duration": -1,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "noIconShownOnBattleStatus": true,
+            "isHiddenFromPlayers": true
+          },
+          "HijikataCounterFuseAfterTime": {
+            "class": "Buff",
+            "duration": 10,
+            "behaviors": [
+              "BuffAfterTime"
+            ],
+            "behaviorOverrides": [
+              {
+                "selfBuffs": [
+                  "HijikataCounterDecrease"
+                ],
+                "fuse": 10
+              }
+            ],
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "noIconShownOnBattleStatus": true,
+            "isHiddenFromPlayers": true
+          },
+          "MegaPoison100TU": {
+            "class": "Buff",
+            "stackName": "Poison",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "DamageOverTime"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "percentOfAttack": 0.05,
+                "damageColor": "Green",
+                "abilityEffect": "MidDeath1MegaPoison",
+                "extraDamageFlag": "MegaPoison"
+              }
+            ],
+            "tags": [
+              "Poison",
+              "MegaPoison"
+            ],
+            "canBePurified": true,
+            "duration": 100,
+            "showAsTimer": true,
+            "statusEffect": "MegaPoisonStatus",
+            "statusEffectOffset": 0.1,
+            "damageType": "Poison",
+            "effectToShowWhenApplied": "MegaPoisonEntry1",
+            "iconSpriteName": "IconPurplePoison01"
+          },
+          "SleepForced100TU": {
+            "class": "Buff",
+            "stackName": "Sleep",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "LoseTurn",
+              "RemoveOnHurt"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "PurifyChain"
+              },
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "name": "AutoPurifyAfterTurnNoSleep"
+              },
+              {},
+              {
+                "ignoreIfHurtBySelf": true,
+                "cancelFromDamageFlags": [
+                  "DoNotWake"
+                ]
+              }
+            ],
+            "duration": 100,
+            "showAsTimer": true,
+            "statusEffect": "SleepStatus",
+            "statusEffectOffset": 0.1,
+            "iconSpriteName": "IconWhiteSleepZs01",
+            "textKeyToShowWhenApplied": "SleepKey",
+            "canBePurified": true
+          },
+          "StoreEnergy": {
+            "class": "Buff",
+            "stackLimit": 3,
+            "duration": -1,
+            "showAsTimer": false,
+            "stackName": "StoreEnergy",
+            "noIconShownOnBattleStatus": true,
+            "usesStackCountDescription": true,
+            "iconSpriteName": "IconPinkCharge01"
+          },
+          "TUMinus50": {
+            "class": "Buff",
+            "stackName": "TUMinus",
+            "behaviors": [
+              "Stun"
+            ],
+            "behaviorOverrides": [
+              {
+                "stunTU": -50
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true,
+            "textKeyToShowWhenApplied": "TUMinusKey"
+          }
+        },
+        "attackScalors": {
+          "GoodIfCharged1": {
+            "class": "AttackScalor",
+            "sourceCondition": "IsCharged1"
+          },
+          "GoodIfCharged2": {
+            "class": "AttackScalor",
+            "sourceCondition": "IsCharged2"
+          },
+          "GoodIfCharged3": {
+            "class": "AttackScalor",
+            "sourceCondition": "IsCharged3"
+          }
+        },
+        "conditions": {
+          "IsFireOrAirOrLife": {
+            "class": "MonsterConditions",
+            "elements": [
+              "Fire",
+              "Air",
+              "Life"
+            ]
+          },
+          "IsHijikataCharged2": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "StealthOverdriveCounter"
+            ],
+            "buffStackCounts": [
+              2
+            ]
+          },
+          "IsWaterOrEarthOrDeath": {
+            "class": "MonsterConditions",
+            "elements": [
+              "Water",
+              "Earth",
+              "Death"
+            ]
+          },
+          "NotInstantCooldown2": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "InstantCooldown2"
+              ]
+            }
+          }
+        }
+      },
+      "SingleAttackALudmillaBalletBoss": {
+        "id": "SingleAttackALudmillaBalletBoss",
+        "found": true,
+        "localization": {
+          "name": "Elegant Thrust",
+          "description": "500% damage to 1 enemy. The user is granted a Sleep Ward, Stun Ward, and Poison Ward.\n\nEvery second time this skill is activated while on the battlefield, Deadly Dance is unlocked.\n\nEach Ward prevents their named effect from being applied once, then is removed. Identical Wards cannot stack.",
+          "selected": "500% damage, gains wards, may unlock Deadly Dance"
+        },
+        "ability": {
+          "name": "SingleAttackALudmillaBalletBoss",
+          "class": "Ability",
+          "abilityScalor": 4,
+          "conditionalAbilityScalors": [
+            5,
+            6,
+            7
+          ],
+          "config": "SingleAttackALudmillaBalletBoss",
+          "tuCost": 100,
+          "useLimit": 0,
+          "spiritGain": 3,
+          "blockTargetManipulation": 1,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageFlags": [
+                "BalletBossStunEnemies",
+                "IgnoreArmor",
+                "HardIgnoreBlockDeath",
+                "IgnoreSkin"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "Active3READYForUseBalletBoss"
+              ],
+              "applyConditions": "HasDamagedWithAttack",
+              "showMissConditions": "ShowNoMiss",
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "LoseMomentum",
+                "GainMomentum",
+                "StunImmunityOnce",
+                "SleepImmunityOnce",
+                "PoisonImmunityOnce",
+                "StoreEnergy"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "AttackMinus25Percent1TurnOnly",
+                "SleepForced100TU",
+                "BurnImmunityTempForRevengeSleepAttack"
+              ],
+              "applyConditions": "IsFireOrAirOrLife",
+              "applyToTargetType": "Enemy",
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss"
+            },
+            {
+              "buffs": [
+                "MegaPoison100TU",
+                "BurnImmunityTempForRevenge"
+              ],
+              "applyConditions": "IsWaterOrEarthOrDeath",
+              "applyToTargetType": "Enemy",
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss"
+            }
+          ],
+          "enemyEventType": "Finish",
+          "sourceEventType": "Finish",
+          "abilityEffect": "LudmillaBalletAbility1",
+          "attackScalors": [
+            "GoodIfCharged1",
+            "GoodIfCharged2",
+            "GoodIfCharged3"
+          ],
+          "conditionedAbilityEffects": [
+            "LudmillaBalletAbility1",
+            "LudmillaBalletAbility1",
+            "LudmillaBalletAbility1"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.3,
+            0,
+            0.3,
+            0,
+            0.1,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batfx_cleopatra1/batfx_quickcharge1",
+            "batsfx_prefab/batsfx_ring2",
+            "batfx_LudmillaBallet/batfx_finishblow1",
+            "batsfx_prefab/batsfx_slash1",
+            "batfx_ElmKouhai/batfx_slashlifeBlue03",
+            "batfx_LudmillaBallet/batfx_BalletSlashBlue1",
+            "batsfx_prefab/batsfx_cherryprep1"
+          ],
+          "sortOrderOffset": [
+            2,
+            -2,
+            2,
+            -2,
+            2,
+            2,
+            -2
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            true,
+            false,
+            false,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "Active3READYForUseBalletBoss": {
+            "class": "Buff",
+            "stackName": "Active3READYForUseBallet",
+            "duration": -1,
+            "isHiddenFromPlayers": true,
+            "showAsPermanent": false,
+            "showAsTimer": false
+          },
+          "AttackMinus25Percent1TurnOnly": {
+            "class": "Buff",
+            "stackName": "AttackMinus25Percent",
+            "behaviors": [
+              "RemoveAfterTurnsBehavior",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "turnCount": 1,
+                "scalorStatBonuses": {
+                  "Attack": -0.3333333
+                }
+              },
+              {
+                "name": "AttackPlus50Percent"
+              },
+              {
+                "name": "RageCount1Icon"
+              },
+              {
+                "name": "RageCount2Icon"
+              },
+              {
+                "name": "RageCount3Icon"
+              }
+            ],
+            "iconSpriteName": "IconRedWeak01",
+            "showAsTimer": true,
+            "duration": -1
+          },
+          "BurnImmunityTempForRevenge": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Burn",
+                  "BurnAfterTurn",
+                  "BurnAtEndOfTurn"
+                ],
+                "dontShowText": true
+              },
+              {
+                "name": "BurnAfterTurn"
+              },
+              {
+                "name": "BurnSelfOnHit"
+              }
+            ],
+            "duration": 1,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "tags": [
+              "BurnImmune"
+            ],
+            "stackName": "BurnImmunityTempForRevenge",
+            "isHiddenFromPlayers": true
+          },
+          "BurnImmunityTempForRevengeSleepAttack": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Burn",
+                  "BurnAfterTurn",
+                  "BurnAtEndOfTurn"
+                ],
+                "dontShowText": true
+              },
+              {
+                "name": "BurnAfterTurn"
+              },
+              {
+                "name": "BurnSelfOnHit"
+              }
+            ],
+            "duration": 1,
+            "showAsTimer": false,
+            "applyConditions": "IsNotAnySleepImmune",
+            "showAsPermanent": false,
+            "tags": [
+              "BurnImmune"
+            ],
+            "stackName": "BurnImmunityTempForRevenge",
+            "isHiddenFromPlayers": true
+          },
+          "GainMomentum": {
+            "class": "Buff",
+            "stackName": "MomentumReady",
+            "duration": -1,
+            "isHiddenFromPlayers": true,
+            "applyConditions": "NotLostMomentum"
+          },
+          "LoseMomentum": {
+            "class": "Buff",
+            "stackName": "LoseMomentum",
+            "duration": 0,
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "MomentumReady"
+              }
+            ],
+            "isHiddenFromPlayers": true,
+            "applyConditions": "HasDamagedWithAttack"
+          },
+          "MegaPoison100TU": {
+            "class": "Buff",
+            "stackName": "Poison",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "DamageOverTime"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "percentOfAttack": 0.05,
+                "damageColor": "Green",
+                "abilityEffect": "MidDeath1MegaPoison",
+                "extraDamageFlag": "MegaPoison"
+              }
+            ],
+            "tags": [
+              "Poison",
+              "MegaPoison"
+            ],
+            "canBePurified": true,
+            "duration": 100,
+            "showAsTimer": true,
+            "statusEffect": "MegaPoisonStatus",
+            "statusEffectOffset": 0.1,
+            "damageType": "Poison",
+            "effectToShowWhenApplied": "MegaPoisonEntry1",
+            "iconSpriteName": "IconPurplePoison01"
+          },
+          "PoisonImmunityOnce": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity"
+            ],
+            "stackName": "PoisonImmunityOnce",
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Poison"
+                ],
+                "useLimit": 1
+              }
+            ],
+            "duration": -1,
+            "showAsTimer": true,
+            "tags": [
+              "PoisonImmuneTemp",
+              "ThisIsAWard"
+            ],
+            "iconSpriteName": "IconRedPoisonInvalid01"
+          },
+          "SleepForced100TU": {
+            "class": "Buff",
+            "stackName": "Sleep",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "LoseTurn",
+              "RemoveOnHurt"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "PurifyChain"
+              },
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "name": "AutoPurifyAfterTurnNoSleep"
+              },
+              {},
+              {
+                "ignoreIfHurtBySelf": true,
+                "cancelFromDamageFlags": [
+                  "DoNotWake"
+                ]
+              }
+            ],
+            "duration": 100,
+            "showAsTimer": true,
+            "statusEffect": "SleepStatus",
+            "statusEffectOffset": 0.1,
+            "iconSpriteName": "IconWhiteSleepZs01",
+            "textKeyToShowWhenApplied": "SleepKey",
+            "canBePurified": true
+          },
+          "SleepImmunityOnce": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity"
+            ],
+            "stackName": "SleepImmunityOnce",
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Sleep"
+                ],
+                "useLimit": 1
+              }
+            ],
+            "duration": -1,
+            "showAsTimer": true,
+            "tags": [
+              "SleepImmuneTemp",
+              "ThisIsAWard"
+            ],
+            "iconSpriteName": "IconRedSleepInvalidZs01"
+          },
+          "StoreEnergy": {
+            "class": "Buff",
+            "stackLimit": 3,
+            "duration": -1,
+            "showAsTimer": false,
+            "stackName": "StoreEnergy",
+            "noIconShownOnBattleStatus": true,
+            "usesStackCountDescription": true,
+            "iconSpriteName": "IconPinkCharge01"
+          },
+          "StunImmunityOnce": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity"
+            ],
+            "stackName": "StunImmunityOnce",
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Stun",
+                  "StunNoAbsorb"
+                ],
+                "useLimit": 1
+              }
+            ],
+            "duration": -1,
+            "showAsTimer": true,
+            "tags": [
+              "StunImmuneTemp",
+              "ThisIsAWard"
+            ],
+            "iconSpriteName": "IconRedStunInvalidLightning01"
+          }
+        },
+        "attackScalors": {
+          "GoodIfCharged1": {
+            "class": "AttackScalor",
+            "sourceCondition": "IsCharged1"
+          },
+          "GoodIfCharged2": {
+            "class": "AttackScalor",
+            "sourceCondition": "IsCharged2"
+          },
+          "GoodIfCharged3": {
+            "class": "AttackScalor",
+            "sourceCondition": "IsCharged3"
+          }
+        },
+        "conditions": {
+          "HasDamagedWithAttack": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "MomentumReady"
+            ]
+          },
+          "IsFireOrAirOrLife": {
+            "class": "MonsterConditions",
+            "elements": [
+              "Fire",
+              "Air",
+              "Life"
+            ]
+          },
+          "IsWaterOrEarthOrDeath": {
+            "class": "MonsterConditions",
+            "elements": [
+              "Water",
+              "Earth",
+              "Death"
+            ]
+          }
+        }
+      },
+      "BigSingleAttackALudmillaBalletBoss": {
+        "id": "BigSingleAttackALudmillaBalletBoss",
+        "found": true,
+        "localization": {
+          "name": "Deadly Dance",
+          "description": "700% damage to 1 enemy. Then the user has their current TU reduced by 50TU.\n\nThis skill is locked until it becomes unlocked by Elegant Thrust. This skill is locked again after each use or if the user leaves the battlefield.",
+          "selected": "700% damage, reduce user TU"
+        },
+        "ability": {
+          "name": "BigSingleAttackALudmillaBalletBoss",
+          "class": "Ability",
+          "abilityScalor": 6,
+          "conditionalAbilityScalors": [
+            7,
+            8,
+            9
+          ],
+          "config": "BigSingleAttackALudmillaBalletBoss",
+          "tuCost": 50,
+          "useLimit": 0,
+          "spiritCost": 2,
+          "blockTargetManipulation": 1,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageFlags": [
+                "BalletBossStunEnemies",
+                "IgnoreArmor",
+                "HardIgnoreBlockDeath",
+                "IgnoreSkin"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "TUMinus50",
+                "RemoveActive3READYForUseBalletBoss",
+                "StoreEnergy"
+              ],
+              "applyToTargetType": "Source",
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "AttackMinus25Percent1TurnOnly",
+                "SleepForced100TU",
+                "BurnImmunityTempForRevengeSleepAttack"
+              ],
+              "applyConditions": "IsFireOrAirOrLife",
+              "applyToTargetType": "Enemy",
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss"
+            },
+            {
+              "buffs": [
+                "MegaPoison100TU",
+                "BurnImmunityTempForRevenge"
+              ],
+              "applyConditions": "IsWaterOrEarthOrDeath",
+              "applyToTargetType": "Enemy",
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss"
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "LudmillaBalletSP",
+          "attackScalors": [
+            "GoodIfCharged1",
+            "GoodIfCharged2",
+            "GoodIfCharged3"
+          ],
+          "conditionedAbilityEffects": [
+            "LudmillaBalletSP",
+            "LudmillaBalletSP",
+            "LudmillaBalletSP"
+          ],
+          "recommendEffectWhenUsable": -2,
+          "useCondition": "IsActive3READYForUseBallet",
+          "killLockSkillIcon": "IconRedEx01",
+          "killLockUnlockedSkillIcon": "IconGreenCircle01",
+          "killLockUnlockedKey": "SkillReadyToUseKey",
+          "killLockLockedKey": "BalletLockLockedKey"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.8,
+            0,
+            0,
+            0,
+            0.4,
+            0,
+            0,
+            0.2,
+            0,
+            0.2,
+            0,
+            0,
+            0.3,
+            0,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batfx_tailwindblue/batfx_tailwindblue",
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_LudmillaBallet/batfx_Ribbonstorm1",
+            "batsfx_prefab/batsfx_swordslash",
+            "batfx_groundimpactblue/batfx_groundimpactblue",
+            "batfx_tailwindblue/batfx_tailwindblue",
+            "batfx_LudmillaBallet/batfx_Ribbonstorm2",
+            "batfx_groundimpactblue/batfx_groundimpactblue",
+            "batsfx_prefab/batsfx_multislash1",
+            "batfx_LudmillaBallet/batfx_Ribbonstorm3",
+            "batfx_groundimpactblue/batfx_groundimpactblue",
+            "batfx_LudmillaBallet/batfx_RingPrepYellow1",
+            "batsfx_prefab/batsfx_summerTune1",
+            "batsfx_prefab/batsfx_frost1",
+            "batfx_LudmillaBallet/batfx_Ribbonstorm4",
+            "batfx_LudmillaBallet/batfx_Ribbonstorm5",
+            "batfx_groundimpactblue/batfx_groundimpactblue",
+            "batfx_LudmillaBallet/batfx_CastingHardLightBallet1"
+          ],
+          "sortOrderOffset": [
+            -50,
+            -2,
+            1,
+            -2,
+            -1,
+            -50,
+            1,
+            -1,
+            -2,
+            1,
+            -1,
+            1,
+            -2,
+            -2,
+            1,
+            -20,
+            -1,
+            -1
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle3"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            true,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            true,
+            false,
+            true,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            true,
+            true,
+            false,
+            false,
+            false,
+            false
+          ],
+          "positionInBattlefieldCenter": [
+            true,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "AttackMinus25Percent1TurnOnly": {
+            "class": "Buff",
+            "stackName": "AttackMinus25Percent",
+            "behaviors": [
+              "RemoveAfterTurnsBehavior",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "turnCount": 1,
+                "scalorStatBonuses": {
+                  "Attack": -0.3333333
+                }
+              },
+              {
+                "name": "AttackPlus50Percent"
+              },
+              {
+                "name": "RageCount1Icon"
+              },
+              {
+                "name": "RageCount2Icon"
+              },
+              {
+                "name": "RageCount3Icon"
+              }
+            ],
+            "iconSpriteName": "IconRedWeak01",
+            "showAsTimer": true,
+            "duration": -1
+          },
+          "BurnImmunityTempForRevenge": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Burn",
+                  "BurnAfterTurn",
+                  "BurnAtEndOfTurn"
+                ],
+                "dontShowText": true
+              },
+              {
+                "name": "BurnAfterTurn"
+              },
+              {
+                "name": "BurnSelfOnHit"
+              }
+            ],
+            "duration": 1,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "tags": [
+              "BurnImmune"
+            ],
+            "stackName": "BurnImmunityTempForRevenge",
+            "isHiddenFromPlayers": true
+          },
+          "BurnImmunityTempForRevengeSleepAttack": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Burn",
+                  "BurnAfterTurn",
+                  "BurnAtEndOfTurn"
+                ],
+                "dontShowText": true
+              },
+              {
+                "name": "BurnAfterTurn"
+              },
+              {
+                "name": "BurnSelfOnHit"
+              }
+            ],
+            "duration": 1,
+            "showAsTimer": false,
+            "applyConditions": "IsNotAnySleepImmune",
+            "showAsPermanent": false,
+            "tags": [
+              "BurnImmune"
+            ],
+            "stackName": "BurnImmunityTempForRevenge",
+            "isHiddenFromPlayers": true
+          },
+          "MegaPoison100TU": {
+            "class": "Buff",
+            "stackName": "Poison",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "DamageOverTime"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "percentOfAttack": 0.05,
+                "damageColor": "Green",
+                "abilityEffect": "MidDeath1MegaPoison",
+                "extraDamageFlag": "MegaPoison"
+              }
+            ],
+            "tags": [
+              "Poison",
+              "MegaPoison"
+            ],
+            "canBePurified": true,
+            "duration": 100,
+            "showAsTimer": true,
+            "statusEffect": "MegaPoisonStatus",
+            "statusEffectOffset": 0.1,
+            "damageType": "Poison",
+            "effectToShowWhenApplied": "MegaPoisonEntry1",
+            "iconSpriteName": "IconPurplePoison01"
+          },
+          "RemoveActive3READYForUseBalletBoss": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "Active3READYForUseBallet"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "SleepForced100TU": {
+            "class": "Buff",
+            "stackName": "Sleep",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "LoseTurn",
+              "RemoveOnHurt"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "PurifyChain"
+              },
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "name": "AutoPurifyAfterTurnNoSleep"
+              },
+              {},
+              {
+                "ignoreIfHurtBySelf": true,
+                "cancelFromDamageFlags": [
+                  "DoNotWake"
+                ]
+              }
+            ],
+            "duration": 100,
+            "showAsTimer": true,
+            "statusEffect": "SleepStatus",
+            "statusEffectOffset": 0.1,
+            "iconSpriteName": "IconWhiteSleepZs01",
+            "textKeyToShowWhenApplied": "SleepKey",
+            "canBePurified": true
+          },
+          "StoreEnergy": {
+            "class": "Buff",
+            "stackLimit": 3,
+            "duration": -1,
+            "showAsTimer": false,
+            "stackName": "StoreEnergy",
+            "noIconShownOnBattleStatus": true,
+            "usesStackCountDescription": true,
+            "iconSpriteName": "IconPinkCharge01"
+          },
+          "TUMinus50": {
+            "class": "Buff",
+            "stackName": "TUMinus",
+            "behaviors": [
+              "Stun"
+            ],
+            "behaviorOverrides": [
+              {
+                "stunTU": -50
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true,
+            "textKeyToShowWhenApplied": "TUMinusKey"
+          }
+        },
+        "attackScalors": {
+          "GoodIfCharged1": {
+            "class": "AttackScalor",
+            "sourceCondition": "IsCharged1"
+          },
+          "GoodIfCharged2": {
+            "class": "AttackScalor",
+            "sourceCondition": "IsCharged2"
+          },
+          "GoodIfCharged3": {
+            "class": "AttackScalor",
+            "sourceCondition": "IsCharged3"
+          }
+        },
+        "conditions": {
+          "IsActive3READYForUseBallet": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "Active3READYForUseBallet"
+            ]
+          },
+          "IsFireOrAirOrLife": {
+            "class": "MonsterConditions",
+            "elements": [
+              "Fire",
+              "Air",
+              "Life"
+            ]
+          },
+          "IsWaterOrEarthOrDeath": {
+            "class": "MonsterConditions",
+            "elements": [
+              "Water",
+              "Earth",
+              "Death"
+            ]
+          }
+        }
+      },
+      "AllyBuffALudmillaBalletBoss": {
+        "id": "AllyBuffALudmillaBalletBoss",
+        "found": true,
+        "localization": {
+          "name": "Dance Training",
+          "description": "Purifies (removes negative status effects like sleep, burn or poison) all allies on the battlefield. Allies gain 1 Spirit for each ally on the battlefield.\n\nThen if ally Spirit is:\n- At least 5 but less than 10, a random ally is Enraged, and given the next turn by reducing their current TU to 0.\n- 10, all allies are Enraged, and given the next turns by reducing their current TU.\n\nThis skill becomes locked for 50TU after use. Active skills that grant turns cannot be used on turns given by this skill. This will overwrite the effects of other Enrage skills on those units. Enraged units have their Attack increased to 1.5x until the end of their next turn.",
+          "selected": "Purify, Gain Spirit, May Grant Turn"
+        },
+        "ability": {
+          "name": "AllyBuffALudmillaBalletBoss",
+          "class": "Ability",
+          "config": "AllyBuffALudmillaBalletBoss",
+          "tuCost": 1,
+          "useLimit": 0,
+          "spiritGain": 0,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "AllAlly",
+          "components": [
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "RemoveBuffs"
+              ],
+              "applyToTargetType": "Friendly",
+              "showMissConditions": "ShowNoMiss"
+            },
+            {
+              "buffs": [
+                "GainSpiritAndTurnBuffBalletBossEBB",
+                "BalletBossActive4Cooldown50"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss"
+            }
+          ],
+          "friendlyEventType": "Finish",
+          "sourceEventType": "Finish",
+          "flags": [
+            "Purify",
+            "GiveTurn"
+          ],
+          "abilityEffect": "LudmillaBalletAbility2",
+          "useCondition": "NotInstantCooldown"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "allFriends": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.8,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batfx_snowwhitebride1/batfx_spotlighttarget2",
+            "batsfx_prefab/batsfx_magic1",
+            "batfx_LudmillaBallet/batfx_chargepetalLudBallet1",
+            "batfx_LudmillaBallet/batfx_chargepetalLudBallet2",
+            "batsfx_prefab/batsfx_charge1"
+          ],
+          "sortOrderOffset": [
+            -1,
+            -2,
+            1,
+            -2,
+            -2
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            true,
+            false,
+            false,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "BalletBossActive4Cooldown50": {
+            "class": "Buff",
+            "stackName": "InstantCooldown",
+            "duration": 50,
+            "isHiddenFromPlayers": false,
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "iconSpriteName": "IconBlueCountdownClock3Numbered04"
+          },
+          "GainSpiritAndTurnBuffBalletBossEBB": {
+            "class": "Buff",
+            "behaviors": [
+              "EnterBattleBuff",
+              "EnterBattleBuff",
+              "EnterBattleBuff"
+            ],
+            "behaviorOverrides": [
+              {
+                "allyBuffs": [
+                  "SpiritGainD"
+                ],
+                "selfBuffs": [
+                  "SpiritGainD"
+                ]
+              },
+              {
+                "randomAllyBuffs": [
+                  "GiveTurn",
+                  "OnExtraTurn",
+                  "JustGivenTurn",
+                  "AttackPlus50Percent1TurnOnly"
+                ],
+                "numRandomToBuff": 1,
+                "spreadCondition": "AllySpirit5Or6Or7Or8Or9"
+              },
+              {
+                "randomAllyBuffs": [
+                  "GiveTurn",
+                  "OnExtraTurn",
+                  "JustGivenTurn",
+                  "AttackPlus50Percent1TurnOnly"
+                ],
+                "numRandomToBuff": 4,
+                "spreadCondition": "AllySpirit10OrMore"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "GiveTurn": {
+            "class": "Buff",
+            "behaviors": [
+              "GiveTurn"
+            ],
+            "behaviorOverrides": [
+              {}
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "textKeyToShowWhenApplied": "TurnGivenKey",
+            "isHiddenFromPlayers": true
+          },
+          "RemoveBuffs": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "NotInstantCooldown": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "InstantCooldown"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "passives": {
+      "WatchMeDancePassiveABalletBoss": {
+        "id": "WatchMeDancePassiveABalletBoss",
+        "found": true,
+        "localization": {
+          "name": "Dancing Sword",
+          "description": "This unit cannot be sent to the reinforcements from the battlefield.\n\nThis unit's attacks ignore Guardians, any effects of non-boss enemies that would prevent the target from being defeated, enemy damage reduction effects, the Counter Stance Status Effect, and the effects of Skin passive skills.\n\nWhen this unit damages an enemy with an attack, if they are:\n- Water, Earth or Dark, Stun them for 100TU, and grant them the Mega Poison status effect for 100TU.\n- Fire, Storm or Light, Weaken them, and grant them the Sleep status effect for 100TU, even if they have already slept while on the battlefield. This will overwrite any existing Weak or Enrage effects on that unit.\n\nWhenever this unit defeats a non-conjured enemy with an attack, all allies are Purified. Then all other allies are given the next turns by reducing their current TU. Effects that influence TU order may interrupt the extra turn (e.g. Stuns targeting the lowest TU target).\n\nMega Poison and Sleep will overwrite other status effects on those units. Mega Poison deals 20 times the damage of normal Poison and cannot be overwritten by normal Poison or Super Poison. Weakened units have their Attack reduced to 0.75x until the end of their next turn. The effect of Weakening may be diminished if the affected unit's Attack is increased by other effects and it can be overwritten by Enrage effects."
+        }
+      },
+      "PeakPerformancePassiveABalletBoss": {
+        "id": "PeakPerformancePassiveABalletBoss",
+        "found": true,
+        "localization": {
+          "name": "Charged Dance",
+          "description": "If this unit would be defeated by an enemy attack or a status effect while having more than 1 HP, it instead survives with 1 HP.\n\nThis unit enters battle with a Charge, Stun Ward, Sleep Ward, and a Poison Ward. Certain skills are affected by and may consume charges. A unit can store a maximum of 3 charges.\n\nEach time this unit damages an enemy with an attack, this unit is granted a Charge.\n\nWhen attacking, adds 100% to the damage % of this unit's attacks for each Charge stored on this unit (e.g. Deadly Dance: 700% => 1000% damage with 3 Charges are stored).\n\nThis unit has 50% damage reduction.\n\nEach time this unit takes damage from an attack, and survives until after the end of the turn, if this unit is charged, this unit will spend a Charge to heal for 1% of max HP. Otherwise, if this unit is not charged, this unit will have its TU reduced to 0. This extra turn may be interrupted by other effects that influence the turn order (e.g. other stuns targeting the lowest TU target). This is not considered a Counter Skin type effect."
+        }
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": null
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "LudmillaBalletBoss03",
+    "family": "LudmillaBalletBoss",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "LudmillaBalletBoss03",
+    "class": "Monster",
+    "family": "LudmillaBalletBoss",
+    "activeSkills": {
+      "0": "QuickSingleAttackALudmillaBalletBoss",
+      "1": "SingleAttackALudmillaBalletBoss",
+      "2": "BigSingleAttackALudmillaBalletBoss",
+      "3": "AllyBuffALudmillaBalletBoss"
+    },
+    "passives": {
+      "0": "WatchMeDancePassiveABalletBoss",
+      "1": "PeakPerformancePassiveABalletBoss"
+    },
+    "cost": 999,
+    "baseAttack": 3000,
+    "baseMaxHp": 190500,
+    "speed": 612,
+    "element": "Life",
+    "weaponPref": "Hammer",
+    "weaponPivotIndex": 0,
+    "walkSound": "TestSound",
+    "secure": 1,
+    "aiTargetPickWeight": 1,
+    "stars": 6,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 1,
+    "battleOrbImageFlip": 0,
+    "skillVoices": {
+      "0": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "1": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "2": [
+        13,
+        14,
+        15,
+        16
+      ],
+      "3": [
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    "damageVoices": [
+      17,
+      18,
+      19,
+      20
+    ],
+    "deathVoices": [
+      21,
+      22,
+      23,
+      24
+    ]
+  },
+  "_build": {
+    "scriptVersion": "6-character-family-states",
+    "sourceHash": "7a2c970f774b19efad3481857b596365e46b8ffa1dc000a2ac66435727208abf",
+    "dependencyHash": "b8463ce84b0f59b2417970b9f1bcd6c8f31c9f68829831c86340435145bf1a56",
+    "generatedAt": 1780087852
+  }
+}

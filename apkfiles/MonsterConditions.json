@@ -30497,4 +30497,49 @@
 		"teamSpiritLessThan": 1000
 	},
 	"IsNotVictoriaRegularExtraTurnTrigger": {
-        "class": "MonsterCondition
+        "class": "MonsterConditions",
+        "not":{
+            "class":"MonsterConditions",
+            "buffStackNames": ["VictoriaRegularExtraTurnTrigger"]
+        }
+    },
+	"IsLupinActive4ReadyOr1AllyHPBelow50Percent": {
+		"class": "MonsterConditions",
+		"buffStackNames": ["LupinRegularActive4Ready"],
+		"or": {
+			"class": "MonsterConditions",
+			"myTeamMonsterConditionMatchesNeeded":{
+				"HPBelow50Percent": 1
+			}
+		}
+	},
+	"HasAWard":{
+		"class": "MonsterConditions",
+		"monsterTags": ["ThisIsAWard"]
+	},
+	"HasNoWards":{
+		"class": "MonsterConditions",
+		"not":{
+			"class": "MonsterConditions",
+			"monsterTags": ["ThisIsAWard"]
+		}
+	},
+	"IsStealthOrInstantCooldown": {
+		"class": "MonsterConditions",
+		"buffStackNames": ["Stealth"],
+		"or": {
+			"class": "MonsterConditions",
+			"buffStackNames": ["InstantCooldown"]
+		}
+	},
+	"NoSleepingPoisonedOrBurningAllies":{
+		"class": "MonsterConditions",
+		"not":{
+			"class": "MonsterConditions",
+			"myTeamMonsterConditionMatchesNeeded":{
+				"IsSleepingPoisonedOrBurning": 1
+			}
+		}
+	}
+}
+}
