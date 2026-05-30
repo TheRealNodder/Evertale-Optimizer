@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Any, Dict
 
 ROOT_MARKERS = ["apkfiles", "tools"]
-PIPELINE_VERSION = 4
+PIPELINE_VERSION = 5
 
 DEFAULT_STEPS = [
     "bookmark_before",
@@ -50,7 +50,26 @@ def find_repo_root(start: Path) -> Path:
 
 def write_json(path: Path, data: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8", newline="\n")
+    path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
+
+
+def write_marker(repo_root: Path, status: str, step: str, processed_count: int, total_count: int, extra: Dict[str, Any] | None = None) -> None:
+    path = repo_root / "apkfiles" / "entries" / "_markers" / "run_entry_pipeline_all.marker.json"
+    payload = {
+        "schemaVersion": 1,
+        "tool": "run_entry_pipeline",
+        "category": "all",
+        "status": status,
+        "lastKey": step,
+        "lastSourceId": "",
+        "lastHandle": None,
+        "lastFile": "",
+        "processedCount": processed_count,
+        "totalCount": total_count,
+        "updatedAt": int(time.time()),
+        "extra": extra or {},
+    }
+    write_json(path, payload)
 
 
 def run_step(repo_root: Path, tools_dir: Path, step: str, args: argparse.Namespace) -> Dict[str, Any]:
@@ -99,9 +118,12 @@ def main() -> int:
     }
 
     final_code = 0
-    for step in DEFAULT_STEPS:
+    write_marker(repo_root, "started", "start", 0, len(DEFAULT_STEPS), {"raw": args.raw, "force": args.force})
+    for idx, step in enumerate(DEFAULT_STEPS, start=1):
+        write_marker(repo_root, "partial", step, idx - 1, len(DEFAULT_STEPS), {"currentStep": step})
         result = run_step(repo_root, tools_dir, step, args)
         report["steps"].append(result)
+        write_marker(repo_root, result["status"], step, idx, len(DEFAULT_STEPS), {"returnCode": result["returnCode"]})
         if result["status"] == "failed":
             final_code = result["returnCode"] or 1
             break
@@ -109,6 +131,7 @@ def main() -> int:
     report["finishedAt"] = int(time.time())
     report["status"] = "ok" if final_code == 0 else "failed"
     write_json(reports_dir / "entry_pipeline_report.json", report)
+    write_marker(repo_root, report["status"], report["steps"][-1]["step"] if report["steps"] else "none", len(report["steps"]), len(DEFAULT_STEPS), {"report": "apkfiles/entries/reports/entry_pipeline_report.json"})
     print("Pipeline complete:", report["status"])
     return final_code
 
