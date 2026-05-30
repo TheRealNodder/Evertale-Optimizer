@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "description": "Canonical Python tool registry for master-control workflows. Scripts listed under active are the supported tools. Legacy candidates should not be deleted until their behavior is replaced and verified.",
+  "active": [
+    {
+      "path": "tools/new_structure/master_control_refined.py",
+      "purpose": "Discovery, matching, collision reporting, and safe injection planning for entries.",
+      "usesCheckpoint": true
+    },
+    {
+      "path": "tools/new_structure/organize_by_handle.py",
+      "purpose": "Organize already-numbered entry folders by 0000_Name01.json handles.",
+      "usesCheckpoint": true
+    },
+    {
+      "path": "tools/new_structure/renumber_category_from_order_list.py",
+      "purpose": "Renumber weapons now and accessories/bosses later from ordered text lists. Bottom line equals 0001_.",
+      "usesCheckpoint": true
+    },
+    {
+      "path": "tools/new_structure/sync_category_order_canonical.py",
+      "purpose": "Generic category order sync for existing canonical text lists.",
+      "usesCheckpoint": false
+    },
+    {
+      "path": "tools/new_structure/sync_weapon_order_canonical.py",
+      "purpose": "Weapon-specific legacy sync. Keep until renumber_category_from_order_list fully replaces it.",
+      "usesCheckpoint": false
+    }
+  ],
+  "legacyCandidates": [
+    {
+      "path": "tools/new_structure/renumber_entry_files.py",
+      "reason": "Likely superseded by organize_by_handle.py and renumber_category_from_order_list.py, but must be inspected before deletion."
+    }
+  ],
+  "checkpointPolicy": {
+    "folder": "apkfiles/entries/_markers",
+    "overwriteEachRun": true,
+    "purpose": "Each long-running entry tool writes its latest category, key, sourceId, handle, file path, and completion status so future runs can resume without scanning/remaking every JSON entry.",
+    "fileNaming": "<tool_name>_<category>.marker.json"
+  }
+}
