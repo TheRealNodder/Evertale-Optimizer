@@ -16,6 +16,15 @@
   function addAlias(alias, k, v){ k = rawKey(k); v = rawKey(v); if(k && v && !alias.has(k)) alias.set(k, v); }
   function aliasOf(alias, id){ const r = rawKey(id); const s = key(id); return alias.get(r) || alias.get(s) || r || s; }
 
+  function ensureStateRestore(){
+    if(document.querySelector('script[data-catalog-state-restore="true"]')) return;
+    const s = document.createElement('script');
+    s.src = './catalog-state-restore.js?v=1';
+    s.async = false;
+    s.dataset.catalogStateRestore = 'true';
+    document.body.appendChild(s);
+  }
+
   function buildAlias(bundle){
     const alias = new Map();
     const rows = Array.isArray(bundle?.entries) ? bundle.entries : [];
@@ -90,7 +99,6 @@
       const records = cards.map(card => ({ card, ids: cardIds(card, alias) }));
       const hasId = (record, id) => record.ids.has(id);
 
-      // Reset only the bypass flags owned by this script. The data-loader collapse can still hide rows earlier.
       records.forEach(({card}) => {
         if(card.getAttribute('data-sort-bypass') === 'duo-child'){
           card.hidden = false;
@@ -137,6 +145,7 @@
 
   document.addEventListener('DOMContentLoaded', () => {
     style();
+    ensureStateRestore();
     schedule();
     const grid = document.getElementById('catalogGrid');
     if(grid) new MutationObserver(schedule).observe(grid, { childList:true, subtree:false });
