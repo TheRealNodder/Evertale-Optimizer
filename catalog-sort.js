@@ -28,10 +28,12 @@
   function kindRank(card){ return KIND_RANK[kind(card)] ?? 99; }
   function originalIndex(card){ return Number(card.getAttribute('data-sort-original') || '0'); }
   function sortName(card){ return title(card).trim().toLowerCase(); }
+  function numericValue(value){ const n = Number(value); return Number.isFinite(n) && n > 0 ? n : null; }
+  function numericFromId(value){ const m = String(value || '').match(/^(\d+)/) || String(value || '').match(/(\d+)/); return m ? numericValue(m[1]) : null; }
 
   function orderIndex(card){
-    const explicit = Number(card.getAttribute('data-order') || '');
-    if(Number.isFinite(explicit) && explicit > 0) return explicit;
+    const explicit = numericValue(card.getAttribute('data-order')) || numericFromId(id(card));
+    if(explicit !== null) return explicit;
     const k = kind(card);
     const map = orderMaps[k];
     if(!map) return null;
@@ -46,7 +48,8 @@
   }
 
   function addOrderKeys(map, row, fallbackIndex){
-    const rawOrder = Number(row.order ?? row.sourceOrder ?? row.fileHandleOrder ?? row.visualOrder ?? fallbackIndex + 1);
+    const fromFile = numericFromId(row.file || row.key || row.sourceId);
+    const rawOrder = numericValue(row.fileHandleOrder) || numericValue(row.sourceOrder) || fromFile || numericValue(row.order) || numericValue(row.visualOrder) || (fallbackIndex + 1);
     const order = Number.isFinite(rawOrder) ? rawOrder : fallbackIndex + 1;
     [
       row.key,
@@ -115,7 +118,6 @@
       const ao = Number.isFinite(a.order) ? a.order : null;
       const bo = Number.isFinite(b.order) ? b.order : null;
       if(ao !== null && bo !== null && ao !== bo){
-        // Higher numeric entry handles are newer, e.g. 0737_* should sort above 0736_*.
         return mode === 'oldest' ? ao - bo : bo - ao;
       }
       if(ao !== null && bo === null) return -1;
