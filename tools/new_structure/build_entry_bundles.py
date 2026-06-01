@@ -4,12 +4,15 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 CATEGORIES = ["characters", "weapons", "accessories", "bosses"]
 ROOT_MARKERS = ["apkfiles"]
+STRICT_INDEX_CATEGORIES = {"weapons", "accessories", "bosses"}
+EXCLUDED_DIR_NAMES = {"legacy", "Legacy", "_weapon_duplicate_quarantine", "_boss_duplicate_quarantine", "_duplicate_quarantine"}
 
 
 def find_repo_root(start: Path) -> Path:
@@ -44,7 +47,20 @@ def read_index_entries(category_dir: Path) -> List[Dict[str, Any]]:
     if not index_path.exists():
         return []
     index = load_json(index_path)
-    return list(index.get("entries", [])) if isinstance(index, dict) else []
+    rows = list(index.get("entries", [])) if isinstance(index, dict) else []
+    return sorted(rows, key=index_row_order)
+
+
+def index_row_order(row: Dict[str, Any]) -> int:
+    for key in ("fileHandleOrder", "sourceOrder", "order", "visualOrder"):
+        try:
+            value = int(row.get(key))
+            if value > 0:
+                return value
+        except Exception:
+            pass
+    match = re.match(r"^(\d+)_", str(row.get("file", "")).split("/")[-1])
+    return int(match.group(1)) if match else 999999
 
 
 def resolve_entry_path(category_dir: Path, rel_file: str) -> Path:
@@ -54,38 +70,32 @@ def resolve_entry_path(category_dir: Path, rel_file: str) -> Path:
     return category_dir / "entries" / rel_file
 
 
-def load_indexed_entries(category_dir: Path) -> tuple[List[Dict[str, Any]], List[str]]:
-    rows: List[Dict[str, Any]] = []
-    errors: List[str] = []
-    for index_row in read_index_entries(category_dir):
-        rel_file = normalize_rel_path(index_row.get("file", ""))
-        if not rel_file:
-            continue
-        entry_path = resolve_entry_path(category_dir, rel_file)
-        try:
-            rows.append(load_json(entry_path))
-        except Exception as exc:
-            errors.append(f"{rel_file}: {exc}")
-    return rows, errors
-
-
 def source_id_from_entry(entry: Dict[str, Any], fallback: str = "") -> str:
     internal = entry.get("internal") if isinstance(entry.get("internal"), dict) else {}
     return str(internal.get("sourceId") or entry.get("sourceId") or entry.get("name") or entry.get("id") or fallback).strip()
+
+
+def is_excluded_entry_file(path: Path) -> bool:
+    if path.name.startswith("_") or path.name.endswith("_report.json") or path.name.endswith(".renumber_tmp"):
+        return True
+    return any(part in EXCLUDED_DIR_NAMES or part.startswith("_") for part in path.parts)
 
 
 def discover_entry_files(category_dir: Path) -> List[Path]:
     entries_dir = category_dir / "entries"
     if not entries_dir.exists():
         return []
-    return sorted(p for p in entries_dir.glob("*.json") if p.is_file())
+    return sorted(p for p in entries_dir.glob("*.json") if p.is_file() and not is_excluded_entry_file(p))
 
 
-def load_entries_with_discovery(category_dir: Path) -> tuple[List[Dict[str, Any]], List[str], Dict[str, Any]]:
-    """Load indexed entries, then append any raw entry files not listed in index.json.
+def load_entries_with_discovery(category_dir: Path, category: str) -> tuple[List[Dict[str, Any]], List[str], Dict[str, Any]]:
+    """Build bundle rows.
 
-    This prevents stale override/index files from hiding newly extracted content.
-    Existing index order remains authoritative; auto-discovered files append in filename order.
+    Strict categories use only index.json. This prevents quarantined/legacy/unindexed weapon,
+    accessory, or boss JSON files from overriding the intended order.
+
+    Characters retain discovery because character extraction can still introduce newly generated
+    family/source rows, but excluded folders/files are still ignored.
     """
     rows: List[Dict[str, Any]] = []
     errors: List[str] = []
@@ -98,6 +108,9 @@ def load_entries_with_discovery(category_dir: Path) -> tuple[List[Dict[str, Any]
             continue
         entry_path = resolve_entry_path(category_dir, rel_file)
         seen_files.add(entry_path.name)
+        if is_excluded_entry_file(entry_path):
+            errors.append(f"excluded indexed file skipped: {rel_file}")
+            continue
         try:
             entry = load_json(entry_path)
             sid = source_id_from_entry(entry, entry_path.stem)
@@ -108,26 +121,34 @@ def load_entries_with_discovery(category_dir: Path) -> tuple[List[Dict[str, Any]
             errors.append(f"{rel_file}: {exc}")
 
     discovered: List[str] = []
-    for entry_path in discover_entry_files(category_dir):
-        if entry_path.name in seen_files:
-            continue
-        try:
-            entry = load_json(entry_path)
-            sid = source_id_from_entry(entry, entry_path.stem)
-            # Do not drop same display id values; only prevent exact sourceId duplicates.
-            if sid and sid in seen_ids:
+    skipped_unindexed: List[str] = []
+    if category not in STRICT_INDEX_CATEGORIES:
+        for entry_path in discover_entry_files(category_dir):
+            if entry_path.name in seen_files:
                 continue
-            if sid:
-                seen_ids.add(sid)
-            rows.append(entry)
-            discovered.append(entry_path.name)
-        except Exception as exc:
-            errors.append(f"entries/{entry_path.name}: {exc}")
+            try:
+                entry = load_json(entry_path)
+                sid = source_id_from_entry(entry, entry_path.stem)
+                if sid and sid in seen_ids:
+                    continue
+                if sid:
+                    seen_ids.add(sid)
+                rows.append(entry)
+                discovered.append(entry_path.name)
+            except Exception as exc:
+                errors.append(f"entries/{entry_path.name}: {exc}")
+    else:
+        for entry_path in discover_entry_files(category_dir):
+            if entry_path.name not in seen_files:
+                skipped_unindexed.append(entry_path.name)
 
     meta = {
         "indexedCount": len(seen_files),
+        "strictIndexOnly": category in STRICT_INDEX_CATEGORIES,
         "discoveredUnindexedCount": len(discovered),
         "discoveredUnindexedFiles": discovered,
+        "skippedUnindexedCount": len(skipped_unindexed),
+        "skippedUnindexedFiles": skipped_unindexed[:500],
     }
     return rows, errors, meta
 
@@ -137,10 +158,11 @@ def build_category(entries_root: Path, bundles_dir: Path, category: str) -> Dict
     index_path = category_dir / "index.json"
     if not index_path.exists():
         return {"category": category, "status": "missing_index", "count": 0}
-    source_index_count = len(read_index_entries(category_dir))
-    rows, errors, discovery = load_entries_with_discovery(category_dir)
+    index_rows = read_index_entries(category_dir)
+    source_index_count = len(index_rows)
+    rows, errors, discovery = load_entries_with_discovery(category_dir, category)
     bundle = {
-        "schemaVersion": 2,
+        "schemaVersion": 3,
         "category": category,
         "generatedAt": int(time.time()),
         "sourceIndexCount": source_index_count,
@@ -152,7 +174,7 @@ def build_category(entries_root: Path, bundles_dir: Path, category: str) -> Dict
     }
     out_path = bundles_dir / f"{category}.bundle.json"
     write_json(out_path, bundle)
-    return {"category": category, "status": "ok", "sourceIndexCount": source_index_count, "count": len(rows), "errors": len(errors), "discoveredUnindexedCount": discovery["discoveredUnindexedCount"], "contentHash": bundle["contentHash"], "output": str(out_path)}
+    return {"category": category, "status": "ok", "sourceIndexCount": source_index_count, "count": len(rows), "errors": len(errors), "discoveredUnindexedCount": discovery["discoveredUnindexedCount"], "skippedUnindexedCount": discovery["skippedUnindexedCount"], "contentHash": bundle["contentHash"], "output": str(out_path)}
 
 
 def resolve_family_path(family_dir: Path, rel_file: str) -> Path:
@@ -171,7 +193,7 @@ def build_character_families(entries_root: Path, bundles_dir: Path) -> Dict[str,
     index_rows = list(index.get("entries", [])) if isinstance(index, dict) else []
     rows: List[Dict[str, Any]] = []
     errors: List[str] = []
-    for index_row in index_rows:
+    for index_row in sorted(index_rows, key=index_row_order):
         rel_file = normalize_rel_path(index_row.get("file", ""))
         if not rel_file:
             continue
@@ -181,7 +203,7 @@ def build_character_families(entries_root: Path, bundles_dir: Path) -> Dict[str,
         except Exception as exc:
             errors.append(f"{rel_file}: {exc}")
     bundle = {
-        "schemaVersion": 2,
+        "schemaVersion": 3,
         "category": "character_families",
         "generatedAt": int(time.time()),
         "sourceIndexCount": len(index_rows),
@@ -196,7 +218,7 @@ def build_character_families(entries_root: Path, bundles_dir: Path) -> Dict[str,
 
 
 def build_catalog_bundle(entries_root: Path, bundles_dir: Path, category_reports: List[Dict[str, Any]], families_report: Dict[str, Any]) -> Dict[str, Any]:
-    catalog: Dict[str, Any] = {"schemaVersion": 2, "generatedAt": int(time.time()), "categories": {}, "characterFamilies": [], "report": {"categories": category_reports, "characterFamilies": families_report}}
+    catalog: Dict[str, Any] = {"schemaVersion": 3, "generatedAt": int(time.time()), "categories": {}, "characterFamilies": [], "report": {"categories": category_reports, "characterFamilies": families_report}}
     for category in CATEGORIES:
         bundle_path = bundles_dir / f"{category}.bundle.json"
         if bundle_path.exists():
@@ -235,7 +257,7 @@ def main() -> int:
     catalog_report = None
     if not args.skip_catalog and not args.category:
         catalog_report = build_catalog_bundle(entries_root, bundles_dir, category_reports, families_report)
-    report = {"schemaVersion": 2, "generatedAt": int(time.time()), "entriesRoot": str(entries_root), "bundlesRoot": str(bundles_dir), "categories": category_reports, "characterFamilies": families_report, "catalog": catalog_report}
+    report = {"schemaVersion": 3, "generatedAt": int(time.time()), "entriesRoot": str(entries_root), "bundlesRoot": str(bundles_dir), "categories": category_reports, "characterFamilies": families_report, "catalog": catalog_report}
     write_json(entries_root / "reports" / "bundle_report.json", report)
     print(json.dumps(report, ensure_ascii=False, indent=2))
     return 0
