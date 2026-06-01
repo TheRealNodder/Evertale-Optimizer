@@ -10,16 +10,6 @@ Dry run:
 
 Apply rename + duplicate quarantine:
   python detect_renumber_and_dedupe_weapons_in_folder.py --apply
-
-What it does:
-- Reads every .json weapon file in the current folder.
-- Detects the full weapon handle from filename and JSON fields.
-- Determines each weapon's actual order number from the embedded authority list.
-- Renames files to ####_FullWeaponHandle.json.
-- Detects duplicate files that resolve to the same target.
-- Keeps the best duplicate and moves extras to _weapon_duplicate_quarantine on --apply.
-- Writes CSV/JSON reports.
-- Does not require running from repo root.
 """
 from __future__ import annotations
 
@@ -28,9 +18,10 @@ import csv
 import hashlib
 import json
 import re
+import shutil
 import time
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Tuple
 
 ORDER_TEXT = r'''
 RibbonHammer (The Gigas Rose)
@@ -422,6 +413,10 @@ def read_json(path: Path) -> Dict[str, Any]:
         return {}
 
 
+def write_json(path: Path, data: Any) -> None:
+    path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n', encoding='utf-8', newline='\n')
+
+
 def sha1(path: Path) -> str:
     h = hashlib.sha1()
     with path.open('rb') as f:
@@ -434,12 +429,7 @@ def detect_ids(path: Path, data: Dict[str, Any]) -> List[str]:
     stem = strip_prefix(path.stem)
     internal = data.get('internal') if isinstance(data.get('internal'), dict) else {}
     raw = data.get('raw') if isinstance(data.get('raw'), dict) else {}
-    vals = [
-        stem,
-        data.get('sourceId'), data.get('id'), data.get('family'), data.get('name'), data.get('displayName'), data.get('title'),
-        internal.get('sourceId'), internal.get('weaponId'), internal.get('name'), internal.get('displayName'),
-        raw.get('name'), raw.get('displayName'), raw.get('id'),
-    ]
+    vals = [stem, data.get('sourceId'), data.get('id'), data.get('family'), data.get('name'), data.get('displayName'), data.get('title'), internal.get('sourceId'), internal.get('weaponId'), internal.get('name'), internal.get('displayName'), raw.get('name'), raw.get('displayName'), raw.get('id')]
     out = []
     for v in vals:
         v = str(v or '').strip()
@@ -469,12 +459,7 @@ def leading_number(name: str) -> int:
 
 
 def choose_keeper(paths: List[Path]) -> Path:
-    return sorted(paths, key=lambda p: (
-        0 if leading_number(p.name) != 999999 else 1,
-        leading_number(p.name),
-        len(p.name),
-        p.name.lower(),
-    ))[0]
+    return sorted(paths, key=lambda p: (0 if leading_number(p.name) != 999999 else 1, leading_number(p.name), len(p.name), p.name.lower()))[0]
 
 
 def unique_quarantine_path(folder: Path, name: str) -> Path:
@@ -492,19 +477,34 @@ def unique_quarantine_path(folder: Path, name: str) -> Path:
         i += 1
 
 
+def repo_root_from_entries_folder(folder: Path) -> Path | None:
+    for parent in [folder, *folder.parents]:
+        if (parent / 'apkfiles').exists() and (parent / 'tools').exists():
+            return parent
+    return None
+
+
+def write_marker(folder: Path, report: Dict[str, Any]) -> None:
+    repo = repo_root_from_entries_folder(folder)
+    marker = folder / '_weapon_detect_renumber_dedupe.marker.json'
+    if repo:
+        marker = repo / 'apkfiles' / 'entries' / '_markers' / 'weapon_detect_renumber_dedupe.marker.json'
+    marker.parent.mkdir(parents=True, exist_ok=True)
+    write_json(marker, {'schemaVersion': 1, 'tool': 'detect_renumber_and_dedupe_weapons_in_folder', 'category': 'weapons', 'status': 'applied' if report.get('apply') else 'dry-run', 'lastKey': 'weapon_dedupe', 'lastSourceId': '', 'lastHandle': None, 'lastFile': str(folder), 'processedCount': report.get('matchedCount', 0), 'totalCount': report.get('filesScanned', 0), 'updatedAt': int(time.time()), 'extra': {'missingCount': report.get('missingCount', 0), 'duplicateCount': report.get('duplicateCount', 0), 'conflictCount': report.get('conflictCount', 0), 'report': '_weapon_detect_renumber_dedupe_report.json'}})
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description='Detect weapon handle from JSON/files, rename to authority order, and quarantine duplicates.')
-    ap.add_argument('--apply', action='store_true', help='Actually rename files and quarantine duplicates. Default is dry-run only.')
+    ap.add_argument('--apply', action='store_true')
+    ap.add_argument('--force', action='store_true', help='Allow apply when unmatched files exist. Conflicts still block.')
     args = ap.parse_args()
-
     folder = Path.cwd()
-    files = sorted([p for p in folder.glob('*.json') if p.is_file() and not p.name.startswith('_')])
+    files = sorted([p for p in folder.glob('*.json') if p.is_file() and not p.name.startswith('_') and not p.name.endswith('_report.json')])
     order_map = build_order_map()
-
     candidates = []
     missing = []
     grouped: Dict[str, List[Dict[str, Any]]] = {}
-
+    target_existing: Dict[str, str] = {}
     for path in files:
         data = read_json(path)
         ids = detect_ids(path, data)
@@ -521,18 +521,11 @@ def main() -> int:
             continue
         number, key, display = found
         target = f'{number:04d}_{key}.json'
-        row = {
-            'old': path.name,
-            'new': target,
-            'number': number,
-            'key': key,
-            'display': display,
-            'sha1': sha1(path),
-            'detected_ids': ids,
-        }
+        row = {'old': path.name, 'new': target, 'number': number, 'key': key, 'display': display, 'sha1': sha1(path), 'detected_ids': ids}
         candidates.append(row)
         grouped.setdefault(target, []).append(row)
-
+        if (folder / target).exists():
+            target_existing[target] = (folder / target).name
     keep_rows = []
     duplicate_rows = []
     for target, rows in grouped.items():
@@ -545,31 +538,23 @@ def main() -> int:
             else:
                 row['action'] = 'quarantine_duplicate'
                 duplicate_rows.append(row)
-
-    report = {
-        'schemaVersion': 1,
-        'generatedAt': int(time.time()),
-        'folder': str(folder),
-        'apply': args.apply,
-        'filesScanned': len(files),
-        'matchedCount': len(candidates),
-        'uniqueTargetCount': len(grouped),
-        'duplicateCount': len(duplicate_rows),
-        'missingCount': len(missing),
-        'missing': missing,
-        'duplicates': duplicate_rows,
-        'kept': keep_rows,
-        'allMatched': candidates,
-    }
-
-    Path('_weapon_detect_renumber_dedupe_report.json').write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
-    with Path('_weapon_detect_renumber_dedupe_report.csv').open('w', encoding='utf-8', newline='') as f:
+    conflicts = []
+    keep_old_names = {r['old'] for r in keep_rows}
+    for row in keep_rows:
+        target = folder / row['new']
+        if target.exists() and target.name not in keep_old_names and target.name != row['old']:
+            conflicts.append({'old': row['old'], 'new': row['new'], 'existingTarget': target.name})
+    blocked = bool(conflicts or (missing and not args.force))
+    report = {'schemaVersion': 2, 'generatedAt': int(time.time()), 'folder': str(folder), 'apply': bool(args.apply and not blocked), 'force': args.force, 'blocked': blocked, 'filesScanned': len(files), 'matchedCount': len(candidates), 'uniqueTargetCount': len(grouped), 'duplicateCount': len(duplicate_rows), 'missingCount': len(missing), 'conflictCount': len(conflicts), 'missing': missing, 'conflicts': conflicts, 'duplicates': duplicate_rows, 'kept': keep_rows, 'allMatched': candidates}
+    write_json(folder / '_weapon_detect_renumber_dedupe_report.json', report)
+    with (folder / '_weapon_detect_renumber_dedupe_report.csv').open('w', encoding='utf-8', newline='') as f:
         w = csv.DictWriter(f, fieldnames=['action', 'old', 'new', 'number', 'key', 'display', 'sha1'])
         w.writeheader()
         for row in keep_rows + duplicate_rows:
             w.writerow({k: row.get(k, '') for k in ['action', 'old', 'new', 'number', 'key', 'display', 'sha1']})
-
-    if args.apply:
+    if args.apply and not blocked:
+        backup_dir = folder / '_weapon_rename_backup'
+        backup_dir.mkdir(exist_ok=True)
         for row in duplicate_rows:
             old = folder / row['old']
             if old.exists():
@@ -580,6 +565,9 @@ def main() -> int:
             new = folder / row['new']
             if not old.exists() or old.name == new.name:
                 continue
+            backup = backup_dir / old.name
+            if not backup.exists():
+                shutil.copy2(old, backup)
             tmp = old.with_name(old.name + '.weapon_rename_tmp')
             if tmp.exists():
                 tmp.unlink()
@@ -589,21 +577,9 @@ def main() -> int:
             if new.exists():
                 new.rename(unique_quarantine_path(folder, new.name))
             tmp.rename(new)
-
-    print(json.dumps({
-        'status': 'applied' if args.apply else 'dry-run',
-        'filesScanned': len(files),
-        'matchedCount': len(candidates),
-        'uniqueTargetCount': len(grouped),
-        'duplicateCount': len(duplicate_rows),
-        'missingCount': len(missing),
-        'report': '_weapon_detect_renumber_dedupe_report.json',
-        'csv': '_weapon_detect_renumber_dedupe_report.csv',
-        'duplicateQuarantine': '_weapon_duplicate_quarantine',
-    }, indent=2))
-    if missing:
-        print('WARNING: Some weapon files were not matched. Review the report before applying.')
-    return 0
+    write_marker(folder, report)
+    print(json.dumps({'status': 'blocked' if blocked else 'applied' if report['apply'] else 'dry-run', 'filesScanned': len(files), 'matchedCount': len(candidates), 'uniqueTargetCount': len(grouped), 'duplicateCount': len(duplicate_rows), 'missingCount': len(missing), 'conflictCount': len(conflicts), 'report': '_weapon_detect_renumber_dedupe_report.json', 'csv': '_weapon_detect_renumber_dedupe_report.csv', 'duplicateQuarantine': '_weapon_duplicate_quarantine'}, indent=2))
+    return 1 if blocked and args.apply else 0
 
 
 if __name__ == '__main__':
