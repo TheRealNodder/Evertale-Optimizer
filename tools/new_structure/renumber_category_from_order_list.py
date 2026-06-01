@@ -116,6 +116,22 @@ def norm(value: Any) -> str:
     return re.sub(r"[^a-z0-9]+", "", str(value or "").lower())
 
 
+def norm_aliases(value: Any) -> List[str]:
+    raw = str(value or "").strip()
+    if not raw:
+        return []
+    vals = {raw, raw.replace("Greataxe", "GreatAxe"), raw.replace("GreatAxe", "Greataxe")}
+    more = set()
+    for v in vals:
+        more.add(v)
+        more.add(re.sub(r"^\d+_", "", v))
+        more.add(strip_form_suffix(v))
+        more.add(strip_form_suffix(re.sub(r"^\d+_", "", v)))
+        if not re.search(r"\d+$", v):
+            more.add(v + "01")
+    return [norm(v) for v in more if norm(v)]
+
+
 def strip_form_suffix(value: Any) -> str:
     return re.sub(r"\d+$", "", str(value or "").strip())
 
@@ -214,17 +230,38 @@ def build_match_maps(index: Dict[str, Any], entries_dir: Path, config: Dict[str,
         path = entries_dir.parent / file_rel if file_rel else None
         data = read_json(path) if path and path.exists() else {}
         source_id = str(row.get("sourceId") or json_source_id(data, Path(file_rel).stem))
+        file_stem = Path(file_rel).stem
+        file_stem_no_handle = re.sub(r"^\d+_", "", file_stem)
         base = strip_form_suffix(source_id) if config.get("collapse_numeric_forms") else source_id
-        keys = [source_id, base, row.get("name"), row.get("displayName"), Path(file_rel).stem]
+        keys = [
+            source_id,
+            base,
+            row.get("name"),
+            row.get("displayName"),
+            file_stem,
+            file_stem_no_handle,
+            strip_form_suffix(file_stem_no_handle),
+        ]
         image = str(row.get("image") or "")
         if image:
             keys.append(re.sub(r"\.[a-z0-9]+$", "", image.split("/")[-1]))
         payload = {"row": row, "data": data, "path": path, "sourceId": source_id}
         for key in keys:
-            n = norm(key)
-            if n and n not in out:
-                out[n] = payload
+            for n in norm_aliases(key):
+                if n and n not in out:
+                    out[n] = payload
     return out
+
+
+def desired_lookup_keys(key: str, config: Dict[str, Any]) -> List[str]:
+    keys = [key]
+    if config.get("collapse_numeric_forms") and not re.search(r"\d+$", key):
+        keys.append(f"{key}{config.get('default_suffix', '01')}")
+    keys.append(strip_form_suffix(key))
+    out = []
+    for k in keys:
+        out.extend(norm_aliases(k))
+    return list(dict.fromkeys(out))
 
 
 def desired_source_id(key: str, config: Dict[str, Any]) -> str:
@@ -277,10 +314,9 @@ def run(category: str, order_list: Path, write: bool, bottom_is_oldest: bool) ->
     used_sources = set()
 
     for row in desired:
-        lookup_keys = [row.key, desired_source_id(row.key, config)]
         found = None
-        for key in lookup_keys:
-            found = by_key.get(norm(key))
+        for key in desired_lookup_keys(row.key, config):
+            found = by_key.get(key)
             if found:
                 break
         if not found:
@@ -363,7 +399,7 @@ def run(category: str, order_list: Path, write: bool, bottom_is_oldest: bool) ->
     canonical_text = "\n".join(format_order_line(r.key, r.display_name) for r in desired) + "\n"
     last = matches[-1] if matches else None
     report = {
-        "schemaVersion": 2,
+        "schemaVersion": 3,
         "generatedAt": int(time.time()),
         "category": category,
         "write": write,
