@@ -42,15 +42,6 @@ def normalize_rel_path(path_value: str) -> str:
     return str(path_value or "").replace("\\", "/").lstrip("./")
 
 
-def read_index_entries(category_dir: Path) -> List[Dict[str, Any]]:
-    index_path = category_dir / "index.json"
-    if not index_path.exists():
-        return []
-    index = load_json(index_path)
-    rows = list(index.get("entries", [])) if isinstance(index, dict) else []
-    return sorted(rows, key=index_row_order)
-
-
 def index_row_order(row: Dict[str, Any]) -> int:
     for key in ("fileHandleOrder", "sourceOrder", "order", "visualOrder"):
         try:
@@ -61,6 +52,15 @@ def index_row_order(row: Dict[str, Any]) -> int:
             pass
     match = re.match(r"^(\d+)_", str(row.get("file", "")).split("/")[-1])
     return int(match.group(1)) if match else 999999
+
+
+def read_index_entries(category_dir: Path) -> List[Dict[str, Any]]:
+    index_path = category_dir / "index.json"
+    if not index_path.exists():
+        return []
+    index = load_json(index_path)
+    rows = list(index.get("entries", [])) if isinstance(index, dict) else []
+    return sorted(rows, key=index_row_order)
 
 
 def resolve_entry_path(category_dir: Path, rel_file: str) -> Path:
@@ -255,7 +255,10 @@ def main() -> int:
     category_reports = [build_category(entries_root, bundles_dir, category) for category in categories]
     families_report = build_character_families(entries_root, bundles_dir) if (not args.category or args.category == "characters") else {"category": "character_families", "status": "skipped"}
     catalog_report = None
-    if not args.skip_catalog and not args.category:
+    # Important: always rebuild catalog.bundle.json unless explicitly skipped.
+    # data-loader.js prefers catalog.bundle.json, so rebuilding only --category weapons
+    # without refreshing catalog.bundle.json leaves the live site on stale data.
+    if not args.skip_catalog:
         catalog_report = build_catalog_bundle(entries_root, bundles_dir, category_reports, families_report)
     report = {"schemaVersion": 3, "generatedAt": int(time.time()), "entriesRoot": str(entries_root), "bundlesRoot": str(bundles_dir), "categories": category_reports, "characterFamilies": families_report, "catalog": catalog_report}
     write_json(entries_root / "reports" / "bundle_report.json", report)
