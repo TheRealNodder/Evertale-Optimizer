@@ -1,10 +1,10 @@
 /* catalog-sort.js — stable display-only sorter.
-   Characters, weapons, accessories, and bosses all sort from their generated index/order maps.
-   Newest = highest fileHandleOrder/sourceOrder/####_ filename number.
-   Oldest = lowest fileHandleOrder/sourceOrder/####_ filename number.
+   Rendered card order is the first authority.
+   index.json is fallback authority.
+   Stale explorer/order-map JSON files are intentionally ignored so they cannot override rebuilt bundles.
 */
 (function(){
-  const SORT_KEY = 'evertale_catalog_sort_v2';
+  const SORT_KEY = 'evertale_catalog_sort_v3';
   const DEFAULT_SORT = 'newest';
   const KIND_RANK = { characters: 0, weapons: 1, accessories: 2, bosses: 3 };
   const INDEX_FILES = {
@@ -12,11 +12,6 @@
     weapons: './apkfiles/entries/weapons/index.json',
     accessories: './apkfiles/entries/accessories/index.json',
     bosses: './apkfiles/entries/bosses/index.json',
-  };
-  const ORDER_FILES = {
-    weapons: ['./apkfiles/entries/maps/explorer_weapon_order.json','./apkfiles/entries/maps/weapon_order_map.json'],
-    accessories: ['./apkfiles/entries/maps/explorer_accessory_order.json','./apkfiles/entries/maps/accessory_order_map.json'],
-    bosses: ['./apkfiles/entries/maps/explorer_boss_order.json','./apkfiles/entries/maps/boss_order_map.json'],
   };
   let orderMaps = { characters: new Map(), weapons: new Map(), accessories: new Map(), bosses: new Map() };
   let sorting = false;
@@ -36,10 +31,7 @@
   function numericValue(value){ const n = Number(value); return Number.isFinite(n) && n > 0 ? n : null; }
   function handleFromFile(file){ const m = String(file || '').split('/').pop().match(/^(\d+)_/); return m ? numericValue(m[1]) : null; }
 
-  function addKey(map, key, order){
-    const n = norm(key);
-    if(n && order && !map.has(n)) map.set(n, order);
-  }
+  function addKey(map, key, order){ const n = norm(key); if(n && order && !map.has(n)) map.set(n, order); }
   function addAliases(map, value, order){
     if(!value || !order) return;
     const raw = String(value || '');
@@ -50,10 +42,6 @@
     const order = handleFromFile(row.file) || numericValue(row.fileHandleOrder) || numericValue(row.sourceOrder) || numericValue(row.order) || numericValue(row.visualOrder);
     if(!order) return;
     [row.sourceId,row.family,row.key,row.name,row.displayName,row.title,row.sortName,row.file].forEach(v => addAliases(map, v, order));
-  }
-  function addOrderRow(map, row, fallbackIndex){
-    const order = numericValue(row.fileHandleOrder) || numericValue(row.sourceOrder) || handleFromFile(row.file) || numericValue(row.order) || numericValue(row.visualOrder) || (fallbackIndex + 1);
-    [row.key,row.sourceId,row.displayName,row.sortName,row.name,row.title,row.file].forEach(v => addAliases(map, v, order));
   }
   async function fetchJson(url){
     const res = await fetch(url, { cache: 'no-store' });
@@ -69,28 +57,17 @@
     }catch(err){ console.warn(`[CatalogSort] Index order unavailable for ${kindKey}`, err); }
     return map;
   }
-  async function loadOrderFiles(kindKey, map){
-    for(const url of ORDER_FILES[kindKey] || []){
-      try{
-        const json = await fetchJson(url);
-        const rows = Array.isArray(json?.order) ? json.order : [];
-        rows.forEach((row, idx) => addOrderRow(map, row, idx));
-      }catch(err){ console.warn(`[CatalogSort] Order map unavailable for ${kindKey}: ${url}`, err); }
-    }
-    return map;
-  }
   async function loadAllOrders(){
-    const kinds = ['characters','weapons','accessories','bosses'];
-    const pairs = await Promise.all(kinds.map(async k => {
-      const indexMap = await loadIndexOrder(k);
-      const fullMap = await loadOrderFiles(k, indexMap);
-      return [k, fullMap];
-    }));
+    const pairs = await Promise.all(['characters','weapons','accessories','bosses'].map(async k => [k, await loadIndexOrder(k)]));
     pairs.forEach(([k, map]) => { orderMaps[k] = map; });
   }
+  function cardNativeOrder(card){
+    return numericValue(card.getAttribute('data-order')) || numericValue(card.getAttribute('data-source-order')) || numericValue(card.getAttribute('data-file-handle-order'));
+  }
   function orderIndex(card){
-    const k = kind(card);
-    const map = orderMaps[k];
+    const native = cardNativeOrder(card);
+    if(native) return native;
+    const map = orderMaps[kind(card)];
     if(!map) return null;
     const keys = [
       id(card), stripHandle(id(card)), family(id(card)), family(stripHandle(id(card))),
@@ -98,7 +75,7 @@
       card.getAttribute('data-source-id'), card.getAttribute('data-family'), card.getAttribute('data-order-key')
     ].map(norm).filter(Boolean);
     for(const key of keys) if(map.has(key)) return map.get(key);
-    return numericValue(card.getAttribute('data-order')) || numericValue(card.getAttribute('data-source-order')) || numericValue(card.getAttribute('data-file-handle-order'));
+    return null;
   }
   function sortCards(cards, mode){
     const rows = cards.map((card, index) => {
