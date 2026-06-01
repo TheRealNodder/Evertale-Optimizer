@@ -10,14 +10,6 @@ Dry run:
 
 Apply rename:
   python detect_and_renumber_bosses_in_folder.py --apply
-
-What it does:
-- Reads every .json boss file in the current folder.
-- Detects the full boss handle from filename and JSON fields.
-- Determines each boss's actual order number from the authority list below.
-- Renames files to ####_FullBossHandle.json.
-- Writes CSV/JSON reports.
-- Does not require running from repo root.
 """
 from __future__ import annotations
 
@@ -25,9 +17,10 @@ import argparse
 import csv
 import json
 import re
+import shutil
 import time
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Tuple
 
 ORDER_TEXT = r'''
 LupinRegularBoss03 (Mega Lupin)
@@ -218,231 +211,6 @@ CatIdolGirlBoss03 (Mega Mirai)
 AntaresModernBoss03 (Mega Antares)
 SchoolGirlWarriorBoss03 (Mega Saya)
 HorseIdolGirlBoss03 (Mega Sakura)
-OniSchoolGirlBoss03 (Mega Hibiki)
-MechaSisterBrideBoss03 (Mega Anya)
-AstridBrideBoss03 (Mega Astrid)
-MechaSisterBrideBoss01 (Berserk Anya)
-AstridBrideBoss01 (Berserk Astrid)
-FreyaRegularBoss03 (Mega Freya)
-FreyaRegularBoss02 (Berserk Freya)
-FreyaRegularBoss01 (Berserk Freya)
-LokiRegularBoss03 (Mega Loki)
-LokiRegularBoss02 (Berserk Loki)
-LokiRegularBoss01 (Berserk Loki)
-OdinRavenBoss03 (Mega Winged Shade)
-OdinRavenBoss01 (Berserk Winged Shade)
-OdinRegularBoss03 (Mega Odin)
-OdinRegularBoss02 (Berserk Odin)
-OdinRegularBoss01 (Berserk Odin)
-KaguyahimeRegularBoss03 (Mega Kaguya)
-KaguyahimeRegularBoss01 (Berserk Kaguya)
-HimikoRegularBoss03 (Mega Himiko)
-HimikoRegularBoss01 (Berserk Himiko)
-CyrusBoss01 (Scheming Cyrus)
-JeanneDarkAngelBoss02 (Mega Dark Mikaela)
-JeanneDarkAngelBoss01 (Mega Dark Mikaela)
-JeanneDarkBoss01 (Mega Dark Jeanne)
-JeanneDarkSwimsuitBoss03 (Mega Dark Jeanne)
-JeanneDarkSwimsuitBoss02 (Mega Dark Jeanne)
-JeanneDarkSwimsuitBoss01 (Berserk Dark Jeanne)
-FireMinionBoss01 (Himori Bomber)
-LifeMinionBoss01 (Grudge Mori)
-LudmillaRacequeenBoss02 (Mega Ludmilla)
-LudmillaRacequeenBoss01 (Berserk Ludmilla)
-YandereMaidRaceQueenBoss02 (Mega Clarice)
-YandereMaidRaceQueenBoss01 (Berserk Clarice)
-KingArthurRegularBoss03 (Mega King Arthur)
-KingArthurRegularBoss02 (Mega King Arthur)
-KingArthurRegularBoss01 (Berserk King Arthur)
-DeerGirlBoss02 (Mega Haku)
-DeerGirlBoss01 (Berserk Haku)
-BurnedGirlRegularBoss02 (Mega Honnoji)
-BurnedGirlRegularBoss01 (Berserk Honnoji)
-NobunagaRegularBoss02 (Mega Nobunaga)
-NobunagaRegularBoss01 (Berserk Nobunaga)
-SnowBlackBrideBoss02 (Mega Snow Black)
-SnowBlackBrideBoss01 (Berserk Snow Black)
-SnowWhiteBrideBoss02 (Mega Snow White)
-SnowWhiteBrideBoss01 (Berserk Snow White)
-YandereMaidBossB01 (Future Clarice)
-LudmillaRegularBossB01 (Future Ludmilla)
-RolotiaNewBoss02 (Mega Rolotia)
-RolotiaNewBoss01 (Berserk Rolotia)
-LudmillaSchoolGirlBoss02 (Mega Ludmilla & Clarice)
-LudmillaSchoolGirlBoss01 (Berserk Ludmilla & Clarice)
-OniSchoolGirlBossB02 (Mega Hibiki)
-OniSchoolGirlBossB01 (Berserk Hibiki)
-DarkFinnBossC02 (Fullmetal Knight)
-DarkFinnBossC01 (Fullmetal Knight)
-DarkFinnBossB01 (Fullmetal Knight)
-DarkRizetteSwimsuitBoss02 (Mega Endless Rizette)
-DarkRizetteSwimsuitBoss01 (Berserk Endless Rizette)
-LunaHoodBoss01 (Luna)
-SnowWhiteBoss02 (Mega Snow White)
-SnowWhiteBoss01 (Berserk Snow White)
-IbarahimeRegularBoss02 (Mega Sleeping Beauty)
-IbarahimeRegularBoss01 (Berserk Sleeping Beauty)
-CinderellaRegularBoss02 (Mega Cinderella)
-CinderellaRegularBoss01 (Berserk Cinderella)
-Ibarahime02 (Nightmare Beauty)
-Ibarahime01 (???)
-HoodedThiefBoss01 (Brigand)
-FireKnightMaleE01 (Red Knight)
-AstridNewBoss02 (Mega Astrid)
-AstridNewBoss01 (Commander Astrid)
-OssiaDarkBoss02Fake (Mega Ossia)
-OssiaDarkBoss03 (Mega Ossia)
-OssiaDarkBoss02 (Mega Ossia)
-OssiaDarkBoss01 (Evil Ossia)
-GyurelleRegularBoss03 (Mega Gyurelle)
-GyurelleRegularBoss02 (Mega Gyurelle)
-GyurelleRegularBoss02ForDisguise (Mega Gyurelle)
-GyurelleRegularBoss01C (Evil Gyurelle C)
-GyurelleRegularBoss01B (Evil Gyurelle B)
-GyurelleRegularBoss01A (Evil Gyurelle A)
-GyurelleRegularBoss01ForDisguise (Evil Gyurelle)
-MerlinRegularBoss01 (Merlin)
-CrossSwordKnightBoss02 (Mega Gawain)
-CrossSwordKnightBoss01 (Evil Gawain)
-RoundTableKnightBoss02 (Mega Lancelot)
-RoundTableKnightBoss01 (Evil Lancelot)
-LifeConstruct01C (Small Light Golem)
-DeathConstruct01C (Small Dark Golem)
-WaterConstruct01C (Small Water Golem)
-FireConstruct01C (Small Fire Golem)
-AirConstruct01C (Small Storm Golem)
-EarthConstruct01C (Small Earth Golem)
-LifeConstruct01B (Light Golem)
-DeathConstruct01B (Dark Golem)
-WaterConstruct01B (Water Golem)
-FireConstruct01B (Fire Golem)
-AirConstruct01B (Storm Golem)
-EarthConstruct01B (Earth Golem)
-LifeConstruct01 (Large Light Golem)
-DeathConstruct01 (Large Dark Golem)
-WaterConstruct01 (Large Water Golem)
-FireConstruct01 (Large Fire Golem)
-AirConstruct01 (Large Storm Golem)
-EarthConstruct01 (Large Earth Golem)
-BahamutBoss01 (Bahamut)
-CyrusBoss02 ()
-DarkFinnBoss01 (Endless Finn)
-Orcanix01 (Orcanix)
-DarkAstridBoss03 (Endless Astrid)
-DarkAstridBoss02 (Endless Astrid)
-OniSchoolGirlBoss02 (Hibiki)
-SchoolGirlWarriorBoss02 (Saya)
-BunnySamuraiBoss02 (Nanami)
-YandereMaidBoss02 (Clarice Mirage)
-LudmillaRegularBoss02 (Ludmilla)
-DarkAstridBoss01 (Endless Astrid)
-DarkRizetteBossB03 (Endless Rizette)
-GoldAngelEX01 (En Avenger)
-GoldAngelEX02 (En Champion)
-LifeEyeballEX01 (Divine Arbiter)
-VanguardSoldier01 (Vanguard Soldier)
-DarkLudmillaBoss02 (Commander Ludmilla)
-LavaDragon02 (Lava Beast)
-LavaDragon01 (Lava Spawn)
-MiboneEX01 (Ossia)
-MaskElfWarrior01 (Raleigh)
-MetalDragonDemon01 (Abyssal Emissary)
-BabyDarkDragonBoss01 (Commander Crescent)
-WindDragonBoss01 (Lieutenant Aethrodon)
-EarthKaijuBoss01 (General Voraxion)
-NovaBlastDragonBoss01 (Sergeant Altaireon)
-FireSpirit01 (Flame Crystal)
-FireLich02 (Endless Tyrant)
-DarkRizetteBoss03 (Endless Rizette)
-MechanicalTitan02 (Endless Titan)
-GolemBoss01 (Monstrous Golem)
-NorzaRegularBossB01 ()
-NorzaRegularBoss01 (Norza)
-DarnaB03 ()
-Darna03 (Darna)
-UndeadMinotaur01 (Endless Minotaur)
-AirGenieA01 (Endless Wraith)
-GhostKnightC01 (Endless Knight)
-GhostKnightB01 (Endless Knight)
-GhostKnightA01 (Endless Knight)
-CapedSkeletonC01 (Endless Legion)
-CapedSkeletonB01 (Endless Legion)
-CapedSkeletonA01 (Endless Legion)
-AirGenieBoss01 (Jynn)
-AirCloakKnight03 (Argento)
-FireBirdTest01 ()
-AnimalFamiliarBoss01 (Beryx)
-MistDragonBoss01 (Zeregia)
-GreenDragonBoss01 (Dairyu)
-TaotieBoss01 (Grenzor)
-DeathKnightBoss01 ()
-RedMinotaurDojo01 (Minotaur)
-FloatingMageBoss02 (Ul Ganan)
-FireKnightMaleD01 (Red Knight)
-Astrid01B (Astrid)
-Luther01B (Luther)
-GyurelleInDisguise01C (Aeon Knight)
-Gyurelle01C (Gyurelle)
-PrimevalDemonF01 (Aeon Knight)
-GyurelleInDisguise01B (Aeon Knight)
-Gyurelle01B (Gyurelle)
-FireLizardLancer02 (A'Zelmeda)
-FireDragonBoss01 (Rashanar)
-ForestBearBoss02 (Kaizermaw)
-ForestBearBoss01 (Rexcub)
-DrukeSmall01 (???)
-MaskViola01 (Velkajah)
-MetalDragonBoss01 (Jedariel)
-FloatingMageBoss01 (Ul Ganan)
-GyurelleInDisguise01ATB (Aeon Knight)
-GyurelleInDisguise01AT (Aeon Knight)
-GyurelleInDisguise01 (Aeon Knight)
-PrimevalDemonE01 (Aeon Knight)
-PrimevalDemonD01 (Aeon Knight)
-PrimevalDemonC01 (Aeon Knight)
-PrimevalDemonB01 (Aeon Knight)
-PrimevalDemon01 (Aeon Knight)
-FireKnightMaleC01 (Red Knight)
-FireKnightMaleB01 (Red Knight)
-FireKnightMale01 (Red Knight)
-Cetus02 (Cetus)
-Luther01ATB (Luther)
-Luther01AT (Luther)
-Luther01 (Luther)
-Druke01ATB (Druke)
-Druke01AT (Druke)
-Druke01 (Druke)
-Gyurelle02CATB (Gyurelle C)
-Gyurelle02CAT (Gyurelle C)
-Gyurelle02C (Gyurelle C)
-Gyurelle02BATB (Gyurelle B)
-Gyurelle02BAT (Gyurelle B)
-Gyurelle02B (Gyurelle B)
-Gyurelle02ATB (Gyurelle A)
-Gyurelle02AT (Gyurelle A)
-Gyurelle02 (Gyurelle A)
-Gyurelle01ATBNoDisguiseSelfAbility (Gyurelle)
-Gyurelle01ATB (Gyurelle)
-Gyurelle01AT (Gyurelle)
-Gyurelle01 (Gyurelle)
-Norza02ATB (Norza)
-Norza02AT (Norza)
-Norza02 (Norza)
-NorzaB01 ()
-Norza01ATB (Norza)
-Norza01AT (Norza)
-Norza01 (Norza)
-EternalB02 ()
-Eternal02ATB (Arcane)
-Eternal02AT (Arcane)
-Eternal02 (Arcane)
-Eternal01ATB (The Eternal)
-Eternal01AT (The Eternal)
-Eternal01 (The Eternal)
-RedMinotaur01 (Minotaur)
-MiboneB02 ()
-Mibone02 (Ossia)
-Mibone01 (Ossia)
 '''
 
 LINE_RE = re.compile(r'([A-Za-z0-9_]+)\s*\((.*?)\)')
@@ -463,25 +231,15 @@ def read_json(path: Path) -> Dict[str, Any]:
         return {}
 
 
-def nested(data: Dict[str, Any], *keys: str) -> str:
-    cur: Any = data
-    for key in keys:
-        if not isinstance(cur, dict):
-            return ''
-        cur = cur.get(key)
-    return '' if cur is None else str(cur)
+def write_json(path: Path, data: Any) -> None:
+    path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n', encoding='utf-8', newline='\n')
 
 
 def detect_ids(path: Path, data: Dict[str, Any]) -> List[str]:
     stem = strip_prefix(path.stem)
     internal = data.get('internal') if isinstance(data.get('internal'), dict) else {}
     raw = data.get('raw') if isinstance(data.get('raw'), dict) else {}
-    vals = [
-        stem,
-        data.get('sourceId'), data.get('id'), data.get('family'), data.get('name'), data.get('displayName'), data.get('title'),
-        internal.get('sourceId'), internal.get('bossId'), internal.get('name'), internal.get('displayName'),
-        raw.get('name'), raw.get('displayName'), raw.get('id'),
-    ]
+    vals = [stem, data.get('sourceId'), data.get('id'), data.get('family'), data.get('name'), data.get('displayName'), data.get('title'), internal.get('sourceId'), internal.get('bossId'), internal.get('name'), internal.get('displayName'), raw.get('name'), raw.get('displayName'), raw.get('id')]
     out = []
     for v in vals:
         v = str(v or '').strip()
@@ -492,7 +250,6 @@ def detect_ids(path: Path, data: Dict[str, Any]) -> List[str]:
 
 def order_rows() -> List[Tuple[int, str, str]]:
     pairs = [(m.group(1).strip(), m.group(2).strip()) for m in LINE_RE.finditer(ORDER_TEXT)]
-    # User order rule: bottom of list becomes 0001, increasing upward.
     pairs = list(reversed(pairs))
     return [(i, key, display) for i, (key, display) in enumerate(pairs, start=1)]
 
@@ -507,20 +264,56 @@ def build_order_map() -> Dict[str, Tuple[int, str, str]]:
     return mp
 
 
+def leading_number(name: str) -> int:
+    m = re.match(r'^(\d+)_', name)
+    return int(m.group(1)) if m else 999999
+
+
+def choose_keeper(names: List[str]) -> str:
+    return sorted(names, key=lambda n: (0 if leading_number(n) != 999999 else 1, leading_number(n), len(n), n.lower()))[0]
+
+
+def unique_quarantine_path(folder: Path, name: str) -> Path:
+    q = folder / '_boss_duplicate_quarantine'
+    q.mkdir(exist_ok=True)
+    target = q / name
+    if not target.exists():
+        return target
+    i = 1
+    while True:
+        candidate = q / f'{target.stem}_dup{i}{target.suffix}'
+        if not candidate.exists():
+            return candidate
+        i += 1
+
+
+def repo_root_from_entries_folder(folder: Path) -> Path | None:
+    for parent in [folder, *folder.parents]:
+        if (parent / 'apkfiles').exists() and (parent / 'tools').exists():
+            return parent
+    return None
+
+
+def write_marker(folder: Path, report: Dict[str, Any]) -> None:
+    repo = repo_root_from_entries_folder(folder)
+    marker = folder / '_boss_detect_rename.marker.json'
+    if repo:
+        marker = repo / 'apkfiles' / 'entries' / '_markers' / 'boss_detect_rename.marker.json'
+    marker.parent.mkdir(parents=True, exist_ok=True)
+    write_json(marker, {'schemaVersion': 1, 'tool': 'detect_and_renumber_bosses_in_folder', 'category': 'bosses', 'status': 'applied' if report.get('apply') else 'blocked' if report.get('blocked') else 'dry-run', 'lastKey': 'boss_renumber', 'lastSourceId': '', 'lastHandle': None, 'lastFile': str(folder), 'processedCount': report.get('matchedCount', 0), 'totalCount': report.get('filesScanned', 0), 'updatedAt': int(time.time()), 'extra': {'missingCount': report.get('missingCount', 0), 'duplicateCount': report.get('duplicateCount', 0), 'conflictCount': report.get('conflictCount', 0), 'report': '_boss_detect_and_rename_report.json'}})
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description='Detect boss handle from JSON/files and rename to authority order numbers.')
-    ap.add_argument('--apply', action='store_true', help='Actually rename files. Default is dry-run only.')
-    ap.add_argument('--include-script', action='store_true', help='Also scan this script if it has .py extension. Default no effect for JSON-only scan.')
+    ap.add_argument('--apply', action='store_true')
+    ap.add_argument('--force', action='store_true', help='Allow apply with missing matches. Conflicts still block.')
     args = ap.parse_args()
-
     folder = Path.cwd()
-    files = sorted([p for p in folder.glob('*.json') if p.is_file()])
+    files = sorted([p for p in folder.glob('*.json') if p.is_file() and not p.name.startswith('_') and not p.name.endswith('_report.json')])
     order_map = build_order_map()
-
     matched = []
     missing = []
-    duplicate_targets = {}
-
+    grouped: Dict[str, List[Dict[str, Any]]] = {}
     for path in files:
         data = read_json(path)
         ids = detect_ids(path, data)
@@ -534,49 +327,50 @@ def main() -> int:
             continue
         number, key, display = found
         target = f'{number:04d}_{key}.json'
-        duplicate_targets.setdefault(target, []).append(path.name)
-        matched.append({
-            'old': path.name,
-            'new': target,
-            'number': number,
-            'key': key,
-            'display': display,
-            'detected_ids': ids,
-        })
-
-    conflicts = {k: v for k, v in duplicate_targets.items() if len(v) > 1}
-    report = {
-        'schemaVersion': 1,
-        'generatedAt': int(time.time()),
-        'folder': str(folder),
-        'apply': args.apply,
-        'filesScanned': len(files),
-        'matchedCount': len(matched),
-        'missingCount': len(missing),
-        'conflictCount': len(conflicts),
-        'conflicts': conflicts,
-        'missing': missing,
-        'matched': matched,
-    }
-
-    Path('_boss_detect_and_rename_report.json').write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
-    with Path('_boss_detect_and_rename_report.csv').open('w', encoding='utf-8', newline='') as f:
-        w = csv.DictWriter(f, fieldnames=['old', 'new', 'number', 'key', 'display'])
+        row = {'old': path.name, 'new': target, 'number': number, 'key': key, 'display': display, 'detected_ids': ids}
+        matched.append(row)
+        grouped.setdefault(target, []).append(row)
+    keep_rows = []
+    duplicate_rows = []
+    for target, rows in grouped.items():
+        keeper = choose_keeper([r['old'] for r in rows])
+        for row in rows:
+            if row['old'] == keeper:
+                row['action'] = 'rename' if row['old'] != row['new'] else 'keep'
+                keep_rows.append(row)
+            else:
+                row['action'] = 'quarantine_duplicate'
+                duplicate_rows.append(row)
+    keep_old_names = {r['old'] for r in keep_rows}
+    conflicts = []
+    for row in keep_rows:
+        target = folder / row['new']
+        if target.exists() and target.name not in keep_old_names and target.name != row['old']:
+            conflicts.append({'old': row['old'], 'new': row['new'], 'existingTarget': target.name})
+    blocked = bool(conflicts or (missing and not args.force))
+    report = {'schemaVersion': 2, 'generatedAt': int(time.time()), 'folder': str(folder), 'apply': bool(args.apply and not blocked), 'force': args.force, 'blocked': blocked, 'filesScanned': len(files), 'matchedCount': len(matched), 'keptCount': len(keep_rows), 'duplicateCount': len(duplicate_rows), 'missingCount': len(missing), 'conflictCount': len(conflicts), 'conflicts': conflicts, 'missing': missing, 'duplicates': duplicate_rows, 'kept': keep_rows, 'matched': matched}
+    write_json(folder / '_boss_detect_and_rename_report.json', report)
+    with (folder / '_boss_detect_and_rename_report.csv').open('w', encoding='utf-8', newline='') as f:
+        w = csv.DictWriter(f, fieldnames=['action', 'old', 'new', 'number', 'key', 'display'])
         w.writeheader()
-        for row in matched:
-            w.writerow({k: row.get(k, '') for k in ['old', 'new', 'number', 'key', 'display']})
-
-    if conflicts:
-        print(json.dumps({'status': 'blocked-conflicts', 'conflictCount': len(conflicts), 'report': '_boss_detect_and_rename_report.json'}, indent=2))
-        return 2
-
-    if args.apply:
+        for row in keep_rows + duplicate_rows:
+            w.writerow({k: row.get(k, '') for k in ['action', 'old', 'new', 'number', 'key', 'display']})
+    if args.apply and not blocked:
+        backup_dir = folder / '_boss_rename_backup'
+        backup_dir.mkdir(exist_ok=True)
+        for row in duplicate_rows:
+            old = folder / row['old']
+            if old.exists():
+                old.rename(unique_quarantine_path(folder, old.name))
         temp_moves = []
-        for row in matched:
+        for row in keep_rows:
             old = folder / row['old']
             new = folder / row['new']
-            if old.name == new.name:
+            if not old.exists() or old.name == new.name:
                 continue
+            backup = backup_dir / old.name
+            if not backup.exists():
+                shutil.copy2(old, backup)
             tmp = old.with_name(old.name + '.boss_rename_tmp')
             if tmp.exists():
                 tmp.unlink()
@@ -584,21 +378,11 @@ def main() -> int:
             temp_moves.append((tmp, new))
         for tmp, new in temp_moves:
             if new.exists():
-                new.unlink()
+                new.rename(unique_quarantine_path(folder, new.name))
             tmp.rename(new)
-
-    print(json.dumps({
-        'status': 'applied' if args.apply else 'dry-run',
-        'filesScanned': len(files),
-        'matchedCount': len(matched),
-        'missingCount': len(missing),
-        'conflictCount': len(conflicts),
-        'report': '_boss_detect_and_rename_report.json',
-        'csv': '_boss_detect_and_rename_report.csv',
-    }, indent=2))
-    if missing:
-        print('WARNING: Some boss files were not matched. Review _boss_detect_and_rename_report.json before trusting the output.')
-    return 0
+    write_marker(folder, report)
+    print(json.dumps({'status': 'blocked' if blocked else 'applied' if report['apply'] else 'dry-run', 'filesScanned': len(files), 'matchedCount': len(matched), 'missingCount': len(missing), 'duplicateCount': len(duplicate_rows), 'conflictCount': len(conflicts), 'report': '_boss_detect_and_rename_report.json', 'csv': '_boss_detect_and_rename_report.csv'}, indent=2))
+    return 1 if blocked and args.apply else 0
 
 
 if __name__ == '__main__':
