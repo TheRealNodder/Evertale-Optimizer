@@ -1,21 +1,22 @@
 /* catalog-sort.js — stable display-only sorter.
-   Characters use ONLY filename handles from apkfiles/entries/characters/index.json.
-   Other categories keep their existing explorer/legacy map behavior.
+   Characters, weapons, accessories, and bosses all sort from their generated index/order maps.
+   Newest = highest fileHandleOrder/sourceOrder/####_ filename number.
+   Oldest = lowest fileHandleOrder/sourceOrder/####_ filename number.
 */
 (function(){
-  const SORT_KEY = 'evertale_catalog_sort_v1';
+  const SORT_KEY = 'evertale_catalog_sort_v2';
   const DEFAULT_SORT = 'newest';
   const KIND_RANK = { characters: 0, weapons: 1, accessories: 2, bosses: 3 };
-  const CHARACTER_INDEX = './apkfiles/entries/characters/index.json';
-  const EXPLORER_ORDER_FILES = {
-    weapons: './apkfiles/entries/maps/explorer_weapon_order.json',
-    accessories: './apkfiles/entries/maps/explorer_accessory_order.json',
-    bosses: './apkfiles/entries/maps/explorer_boss_order.json',
+  const INDEX_FILES = {
+    characters: './apkfiles/entries/characters/index.json',
+    weapons: './apkfiles/entries/weapons/index.json',
+    accessories: './apkfiles/entries/accessories/index.json',
+    bosses: './apkfiles/entries/bosses/index.json',
   };
-  const LEGACY_ORDER_FILES = {
-    weapons: './apkfiles/entries/maps/weapon_order_map.json',
-    accessories: './apkfiles/entries/maps/accessory_order_map.json',
-    bosses: './apkfiles/entries/maps/boss_order_map.json',
+  const ORDER_FILES = {
+    weapons: ['./apkfiles/entries/maps/explorer_weapon_order.json','./apkfiles/entries/maps/weapon_order_map.json'],
+    accessories: ['./apkfiles/entries/maps/explorer_accessory_order.json','./apkfiles/entries/maps/accessory_order_map.json'],
+    bosses: ['./apkfiles/entries/maps/explorer_boss_order.json','./apkfiles/entries/maps/boss_order_map.json'],
   };
   let orderMaps = { characters: new Map(), weapons: new Map(), accessories: new Map(), bosses: new Map() };
   let sorting = false;
@@ -23,6 +24,7 @@
 
   function $(id){ return document.getElementById(id); }
   function norm(value){ return String(value || '').toLowerCase().replace(/[\u2019']/g, '').replace(/[^a-z0-9]+/g, ''); }
+  function stripHandle(value){ return String(value || '').split('/').pop().replace(/\.json$/i,'').replace(/^\d+_/,''); }
   function family(value){ return String(value || '').replace(/\d+$/, ''); }
   function title(card){ return (card.querySelector('.unitName')?.textContent || '').trim(); }
   function subtitle(card){ return (card.querySelector('.unitTitle')?.textContent || '').trim(); }
@@ -35,86 +37,79 @@
   function handleFromFile(file){ const m = String(file || '').split('/').pop().match(/^(\d+)_/); return m ? numericValue(m[1]) : null; }
 
   function addKey(map, key, order){
-    key = norm(key);
-    if(key && order && !map.has(key)) map.set(key, order);
+    const n = norm(key);
+    if(n && order && !map.has(n)) map.set(n, order);
   }
-
-  function addCharacterIndexRow(map, row){
-    const order = handleFromFile(row.file) || numericValue(row.fileHandleOrder) || numericValue(row.sourceOrder);
+  function addAliases(map, value, order){
+    if(!value || !order) return;
+    const raw = String(value || '');
+    const stem = stripHandle(raw);
+    [raw, stem, family(raw), family(stem), raw.replace('Greataxe','GreatAxe'), raw.replace('GreatAxe','Greataxe')].forEach(v => addKey(map, v, order));
+  }
+  function addIndexRow(map, row){
+    const order = handleFromFile(row.file) || numericValue(row.fileHandleOrder) || numericValue(row.sourceOrder) || numericValue(row.order) || numericValue(row.visualOrder);
     if(!order) return;
-    const src = row.sourceId || '';
-    const fam = row.family || family(src);
-    addKey(map, src, order);
-    addKey(map, family(src), order);
-    addKey(map, fam, order);
-    addKey(map, family(fam), order);
-    addKey(map, row.file, order);
+    [row.sourceId,row.family,row.key,row.name,row.displayName,row.title,row.sortName,row.file].forEach(v => addAliases(map, v, order));
   }
-
-  function addOrderKeys(map, row, fallbackIndex){
+  function addOrderRow(map, row, fallbackIndex){
     const order = numericValue(row.fileHandleOrder) || numericValue(row.sourceOrder) || handleFromFile(row.file) || numericValue(row.order) || numericValue(row.visualOrder) || (fallbackIndex + 1);
-    [row.key,row.sourceId,row.displayName,row.sortName,row.name,row.title,row.file].forEach(value => addKey(map, value, order));
+    [row.key,row.sourceId,row.displayName,row.sortName,row.name,row.title,row.file].forEach(v => addAliases(map, v, order));
   }
-
   async function fetchJson(url){
     const res = await fetch(url, { cache: 'no-store' });
     if(!res.ok) throw new Error(`${url}: ${res.status}`);
     return await res.json();
   }
-
-  async function loadCharacterHandleOrder(){
+  async function loadIndexOrder(kindKey){
     const map = new Map();
     try{
-      const json = await fetchJson(CHARACTER_INDEX);
+      const json = await fetchJson(INDEX_FILES[kindKey]);
       const rows = Array.isArray(json?.entries) ? json.entries : [];
-      rows.forEach(row => addCharacterIndexRow(map, row));
-    }catch(err){
-      console.warn('[CatalogSort] Character handle index unavailable', err);
+      rows.forEach(row => addIndexRow(map, row));
+    }catch(err){ console.warn(`[CatalogSort] Index order unavailable for ${kindKey}`, err); }
+    return map;
+  }
+  async function loadOrderFiles(kindKey, map){
+    for(const url of ORDER_FILES[kindKey] || []){
+      try{
+        const json = await fetchJson(url);
+        const rows = Array.isArray(json?.order) ? json.order : [];
+        rows.forEach((row, idx) => addOrderRow(map, row, idx));
+      }catch(err){ console.warn(`[CatalogSort] Order map unavailable for ${kindKey}: ${url}`, err); }
     }
     return map;
   }
-
-  async function loadOtherOrder(kindKey){
-    const map = new Map();
-    try{
-      const json = await fetchJson(EXPLORER_ORDER_FILES[kindKey]);
-      const rows = Array.isArray(json?.order) ? json.order : [];
-      rows.forEach((row, idx) => addOrderKeys(map, row, idx));
-      if(map.size) return map;
-    }catch(err){ console.warn(`[CatalogSort] Explorer order unavailable for ${kindKey}`, err); }
-    try{
-      const json = await fetchJson(LEGACY_ORDER_FILES[kindKey]);
-      const rows = Array.isArray(json?.order) ? json.order : [];
-      rows.forEach((row, idx) => addOrderKeys(map, row, idx));
-    }catch(err){ console.warn(`[CatalogSort] Legacy order unavailable for ${kindKey}`, err); }
-    return map;
-  }
-
   async function loadAllOrders(){
-    orderMaps.characters = await loadCharacterHandleOrder();
-    const rest = await Promise.all(['weapons','accessories','bosses'].map(async k => [k, await loadOtherOrder(k)]));
-    rest.forEach(([k, map]) => { orderMaps[k] = map; });
+    const kinds = ['characters','weapons','accessories','bosses'];
+    const pairs = await Promise.all(kinds.map(async k => {
+      const indexMap = await loadIndexOrder(k);
+      const fullMap = await loadOrderFiles(k, indexMap);
+      return [k, fullMap];
+    }));
+    pairs.forEach(([k, map]) => { orderMaps[k] = map; });
   }
-
   function orderIndex(card){
     const k = kind(card);
     const map = orderMaps[k];
     if(!map) return null;
-    const keys = [id(card), family(id(card)), title(card), subtitle(card), `${title(card)} ${subtitle(card)}`].map(norm).filter(Boolean);
-    for (const key of keys) if (map.has(key)) return map.get(key);
-    return numericValue(card.getAttribute('data-order'));
+    const keys = [
+      id(card), stripHandle(id(card)), family(id(card)), family(stripHandle(id(card))),
+      title(card), subtitle(card), `${title(card)} ${subtitle(card)}`,
+      card.getAttribute('data-source-id'), card.getAttribute('data-family'), card.getAttribute('data-order-key')
+    ].map(norm).filter(Boolean);
+    for(const key of keys) if(map.has(key)) return map.get(key);
+    return numericValue(card.getAttribute('data-order')) || numericValue(card.getAttribute('data-source-order')) || numericValue(card.getAttribute('data-file-handle-order'));
   }
-
   function sortCards(cards, mode){
     const rows = cards.map((card, index) => {
       if(!card.hasAttribute('data-sort-original')) card.setAttribute('data-sort-original', String(index));
       return { card, index, order: orderIndex(card), name: sortName(card) };
     });
-    rows.sort((a, b) => {
+    rows.sort((a,b) => {
       if(mode === 'az' || mode === 'za'){
         const kr = kindRank(a.card) - kindRank(b.card);
         if(kr) return kr;
-        const cmp = a.name.localeCompare(b.name, undefined, { sensitivity: 'base', numeric: true });
+        const cmp = a.name.localeCompare(b.name, undefined, { sensitivity:'base', numeric:true });
         return cmp ? (mode === 'az' ? cmp : -cmp) : a.index - b.index;
       }
       const kr = kindRank(a.card) - kindRank(b.card);
@@ -128,14 +123,13 @@
     });
     return rows.map(row => row.card);
   }
-
   function applySort(force){
     const grid = $('catalogGrid');
     const select = $('catalogSort');
     if(!grid || !select || sorting) return;
     const cards = Array.from(grid.querySelectorAll('.unitCard'));
     if(cards.length < 2) return;
-    const signature = cards.map(c => `${kind(c)}:${id(c)}`).join('|') + '::' + (select.value || DEFAULT_SORT);
+    const signature = cards.map(c => `${kind(c)}:${id(c)}:${orderIndex(c)}`).join('|') + '::' + (select.value || DEFAULT_SORT);
     if(!force && signature === lastSignature) return;
     lastSignature = signature;
     sorting = true;
@@ -145,7 +139,6 @@
     grid.appendChild(frag);
     requestAnimationFrame(() => { sorting = false; });
   }
-
   function init(){
     const select = $('catalogSort');
     const grid = $('catalogGrid');
@@ -153,10 +146,10 @@
     const saved = localStorage.getItem(SORT_KEY) || DEFAULT_SORT;
     select.value = ['newest','oldest','az','za'].includes(saved) ? saved : DEFAULT_SORT;
     select.addEventListener('change', () => { localStorage.setItem(SORT_KEY, select.value || DEFAULT_SORT); lastSignature=''; applySort(true); });
-    new MutationObserver(() => applySort(false)).observe(grid, { childList: true });
+    new MutationObserver(() => applySort(false)).observe(grid, { childList:true });
     setTimeout(() => applySort(true), 0);
-    setTimeout(() => applySort(true), 700);
+    setTimeout(() => applySort(true), 350);
+    setTimeout(() => applySort(true), 1200);
   }
-
   document.addEventListener('DOMContentLoaded', async () => { await loadAllOrders(); init(); });
 })();
