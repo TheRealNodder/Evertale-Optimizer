@@ -7,7 +7,7 @@ import json
 import re
 import time
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 CATEGORIES = ["characters", "weapons", "accessories", "bosses"]
 ROOT_MARKERS = ["apkfiles"]
@@ -88,15 +88,16 @@ def discover_entry_files(category_dir: Path) -> List[Path]:
     return sorted(p for p in entries_dir.glob("*.json") if p.is_file() and not is_excluded_entry_file(p))
 
 
-def load_entries_with_discovery(category_dir: Path, category: str) -> tuple[List[Dict[str, Any]], List[str], Dict[str, Any]]:
-    """Build bundle rows.
+def find_duplicate_source_ids(rows: List[Dict[str, Any]]) -> Dict[str, List[str]]:
+    seen: Dict[str, List[str]] = {}
+    for entry in rows:
+        sid = source_id_from_entry(entry, "")
+        if sid:
+            seen.setdefault(sid, []).append(str(entry.get("_bundleSourceFile", "")))
+    return {sid: files for sid, files in seen.items() if len(files) > 1}
 
-    Strict categories use only index.json. This prevents quarantined/legacy/unindexed weapon,
-    accessory, or boss JSON files from overriding the intended order.
 
-    Characters retain discovery because character extraction can still introduce newly generated
-    family/source rows, but excluded folders/files are still ignored.
-    """
+def load_entries_with_discovery(category_dir: Path, category: str) -> Tuple[List[Dict[str, Any]], List[str], Dict[str, Any]]:
     rows: List[Dict[str, Any]] = []
     errors: List[str] = []
     seen_files: set[str] = set()
@@ -116,6 +117,7 @@ def load_entries_with_discovery(category_dir: Path, category: str) -> tuple[List
             sid = source_id_from_entry(entry, entry_path.stem)
             if sid:
                 seen_ids.add(sid)
+            entry["_bundleSourceFile"] = rel_file
             rows.append(entry)
         except Exception as exc:
             errors.append(f"{rel_file}: {exc}")
@@ -133,6 +135,7 @@ def load_entries_with_discovery(category_dir: Path, category: str) -> tuple[List
                     continue
                 if sid:
                     seen_ids.add(sid)
+                entry["_bundleSourceFile"] = f"entries/{entry_path.name}"
                 rows.append(entry)
                 discovered.append(entry_path.name)
             except Exception as exc:
@@ -142,15 +145,16 @@ def load_entries_with_discovery(category_dir: Path, category: str) -> tuple[List
             if entry_path.name not in seen_files:
                 skipped_unindexed.append(entry_path.name)
 
-    meta = {
-        "indexedCount": len(seen_files),
-        "strictIndexOnly": category in STRICT_INDEX_CATEGORIES,
-        "discoveredUnindexedCount": len(discovered),
-        "discoveredUnindexedFiles": discovered,
-        "skippedUnindexedCount": len(skipped_unindexed),
-        "skippedUnindexedFiles": skipped_unindexed[:500],
-    }
+    duplicates = find_duplicate_source_ids(rows)
+    meta = {"indexedCount": len(seen_files), "strictIndexOnly": category in STRICT_INDEX_CATEGORIES, "discoveredUnindexedCount": len(discovered), "discoveredUnindexedFiles": discovered, "skippedUnindexedCount": len(skipped_unindexed), "skippedUnindexedFiles": skipped_unindexed[:500], "duplicateSourceIdCount": len(duplicates), "duplicateSourceIds": duplicates}
     return rows, errors, meta
+
+
+def strip_bundle_internal_markers(rows: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    clean = []
+    for row in rows:
+        clean.append({k: v for k, v in row.items() if not k.startswith("_bundle")})
+    return clean
 
 
 def build_category(entries_root: Path, bundles_dir: Path, category: str) -> Dict[str, Any]:
@@ -158,23 +162,17 @@ def build_category(entries_root: Path, bundles_dir: Path, category: str) -> Dict
     index_path = category_dir / "index.json"
     if not index_path.exists():
         return {"category": category, "status": "missing_index", "count": 0}
-    index_rows = read_index_entries(category_dir)
-    source_index_count = len(index_rows)
+    source_index_count = len(read_index_entries(category_dir))
     rows, errors, discovery = load_entries_with_discovery(category_dir, category)
-    bundle = {
-        "schemaVersion": 3,
-        "category": category,
-        "generatedAt": int(time.time()),
-        "sourceIndexCount": source_index_count,
-        "discovery": discovery,
-        "count": len(rows),
-        "errors": errors,
-        "contentHash": stable_hash(rows),
-        "entries": rows,
-    }
+    clean_rows = strip_bundle_internal_markers(rows)
+    if category in STRICT_INDEX_CATEGORIES and len(clean_rows) != source_index_count:
+        errors.append(f"strict_count_mismatch index={source_index_count} bundle={len(clean_rows)}")
+    if discovery.get("duplicateSourceIdCount"):
+        errors.append(f"duplicate_source_ids={discovery.get('duplicateSourceIdCount')}")
+    bundle = {"schemaVersion": 4, "category": category, "generatedAt": int(time.time()), "sourceIndexCount": source_index_count, "discovery": discovery, "count": len(clean_rows), "errors": errors, "contentHash": stable_hash(clean_rows), "entries": clean_rows}
     out_path = bundles_dir / f"{category}.bundle.json"
     write_json(out_path, bundle)
-    return {"category": category, "status": "ok", "sourceIndexCount": source_index_count, "count": len(rows), "errors": len(errors), "discoveredUnindexedCount": discovery["discoveredUnindexedCount"], "skippedUnindexedCount": discovery["skippedUnindexedCount"], "contentHash": bundle["contentHash"], "output": str(out_path)}
+    return {"category": category, "status": "ok" if not errors else "warning", "sourceIndexCount": source_index_count, "count": len(clean_rows), "errors": len(errors), "discoveredUnindexedCount": discovery["discoveredUnindexedCount"], "skippedUnindexedCount": discovery["skippedUnindexedCount"], "duplicateSourceIdCount": discovery["duplicateSourceIdCount"], "contentHash": bundle["contentHash"], "output": str(out_path)}
 
 
 def resolve_family_path(family_dir: Path, rel_file: str) -> Path:
@@ -202,23 +200,15 @@ def build_character_families(entries_root: Path, bundles_dir: Path) -> Dict[str,
             rows.append(load_json(entry_path))
         except Exception as exc:
             errors.append(f"{rel_file}: {exc}")
-    bundle = {
-        "schemaVersion": 3,
-        "category": "character_families",
-        "generatedAt": int(time.time()),
-        "sourceIndexCount": len(index_rows),
-        "count": len(rows),
-        "errors": errors,
-        "contentHash": stable_hash(rows),
-        "entries": rows,
-    }
+    bundle = {"schemaVersion": 4, "category": "character_families", "generatedAt": int(time.time()), "sourceIndexCount": len(index_rows), "count": len(rows), "errors": errors, "contentHash": stable_hash(rows), "entries": rows}
     out_path = bundles_dir / "character_families.bundle.json"
     write_json(out_path, bundle)
-    return {"category": "character_families", "status": "ok", "sourceIndexCount": len(index_rows), "count": len(rows), "errors": len(errors), "contentHash": bundle["contentHash"], "output": str(out_path)}
+    return {"category": "character_families", "status": "ok" if not errors else "warning", "sourceIndexCount": len(index_rows), "count": len(rows), "errors": len(errors), "contentHash": bundle["contentHash"], "output": str(out_path)}
 
 
 def build_catalog_bundle(entries_root: Path, bundles_dir: Path, category_reports: List[Dict[str, Any]], families_report: Dict[str, Any]) -> Dict[str, Any]:
-    catalog: Dict[str, Any] = {"schemaVersion": 3, "generatedAt": int(time.time()), "categories": {}, "characterFamilies": [], "report": {"categories": category_reports, "characterFamilies": families_report}}
+    catalog: Dict[str, Any] = {"schemaVersion": 4, "generatedAt": int(time.time()), "categories": {}, "characterFamilies": [], "report": {"categories": category_reports, "characterFamilies": families_report}}
+    missing_bundles = []
     for category in CATEGORIES:
         bundle_path = bundles_dir / f"{category}.bundle.json"
         if bundle_path.exists():
@@ -226,14 +216,21 @@ def build_catalog_bundle(entries_root: Path, bundles_dir: Path, category_reports
             catalog["categories"][category] = bundle.get("entries", [])
         else:
             catalog["categories"][category] = []
+            missing_bundles.append(category)
     families_path = bundles_dir / "character_families.bundle.json"
     if families_path.exists():
         bundle = load_json(families_path)
         catalog["characterFamilies"] = bundle.get("entries", [])
+    catalog["missingBundles"] = missing_bundles
+    catalog["categoryCounts"] = {k: len(v) for k, v in catalog["categories"].items()}
     catalog["contentHash"] = stable_hash({"categories": catalog["categories"], "characterFamilies": catalog["characterFamilies"]})
     out_path = bundles_dir / "catalog.bundle.json"
     write_json(out_path, catalog)
-    return {"category": "catalog", "status": "ok", "count": sum(len(v) for v in catalog["categories"].values()), "characterFamilies": len(catalog["characterFamilies"]), "contentHash": catalog["contentHash"], "output": str(out_path)}
+    return {"category": "catalog", "status": "ok" if not missing_bundles else "warning", "count": sum(len(v) for v in catalog["categories"].values()), "characterFamilies": len(catalog["characterFamilies"]), "missingBundles": missing_bundles, "categoryCounts": catalog["categoryCounts"], "contentHash": catalog["contentHash"], "output": str(out_path)}
+
+
+def write_marker(entries_root: Path, report: Dict[str, Any]) -> None:
+    write_json(entries_root / "_markers" / "build_entry_bundles.marker.json", {"schemaVersion": 1, "tool": "build_entry_bundles", "category": "all", "status": "complete", "lastKey": "bundles", "lastSourceId": "", "lastHandle": None, "lastFile": "apkfiles/entries/reports/bundle_report.json", "processedCount": sum(c.get("count", 0) for c in report.get("categories", [])), "totalCount": sum(c.get("sourceIndexCount", 0) for c in report.get("categories", [])), "updatedAt": int(time.time()), "extra": {"report": "apkfiles/entries/reports/bundle_report.json", "schemaVersion": report.get("schemaVersion"), "catalogHash": (report.get("catalog") or {}).get("contentHash")}})
 
 
 def resolve_entries_root(cli_entries: Optional[str]) -> Path:
@@ -255,13 +252,11 @@ def main() -> int:
     category_reports = [build_category(entries_root, bundles_dir, category) for category in categories]
     families_report = build_character_families(entries_root, bundles_dir) if (not args.category or args.category == "characters") else {"category": "character_families", "status": "skipped"}
     catalog_report = None
-    # Important: always rebuild catalog.bundle.json unless explicitly skipped.
-    # data-loader.js prefers catalog.bundle.json, so rebuilding only --category weapons
-    # without refreshing catalog.bundle.json leaves the live site on stale data.
     if not args.skip_catalog:
         catalog_report = build_catalog_bundle(entries_root, bundles_dir, category_reports, families_report)
-    report = {"schemaVersion": 3, "generatedAt": int(time.time()), "entriesRoot": str(entries_root), "bundlesRoot": str(bundles_dir), "categories": category_reports, "characterFamilies": families_report, "catalog": catalog_report}
+    report = {"schemaVersion": 4, "generatedAt": int(time.time()), "entriesRoot": str(entries_root), "bundlesRoot": str(bundles_dir), "categories": category_reports, "characterFamilies": families_report, "catalog": catalog_report}
     write_json(entries_root / "reports" / "bundle_report.json", report)
+    write_marker(entries_root, report)
     print(json.dumps(report, ensure_ascii=False, indent=2))
     return 0
 
