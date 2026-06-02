@@ -37,7 +37,94 @@ jobs:
           python-version: '3.11'
 
       - name: Run safe entry pipeline
-        run: python tools/new_structure/run_entry_pipeline.py
+        id: pipeline
+        shell: bash
+        continue-on-error: true
+        run: |
+          mkdir -p workflow-debug-artifacts
+          set +e
+          python tools/new_structure/run_entry_pipeline.py > workflow-debug-artifacts/run_entry_pipeline.stdout.log 2> workflow-debug-artifacts/run_entry_pipeline.stderr.log
+          status=$?
+          echo "$status" > workflow-debug-artifacts/run_entry_pipeline.exitcode.txt
+          echo "PIPELINE_EXIT_CODE=$status" >> "$GITHUB_ENV"
+          echo "Pipeline exit code: $status"
+          echo "--- STDOUT TAIL ---"
+          tail -n 250 workflow-debug-artifacts/run_entry_pipeline.stdout.log || true
+          echo "--- STDERR TAIL ---"
+          tail -n 250 workflow-debug-artifacts/run_entry_pipeline.stderr.log || true
+          exit 0
+
+      - name: Collect debug reports
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p workflow-debug-artifacts/reports workflow-debug-artifacts/markers workflow-debug-artifacts/maps workflow-debug-artifacts/bundles
+          cp -v apkfiles/entries/reports/*.json workflow-debug-artifacts/reports/ 2>/dev/null || true
+          cp -v apkfiles/entries/_markers/*.json workflow-debug-artifacts/markers/ 2>/dev/null || true
+          cp -v apkfiles/entries/maps/*.json workflow-debug-artifacts/maps/ 2>/dev/null || true
+          cp -v apkfiles/entries/bundles/*.json workflow-debug-artifacts/bundles/ 2>/dev/null || true
+          python - <<'PY' > workflow-debug-artifacts/debug_summary.txt
+          import json
+          from pathlib import Path
+          print('Entry Safe Rebuild Debug Summary')
+          print('================================')
+          for p in [
+              Path('workflow-debug-artifacts/run_entry_pipeline.exitcode.txt'),
+              Path('apkfiles/entries/reports/entry_pipeline_report.json'),
+              Path('apkfiles/entries/reports/validation_report.json'),
+              Path('apkfiles/entries/reports/category_order_sync_report.json'),
+              Path('apkfiles/entries/reports/bundle_report.json'),
+          ]:
+              print('\nFILE:', p)
+              if not p.exists():
+                  print('missing')
+                  continue
+              if p.suffix == '.txt':
+                  print(p.read_text(encoding='utf-8', errors='replace'))
+                  continue
+              try:
+                  data = json.loads(p.read_text(encoding='utf-8'))
+              except Exception as exc:
+                  print('json read error:', exc)
+                  continue
+              if p.name == 'validation_report.json':
+                  print('errors:', len(data.get('errors', [])))
+                  print('warnings:', len(data.get('warnings', [])))
+                  print('top errors:')
+                  for item in data.get('errors', [])[:50]:
+                      print('-', item)
+                  print('top warnings:')
+                  for item in data.get('warnings', [])[:50]:
+                      print('-', item)
+              elif p.name == 'category_order_sync_report.json':
+                  for row in data.get('categories', []):
+                      print(row.get('category'), 'ordered=', row.get('orderedCount'), 'index=', row.get('indexEntryCount'), 'canonical=', row.get('canonicalExistingCount'), 'missingCanonical=', row.get('missingCanonicalEntries'), 'blockedAppends=', row.get('blockedAppends'))
+              elif p.name == 'bundle_report.json':
+                  for row in data.get('categories', []):
+                      print(row.get('category'), 'sourceIndexCount=', row.get('sourceIndexCount'), 'count=', row.get('count'), 'errors=', row.get('errors'), 'duplicates=', row.get('duplicateSourceIdCount'))
+              else:
+                  print(json.dumps(data, ensure_ascii=False, indent=2)[:5000])
+          PY
+          cat workflow-debug-artifacts/debug_summary.txt
+
+      - name: Upload pipeline debug artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: entry-safe-rebuild-debug-${{ github.run_id }}
+          path: workflow-debug-artifacts/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Fail if pipeline failed
+        if: always()
+        shell: bash
+        run: |
+          code="${PIPELINE_EXIT_CODE:-1}"
+          if [ "$code" != "0" ]; then
+            echo "Pipeline failed with exit code $code. Download the entry-safe-rebuild-debug artifact for full reports/logs."
+            exit "$code"
+          fi
 
       - name: Run tools audit if available
         run: |
