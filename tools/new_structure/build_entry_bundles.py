@@ -42,6 +42,23 @@ def normalize_rel_path(path_value: str) -> str:
     return str(path_value or "").replace("\\", "/").lstrip("./")
 
 
+def strip_handle(value: str) -> str:
+    return re.sub(r"^\d+_", "", str(value or "")).replace(".json", "")
+
+
+def suffix_aliases(value: str) -> List[str]:
+    raw = str(value or "").strip()
+    if not raw:
+        return []
+    vals = {raw, strip_handle(raw)}
+    for v in list(vals):
+        if v.endswith("01"):
+            vals.add(v[:-2])
+        else:
+            vals.add(v + "01")
+    return [v for v in vals if v]
+
+
 def index_row_order(row: Dict[str, Any]) -> int:
     for key in ("fileHandleOrder", "sourceOrder", "order", "visualOrder"):
         try:
@@ -68,6 +85,32 @@ def resolve_entry_path(category_dir: Path, rel_file: str) -> Path:
     if rel_file.startswith("entries/"):
         return category_dir / rel_file
     return category_dir / "entries" / rel_file
+
+
+def find_renamed_entry_path(category_dir: Path, index_row: Dict[str, Any], rel_file: str) -> Optional[Path]:
+    entries_dir = category_dir / "entries"
+    if not entries_dir.exists():
+        return None
+    seed_values = [
+        index_row.get("sourceId"),
+        index_row.get("key"),
+        index_row.get("id"),
+        strip_handle(Path(str(rel_file or "")).stem),
+    ]
+    seen = set()
+    for value in seed_values:
+        for alias in suffix_aliases(str(value or "")):
+            if alias in seen:
+                continue
+            seen.add(alias)
+            exact = entries_dir / f"{alias}.json"
+            if exact.exists():
+                return exact
+            matches = sorted(entries_dir.glob(f"*_{alias}.json"))
+            matches = [p for p in matches if p.is_file() and not is_excluded_entry_file(p)]
+            if len(matches) == 1:
+                return matches[0]
+    return None
 
 
 def source_id_from_entry(entry: Dict[str, Any], fallback: str = "") -> str:
@@ -102,12 +145,18 @@ def load_entries_with_discovery(category_dir: Path, category: str) -> Tuple[List
     errors: List[str] = []
     seen_files: set[str] = set()
     seen_ids: set[str] = set()
+    resolved_renamed: List[Dict[str, str]] = []
 
     for index_row in read_index_entries(category_dir):
         rel_file = normalize_rel_path(index_row.get("file", ""))
         if not rel_file:
             continue
         entry_path = resolve_entry_path(category_dir, rel_file)
+        if not entry_path.exists():
+            renamed_path = find_renamed_entry_path(category_dir, index_row, rel_file)
+            if renamed_path:
+                resolved_renamed.append({"indexedFile": rel_file, "resolvedFile": f"entries/{renamed_path.name}"})
+                entry_path = renamed_path
         seen_files.add(entry_path.name)
         if is_excluded_entry_file(entry_path):
             errors.append(f"excluded indexed file skipped: {rel_file}")
@@ -117,7 +166,7 @@ def load_entries_with_discovery(category_dir: Path, category: str) -> Tuple[List
             sid = source_id_from_entry(entry, entry_path.stem)
             if sid:
                 seen_ids.add(sid)
-            entry["_bundleSourceFile"] = rel_file
+            entry["_bundleSourceFile"] = rel_file if entry_path.name == Path(rel_file).name else f"entries/{entry_path.name}"
             rows.append(entry)
         except Exception as exc:
             errors.append(f"{rel_file}: {exc}")
@@ -146,7 +195,7 @@ def load_entries_with_discovery(category_dir: Path, category: str) -> Tuple[List
                 skipped_unindexed.append(entry_path.name)
 
     duplicates = find_duplicate_source_ids(rows)
-    meta = {"indexedCount": len(seen_files), "strictIndexOnly": category in STRICT_INDEX_CATEGORIES, "discoveredUnindexedCount": len(discovered), "discoveredUnindexedFiles": discovered, "skippedUnindexedCount": len(skipped_unindexed), "skippedUnindexedFiles": skipped_unindexed[:500], "duplicateSourceIdCount": len(duplicates), "duplicateSourceIds": duplicates}
+    meta = {"indexedCount": len(seen_files), "strictIndexOnly": category in STRICT_INDEX_CATEGORIES, "resolvedRenamedCount": len(resolved_renamed), "resolvedRenamedFiles": resolved_renamed[:500], "discoveredUnindexedCount": len(discovered), "discoveredUnindexedFiles": discovered, "skippedUnindexedCount": len(skipped_unindexed), "skippedUnindexedFiles": skipped_unindexed[:500], "duplicateSourceIdCount": len(duplicates), "duplicateSourceIds": duplicates}
     return rows, errors, meta
 
 
@@ -172,7 +221,7 @@ def build_category(entries_root: Path, bundles_dir: Path, category: str) -> Dict
     bundle = {"schemaVersion": 4, "category": category, "generatedAt": int(time.time()), "sourceIndexCount": source_index_count, "discovery": discovery, "count": len(clean_rows), "errors": errors, "contentHash": stable_hash(clean_rows), "entries": clean_rows}
     out_path = bundles_dir / f"{category}.bundle.json"
     write_json(out_path, bundle)
-    return {"category": category, "status": "ok" if not errors else "warning", "sourceIndexCount": source_index_count, "count": len(clean_rows), "errors": len(errors), "discoveredUnindexedCount": discovery["discoveredUnindexedCount"], "skippedUnindexedCount": discovery["skippedUnindexedCount"], "duplicateSourceIdCount": discovery["duplicateSourceIdCount"], "contentHash": bundle["contentHash"], "output": str(out_path)}
+    return {"category": category, "status": "ok" if not errors else "warning", "sourceIndexCount": source_index_count, "count": len(clean_rows), "errors": len(errors), "resolvedRenamedCount": discovery.get("resolvedRenamedCount", 0), "discoveredUnindexedCount": discovery["discoveredUnindexedCount"], "skippedUnindexedCount": discovery["skippedUnindexedCount"], "duplicateSourceIdCount": discovery["duplicateSourceIdCount"], "contentHash": bundle["contentHash"], "output": str(out_path)}
 
 
 def resolve_family_path(family_dir: Path, rel_file: str) -> Path:
