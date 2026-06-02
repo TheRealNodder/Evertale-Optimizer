@@ -4,7 +4,7 @@
    Stale explorer/order-map JSON files are intentionally ignored so they cannot override rebuilt bundles.
 */
 (function(){
-  const SORT_KEY = 'evertale_catalog_sort_v3';
+  const SORT_KEY = 'evertale_catalog_sort_v4';
   const DEFAULT_SORT = 'newest';
   const KIND_RANK = { characters: 0, weapons: 1, accessories: 2, bosses: 3 };
   const INDEX_FILES = {
@@ -30,13 +30,44 @@
   function sortName(card){ return title(card).trim().toLowerCase(); }
   function numericValue(value){ const n = Number(value); return Number.isFinite(n) && n > 0 ? n : null; }
   function handleFromFile(file){ const m = String(file || '').split('/').pop().match(/^(\d+)_/); return m ? numericValue(m[1]) : null; }
+  function unique(values){ const out=[]; const seen=new Set(); values.forEach(v => { const s=String(v || '').trim(); const n=norm(s); if(s && n && !seen.has(n)){ seen.add(n); out.push(s); } }); return out; }
+  function suffixVariants(value){
+    const raw = String(value || '').trim();
+    if(!raw) return [];
+    const vals = [raw];
+    if(/01$/i.test(raw)) vals.push(raw.replace(/01$/i,''));
+    else vals.push(raw + '01');
+    return vals;
+  }
+  function bossVariants(value){
+    const raw = String(value || '').trim();
+    if(!raw) return [];
+    const vals = [raw];
+    const m = raw.match(/^(.*Boss)(\d{2})$/i);
+    if(m) vals.push(m[1]);
+    else if(/Boss$/i.test(raw)) ['01','02','03','04','05'].forEach(s => vals.push(raw + s));
+    return vals;
+  }
+  function greatAxeVariants(value){
+    const raw = String(value || '').trim();
+    if(!raw) return [];
+    return [raw, raw.replace('Greataxe','GreatAxe'), raw.replace('GreatAxe','Greataxe'), raw.replace('Greatsword','GreatSword'), raw.replace('GreatSword','Greatsword')];
+  }
 
   function addKey(map, key, order){ const n = norm(key); if(n && order && !map.has(n)) map.set(n, order); }
   function addAliases(map, value, order){
     if(!value || !order) return;
     const raw = String(value || '');
     const stem = stripHandle(raw);
-    [raw, stem, family(raw), family(stem), raw.replace('Greataxe','GreatAxe'), raw.replace('GreatAxe','Greataxe')].forEach(v => addKey(map, v, order));
+    const baseRaw = family(raw);
+    const baseStem = family(stem);
+    let values = [raw, stem, baseRaw, baseStem];
+    [raw, stem, baseRaw, baseStem].forEach(v => {
+      values = values.concat(suffixVariants(v));
+      values = values.concat(bossVariants(v));
+      values = values.concat(greatAxeVariants(v));
+    });
+    values.forEach(v => addKey(map, v, order));
   }
   function addIndexRow(map, row){
     const order = handleFromFile(row.file) || numericValue(row.fileHandleOrder) || numericValue(row.sourceOrder) || numericValue(row.order) || numericValue(row.visualOrder);
@@ -64,16 +95,25 @@
   function cardNativeOrder(card){
     return numericValue(card.getAttribute('data-order')) || numericValue(card.getAttribute('data-source-order')) || numericValue(card.getAttribute('data-file-handle-order'));
   }
+  function cardAliasKeys(card){
+    let values = [
+      id(card), stripHandle(id(card)), family(id(card)), family(stripHandle(id(card))),
+      title(card), subtitle(card), `${title(card)} ${subtitle(card)}`,
+      card.getAttribute('data-source-id'), card.getAttribute('data-family'), card.getAttribute('data-order-key'), card.getAttribute('data-file')
+    ];
+    values.slice().forEach(v => {
+      values = values.concat(suffixVariants(v));
+      values = values.concat(bossVariants(v));
+      values = values.concat(greatAxeVariants(v));
+    });
+    return unique(values).map(norm).filter(Boolean);
+  }
   function orderIndex(card){
     const native = cardNativeOrder(card);
     if(native) return native;
     const map = orderMaps[kind(card)];
     if(!map) return null;
-    const keys = [
-      id(card), stripHandle(id(card)), family(id(card)), family(stripHandle(id(card))),
-      title(card), subtitle(card), `${title(card)} ${subtitle(card)}`,
-      card.getAttribute('data-source-id'), card.getAttribute('data-family'), card.getAttribute('data-order-key')
-    ].map(norm).filter(Boolean);
+    const keys = cardAliasKeys(card);
     for(const key of keys) if(map.has(key)) return map.get(key);
     return null;
   }
