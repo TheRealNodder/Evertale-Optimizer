@@ -1,0 +1,72 @@
+name: Entry Safe Rebuild
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'tools/new_structure/**'
+      - 'apkfiles/entries/**'
+      - 'data/character_tags.json'
+      - 'data/character_tags_additions.json'
+      - 'weapon_order.txt'
+      - 'accessory_order.txt'
+      - 'boss_order.txt'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: entry-safe-rebuild-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  safe-rebuild:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run safe entry pipeline
+        run: python tools/new_structure/run_entry_pipeline.py
+
+      - name: Run tools audit if available
+        run: |
+          if [ -f tools/new_structure/audit_python_tools_and_legacy_plan.py ]; then
+            python tools/new_structure/audit_python_tools_and_legacy_plan.py
+          else
+            echo "Audit tool not found; skipping."
+          fi
+
+      - name: Show bundle report summary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path('apkfiles/entries/reports/bundle_report.json')
+          data = json.loads(p.read_text(encoding='utf-8'))
+          print('bundle_report schemaVersion:', data.get('schemaVersion'))
+          for row in data.get('categories', []):
+              print(row.get('category'), 'sourceIndexCount=', row.get('sourceIndexCount'), 'count=', row.get('count'), 'skippedUnindexedCount=', row.get('skippedUnindexedCount'), 'errors=', row.get('errors'))
+          PY
+
+      - name: Commit generated rebuild outputs
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apkfiles/entries/bundles apkfiles/entries/reports apkfiles/entries/_markers apkfiles/entries/maps data/character_tags.json
+          if git diff --cached --quiet; then
+            echo "No generated changes to commit."
+          else
+            git commit -m "Auto rebuild entry bundles and reports"
+            git push
+          fi
