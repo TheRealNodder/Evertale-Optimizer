@@ -1,24 +1,11 @@
 #!/usr/bin/env python3
 """
-Extract Localizable_English.txt into grouped, searchable runtime maps.
-
-Universal behavior:
-- Can be run from repo root, tools/new_structure, apkfiles, or any subfolder.
-- Auto-detects repo root.
-- Auto-detects apkfiles folder.
-- Auto-detects apkfiles/entries folder when present.
-- Reads only Localizable_English.txt.
-- Does not rebuild existing entry files.
-
-Run from anywhere inside the repo:
-  python tools/new_structure/extract_localizable_groups.py
-
-Optional explicit paths:
-  python tools/new_structure/extract_localizable_groups.py --input apkfiles --entries apkfiles/entries --output apkfiles/entries/localization
+Extract Localizable_English.txt into grouped runtime maps.
 
 Outputs:
   apkfiles/entries/localization/localizable_groups.json
   apkfiles/entries/localization/localizable_groups_by_category.json
+  apkfiles/entries/localization/leader_skill_localization.json
   apkfiles/entries/localization/localizable_group_report.json
 """
 from __future__ import annotations
@@ -28,12 +15,13 @@ import json
 import re
 import time
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
+from typing import Any, Dict, Optional, Set, Tuple
 
 KEY_RE = re.compile(r'^"(?P<key>.*?)"="(?P<value>.*)"$')
 KNOWN_SUFFIXES = [
     "SecondNameKey",
     "DescriptionKey",
+    "AffectedKey",
     "NameKey",
     "TitleKey",
     "SubTitleKey",
@@ -44,7 +32,11 @@ KNOWN_SUFFIXES = [
     "MessageKey",
     "TitleMessageKey",
 ]
-CATEGORY_ORDER = ["characters", "weapons", "accessories", "bosses", "unknown"]
+CATEGORY_ORDER = ["characters", "weapons", "accessories", "bosses", "leader_skills", "unknown"]
+LEADER_BASE_RE = re.compile(
+    r"(LeaderSkill|HPUp|ATKUp|AttackUp|AttackAndHPUp|CostDown|Spirit|SpeedUp|SPDUp|TUCost|DamageReduc|DamageReduction)",
+    re.I,
+)
 
 
 def read_text(path: Path) -> str:
@@ -58,8 +50,7 @@ def write_json(path: Path, data: Any) -> None:
 
 def find_repo_root(start: Optional[Path] = None) -> Path:
     cur = (start or Path.cwd()).resolve()
-    candidates = [cur, *cur.parents]
-    for path in candidates:
+    for path in [cur, *cur.parents]:
         if (path / ".git").exists() or (path / "apkfiles").exists():
             return path
     return cur
@@ -80,8 +71,7 @@ def find_apkfiles(repo_root: Path, explicit: Optional[str]) -> Path:
         path = resolve_path(explicit, repo_root, explicit)
         if path.exists():
             return path
-    candidates = [repo_root / "apkfiles", Path.cwd() / "apkfiles"]
-    for path in candidates:
+    for path in [repo_root / "apkfiles", Path.cwd() / "apkfiles"]:
         if path.exists() and path.is_dir():
             return path.resolve()
     for path in repo_root.rglob("apkfiles"):
@@ -95,16 +85,14 @@ def find_entries(repo_root: Path, apkfiles: Path, explicit: Optional[str]) -> Pa
         path = resolve_path(explicit, repo_root, explicit)
         if path.exists():
             return path
-    candidates = [apkfiles / "entries", repo_root / "apkfiles" / "entries", Path.cwd() / "entries"]
-    for path in candidates:
+    for path in [apkfiles / "entries", repo_root / "apkfiles" / "entries", Path.cwd() / "entries"]:
         if path.exists() and path.is_dir():
             return path.resolve()
     return (apkfiles / "entries").resolve()
 
 
 def find_localizable(input_dir: Path) -> Path:
-    candidates = [input_dir / "Localizable_English.txt", input_dir / "Localizable_English"]
-    for path in candidates:
+    for path in [input_dir / "Localizable_English.txt", input_dir / "Localizable_English"]:
         if path.exists() and path.is_file():
             return path
     for path in input_dir.rglob("*"):
@@ -120,7 +108,7 @@ def parse_localizable(path: Path) -> Dict[str, str]:
         if not match:
             continue
         key = match.group("key")
-        value = match.group("value").replace('\\n', '\n').replace('\\"', '"')
+        value = match.group("value").replace("\\n", "\n").replace('\\"', '"')
         rows[key] = value
     return rows
 
@@ -164,7 +152,17 @@ def load_index_source_ids(entries_root: Path, category: str) -> Set[str]:
     return out
 
 
-def category_from_base(base: str, known: Dict[str, Set[str]]) -> str:
+def is_leader_skill_group(base: str, keys: Dict[str, str]) -> bool:
+    if LEADER_BASE_RE.search(base):
+        return True
+    if "AffectedKey" in keys and ("DescriptionKey" in keys or "NameKey" in keys):
+        return True
+    return False
+
+
+def category_from_base(base: str, keys: Dict[str, str], known: Dict[str, Set[str]]) -> str:
+    if is_leader_skill_group(base, keys):
+        return "leader_skills"
     if base in known["characters"]:
         return "characters"
     if base in known["weapons"]:
@@ -178,9 +176,9 @@ def category_from_base(base: str, known: Dict[str, Set[str]]) -> str:
         return "characters"
     if "Boss" in base or base.endswith("Boss"):
         return "bosses"
-    if re.search(r"(Sword|Axe|Staff|Mace|Spear|Lance|Bow|Gun|Dagger|Katana|Greatsword|Hammer)", base):
+    if re.search(r"(Sword|Axe|Staff|Mace|Spear|Lance|Bow|Gun|Dagger|Katana|Greatsword|GreatAxe|Hammer)", base):
         return "weapons"
-    if re.search(r"(Ring|Charm|Armor|Amulet|Pendant|Earring|Crown|Helm|Boot|Bracelet|Necklace|Accessory|Equipment)", base):
+    if re.search(r"(Ring|Charm|Armor|Amulet|Pendant|Earring|Crown|Helm|Helmet|Boot|Bracelet|Necklace|Accessory|Equipment|Belt|Gauntlet|Cloak)", base):
         return "accessories"
     return "unknown"
 
@@ -192,7 +190,7 @@ def group_rows(rows: Dict[str, str], known: Dict[str, Set[str]]) -> Dict[str, Di
         group = grouped.setdefault(base, {
             "base": base,
             "family": re.sub(r"\d+$", "", base),
-            "category": category_from_base(base, known),
+            "category": "unknown",
             "keys": {},
             "rawKeys": [],
         })
@@ -200,15 +198,39 @@ def group_rows(rows: Dict[str, str], known: Dict[str, Set[str]]) -> Dict[str, Di
         group["rawKeys"].append(key)
     for group in grouped.values():
         keys = group["keys"]
+        group["category"] = category_from_base(group["base"], keys, known)
         group["name"] = keys.get("NameKey", "")
         group["secondName"] = keys.get("SecondNameKey", "")
         group["title"] = keys.get("TitleKey", "") or keys.get("SecondNameKey", "")
         group["subtitle"] = keys.get("SubTitleKey", "")
         group["description"] = keys.get("DescriptionKey", "")
+        group["affected"] = keys.get("AffectedKey", "")
         group["profile"] = keys.get("ProfileKey", "")
         group["selected"] = keys.get("SelectedKey", "")
         group["keyCount"] = len(group["rawKeys"])
     return grouped
+
+
+def build_leader_skill_map(grouped: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
+    skills: Dict[str, Dict[str, Any]] = {}
+    for base, group in grouped.items():
+        if group.get("category") != "leader_skills":
+            continue
+        if not (group.get("name") or group.get("description") or group.get("affected")):
+            continue
+        skills[base] = {
+            "id": base,
+            "name": group.get("name", ""),
+            "description": group.get("description", ""),
+            "affected": group.get("affected", ""),
+            "rawKeys": group.get("rawKeys", []),
+        }
+    return {
+        "schemaVersion": 1,
+        "generatedAt": int(time.time()),
+        "count": len(skills),
+        "skills": skills,
+    }
 
 
 def main() -> int:
@@ -227,6 +249,7 @@ def main() -> int:
     rows = parse_localizable(loc_path)
     known = {cat: load_index_source_ids(entries_root, cat) for cat in ["characters", "weapons", "accessories", "bosses"]}
     grouped = group_rows(rows, known)
+    leader_skills = build_leader_skill_map(grouped)
 
     by_category = {cat: [] for cat in CATEGORY_ORDER}
     for base in sorted(grouped):
@@ -234,7 +257,7 @@ def main() -> int:
         by_category.setdefault(group["category"], []).append(group)
 
     report = {
-        "schemaVersion": 1,
+        "schemaVersion": 2,
         "generatedAt": int(time.time()),
         "repoRoot": str(repo_root),
         "input": str(input_dir),
@@ -243,22 +266,16 @@ def main() -> int:
         "source": str(loc_path),
         "totalLocalizedKeys": len(rows),
         "totalGroups": len(grouped),
+        "leaderSkillCount": leader_skills["count"],
         "knownSourceIds": {cat: len(ids) for cat, ids in known.items()},
         "categoryCounts": {cat: len(by_category.get(cat, [])) for cat in CATEGORY_ORDER},
-        "sampleGroups": {
-            cat: by_category.get(cat, [])[:10] for cat in CATEGORY_ORDER
-        },
+        "sampleLeaderSkills": list(leader_skills["skills"].values())[:20],
+        "sampleGroups": {cat: by_category.get(cat, [])[:10] for cat in CATEGORY_ORDER},
     }
 
-    write_json(output_dir / "localizable_groups.json", {
-        "schemaVersion": 1,
-        "count": len(grouped),
-        "groups": grouped,
-    })
-    write_json(output_dir / "localizable_groups_by_category.json", {
-        "schemaVersion": 1,
-        "categories": by_category,
-    })
+    write_json(output_dir / "localizable_groups.json", {"schemaVersion": 2, "count": len(grouped), "groups": grouped})
+    write_json(output_dir / "localizable_groups_by_category.json", {"schemaVersion": 2, "categories": by_category})
+    write_json(output_dir / "leader_skill_localization.json", leader_skills)
     write_json(output_dir / "localizable_group_report.json", report)
     print(json.dumps(report, ensure_ascii=False, indent=2))
     return 0
