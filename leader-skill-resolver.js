@@ -1,10 +1,34 @@
 /* leader-skill-resolver.js — populate displayable leader skill names/descriptions.
-   Converts APK leader buff ids into readable site text.
+   Authority order:
+   1) apkfiles/entries/localization/leader_skill_localization.json from Localizable_English
+   2) existing entry leaderSkill fields
+   3) deterministic fallback text only when localization is missing
 */
 (function(){
-  const TIER_PERCENT = { A:30, B:25, C:20, D:10, E:5 };
+  const TIER_PERCENT = { A:2, B:4, C:7, D:10, E:15, F:20 };
+  const DATA_VERSION = window.EVERTALE_LIVE_CONFIG?.dataVersion || window.EVERTALE_LIVE_CONFIG?.version || '';
+  let leaderSkillMapPromise = null;
+
   function norm(v){return String(v||'').trim();}
+  function keyNorm(v){return String(v||'').toLowerCase().replace(/[^a-z0-9]+/g,'');}
   function wordsFromCamel(v){return norm(v).replace(/([a-z])([A-Z])/g,'$1 $2').replace(/([A-Z]+)([A-Z][a-z])/g,'$1 $2').replace(/[_-]+/g,' ').trim();}
+  function versioned(url){ if(!DATA_VERSION)return url; return `${url}${url.includes('?')?'&':'?'}v=${encodeURIComponent(DATA_VERSION)}`; }
+  async function loadLeaderSkillMap(){
+    if(leaderSkillMapPromise) return leaderSkillMapPromise;
+    leaderSkillMapPromise = fetch(versioned('./apkfiles/entries/localization/leader_skill_localization.json'), { cache:'no-store' })
+      .then(r => r.ok ? r.json() : null)
+      .then(j => j && j.skills && typeof j.skills === 'object' ? j.skills : {})
+      .catch(() => ({}));
+    return leaderSkillMapPromise;
+  }
+  function localizedLookup(skills, id){
+    const raw = norm(id);
+    if(!raw || !skills) return null;
+    if(skills[raw]) return skills[raw];
+    const n = keyNorm(raw);
+    for(const [k,v] of Object.entries(skills)) if(keyNorm(k) === n) return v;
+    return null;
+  }
   function elementFromText(v){
     const s=norm(v).toLowerCase();
     if(/fire|flame/.test(s))return'Fire';
@@ -15,16 +39,12 @@
     if(/dark|death|shadow/.test(s))return'Dark';
     return'';
   }
-  function tierFromBuff(id){
-    const m=norm(id).match(/([A-Z])$/);
-    return m?m[1]:'';
-  }
+  function tierFromBuff(id){ const m=norm(id).match(/([A-Z])$/); return m?m[1]:''; }
   function percentFromBuff(id, raw, refs, existing){
     const direct = existing?.percent ?? existing?.value ?? refs?.leaderBuffPercent ?? raw?.leaderBuffPercent ?? raw?.leaderBuffValue;
     const n = Number(direct);
     if(Number.isFinite(n) && n > 0) return n <= 1 ? Math.round(n * 100) : n;
-    const tier=tierFromBuff(id);
-    return TIER_PERCENT[tier] || null;
+    return TIER_PERCENT[tierFromBuff(id)] || null;
   }
   function statFromBuff(id){
     const s=norm(id);
@@ -39,9 +59,9 @@
   function scopeFromCondition(condition,id){
     const cond=norm(condition);
     const elem=elementFromText(cond)||elementFromText(id);
-    if(elem)return`${elem} units`;
-    if(/all|ally|allies/i.test(cond))return'all allies';
-    return'allies';
+    if(elem)return`${elem} element units`;
+    if(/all|ally|allies/i.test(cond))return'all allied units';
+    return'allied units';
   }
   function buildDescription(id,condition,raw,refs,existing){
     const stat=statFromBuff(id);
@@ -65,10 +85,11 @@
     if(!s || s==='None') return true;
     if(/\bTier [A-Z]\b/.test(s)) return true;
     if(/^Increases\s+(HP|Attack|Speed|Stats)\s+for\s+/i.test(s)) return true;
+    if(/^Raises\s+.*\s+(max HP|Attack|Speed|Stats)\s+by\s+\d+%\.?$/i.test(s)) return true;
     if(/^Decreases\s+Cost\s+for\s+/i.test(s)) return true;
     return false;
   }
-  function resolveUnit(u){
+  function resolveUnitWithMap(u, skills){
     if(!u||typeof u!=='object')return u;
     const existing=u.leaderSkill&&typeof u.leaderSkill==='object'?u.leaderSkill:{};
     const raw=u.raw&&typeof u.raw==='object'?u.raw:{};
@@ -79,13 +100,27 @@
       u.leaderSkill={name:'No Leader Skill',description:'This unit does not provide a leader skill.',internalId:'',condition:''};
       return u;
     }
+    const loc=localizedLookup(skills, internalId);
+    if(loc && (loc.name || loc.description || loc.affected)){
+      u.leaderSkill={
+        ...existing,
+        name: loc.name || existing.name || buildName(internalId,condition),
+        description: loc.description || loc.affected || existing.description || buildDescription(internalId,condition,raw,refs,existing),
+        affected: loc.affected || existing.affected || '',
+        internalId,
+        condition,
+        localizationSource:'Localizable_English'
+      };
+      return u;
+    }
     const name=norm(existing.name)&&existing.name!=='None'?existing.name:buildName(internalId,condition);
     const description=!isWeakGeneratedDescription(existing.description)?existing.description:buildDescription(internalId,condition,raw,refs,existing);
-    u.leaderSkill={...existing,name,description,internalId,condition,percent:percentFromBuff(internalId,raw,refs,existing)};
+    u.leaderSkill={...existing,name,description,internalId,condition,percent:percentFromBuff(internalId,raw,refs,existing),localizationSource:'fallback'};
     return u;
   }
-  function resolveRows(rows){
-    if(Array.isArray(rows))rows.forEach(resolveUnit);
+  async function resolveRows(rows){
+    const skills = await loadLeaderSkillMap();
+    if(Array.isArray(rows)) rows.forEach(u => resolveUnitWithMap(u, skills));
     return rows;
   }
   function patch(){
@@ -97,7 +132,7 @@
       if(typeof orig!=='function')return;
       d[name]=async function(...args){
         const rows=await orig.apply(this,args);
-        return resolveRows(rows);
+        return await resolveRows(rows);
       };
     };
     wrapList('loadCharactersMerged');
@@ -106,7 +141,7 @@
     if(typeof origAll==='function'){
       d.loadAllEntries=async function(...args){
         const all=await origAll.apply(this,args);
-        if(all&&Array.isArray(all.characters))resolveRows(all.characters);
+        if(all&&Array.isArray(all.characters)) await resolveRows(all.characters);
         return all;
       };
     }
