@@ -123,6 +123,10 @@ def split_key(key: str) -> Tuple[str, str]:
     return key, "value"
 
 
+def key_norm(value: Any) -> str:
+    return re.sub(r"[^a-z0-9]+", "", str(value or "").lower())
+
+
 def load_index_source_ids(entries_root: Path, category: str) -> Set[str]:
     out: Set[str] = set()
     index_path = entries_root / category / "index.json"
@@ -211,7 +215,58 @@ def group_rows(rows: Dict[str, str], known: Dict[str, Set[str]]) -> Dict[str, Di
     return grouped
 
 
-def build_leader_skill_map(grouped: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
+def find_legacy_leader_skills(repo_root: Path) -> Path | None:
+    candidates = [
+        repo_root / "legacy" / "legacy_unused" / "data" / "leader_skills.json",
+        repo_root / "data" / "leader_skills.json",
+        repo_root / "legacy" / "data" / "leader_skills.json",
+    ]
+    for path in candidates:
+        if path.exists():
+            return path
+    return None
+
+
+def load_legacy_leader_skills(repo_root: Path) -> Dict[str, Any]:
+    path = find_legacy_leader_skills(repo_root)
+    if not path:
+        return {"source": None, "skills": [], "byCharacter": {}, "aliases": {}}
+    try:
+        data = json.loads(read_text(path))
+    except Exception:
+        return {"source": str(path), "skills": [], "byCharacter": {}, "aliases": {}}
+    rows = data.get("leaderSkills", []) if isinstance(data, dict) else []
+    by_character: Dict[str, Dict[str, Any]] = {}
+    aliases: Dict[str, str] = {}
+    cleaned_rows = []
+    for row in rows if isinstance(rows, list) else []:
+        if not isinstance(row, dict):
+            continue
+        character = str(row.get("character") or "").strip()
+        name = str(row.get("name") or "").strip()
+        description = str(row.get("description") or "").strip().replace("mac HP", "max HP")
+        element = str(row.get("element") or "").strip()
+        if not character or not (name or description):
+            continue
+        clean = {
+            "character": character,
+            "element": element,
+            "name": name,
+            "description": description,
+            "source": "legacy/legacy_unused/data/leader_skills.json",
+        }
+        cleaned_rows.append(clean)
+        by_character[character] = clean
+        aliases[key_norm(character)] = character
+        parts = character.split()
+        if parts:
+            aliases[key_norm(parts[0])] = character
+        if len(parts) >= 2:
+            aliases[key_norm(" ".join(parts[:2]))] = character
+    return {"source": str(path), "skills": cleaned_rows, "byCharacter": by_character, "aliases": aliases}
+
+
+def build_leader_skill_map(grouped: Dict[str, Dict[str, Any]], repo_root: Path) -> Dict[str, Any]:
     skills: Dict[str, Dict[str, Any]] = {}
     for base, group in grouped.items():
         if group.get("category") != "leader_skills":
@@ -224,12 +279,18 @@ def build_leader_skill_map(grouped: Dict[str, Dict[str, Any]]) -> Dict[str, Any]
             "description": group.get("description", ""),
             "affected": group.get("affected", ""),
             "rawKeys": group.get("rawKeys", []),
+            "source": "Localizable_English",
         }
+    legacy = load_legacy_leader_skills(repo_root)
     return {
-        "schemaVersion": 1,
+        "schemaVersion": 2,
         "generatedAt": int(time.time()),
         "count": len(skills),
         "skills": skills,
+        "legacyCount": len(legacy.get("skills", [])),
+        "legacyByCharacter": legacy.get("byCharacter", {}),
+        "legacyCharacterAliases": legacy.get("aliases", {}),
+        "legacySource": legacy.get("source"),
     }
 
 
@@ -249,7 +310,7 @@ def main() -> int:
     rows = parse_localizable(loc_path)
     known = {cat: load_index_source_ids(entries_root, cat) for cat in ["characters", "weapons", "accessories", "bosses"]}
     grouped = group_rows(rows, known)
-    leader_skills = build_leader_skill_map(grouped)
+    leader_skills = build_leader_skill_map(grouped, repo_root)
 
     by_category = {cat: [] for cat in CATEGORY_ORDER}
     for base in sorted(grouped):
@@ -257,7 +318,7 @@ def main() -> int:
         by_category.setdefault(group["category"], []).append(group)
 
     report = {
-        "schemaVersion": 2,
+        "schemaVersion": 3,
         "generatedAt": int(time.time()),
         "repoRoot": str(repo_root),
         "input": str(input_dir),
@@ -267,14 +328,17 @@ def main() -> int:
         "totalLocalizedKeys": len(rows),
         "totalGroups": len(grouped),
         "leaderSkillCount": leader_skills["count"],
+        "legacyLeaderSkillCount": leader_skills.get("legacyCount", 0),
+        "legacyLeaderSkillSource": leader_skills.get("legacySource"),
         "knownSourceIds": {cat: len(ids) for cat, ids in known.items()},
         "categoryCounts": {cat: len(by_category.get(cat, [])) for cat in CATEGORY_ORDER},
         "sampleLeaderSkills": list(leader_skills["skills"].values())[:20],
+        "sampleLegacyLeaderSkills": list(leader_skills.get("legacyByCharacter", {}).values())[:20],
         "sampleGroups": {cat: by_category.get(cat, [])[:10] for cat in CATEGORY_ORDER},
     }
 
-    write_json(output_dir / "localizable_groups.json", {"schemaVersion": 2, "count": len(grouped), "groups": grouped})
-    write_json(output_dir / "localizable_groups_by_category.json", {"schemaVersion": 2, "categories": by_category})
+    write_json(output_dir / "localizable_groups.json", {"schemaVersion": 3, "count": len(grouped), "groups": grouped})
+    write_json(output_dir / "localizable_groups_by_category.json", {"schemaVersion": 3, "categories": by_category})
     write_json(output_dir / "leader_skill_localization.json", leader_skills)
     write_json(output_dir / "localizable_group_report.json", report)
     print(json.dumps(report, ensure_ascii=False, indent=2))
