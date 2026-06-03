@@ -1,8 +1,9 @@
 /* leader-skill-resolver.js — populate displayable leader skill names/descriptions.
    Authority order:
    1) apkfiles/entries/localization/leader_skill_localization.json from Localizable_English
-   2) existing entry leaderSkill fields
-   3) deterministic fallback text only when localization is missing
+   2) legacy leader skills merged into that file by character display name
+   3) existing entry leaderSkill fields
+   4) deterministic fallback text only when localization is missing
 */
 (function(){
   const TIER_PERCENT = { A:2, B:4, C:7, D:10, E:15, F:20 };
@@ -17,16 +18,39 @@
     if(leaderSkillMapPromise) return leaderSkillMapPromise;
     leaderSkillMapPromise = fetch(versioned('./apkfiles/entries/localization/leader_skill_localization.json'), { cache:'no-store' })
       .then(r => r.ok ? r.json() : null)
-      .then(j => j && j.skills && typeof j.skills === 'object' ? j.skills : {})
-      .catch(() => ({}));
+      .then(j => j && typeof j === 'object' ? j : { skills:{} })
+      .catch(() => ({ skills:{} }));
     return leaderSkillMapPromise;
   }
-  function localizedLookup(skills, id){
+  function localizedLookup(payload, id){
+    const skills = payload?.skills || {};
     const raw = norm(id);
     if(!raw || !skills) return null;
     if(skills[raw]) return skills[raw];
     const n = keyNorm(raw);
     for(const [k,v] of Object.entries(skills)) if(keyNorm(k) === n) return v;
+    return null;
+  }
+  function legacyLookup(payload, u){
+    const legacy = payload?.legacyByCharacter || {};
+    const aliases = payload?.legacyCharacterAliases || {};
+    const names = [
+      u?.name, u?.displayName, u?.title, u?.subtitle,
+      u?.localization?.name,
+      [u?.localization?.name, u?.localization?.title || u?.localization?.secondName].filter(Boolean).join(' '),
+      [u?.name, u?.title || u?.subtitle].filter(Boolean).join(' '),
+      u?.family, u?.sourceId, u?.internal?.sourceId
+    ].filter(Boolean);
+    for(const value of names){
+      if(legacy[value]) return legacy[value];
+      const alias = aliases[keyNorm(value)];
+      if(alias && legacy[alias]) return legacy[alias];
+      const n = keyNorm(value);
+      for(const [character,row] of Object.entries(legacy)){
+        const ck = keyNorm(character);
+        if(n && ck && (n === ck || n.includes(ck) || ck.includes(n))) return row;
+      }
+    }
     return null;
   }
   function elementFromText(v){
@@ -89,18 +113,32 @@
     if(/^Decreases\s+Cost\s+for\s+/i.test(s)) return true;
     return false;
   }
-  function resolveUnitWithMap(u, skills){
+  function resolveUnitWithMap(u, payload){
     if(!u||typeof u!=='object')return u;
     const existing=u.leaderSkill&&typeof u.leaderSkill==='object'?u.leaderSkill:{};
     const raw=u.raw&&typeof u.raw==='object'?u.raw:{};
     const refs=u.refs&&typeof u.refs==='object'?u.refs:{};
     const internalId=norm(existing.internalId||existing.id||refs.leaderBuff||raw.leaderBuff||'');
     const condition=norm(existing.condition||refs.leaderBuffCondition||raw.leaderBuffCondition||'');
+    const legacy=legacyLookup(payload, u);
+    if(legacy && (legacy.name || legacy.description)){
+      u.leaderSkill={
+        ...existing,
+        name: legacy.name || existing.name || buildName(internalId,condition),
+        description: legacy.description || existing.description || buildDescription(internalId,condition,raw,refs,existing),
+        affected: legacy.element || existing.affected || '',
+        internalId,
+        condition,
+        localizationSource:'legacy/leader_skills.json',
+        legacyCharacter: legacy.character || ''
+      };
+      return u;
+    }
     if(!internalId){
       u.leaderSkill={name:'No Leader Skill',description:'This unit does not provide a leader skill.',internalId:'',condition:''};
       return u;
     }
-    const loc=localizedLookup(skills, internalId);
+    const loc=localizedLookup(payload, internalId);
     if(loc && (loc.name || loc.description || loc.affected)){
       u.leaderSkill={
         ...existing,
@@ -119,8 +157,8 @@
     return u;
   }
   async function resolveRows(rows){
-    const skills = await loadLeaderSkillMap();
-    if(Array.isArray(rows)) rows.forEach(u => resolveUnitWithMap(u, skills));
+    const payload = await loadLeaderSkillMap();
+    if(Array.isArray(rows)) rows.forEach(u => resolveUnitWithMap(u, payload));
     return rows;
   }
   function patch(){
