@@ -6,6 +6,13 @@
   const $ = id => document.getElementById(id);
   const clean = v => String(v || '').toLowerCase().replace(/\d+$/,'').replace(/[^a-z0-9]+/g,'');
   const directKey = v => String(v || '').toLowerCase().replace(/[^a-z0-9]+/g,'');
+  function loadElementNormalizer(){
+    if(window.EvertaleElementReference) return;
+    const s=document.createElement('script');
+    s.src='./element-normalizer.js?v=1';
+    s.defer=true;
+    document.head.appendChild(s);
+  }
   async function fetchJson(url){ const r = await fetch(`${url}?v=1780518798`, { cache:'no-store' }); if(!r.ok) return null; return await r.json(); }
   function addMap(m, key, rows){ const keys=[key, clean(key), directKey(key)].filter(Boolean); keys.forEach(k=>{ if(k && rows?.length && !m.has(k)) m.set(k, rows); }); }
   function rowsFromEntry(e){
@@ -51,12 +58,13 @@
   }
   async function selectCard(card){if(!card)return;document.querySelectorAll('.unitCard.v2-selected').forEach(c=>c.classList.remove('v2-selected'));card.classList.add('v2-selected');const map=await loadDescMap();let rows=[];for(const key of cardKeyList(card)){rows=map.get(key)||[];if(rows.length)break;}setHero(card,rows)}
   function wire(){
+    loadElementNormalizer();
     const grid=$('catalogGrid');if(!grid)return;
     grid.addEventListener('click',e=>{const card=e.target.closest('.unitCard');if(card)setTimeout(()=>selectCard(card),70)});
     grid.addEventListener('click',e=>{if(e.target.closest('.stateBtn,.duoFormBtn')){const card=e.target.closest('.unitCard');setTimeout(()=>selectCard(card),120)}});
     $('v2AwakenTabs')?.addEventListener('click',async e=>{const btn=e.target.closest('button');const card=document.querySelector('.unitCard.v2-selected');if(!btn||!card)return;const map=await loadDescMap();let rows=[];for(const key of cardKeyList(card)){rows=map.get(key)||[];if(rows.length)break;}[...$('v2AwakenTabs').children].forEach((b,i)=>b.classList.toggle('active',i===Number(btn.dataset.v2Idx)));$('v2Desc').textContent=rows[Number(btn.dataset.v2Idx)]?.description||'No description loaded for this state.'});
-    new MutationObserver(()=>{const cards=document.querySelectorAll('.unitCard');$('v2Count').textContent=cards.length?`• ${cards.length} visible`:'';if(!document.querySelector('.unitCard.v2-selected')&&cards[0])selectCard(cards[0]);}).observe(grid,{childList:true});
-    setTimeout(()=>{const first=document.querySelector('.unitCard');if(first)selectCard(first)},1200);
+    new MutationObserver(()=>{const cards=document.querySelectorAll('.unitCard');$('v2Count').textContent=cards.length?`• ${cards.length} visible`:'';if(!document.querySelector('.unitCard.v2-selected')&&cards[0])selectCard(cards[0]);window.EvertaleElementReference?.normalizeAll?.();}).observe(grid,{childList:true});
+    setTimeout(()=>{const first=document.querySelector('.unitCard');if(first)selectCard(first);window.EvertaleElementReference?.normalizeAll?.();},1200);
   }
   document.addEventListener('DOMContentLoaded',wire);
 })();
