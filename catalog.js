@@ -4,7 +4,9 @@ const PLACEHOLDER_IMG = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2
 const BAD_IMG_CACHE_KEY = "evertale_bad_img_urls_v1";
 const BAD_IMG_CACHE = new Set(safeJsonParse(localStorage.getItem(BAD_IMG_CACHE_KEY), []));
 const LS_MOBILE_VIEW_KEY = "evertale_mobile_view_v1";
-const state = { items: [], q: "", type: "all", listTokens: null };
+const RENDER_BATCH = 80;
+const RENDER_STEP = 80;
+const state = { items: [], q: "", type: "all", listTokens: null, filteredItems: [], renderedCount: 0, renderToken: 0 };
 const $ = id => document.getElementById(id);
 
 function safeJsonParse(raw, fallback){ try{return JSON.parse(raw)}catch{return fallback} }
@@ -13,7 +15,6 @@ function isBadImgUrl(url){ try{return !!url && BAD_IMG_CACHE.has(url)}catch{retu
 function safeText(s){ return String(s??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"','&quot;'); }
 function pickFirst(...vals){ for(const v of vals){ if(v!==undefined&&v!==null&&v!=="") return v; } return ""; }
 function normKey(s){ return String(s??"").toLowerCase().replace(/[\u2019']/g,"").replace(/[^a-z0-9]+/g," ").trim().replace(/\s+/g," "); }
-function basenameNoExt(url){ const s=String(url||'').split(/[?#]/)[0].split('/').pop()||''; return s.replace(/\.[a-z0-9]+$/i,''); }
 function stripHandle(value){ return String(value||'').split('/').pop().replace(/\.json$/i,'').replace(/^\d+_/,''); }
 function normalizeElementDisplay(el){ const raw=String(el||'').trim(); return raw?raw.replace(/[_-]+/g,' ').replace(/\b\w/g,c=>c.toUpperCase()):''; }
 function normalizeElementClass(el){ const e=String(el||'').trim().toLowerCase().replace(/[^a-z0-9]+/g,''); if(e==='fire'||e==='flame')return'el-fire'; if(e==='water'||e==='ice')return'el-water'; if(e==='storm'||e==='air'||e==='wind'||e==='thunder'||e==='lightning'||e==='electric')return'el-storm'; if(e==='earth'||e==='terra'||e==='ground')return'el-earth'; if(e==='light'||e==='life'||e==='holy')return'el-light'; if(e==='dark'||e==='death'||e==='shadow')return'el-dark'; return e?`el-${e}`:''; }
@@ -31,6 +32,8 @@ function imageUrlsFromCharacter(u){ const raw=Array.isArray(u.imageVariants)?u.i
 function normalizeFormSkillRows(forms, key){ return Array.isArray(forms)?forms.map(f=>({ state:f.state, sourceId:f.sourceId, rows:Array.isArray(f[key])?f[key]:[] })):[]; }
 function skillDetailsFromResolved(entry){ const out=[]; const resolved=entry?.resolved?.passives; if(resolved&&typeof resolved==='object'){ for(const [id, detail] of Object.entries(resolved)){ const loc=detail?.localization||{}; out.push({ id, name:loc.name||id, description:loc.description||'' }); } } return out; }
 function activeDetailsFromResolved(entry){ const out=[]; const resolved=entry?.resolved?.activeSkills; if(resolved&&typeof resolved==='object'){ for(const [id, detail] of Object.entries(resolved)){ const loc=detail?.localization||{}; out.push({ id, name:loc.name||id, description:loc.description||'' }); } } return out; }
+function debounce(fn, wait=160){ let t; return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn(...args),wait); }; }
+function idle(fn){ if('requestIdleCallback' in window) requestIdleCallback(fn,{timeout:250}); else setTimeout(fn,0); }
 
 function normalizeCharacters(arr){
   const seen=new Set(); const out=[];
@@ -58,7 +61,7 @@ function stateRowHtml(imgs){ if(!Array.isArray(imgs)||imgs.length<2)return""; co
 function renderCard(item){
   const imgsRaw=(item.kind==="characters"&&Array.isArray(item.imagesLarge)&&item.imagesLarge.length)?item.imagesLarge:(item.image?[item.image]:[]);
   const imgs=(imgsRaw||[]).filter(u=>u&&!isBadImgUrl(u)).slice(0,3);
-  const img=imgs.length?`<img src="${safeText(imgs[0])}" data-imgs="${safeText(encodeURIComponent(JSON.stringify(imgs)))}" data-state="0" alt="${safeText(item.name)}" onerror="markBadImgUrl(this.src);this.onerror=null;this.src=PLACEHOLDER_IMG;">`:`<div class="ph">?</div>`;
+  const img=imgs.length?`<img src="${safeText(imgs[0])}" loading="lazy" decoding="async" fetchpriority="low" data-imgs="${safeText(encodeURIComponent(JSON.stringify(imgs)))}" data-state="0" alt="${safeText(item.name)}" onerror="markBadImgUrl(this.src);this.onerror=null;this.src=PLACEHOLDER_IMG;">`:`<div class="ph">?</div>`;
   const elClass=item.element?` ${safeText(normalizeElementClass(item.element))}`:"";
   const chips=[]; chips.push(`<span class="tag kind">${safeText(kindLabel(item.kind))}</span>`); if(item.element)chips.push(`<span class="tag element">${safeText(normalizeElementDisplay(item.element))}</span>`); if(item.rarity!==""&&item.rarity!=null)chips.push(`<span class="tag rarity">${safeText(item.rarity)}</span>`);
   const {atk,hp,spd,cost}=item.stats||{};
@@ -74,7 +77,9 @@ function renderCard(item){
       <div class="unitDetails">${statParts.length?`<div class="statLine">${statParts.join("")}</div>`:""}${item.kind==="characters"&&(item.leaderSkillName||item.leaderSkillDesc)?`<div class="leaderBlock"><div class="leaderName">${safeText(item.leaderSkillName||"No Leader Skill")}</div><div class="leaderDesc">${safeText(item.leaderSkillDesc||"This unit does not provide a leader skill.")}</div></div>`:""}${renderDescriptionPanel(item)}${extra}${renderSkillBoxes(item.kind==="characters"?"Active Skills":"Skills",item.activeSkills,"activeSkillPanel")}${renderSkillBoxes(item.kind==="characters"?"Passive Skills":"Passives",item.passiveSkillDetails,"passiveSkillPanel")}</div>
     </div></div>`;
 }
-function render(){ const grid=$("catalogGrid"),status=$("statusText"); if(!grid)return; const q=(state.q||"").toLowerCase(),tokens=state.listTokens; let items=state.items; if(state.type!=="all")items=items.filter(i=>i.kind===state.type); items=items.filter(i=>{ if(tokens&&tokens.length)return matchesTokens(i,tokens); if(!q)return true; return `${i.name} ${i.subtitle} ${i.description} ${i.rarity} ${i.element} ${i.kind} ${i.sourceId}`.toLowerCase().includes(q); }); if(status)status.textContent=tokens?.length?`${items.length} matched from pasted list`:`${items.length} items shown`; grid.innerHTML=items.map(renderCard).join(""); }
+function filterItems(){ const q=(state.q||"").toLowerCase(),tokens=state.listTokens; let items=state.items; if(state.type!=="all")items=items.filter(i=>i.kind===state.type); return items.filter(i=>{ if(tokens&&tokens.length)return matchesTokens(i,tokens); if(!q)return true; return `${i.name} ${i.subtitle} ${i.description} ${i.rarity} ${i.element} ${i.kind} ${i.sourceId}`.toLowerCase().includes(q); }); }
+function render(){ const grid=$("catalogGrid"),status=$("statusText"); if(!grid)return; const token=++state.renderToken; const items=filterItems(); state.filteredItems=items; state.renderedCount=0; grid.innerHTML=""; if(status)status.textContent=state.listTokens?.length?`${items.length} matched from pasted list`:`${items.length} items shown`; renderMore(token, RENDER_BATCH); }
+function renderMore(token, count=RENDER_STEP){ const grid=$("catalogGrid"); if(!grid||token!==state.renderToken)return; const start=state.renderedCount; const end=Math.min(start+count,state.filteredItems.length); if(end<=start)return; grid.insertAdjacentHTML('beforeend', state.filteredItems.slice(start,end).map(renderCard).join("")); state.renderedCount=end; if(end<state.filteredItems.length) idle(()=>renderMore(token, RENDER_STEP)); }
 function stateDescriptionByIndex(card, idx){ const panel=card?.querySelector(".descriptionPanel"); const enc=panel?.getAttribute("data-descriptions")||""; let rows=[]; try{rows=JSON.parse(decodeURIComponent(enc))}catch{} return Array.isArray(rows)?rows[idx]:null; }
 function applyStateToCard(card, idx){ if(!card)return; const descRow=stateDescriptionByIndex(card, idx); const descEl=card.querySelector(".descriptionText"); if(descEl&&descRow&&typeof descRow.description==="string")descEl.textContent=descRow.description; const titleEl=card.querySelector(".unitTitle"); if(titleEl&&descRow&&descRow.title)titleEl.textContent=descRow.title; }
 function attachStateHandlers(root){ root.addEventListener("click",e=>{ const btn=e.target.closest(".stateBtn"); if(!btn)return; e.preventDefault(); e.stopPropagation(); const row=btn.closest(".stateRow"); const enc=row?.getAttribute("data-imgs")||""; let imgs=[]; try{imgs=JSON.parse(decodeURIComponent(enc))}catch{} if(!imgs.length)return; const card=btn.closest(".unitCard"); const imgEl=card?.querySelector(".unitThumb img"); if(!imgEl)return; const idx=parseInt(btn.getAttribute("data-idx")||"0",10); if(!Number.isFinite(idx)||idx<0||idx>=imgs.length)return; imgEl.src=imgs[idx]; imgEl.setAttribute("data-state",String(idx)); row.querySelectorAll(".stateBtn").forEach(b=>b.classList.remove("active")); btn.classList.add("active"); applyStateToCard(card, idx); }); root.addEventListener("click",e=>{ const img=e.target.closest(".unitThumb img"); if(!img)return; const card=img.closest(".unitCard"); if(!card)return; const enc=img.getAttribute("data-imgs")||card.querySelector(".stateRow")?.getAttribute("data-imgs")||""; let imgs=[]; try{imgs=JSON.parse(decodeURIComponent(enc))}catch{} if(!Array.isArray(imgs)||imgs.length<2)return; e.preventDefault(); e.stopPropagation(); const cur=parseInt(img.getAttribute("data-state")||"0",10); const next=(Number.isFinite(cur)?cur+1:1)%imgs.length; img.src=imgs[next]; img.setAttribute("data-state",String(next)); const row=card.querySelector(".stateRow"); if(row)row.querySelectorAll(".stateBtn").forEach((b,i)=>b.classList.toggle("active",i===next)); applyStateToCard(card, next); }); }
@@ -93,11 +98,12 @@ async function init(){
     ...normalizedBosses.sort((a,b)=>(Number(a.order??999999)-Number(b.order??999999)))
   ];
   const search=$("catalogSearch"),typeSel=$("catalogType"),viewBtn=$("viewToggle");
-  search?.addEventListener("input",()=>{ const v=search.value||""; const maybeList=parseListTokens(v); state.listTokens=maybeList; state.q=maybeList?"":v; render(); });
+  const scheduleSearch=debounce(()=>{ const v=search?.value||""; const maybeList=parseListTokens(v); state.listTokens=maybeList; state.q=maybeList?"":v; render(); },160);
+  search?.addEventListener("input",scheduleSearch);
   search?.addEventListener("paste",e=>{ const pasted=(e.clipboardData||window.clipboardData)?.getData("text")||""; setTimeout(()=>{ const tokens=parseListTokens(pasted); if(tokens){ state.listTokens=tokens; state.q=""; render(); }},0); });
   typeSel?.addEventListener("change",()=>{ state.type=String(typeSel.value||"all"); render(); });
   viewBtn?.addEventListener("click",()=>{ const cur=getMobileViewPref(); const next=cur==="compact"?"detailed":"compact"; setMobileViewPref(next); applyMobileViewClass(next); syncViewToggleText(); });
-  window.addEventListener("resize",()=>applyMobileViewClass(getMobileViewPref()));
+  window.addEventListener("resize",debounce(()=>applyMobileViewClass(getMobileViewPref()),100));
   render(); const grid=$("catalogGrid"); if(grid)attachStateHandlers(grid);
 }
 document.addEventListener("DOMContentLoaded",()=>{ init().catch(err=>{ console.error(err); const status=$("statusText"); if(status)status.textContent=`Error: ${String(err.message||err)}`; }); });
