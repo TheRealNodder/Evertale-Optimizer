@@ -1,6 +1,6 @@
 /* catalog-description-state-fix.js
    Hot fix: hydrate per-state descriptions from character_families.bundle.json states[].
-   This avoids relying only on descriptionByForm, which is often empty.
+   Also normalizes Test Catalog V2 hero stats so they read exact data-stat values.
 */
 (function(){
   const URL='./apkfiles/entries/bundles/character_families.bundle.json';
@@ -25,7 +25,7 @@
     cache=m;return m;
   }
   function cardKey(card){
-    return [card.getAttribute('data-duo-root'),card.getAttribute('data-id'),card.querySelector('.unitName')?.textContent,card.querySelector('.unitTitle')?.textContent].map(key).find(Boolean)||'';
+    return [card.getAttribute('data-duo-root'),card.getAttribute('data-source-id'),card.getAttribute('data-family'),card.getAttribute('data-id'),card.querySelector('.unitName')?.textContent,card.querySelector('.unitTitle')?.textContent].map(key).find(Boolean)||'';
   }
   function applyRows(card,rows){
     const panel=card.querySelector('.descriptionPanel');
@@ -42,11 +42,40 @@
       const rows=map.get(cardKey(card));
       if(rows)applyRows(card,rows);
     });
+    fixV2HeroStats();
+  }
+  function exactStat(card, stat){
+    const val=card?.querySelector(`.stat[data-stat="${stat.toLowerCase()}"] .statVal`)?.textContent?.trim();
+    if(val)return val;
+    const statBox=card?.querySelector(`.stat[data-stat="${stat.toLowerCase()}"]`);
+    if(statBox){
+      const clone=statBox.cloneNode(true);
+      clone.querySelector('.statLabel')?.remove();
+      return clone.textContent.trim()||'—';
+    }
+    return '—';
+  }
+  function fixV2HeroStats(){
+    const card=document.querySelector('.unitCard.v2-selected')||document.querySelector('.unitCard');
+    if(!card||!document.getElementById('v2Hp'))return;
+    document.getElementById('v2Hp').textContent=exactStat(card,'hp');
+    document.getElementById('v2Atk').textContent=exactStat(card,'atk');
+    document.getElementById('v2Spd').textContent=exactStat(card,'spd');
+    document.getElementById('v2Cost').textContent=exactStat(card,'cost');
   }
   document.addEventListener('DOMContentLoaded',()=>{
     setTimeout(()=>hydrate().catch(console.warn),800);
-    document.getElementById('catalogGrid')?.addEventListener('click',e=>{
-      if(e.target.closest('.stateBtn,.duoFormBtn'))setTimeout(()=>hydrate().catch(console.warn),30);
+    setTimeout(fixV2HeroStats,1300);
+    const grid=document.getElementById('catalogGrid');
+    grid?.addEventListener('click',e=>{
+      if(e.target.closest('.unitCard,.stateBtn,.duoFormBtn')){
+        setTimeout(()=>hydrate().catch(console.warn),60);
+        setTimeout(fixV2HeroStats,180);
+      }
     });
+    const target=document.getElementById('catalogGrid');
+    if(target){
+      new MutationObserver(()=>setTimeout(fixV2HeroStats,80)).observe(target,{childList:true,subtree:true});
+    }
   });
 })();
