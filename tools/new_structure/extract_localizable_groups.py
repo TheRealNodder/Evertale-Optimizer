@@ -33,8 +33,11 @@ KNOWN_SUFFIXES = [
     "TitleMessageKey",
 ]
 CATEGORY_ORDER = ["characters", "weapons", "accessories", "bosses", "leader_skills", "unknown"]
+ELEMENT_WORD_RE = re.compile(r"\b(Fire|Water|Storm|Earth|Light|Dark)\b", re.I)
+LEADER_STAT_RE = re.compile(r"\b(HP|ATK|Attack|Atk)\b", re.I)
+LEADER_COMBO_RE = re.compile(r"(ATK\s*&\s*HP|Attack\s*&\s*HP|AttackAndHP|ATKAndHP|HPAndATK)", re.I)
 LEADER_BASE_RE = re.compile(
-    r"(LeaderSkill|HPUp|ATKUp|AttackUp|AttackAndHPUp|CostDown|Spirit|SpeedUp|SPDUp|TUCost|DamageReduc|DamageReduction)",
+    r"(HPUp|ATKUp|AtkUp|AttackUp|AttackAndHPUp|ATKAndHPUp|HPAndATKUp|Allies?HP|Allies?ATK|Allies?Attack)",
     re.I,
 )
 
@@ -156,12 +159,19 @@ def load_index_source_ids(entries_root: Path, category: str) -> Set[str]:
     return out
 
 
+def is_true_leader_skill_text(base: str, keys: Dict[str, str]) -> bool:
+    text = " ".join(str(keys.get(k, "")) for k in ("NameKey", "TitleKey", "DescriptionKey", "AffectedKey"))
+    combined = f"{base} {text}"
+    has_stat = bool(LEADER_STAT_RE.search(combined) or LEADER_COMBO_RE.search(combined))
+    has_element = bool(ELEMENT_WORD_RE.search(combined))
+    has_leader_phrase = bool(re.search(r"\b(Allied|ally|allies|element units|units have their)\b", combined, re.I))
+    has_base_pattern = bool(LEADER_BASE_RE.search(base))
+    has_percent = "%" in combined or "Percent" in base
+    return (has_base_pattern or has_stat or LEADER_COMBO_RE.search(combined)) and (has_element or has_leader_phrase or has_percent)
+
+
 def is_leader_skill_group(base: str, keys: Dict[str, str]) -> bool:
-    if LEADER_BASE_RE.search(base):
-        return True
-    if "AffectedKey" in keys and ("DescriptionKey" in keys or "NameKey" in keys):
-        return True
-    return False
+    return is_true_leader_skill_text(base, keys)
 
 
 def category_from_base(base: str, keys: Dict[str, str], known: Dict[str, Set[str]]) -> str:
@@ -268,8 +278,11 @@ def load_legacy_leader_skills(repo_root: Path) -> Dict[str, Any]:
 
 def build_leader_skill_map(grouped: Dict[str, Dict[str, Any]], repo_root: Path) -> Dict[str, Any]:
     skills: Dict[str, Dict[str, Any]] = {}
+    rejected_samples = []
     for base, group in grouped.items():
         if group.get("category") != "leader_skills":
+            if len(rejected_samples) < 30 and re.search(r"(DamageReduc|DamageReduction|Ready|Guard|Poison|Burn|Sleep|Stun)", base, re.I):
+                rejected_samples.append({"id": base, "name": group.get("name", ""), "description": group.get("description", "")})
             continue
         if not (group.get("name") or group.get("description") or group.get("affected")):
             continue
@@ -283,7 +296,7 @@ def build_leader_skill_map(grouped: Dict[str, Dict[str, Any]], repo_root: Path) 
         }
     legacy = load_legacy_leader_skills(repo_root)
     return {
-        "schemaVersion": 2,
+        "schemaVersion": 3,
         "generatedAt": int(time.time()),
         "count": len(skills),
         "skills": skills,
@@ -291,6 +304,11 @@ def build_leader_skill_map(grouped: Dict[str, Dict[str, Any]], repo_root: Path) 
         "legacyByCharacter": legacy.get("byCharacter", {}),
         "legacyCharacterAliases": legacy.get("aliases", {}),
         "legacySource": legacy.get("source"),
+        "rejectedPassiveSamples": rejected_samples,
+        "filter": {
+            "keywords": ["HP", "ATK", "Attack", "ATK & HP", "Fire", "Water", "Storm", "Earth", "Light", "Dark"],
+            "excluded": ["Damage Reduction", "passive-only self buffs", "survivor/status effects"],
+        },
     }
 
 
@@ -318,7 +336,7 @@ def main() -> int:
         by_category.setdefault(group["category"], []).append(group)
 
     report = {
-        "schemaVersion": 3,
+        "schemaVersion": 4,
         "generatedAt": int(time.time()),
         "repoRoot": str(repo_root),
         "input": str(input_dir),
@@ -332,13 +350,15 @@ def main() -> int:
         "legacyLeaderSkillSource": leader_skills.get("legacySource"),
         "knownSourceIds": {cat: len(ids) for cat, ids in known.items()},
         "categoryCounts": {cat: len(by_category.get(cat, [])) for cat in CATEGORY_ORDER},
+        "leaderSkillFilter": leader_skills.get("filter", {}),
+        "rejectedPassiveSamples": leader_skills.get("rejectedPassiveSamples", []),
         "sampleLeaderSkills": list(leader_skills["skills"].values())[:20],
         "sampleLegacyLeaderSkills": list(leader_skills.get("legacyByCharacter", {}).values())[:20],
         "sampleGroups": {cat: by_category.get(cat, [])[:10] for cat in CATEGORY_ORDER},
     }
 
-    write_json(output_dir / "localizable_groups.json", {"schemaVersion": 3, "count": len(grouped), "groups": grouped})
-    write_json(output_dir / "localizable_groups_by_category.json", {"schemaVersion": 3, "categories": by_category})
+    write_json(output_dir / "localizable_groups.json", {"schemaVersion": 4, "count": len(grouped), "groups": grouped})
+    write_json(output_dir / "localizable_groups_by_category.json", {"schemaVersion": 4, "categories": by_category})
     write_json(output_dir / "leader_skill_localization.json", leader_skills)
     write_json(output_dir / "localizable_group_report.json", report)
     print(json.dumps(report, ensure_ascii=False, indent=2))
