@@ -1,7 +1,9 @@
-/* element-normalizer.js — applies canonical element classes from element_reference.json. */
+/* element-normalizer.js — applies canonical element classes from element_reference.json without render loops. */
 (function(){
   const REF_URL='./apkfiles/entries/maps/element_reference.json';
   let refPromise=null;
+  let indexPromise=null;
+  let scheduled=false;
   function key(v){return String(v||'').toLowerCase().replace(/[^a-z0-9]+/g,'');}
   async function loadRef(){
     if(refPromise)return refPromise;
@@ -29,8 +31,13 @@
     Object.entries(ref?.leaderSkillAliases||{}).forEach(([alias,canonical])=>{const row=elements[canonical];if(row)out.set(key(alias),{canonical,display:row.display||canonical,className:row.className||`el-${canonical}`});});
     return out;
   }
+  async function getIndex(){
+    if(indexPromise)return indexPromise;
+    indexPromise=loadRef().then(ref=>buildIndex(ref||{}));
+    return indexPromise;
+  }
   function cardElementText(card){
-    const explicit=card.getAttribute('data-element')||card.getAttribute('data-apk-element')||'';
+    const explicit=card.getAttribute('data-element')||card.getAttribute('data-apk-element')||card.getAttribute('data-element-display')||'';
     if(explicit)return explicit;
     const tags=[...card.querySelectorAll('.tag,.element')].map(x=>x.textContent||'');
     return tags.find(t=>fallback(t))||'';
@@ -40,24 +47,34 @@
     const raw=cardElementText(card);
     const resolved=index.get(key(raw))||fallback(raw);
     if(!resolved)return;
-    ['el-fire','el-water','el-storm','el-earth','el-light','el-dark'].forEach(c=>card.classList.remove(c));
+    const current=card.getAttribute('data-element-canonical');
+    if(current===resolved.canonical && card.classList.contains(resolved.className))return;
+    ['el-fire','el-water','el-storm','el-earth','el-light','el-dark'].forEach(c=>{ if(c!==resolved.className) card.classList.remove(c); });
     card.classList.add(resolved.className);
     card.setAttribute('data-element-canonical',resolved.canonical);
     card.setAttribute('data-element-display',resolved.display);
     const tag=[...card.querySelectorAll('.tag')].find(x=>fallback(x.textContent));
-    if(tag)tag.textContent=resolved.display;
+    if(tag && tag.textContent.trim()!==resolved.display)tag.textContent=resolved.display;
   }
-  async function normalizeAll(){
-    const ref=await loadRef();
-    const index=buildIndex(ref||{});
-    document.querySelectorAll('.unitCard').forEach(card=>normalizeCard(card,index));
+  async function normalizeAll(root=document){
+    const index=await getIndex();
+    root.querySelectorAll?.('.unitCard')?.forEach(card=>normalizeCard(card,index));
+  }
+  function scheduleNormalize(root=document){
+    if(scheduled)return;
+    scheduled=true;
+    const run=()=>{scheduled=false;normalizeAll(root).catch(console.warn);};
+    if('requestAnimationFrame' in window)requestAnimationFrame(run);else setTimeout(run,0);
   }
   document.addEventListener('DOMContentLoaded',()=>{
-    setTimeout(()=>normalizeAll().catch(console.warn),100);
+    scheduleNormalize(document);
     const grid=document.getElementById('catalogGrid');
     if(grid){
-      new MutationObserver(()=>normalizeAll().catch(console.warn)).observe(grid,{childList:true,subtree:true});
+      new MutationObserver(mutations=>{
+        if(!mutations.some(m=>[...m.addedNodes].some(n=>n.nodeType===1 && (n.classList?.contains('unitCard')||n.querySelector?.('.unitCard')))))return;
+        scheduleNormalize(grid);
+      }).observe(grid,{childList:true});
     }
   });
-  window.EvertaleElementReference={load:loadRef,normalizeAll};
+  window.EvertaleElementReference={load:loadRef,normalizeAll,scheduleNormalize};
 })();
