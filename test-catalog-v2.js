@@ -7,6 +7,13 @@
   const clean = v => String(v || '').toLowerCase().replace(/\d+$/,'').replace(/[^a-z0-9]+/g,'');
   const directKey = v => String(v || '').toLowerCase().replace(/[^a-z0-9]+/g,'');
   function loadElementNormalizer(){
+    if(!document.querySelector('link[data-v2-element-surface]')){
+      const l=document.createElement('link');
+      l.rel='stylesheet';
+      l.href='./test-catalog-v2-elements.css?v=1';
+      l.setAttribute('data-v2-element-surface','1');
+      document.head.appendChild(l);
+    }
     if(window.EvertaleElementReference) return;
     const s=document.createElement('script');
     s.src='./element-normalizer.js?v=1';
