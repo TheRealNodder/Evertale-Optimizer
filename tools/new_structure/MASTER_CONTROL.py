@@ -2,24 +2,17 @@
 """
 MASTER CONTROL for the Evertale Optimizer extraction/injection pipeline.
 
-Purpose:
-- Provide one obvious command for rebuilding the new apkfiles/entries runtime.
-- Keep raw/input extraction, entry injection, runtime rebuild, and audit flow coordinated.
-- Preserve the existing safe ingest behavior instead of duplicating pipeline logic.
-
-Default fast path:
+Default safe rebuild:
   python tools/new_structure/MASTER_CONTROL.py
 
-Full audit path before quarantine/removal decisions:
-  python tools/new_structure/MASTER_CONTROL.py --full-audit
+Fresh game-data extraction from apkfiles:
+  python tools/new_structure/MASTER_CONTROL.py --extract
 
-Future raw input path:
-  python tools/new_structure/MASTER_CONTROL.py --raw ./raw
+Force extraction from apkfiles:
+  python tools/new_structure/MASTER_CONTROL.py --extract --force
 
-Notes:
-- apkfiles/entries remains the generated/output structure.
-- raw/ is intended to become the untouched game-file input folder.
-- This script delegates to run_safe_new_data_ingest.py as the canonical safe runner.
+Custom input folder, if ever needed:
+  python tools/new_structure/MASTER_CONTROL.py --extract --input ./apkfiles
 """
 from __future__ import annotations
 
@@ -31,7 +24,7 @@ import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-MASTER_SCHEMA_VERSION = 1
+MASTER_SCHEMA_VERSION = 2
 SAFE_INGEST_REL = "tools/new_structure/run_safe_new_data_ingest.py"
 REPORT_REL = "apkfiles/entries/reports/master_control_report.json"
 
@@ -84,45 +77,61 @@ def run_step(repo: Path, label: str, command: List[str], dry_run: bool = False) 
 def build_safe_ingest_command(repo: Path, args: argparse.Namespace) -> List[str]:
     script = repo / SAFE_INGEST_REL
     command = [sys.executable, str(script)]
-    if args.raw:
-        command.extend(["--raw", str(Path(args.raw))])
+    if args.extract:
+        command.append("--extract")
+        command.extend(["--raw", str(Path(args.input or (repo / "apkfiles")).resolve())])
+    elif args.input:
+        raise SystemExit("ERROR: --input requires --extract. Use --extract for fresh apkfiles ingest.")
+    if args.force:
+        command.append("--force")
     if args.full_audit:
         command.append("--full-audit")
+    if args.dry_run:
+        command.append("--dry-run")
     return command
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="MASTER CONTROL: run the Evertale Optimizer safe extraction/injection/runtime rebuild pipeline."
+        description="MASTER CONTROL: run safe rebuild or extract fresh Evertale game JSON from apkfiles."
     )
-    parser.add_argument("--raw", help="Optional raw game-file input folder. Future default target is ./raw.")
+    parser.add_argument("--extract", action="store_true", help="Extract fresh Monster/Weapon/Equipment/Boss JSON from apkfiles before rebuilding.")
+    parser.add_argument("--input", help="Optional input folder. Defaults to ./apkfiles when --extract is used.")
+    parser.add_argument("--raw", dest="input", help=argparse.SUPPRESS)
+    parser.add_argument("--force", action="store_true", help="Force extraction rebuild. Requires --extract.")
     parser.add_argument("--full-audit", action="store_true", help="Run full dependency/audit checks through safe ingest.")
     parser.add_argument("--dry-run", action="store_true", help="Print planned steps without running them.")
     args = parser.parse_args()
+
+    if args.force and not args.extract:
+        raise SystemExit("ERROR: --force requires --extract.")
 
     repo = find_repo_root()
     safe_ingest = repo / SAFE_INGEST_REL
     if not safe_ingest.exists():
         raise FileNotFoundError(f"Missing safe ingest runner: {safe_ingest}")
 
+    mode = "extract-from-apkfiles" if args.extract else ("full-audit" if args.full_audit else "fast-safe-rebuild")
+    input_folder = str(Path(args.input or (repo / "apkfiles")).resolve()) if args.extract else None
     report: Dict[str, Any] = {
         "schemaVersion": MASTER_SCHEMA_VERSION,
         "generatedAt": int(time.time()),
         "repoRoot": str(repo),
-        "mode": "full-audit" if args.full_audit else "fast-safe-ingest",
-        "rawInput": str(Path(args.raw)) if args.raw else None,
+        "mode": mode,
+        "inputFolder": input_folder,
         "dryRun": bool(args.dry_run),
         "steps": [],
         "notes": [
-            "MASTER_CONTROL.py is the preferred visible entry point for extraction/injection/runtime rebuilds.",
-            "Delegates to run_safe_new_data_ingest.py to preserve existing safe pipeline behavior.",
+            "Default mode rebuilds existing apkfiles/entries outputs safely.",
+            "Use --extract when fresh Monster.json, Weapon.json, Equipment.json, or Boss.json have been placed in apkfiles.",
+            "Extraction input defaults to apkfiles, not raw.",
             "Use --full-audit before quarantine/removal decisions.",
         ],
     }
 
     command = build_safe_ingest_command(repo, args)
     try:
-        report["steps"].append(run_step(repo, "safe-new-data-ingest", command, dry_run=args.dry_run))
+        report["steps"].append(run_step(repo, "safe-new-data-ingest", command, dry_run=False))
         report["ok"] = True
     except Exception as exc:
         report["ok"] = False
