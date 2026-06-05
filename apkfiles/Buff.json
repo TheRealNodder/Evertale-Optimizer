@@ -1,6 +1,6 @@
 {
 	"Version": 23,
-	"Time": 1779867949,
+	"Time": 1780564399,
 	"Buff": {
 	"RelationshipFlatAttack50": {
 		"class": "Buff",
@@ -87303,6 +87303,187 @@
 			"showAsTimer": true,
 			"showAsPermanent": false,
 			"iconSpriteName": "IconBlueCountdownClock3Numbered04"
+		},
+		"IamtheQueenPassiveAVictoriaRegular":{
+			"class": "Buff",
+			"stackName": "IamtheQueenPassiveAVictoriaRegular",
+			"behaviors": ["BuffOnMonsterTurn","EnterBattleBuff","BuffWhenMonsterHurt","SleepImmunityFallback"],
+			"behaviorOverrides": [{
+					"allAlliesButSelfBuffs": ["WhenHitGrantSourceVictoriaRegularABuff"],
+					"activeMonsterConditions": "AlwaysTrue"
+				},{
+					"sourceBuffs": ["BlockDeathByBuffDamage","RandomDamageGenerator","SleepImmunity","KnockbackImmunity","DisableFallBackImmunity","GenericPowerChargeIcon"]
+				},{
+					"selfBuffs": ["Grant1RandomEnemyColdSleep"],
+					"cancelFromDamageTypes": ["BuffDamage"],
+					"spreadCondition": "IsNotAlone"
+			},{}],
+			"duration": -1,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true,
+			"noIconShownOnBattleStatus": true
+		},
+		"GenericPowerChargeIcon": {
+			"class": "Buff",
+			"behaviors": ["Immunity"],
+			"behaviorOverrides": [{
+				"stackNamesToBlock": ["Placeholder"],
+				"activateCondition": "HasPowerCharge"
+			}],
+			"duration": -1,
+			"showAsTimer": true,
+			"iconSpriteName": "IconPowerCharge01",
+			"hideFromPlayerCondition": "NoPowerCharge"
+		},
+		"Grant1RandomEnemyColdSleep": {
+			"class": "Buff",
+			"behaviors": ["BuffOnMonsterTurnEnd","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+				"randomEnemyBuffs": ["ColdSleepForced100TU"],
+				"numRandomToBuff": 1,
+				"activeMonsterConditions": "AlwaysTrue"
+			},{}],
+			"stackName": "Grant1RandomEnemyColdSleep",
+			"duration": 0,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true
+		},
+		"WhenHitGrantSourceVictoriaRegularABuff":{
+			"class": "Buff",
+			"behaviors": ["BuffWhenMonsterHurt"],
+			"behaviorOverrides": [{
+					"sourceBuffs": ["GrantSourceVictoriaRegularTheTurn"],
+					"cancelFromDamageTypes": ["BuffDamage"]
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true,
+			"noIconShownOnBattleStatus": true
+		},
+		"GrantSourceVictoriaRegularTheTurn":{
+			"class": "Buff",
+			"behaviors": ["BuffOnMonsterTurnEnd"],
+			"behaviorOverrides": [{
+					"selfBuffs": ["PseudoGetTurn","OnExtraTurn","JustGivenTurn","VictoriaRegularExtraTurn50TUTrigger"],
+					"activeMonsterConditions": "NotAlwaysMyTurn",
+					"spreadCondition": "IsNotVictoriaRegularExtraTurnTrigger"
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true,
+			"noIconShownOnBattleStatus": true
+		},
+		"WarQueenPassiveAVictoriaRegular":{
+			"class": "Buff",
+			"stackName": "WarQueenPassiveAVictoriaRegular",
+			"behaviors": ["EnterBattleBuff","BuffOnMonsterTurnEnd","BuffOnMonsterTurnEnd","BuffWhenMonstersDie","BuffWhenMonstersDie"],
+			"behaviorOverrides": [{
+				"sourceBuffs": ["InstantKillImmunityOnce","HPRegen10PercentMaxHPEndEveryTurnFor200TU","80PercentDamageReductionFor100TU","HoldGroundOnceForHoldGroundPlusForPowerCharge","BlockDeathUntilNextTurnForHoldGroundPlusForPowerCharge"]
+			},{
+				"sourceBuffs": ["AttackPlus50Percent1TurnOnly"],
+				"activeMonsterConditions": "AlwaysTrue",
+				"sameTeam": false
+			},{
+				"sourceBuffs": ["RemoveBuffs","RemoveBuffsFX"],
+				"activeMonsterConditions": "AlwaysTrue",
+				"sameTeam": true	
+			},{
+				"sourceBuffs": ["FullHealAndGrantAllAlliesInstantDeathWards","FudgeUsedAlt"],
+				"sameTeam": false,
+				"spreadCondition": "KillsMoreThanSkillUsedAlt",
+				"deadMonsterConditions": "IsNotSummonedOrTransformingOrMirage"
+			},{
+				"sourceBuffs": ["FudgeUsedAltEndOfTurn"],
+				"sameTeam": false,
+				"spreadCondition": "KillsMoreThanSkillUsedAlt"	
+			}],
+			"duration": -1,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true,
+			"noIconShownOnBattleStatus": true
+		},
+		"HoldGroundOnceForHoldGroundPlusForPowerCharge": {
+			"class": "Buff",
+			"stackName": "HoldGroundOnceForHoldGroundPlus",
+			"behaviors": ["BlockDeath"],
+			"behaviorOverrides": [{
+				"conditions": "AlwaysTrue",
+				"removeAfterTriggers": 1,
+				"cancelFromDamageFlags": ["IgnoreBlockDeath","HardIgnoreBlockDeath","LethalPoison"]
+			}],
+			"iconSpriteName": "IconWhiteFightSwordPlus01",
+			"duration": -1,
+			"showAsTimer": true,
+			"tags": ["PowerCharge"]
+		},
+		"BlockDeathUntilNextTurnForHoldGroundPlusForPowerCharge": {
+			"class": "Buff",
+			"stackName": "BlockDeathUntilNextTurn",
+			"behaviors": ["BuffOnMonsterTurn", "BlockDeath", "Immunity"],
+			"behaviorOverrides": [{
+				"selfBuffs": ["RemoveBlockDeathUntilNextTurnForHoldGroundPlus"],
+				"spreadCondition": "NotHoldGroundOnceForHoldGroundPlus"
+			}, {
+				"conditions": "NotAlwaysEnemyTurn",
+				"cancelFromDamageFlags": ["IgnoreBlockDeath","HardIgnoreBlockDeath","LethalPoison"]
+			}, {
+				"stackNamesToBlock": ["BlockDeathUntilNextTurn"],
+				"activateCondition": "NotHoldGroundOnceForHoldGroundPlusNotMyTurn",
+				"dontShowText": true
+			}],
+			"hideFromPlayerCondition": "HoldGroundOnceForHoldGroundPlusOrMyTurn",
+			"iconSpriteName": "IconWhiteFightSwordPlus01",
+			"duration": -1,
+			"showAsTimer": true
+		},
+		"FullHealAndGrantAllAlliesInstantDeathWards": {
+			"class": "Buff",
+			"behaviors": ["EnterBattleBuff"],
+			"behaviorOverrides": [{
+				"randomAllyBuffs": ["InstantKillImmunityOnce","HealFull"],
+				"numRandomToBuff": 4
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true
+		},
+		"80PercentDamageReductionFor100TU": {
+			"class": "Buff",
+			"stackName": "50PercentDamageReduction",
+			"behaviors": ["ModifyDamage"],
+			"behaviorOverrides": [{
+				"percent": 0.20,
+				"cancelFromDamageTypes": ["BuffDamage", "Poison", "Burn"],
+				"cancelFromDamageFlags": ["Sneak", "IgnoreArmor"]
+			}],
+			"duration": 100,
+			"showAsPermanent": false,
+			"showAsTimer": true,
+			"tags": ["BigDamageMinus"],
+			"iconSpriteName": "IconPurpleDamageMinus01"
+		},
+		"VictoriaRegularActive2Cooldown50": {
+			"class": "Buff",
+			"stackName": "InstantCooldown",
+			"duration": 50,
+			"isHiddenFromPlayers": false,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"iconSpriteName": "IconBlueCountdownClock3"
+		},
+		"VictoriaRegularExtraTurn50TUTrigger": {
+			"class": "Buff",
+			"stackName": "VictoriaRegularExtraTurnTrigger",
+			"duration": 50,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"iconSpriteName": "IconRedCountdownPassiveClock3"
 		}
     }
 }

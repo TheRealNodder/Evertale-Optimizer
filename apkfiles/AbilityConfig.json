@@ -1,6 +1,6 @@
 {
 	"Version": 23,
-	"Time": 1780015240,
+	"Time": 1780383575,
 	"AbilityConfig": {
 		"StunSingle200A": {
 			"class": "AbilityConfig",
@@ -46354,6 +46354,92 @@
 			"flags": ["Healer","Purify","GiveTurn"],
 			"abilityEffect": "YandereBalletAbility2",
 			"useCondition": "NotInstantCooldown"
+		},
+		"AllAttackAVictoriaRegular":{
+			"class": "AbilityConfig",
+			"targetingData": "AllEnemy",
+			"components": ["Damage","ApplyBuff","ApplyBuff"],
+			"componentOverrides":[{
+				"applyToTargetType": "Enemy",
+				"damageFlags": ["IgnoreSkin","HardIgnoreBlockDeath","DoNotWake"],
+				"drainPercent": 1.0,
+				"drainEffect": "VampireDrain1"
+			},{
+				"buffs": ["PseudoGetTurn","OnExtraTurn","JustGivenTurn"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"buffAppliedEffects": ["blank1"],
+				"applyConditions": "NoFreshNewMomentum",
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs": ["FreshNewMomentum"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "VictoriaRain1",
+			"attackScalors": ["NotGoodRandomDamage","Good50PercentChance","GoodOneThirdChance"],
+			"conditionedAbilityEffects": ["VictoriaRain1","VictoriaRain1","VictoriaRain1"],
+			"recommendEffectWhenUsable": -1
+		},
+		"EnemyBuffAVictoriaRegular": {
+			"class": "AbilityConfig",
+			"targetingData": "RandomEnemy",
+			"components": ["ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"buffs": ["RemoveBurn","FrostBiteCounter","SpreadPlagueFrostBiteCounter"],
+				"applyToTargetType": "Enemy"
+			},{
+				"buffs": ["Gain2SpiritForEachNonSleepingEnemyOnBattlefieldEBB","VictoriaRegularActive2Cooldown50"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "VictoriaCrown",
+			"flags": ["NoDamage"],
+			"useCondition": "NotInstantCooldown"
+		},
+		"SingleAttackAVictoriaRegular":{
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage","ApplyBuff"],
+			"componentOverrides":[{
+				"applyToTargetType": "Enemy",
+				"damageFlags": ["IgnoreArmor","HardIgnoreBlockDeath","DoNotWake"],
+				"drainPercent": 1.0,
+				"drainEffect": "VampireDrain1"
+			},{
+				"buffs": ["LosingFreshMomentum","UsedAbilityCounter"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "VictoriaSpecial",
+			"attackScalors": ["GoodIfUsedOnce","GoodIfUsedTwice","GoodIfUsedThrice"],
+			"conditionedAbilityEffects": ["VictoriaSpecial","VictoriaSpecial","VictoriaSpecial"],
+			"recommendEffectWhenUsable": -1
+		},
+		"AllyBuffAVictoriaRegular": {
+			"class": "AbilityConfig",
+			"targetingData": "AllAlly",
+			"components": ["ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"buffs": ["Heal500Percent","Armor"],
+				"applyToTargetType": "Friendly"
+			},{
+				"buffs": ["GrantAllOtherAlliesTurnEBB","HoldGroundOnceForHoldGroundPlusForPowerCharge","BlockDeathUntilNextTurnForHoldGroundPlusForPowerCharge"],
+				"applyToTargetType": "Source",
+				"skipAbilityEffect": true
+			}],
+			"friendlyEventType": "Finish",
+			"sourceEventType": "Hit",
+			"abilityEffect": "VictoriaPowerCharge1",
+			"flags": ["NoDamage","GiveTurn"],
+			"useCondition": "NoPowerCharge"
 		}
 	}
 }
