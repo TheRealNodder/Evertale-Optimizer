@@ -131,7 +131,8 @@ def step_command(tools_dir: Path, raw_step: str) -> List[str]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Run safe append-only new-data ingest, runtime rebuild, and fast checks.")
-    parser.add_argument("--raw", default=None, help="Optional raw extracted/downloaded game data folder passed into run_entry_pipeline.py.")
+    parser.add_argument("--raw", default=None, help="Input folder containing Monster.json, Weapon.json, Equipment.json, Boss.json. Defaults to ./apkfiles when --extract is used.")
+    parser.add_argument("--extract", action="store_true", help="Run extraction from apkfiles/raw game JSON before rebuilding bundles.")
     parser.add_argument("--force", action="store_true", help="Pass --force into run_entry_pipeline.py extraction step.")
     parser.add_argument("--skip-post-checks", action="store_true", help="Only run the entry pipeline; skip runtime rebuild/checks.")
     parser.add_argument("--full-audit", action="store_true", help="Also run slow deep_dependency_audit.py and export_quarantine_plan.py.")
@@ -142,10 +143,14 @@ def main() -> int:
     tools_dir = repo / "tools" / "new_structure"
     report_path = repo / REPORT_REL
 
+    input_folder = Path(args.raw).resolve() if args.raw else (repo / "apkfiles")
+    should_extract = bool(args.extract or args.raw or args.force)
+
     steps: List[Dict[str, Any]] = []
     pipeline_cmd = [sys.executable, str(tools_dir / PIPELINE_SCRIPT)]
-    if args.raw:
-        pipeline_cmd.extend(["--raw", str(Path(args.raw).resolve())])
+    if should_extract:
+        pipeline_cmd.append("--extract")
+        pipeline_cmd.extend(["--raw", str(input_folder)])
     if args.force:
         pipeline_cmd.append("--force")
 
@@ -169,13 +174,14 @@ def main() -> int:
                 break
 
     report = {
-        "schemaVersion": 2,
+        "schemaVersion": 3,
         "purpose": "Single safe runner for append-only new game data ingest and post-ingest checks.",
         "startedAt": started,
         "finishedAt": int(time.time()),
         "status": "ok" if final_code == 0 else "failed",
         "dryRun": args.dry_run,
-        "raw": args.raw,
+        "mode": "extract" if should_extract else "safe_rebuild",
+        "inputFolder": str(input_folder) if should_extract else None,
         "force": args.force,
         "fullAudit": args.full_audit,
         "rules": [
@@ -183,7 +189,8 @@ def main() -> int:
             "New entries are appended by sync_category_order_canonical.py.",
             "This wrapper does not delete, quarantine, or overwrite unrelated data.",
             "Runtime outputs are rebuilt after ingest so the site uses the new extracted data.",
-            "Deep dependency audit is intentionally opt-in via --full-audit because it is slow."
+            "Deep dependency audit is intentionally opt-in via --full-audit because it is slow.",
+            "Fresh game JSON files are expected in apkfiles by default when extraction is requested."
         ],
         "steps": steps,
         "entryPipelineReport": read_json(repo / ENTRY_PIPELINE_REPORT, {}) if not args.dry_run else {},
@@ -193,7 +200,7 @@ def main() -> int:
         "nextSteps": [
             "Review this report first.",
             "Run local server from repo root: python -m http.server 8000.",
-            "Test index.html, roster.html, and optimizer.html.",
+            "Test index.html, roster.html, optimizer.html, and test-catalog-v2.html.",
             "Run with --full-audit only before quarantine/removal decisions.",
             "Only commit/push after local pages work."
         ],
@@ -205,6 +212,8 @@ def main() -> int:
     print("\nSAFE NEW DATA INGEST COMPLETE")
     print(json.dumps({
         "status": report["status"],
+        "mode": report["mode"],
+        "inputFolder": report["inputFolder"],
         "report": str(report_path),
         "fullAudit": args.full_audit,
         "runtimeSummary": report["runtimeSummary"],
