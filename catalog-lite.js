@@ -40,45 +40,6 @@
   function readSkills(card,type){let rows=[];try{rows=JSON.parse(decodeURIComponent(card?.getAttribute(type==='active'?'data-active-skills':'data-passive-skills')||''))}catch{}return (Array.isArray(rows)?rows:[]).map(s=>({name:s.name||s.id||'Unnamed Skill',meta:[s.tu?`${s.tu} TU`:'',s.sp!==undefined?`${Number(s.sp)>0?'+':''}${s.sp} SP`:''].filter(Boolean).join(' • '),desc:s.description||''}));}
   function openSkills(card,type){const rows=readSkills(card,type);if(!rows.length)return;let pop=$('liteSkillPop');if(!pop){document.body.insertAdjacentHTML('beforeend','<div class="lite-skill-pop" id="liteSkillPop" aria-hidden="true"><div class="lite-skill-card"><div class="lite-skill-head"><h3 id="liteSkillTitle">Skills</h3><button type="button" id="liteSkillClose" aria-label="Close">×</button></div><div class="lite-skill-list" id="liteSkillList"></div></div></div>');pop=$('liteSkillPop');$('liteSkillClose')?.addEventListener('click',()=>pop.classList.remove('open'));pop.addEventListener('click',e=>{if(e.target===pop)pop.classList.remove('open')});}const title=type==='active'?'Active Skills':'Passive Skills';$('liteSkillTitle').textContent=`${card.querySelector('.unitName')?.textContent?.trim()||'Selected'} — ${title}`;$('liteSkillList').innerHTML=rows.map(s=>`<div class="lite-skill-item"><strong>${safe(s.name)}</strong>${s.meta?`<span>${safe(s.meta)}</span>`:''}<p>${safe(s.desc)||'No description loaded.'}</p></div>`).join('');pop.classList.add('open');pop.setAttribute('aria-hidden','false');}
   function attach(){const grid=$('catalogGrid');if(!grid)return;grid.addEventListener('error',e=>{if(e.target&&e.target.tagName==='IMG'){e.target.replaceWith(Object.assign(document.createElement('div'),{className:'ph',textContent:'?'}));}},true);grid.addEventListener('click',e=>{const skill=e.target.closest('[data-lite-skill]');if(skill){openSkills(skill.closest('.unitCard'),skill.getAttribute('data-lite-skill'));return;}const btn=e.target.closest('.stateBtn');if(!btn)return;const card=btn.closest('.unitCard'),row=btn.closest('.stateRow'),img=card?.querySelector('.unitThumb img');let imgs=[];try{imgs=JSON.parse(decodeURIComponent(row?.dataset.imgs||''))}catch{}const idx=Number(btn.dataset.idx||0);if(!img||!imgs[idx])return;img.src=imgs[idx];img.dataset.state=String(idx);row.querySelectorAll('.stateBtn').forEach((b,i)=>b.classList.toggle('active',i===idx));});}
-  const ENTRY_BASE=(window.EVERTALE_LIVE_CONFIG&&window.EVERTALE_LIVE_CONFIG.entryBase)||'./apkfiles/entries';
-  const DATA_VERSION=(window.EVERTALE_LIVE_CONFIG&&(window.EVERTALE_LIVE_CONFIG.dataVersion||window.EVERTALE_LIVE_CONFIG.version))||'';
-  function versionedUrl(url){if(!DATA_VERSION)return url;const sep=String(url).includes('?')?'&':'?';return `${url}${sep}v=${encodeURIComponent(DATA_VERSION)}`;}
-  async function fetchBundleCategory(category){
-    const url=versionedUrl(`${ENTRY_BASE}/bundles/${category}.bundle.json`);
-    const res=await fetch(url,{cache:'no-cache'});
-    if(!res.ok)throw new Error(`${category} bundle failed: ${res.status}`);
-    const json=await res.json();
-    return Array.isArray(json?.entries)?json.entries:[];
-  }
-  async function loadCategoryFast(category){
-    try{return await fetchBundleCategory(category);}
-    catch(err){
-      console.warn('[CatalogLite] direct bundle failed, falling back:',category,err);
-      if(window.EvertaleData?.loadEntryCategory)return await window.EvertaleData.loadEntryCategory(category,category!=='characters');
-      return [];
-    }
-  }
-  function setStatusText(message){const s=$('statusText');if(s)s.textContent=message;}
-  function loadProgressive(){
-    const loaded={characters:[],weapons:[],accessories:[],bosses:[]};
-    const order=['weapons','accessories','characters','bosses'];
-    const pending=new Set(order);
-    setStatusText('Loading catalog bundles...');
-    order.forEach(category=>{
-      loadCategoryFast(category).then(rows=>{
-        loaded[category]=rows||[];
-        pending.delete(category);
-        state.items=normalize(loaded);
-        render();
-        const shown=state.filtered.length;
-        setStatusText(pending.size?`${shown} items shown • loading ${Array.from(pending).join(', ')}...`:`${shown} items shown`);
-      }).catch(err=>{
-        pending.delete(category);
-        console.error('[CatalogLite] category failed:',category,err);
-        setStatusText(`${category} failed: ${err.message||err}`);
-      });
-    });
-  }
-  async function init(){document.body.classList.add('page-catalog','mobile-compact');const search=$('catalogSearch'),type=$('catalogType'),view=$('viewToggle');if(view)view.textContent='View: Compact';search?.addEventListener('input',()=>{clearTimeout(search._t);search._t=setTimeout(()=>{state.q=search.value||'';render();},150);});type?.addEventListener('change',()=>{state.type=type.value||'all';render();});attach();loadProgressive();}
+  async function init(){document.body.classList.add('page-catalog','mobile-compact');const entries=await window.EvertaleData.loadAllEntries();state.items=normalize(entries);const search=$('catalogSearch'),type=$('catalogType'),view=$('viewToggle');if(view)view.textContent='View: Compact';search?.addEventListener('input',()=>{clearTimeout(search._t);search._t=setTimeout(()=>{state.q=search.value||'';render();},150);});type?.addEventListener('change',()=>{state.type=type.value||'all';render();});render();attach();}
   document.addEventListener('DOMContentLoaded',()=>init().catch(err=>{console.error(err);const s=$('statusText');if(s)s.textContent=`Error: ${err.message||err}`;}));
 })();

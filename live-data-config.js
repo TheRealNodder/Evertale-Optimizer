@@ -21,11 +21,12 @@
     runtimeBase: `${ENTRY_BASE}/runtime`,
     legacyFallbackEnabled: false,
 
-    // Bundles/indexes are small and must not go stale after content drops.
-    // Heavy entry JSON/image assets can still be cached by the browser/CDN.
-    cacheMode: 'no-cache',
-    bundleCacheMode: 'no-cache',
-    mapCacheMode: 'no-cache',
+    // Versioned URLs below invalidate stale content after data drops.
+    // Let the browser/CDN cache JSON normally so repeat visits avoid
+    // downloading and parsing multi-megabyte bundles on every page load.
+    cacheMode: 'default',
+    bundleCacheMode: 'default',
+    mapCacheMode: 'default',
     dataVersion: DATA_VERSION,
     noStoreUrls: false,
   });
