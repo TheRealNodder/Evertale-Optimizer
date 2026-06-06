@@ -4,6 +4,7 @@
 
    Behavior:
    - If overlay exists, catalog weapons come from overlay.
+   - Overlay order is preserved under default Newest Added sort.
    - Current indexed weapons from apkfiles/entries/weapons/index.json are appended only if not already in the overlay.
    - This prevents raw discovered weapon variants from flooding the test/live catalog.
 */
@@ -11,6 +12,7 @@
   const OVERLAY_URL = './apkfiles/entries/overlays/weapons_overlay.json';
   const INDEX_URL = './apkfiles/entries/weapons/index.json';
   const ENTRY_BASE = './apkfiles/entries/weapons';
+  const OVERLAY_ORDER_BASE = 900000;
   let overlayPromise = null;
 
   function norm(v){return String(v||'').toLowerCase().replace(/[^a-z0-9]+/g,'');}
@@ -32,21 +34,30 @@
   }
   function hasAnyKey(set,row){return sourceKeys(row).some(k=>set.has(k));}
   function addKeys(set,row){sourceKeys(row).forEach(k=>set.add(k));}
+  function overlaySortOrder(index,total){return OVERLAY_ORDER_BASE + (total - index);}
+  function appendSortOrder(index){return OVERLAY_ORDER_BASE + 1000 + index;}
   async function fetchJson(url, optional=true){
     try{const r=await fetch(url,{cache:'no-store'}); if(!r.ok){if(optional)return null; throw new Error(`${url}: ${r.status}`);} return await r.json();}
     catch(e){if(optional)return null; throw e;}
   }
   function overlayRows(payload){
     const rows = Array.isArray(payload?.weapons) ? payload.weapons : Array.isArray(payload?.entries) ? payload.entries : [];
-    return rows.map((w,i)=>({
-      ...w,
-      kind:'weapons',
-      category:'weapons',
-      sourceId:w.sourceId || w.internal?.sourceId || w.raw?.name || basename(w.image) || w.id || w.name,
-      internal:{...(w.internal||{}),source:'weapon_overlay',sourceId:w.sourceId || w.internal?.sourceId || w.raw?.name || basename(w.image) || w.id || w.name,weaponId:w.internal?.weaponId || w.raw?.name || basename(w.image)},
-      order:w.order ?? w.fileHandleOrder ?? i + 1,
-      _weaponOverlay:true
-    }));
+    const total = rows.length;
+    return rows.map((w,i)=>{
+      const sourceId = w.sourceId || w.internal?.sourceId || w.raw?.name || basename(w.image) || w.id || w.name;
+      return {
+        ...w,
+        kind:'weapons',
+        category:'weapons',
+        sourceId,
+        internal:{...(w.internal||{}),source:'weapon_overlay',sourceId,weaponId:w.internal?.weaponId || w.raw?.name || basename(w.image)},
+        order:overlaySortOrder(i,total),
+        fileHandleOrder:overlaySortOrder(i,total),
+        sourceOrder:overlaySortOrder(i,total),
+        _weaponOverlay:true,
+        _weaponOverlayIndex:i
+      };
+    });
   }
   async function indexedWeaponRows(existingRows){
     const index = await fetchJson(INDEX_URL,true);
@@ -79,9 +90,11 @@
         const keys=new Set();
         out.forEach(row=>addKeys(keys,row));
         const indexed=await indexedWeaponRows(existing);
+        let appendIndex=0;
         for(const row of indexed){
           if(!hasAnyKey(keys,row)){
-            out.push({...row,_weaponOverlayAppend:true});
+            const order=appendSortOrder(appendIndex++);
+            out.unshift({...row,order,fileHandleOrder:order,sourceOrder:order,_weaponOverlayAppend:true});
             addKeys(keys,row);
           }
         }
