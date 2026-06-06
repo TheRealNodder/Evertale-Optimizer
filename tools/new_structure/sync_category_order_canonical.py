@@ -15,7 +15,7 @@ EXCLUDED_PATH_PARTS = {"legacy", "Legacy", "_weapon_duplicate_quarantine", "_bos
 
 CATEGORY_CONFIG = {
     "characters": {"index": "apkfiles/entries/characters/families/index.json", "canonical": "apkfiles/entries/maps/character_order_canonical.txt", "order_map": "apkfiles/entries/maps/character_order_map.json", "report": "apkfiles/entries/reports/character_order_sync_report.json", "key_field": "family", "display_fields": ["name", "displayName", "title"], "fallback_key_field": "sourceId", "collapse_numeric_forms": False},
-    "weapons": {"index": "apkfiles/entries/weapons/index.json", "canonical": "apkfiles/entries/maps/weapon_order_canonical.txt", "order_map": "apkfiles/entries/maps/weapon_order_map.json", "report": "apkfiles/entries/reports/weapon_order_sync_report.json", "key_field": "sourceId", "display_fields": ["name", "displayName"], "fallback_key_field": "name", "collapse_numeric_forms": False},
+    "weapons": {"index": "apkfiles/entries/weapons/index.json", "canonical": "apkfiles/entries/maps/weapon_order_canonical.txt", "order_map": "apkfiles/entries/maps/weapon_order_map.json", "report": "apkfiles/entries/reports/weapon_order_sync_report.json", "key_field": "sourceId", "display_fields": ["name", "displayName"], "fallback_key_field": "name", "collapse_numeric_forms": True},
     "accessories": {"index": "apkfiles/entries/accessories/index.json", "canonical": "apkfiles/entries/maps/accessory_order_canonical.txt", "order_map": "apkfiles/entries/maps/accessory_order_map.json", "report": "apkfiles/entries/reports/accessory_order_sync_report.json", "key_field": "sourceId", "display_fields": ["name", "displayName"], "fallback_key_field": "name", "collapse_numeric_forms": False},
     "bosses": {"index": "apkfiles/entries/bosses/index.json", "canonical": "apkfiles/entries/maps/boss_order_canonical.txt", "order_map": "apkfiles/entries/maps/boss_order_map.json", "report": "apkfiles/entries/reports/boss_order_sync_report.json", "key_field": "sourceId", "display_fields": ["name", "displayName"], "fallback_key_field": "name", "collapse_numeric_forms": False},
 }
@@ -56,6 +56,10 @@ def norm(value: Any) -> str:
 
 def strip_file_handle(value: Any) -> str:
     return re.sub(r"^\d+_", "", Path(str(value or "")).stem)
+
+
+def strip_form_suffix(value: Any) -> str:
+    return re.sub(r"\d+$", "", str(value or ""))
 
 
 def file_handle_order(file_value: Any) -> Optional[int]:
@@ -99,11 +103,13 @@ def row_key(row: Dict[str, Any], config: Dict[str, Any]) -> str:
     value = row.get(config["key_field"]) or row.get(config.get("fallback_key_field", ""))
     if not value and row.get("file"):
         value = strip_file_handle(row.get("file"))
-    return str(value or "").strip()
+    value = str(value or "").strip()
+    return strip_form_suffix(value) if config.get("collapse_numeric_forms") else value
 
 
 def row_source_id(row: Dict[str, Any], config: Dict[str, Any], key: str) -> str:
-    return str(row.get("sourceId") or row.get("family") or key).strip()
+    value = str(row.get("sourceId") or row.get("family") or key).strip()
+    return strip_form_suffix(value) if config.get("collapse_numeric_forms") else value
 
 
 def row_display(row: Dict[str, Any], config: Dict[str, Any], key: str) -> str:
