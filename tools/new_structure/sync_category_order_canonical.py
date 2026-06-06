@@ -15,7 +15,7 @@ EXCLUDED_PATH_PARTS = {"legacy", "Legacy", "_weapon_duplicate_quarantine", "_bos
 
 CATEGORY_CONFIG = {
     "characters": {"index": "apkfiles/entries/characters/families/index.json", "canonical": "apkfiles/entries/maps/character_order_canonical.txt", "order_map": "apkfiles/entries/maps/character_order_map.json", "report": "apkfiles/entries/reports/character_order_sync_report.json", "key_field": "family", "display_fields": ["name", "displayName", "title"], "fallback_key_field": "sourceId", "collapse_numeric_forms": False},
-    "weapons": {"index": "apkfiles/entries/weapons/index.json", "canonical": "apkfiles/entries/maps/weapon_order_canonical.txt", "order_map": "apkfiles/entries/maps/weapon_order_map.json", "report": "apkfiles/entries/reports/weapon_order_sync_report.json", "key_field": "sourceId", "display_fields": ["name", "displayName"], "fallback_key_field": "name", "collapse_numeric_forms": True},
+    "weapons": {"index": "apkfiles/entries/weapons/index.json", "canonical": "apkfiles/entries/maps/weapon_order_canonical.txt", "order_map": "apkfiles/entries/maps/weapon_order_map.json", "report": "apkfiles/entries/reports/weapon_order_sync_report.json", "key_field": "sourceId", "display_fields": ["name", "displayName"], "fallback_key_field": "name", "collapse_numeric_forms": True, "order_by_file_handle": True, "newest_first": True},
     "accessories": {"index": "apkfiles/entries/accessories/index.json", "canonical": "apkfiles/entries/maps/accessory_order_canonical.txt", "order_map": "apkfiles/entries/maps/accessory_order_map.json", "report": "apkfiles/entries/reports/accessory_order_sync_report.json", "key_field": "sourceId", "display_fields": ["name", "displayName"], "fallback_key_field": "name", "collapse_numeric_forms": False},
     "bosses": {"index": "apkfiles/entries/bosses/index.json", "canonical": "apkfiles/entries/maps/boss_order_canonical.txt", "order_map": "apkfiles/entries/maps/boss_order_map.json", "report": "apkfiles/entries/reports/boss_order_sync_report.json", "key_field": "sourceId", "display_fields": ["name", "displayName"], "fallback_key_field": "name", "collapse_numeric_forms": False},
 }
@@ -140,7 +140,14 @@ def excluded_index_row(row: Dict[str, Any]) -> bool:
     return any(part in EXCLUDED_PATH_PARTS or part.startswith("_") for part in path.parts)
 
 
-def index_sort_key(row: Dict[str, Any]) -> int:
+def index_sort_key(row: Dict[str, Any], config: Optional[Dict[str, Any]] = None) -> int:
+    # Weapons use the numeric file-handle prefix as the source of truth:
+    # 0001_* is oldest; larger prefixes are newer.  Generated order fields can
+    # become stale, so they are intentionally ignored for weapon ordering.
+    handle = file_handle_order(row.get("file"))
+    if config and config.get("order_by_file_handle"):
+        value = handle or 999999
+        return -value if config.get("newest_first") else value
     for key in ("fileHandleOrder", "sourceOrder", "order", "visualOrder"):
         try:
             value = int(row.get(key))
@@ -148,14 +155,14 @@ def index_sort_key(row: Dict[str, Any]) -> int:
                 return value
         except Exception:
             pass
-    return file_handle_order(row.get("file")) or 999999
+    return handle or 999999
 
 
 def build_index_maps(index: Dict[str, Any], config: Dict[str, Any]) -> Tuple[Dict[str, Dict[str, Any]], List[Dict[str, Any]], List[Dict[str, Any]]]:
     by_norm: Dict[str, Dict[str, Any]] = {}
     rows: List[Dict[str, Any]] = []
     excluded: List[Dict[str, Any]] = []
-    for row in sorted(index.get("entries", []) or [], key=index_sort_key):
+    for row in sorted(index.get("entries", []) or [], key=lambda r: index_sort_key(r, config)):
         if not isinstance(row, dict):
             continue
         if excluded_index_row(row):
@@ -199,6 +206,46 @@ def sync_category(repo: Path, category: str, dry_run: bool) -> Dict[str, Any]:
     seen_row_ids = set()
     seen_canonical_keys = set()
     missing_canonical: List[Dict[str, str]] = []
+    if category == "weapons":
+        # For weapons, the handle prefix is the chronological source of truth.
+        # Rebuild the canonical/display order from files so 0001_* stays oldest
+        # and the largest handle renders first in "newest" views.
+        ordered = []
+        for row in index_rows:
+            key = row.get("_canonicalKey") or row.get("_sourceId")
+            row_id = row.get("_sourceId") or key
+            display = row.get("_displayName") or key
+            ordered.append({"key": key, "sourceId": row_id, "displayName": display, "file": row.get("file"), "matchedBy": "file-handle", "indexRow": row})
+        canonical = [{"key": row["key"], "displayName": row["displayName"]} for row in ordered]
+        missing_canonical = []
+        appended = []
+        blocked_append = []
+        new_canonical = canonical
+        order_rows = []
+        rewritten_entries = []
+        for order, row in enumerate(ordered, start=1):
+            clean_index_row = {k: v for k, v in row["indexRow"].items() if not k.startswith("_")}
+            handle_order = file_handle_order(clean_index_row.get("file")) or order
+            clean_index_row["order"] = handle_order
+            clean_index_row["sourceOrder"] = handle_order
+            clean_index_row["fileHandleOrder"] = handle_order
+            rewritten_entries.append(clean_index_row)
+            order_rows.append({"order": handle_order, "sourceOrder": handle_order, "fileHandleOrder": handle_order, "key": row["key"], "sourceId": row["sourceId"], "displayName": row["displayName"], "file": row.get("file"), "matchedBy": row.get("matchedBy")})
+        new_index = dict(index)
+        new_index["schemaVersion"] = max(int(new_index.get("schemaVersion", 1)), 3)
+        new_index["entries"] = rewritten_entries
+        new_index["count"] = len(rewritten_entries)
+        new_index["orderSource"] = "file-handle-prefix"
+        new_index["orderLocked"] = True
+        new_index["orderGeneratedAt"] = int(time.time())
+        report = {"schemaVersion": 2, "generatedAt": int(time.time()), "dryRun": dry_run, "category": category, "orderLocked": True, "seededCanonicalFromCurrentIndex": False, "canonicalFile": str(canonical_path), "indexFile": str(index_path), "orderMap": str(order_map_path), "canonicalExistingCount": len(canonical), "indexEntryCount": len(index_rows), "excludedIndexRows": len(excluded_rows), "orderedCount": len(ordered), "appendedNewEntries": 0, "blockedAppends": 0, "missingCanonicalEntries": 0, "appended": [], "blockedAppendRows": [], "missingCanonical": [], "orderAuthority": "file-handle-prefix: 0001 oldest, highest prefix newest"}
+        if not dry_run:
+            write_text(canonical_path, "\n".join(format_order_line(r["key"], r["displayName"]) for r in new_canonical) + "\n")
+            write_json(order_map_path, {"schemaVersion": 3, "source": "file-handle weapon order; 0001 oldest, highest prefix newest", "generatedAt": int(time.time()), "category": category, "count": len(order_rows), "order": order_rows})
+            write_json(index_path, new_index)
+            write_json(report_path, report)
+        return report
+
 
     for canon in canonical:
         canon_key_norm = norm(canon["key"])

@@ -39,7 +39,16 @@
   async function fetchJson(url){ const res=await fetch(url,{cache:'no-store'}); if(!res.ok)throw new Error(`${url}: ${res.status}`); return await res.json(); }
   async function loadIndexOrder(kindKey){ const map=new Map(); try{ const json=await fetchJson(INDEX_FILES[kindKey]); const rows=Array.isArray(json?.entries)?json.entries:[]; rows.forEach(row=>addIndexRow(map,row)); }catch(err){ console.warn(`[CatalogSort] Index order unavailable for ${kindKey}`,err); } return map; }
   async function loadAllOrders(){ const pairs=await Promise.all(['characters','weapons','accessories','bosses'].map(async k=>[k,await loadIndexOrder(k)])); pairs.forEach(([k,map])=>{orderMaps[k]=map;}); }
-  function cardNativeOrder(card){ return numericValue(card.getAttribute('data-order'))||numericValue(card.getAttribute('data-source-order'))||numericValue(card.getAttribute('data-file-handle-order')); }
+  function cardNativeOrder(card){
+    // Weapons are chronologically ordered by their file-handle prefix:
+    // 0001_* is oldest, larger prefixes are newer.  Prefer that prefix over
+    // any generated order/sourceOrder so stale maps cannot reshuffle weapons.
+    if(kind(card)==='weapons'){
+      const handle = handleFromFile(card.getAttribute('data-file') || id(card));
+      if(handle)return handle;
+    }
+    return numericValue(card.getAttribute('data-file-handle-order'))||numericValue(card.getAttribute('data-source-order'))||numericValue(card.getAttribute('data-order'));
+  }
   function cardAliasKeys(card){ let values=[id(card),stripHandle(id(card)),family(id(card)),family(stripHandle(id(card))),title(card),subtitle(card),`${title(card)} ${subtitle(card)}`,card.getAttribute('data-source-id'),card.getAttribute('data-family'),card.getAttribute('data-order-key'),card.getAttribute('data-file')]; values.slice().forEach(v=>{ values=values.concat(suffixVariants(v),bossVariants(v),greatAxeVariants(v)); }); return unique(values).map(norm).filter(Boolean); }
   function orderIndex(card){
     const native=cardNativeOrder(card);
