@@ -2,7 +2,7 @@
    Safe with lazy batch rendering: sort is scheduled, not run recursively per DOM mutation.
 */
 (function(){
-  const SORT_KEY = 'evertale_catalog_sort_v5';
+  const SORT_KEY = 'evertale_catalog_sort_v6';
   const DEFAULT_SORT = 'newest';
   const KIND_RANK = { characters: 0, weapons: 1, accessories: 2, bosses: 3 };
   const INDEX_FILES = {
@@ -41,7 +41,14 @@
   async function loadAllOrders(){ const pairs=await Promise.all(['characters','weapons','accessories','bosses'].map(async k=>[k,await loadIndexOrder(k)])); pairs.forEach(([k,map])=>{orderMaps[k]=map;}); }
   function cardNativeOrder(card){ return numericValue(card.getAttribute('data-order'))||numericValue(card.getAttribute('data-source-order'))||numericValue(card.getAttribute('data-file-handle-order')); }
   function cardAliasKeys(card){ let values=[id(card),stripHandle(id(card)),family(id(card)),family(stripHandle(id(card))),title(card),subtitle(card),`${title(card)} ${subtitle(card)}`,card.getAttribute('data-source-id'),card.getAttribute('data-family'),card.getAttribute('data-order-key'),card.getAttribute('data-file')]; values.slice().forEach(v=>{ values=values.concat(suffixVariants(v),bossVariants(v),greatAxeVariants(v)); }); return unique(values).map(norm).filter(Boolean); }
-  function orderIndex(card){ const native=cardNativeOrder(card); if(native)return native; const map=orderMaps[kind(card)]; if(!map)return null; for(const key of cardAliasKeys(card)) if(map.has(key)) return map.get(key); return null; }
+  function orderIndex(card){
+    const native=cardNativeOrder(card);
+    if(native)return native;
+    const map=orderMaps[kind(card)];
+    if(!map)return null;
+    for(const key of cardAliasKeys(card)) if(map.has(key)) return map.get(key);
+    return null;
+  }
   function sortCards(cards,mode){ const rows=cards.map((card,index)=>{ if(!card.hasAttribute('data-sort-original'))card.setAttribute('data-sort-original',String(index)); return{card,index,order:orderIndex(card),name:sortName(card)}; }); rows.sort((a,b)=>{ if(mode==='az'||mode==='za'){ const kr=kindRank(a.card)-kindRank(b.card); if(kr)return kr; const cmp=a.name.localeCompare(b.name,undefined,{sensitivity:'base',numeric:true}); return cmp?(mode==='az'?cmp:-cmp):a.index-b.index; } const kr=kindRank(a.card)-kindRank(b.card); if(kr)return kr; const ao=Number.isFinite(a.order)?a.order:null; const bo=Number.isFinite(b.order)?b.order:null; if(ao!==null&&bo!==null&&ao!==bo)return mode==='oldest'?ao-bo:bo-ao; if(ao!==null&&bo===null)return-1; if(ao===null&&bo!==null)return 1; return mode==='oldest'?originalIndex(a.card)-originalIndex(b.card):originalIndex(b.card)-originalIndex(a.card); }); return rows.map(row=>row.card); }
   function signatureFor(cards,mode){ return cards.map(c=>`${kind(c)}:${id(c)}:${orderIndex(c)}`).join('|')+'::'+mode; }
   function applySort(force){
