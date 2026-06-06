@@ -7,15 +7,12 @@ import json
 import re
 import time
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Tuple
 
 CATEGORIES = ["characters", "weapons", "accessories", "bosses"]
 ROOT_MARKERS = ["apkfiles"]
-STRICT_INDEX_CATEGORIES = {"weapons", "bosses"}
 EXCLUDED_DIR_NAMES = {"legacy", "Legacy", "_weapon_duplicate_quarantine", "_boss_duplicate_quarantine", "_duplicate_quarantine"}
-WEAPON_OVERLAY_REL = "overlays/weapons_overlay.json"
-WEAPON_OVERLAY_ORDER_BASE = 900000
-
+TESTLIKE_RE = re.compile(r"(test|debug|prototype|dev|internal|placeholder|sandbox|experimental)", re.I)
 
 def find_repo_root(start: Path) -> Path:
     current = start.resolve()
@@ -24,63 +21,24 @@ def find_repo_root(start: Path) -> Path:
             return folder
     return current
 
-
 def load_json(path: Path) -> Any:
     with path.open("r", encoding="utf-8-sig") as f:
         return json.load(f)
-
 
 def write_json(path: Path, data: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":")), encoding="utf-8", newline="\n")
 
-
 def stable_hash(data: Any) -> str:
     raw = json.dumps(data, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
     return hashlib.sha256(raw).hexdigest()[:16]
 
-
 def normalize_rel_path(path_value: str) -> str:
     return str(path_value or "").replace("\\", "/").lstrip("./")
 
-
-def strip_handle(value: str) -> str:
-    return re.sub(r"^\d+_", "", str(value or "")).replace(".json", "")
-
-
-def base_no_ext(value: str) -> str:
-    raw = str(value or "").split("?")[0].split("#")[0].split("/")[-1]
-    return re.sub(r"\.[a-z0-9]+$", "", raw, flags=re.I)
-
-
-def norm_key(value: Any) -> str:
-    return re.sub(r"[^a-z0-9]+", "", str(value or "").lower())
-
-
-def suffix_aliases(value: str) -> List[str]:
-    raw = str(value or "").strip()
-    if not raw:
-        return []
-    vals = {raw, strip_handle(raw), base_no_ext(raw), strip_handle(base_no_ext(raw))}
-    for v in list(vals):
-        if v.endswith("01"):
-            vals.add(v[:-2])
-        else:
-            vals.add(v + "01")
-    return [v for v in vals if v]
-
-
-def index_row_order(row: Dict[str, Any]) -> int:
-    for key in ("fileHandleOrder", "sourceOrder", "order", "visualOrder"):
-        try:
-            value = int(row.get(key))
-            if value > 0:
-                return value
-        except Exception:
-            pass
-    match = re.match(r"^(\d+)_", str(row.get("file", "")).split("/")[-1])
-    return int(match.group(1)) if match else 999999
-
+def file_handle(path_or_name: Any) -> int:
+    m = re.match(r"^(\d+)_", str(path_or_name or "").split("/")[-1])
+    return int(m.group(1)) if m else 0
 
 def read_index_entries(category_dir: Path) -> List[Dict[str, Any]]:
     index_path = category_dir / "index.json"
@@ -88,8 +46,7 @@ def read_index_entries(category_dir: Path) -> List[Dict[str, Any]]:
         return []
     index = load_json(index_path)
     rows = list(index.get("entries", [])) if isinstance(index, dict) else []
-    return sorted(rows, key=index_row_order)
-
+    return sorted(rows, key=lambda r: int(r.get("fileHandleOrder") or r.get("sourceOrder") or r.get("order") or file_handle(r.get("file")) or 0))
 
 def resolve_entry_path(category_dir: Path, rel_file: str) -> Path:
     rel_file = normalize_rel_path(rel_file)
@@ -97,229 +54,151 @@ def resolve_entry_path(category_dir: Path, rel_file: str) -> Path:
         return category_dir / rel_file
     return category_dir / "entries" / rel_file
 
-
-def find_renamed_entry_path(category_dir: Path, index_row: Dict[str, Any], rel_file: str) -> Optional[Path]:
-    entries_dir = category_dir / "entries"
-    if not entries_dir.exists():
-        return None
-    seed_values = [index_row.get("sourceId"), index_row.get("key"), index_row.get("id"), strip_handle(Path(str(rel_file or "")).stem)]
-    seen = set()
-    for value in seed_values:
-        for alias in suffix_aliases(str(value or "")):
-            if alias in seen:
-                continue
-            seen.add(alias)
-            exact = entries_dir / f"{alias}.json"
-            if exact.exists():
-                return exact
-            matches = sorted(entries_dir.glob(f"*_{alias}.json"))
-            matches = [p for p in matches if p.is_file() and not is_excluded_entry_file(p)]
-            if len(matches) == 1:
-                return matches[0]
-    return None
-
-
-def source_id_from_entry(entry: Dict[str, Any], fallback: str = "") -> str:
-    internal = entry.get("internal") if isinstance(entry.get("internal"), dict) else {}
-    return str(internal.get("sourceId") or entry.get("sourceId") or entry.get("name") or entry.get("id") or fallback).strip()
-
-
-def weapon_keys(row: Dict[str, Any]) -> set[str]:
-    internal = row.get("internal") if isinstance(row.get("internal"), dict) else {}
-    raw = row.get("raw") if isinstance(row.get("raw"), dict) else {}
-    seeds = [row.get("id"), row.get("sourceId"), row.get("name"), row.get("displayName"), row.get("title"), row.get("image"), internal.get("sourceId"), internal.get("weaponId"), internal.get("family"), raw.get("name"), raw.get("image")]
-    out: set[str] = set()
-    for seed in seeds:
-        for alias in suffix_aliases(str(seed or "")):
-            k = norm_key(alias)
-            if k:
-                out.add(k)
-    return out
-
-
-def is_excluded_entry_file(path: Path) -> bool:
-    if path.name.startswith("_") or path.name.endswith("_report.json") or path.name.endswith(".renumber_tmp"):
-        return True
-    return any(part in EXCLUDED_DIR_NAMES or part.startswith("_") for part in path.parts)
-
+def is_excluded(path: Path) -> bool:
+    return path.name.startswith("_") or path.name.endswith("_report.json") or any(part in EXCLUDED_DIR_NAMES or part.startswith("_") for part in path.parts)
 
 def discover_entry_files(category_dir: Path) -> List[Path]:
     entries_dir = category_dir / "entries"
     if not entries_dir.exists():
         return []
-    return sorted(p for p in entries_dir.glob("*.json") if p.is_file() and not is_excluded_entry_file(p))
+    return sorted(p for p in entries_dir.glob("*.json") if p.is_file() and not is_excluded(p))
 
+def source_id_from_entry(entry: Dict[str, Any], fallback: str = "") -> str:
+    internal = entry.get("internal") if isinstance(entry.get("internal"), dict) else {}
+    raw = entry.get("raw") if isinstance(entry.get("raw"), dict) else {}
+    return str(internal.get("sourceId") or internal.get("weaponId") or entry.get("sourceId") or raw.get("name") or entry.get("name") or entry.get("id") or fallback).strip()
 
-def find_duplicate_source_ids(rows: List[Dict[str, Any]]) -> Dict[str, List[str]]:
-    seen: Dict[str, List[str]] = {}
-    for entry in rows:
-        sid = source_id_from_entry(entry, "")
-        if sid:
-            seen.setdefault(sid, []).append(str(entry.get("_bundleSourceFile", "")))
-    return {sid: files for sid, files in seen.items() if len(files) > 1}
+def apply_order(entry: Dict[str, Any], handle: int, source_file: str, test_like: bool = False) -> Dict[str, Any]:
+    entry = dict(entry)
+    entry["order"] = handle
+    entry["fileHandleOrder"] = handle
+    entry["sourceOrder"] = handle
+    entry["_bundleSourceFile"] = source_file
+    if test_like:
+        entry["_testLike"] = True
+    return entry
 
+def load_weapon_entries(category_dir: Path) -> Tuple[List[Dict[str, Any]], List[str], Dict[str, Any]]:
+    rows: List[Dict[str, Any]] = []
+    errors: List[str] = []
+    seen_source_ids: set[str] = set()
+    production: List[Tuple[int, Dict[str, Any]]] = []
+    testlike: List[Tuple[int, Dict[str, Any]]] = []
 
-def load_index_rows(category_dir: Path) -> Tuple[List[Dict[str, Any]], List[str], set[str], set[str], List[Dict[str, str]]]:
+    for path in discover_entry_files(category_dir):
+        handle = file_handle(path.name)
+        try:
+            entry = load_json(path)
+            sid = source_id_from_entry(entry, path.stem)
+            # Keep one visible card per exact source id. This avoids duplicated resolved entries,
+            # while still preserving distinct handles/families.
+            if sid and sid in seen_source_ids:
+                continue
+            if sid:
+                seen_source_ids.add(sid)
+            is_test = bool(TESTLIKE_RE.search(path.name) or TESTLIKE_RE.search(sid))
+            item = apply_order(entry, handle, f"entries/{path.name}", is_test)
+            (testlike if is_test else production).append((handle, item))
+        except Exception as exc:
+            errors.append(f"entries/{path.name}: {exc}")
+
+    production.sort(key=lambda x: x[0], reverse=True)
+    testlike.sort(key=lambda x: x[0], reverse=True)
+    rows = [x[1] for x in production] + [x[1] for x in testlike]
+    meta = {
+        "mode": "weapon_handle_source_of_truth",
+        "orderAuthority": "real 4-digit filename handle; newest is highest handle",
+        "productionCount": len(production),
+        "testLikeCount": len(testlike),
+        "count": len(rows),
+        "strictIndexOnly": False,
+        "discoveredUnindexedCount": 0,
+        "skippedUnindexedCount": 0,
+    }
+    return rows, errors, meta
+
+def load_indexed_with_discovery(category_dir: Path, category: str) -> Tuple[List[Dict[str, Any]], List[str], Dict[str, Any]]:
+    if category == "weapons":
+        return load_weapon_entries(category_dir)
+
     rows: List[Dict[str, Any]] = []
     errors: List[str] = []
     seen_files: set[str] = set()
     seen_ids: set[str] = set()
-    resolved_renamed: List[Dict[str, str]] = []
     for index_row in read_index_entries(category_dir):
         rel_file = normalize_rel_path(index_row.get("file", ""))
         if not rel_file:
             continue
         entry_path = resolve_entry_path(category_dir, rel_file)
-        if not entry_path.exists():
-            renamed_path = find_renamed_entry_path(category_dir, index_row, rel_file)
-            if renamed_path:
-                resolved_renamed.append({"indexedFile": rel_file, "resolvedFile": f"entries/{renamed_path.name}"})
-                entry_path = renamed_path
         seen_files.add(entry_path.name)
-        if is_excluded_entry_file(entry_path):
-            errors.append(f"excluded indexed file skipped: {rel_file}")
+        try:
+            entry = load_json(entry_path)
+            handle = int(index_row.get("fileHandleOrder") or index_row.get("sourceOrder") or index_row.get("order") or file_handle(rel_file) or 0)
+            if handle:
+                entry = apply_order(entry, handle, rel_file)
+            sid = source_id_from_entry(entry, entry_path.stem)
+            if sid:
+                seen_ids.add(sid)
+            rows.append(entry)
+        except Exception as exc:
+            errors.append(f"{rel_file}: {exc}")
+
+    discovered: List[str] = []
+    for entry_path in discover_entry_files(category_dir):
+        if entry_path.name in seen_files:
             continue
         try:
             entry = load_json(entry_path)
             sid = source_id_from_entry(entry, entry_path.stem)
+            if sid and sid in seen_ids:
+                continue
             if sid:
                 seen_ids.add(sid)
-            entry["_bundleSourceFile"] = rel_file if entry_path.name == Path(rel_file).name else f"entries/{entry_path.name}"
-            # Keep runtime sort metadata in sync with the index row.  This is
-            # especially important for weapons, where the file-handle prefix
-            # is the chronological authority.
-            for order_key in ("order", "sourceOrder", "fileHandleOrder", "visualOrder"):
-                if index_row.get(order_key) is not None:
-                    entry[order_key] = index_row.get(order_key)
+            entry = apply_order(entry, file_handle(entry_path.name), f"entries/{entry_path.name}")
             rows.append(entry)
+            discovered.append(entry_path.name)
         except Exception as exc:
-            errors.append(f"{rel_file}: {exc}")
-    return rows, errors, seen_files, seen_ids, resolved_renamed
+            errors.append(f"entries/{entry_path.name}: {exc}")
 
-
-def load_weapon_overlay(entries_root: Path, indexed_rows: List[Dict[str, Any]]) -> Tuple[Optional[List[Dict[str, Any]]], Dict[str, Any]]:
-    overlay_path = entries_root / WEAPON_OVERLAY_REL
-    if not overlay_path.exists():
-        return None, {"enabled": False, "reason": "missing_overlay", "path": str(overlay_path)}
-    payload = load_json(overlay_path)
-    overlay_rows = payload.get("weapons", []) if isinstance(payload, dict) else []
-    if not isinstance(overlay_rows, list) or not overlay_rows:
-        return None, {"enabled": False, "reason": "empty_overlay", "path": str(overlay_path)}
-    out: List[Dict[str, Any]] = []
-    keys: set[str] = set()
-    total = len(overlay_rows)
-    for idx, row in enumerate(overlay_rows):
-        if not isinstance(row, dict):
-            continue
-        order = WEAPON_OVERLAY_ORDER_BASE + (total - idx)
-        source_id = row.get("sourceId") or row.get("name") or base_no_ext(row.get("image")) or row.get("id")
-        item = {**row, "category": "weapons", "order": order, "fileHandleOrder": order, "sourceOrder": order, "internal": {**(row.get("internal") if isinstance(row.get("internal"), dict) else {}), "source": "weapon_overlay", "sourceId": source_id, "weaponId": source_id}, "_weaponOverlay": True, "_weaponOverlayIndex": idx}
-        out.append(item)
-        keys.update(weapon_keys(item))
-    appended = []
-    append_index = 0
-    for row in indexed_rows:
-        if weapon_keys(row).isdisjoint(keys):
-            order = WEAPON_OVERLAY_ORDER_BASE + 1000 + append_index
-            append_index += 1
-            item = {**row, "order": order, "fileHandleOrder": order, "sourceOrder": order, "_weaponOverlayAppend": True}
-            out.insert(0, item)
-            keys.update(weapon_keys(item))
-            appended.append(source_id_from_entry(row, row.get("id", "")))
-    return out, {"enabled": True, "path": str(overlay_path), "overlayCount": len(overlay_rows), "outputCount": len(out), "appendedIndexedCount": len(appended), "appendedIndexed": appended[:100]}
-
-
-def load_entries_with_discovery(category_dir: Path, category: str, entries_root: Path) -> Tuple[List[Dict[str, Any]], List[str], Dict[str, Any]]:
-    rows, errors, seen_files, seen_ids, resolved_renamed = load_index_rows(category_dir)
-    discovered: List[str] = []
-    skipped_unindexed: List[str] = []
-    overlay_meta: Dict[str, Any] = {}
-
-    if category == "weapons":
-        overlay_rows, overlay_meta = load_weapon_overlay(entries_root, rows)
-        if overlay_rows is not None:
-            for entry_path in discover_entry_files(category_dir):
-                if entry_path.name not in seen_files:
-                    skipped_unindexed.append(entry_path.name)
-            duplicates = find_duplicate_source_ids(overlay_rows)
-            meta = {"indexedCount": len(seen_files), "strictIndexOnly": True, "resolvedRenamedCount": len(resolved_renamed), "resolvedRenamedFiles": resolved_renamed[:500], "discoveredUnindexedCount": 0, "discoveredUnindexedFiles": [], "skippedUnindexedCount": len(skipped_unindexed), "skippedUnindexedFiles": skipped_unindexed[:500], "duplicateSourceIdCount": len(duplicates), "duplicateSourceIds": duplicates, "weaponOverlay": overlay_meta}
-            return overlay_rows, errors, meta
-
-    if category not in STRICT_INDEX_CATEGORIES:
-        for entry_path in discover_entry_files(category_dir):
-            if entry_path.name in seen_files:
-                continue
-            try:
-                entry = load_json(entry_path)
-                sid = source_id_from_entry(entry, entry_path.stem)
-                if sid and sid in seen_ids:
-                    continue
-                if sid:
-                    seen_ids.add(sid)
-                entry["_bundleSourceFile"] = f"entries/{entry_path.name}"
-                rows.append(entry)
-                discovered.append(entry_path.name)
-            except Exception as exc:
-                errors.append(f"entries/{entry_path.name}: {exc}")
-    else:
-        for entry_path in discover_entry_files(category_dir):
-            if entry_path.name not in seen_files:
-                skipped_unindexed.append(entry_path.name)
-
-    duplicates = find_duplicate_source_ids(rows)
-    meta = {"indexedCount": len(seen_files), "strictIndexOnly": category in STRICT_INDEX_CATEGORIES, "resolvedRenamedCount": len(resolved_renamed), "resolvedRenamedFiles": resolved_renamed[:500], "discoveredUnindexedCount": len(discovered), "discoveredUnindexedFiles": discovered[:500], "skippedUnindexedCount": len(skipped_unindexed), "skippedUnindexedFiles": skipped_unindexed[:500], "duplicateSourceIdCount": len(duplicates), "duplicateSourceIds": duplicates}
-    if overlay_meta:
-        meta["weaponOverlay"] = overlay_meta
+    meta = {
+        "indexedCount": len(seen_files),
+        "discoveredUnindexedCount": len(discovered),
+        "discoveredUnindexedFiles": discovered[:500],
+        "strictIndexOnly": False,
+    }
     return rows, errors, meta
 
-
-def strip_bundle_internal_markers(rows: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+def strip_bundle_markers(rows: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     return [{k: v for k, v in row.items() if not k.startswith("_bundle")} for row in rows]
-
-
-
-def runtime_file_handle_order(row: Dict[str, Any]) -> int:
-    for key in ("fileHandleOrder", "sourceOrder", "order", "visualOrder"):
-        try:
-            value = int(row.get(key))
-            if value > 0:
-                return value
-        except Exception:
-            pass
-    match = re.match(r"^(\d+)_", str(row.get("_bundleSourceFile") or row.get("file") or "").split("/")[-1])
-    return int(match.group(1)) if match else 0
-
-
-def sort_runtime_rows(category: str, rows: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    if category == "weapons":
-        # Default weapon output follows chronology: highest handle/newest first.
-        return sorted(rows, key=lambda row: (-runtime_file_handle_order(row), str(row.get("name") or row.get("id") or "").lower()))
-    return rows
 
 def build_category(entries_root: Path, bundles_dir: Path, category: str) -> Dict[str, Any]:
     category_dir = entries_root / category
     index_path = category_dir / "index.json"
-    if not index_path.exists():
-        return {"category": category, "status": "missing_index", "count": 0}
-    source_index_count = len(read_index_entries(category_dir))
-    rows, errors, discovery = load_entries_with_discovery(category_dir, category, entries_root)
-    clean_rows = sort_runtime_rows(category, strip_bundle_internal_markers(rows))
-    if category in STRICT_INDEX_CATEGORIES and len(clean_rows) != source_index_count and not (category == "weapons" and discovery.get("weaponOverlay", {}).get("enabled")):
-        errors.append(f"strict_count_mismatch index={source_index_count} bundle={len(clean_rows)}")
-    if discovery.get("duplicateSourceIdCount"):
-        errors.append(f"duplicate_source_ids={discovery.get('duplicateSourceIdCount')}")
-    bundle = {"schemaVersion": 4, "category": category, "generatedAt": int(time.time()), "sourceIndexCount": source_index_count, "discovery": discovery, "count": len(clean_rows), "errors": errors, "contentHash": stable_hash(clean_rows), "entries": clean_rows}
+    if not category_dir.exists():
+        return {"category": category, "status": "missing_category", "count": 0}
+    source_index_count = len(read_index_entries(category_dir)) if index_path.exists() else 0
+    rows, errors, discovery = load_indexed_with_discovery(category_dir, category)
+    clean_rows = strip_bundle_markers(rows)
+    bundle = {
+        "schemaVersion": 4,
+        "category": category,
+        "generatedAt": int(time.time()),
+        "sourceIndexCount": source_index_count,
+        "discovery": discovery,
+        "count": len(clean_rows),
+        "errors": errors,
+        "contentHash": stable_hash(clean_rows),
+        "entries": clean_rows,
+    }
     out_path = bundles_dir / f"{category}.bundle.json"
     write_json(out_path, bundle)
-    return {"category": category, "status": "ok" if not errors else "warning", "sourceIndexCount": source_index_count, "count": len(clean_rows), "errors": len(errors), "resolvedRenamedCount": discovery.get("resolvedRenamedCount", 0), "discoveredUnindexedCount": discovery["discoveredUnindexedCount"], "skippedUnindexedCount": discovery["skippedUnindexedCount"], "duplicateSourceIdCount": discovery["duplicateSourceIdCount"], "weaponOverlay": discovery.get("weaponOverlay"), "contentHash": bundle["contentHash"], "output": str(out_path)}
-
+    return {"category": category, "status": "ok" if not errors else "warning", "sourceIndexCount": source_index_count, "count": len(clean_rows), "errors": len(errors), "discovery": discovery, "contentHash": bundle["contentHash"], "output": str(out_path)}
 
 def resolve_family_path(family_dir: Path, rel_file: str) -> Path:
     rel_file = normalize_rel_path(rel_file)
     if rel_file.startswith("families/"):
         return family_dir / rel_file.split("/", 1)[1]
     return family_dir / rel_file
-
 
 def build_character_families(entries_root: Path, bundles_dir: Path) -> Dict[str, Any]:
     family_dir = entries_root / "characters" / "families"
@@ -328,8 +207,8 @@ def build_character_families(entries_root: Path, bundles_dir: Path) -> Dict[str,
         return {"category": "character_families", "status": "missing_index", "count": 0}
     index = load_json(index_path)
     index_rows = list(index.get("entries", [])) if isinstance(index, dict) else []
-    rows = []
-    errors = []
+    rows: List[Dict[str, Any]] = []
+    errors: List[str] = []
     for row in index_rows:
         rel_file = normalize_rel_path(row.get("file", ""))
         if not rel_file:
@@ -343,7 +222,6 @@ def build_character_families(entries_root: Path, bundles_dir: Path) -> Dict[str,
     out_path = bundles_dir / "character_families.bundle.json"
     write_json(out_path, bundle)
     return {"category": "character_families", "status": "ok" if not errors else "warning", "sourceIndexCount": len(index_rows), "count": len(rows), "errors": len(errors), "contentHash": bundle["contentHash"], "output": str(out_path)}
-
 
 def build_catalog_bundle(bundles_dir: Path) -> Dict[str, Any]:
     categories: Dict[str, List[Dict[str, Any]]] = {}
@@ -361,18 +239,16 @@ def build_catalog_bundle(bundles_dir: Path) -> Dict[str, Any]:
     if families_path.exists():
         payload = load_json(families_path)
         character_families = payload.get("entries", []) if isinstance(payload, dict) else []
-    catalog = {"schemaVersion": 4, "generatedAt": int(time.time()), "categories": categories, "characterFamilies": character_families, "missingBundles": missing, "categoryCounts": {category: len(categories.get(category, [])) for category in CATEGORIES}, "characterFamilyCount": len(character_families), "contentHash": stable_hash({"categories": categories, "characterFamilies": character_families})}
+    catalog = {"schemaVersion": 4, "generatedAt": int(time.time()), "categories": categories, "characterFamilies": character_families, "missingBundles": missing, "categoryCounts": {c: len(categories.get(c, [])) for c in CATEGORIES}, "characterFamilyCount": len(character_families), "contentHash": stable_hash({"categories": categories, "characterFamilies": character_families})}
     out_path = bundles_dir / "catalog.bundle.json"
     write_json(out_path, catalog)
     return {"category": "catalog", "status": "ok" if not missing else "warning", "count": sum(len(v) for v in categories.values()), "characterFamilies": len(character_families), "missingBundles": missing, "categoryCounts": catalog["categoryCounts"], "contentHash": catalog["contentHash"], "output": str(out_path)}
-
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Build compact entry bundles from apkfiles/entries.")
     parser.add_argument("--entries-root", default="apkfiles/entries")
     parser.add_argument("--bundles-root", default=None)
     args = parser.parse_args()
-
     repo = find_repo_root(Path.cwd())
     entries_root = (repo / args.entries_root).resolve() if not Path(args.entries_root).is_absolute() else Path(args.entries_root).resolve()
     bundles_dir = Path(args.bundles_root).resolve() if args.bundles_root else entries_root / "bundles"
@@ -382,12 +258,11 @@ def main() -> int:
     results.append(build_character_families(entries_root, bundles_dir))
     results.append(build_catalog_bundle(bundles_dir))
 
-    report = {"schemaVersion": 4, "generatedAt": int(time.time()), "entriesRoot": str(entries_root), "bundlesRoot": str(bundles_dir), "strictIndexCategories": sorted(STRICT_INDEX_CATEGORIES), "weaponOverlay": str(entries_root / WEAPON_OVERLAY_REL), "categories": results}
+    report = {"schemaVersion": 4, "generatedAt": int(time.time()), "entriesRoot": str(entries_root), "bundlesRoot": str(bundles_dir), "categories": results}
     report_path = entries_root / "reports" / "bundle_build_report.json"
     write_json(report_path, report)
     print(json.dumps(report, ensure_ascii=False, indent=2))
     return 0
-
 
 if __name__ == "__main__":
     raise SystemExit(main())
