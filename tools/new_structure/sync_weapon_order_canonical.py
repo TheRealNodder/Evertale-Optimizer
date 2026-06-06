@@ -61,6 +61,11 @@ def strip_form_suffix(value: str) -> str:
     return re.sub(r"\d+$", "", value or "")
 
 
+def primary_source_id(value: str) -> str:
+    base = strip_form_suffix(value)
+    return f"{base}01" if base else value
+
+
 def parse_order_line(line: str) -> Optional[Tuple[str, str]]:
     line = line.strip()
     if not line or line.startswith("#"):
@@ -112,10 +117,13 @@ def build_index_maps(index: Dict[str, Any]) -> Tuple[Dict[str, Dict[str, Any]], 
     by_source: Dict[str, Dict[str, Any]] = {}
     for row in index.get("entries", []) or []:
         source_id = str(row.get("sourceId") or "")
-        if source_id:
-            by_source[source_id] = dict(row)
-        for key in row_keys(row):
-            by_norm.setdefault(norm(key), dict(row))
+        family_id = strip_form_suffix(source_id)
+        row_copy = dict(row)
+        if family_id:
+            by_source.setdefault(family_id, row_copy)
+        for key in row_keys(row) + [family_id]:
+            by_norm.setdefault(norm(strip_form_suffix(key)), row_copy)
+            by_norm.setdefault(norm(key), row_copy)
     return by_norm, by_source
 
 
@@ -133,7 +141,7 @@ def sync(canonical_path: Path, index_path: Path, order_map_path: Path, report_pa
         if not matched:
             missing_canonical.append(row)
             continue
-        source_id = str(matched.get("sourceId") or row["key"])
+        source_id = strip_form_suffix(str(matched.get("sourceId") or row["key"]))
         if source_id in seen_sources:
             continue
         seen_sources.add(source_id)

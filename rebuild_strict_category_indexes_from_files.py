@@ -59,6 +59,17 @@ def source_id_from_entry(data: Dict[str, Any], fallback: str) -> str:
     return str(value or fallback).strip()
 
 
+
+def weapon_family_key(source_id: str, fallback: str) -> str:
+    value = str(source_id or fallback or "").strip()
+    return re.sub(r"\d+$", "", value) or value
+
+
+def is_primary_weapon_form(source_id: str, path: Path) -> bool:
+    value = str(source_id or strip_file_handle(path)).strip()
+    match = re.search(r"(\d+)$", value)
+    return not match or match.group(1) == "01"
+
 def display_name_from_entry(data: Dict[str, Any], source_id: str) -> str:
     raw = data.get("raw") if isinstance(data.get("raw"), dict) else {}
     for value in [data.get("displayName"), data.get("title"), data.get("name"), raw.get("displayName"), raw.get("title"), raw.get("name")]:
@@ -109,6 +120,7 @@ def build_index_for_category(repo_root: Path, category: str) -> Dict[str, Any]:
     files = sorted([p for p in entries_dir.glob("*.json") if p.is_file() and not is_excluded_entry_file(p)], key=lambda p: (file_handle_order(p), p.name.lower()))
     rows: List[Dict[str, Any]] = []
     seen: Dict[str, List[str]] = {}
+    seen_weapon_families: set[str] = set()
 
     for path in files:
         data = load_json(path, None)
@@ -117,6 +129,11 @@ def build_index_for_category(repo_root: Path, category: str) -> Dict[str, Any]:
             continue
         fallback = strip_file_handle(path)
         source_id = source_id_from_entry(data, fallback)
+        if category == "weapons":
+            family_key = weapon_family_key(source_id, fallback)
+            if family_key in seen_weapon_families or not is_primary_weapon_form(source_id, path):
+                continue
+            seen_weapon_families.add(family_key)
         order = file_handle_order(path)
         old = old_rows.get(f"sid:{source_id}") or old_rows.get(f"file:{path.name}") or {}
         row = {
