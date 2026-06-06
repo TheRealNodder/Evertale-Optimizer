@@ -11,10 +11,10 @@ from typing import Any, Dict, List, Optional, Tuple
 
 CATEGORIES = ["characters", "weapons", "accessories", "bosses"]
 ROOT_MARKERS = ["apkfiles"]
-# Bosses stay index-strict because boss duplicate/quarantine naming is more volatile.
-# Weapons/accessories are intentionally discovery-enabled so test/live catalogs can show the complete extracted set.
-STRICT_INDEX_CATEGORIES = {"bosses"}
+STRICT_INDEX_CATEGORIES = {"weapons", "bosses"}
 EXCLUDED_DIR_NAMES = {"legacy", "Legacy", "_weapon_duplicate_quarantine", "_boss_duplicate_quarantine", "_duplicate_quarantine"}
+WEAPON_OVERLAY_REL = "overlays/weapons_overlay.json"
+WEAPON_OVERLAY_ORDER_BASE = 900000
 
 
 def find_repo_root(start: Path) -> Path:
@@ -48,11 +48,20 @@ def strip_handle(value: str) -> str:
     return re.sub(r"^\d+_", "", str(value or "")).replace(".json", "")
 
 
+def base_no_ext(value: str) -> str:
+    raw = str(value or "").split("?")[0].split("#")[0].split("/")[-1]
+    return re.sub(r"\.[a-z0-9]+$", "", raw, flags=re.I)
+
+
+def norm_key(value: Any) -> str:
+    return re.sub(r"[^a-z0-9]+", "", str(value or "").lower())
+
+
 def suffix_aliases(value: str) -> List[str]:
     raw = str(value or "").strip()
     if not raw:
         return []
-    vals = {raw, strip_handle(raw)}
+    vals = {raw, strip_handle(raw), base_no_ext(raw), strip_handle(base_no_ext(raw))}
     for v in list(vals):
         if v.endswith("01"):
             vals.add(v[:-2])
@@ -93,12 +102,7 @@ def find_renamed_entry_path(category_dir: Path, index_row: Dict[str, Any], rel_f
     entries_dir = category_dir / "entries"
     if not entries_dir.exists():
         return None
-    seed_values = [
-        index_row.get("sourceId"),
-        index_row.get("key"),
-        index_row.get("id"),
-        strip_handle(Path(str(rel_file or "")).stem),
-    ]
+    seed_values = [index_row.get("sourceId"), index_row.get("key"), index_row.get("id"), strip_handle(Path(str(rel_file or "")).stem)]
     seen = set()
     for value in seed_values:
         for alias in suffix_aliases(str(value or "")):
@@ -118,6 +122,19 @@ def find_renamed_entry_path(category_dir: Path, index_row: Dict[str, Any], rel_f
 def source_id_from_entry(entry: Dict[str, Any], fallback: str = "") -> str:
     internal = entry.get("internal") if isinstance(entry.get("internal"), dict) else {}
     return str(internal.get("sourceId") or entry.get("sourceId") or entry.get("name") or entry.get("id") or fallback).strip()
+
+
+def weapon_keys(row: Dict[str, Any]) -> set[str]:
+    internal = row.get("internal") if isinstance(row.get("internal"), dict) else {}
+    raw = row.get("raw") if isinstance(row.get("raw"), dict) else {}
+    seeds = [row.get("id"), row.get("sourceId"), row.get("name"), row.get("displayName"), row.get("title"), row.get("image"), internal.get("sourceId"), internal.get("weaponId"), internal.get("family"), raw.get("name"), raw.get("image")]
+    out: set[str] = set()
+    for seed in seeds:
+        for alias in suffix_aliases(str(seed or "")):
+            k = norm_key(alias)
+            if k:
+                out.add(k)
+    return out
 
 
 def is_excluded_entry_file(path: Path) -> bool:
@@ -142,13 +159,12 @@ def find_duplicate_source_ids(rows: List[Dict[str, Any]]) -> Dict[str, List[str]
     return {sid: files for sid, files in seen.items() if len(files) > 1}
 
 
-def load_entries_with_discovery(category_dir: Path, category: str) -> Tuple[List[Dict[str, Any]], List[str], Dict[str, Any]]:
+def load_index_rows(category_dir: Path) -> Tuple[List[Dict[str, Any]], List[str], set[str], set[str], List[Dict[str, str]]]:
     rows: List[Dict[str, Any]] = []
     errors: List[str] = []
     seen_files: set[str] = set()
     seen_ids: set[str] = set()
     resolved_renamed: List[Dict[str, str]] = []
-
     for index_row in read_index_entries(category_dir):
         rel_file = normalize_rel_path(index_row.get("file", ""))
         if not rel_file:
@@ -172,9 +188,57 @@ def load_entries_with_discovery(category_dir: Path, category: str) -> Tuple[List
             rows.append(entry)
         except Exception as exc:
             errors.append(f"{rel_file}: {exc}")
+    return rows, errors, seen_files, seen_ids, resolved_renamed
 
+
+def load_weapon_overlay(entries_root: Path, indexed_rows: List[Dict[str, Any]]) -> Tuple[Optional[List[Dict[str, Any]]], Dict[str, Any]]:
+    overlay_path = entries_root / WEAPON_OVERLAY_REL
+    if not overlay_path.exists():
+        return None, {"enabled": False, "reason": "missing_overlay", "path": str(overlay_path)}
+    payload = load_json(overlay_path)
+    overlay_rows = payload.get("weapons", []) if isinstance(payload, dict) else []
+    if not isinstance(overlay_rows, list) or not overlay_rows:
+        return None, {"enabled": False, "reason": "empty_overlay", "path": str(overlay_path)}
+    out: List[Dict[str, Any]] = []
+    keys: set[str] = set()
+    total = len(overlay_rows)
+    for idx, row in enumerate(overlay_rows):
+        if not isinstance(row, dict):
+            continue
+        order = WEAPON_OVERLAY_ORDER_BASE + (total - idx)
+        source_id = row.get("sourceId") or row.get("name") or base_no_ext(row.get("image")) or row.get("id")
+        item = {**row, "category": "weapons", "order": order, "fileHandleOrder": order, "sourceOrder": order, "internal": {**(row.get("internal") if isinstance(row.get("internal"), dict) else {}), "source": "weapon_overlay", "sourceId": source_id, "weaponId": source_id}, "_weaponOverlay": True, "_weaponOverlayIndex": idx}
+        out.append(item)
+        keys.update(weapon_keys(item))
+    appended = []
+    append_index = 0
+    for row in indexed_rows:
+        if weapon_keys(row).isdisjoint(keys):
+            order = WEAPON_OVERLAY_ORDER_BASE + 1000 + append_index
+            append_index += 1
+            item = {**row, "order": order, "fileHandleOrder": order, "sourceOrder": order, "_weaponOverlayAppend": True}
+            out.insert(0, item)
+            keys.update(weapon_keys(item))
+            appended.append(source_id_from_entry(row, row.get("id", "")))
+    return out, {"enabled": True, "path": str(overlay_path), "overlayCount": len(overlay_rows), "outputCount": len(out), "appendedIndexedCount": len(appended), "appendedIndexed": appended[:100]}
+
+
+def load_entries_with_discovery(category_dir: Path, category: str, entries_root: Path) -> Tuple[List[Dict[str, Any]], List[str], Dict[str, Any]]:
+    rows, errors, seen_files, seen_ids, resolved_renamed = load_index_rows(category_dir)
     discovered: List[str] = []
     skipped_unindexed: List[str] = []
+    overlay_meta: Dict[str, Any] = {}
+
+    if category == "weapons":
+        overlay_rows, overlay_meta = load_weapon_overlay(entries_root, rows)
+        if overlay_rows is not None:
+            for entry_path in discover_entry_files(category_dir):
+                if entry_path.name not in seen_files:
+                    skipped_unindexed.append(entry_path.name)
+            duplicates = find_duplicate_source_ids(overlay_rows)
+            meta = {"indexedCount": len(seen_files), "strictIndexOnly": True, "resolvedRenamedCount": len(resolved_renamed), "resolvedRenamedFiles": resolved_renamed[:500], "discoveredUnindexedCount": 0, "discoveredUnindexedFiles": [], "skippedUnindexedCount": len(skipped_unindexed), "skippedUnindexedFiles": skipped_unindexed[:500], "duplicateSourceIdCount": len(duplicates), "duplicateSourceIds": duplicates, "weaponOverlay": overlay_meta}
+            return overlay_rows, errors, meta
+
     if category not in STRICT_INDEX_CATEGORIES:
         for entry_path in discover_entry_files(category_dir):
             if entry_path.name in seen_files:
@@ -198,14 +262,13 @@ def load_entries_with_discovery(category_dir: Path, category: str) -> Tuple[List
 
     duplicates = find_duplicate_source_ids(rows)
     meta = {"indexedCount": len(seen_files), "strictIndexOnly": category in STRICT_INDEX_CATEGORIES, "resolvedRenamedCount": len(resolved_renamed), "resolvedRenamedFiles": resolved_renamed[:500], "discoveredUnindexedCount": len(discovered), "discoveredUnindexedFiles": discovered[:500], "skippedUnindexedCount": len(skipped_unindexed), "skippedUnindexedFiles": skipped_unindexed[:500], "duplicateSourceIdCount": len(duplicates), "duplicateSourceIds": duplicates}
+    if overlay_meta:
+        meta["weaponOverlay"] = overlay_meta
     return rows, errors, meta
 
 
 def strip_bundle_internal_markers(rows: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    clean = []
-    for row in rows:
-        clean.append({k: v for k, v in row.items() if not k.startswith("_bundle")})
-    return clean
+    return [{k: v for k, v in row.items() if not k.startswith("_bundle")} for row in rows]
 
 
 def build_category(entries_root: Path, bundles_dir: Path, category: str) -> Dict[str, Any]:
@@ -214,16 +277,16 @@ def build_category(entries_root: Path, bundles_dir: Path, category: str) -> Dict
     if not index_path.exists():
         return {"category": category, "status": "missing_index", "count": 0}
     source_index_count = len(read_index_entries(category_dir))
-    rows, errors, discovery = load_entries_with_discovery(category_dir, category)
+    rows, errors, discovery = load_entries_with_discovery(category_dir, category, entries_root)
     clean_rows = strip_bundle_internal_markers(rows)
-    if category in STRICT_INDEX_CATEGORIES and len(clean_rows) != source_index_count:
+    if category in STRICT_INDEX_CATEGORIES and len(clean_rows) != source_index_count and not (category == "weapons" and discovery.get("weaponOverlay", {}).get("enabled")):
         errors.append(f"strict_count_mismatch index={source_index_count} bundle={len(clean_rows)}")
     if discovery.get("duplicateSourceIdCount"):
         errors.append(f"duplicate_source_ids={discovery.get('duplicateSourceIdCount')}")
     bundle = {"schemaVersion": 4, "category": category, "generatedAt": int(time.time()), "sourceIndexCount": source_index_count, "discovery": discovery, "count": len(clean_rows), "errors": errors, "contentHash": stable_hash(clean_rows), "entries": clean_rows}
     out_path = bundles_dir / f"{category}.bundle.json"
     write_json(out_path, bundle)
-    return {"category": category, "status": "ok" if not errors else "warning", "sourceIndexCount": source_index_count, "count": len(clean_rows), "errors": len(errors), "resolvedRenamedCount": discovery.get("resolvedRenamedCount", 0), "discoveredUnindexedCount": discovery["discoveredUnindexedCount"], "skippedUnindexedCount": discovery["skippedUnindexedCount"], "duplicateSourceIdCount": discovery["duplicateSourceIdCount"], "contentHash": bundle["contentHash"], "output": str(out_path)}
+    return {"category": category, "status": "ok" if not errors else "warning", "sourceIndexCount": source_index_count, "count": len(clean_rows), "errors": len(errors), "resolvedRenamedCount": discovery.get("resolvedRenamedCount", 0), "discoveredUnindexedCount": discovery["discoveredUnindexedCount"], "skippedUnindexedCount": discovery["skippedUnindexedCount"], "duplicateSourceIdCount": discovery["duplicateSourceIdCount"], "weaponOverlay": discovery.get("weaponOverlay"), "contentHash": bundle["contentHash"], "output": str(out_path)}
 
 
 def resolve_family_path(family_dir: Path, rel_file: str) -> Path:
@@ -290,13 +353,11 @@ def main() -> int:
     bundles_dir = Path(args.bundles_root).resolve() if args.bundles_root else entries_root / "bundles"
     bundles_dir.mkdir(parents=True, exist_ok=True)
 
-    results = []
-    for category in CATEGORIES:
-        results.append(build_category(entries_root, bundles_dir, category))
+    results = [build_category(entries_root, bundles_dir, category) for category in CATEGORIES]
     results.append(build_character_families(entries_root, bundles_dir))
     results.append(build_catalog_bundle(bundles_dir))
 
-    report = {"schemaVersion": 4, "generatedAt": int(time.time()), "entriesRoot": str(entries_root), "bundlesRoot": str(bundles_dir), "strictIndexCategories": sorted(STRICT_INDEX_CATEGORIES), "categories": results}
+    report = {"schemaVersion": 4, "generatedAt": int(time.time()), "entriesRoot": str(entries_root), "bundlesRoot": str(bundles_dir), "strictIndexCategories": sorted(STRICT_INDEX_CATEGORIES), "weaponOverlay": str(entries_root / WEAPON_OVERLAY_REL), "categories": results}
     report_path = entries_root / "reports" / "bundle_build_report.json"
     write_json(report_path, report)
     print(json.dumps(report, ensure_ascii=False, indent=2))
