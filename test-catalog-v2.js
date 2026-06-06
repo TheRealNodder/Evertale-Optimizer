@@ -15,6 +15,13 @@
       l.setAttribute('data-v2-element-surface','1');
       document.head.appendChild(l);
     }
+    if(!document.querySelector('link[data-v2-mobile]')){
+      const m=document.createElement('link');
+      m.rel='stylesheet';
+      m.href='./test-catalog-v2-mobile.css?v=1';
+      m.setAttribute('data-v2-mobile','1');
+      document.head.appendChild(m);
+    }
     if(window.EvertaleElementReference) return;
     const s=document.createElement('script');
     s.src='./element-normalizer.js?v=1';
