@@ -66,6 +66,11 @@ def primary_source_id(value: str) -> str:
     return f"{base}01" if base else value
 
 
+def file_handle_order(file_value: Any) -> int:
+    match = re.match(r"^(\d+)_", str(file_value or "").split("/")[-1])
+    return int(match.group(1)) if match else 999999
+
+
 def parse_order_line(line: str) -> Optional[Tuple[str, str]]:
     line = line.strip()
     if not line or line.startswith("#"):
@@ -128,55 +133,42 @@ def build_index_maps(index: Dict[str, Any]) -> Tuple[Dict[str, Dict[str, Any]], 
 
 
 def sync(canonical_path: Path, index_path: Path, order_map_path: Path, report_path: Path, dry_run: bool) -> Dict[str, Any]:
-    canonical = load_canonical(canonical_path)
     index = load_index(index_path)
     by_norm, by_source = build_index_maps(index)
 
-    ordered: List[Dict[str, Any]] = []
+    # Weapon chronology is the file-handle prefix.  0001_* is oldest; larger
+    # prefixes are newer.  Rebuild the canonical list and order map from that
+    # numeric prefix instead of trusting stale canonical/sourceOrder values.
+    rows = []
     seen_sources = set()
-    missing_canonical: List[Dict[str, str]] = []
-
-    for row in canonical:
-        matched = by_norm.get(norm(row["key"]))
-        if not matched:
-            missing_canonical.append(row)
-            continue
-        source_id = strip_form_suffix(str(matched.get("sourceId") or row["key"]))
-        if source_id in seen_sources:
-            continue
-        seen_sources.add(source_id)
-        ordered.append({
-            "key": row["key"],
-            "sourceId": source_id,
-            "displayName": row["displayName"] or matched.get("name") or source_id,
-            "file": matched.get("file"),
-            "matchedBy": "canonical",
-            "indexRow": matched,
-        })
-
-    appended: List[Dict[str, str]] = []
     for source_id, row in by_source.items():
         if source_id in seen_sources:
             continue
-        key = strip_form_suffix(source_id)
-        display = str(row.get("name") or "")
         seen_sources.add(source_id)
-        appended.append({"key": key, "displayName": display})
-        ordered.append({
+        key = strip_form_suffix(source_id)
+        display = str(row.get("name") or row.get("displayName") or key)
+        rows.append({
             "key": key,
             "sourceId": source_id,
             "displayName": display,
             "file": row.get("file"),
-            "matchedBy": "appended-new-entry",
+            "matchedBy": "file-handle",
             "indexRow": row,
+            "handleOrder": file_handle_order(row.get("file")),
         })
 
-    new_canonical = canonical + appended
+    rows.sort(key=lambda row: (-int(row["handleOrder"]), str(row["key"]).lower()))
+
     order_map_rows = []
     rewritten_entries = []
-    for i, row in enumerate(ordered, start=1):
+    new_canonical = []
+    for row in rows:
+        handle_order = int(row["handleOrder"]) if int(row["handleOrder"]) != 999999 else len(order_map_rows) + 1
+        new_canonical.append({"key": row["key"], "displayName": row["displayName"]})
         order_map_rows.append({
-            "order": i,
+            "order": handle_order,
+            "sourceOrder": handle_order,
+            "fileHandleOrder": handle_order,
             "key": row["key"],
             "sourceId": row["sourceId"],
             "displayName": row["displayName"],
@@ -184,36 +176,35 @@ def sync(canonical_path: Path, index_path: Path, order_map_path: Path, report_pa
             "matchedBy": row.get("matchedBy"),
         })
         index_row = dict(row["indexRow"])
-        index_row["order"] = i
+        index_row["order"] = handle_order
+        index_row["sourceOrder"] = handle_order
+        index_row["fileHandleOrder"] = handle_order
         rewritten_entries.append(index_row)
 
     new_index = dict(index)
+    new_index["schemaVersion"] = max(int(new_index.get("schemaVersion", 1)), 3)
     new_index["entries"] = rewritten_entries
     new_index["count"] = len(rewritten_entries)
-    new_index["orderSource"] = "apkfiles/entries/maps/weapon_order_canonical.txt"
+    new_index["orderSource"] = "file-handle-prefix"
     new_index["orderGeneratedAt"] = int(time.time())
 
     report = {
-        "schemaVersion": 1,
+        "schemaVersion": 2,
         "generatedAt": int(time.time()),
         "dryRun": dry_run,
         "canonicalFile": str(canonical_path),
         "weaponIndex": str(index_path),
         "orderMap": str(order_map_path),
-        "canonicalExistingCount": len(canonical),
         "indexEntryCount": len(index.get("entries", []) or []),
-        "orderedCount": len(ordered),
-        "appendedNewEntries": len(appended),
-        "missingCanonicalEntries": len(missing_canonical),
-        "appended": appended,
-        "missingCanonical": missing_canonical,
+        "orderedCount": len(rows),
+        "orderAuthority": "file-handle-prefix: 0001 oldest, highest prefix newest",
     }
 
     if not dry_run:
         write_text(canonical_path, "\n".join(format_order_line(r["key"], r["displayName"]) for r in new_canonical) + "\n")
         write_json(order_map_path, {
-            "schemaVersion": 1,
-            "source": "append-only canonical weapon order",
+            "schemaVersion": 3,
+            "source": "file-handle weapon order; 0001 oldest, highest prefix newest",
             "generatedAt": int(time.time()),
             "category": "weapons",
             "count": len(order_map_rows),

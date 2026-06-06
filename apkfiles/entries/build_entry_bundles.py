@@ -118,6 +118,12 @@ def load_entries_with_discovery(category_dir: Path, category: str) -> Tuple[List
             if sid:
                 seen_ids.add(sid)
             entry["_bundleSourceFile"] = rel_file
+            # Keep runtime sort metadata in sync with the index row.  This is
+            # especially important for weapons, where the file-handle prefix
+            # is the chronological authority.
+            for order_key in ("order", "sourceOrder", "fileHandleOrder", "visualOrder"):
+                if index_row.get(order_key) is not None:
+                    entry[order_key] = index_row.get(order_key)
             rows.append(entry)
         except Exception as exc:
             errors.append(f"{rel_file}: {exc}")
@@ -157,6 +163,25 @@ def strip_bundle_internal_markers(rows: List[Dict[str, Any]]) -> List[Dict[str, 
     return clean
 
 
+
+def runtime_file_handle_order(row: Dict[str, Any]) -> int:
+    for key in ("fileHandleOrder", "sourceOrder", "order", "visualOrder"):
+        try:
+            value = int(row.get(key))
+            if value > 0:
+                return value
+        except Exception:
+            pass
+    match = re.match(r"^(\d+)_", str(row.get("_bundleSourceFile") or row.get("file") or "").split("/")[-1])
+    return int(match.group(1)) if match else 0
+
+
+def sort_runtime_rows(category: str, rows: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    if category == "weapons":
+        # Default weapon output follows chronology: highest handle/newest first.
+        return sorted(rows, key=lambda row: (-runtime_file_handle_order(row), str(row.get("name") or row.get("id") or "").lower()))
+    return rows
+
 def build_category(entries_root: Path, bundles_dir: Path, category: str) -> Dict[str, Any]:
     category_dir = entries_root / category
     index_path = category_dir / "index.json"
@@ -164,7 +189,7 @@ def build_category(entries_root: Path, bundles_dir: Path, category: str) -> Dict
         return {"category": category, "status": "missing_index", "count": 0}
     source_index_count = len(read_index_entries(category_dir))
     rows, errors, discovery = load_entries_with_discovery(category_dir, category)
-    clean_rows = strip_bundle_internal_markers(rows)
+    clean_rows = sort_runtime_rows(category, strip_bundle_internal_markers(rows))
     if category in STRICT_INDEX_CATEGORIES and len(clean_rows) != source_index_count:
         errors.append(f"strict_count_mismatch index={source_index_count} bundle={len(clean_rows)}")
     if discovery.get("duplicateSourceIdCount"):
