@@ -1,0 +1,47 @@
+Changed-files-only performance and weapon-order pass
+
+Applied changes:
+- Removed the live catalog prefetch for apkfiles/entries/bundles/catalog.bundle.json so the catalog no longer warms an 18MB bundle during startup.
+- Kept direct category bundles as the first source of truth.
+- Added weapon index metadata back onto bundled weapon rows so UI cards carry the numeric file-handle order.
+- Made weapon overlay restoration display-only; it no longer assigns artificial 900000+ order values.
+- Forced weapon sorting to use the numeric file prefix: 0001_* is oldest, the highest prefix is newest.
+- Changed catalog sort's index fetch cache mode from no-store to default and made re-sort happen on animation frames.
+- Changed the weapon canonical Python sync to write/store canonical order oldest-to-newest by file prefix.
+
+Legacy move notes for other logic:
+These files are tool/report/test artifacts and should not be loaded by the live site. If you maintain a cleanup/move step, they are safe candidates for legacy/tooling areas, not runtime:
+- test-catalog.html
+- test-catalog-v2.html
+- test-catalog-v2.js
+- test-catalog-v2.css
+- test-catalog-v2-mobile.css
+- test-catalog-v2-elements.css
+- catalog.js
+- catalog-v2-lite.js
+- duo-sort-bypass.js
+- restore_weapon_overlay_from_git.py
+- apkfiles/entries/reports/*
+- tools/new_structure/tools/report-only scripts that are not imported by MASTER_CONTROL.py
+
+Do not move:
+- index.html
+- live-data-config.js
+- data-loader.js
+- supercharge.js
+- sw.js
+- catalog-lite.js
+- catalog-lite.css
+- catalog-sort.js
+- duo-source-collapse.js
+- duo-display.js
+- weapon-overlay-runtime.js
+- optimizerRuntimeLoader.js
+- optimizerRuntimeBootstrap.js
+- runtime-data-bridge.js
+- runtime-stat-engine.js
+- apkfiles/entries/bundles/*.bundle.json
+- apkfiles/entries/maps/*.json
+- apkfiles/entries/runtime/*.json
+- apkfiles/entries/overlays/weapons_overlay.json
+- apkfiles/entries/weapons/index.json

@@ -8,7 +8,8 @@
   const strip=v=>String(v||'').split('/').pop().replace(/\.json$/i,'').replace(/^\d+_/,'');
   const num=v=>{const n=Number(v);return Number.isFinite(n)?n:''};
   const val=(e,raw,k,...f)=>num(pick(e?.stats?.[k],e?.[k],...f));
-  const order=e=>num(pick(e?.fileHandleOrder,e?.sourceOrder,e?.order,e?.visualOrder,e?.raw?.bundleNumber));
+  const handleOrder=v=>{const m=String(v||'').split(/[?#]/)[0].split('/').pop().match(/^(\d+)_/);return m?Number(m[1]):''};
+  const order=e=>num(pick(handleOrder(e?.file),handleOrder(e?._bundleSourceFile),e?.fileHandleOrder,e?.sourceOrder,e?.order,e?.visualOrder,e?.raw?.bundleNumber));
   const file=e=>String(e?._bundleSourceFile||e?.file||e?.path||'').replace(/^\.\//,'');
   const attrJson=v=>{try{return safe(encodeURIComponent(JSON.stringify(v||[])))}catch{return''}};
   const idle=fn=>('requestIdleCallback'in window?requestIdleCallback(fn,{timeout:120}):setTimeout(fn,26));
@@ -23,7 +24,7 @@
     const weapons=(entries.weapons||[]).map(e=>{const x=base('weapons',e);return{...x,image:pick(e.image,x.sourceId?`https://ik.imagekit.io/r8fsa98s9/weapons/${x.sourceId}.png`:'')}});
     const accessories=(entries.accessories||[]).map(e=>{const x=base('accessories',e);return{...x,image:pick(e.image,x.sourceId?`https://ik.imagekit.io/r8fsa98s9/accessories/${x.sourceId}.png`:'')}});
     const bosses=(entries.bosses||[]).map(e=>{const x=base('bosses',e);return{...x,image:pick(e.image,x.sourceId?`https://ik.imagekit.io/r8fsa98s9/characters/${x.sourceId.replace(/Boss(?=\d+$)/,'')}.png`:'')}});
-    return [...chars.sort((a,b)=>Number(b.order||0)-Number(a.order||0)),...weapons.sort((a,b)=>Number(b.order||0)-Number(a.order||0)),...accessories.sort((a,b)=>Number(a.order||999999)-Number(b.order||999999)),...bosses.sort((a,b)=>Number(a.order||999999)-Number(b.order||999999))].filter(x=>x.id&&x.name);
+    return [...chars.sort((a,b)=>Number(b.order||0)-Number(a.order||0)),...weapons.sort((a,b)=>Number(b.order||0)-Number(a.order||0)||String(a.name).localeCompare(String(b.name))),...accessories.sort((a,b)=>Number(a.order||999999)-Number(b.order||999999)),...bosses.sort((a,b)=>Number(a.order||999999)-Number(b.order||999999))].filter(x=>x.id&&x.name);
   }
   function stateBtns(imgs){if(!Array.isArray(imgs)||imgs.length<2)return'';const enc=attrJson(imgs.slice(0,3));return`<div class="stateRow" data-imgs="${enc}">${imgs.slice(0,3).map((_,i)=>`<button type="button" class="stateBtn ${i===0?'active':''}" data-idx="${i}" aria-label="State ${i+1}"></button>`).join('')}</div>`;}
   function card(item){
