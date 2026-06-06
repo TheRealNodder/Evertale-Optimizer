@@ -25,6 +25,13 @@
     const match = String(v||'').split(/[?#]/)[0].split('/').pop().match(/^(\d+)_/);
     return match ? Number(match[1]) : null;
   }
+  function isTestWeaponValue(v){
+    const raw=String(v||'').trim();
+    if(!raw)return false;
+    const base=raw.split(/[?#]/)[0].split('/').pop().replace(/^\d+_/,'');
+    return /(^|[_\W])test([_\W]|$|[a-z])/i.test(base)||/(^|[_\W])test([_\W]|$|[a-z])/i.test(raw);
+  }
+  function isTestWeaponRow(row){return [row?.id,row?.sourceId,row?.name,row?.displayName,row?.title,row?.file,row?.path,row?.raw?.name,row?.internal?.sourceId,row?.internal?.weaponId,basename(row?.image),basename(row?.raw?.image)].some(isTestWeaponValue);}
   function firstNumber(...values){
     for(const value of values){
       const n = Number(value);
@@ -64,7 +71,7 @@
     if(indexPromise) return indexPromise;
     indexPromise = (async()=>{
       const index = await fetchJson(INDEX_URL,true);
-      const rows = Array.isArray(index?.entries) ? index.entries : [];
+      const rows = (Array.isArray(index?.entries) ? index.entries : []).filter(row=>!isTestWeaponRow(row));
       const byKey = new Map();
       rows.forEach((row, i)=>{
         const fileOrder = handleOrderFromFile(row.file);
@@ -110,7 +117,7 @@
 
   function overlayRows(payload, indexData){
     const rows = Array.isArray(payload?.weapons) ? payload.weapons : Array.isArray(payload?.entries) ? payload.entries : [];
-    return rows.map(row=>enrichWithIndexOrder(row,indexData));
+    return rows.filter(row=>!isTestWeaponRow(row)).map(row=>enrichWithIndexOrder(row,indexData));
   }
 
   async function indexedWeaponRows(existingRows, indexData){

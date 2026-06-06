@@ -71,6 +71,29 @@ def file_handle_order(file_value: Any) -> int:
     return int(match.group(1)) if match else 999999
 
 
+def is_test_weapon_value(value: Any) -> bool:
+    raw = str(value or "").strip()
+    if not raw:
+        return False
+    base = re.sub(r"^\d+_", "", raw.split("?")[0].split("#")[0].replace("\\", "/").split("/")[-1])
+    return (
+        re.search(r"(^|[_\W])test([_\W]|$|[a-z])", base, re.I) is not None
+        or re.search(r"(^|[_\W])test([_\W]|$|[a-z])", raw, re.I) is not None
+    )
+
+
+def is_test_weapon_row(row: Dict[str, Any]) -> bool:
+    raw = row.get("raw") if isinstance(row.get("raw"), dict) else {}
+    internal = row.get("internal") if isinstance(row.get("internal"), dict) else {}
+    values = [
+        row.get("id"), row.get("sourceId"), row.get("family"), row.get("key"),
+        row.get("name"), row.get("displayName"), row.get("title"),
+        row.get("file"), row.get("path"),
+        raw.get("name"), internal.get("sourceId"), internal.get("weaponId"),
+    ]
+    return any(is_test_weapon_value(value) for value in values)
+
+
 def parse_order_line(line: str) -> Optional[Tuple[str, str]]:
     line = line.strip()
     if not line or line.startswith("#"):
@@ -121,6 +144,8 @@ def build_index_maps(index: Dict[str, Any]) -> Tuple[Dict[str, Dict[str, Any]], 
     by_norm: Dict[str, Dict[str, Any]] = {}
     by_source: Dict[str, Dict[str, Any]] = {}
     for row in index.get("entries", []) or []:
+        if is_test_weapon_row(row):
+            continue
         source_id = str(row.get("sourceId") or "")
         family_id = strip_form_suffix(source_id)
         row_copy = dict(row)
@@ -197,6 +222,7 @@ def sync(canonical_path: Path, index_path: Path, order_map_path: Path, report_pa
         "orderMap": str(order_map_path),
         "indexEntryCount": len(index.get("entries", []) or []),
         "orderedCount": len(rows),
+        "excludedTestWeaponCount": sum(1 for row in index.get("entries", []) or [] if is_test_weapon_row(row)),
         "orderAuthority": "file-handle-prefix: 0001 oldest, highest prefix newest; canonical/index stored oldest-to-newest",
     }
 

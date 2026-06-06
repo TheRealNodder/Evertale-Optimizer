@@ -29,6 +29,16 @@
   function sortName(card){ return title(card).trim().toLowerCase(); }
   function numericValue(value){ const n = Number(value); return Number.isFinite(n) && n > 0 ? n : null; }
   function handleFromFile(file){ const m = String(file || '').split('/').pop().match(/^(\d+)_/); return m ? numericValue(m[1]) : null; }
+  function isTestWeaponValue(value){
+    const raw = String(value || '').trim();
+    if(!raw) return false;
+    const base = raw.split(/[?#]/)[0].split('/').pop().replace(/^\d+_/, '');
+    return /(^|[_\W])test([_\W]|$|[a-z])/i.test(base) || /(^|[_\W])test([_\W]|$|[a-z])/i.test(raw);
+  }
+  function isTestWeaponCard(card){
+    if(kind(card)!=='weapons') return false;
+    return [id(card), title(card), subtitle(card), card.getAttribute('data-source-id'), card.getAttribute('data-family'), card.getAttribute('data-order-key'), card.getAttribute('data-file')].some(isTestWeaponValue);
+  }
   function unique(values){ const out=[]; const seen=new Set(); values.forEach(v => { const s=String(v || '').trim(); const n=norm(s); if(s && n && !seen.has(n)){ seen.add(n); out.push(s); } }); return out; }
   function suffixVariants(value){ const raw=String(value||'').trim(); if(!raw)return[]; return /01$/i.test(raw)?[raw,raw.replace(/01$/i,'')]:[raw,raw+'01']; }
   function bossVariants(value){ const raw=String(value||'').trim(); if(!raw)return[]; const vals=[raw]; const m=raw.match(/^(.*Boss)(\d{2})$/i); if(m)vals.push(m[1]); else if(/Boss$/i.test(raw))['01','02','03','04','05'].forEach(s=>vals.push(raw+s)); return vals; }
@@ -51,6 +61,9 @@
   }
   function cardAliasKeys(card){ let values=[id(card),stripHandle(id(card)),family(id(card)),family(stripHandle(id(card))),title(card),subtitle(card),`${title(card)} ${subtitle(card)}`,card.getAttribute('data-source-id'),card.getAttribute('data-family'),card.getAttribute('data-order-key'),card.getAttribute('data-file')]; values.slice().forEach(v=>{ values=values.concat(suffixVariants(v),bossVariants(v),greatAxeVariants(v)); }); return unique(values).map(norm).filter(Boolean); }
   function orderIndex(card){
+    // Test/debug weapons exist in extracted APK data but should never outrank real weapons.
+    // Treat them as unranked in the UI; newest/oldest then push them behind known real handles.
+    if(isTestWeaponCard(card)) return null;
     const native=cardNativeOrder(card);
     if(native)return native;
     // Weapons must not be reshuffled by stale overlay/order-map aliases.
