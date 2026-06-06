@@ -20,6 +20,58 @@
   let characterFamiliesCache = null;
   let characterImageMapCache = null;
   let localizationGroupsCache = null;
+  let categoryIndexCache = Object.create(null);
+
+  function fileHandleOrder(fileValue) {
+    const match = String(fileValue || '').split(/[?#]/)[0].split('/').pop().match(/^(\d+)_/);
+    return match ? Number(match[1]) : null;
+  }
+  function keyNorm(value) { return String(value || '').toLowerCase().replace(/[^a-z0-9]+/g, ''); }
+  function indexKeys(row) {
+    const sourceId = row?.sourceId || row?.internal?.sourceId || row?.internal?.weaponId || row?.raw?.name || row?.name || row?.id;
+    const family = row?.family || row?.internal?.family || stripFormSuffix(sourceId);
+    const imageBase = String(row?.image || row?.raw?.image || '').split(/[?#]/)[0].split('/').pop().replace(/\.[a-z0-9]+$/i, '');
+    return [sourceId, family, row?.name, row?.displayName, row?.title, imageBase]
+      .map(keyNorm)
+      .filter(Boolean);
+  }
+  async function getCategoryIndex(category) {
+    if (categoryIndexCache[category] !== undefined) return categoryIndexCache[category];
+    const index = await fetchJson(versionedUrl(`${ENTRY_BASE}/${category}/index.json`), true, MAP_CACHE_MODE);
+    const rows = Array.isArray(index?.entries) ? index.entries : [];
+    const byKey = new Map();
+    rows.forEach((row, idx) => {
+      const order = fileHandleOrder(row.file) || Number(row.fileHandleOrder || row.sourceOrder || row.order || row.visualOrder) || idx + 1;
+      const enriched = { ...row, order, sourceOrder: order, fileHandleOrder: order };
+      indexKeys(enriched).forEach(key => { if (!byKey.has(key)) byKey.set(key, enriched); });
+    });
+    categoryIndexCache[category] = { rows, byKey };
+    return categoryIndexCache[category];
+  }
+  function applyIndexMetadata(row, indexData) {
+    if (!indexData || !indexData.byKey) return row;
+    let match = null;
+    for (const key of indexKeys(row)) {
+      match = indexData.byKey.get(key);
+      if (match) break;
+    }
+    if (!match) return row;
+    const order = fileHandleOrder(match.file) || Number(match.fileHandleOrder || match.sourceOrder || match.order || row.fileHandleOrder || row.sourceOrder || row.order) || null;
+    return {
+      ...row,
+      file: row.file || match.file || '',
+      path: row.path || match.file || '',
+      order: order || row.order,
+      sourceOrder: order || row.sourceOrder || row.order,
+      fileHandleOrder: order || row.fileHandleOrder || row.order,
+      internal: {
+        ...(row.internal || {}),
+        sourceId: row.internal?.sourceId || row.sourceId || match.sourceId,
+        family: row.internal?.family || row.family || stripFormSuffix(row.sourceId || match.sourceId)
+      }
+    };
+  }
+
 
   function toArray(json, key) { if (Array.isArray(json)) return json; if (json && Array.isArray(json[key])) return json[key]; if (json && Array.isArray(json.items)) return json.items; return []; }
   async function fetchJson(url, optional = false, cacheMode = 'default') {
@@ -61,6 +113,11 @@
     } else {
       rows = await getCatalogCategory(category);
       if (!Array.isArray(rows) || rows.length === 0) rows = await getDirectCategoryBundle(category);
+    }
+    if (Array.isArray(rows) && category === 'weapons') {
+      const indexData = await getCategoryIndex(category);
+      rows = rows.map(row => applyIndexMetadata(row, indexData));
+      rows.sort((a, b) => (Number(a.fileHandleOrder || a.sourceOrder || a.order || 999999) - Number(b.fileHandleOrder || b.sourceOrder || b.order || 999999)));
     }
     categoryBundleCache[category] = Array.isArray(rows) ? rows : null;
     return categoryBundleCache[category];

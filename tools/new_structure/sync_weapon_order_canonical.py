@@ -157,7 +157,7 @@ def sync(canonical_path: Path, index_path: Path, order_map_path: Path, report_pa
             "handleOrder": file_handle_order(row.get("file")),
         })
 
-    rows.sort(key=lambda row: (-int(row["handleOrder"]), str(row["key"]).lower()))
+    rows.sort(key=lambda row: (int(row["handleOrder"]), str(row["key"]).lower()))
 
     order_map_rows = []
     rewritten_entries = []
@@ -197,7 +197,7 @@ def sync(canonical_path: Path, index_path: Path, order_map_path: Path, report_pa
         "orderMap": str(order_map_path),
         "indexEntryCount": len(index.get("entries", []) or []),
         "orderedCount": len(rows),
-        "orderAuthority": "file-handle-prefix: 0001 oldest, highest prefix newest",
+        "orderAuthority": "file-handle-prefix: 0001 oldest, highest prefix newest; canonical/index stored oldest-to-newest",
     }
 
     if not dry_run:

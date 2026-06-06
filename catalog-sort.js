@@ -36,7 +36,7 @@
   function addKey(map,key,order){ const n=norm(key); if(n&&order&&!map.has(n))map.set(n,order); }
   function addAliases(map,value,order){ if(!value||!order)return; const raw=String(value||''); const stem=stripHandle(raw); const baseRaw=family(raw); const baseStem=family(stem); let values=[raw,stem,baseRaw,baseStem]; [raw,stem,baseRaw,baseStem].forEach(v=>{ values=values.concat(suffixVariants(v),bossVariants(v),greatAxeVariants(v)); }); values.forEach(v=>addKey(map,v,order)); }
   function addIndexRow(map,row){ const order=handleFromFile(row.file)||numericValue(row.fileHandleOrder)||numericValue(row.sourceOrder)||numericValue(row.order)||numericValue(row.visualOrder); if(!order)return; [row.sourceId,row.family,row.key,row.name,row.displayName,row.title,row.sortName,row.file].forEach(v=>addAliases(map,v,order)); }
-  async function fetchJson(url){ const res=await fetch(url,{cache:'no-store'}); if(!res.ok)throw new Error(`${url}: ${res.status}`); return await res.json(); }
+  async function fetchJson(url){ const res=await fetch(url,{cache:'default'}); if(!res.ok)throw new Error(`${url}: ${res.status}`); return await res.json(); }
   async function loadIndexOrder(kindKey){ const map=new Map(); try{ const json=await fetchJson(INDEX_FILES[kindKey]); const rows=Array.isArray(json?.entries)?json.entries:[]; rows.forEach(row=>addIndexRow(map,row)); }catch(err){ console.warn(`[CatalogSort] Index order unavailable for ${kindKey}`,err); } return map; }
   async function loadAllOrders(){ const pairs=await Promise.all(['characters','weapons','accessories','bosses'].map(async k=>[k,await loadIndexOrder(k)])); pairs.forEach(([k,map])=>{orderMaps[k]=map;}); }
   function cardNativeOrder(card){
@@ -53,6 +53,9 @@
   function orderIndex(card){
     const native=cardNativeOrder(card);
     if(native)return native;
+    // Weapons must not be reshuffled by stale overlay/order-map aliases.
+    // If a weapon has no native handle order, leave it in render order.
+    if(kind(card)==='weapons') return null;
     const map=orderMaps[kind(card)];
     if(!map)return null;
     for(const key of cardAliasKeys(card)) if(map.has(key)) return map.get(key);
@@ -78,7 +81,7 @@
   function scheduleSort(force=false){
     if(scheduled)return;
     scheduled=true;
-    setTimeout(()=>{ scheduled=false; applySort(force); },120);
+    requestAnimationFrame(()=>{ scheduled=false; applySort(force); });
   }
   function init(){
     const select=$('catalogSort'); const grid=$('catalogGrid');
