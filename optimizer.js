@@ -216,7 +216,7 @@ function normalizeRuntimeArray(chunk) {
 
 async function loadOptimizerRuntimeIfAvailable() {
   if (window.loadOptimizerRuntime && !window.OptimizerRuntime?.loaded) {
-    try { await window.loadOptimizerRuntime(); } catch (err) { console.warn("[Optimizer] Runtime load failed; equipment pairing disabled.", err); }
+    try { await window.loadOptimizerRuntime({ skipHeavy: true }); } catch (err) { console.warn("[Optimizer] Runtime load failed; equipment pairing disabled.", err); }
   }
   const chunks = window.OptimizerRuntime?.chunks || {};
   const weapons = normalizeRuntimeArray(chunks.weapons);
