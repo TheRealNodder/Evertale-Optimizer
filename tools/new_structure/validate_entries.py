@@ -9,7 +9,8 @@ from typing import Any, Dict, List
 
 ROOT_MARKERS = ["apkfiles", "tools"]
 CATEGORIES = ["characters", "weapons", "accessories", "bosses"]
-STRICT_INDEX_CATEGORIES = {"weapons", "accessories", "bosses"}
+# Must match build_entry_bundles.py. Accessories are not strict-index-only in the current bundle builder.
+STRICT_INDEX_CATEGORIES = {"weapons", "bosses"}
 REQUIRED_MARKERS = [
     "run_entry_pipeline_all.marker.json",
     "build_character_image_map.marker.json",
@@ -62,6 +63,12 @@ def file_handle_order(file_value: Any) -> int | None:
     return int(match.group(1)) if match else None
 
 
+def weapon_overlay_enabled(bundle: Dict[str, Any]) -> bool:
+    discovery = bundle.get("discovery", {}) if isinstance(bundle.get("discovery"), dict) else {}
+    overlay = discovery.get("weaponOverlay", {}) if isinstance(discovery.get("weaponOverlay"), dict) else {}
+    return bool(overlay.get("enabled"))
+
+
 def validate_bundle(base: Path, category: str, index_count: int, errors: List[str], warnings: List[str], bundle_counts: Dict[str, Any]) -> None:
     bundle_path = base / "bundles" / f"{category}.bundle.json"
     if not bundle_path.exists():
@@ -70,20 +77,30 @@ def validate_bundle(base: Path, category: str, index_count: int, errors: List[st
     bundle = load_json(bundle_path, {}) or {}
     entries = bundle.get("entries") if isinstance(bundle, dict) else []
     count = len(entries or []) if isinstance(entries, list) else 0
-    bundle_counts[category] = {"schemaVersion": bundle.get("schemaVersion"), "count": count, "sourceIndexCount": bundle.get("sourceIndexCount"), "discovery": bundle.get("discovery", {})}
+    discovery = bundle.get("discovery", {}) if isinstance(bundle.get("discovery"), dict) else {}
+    bundle_counts[category] = {"schemaVersion": bundle.get("schemaVersion"), "count": count, "sourceIndexCount": bundle.get("sourceIndexCount"), "discovery": discovery}
     if category in STRICT_INDEX_CATEGORIES:
         if bundle.get("schemaVersion", 0) < 3:
             errors.append(f"[{category}] Bundle schemaVersion is stale: {bundle.get('schemaVersion')}")
-        if count != index_count:
+        overlay_ok = category == "weapons" and weapon_overlay_enabled(bundle)
+        if count != index_count and not overlay_ok:
             errors.append(f"[{category}] Strict bundle count mismatch: index={index_count}, bundle={count}")
-        discovery = bundle.get("discovery", {}) if isinstance(bundle.get("discovery"), dict) else {}
         if discovery.get("discoveredUnindexedCount", 0):
             errors.append(f"[{category}] Strict bundle discovered unindexed entries: {discovery.get('discoveredUnindexedCount')}")
         if not discovery.get("strictIndexOnly", False):
             errors.append(f"[{category}] Strict bundle missing strictIndexOnly=true")
 
 
-def validate_catalog_bundle(base: Path, category_counts: Dict[str, int], errors: List[str], warnings: List[str]) -> None:
+def expected_catalog_count(category: str, index_expected: int, bundle_counts: Dict[str, Any]) -> int:
+    bundle = bundle_counts.get(category, {}) if isinstance(bundle_counts.get(category), dict) else {}
+    discovery = bundle.get("discovery", {}) if isinstance(bundle.get("discovery"), dict) else {}
+    overlay = discovery.get("weaponOverlay", {}) if isinstance(discovery.get("weaponOverlay"), dict) else {}
+    if category == "weapons" and overlay.get("enabled"):
+        return int(bundle.get("count") or index_expected)
+    return index_expected
+
+
+def validate_catalog_bundle(base: Path, category_counts: Dict[str, int], errors: List[str], warnings: List[str], bundle_counts: Dict[str, Any]) -> None:
     catalog_path = base / "bundles" / "catalog.bundle.json"
     if not catalog_path.exists():
         errors.append("[catalog] Missing catalog.bundle.json")
@@ -95,7 +112,8 @@ def validate_catalog_bundle(base: Path, category_counts: Dict[str, int], errors:
     if not isinstance(categories, dict):
         errors.append("[catalog] categories is not an object")
         return
-    for category, expected in category_counts.items():
+    for category, index_expected in category_counts.items():
+        expected = expected_catalog_count(category, index_expected, bundle_counts)
         actual = len(categories.get(category, []) or [])
         if actual != expected:
             errors.append(f"[catalog] Category count mismatch for {category}: expected={expected}, actual={actual}")
@@ -127,7 +145,7 @@ def validate() -> int:
     duplicate_source_ids: Dict[str, List[str]] = {}
 
     print("=" * 60)
-    print("Evertale Optimizer Entry Validator v3")
+    print("Evertale Optimizer Entry Validator v4")
     print("=" * 60)
     print(f"Repo Root : {repo_root}")
     print(f"Entries   : {base}")
@@ -193,13 +211,13 @@ def validate() -> int:
                     warnings.append(f"[{category}] Missing {field}: {rel_file}")
         validate_bundle(base, category, category_counts[category], errors, warnings, bundle_counts)
 
-    validate_catalog_bundle(base, category_counts, errors, warnings)
+    validate_catalog_bundle(base, category_counts, errors, warnings, bundle_counts)
     marker_status = validate_markers(base, warnings)
     for category, rows in duplicate_source_ids.items():
         if rows:
             errors.append(f"[{category}] Duplicate sourceIds in index: {len(rows)}")
 
-    report = {"validatorVersion": 3, "generatedAt": int(time.time()), "repoRoot": str(repo_root), "entriesRoot": str(base), "checked": checked, "categoryCounts": category_counts, "bundleCounts": bundle_counts, "markerStatus": marker_status, "duplicateSourceIds": duplicate_source_ids, "errors": errors, "warnings": warnings}
+    report = {"validatorVersion": 4, "generatedAt": int(time.time()), "repoRoot": str(repo_root), "entriesRoot": str(base), "checked": checked, "categoryCounts": category_counts, "bundleCounts": bundle_counts, "markerStatus": marker_status, "duplicateSourceIds": duplicate_source_ids, "errors": errors, "warnings": warnings}
     reports_dir = base / "reports"
     write_json(reports_dir / "validation_report.json", report)
     write_json(base / "_markers" / "validate_entries.marker.json", {"schemaVersion": 1, "tool": "validate_entries", "category": "all", "status": "failed" if errors else "complete", "lastKey": "validation", "lastSourceId": "", "lastHandle": None, "lastFile": "apkfiles/entries/reports/validation_report.json", "processedCount": checked, "totalCount": checked, "updatedAt": int(time.time()), "extra": {"errors": len(errors), "warnings": len(warnings)}})
