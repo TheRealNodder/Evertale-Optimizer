@@ -65,11 +65,13 @@
       const uf=makeUF();
       const label=new Map();
       const group=new Map();
+      const preferredParents=new Set();
       const directedGroups=[];
       const pc=display?.parentCards||{};
 
       for(const [parent,cfg] of Object.entries(pc)){
         const p=canonical(alias,parent);
+        preferredParents.add(p);
         const kids=Array.isArray(cfg?.children)?cfg.children:[];
         kids.forEach(k=>uf.union(p,canonical(alias,k)));
         [p,...kids.map(k=>canonical(alias,k))].forEach(id=>{if(cfg?.buttonLabel)label.set(norm(id),cfg.buttonLabel);if(cfg?.group)group.set(norm(id),cfg.group);});
@@ -85,7 +87,7 @@
       }
       for(const set of grouped.values()){
         const ids=Array.from(set).filter(Boolean);
-        if(ids.length>1)connectedGroups.push({ids,label:null});
+        if(ids.length>1)connectedGroups.push({ids,label:null,preferredParent:ids.find(id=>preferredParents.has(id))||null});
       }
 
       addDirectedGroups(directedGroups,duo?.genericHelperSummons,alias,'Summon');
@@ -102,7 +104,19 @@
   function cardTitle(c){return c?.querySelector('.unitTitle')?.textContent?.trim()||'';}
   function payload(c){return{id:cardId(c),html:c.innerHTML,className:c.className,kind:c.getAttribute('data-kind')||'',name:cardName(c),title:cardTitle(c)}}
   function parentScore(c){const id=scoreText(cardId(c));const name=scoreText(cardName(c));const title=scoreText(cardTitle(c));const all=`${id} ${name} ${title}`;let s=0;if(/ludmillaballet|red dragon dancer/.test(all))s+=1400;if(/yanderemaidballet|clarice/.test(all))s+=200;if(/beautybeastregular|beauty.*beast|beast.*beauty|beauty\s*&\s*beast/.test(all))s+=1000;if(/snowwhitenew|snow white/.test(all)&&!/black/.test(all))s+=800;if(/regular|new|bride/.test(id))s+=50;if(/&| and /.test(name))s+=90;if(/minion|imposter|clone|rabbit|angel|raven|shadow|doll|summon|shiromori|belle|aigis/.test(all))s-=300;return s;}
-  function choose(cards){return cards.slice().sort((a,b)=>parentScore(b)-parentScore(a))[0]||cards[0];}
+  function sameCardKey(card,preferredId){
+    const pref=stripFormSuffix(preferredId).toLowerCase();
+    if(!pref)return false;
+    const vals=[cardId(card),card.getAttribute('data-source-id'),card.getAttribute('data-family'),cardName(card),cardTitle(card)];
+    return vals.some(v=>stripFormSuffix(v).toLowerCase()===pref);
+  }
+  function choose(cards,preferredId){
+    if(preferredId){
+      const preferred=cards.find(c=>sameCardKey(c,preferredId));
+      if(preferred)return preferred;
+    }
+    return cards.slice().sort((a,b)=>parentScore(b)-parentScore(a))[0]||cards[0];
+  }
   function shortName(text){return norm(text).replace(/\s*[-–—].*$/,'').replace(/\s+/g,' ');}
   function visibleLabel(payloads,label){
     const names=payloads.map(p=>shortName(p.name)).filter(Boolean);
@@ -167,7 +181,7 @@
         const ids=Array.from(group.ids||[]).filter(Boolean);
         const groupCards=Array.from(new Set(ids.map(id=>byId.get(norm(id))||byId.get(key(id))).filter(Boolean)));
         if(groupCards.length<2)continue;
-        const parent=choose(groupCards);
+        const parent=choose(groupCards,group.preferredParent);
         const ordered=[parent,...groupCards.filter(c=>c!==parent)];
         const payloads=ordered.map(payload);
         parentPayloads.push({parent,payloads,label:group.label});
