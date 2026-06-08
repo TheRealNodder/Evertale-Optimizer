@@ -25,16 +25,23 @@
   function addConnected(U,map,alias){if(!map)return;for(const [a,bs] of Object.entries(map)){if(Array.isArray(bs))bs.forEach(b=>U.union(canon(alias,a),canon(alias,b)))}}
   function addDirected(out,map,alias,label){if(!map)return;for(const [a,bs] of Object.entries(map)){if(!Array.isArray(bs)||!bs.length)continue;const ids=[canon(alias,a),...bs.map(b=>canon(alias,b))].filter(Boolean);const unique=[...new Set(ids)];if(unique.length>1)out.push({ids:unique,label});}}
   function score(u){const all=`${u?.id||''} ${u?.sourceId||''} ${u?.name||''} ${u?.title||u?.subtitle||''}`.toLowerCase();let s=0;if(/ludmillaballet|red dragon dancer/.test(all))s+=1400;if(/yanderemaidballet|clarice/.test(all))s+=200;if(/beautybeastregular|beauty.*beast|beauty\s*&\s*beast/.test(all))s+=1000;if(/snowwhitenew|snow white/.test(all)&&!/black/.test(all))s+=800;if(/regular|new|bride/.test(String(u?.id||'').toLowerCase()))s+=50;if(/&| and /.test(String(u?.name||'').toLowerCase()))s+=90;if(/minion|imposter|clone|rabbit|angel|raven|shadow|doll|summon|shiromori|belle|aigis/.test(all))s-=300;return s}
-  function choose(items){return items.slice().sort((a,b)=>score(b)-score(a))[0]||items[0]}
+  function sameUnitKey(a,b){a=strip(a);b=strip(b);return !!a&&!!b&&a.toLowerCase()===b.toLowerCase();}
+  function choose(items,preferredId){
+    if(preferredId){
+      const preferred=items.find(u=>sameUnitKey(u?.id,preferredId)||sameUnitKey(u?.sourceId,preferredId)||sameUnitKey(u?.family,preferredId)||(u?.formSourceIds||[]).some(id=>sameUnitKey(id,preferredId))||(u?.forms||[]).some(f=>sameUnitKey(f?.sourceId,preferredId)||sameUnitKey(f?.dataSourceId,preferredId)||sameUnitKey(f?.imageSourceId,preferredId)));
+      if(preferred)return preferred;
+    }
+    return items.slice().sort((a,b)=>score(b)-score(a))[0]||items[0];
+  }
 
   async function buildDuoData(units){
     const alias=new Map();(units||[]).forEach(u=>aliasUnit(alias,u));
     const [display,duo]=await Promise.all([j(DISPLAY_URL),j(DUO_URL)]);
-    const U=uf();const labels=new Map();const groups=[];const pc=display?.parentCards||{};
-    for(const [parent,cfg] of Object.entries(pc)){const p=canon(alias,parent);const kids=Array.isArray(cfg?.children)?cfg.children:[];kids.forEach(k=>U.union(p,canon(alias,k)));[p,...kids.map(k=>canon(alias,k))].forEach(id=>{if(cfg?.buttonLabel)labels.set(id,cfg.buttonLabel)})}
+    const U=uf();const labels=new Map();const groups=[];const preferredParents=new Set();const pc=display?.parentCards||{};
+    for(const [parent,cfg] of Object.entries(pc)){const p=canon(alias,parent);preferredParents.add(p);const kids=Array.isArray(cfg?.children)?cfg.children:[];kids.forEach(k=>U.union(p,canon(alias,k)));[p,...kids.map(k=>canon(alias,k))].forEach(id=>{if(cfg?.buttonLabel)labels.set(id,cfg.buttonLabel)})}
     addConnected(U,duo?.directSpecificLinks,alias);
     const byRoot=new Map();for(const id of U.p.keys()){const r=U.find(id);if(!byRoot.has(r))byRoot.set(r,new Set());byRoot.get(r).add(id)}
-    for(const set of byRoot.values()){const ids=[...set].filter(Boolean);if(ids.length>1)groups.push({ids,label:null})}
+    for(const set of byRoot.values()){const ids=[...set].filter(Boolean);if(ids.length>1)groups.push({ids,label:null,preferredParent:ids.find(id=>preferredParents.has(id))||null})}
     addDirected(groups,duo?.genericHelperSummons,alias,'Summon');
     addDirected(groups,duo?.enemyImposterExchangeUnits,alias,'Exchange');
     addDirected(groups,duo?.selfCloneOrDuplicateUnits,alias,'Clone');
@@ -50,7 +57,7 @@
       const records=(g.ids||[]).map(id=>byId.get(norm(id))).filter(Boolean);
       const items=records.map(r=>r.u);
       if(items.length<2)continue;
-      const parent=choose(items);
+      const parent=choose(items,g.preferredParent);
       if(!parent)continue;
       const ordered=[parent,...items.filter(u=>u.id!==parent.id)];
       const earliest=Math.min(...records.map(r=>r.idx));
