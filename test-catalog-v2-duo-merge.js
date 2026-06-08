@@ -6,8 +6,9 @@
   let timer=null;
 
   function text(v){return String(v||'').trim();}
-  function key(v){return text(v).toLowerCase();}
-  function family(v){return text(v).replace(/\d+$/,'');}
+  function compact(v){return text(v).toLowerCase().replace(/[^a-z0-9]+/g,'');}
+  function strip(v){return text(v).replace(/\d+$/,'');}
+  function key(v){return compact(strip(v));}
   function cardName(card){return text(card?.querySelector('.unitName')?.textContent);}
   function cardTitle(card){return text(card?.querySelector('.unitTitle')?.textContent);}
   function cardKeys(card){
@@ -19,20 +20,40 @@
       cardTitle(card)
     ].filter(Boolean);
     const out=[];
-    vals.forEach(v=>{out.push(text(v));out.push(family(v));out.push(key(v));out.push(key(family(v)));});
+    vals.forEach(v=>{
+      out.push(key(v));
+      out.push(compact(v));
+    });
     return Array.from(new Set(out.filter(Boolean)));
   }
-  function root(parent, child, roots){
-    parent=family(parent); child=family(child);
-    if(!parent||!child)return;
-    if(!roots.has(parent))roots.set(parent,parent);
-    roots.set(child,parent);
+  function payload(card){
+    return {
+      html:card.innerHTML,
+      className:card.className,
+      kind:card.getAttribute('data-kind')||'',
+      id:card.getAttribute('data-id')||'',
+      sourceId:card.getAttribute('data-source-id')||'',
+      family:card.getAttribute('data-family')||'',
+      name:cardName(card),
+      title:cardTitle(card),
+      active:card.getAttribute('data-active-skills')||'',
+      passive:card.getAttribute('data-passive-skills')||''
+    };
   }
-  function rootOf(id, roots){
-    let r=family(id);
-    let seen=0;
-    while(roots.has(r)&&roots.get(r)!==r&&seen++<12)r=roots.get(r);
-    return r;
+  function addLink(parent,child,parentForChild,parentKeys){
+    const p=key(parent), c=key(child);
+    if(!p||!c||p===c)return;
+    parentKeys.add(p);
+    parentForChild.set(c,p);
+  }
+  function rootOf(k,parentForChild){
+    let current=k;
+    const seen=new Set();
+    while(parentForChild.has(current)&&!seen.has(current)){
+      seen.add(current);
+      current=parentForChild.get(current);
+    }
+    return current;
   }
   async function loadMaps(){
     if(mapsPromise)return mapsPromise;
@@ -40,43 +61,66 @@
       fetch(DUO_URL,{cache:'no-store'}).then(r=>r.ok?r.json():{}).catch(()=>({})),
       fetch(DISPLAY_URL,{cache:'no-store'}).then(r=>r.ok?r.json():{}).catch(()=>({}))
     ]).then(([duo,display])=>{
-      const roots=new Map();
-      const parentPreferred=new Set();
+      const parentForChild=new Map();
+      const parentKeys=new Set();
       const direct=duo&&duo.directSpecificLinks&&typeof duo.directSpecificLinks==='object'?duo.directSpecificLinks:{};
-      Object.entries(direct).forEach(([p,children])=>{
-        if(!Array.isArray(children))return;
-        parentPreferred.add(family(p));
-        children.forEach(c=>root(p,c,roots));
+      Object.entries(direct).forEach(([parent,children])=>{
+        if(Array.isArray(children))children.forEach(child=>addLink(parent,child,parentForChild,parentKeys));
       });
-      const pc=display&&display.parentCards&&typeof display.parentCards==='object'?display.parentCards:{};
-      Object.entries(pc).forEach(([p,cfg])=>{
+      const parentCards=display&&display.parentCards&&typeof display.parentCards==='object'?display.parentCards:{};
+      Object.entries(parentCards).forEach(([parent,cfg])=>{
         const children=Array.isArray(cfg&&cfg.children)?cfg.children:[];
-        parentPreferred.add(family(p));
-        children.forEach(c=>root(p,c,roots));
+        children.forEach(child=>addLink(parent,child,parentForChild,parentKeys));
       });
-      return {roots,parentPreferred};
+      return {parentForChild,parentKeys};
     });
     return mapsPromise;
   }
-  function parentScore(card, maps){
-    const ids=cardKeys(card).map(family);
-    let score=0;
-    ids.forEach(id=>{if(maps.parentPreferred.has(id))score+=1000;});
-    const all=(cardName(card)+' '+cardTitle(card)+' '+ids.join(' ')).toLowerCase();
-    if(all.includes('ludmillaballet')||all.includes('red dragon dancer'))score+=800;
-    if(all.includes('yanderemaidballet')||all.includes('clarice'))score+=100;
-    if(all.includes('beautybeastregular')||all.includes('beauty & beast'))score+=600;
-    return score;
+  function findGroup(card,maps){
+    const keys=cardKeys(card);
+    for(const k of keys){
+      if(maps.parentKeys.has(k))return {root:k,isParent:true};
+      if(maps.parentForChild.has(k))return {root:rootOf(k,maps.parentForChild),isParent:false};
+    }
+    return null;
   }
-  function addParentButton(parent, cards){
-    if(parent.querySelector('.duoFormBtn'))return;
-    const names=Array.from(new Set(cards.map(cardName).filter(Boolean)));
-    const label=names.length>1?names.slice(0,2).join(' / '):(names[0]||'Forms');
+  function shortName(v){
+    return text(v).replace(/\s*[-–—].*$/,'').replace(/\s+/g,' ');
+  }
+  function labelFor(payloads){
+    const names=Array.from(new Set(payloads.map(p=>shortName(p.name)).filter(Boolean)));
+    if(names.length>1)return names.slice(0,2).join(' / ');
+    return names[0]||'Forms';
+  }
+  function applyPayload(card,p,index,payloads){
+    card.innerHTML=p.html;
+    card.className=p.className;
+    card.setAttribute('data-kind',p.kind);
+    card.setAttribute('data-id',p.id);
+    card.setAttribute('data-source-id',p.sourceId);
+    card.setAttribute('data-family',p.family);
+    if(p.active)card.setAttribute('data-active-skills',p.active);
+    if(p.passive)card.setAttribute('data-passive-skills',p.passive);
+    card.setAttribute('data-duo-parent','true');
+    card.setAttribute('data-duo-index',String(index));
+    installButton(card,payloads);
+  }
+  function installButton(parent,payloads){
+    if(!parent||!payloads||payloads.length<2)return;
+    parent.querySelector('.duoFormBtn')?.remove();
+    const host=parent.querySelector('.metaMain')||parent.querySelector('.metaHeader')||parent.querySelector('.meta')||parent;
     const btn=document.createElement('button');
     btn.type='button';
     btn.className='duoFormBtn';
-    btn.textContent=label;
-    const host=parent.querySelector('.metaMain')||parent.querySelector('.metaHeader')||parent.querySelector('.meta')||parent;
+    const current=Number(parent.getAttribute('data-duo-index')||0);
+    const base=labelFor(payloads);
+    btn.textContent=`${base} ${current+1}/${payloads.length}`;
+    btn.addEventListener('click',event=>{
+      event.preventDefault();
+      event.stopPropagation();
+      const next=(Number(parent.getAttribute('data-duo-index')||0)+1)%payloads.length;
+      applyPayload(parent,payloads[next],next,payloads);
+    });
     host.appendChild(btn);
   }
   async function merge(){
@@ -85,31 +129,43 @@
     const maps=await loadMaps();
     const cards=Array.from(grid.querySelectorAll('.unitCard[data-kind="characters"]'));
     if(!cards.length)return;
-    cards.forEach(c=>{c.hidden=false;c.style.display='';c.removeAttribute('data-duo-hidden-child');});
+
     const groups=new Map();
     cards.forEach(card=>{
-      const keys=cardKeys(card);
-      let rootKey='';
-      for(const k of keys){
-        const r=rootOf(k,maps.roots);
-        if(r&&maps.roots.has(r)){rootKey=r;break;}
-      }
-      if(!rootKey)return;
-      if(!groups.has(rootKey))groups.set(rootKey,[]);
-      groups.get(rootKey).push(card);
+      const info=findGroup(card,maps);
+      if(!info)return;
+      if(!groups.has(info.root))groups.set(info.root,{root:info.root,parent:null,children:[],payloads:[]});
+      const group=groups.get(info.root);
+      if(info.isParent&&!group.parent)group.parent=card;
+      else group.children.push(card);
+      group.payloads.push(payload(card));
     });
-    groups.forEach(groupCards=>{
-      const unique=Array.from(new Set(groupCards));
-      if(unique.length<2)return;
-      const parent=unique.slice().sort((a,b)=>parentScore(b,maps)-parentScore(a,maps))[0];
-      unique.forEach(card=>{
+
+    groups.forEach(group=>{
+      const allCards=[group.parent,...group.children].filter(Boolean);
+      if(allCards.length<2)return;
+      const parent=group.parent||allCards[0];
+      const payloads=[];
+      const seen=new Set();
+      [parent,...allCards.filter(c=>c!==parent)].forEach(card=>{
+        const p=payload(card);
+        const id=compact(p.id||p.sourceId||p.family||p.name);
+        if(seen.has(id))return;
+        seen.add(id);
+        payloads.push(p);
+      });
+      allCards.forEach(card=>{
         if(card===parent)return;
         card.hidden=true;
         card.style.display='none';
         card.setAttribute('data-duo-hidden-child','true');
       });
+      parent.hidden=false;
+      parent.style.display='';
+      parent.removeAttribute('data-duo-hidden-child');
       parent.setAttribute('data-duo-parent','true');
-      addParentButton(parent,unique);
+      parent.setAttribute('data-duo-index',parent.getAttribute('data-duo-index')||'0');
+      installButton(parent,payloads);
     });
   }
   function schedule(){clearTimeout(timer);timer=setTimeout(()=>merge().catch(console.warn),120);}
