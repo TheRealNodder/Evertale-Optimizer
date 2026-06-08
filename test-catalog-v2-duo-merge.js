@@ -145,7 +145,7 @@
     if(!grid)return;
     const maps=await loadMaps();
     const cards=Array.from(grid.querySelectorAll('.unitCard[data-kind="characters"]'));
-    if(!cards.length)return;
+    if(!cards.length){document.body.classList.remove('v2-grid-merge-hold');return;}
 
     const groups=new Map();
     cards.forEach(card=>{
@@ -180,14 +180,14 @@
       parent.setAttribute('data-duo-index',parent.getAttribute('data-duo-index')||'0');
       installButton(parent,payloads);
     });
-    window.__EVERTALE_V2_DUO_MERGE_REPORT={groups:groups.size,hidden:grid.querySelectorAll('[data-duo-hidden-child="true"]').length,parents:grid.querySelectorAll('[data-duo-parent="true"]').length};
+    window.__EVERTALE_V2_DUO_MERGE_REPORT={groups:groups.size,hidden:grid.querySelectorAll('[data-duo-hidden-child="true"]').length,parents:grid.querySelectorAll('[data-duo-parent="true"]').length,cards:cards.length};
+    document.body.classList.remove('v2-grid-merge-hold');
   }
-  function schedule(){clearTimeout(timer);timer=setTimeout(()=>merge().catch(console.warn),120);}
+  function schedule(){clearTimeout(timer);timer=setTimeout(()=>merge().catch(err=>{console.warn(err);document.body.classList.remove('v2-grid-merge-hold');}),120);}
   document.addEventListener('DOMContentLoaded',()=>{
+    window.addEventListener('evertale:v2-render-complete',schedule);
     schedule();
-    const grid=document.getElementById('catalogGrid');
-    if(grid)new MutationObserver(schedule).observe(grid,{childList:true,subtree:false});
-    ['catalogSearch','catalogType','catalogSort'].forEach(id=>document.getElementById(id)?.addEventListener('input',schedule));
-    ['catalogType','catalogSort'].forEach(id=>document.getElementById(id)?.addEventListener('change',schedule));
+    ['catalogSearch','catalogType','catalogSort'].forEach(id=>document.getElementById(id)?.addEventListener('input',()=>document.body.classList.add('v2-grid-merge-hold')));
+    ['catalogType','catalogSort'].forEach(id=>document.getElementById(id)?.addEventListener('change',()=>document.body.classList.add('v2-grid-merge-hold')));
   });
 })();
