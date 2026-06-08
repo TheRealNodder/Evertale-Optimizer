@@ -92,6 +92,22 @@
     if(names.length>1)return names.slice(0,2).join(' / ');
     return names[0]||'Forms';
   }
+  function hideChild(card){
+    card.hidden=true;
+    card.setAttribute('hidden','');
+    card.setAttribute('aria-hidden','true');
+    card.setAttribute('data-duo-hidden-child','true');
+    card.classList.add('hidden','v2-duo-hidden-child');
+    card.style.setProperty('display','none','important');
+  }
+  function showParent(card){
+    card.hidden=false;
+    card.removeAttribute('hidden');
+    card.removeAttribute('aria-hidden');
+    card.removeAttribute('data-duo-hidden-child');
+    card.classList.remove('hidden','v2-duo-hidden-child');
+    card.style.removeProperty('display');
+  }
   function applyPayload(card,p,index,payloads){
     card.innerHTML=p.html;
     card.className=p.className;
@@ -103,6 +119,7 @@
     if(p.passive)card.setAttribute('data-passive-skills',p.passive);
     card.setAttribute('data-duo-parent','true');
     card.setAttribute('data-duo-index',String(index));
+    showParent(card);
     installButton(card,payloads);
   }
   function installButton(parent,payloads){
@@ -156,17 +173,14 @@
       });
       allCards.forEach(card=>{
         if(card===parent)return;
-        card.hidden=true;
-        card.style.display='none';
-        card.setAttribute('data-duo-hidden-child','true');
+        hideChild(card);
       });
-      parent.hidden=false;
-      parent.style.display='';
-      parent.removeAttribute('data-duo-hidden-child');
+      showParent(parent);
       parent.setAttribute('data-duo-parent','true');
       parent.setAttribute('data-duo-index',parent.getAttribute('data-duo-index')||'0');
       installButton(parent,payloads);
     });
+    window.__EVERTALE_V2_DUO_MERGE_REPORT={groups:groups.size,hidden:grid.querySelectorAll('[data-duo-hidden-child="true"]').length,parents:grid.querySelectorAll('[data-duo-parent="true"]').length};
   }
   function schedule(){clearTimeout(timer);timer=setTimeout(()=>merge().catch(console.warn),120);}
   document.addEventListener('DOMContentLoaded',()=>{
