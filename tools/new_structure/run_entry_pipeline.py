@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 ROOT_MARKERS = ["apkfiles", "tools"]
-PIPELINE_VERSION = 6
+PIPELINE_VERSION = 7
 
 SAFE_DEFAULT_STEPS = [
     "bookmark_before",
@@ -20,6 +20,7 @@ SAFE_DEFAULT_STEPS = [
     "build_character_image_map",
     "sync_character_tags",
     "build_bundles",
+    "build_parent_child_map",
     "validate",
     "bookmark_after",
 ]
@@ -34,6 +35,7 @@ EXTRACT_STEPS = [
     "build_character_image_map",
     "sync_character_tags",
     "build_bundles",
+    "build_parent_child_map",
     "validate",
     "bookmark_after",
 ]
@@ -48,6 +50,7 @@ SCRIPT_MAP = {
     "build_character_image_map": "build_character_image_map.py",
     "sync_character_tags": "sync_character_tags.py",
     "build_bundles": "build_entry_bundles.py",
+    "build_parent_child_map": "build_parent_child_map.py",
     "validate": "validate_entries.py",
 }
 
