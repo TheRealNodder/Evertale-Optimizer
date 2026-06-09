@@ -30,16 +30,19 @@
   function itemKeys(item){return [item.id,item.sourceId,item.family,item.name,item.subtitle].flatMap(v=>[famKey(v),clean(v)]).filter(Boolean);}
   function addSetMap(map,key,value){if(!key||!value||key===value)return;if(!map.has(key))map.set(key,new Set());map.get(key).add(value);}
   function duoCanonical(raw,aliases){const k=famKey(raw);return aliases.get(k)||k;}
+  function addRegistryEdge(p,c,aliases,parentChildren,childParents,parents){const pk=duoCanonical(p,aliases),ck=duoCanonical(c,aliases);if(!pk||!ck||pk===ck)return;parents.add(pk);addSetMap(parentChildren,pk,ck);addSetMap(childParents,ck,pk);}
   async function loadDuoRegistry(){
     const built=await readJson('./apkfiles/entries/maps/character_parent_child_map.json');
-    const [duo,display]=await Promise.all([readJson('./apkfiles/Duo.json'),readJson('./apkfiles/DuoDisplay.json')]);
     const aliases=new Map(), parentChildren=new Map(), childParents=new Map(), parents=new Set();
     Object.entries(built?.aliases||{}).forEach(([k,v])=>aliases.set(clean(k),famKey(v)));
-    const add=(p,c)=>{const pk=duoCanonical(p,aliases),ck=duoCanonical(c,aliases);if(!pk||!ck||pk===ck)return;parents.add(pk);addSetMap(parentChildren,pk,ck);addSetMap(childParents,ck,pk);};
-    Object.entries(built?.parents||{}).forEach(([p,children])=>Array.isArray(children)&&children.forEach(c=>add(p,c)));
-    Object.entries(display?.parentCards||{}).forEach(([p,cfg])=>(Array.isArray(cfg?.children)?cfg.children:[]).forEach(c=>add(p,c)));
-    Object.entries(duo||{}).forEach(([mapName,mapping])=>{if(!mapping||typeof mapping!=='object'||Array.isArray(mapping))return;Object.entries(mapping).forEach(([p,children])=>Array.isArray(children)&&children.forEach(c=>add(p,c)));});
-    return {aliases,parentChildren,childParents,parents,source:built?.parents?'character_parent_child_map+duo_all':'duo_all'};
+    if(built?.parents&&typeof built.parents==='object'){
+      Object.entries(built.parents).forEach(([p,children])=>Array.isArray(children)&&children.forEach(c=>addRegistryEdge(p,c,aliases,parentChildren,childParents,parents)));
+      return {aliases,parentChildren,childParents,parents,source:'character_parent_child_map'};
+    }
+    const [duo,display]=await Promise.all([readJson('./apkfiles/Duo.json'),readJson('./apkfiles/DuoDisplay.json')]);
+    Object.entries(display?.parentCards||{}).forEach(([p,cfg])=>(Array.isArray(cfg?.children)?cfg.children:[]).forEach(c=>addRegistryEdge(p,c,aliases,parentChildren,childParents,parents)));
+    Object.entries(duo||{}).forEach(([,mapping])=>{if(!mapping||typeof mapping!=='object'||Array.isArray(mapping))return;Object.entries(mapping).forEach(([p,children])=>Array.isArray(children)&&children.forEach(c=>addRegistryEdge(p,c,aliases,parentChildren,childParents,parents)));});
+    return {aliases,parentChildren,childParents,parents,source:'duo_fallback'};
   }
   function canonicalItemKeys(item,registry){return itemKeys(item).map(k=>registry.aliases.get(k)||k).filter(Boolean);}
   function findParentKey(item,registry){for(const k of canonicalItemKeys(item,registry)){if(registry.parentChildren.has(k))return k;}return'';}
