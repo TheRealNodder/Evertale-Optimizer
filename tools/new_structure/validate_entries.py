@@ -69,6 +69,16 @@ def weapon_overlay_enabled(bundle: Dict[str, Any]) -> bool:
     return bool(overlay.get("enabled"))
 
 
+def effectively_strict_bundle(category: str, count: int, index_count: int, discovery: Dict[str, Any], bundle: Dict[str, Any]) -> bool:
+    if discovery.get("strictIndexOnly", False):
+        return True
+    if discovery.get("discoveredUnindexedCount", 0):
+        return False
+    if category == "weapons" and weapon_overlay_enabled(bundle):
+        return True
+    return count == index_count
+
+
 def validate_bundle(base: Path, category: str, index_count: int, errors: List[str], warnings: List[str], bundle_counts: Dict[str, Any]) -> None:
     bundle_path = base / "bundles" / f"{category}.bundle.json"
     if not bundle_path.exists():
@@ -87,8 +97,10 @@ def validate_bundle(base: Path, category: str, index_count: int, errors: List[st
             errors.append(f"[{category}] Strict bundle count mismatch: index={index_count}, bundle={count}")
         if discovery.get("discoveredUnindexedCount", 0):
             errors.append(f"[{category}] Strict bundle discovered unindexed entries: {discovery.get('discoveredUnindexedCount')}")
-        if not discovery.get("strictIndexOnly", False):
+        if not effectively_strict_bundle(category, count, index_count, discovery, bundle):
             errors.append(f"[{category}] Strict bundle missing strictIndexOnly=true")
+        elif not discovery.get("strictIndexOnly", False):
+            warnings.append(f"[{category}] Bundle is effectively strict but strictIndexOnly metadata is not set")
 
 
 def expected_catalog_count(category: str, index_expected: int, bundle_counts: Dict[str, Any]) -> int:
