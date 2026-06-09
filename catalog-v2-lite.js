@@ -20,8 +20,25 @@
   function skillRows(e,type){const key=type==='active'?'activeSkills':'passiveSkillDetails';if(Array.isArray(e?.[key]))return e[key];const src=type==='active'?e?.resolved?.activeSkills:e?.resolved?.passives;const out=[];if(src&&typeof src==='object'){for(const [id,d]of Object.entries(src)){const loc=d?.localization||{};out.push({id,name:loc.name||id,description:loc.description||'',tu:d?.tu,sp:d?.sp});}}return out;}
   function charImgs(u){const raw=Array.isArray(u.imageVariants)?u.imageVariants.map(v=>v&&v.url):Array.isArray(u.imagesLarge)?u.imagesLarge:(u.image?[u.image]:[]);return [...new Set((raw||[]).filter(Boolean))].slice(0,3);}
   function base(kind,e){const raw=e?.raw||{};const sourceId=String(e?.sourceId??e?.internal?.sourceId??e?.internal?.weaponId??e?.internal?.bossId??raw.name??e?.name??e?.id??'');return{kind,id:String(e?.id??e?.family??sourceId),sourceId,family:String(e?.family??e?.internal?.family??raw.family??strip(sourceId)),file:file(e),order:order(e),name:pick(e?.displayName,e?.title,e?.name,sourceId),subtitle:pick(e?.weaponType,raw.weaponPref,e?.category,e?.subtitle,kindLabel(kind)),description:pick(e?.description,e?.flavorText,e?.profile,e?.effect,raw.profile,''),rarity:pick(e?.rarity,e?.stars,raw.stars,raw.accessoryStars,''),element:displayEl(pick(e?.element,raw.element,'')),stats:{atk:val(e,raw,'atk',raw.flatAttack,raw.baseAttack,raw.attack),hp:val(e,raw,'hp',raw.flatMaxHp,raw.baseMaxHp,raw.hp),spd:val(e,raw,'spd',raw.flatSpeed,raw.speed),cost:val(e,raw,'cost',raw.cost)},activeSkills:skillRows(e,'active'),passiveSkillDetails:skillRows(e,'passive'),descriptionByForm:Array.isArray(e?.descriptionByForm)?e.descriptionByForm:[],leaderSkillName:pick(e?.leaderSkill?.name,''),leaderSkillDesc:pick(e?.leaderSkill?.description,'')};}
+  function characterStateRoot(item){return famKey(item.family||item.sourceId||item.id||item.name);}
+  function collapseCharacterStates(chars){
+    const groups=new Map();
+    chars.forEach(item=>{const k=characterStateRoot(item);if(!k){groups.set(Symbol(),[item]);return;}if(!groups.has(k))groups.set(k,[]);groups.get(k).push(item);});
+    const out=[];
+    groups.forEach(list=>{
+      if(list.length<2){out.push(list[0]);return;}
+      list.sort((a,b)=>Number(b.order||0)-Number(a.order||0));
+      const primary={...list[0]};
+      primary.images=[...new Set(list.flatMap(x=>Array.isArray(x.images)?x.images:(x.image?[x.image]:[])).filter(Boolean))].slice(0,3);
+      primary.image=primary.images[0]||primary.image;
+      primary.descriptionByForm=list.flatMap(x=>Array.isArray(x.descriptionByForm)&&x.descriptionByForm.length?x.descriptionByForm:[x.description].filter(Boolean));
+      primary._stateForms=list.map(x=>({id:x.id,sourceId:x.sourceId,family:x.family,name:x.name,title:x.subtitle,order:x.order,image:x.image}));
+      out.push(primary);
+    });
+    return out;
+  }
   function normalize(entries){
-    const chars=(entries.characters||[]).map(e=>({...base('characters',e),name:pick(e.name,e.family,e.sourceId),subtitle:pick(e.title,e.subtitle,''),image:pick(e.image,charImgs(e)[0],''),images:charImgs(e)}));
+    const chars=collapseCharacterStates((entries.characters||[]).map(e=>({...base('characters',e),name:pick(e.name,e.family,e.sourceId),subtitle:pick(e.title,e.subtitle,''),image:pick(e.image,charImgs(e)[0],''),images:charImgs(e)})));
     const weapons=(entries.weapons||[]).map(e=>{const x=base('weapons',e);return{...x,image:pick(e.image,x.sourceId?`https://ik.imagekit.io/r8fsa98s9/weapons/${x.sourceId}.png`:'')}});
     const accessories=(entries.accessories||[]).map(e=>{const x=base('accessories',e);return{...x,image:pick(e.image,x.sourceId?`https://ik.imagekit.io/r8fsa98s9/accessories/${x.sourceId}.png`:'')}});
     const bosses=(entries.bosses||[]).map(e=>{const x=base('bosses',e);return{...x,image:pick(e.image,x.sourceId?`https://ik.imagekit.io/r8fsa98s9/characters/${x.sourceId.replace(/Boss(?=\d+$)/,'')}.png`:'')}});
@@ -30,19 +47,16 @@
   function itemKeys(item){return [item.id,item.sourceId,item.family,item.name,item.subtitle].flatMap(v=>[famKey(v),clean(v)]).filter(Boolean);}
   function addSetMap(map,key,value){if(!key||!value||key===value)return;if(!map.has(key))map.set(key,new Set());map.get(key).add(value);}
   function duoCanonical(raw,aliases){const k=famKey(raw);return aliases.get(k)||k;}
-  function addRegistryEdge(p,c,aliases,parentChildren,childParents,parents){const pk=duoCanonical(p,aliases),ck=duoCanonical(c,aliases);if(!pk||!ck||pk===ck)return;parents.add(pk);addSetMap(parentChildren,pk,ck);addSetMap(childParents,ck,pk);}
   async function loadDuoRegistry(){
     const built=await readJson('./apkfiles/entries/maps/character_parent_child_map.json');
+    const [duo,display]=await Promise.all([readJson('./apkfiles/Duo.json'),readJson('./apkfiles/DuoDisplay.json')]);
     const aliases=new Map(), parentChildren=new Map(), childParents=new Map(), parents=new Set();
     Object.entries(built?.aliases||{}).forEach(([k,v])=>aliases.set(clean(k),famKey(v)));
-    if(built?.parents&&typeof built.parents==='object'){
-      Object.entries(built.parents).forEach(([p,children])=>Array.isArray(children)&&children.forEach(c=>addRegistryEdge(p,c,aliases,parentChildren,childParents,parents)));
-      return {aliases,parentChildren,childParents,parents,source:'character_parent_child_map'};
-    }
-    const [duo,display]=await Promise.all([readJson('./apkfiles/Duo.json'),readJson('./apkfiles/DuoDisplay.json')]);
-    Object.entries(display?.parentCards||{}).forEach(([p,cfg])=>(Array.isArray(cfg?.children)?cfg.children:[]).forEach(c=>addRegistryEdge(p,c,aliases,parentChildren,childParents,parents)));
-    Object.entries(duo||{}).forEach(([,mapping])=>{if(!mapping||typeof mapping!=='object'||Array.isArray(mapping))return;Object.entries(mapping).forEach(([p,children])=>Array.isArray(children)&&children.forEach(c=>addRegistryEdge(p,c,aliases,parentChildren,childParents,parents)));});
-    return {aliases,parentChildren,childParents,parents,source:'duo_fallback'};
+    const add=(p,c)=>{const pk=duoCanonical(p,aliases),ck=duoCanonical(c,aliases);if(!pk||!ck||pk===ck)return;parents.add(pk);addSetMap(parentChildren,pk,ck);addSetMap(childParents,ck,pk);};
+    Object.entries(built?.parents||{}).forEach(([p,children])=>Array.isArray(children)&&children.forEach(c=>add(p,c)));
+    Object.entries(display?.parentCards||{}).forEach(([p,cfg])=>(Array.isArray(cfg?.children)?cfg.children:[]).forEach(c=>add(p,c)));
+    Object.entries(duo||{}).forEach(([mapName,mapping])=>{if(!mapping||typeof mapping!=='object'||Array.isArray(mapping))return;Object.entries(mapping).forEach(([p,children])=>Array.isArray(children)&&children.forEach(c=>add(p,c)));});
+    return {aliases,parentChildren,childParents,parents,source:built?.parents?'character_parent_child_map+duo_all':'duo_all'};
   }
   function canonicalItemKeys(item,registry){return itemKeys(item).map(k=>registry.aliases.get(k)||k).filter(Boolean);}
   function findParentKey(item,registry){for(const k of canonicalItemKeys(item,registry)){if(registry.parentChildren.has(k))return k;}return'';}
