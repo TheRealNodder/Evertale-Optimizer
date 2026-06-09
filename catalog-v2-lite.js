@@ -28,54 +28,44 @@
     return [...chars.sort((a,b)=>Number(b.order||0)-Number(a.order||0)),...weapons.sort((a,b)=>Number(b.order||0)-Number(a.order||0)),...accessories.sort((a,b)=>Number(a.order||999999)-Number(b.order||999999)),...bosses.sort((a,b)=>Number(b.order||0)-Number(a.order||0))].filter(x=>x.id&&x.name);
   }
   function itemKeys(item){return [item.id,item.sourceId,item.family,item.name,item.subtitle].flatMap(v=>[famKey(v),clean(v)]).filter(Boolean);}
-  function canonicalKey(k,registry){return registry.aliases?.get(k)||k;}
+  function addSetMap(map,key,value){if(!key||!value||key===value)return;if(!map.has(key))map.set(key,new Set());map.get(key).add(value);}
+  function duoCanonical(raw,aliases){const k=famKey(raw);return aliases.get(k)||k;}
   async function loadDuoRegistry(){
     const built=await readJson('./apkfiles/entries/maps/character_parent_child_map.json');
-    if(built&&built.parents&&typeof built.parents==='object'){
-      const childToParent=new Map(), parents=new Set(), aliases=new Map();
-      Object.entries(built.aliases||{}).forEach(([k,v])=>aliases.set(clean(k),famKey(v)));
-      Object.entries(built.parents||{}).forEach(([parent,children])=>{
-        const pk=famKey(parent); if(!pk)return; parents.add(pk);
-        if(Array.isArray(children))children.forEach(child=>{const ck=famKey(child);if(ck&&ck!==pk)childToParent.set(ck,pk);});
-      });
-      return {childToParent,parents,aliases,source:'character_parent_child_map'};
-    }
     const [duo,display]=await Promise.all([readJson('./apkfiles/Duo.json'),readJson('./apkfiles/DuoDisplay.json')]);
-    const childToParent=new Map(), parents=new Set(), aliases=new Map();
-    const add=(p,c)=>{const pk=famKey(p),ck=famKey(c);if(!pk||!ck||pk===ck)return;parents.add(pk);childToParent.set(ck,pk);};
+    const aliases=new Map(), parentChildren=new Map(), childParents=new Map(), parents=new Set();
+    Object.entries(built?.aliases||{}).forEach(([k,v])=>aliases.set(clean(k),famKey(v)));
+    const add=(p,c)=>{const pk=duoCanonical(p,aliases),ck=duoCanonical(c,aliases);if(!pk||!ck||pk===ck)return;parents.add(pk);addSetMap(parentChildren,pk,ck);addSetMap(childParents,ck,pk);};
+    Object.entries(built?.parents||{}).forEach(([p,children])=>Array.isArray(children)&&children.forEach(c=>add(p,c)));
     Object.entries(display?.parentCards||{}).forEach(([p,cfg])=>(Array.isArray(cfg?.children)?cfg.children:[]).forEach(c=>add(p,c)));
-    Object.entries(duo?.directSpecificLinks||{}).forEach(([p,children])=>Array.isArray(children)&&children.forEach(c=>add(p,c)));
-    return {childToParent,parents,aliases,source:'duo_fallback'};
+    Object.entries(duo||{}).forEach(([mapName,mapping])=>{if(!mapping||typeof mapping!=='object'||Array.isArray(mapping))return;Object.entries(mapping).forEach(([p,children])=>Array.isArray(children)&&children.forEach(c=>add(p,c)));});
+    return {aliases,parentChildren,childParents,parents,source:built?.parents?'character_parent_child_map+duo_all':'duo_all'};
   }
-  function registryRole(item,registry){
-    for(const raw of itemKeys(item)){const k=canonicalKey(raw,registry);if(registry.parents.has(k))return{role:'parent',root:k};}
-    for(const raw of itemKeys(item)){const k=canonicalKey(raw,registry);if(registry.childToParent.has(k))return{role:'child',root:registry.childToParent.get(k)};}
-    return null;
-  }
+  function canonicalItemKeys(item,registry){return itemKeys(item).map(k=>registry.aliases.get(k)||k).filter(Boolean);}
+  function findParentKey(item,registry){for(const k of canonicalItemKeys(item,registry)){if(registry.parentChildren.has(k))return k;}return'';}
+  function isChildOnly(item,registry,parentKey){if(parentKey)return false;return canonicalItemKeys(item,registry).some(k=>registry.childParents.has(k));}
+  function buildItemIndex(items,registry){const map=new Map();items.forEach(item=>{if(item.kind!=='characters')return;canonicalItemKeys(item,registry).forEach(k=>{if(!map.has(k))map.set(k,item);});});return map;}
   function applyDuoRegistry(items,registry){
-    const groups=new Map();
-    const roles=new Map();
-    items.forEach(item=>{if(item.kind!=='characters')return;const role=registryRole(item,registry);if(!role)return;roles.set(item,role);if(!groups.has(role.root))groups.set(role.root,{parent:null,children:[]});const g=groups.get(role.root);if(role.role==='parent'&&!g.parent)g.parent=item;else g.children.push(item);});
-    const out=[];
-    const emitted=new Set();
+    const itemIndex=buildItemIndex(items,registry);
+    const out=[];let parentCount=0,attachedChildren=0,skippedChildren=0;
     for(const item of items){
-      const role=roles.get(item);
-      if(!role){out.push(item);continue;}
-      const group=groups.get(role.root);
-      if(role.role==='child')continue;
-      if(emitted.has(role.root))continue;
-      emitted.add(role.root);
-      const parent=group.parent||item;
-      const forms=[parent,...group.children].filter(Boolean);
-      parent.duoForms=forms.map(f=>({...f,duoForms:undefined}));
-      out.push(parent);
+      if(item.kind!=='characters'){out.push(item);continue;}
+      const parentKey=findParentKey(item,registry);
+      if(isChildOnly(item,registry,parentKey)){skippedChildren++;continue;}
+      if(parentKey){
+        const children=[...(registry.parentChildren.get(parentKey)||[])].map(k=>itemIndex.get(k)).filter(Boolean).filter(child=>child!==item);
+        const unique=[];const seen=new Set();[item,...children].forEach(form=>{const id=famKey(form.family||form.sourceId||form.id||form.name);if(!id||seen.has(id))return;seen.add(id);unique.push(form);});
+        if(unique.length>1){item.duoForms=unique.map(f=>({...f,duoForms:undefined}));parentCount++;attachedChildren+=unique.length-1;}
+      }
+      out.push(item);
     }
-    window.__EVERTALE_V2_DUO_DATA_REPORT={source:registry.source,parents:groups.size,children:Array.from(groups.values()).reduce((n,g)=>n+g.children.length,0),itemsBefore:items.length,itemsAfter:out.length};
+    window.__EVERTALE_V2_DUO_DATA_REPORT={source:registry.source,parents:parentCount,children:attachedChildren,skippedChildren,itemsBefore:items.length,itemsAfter:out.length};
     return out;
   }
   function stateBtns(imgs){if(!Array.isArray(imgs)||imgs.length<2)return'';const enc=attrJson(imgs.slice(0,3));return`<div class="stateRow" data-imgs="${enc}">${imgs.slice(0,3).map((_,i)=>`<button type="button" class="stateBtn ${i===0?'active':''}" data-idx="${i}" aria-label="State ${i+1}"></button>`).join('')}</div>`;}
-  function duoBtn(item){if(!Array.isArray(item.duoForms)||item.duoForms.length<2)return'';const names=[...new Set(item.duoForms.map(f=>String(f.name||'').replace(/\s*[-–—].*$/,'').trim()).filter(Boolean))];const label=names.length>1?names.slice(0,2).join(' / '):(names[0]||'Forms');return`<button type="button" class="duoFormBtn" data-duo-index="0" data-duo-forms="${attrJson(item.duoForms)}">${safe(label)} 1/${item.duoForms.length}</button>`;}
-  function card(item){
+  function duoLabel(forms){const names=[...new Set((forms||[]).map(f=>String(f.name||'').replace(/\s*[-–—].*$/,'').trim()).filter(Boolean))];return names.length>1?names.slice(0,3).join(' / '):(names[0]||'Forms');}
+  function duoBtn(item){if(!Array.isArray(item.duoForms)||item.duoForms.length<2)return'';return`<button type="button" class="duoFormBtn" data-duo-index="0" data-duo-forms="${attrJson(item.duoForms)}">${safe(duoLabel(item.duoForms))}</button>`;}
+  function renderCard(item){
     const imgs=item.images?.length?item.images:(item.image?[item.image]:[]);const img=imgs[0]?`<img src="${safe(imgs[0])}" loading="lazy" decoding="async" fetchpriority="low" data-imgs="${attrJson(imgs)}" data-state="0" alt="${safe(item.name)}">`:'<div class="ph">?</div>';
     const chips=[`<span class="tag kind">${kindLabel(item.kind)}</span>`];if(item.element)chips.push(`<span class="tag element">${safe(item.element)}</span>`);if(item.rarity)chips.push(`<span class="tag rarity">${safe(item.rarity)}</span>`);
     const statHtml=Object.entries(item.stats||{}).filter(([,v])=>v!==''&&v!=null).map(([k,v])=>`<div class="stat" data-stat="${k}"><span class="statLabel">${k.toUpperCase()}</span><span class="statVal">${safe(v)}</span></div>`).join('');
@@ -84,12 +74,12 @@
   }
   function filter(){const q=state.q.toLowerCase();let rows=state.items;if(state.type!=='all')rows=rows.filter(i=>i.kind===state.type);if(!q)return rows;return rows.filter(i=>`${i.name} ${i.subtitle} ${i.description} ${i.rarity} ${i.element} ${i.kind} ${i.sourceId}`.toLowerCase().includes(q));}
   function render(){const grid=$('catalogGrid'),status=$('statusText');if(!grid)return;const token=++state.token;state.filtered=filter();state.rendered=0;grid.innerHTML='';if(status)status.textContent=`${state.filtered.length} items shown`;renderMore(token,24);}
-  function renderMore(token,count=32){const grid=$('catalogGrid');if(!grid||token!==state.token)return;if(document.hidden){setTimeout(()=>renderMore(token,count),250);return;}const start=state.rendered,end=Math.min(start+count,state.filtered.length);if(end<=start)return;grid.insertAdjacentHTML('beforeend',state.filtered.slice(start,end).map(card).join(''));state.rendered=end;if(end<state.filtered.length)idle(()=>renderMore(token,32));}
+  function renderMore(token,count=32){const grid=$('catalogGrid');if(!grid||token!==state.token)return;if(document.hidden){setTimeout(()=>renderMore(token,count),250);return;}const start=state.rendered,end=Math.min(start+count,state.filtered.length);if(end<=start)return;grid.insertAdjacentHTML('beforeend',state.filtered.slice(start,end).map(renderCard).join(''));state.rendered=end;if(end<state.filtered.length)idle(()=>renderMore(token,32));}
   function readSkills(card,type){let rows=[];try{rows=JSON.parse(decodeURIComponent(card?.getAttribute(type==='active'?'data-active-skills':'data-passive-skills')||''))}catch{}return (Array.isArray(rows)?rows:[]).map(s=>({name:s.name||s.id||'Unnamed Skill',meta:[s.tu?`${s.tu} TU`:'',s.sp!==undefined?`${Number(s.sp)>0?'+':''}${s.sp} SP`:''].filter(Boolean).join(' • '),desc:s.description||''}));}
   function closeCardSkillPanels(except){document.querySelectorAll('.unitCard.v2-skill-open').forEach(c=>{if(c!==except)c.classList.remove('v2-skill-open');});document.querySelectorAll('.v2-card-skill-panel').forEach(p=>{if(!except||!except.contains(p))p.hidden=true;});}
   function openSkills(type){const card=document.querySelector('.unitCard.v2-selected')||document.querySelector('.unitCard');if(!card)return false;const rows=readSkills(card,type);const details=card.querySelector('.unitDetails')||card;let panel=card.querySelector('.v2-card-skill-panel');if(!panel){details.insertAdjacentHTML('beforeend','<div class="v2-card-skill-panel" hidden><div class="v2-card-skill-head"><h3 class="v2-card-skill-title"></h3><button type="button" class="v2-card-skill-close" aria-label="Close skill details">×</button></div><div class="v2-card-skill-list"></div></div>');panel=card.querySelector('.v2-card-skill-panel');panel.querySelector('.v2-card-skill-close')?.addEventListener('click',()=>{panel.hidden=true;card.classList.remove('v2-skill-open');});}const title=type==='active'?'Active Skills':'Passive Skills';panel.querySelector('.v2-card-skill-title').textContent=title;panel.querySelector('.v2-card-skill-list').innerHTML=rows.length?rows.map(s=>`<div class="v2-card-skill-item"><strong>${safe(s.name)}</strong>${s.meta?`<span>${safe(s.meta)}</span>`:''}<p>${safe(s.desc)||'No description loaded.'}</p></div>`).join(''):`<div class="v2-card-skill-item"><strong>No ${title}</strong><p>No ${title.toLowerCase()} were found on this entry.</p></div>`;const wasOpen=!panel.hidden&&card.classList.contains('v2-skill-open')&&panel.dataset.type===type;closeCardSkillPanels(card);panel.dataset.type=type;panel.hidden=wasOpen;card.classList.toggle('v2-skill-open',!wasOpen);if(!wasOpen)card.scrollIntoView({behavior:'smooth',block:'nearest'});return true;}
-  function swapDuo(card,forms,next){const item={...forms[next],duoForms:forms};const wrap=document.createElement('div');wrap.innerHTML=card(item);const fresh=wrap.firstElementChild;if(!fresh)return;card.innerHTML=fresh.innerHTML;card.className=fresh.className;for(const attr of [...fresh.attributes])card.setAttribute(attr.name,attr.value);const btn=card.querySelector('.duoFormBtn');if(btn){btn.dataset.duoIndex=String(next);btn.textContent=btn.textContent.replace(/\d+\/\d+$/,`${next+1}/${forms.length}`);}}
-  function attach(){const grid=$('catalogGrid');if(!grid)return;document.addEventListener('click',e=>{const btn=e.target.closest('[data-v2-skill]');if(btn&&openSkills(btn.getAttribute('data-v2-skill'))){e.preventDefault();e.stopImmediatePropagation();}},true);grid.addEventListener('error',e=>{if(e.target&&e.target.tagName==='IMG'){e.target.replaceWith(Object.assign(document.createElement('div'),{className:'ph',textContent:'?'}));}},true);grid.addEventListener('click',e=>{const duo=e.target.closest('.duoFormBtn');if(duo){const card=e.target.closest('.unitCard');let forms=[];try{forms=JSON.parse(decodeURIComponent(duo.dataset.duoForms||''))}catch{}if(card&&forms.length>1){const next=(Number(duo.dataset.duoIndex||0)+1)%forms.length;swapDuo(card,forms,next);card.classList.add('v2-selected');}return;}const card=e.target.closest('.unitCard');if(card){document.querySelectorAll('.unitCard.v2-selected').forEach(c=>c.classList.remove('v2-selected'));card.classList.add('v2-selected');}const btn=e.target.closest('.stateBtn');if(!btn)return;const row=btn.closest('.stateRow'),img=card?.querySelector('.unitThumb img');let imgs=[];try{imgs=JSON.parse(decodeURIComponent(row?.dataset.imgs||''))}catch{}const idx=Number(btn.dataset.idx||0);if(!img||!imgs[idx])return;img.src=imgs[idx];img.dataset.state=String(idx);row.querySelectorAll('.stateBtn').forEach((b,i)=>b.classList.toggle('active',i===idx));});}
+  function swapDuo(hostCard,forms,next){const item={...forms[next],duoForms:forms};const wrap=document.createElement('div');wrap.innerHTML=renderCard(item);const fresh=wrap.firstElementChild;if(!fresh)return;hostCard.innerHTML=fresh.innerHTML;hostCard.className=fresh.className;for(const attr of [...fresh.attributes])hostCard.setAttribute(attr.name,attr.value);const btn=hostCard.querySelector('.duoFormBtn');if(btn){btn.dataset.duoIndex=String(next);btn.textContent=duoLabel(forms);}}
+  function attach(){const grid=$('catalogGrid');if(!grid)return;document.addEventListener('click',e=>{const btn=e.target.closest('[data-v2-skill]');if(btn&&openSkills(btn.getAttribute('data-v2-skill'))){e.preventDefault();e.stopImmediatePropagation();}},true);grid.addEventListener('error',e=>{if(e.target&&e.target.tagName==='IMG'){e.target.replaceWith(Object.assign(document.createElement('div'),{className:'ph',textContent:'?'}));}},true);grid.addEventListener('click',e=>{const duo=e.target.closest('.duoFormBtn');if(duo){const hostCard=e.target.closest('.unitCard');let forms=[];try{forms=JSON.parse(decodeURIComponent(duo.dataset.duoForms||''))}catch{}if(hostCard&&forms.length>1){const next=(Number(duo.dataset.duoIndex||0)+1)%forms.length;swapDuo(hostCard,forms,next);hostCard.classList.add('v2-selected');}return;}const card=e.target.closest('.unitCard');if(card){document.querySelectorAll('.unitCard.v2-selected').forEach(c=>c.classList.remove('v2-selected'));card.classList.add('v2-selected');}const btn=e.target.closest('.stateBtn');if(!btn)return;const row=btn.closest('.stateRow'),img=card?.querySelector('.unitThumb img');let imgs=[];try{imgs=JSON.parse(decodeURIComponent(row?.dataset.imgs||''))}catch{}const idx=Number(btn.dataset.idx||0);if(!img||!imgs[idx])return;img.src=imgs[idx];img.dataset.state=String(idx);row.querySelectorAll('.stateBtn').forEach((b,i)=>b.classList.toggle('active',i===idx));});}
   async function init(){document.body.classList.add('page-catalog','page-catalog-v2','mobile-compact');const entries=await window.EvertaleData.loadAllEntries();const registry=await loadDuoRegistry();state.items=applyDuoRegistry(normalize(entries),registry);const search=$('catalogSearch'),type=$('catalogType'),view=$('viewToggle');if(view)view.textContent='View: Compact';search?.addEventListener('input',()=>{clearTimeout(search._t);search._t=setTimeout(()=>{state.q=search.value||'';render();},140);});type?.addEventListener('change',()=>{state.type=type.value||'all';render();});render();attach();}
   document.addEventListener('DOMContentLoaded',()=>init().catch(err=>{console.error(err);const s=$('statusText');if(s)s.textContent=`Error: ${err.message||err}`;}));
 })();
