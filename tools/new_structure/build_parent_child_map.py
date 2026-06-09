@@ -11,6 +11,9 @@ from typing import Any, Dict, List, Tuple
 ROOT_MARKERS = ["apkfiles", "tools"]
 STATE_SUFFIX_RE = re.compile(r"^(.*?)(\d{2})$")
 CHILD_HINT_RE = re.compile(r"(rabbit|angel|raven|clone|doll|summon|minion|shadow|imposter|beastshikigami|yandere|maid|exchange|token)", re.I)
+FORCED_PARENT_CHILDREN = {
+    "BeautyBeastRegular": ["BeautyRegular", "BeastRegular"],
+}
 
 
 def find_repo_root(start: Path) -> Path:
@@ -133,22 +136,13 @@ def canonical(value: Any, aliases: Dict[str, str]) -> str:
     return aliases.get(k) or strip_state(value)
 
 
-def child_score(family: str) -> int:
-    score = 0
-    if CHILD_HINT_RE.search(family):
-        score += 100
-    if re.search(r"(regular|bride|swimsuit|dark|christmas|valentine|ballet)$", family, re.I):
-        score -= 10
-    return score
-
-
 def add_edge(edges: Dict[str, set[str]], parent: str, child: str) -> None:
     if not parent or not child or parent == child:
         return
     edges.setdefault(parent, set()).add(child)
 
 
-def add_relationship_map(edges: Dict[str, set[str]], labels: Dict[str, str], aliases: Dict[str, str], map_name: str, mapping: Any, preferred: set[str]) -> int:
+def add_relationship_map(edges: Dict[str, set[str]], labels: Dict[str, str], aliases: Dict[str, str], map_name: str, mapping: Any) -> int:
     if not isinstance(mapping, dict):
         return 0
     added = 0
@@ -168,21 +162,45 @@ def add_relationship_map(edges: Dict[str, set[str]], labels: Dict[str, str], ali
     return added
 
 
-def build_edges(repo: Path, aliases: Dict[str, str]) -> Tuple[Dict[str, set[str]], Dict[str, str], List[Dict[str, Any]], List[str]]:
+def apply_forced_directions(edges: Dict[str, set[str]], labels: Dict[str, str], aliases: Dict[str, str]) -> List[Dict[str, Any]]:
+    applied: List[Dict[str, Any]] = []
+    for parent_raw, children_raw in FORCED_PARENT_CHILDREN.items():
+        parent = canonical(parent_raw, aliases)
+        children = [canonical(child, aliases) for child in children_raw]
+        children = [child for child in children if child and child != parent]
+        if not parent or not children:
+            continue
+        for child in children:
+            edges.pop(child, None)
+        for source_parent, kids in list(edges.items()):
+            if source_parent != parent:
+                kids.discard(parent)
+                for child in children:
+                    if source_parent in children:
+                        kids.clear()
+                    else:
+                        kids.discard(parent)
+            if not kids:
+                edges.pop(source_parent, None)
+        edges[parent] = set(children)
+        labels[parent] = "Forms"
+        applied.append({"parent": parent, "children": children})
+    return applied
+
+
+def build_edges(repo: Path, aliases: Dict[str, str]) -> Tuple[Dict[str, set[str]], Dict[str, str], List[Dict[str, Any]], List[str], List[Dict[str, Any]]]:
     duo = load_json(repo / "apkfiles" / "Duo.json", {}) or {}
     display = load_json(repo / "apkfiles" / "DuoDisplay.json", {}) or {}
     edges: Dict[str, set[str]] = {}
     labels: Dict[str, str] = {}
     issues: List[Dict[str, Any]] = []
     source_maps: List[str] = []
-    preferred: set[str] = set()
 
     parent_cards = display.get("parentCards", {}) if isinstance(display, dict) else {}
     if isinstance(parent_cards, dict):
         source_maps.append("DuoDisplay.parentCards")
         for parent_raw, cfg in parent_cards.items():
             parent = canonical(parent_raw, aliases)
-            preferred.add(parent)
             labels[parent] = str((cfg or {}).get("buttonLabel") or "Forms")
             children = (cfg or {}).get("children", []) if isinstance(cfg, dict) else []
             for child_raw in children if isinstance(children, list) else []:
@@ -193,13 +211,12 @@ def build_edges(repo: Path, aliases: Dict[str, str]) -> Tuple[Dict[str, set[str]
         for map_name, mapping in duo.items():
             if not isinstance(mapping, dict):
                 continue
-            added = add_relationship_map(edges, labels, aliases, map_name, mapping, preferred)
+            added = add_relationship_map(edges, labels, aliases, map_name, mapping)
             if added:
                 source_maps.append(f"Duo.{map_name}")
 
-    # Keep every parent group. Children may be shared by more than one summoner or exchange user.
-    # The frontend will skip the child as a standalone card but can attach the same child payload to each parent.
-    return edges, labels, issues, source_maps
+    forced = apply_forced_directions(edges, labels, aliases)
+    return edges, labels, issues, source_maps, forced
 
 
 def main() -> int:
@@ -213,7 +230,7 @@ def main() -> int:
     reports_dir = entries_root / "reports"
 
     aliases, families = build_aliases(repo, entries_root)
-    edges, labels, issues, source_maps = build_edges(repo, aliases)
+    edges, labels, issues, source_maps, forced = build_edges(repo, aliases)
 
     parents = {parent: sorted(children) for parent, children in sorted(edges.items()) if children}
     child_to_parents: Dict[str, List[str]] = {}
@@ -236,6 +253,7 @@ def main() -> int:
         "schemaVersion": 2,
         "generatedAt": int(time.time()),
         "source": source_maps,
+        "forcedDirections": forced,
         "parents": parents,
         "children": children,
         "groups": groups,
@@ -256,6 +274,7 @@ def main() -> int:
         "status": "ok" if not issues else "warning",
         "counts": payload["counts"],
         "issues": issues,
+        "forcedDirections": forced,
         "sourceMaps": source_maps,
         "victoriaPresentInAliases": "victoriaregular" in aliases,
         "outputs": ["apkfiles/entries/maps/character_parent_child_map.json"],
