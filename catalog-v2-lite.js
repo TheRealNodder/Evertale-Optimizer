@@ -25,20 +25,31 @@
     const weapons=(entries.weapons||[]).map(e=>{const x=base('weapons',e);return{...x,image:pick(e.image,x.sourceId?`https://ik.imagekit.io/r8fsa98s9/weapons/${x.sourceId}.png`:'')}});
     const accessories=(entries.accessories||[]).map(e=>{const x=base('accessories',e);return{...x,image:pick(e.image,x.sourceId?`https://ik.imagekit.io/r8fsa98s9/accessories/${x.sourceId}.png`:'')}});
     const bosses=(entries.bosses||[]).map(e=>{const x=base('bosses',e);return{...x,image:pick(e.image,x.sourceId?`https://ik.imagekit.io/r8fsa98s9/characters/${x.sourceId.replace(/Boss(?=\d+$)/,'')}.png`:'')}});
-    return [...chars.sort((a,b)=>Number(b.order||0)-Number(a.order||0)),...weapons.sort((a,b)=>Number(b.order||0)-Number(a.order||0)),...accessories.sort((a,b)=>Number(a.order||999999)-Number(b.order||999999)),...bosses.sort((a,b)=>Number(a.order||999999)-Number(b.order||999999))].filter(x=>x.id&&x.name);
+    return [...chars.sort((a,b)=>Number(b.order||0)-Number(a.order||0)),...weapons.sort((a,b)=>Number(b.order||0)-Number(a.order||0)),...accessories.sort((a,b)=>Number(a.order||999999)-Number(b.order||999999)),...bosses.sort((a,b)=>Number(b.order||0)-Number(a.order||0))].filter(x=>x.id&&x.name);
   }
   function itemKeys(item){return [item.id,item.sourceId,item.family,item.name,item.subtitle].flatMap(v=>[famKey(v),clean(v)]).filter(Boolean);}
+  function canonicalKey(k,registry){return registry.aliases?.get(k)||k;}
   async function loadDuoRegistry(){
+    const built=await readJson('./apkfiles/entries/maps/character_parent_child_map.json');
+    if(built&&built.parents&&typeof built.parents==='object'){
+      const childToParent=new Map(), parents=new Set(), aliases=new Map();
+      Object.entries(built.aliases||{}).forEach(([k,v])=>aliases.set(clean(k),famKey(v)));
+      Object.entries(built.parents||{}).forEach(([parent,children])=>{
+        const pk=famKey(parent); if(!pk)return; parents.add(pk);
+        if(Array.isArray(children))children.forEach(child=>{const ck=famKey(child);if(ck&&ck!==pk)childToParent.set(ck,pk);});
+      });
+      return {childToParent,parents,aliases,source:'character_parent_child_map'};
+    }
     const [duo,display]=await Promise.all([readJson('./apkfiles/Duo.json'),readJson('./apkfiles/DuoDisplay.json')]);
-    const childToParent=new Map(), parents=new Set();
+    const childToParent=new Map(), parents=new Set(), aliases=new Map();
     const add=(p,c)=>{const pk=famKey(p),ck=famKey(c);if(!pk||!ck||pk===ck)return;parents.add(pk);childToParent.set(ck,pk);};
-    Object.entries(duo?.directSpecificLinks||{}).forEach(([p,children])=>Array.isArray(children)&&children.forEach(c=>add(p,c)));
     Object.entries(display?.parentCards||{}).forEach(([p,cfg])=>(Array.isArray(cfg?.children)?cfg.children:[]).forEach(c=>add(p,c)));
-    return {childToParent,parents};
+    Object.entries(duo?.directSpecificLinks||{}).forEach(([p,children])=>Array.isArray(children)&&children.forEach(c=>add(p,c)));
+    return {childToParent,parents,aliases,source:'duo_fallback'};
   }
   function registryRole(item,registry){
-    for(const k of itemKeys(item)){if(registry.parents.has(k))return{role:'parent',root:k};}
-    for(const k of itemKeys(item)){if(registry.childToParent.has(k))return{role:'child',root:registry.childToParent.get(k)};}
+    for(const raw of itemKeys(item)){const k=canonicalKey(raw,registry);if(registry.parents.has(k))return{role:'parent',root:k};}
+    for(const raw of itemKeys(item)){const k=canonicalKey(raw,registry);if(registry.childToParent.has(k))return{role:'child',root:registry.childToParent.get(k)};}
     return null;
   }
   function applyDuoRegistry(items,registry){
@@ -59,7 +70,7 @@
       parent.duoForms=forms.map(f=>({...f,duoForms:undefined}));
       out.push(parent);
     }
-    window.__EVERTALE_V2_DUO_DATA_REPORT={parents:groups.size,children:Array.from(groups.values()).reduce((n,g)=>n+g.children.length,0),itemsBefore:items.length,itemsAfter:out.length};
+    window.__EVERTALE_V2_DUO_DATA_REPORT={source:registry.source,parents:groups.size,children:Array.from(groups.values()).reduce((n,g)=>n+g.children.length,0),itemsBefore:items.length,itemsAfter:out.length};
     return out;
   }
   function stateBtns(imgs){if(!Array.isArray(imgs)||imgs.length<2)return'';const enc=attrJson(imgs.slice(0,3));return`<div class="stateRow" data-imgs="${enc}">${imgs.slice(0,3).map((_,i)=>`<button type="button" class="stateBtn ${i===0?'active':''}" data-idx="${i}" aria-label="State ${i+1}"></button>`).join('')}</div>`;}
