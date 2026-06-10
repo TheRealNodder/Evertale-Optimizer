@@ -7,25 +7,28 @@
   const $ = id => document.getElementById(id);
   const clean = v => String(v || '').toLowerCase().replace(/\d+$/,'').replace(/[^a-z0-9]+/g,'');
   const directKey = v => String(v || '').toLowerCase().replace(/[^a-z0-9]+/g,'');
+  function hasStylesheet(file){
+    return [...document.querySelectorAll('link[rel="stylesheet"]')].some(l => String(l.getAttribute('href') || '').includes(file));
+  }
   function loadElementNormalizer(){
-    if(!document.querySelector('link[data-v2-element-surface]')){
+    if(!document.querySelector('link[data-v2-element-surface]') && !hasStylesheet('test-catalog-v2-elements.css')){
       const l=document.createElement('link');
       l.rel='stylesheet';
-      l.href='./test-catalog-v2-elements.css?v=2';
+      l.href='./test-catalog-v2-elements.css?v=4';
       l.setAttribute('data-v2-element-surface','1');
       document.head.appendChild(l);
     }
-    if(!document.querySelector('link[data-v2-theme]')){
+    if(!document.querySelector('link[data-v2-theme]') && !hasStylesheet('test-catalog-v2-theme.css')){
       const t=document.createElement('link');
       t.rel='stylesheet';
-      t.href='./test-catalog-v2-theme.css?v=1';
+      t.href='./test-catalog-v2-theme.css?v=2';
       t.setAttribute('data-v2-theme','1');
       document.head.appendChild(t);
     }
-    if(!document.querySelector('link[data-v2-mobile]')){
+    if(!document.querySelector('link[data-v2-mobile]') && !hasStylesheet('test-catalog-v2-mobile.css')){
       const m=document.createElement('link');
       m.rel='stylesheet';
-      m.href='./test-catalog-v2-mobile.css?v=1';
+      m.href='./test-catalog-v2-mobile.css?v=2';
       m.setAttribute('data-v2-mobile','1');
       document.head.appendChild(m);
     }
@@ -85,7 +88,7 @@
     $('v2Cost').textContent=exactStat(card,'cost');
     const idx=Math.min(activeIdx(card),Math.max((rows||[]).length-1,0));
     $('v2AwakenTabs').innerHTML=(rows||[]).map((r,i)=>`<button type="button" class="${i===idx?'active':''}" data-v2-idx="${i}">${i+1}</button>`).join('');
-    $('v2Desc').textContent=(rows&&rows[idx]&&(rows[idx].description||rows[idx].title||''))||text('.descriptionText',card)||text('.leaderDesc',card)||'No description loaded for this state.';
+    $('v2Desc').textContent=(rows&&rows[idx]&&(rows[idx].description||rows[idx].title||''))||text('.descriptionText',card)||'No description loaded for this state.';
   }
   async function selectCard(card){if(!card)return;document.querySelectorAll('.unitCard.v2-selected').forEach(c=>c.classList.remove('v2-selected'));card.classList.add('v2-selected');const map=await loadDescMap();let rows=[];for(const key of cardKeyList(card)){rows=map.get(key)||[];if(rows.length)break;}setHero(card,rows)}
   function ensureSkillPrompt(){
@@ -99,7 +102,16 @@
     return pop;
   }
   function closeSkillPrompt(){const pop=$('v2SkillPop'); if(pop){pop.classList.remove('open'); pop.setAttribute('aria-hidden','true');}}
+  function readSkillDataAttr(card,type){
+    try{
+      const attr=type==='active'?'data-active-skills':'data-passive-skills';
+      const rows=JSON.parse(decodeURIComponent(card?.getAttribute(attr)||''));
+      return Array.isArray(rows)?rows.map(s=>({name:s.name||s.id||'Unnamed Skill',meta:[s.tu?`${s.tu} TU`:'',s.sp!==undefined?`${Number(s.sp)>0?'+':''}${s.sp} SP`:''].filter(Boolean).join(' • '),desc:s.description||''})):[];
+    }catch{return[];}
+  }
   function extractSkills(card,type){
+    const fromData=readSkillDataAttr(card,type);
+    if(fromData.length)return fromData;
     const panel=card?.querySelector(type==='active'?'.activeSkillPanel':'.passiveSkillPanel');
     const boxes=[...(panel?.querySelectorAll('.skillBox')||[])];
     return boxes.map(box=>({name:text('strong',box)||'Unnamed Skill',meta:text('.skillBoxHead span',box),desc:htmlText('.skillBoxText',box).replace(/<br\s*\/?>/gi,'\n').replace(/<[^>]+>/g,'').trim()}));
