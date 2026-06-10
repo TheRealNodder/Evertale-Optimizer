@@ -1,4 +1,7 @@
-/* test-catalog-v2-mobile-fluid.css — mobile-only desktop-feel polish for Test Catalog V2. */
+/* test-catalog-v2-mobile-fluid.css — mobile-only exact card order for Test Catalog V2.
+   Required mobile order:
+   Portrait -> Name -> Title -> Stars -> Switch badge -> [Character][Element][SSR] -> [ATK][HP][SPD][COST]
+*/
 @media (max-width: 820px){
   .page-catalog-v2{
     background:
@@ -17,13 +20,13 @@
   .page-catalog-v2 #catalogSearch{grid-column:1/-1;}
   .page-catalog-v2 .input,.page-catalog-v2 .btn{min-height:42px !important;border-radius:15px !important;background:rgba(255,255,255,.07) !important;box-shadow:inset 0 1px 0 rgba(255,255,255,.06) !important;}
 
-  .page-catalog-v2 .v2-hero{gap:10px !important;margin-bottom:10px !important;}
   .page-catalog-v2 .v2-description{display:none !important;}
   .page-catalog-v2 .v2-grid-panel{border-radius:24px !important;padding:10px !important;background:linear-gradient(180deg,rgba(13,10,28,.84),rgba(5,5,12,.96)) !important;}
   .page-catalog-v2 .v2-grid-head{position:sticky;top:64px;z-index:12;margin:-2px -2px 10px !important;padding:8px 8px 9px !important;border-radius:18px !important;background:rgba(7,6,16,.72) !important;backdrop-filter:blur(16px) saturate(1.2);border:1px solid rgba(255,255,255,.06);}
   .page-catalog-v2 .rosterGrid{grid-template-columns:1fr !important;gap:12px !important;}
 
-  .page-catalog-v2 .unitCard{
+  /* Card shell */
+  .page-catalog-v2 #catalogGrid .unitCard{
     display:flex !important;
     flex-direction:column !important;
     min-height:0 !important;
@@ -34,41 +37,167 @@
     will-change:transform;
   }
 
-  .page-catalog-v2 .unitCard::after{width:8px !important;border-radius:24px 0 0 24px !important;}
-  .page-catalog-v2 .unitLeft{order:1 !important;width:100% !important;min-width:0 !important;margin:0 0 11px !important;}
-  .page-catalog-v2 .unitThumb{width:100% !important;min-height:0 !important;height:clamp(300px,76vw,430px) !important;border-radius:20px !important;display:flex !important;align-items:flex-end !important;justify-content:center !important;background:radial-gradient(circle at 50% 14%,color-mix(in srgb,var(--element-secondary) 16%,transparent),transparent 36%),radial-gradient(circle at 50% 78%,color-mix(in srgb,var(--element-primary) 18%,transparent),transparent 54%),rgba(0,0,0,.20)!important;}
-  .page-catalog-v2 .unitThumb img{width:100% !important;height:100% !important;max-height:none !important;object-fit:cover !important;object-position:center top !important;}
+  .page-catalog-v2 #catalogGrid .unitCard::after{width:8px !important;border-radius:24px 0 0 24px !important;}
 
-  .page-catalog-v2 .meta{order:2 !important;display:flex !important;flex-direction:column !important;min-width:0 !important;padding:0 !important;}
-  .page-catalog-v2 .metaHeader{display:flex !important;flex-direction:column !important;gap:8px !important;align-items:stretch !important;min-width:0 !important;}
-  .page-catalog-v2 .metaMain{display:flex !important;flex-direction:column !important;align-items:center !important;justify-content:center !important;text-align:center !important;min-width:0 !important;}
-  .page-catalog-v2 .nameBlock{width:100% !important;text-align:center !important;}
-  .page-catalog-v2 .unitName{font-size:clamp(19px,5.6vw,24px) !important;line-height:1.08 !important;text-align:center !important;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
-  .page-catalog-v2 .unitTitle{font-size:clamp(13px,3.9vw,16px) !important;line-height:1.22 !important;text-align:center !important;display:-webkit-box !important;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;max-width:94%;margin:3px auto 0 !important;}
+  /* 1. Portrait */
+  .page-catalog-v2 #catalogGrid .unitCard > .unitLeft{
+    order:1 !important;
+    width:100% !important;
+    min-width:0 !important;
+    margin:0 0 12px !important;
+  }
+  .page-catalog-v2 #catalogGrid .unitCard > .unitLeft .unitThumb{
+    width:100% !important;
+    min-height:0 !important;
+    height:clamp(300px,76vw,430px) !important;
+    border-radius:20px !important;
+    display:flex !important;
+    align-items:flex-end !important;
+    justify-content:center !important;
+    background:
+      radial-gradient(circle at 50% 14%,color-mix(in srgb,var(--element-secondary) 16%,transparent),transparent 36%),
+      radial-gradient(circle at 50% 78%,color-mix(in srgb,var(--element-primary) 18%,transparent),transparent 54%),
+      rgba(0,0,0,.20)!important;
+  }
+  .page-catalog-v2 #catalogGrid .unitCard > .unitLeft .unitThumb img{
+    width:100% !important;
+    height:100% !important;
+    max-height:none !important;
+    object-fit:cover !important;
+    object-position:center top !important;
+  }
 
-  .page-catalog-v2 .stateRow{order:2 !important;gap:8px !important;margin-top:10px !important;justify-content:center !important;}
-  .page-catalog-v2 .stateBtn{width:25px !important;height:25px !important;}
-  .page-catalog-v2 .duoFormBtn{order:3 !important;max-width:190px !important;min-height:31px !important;padding:7px 12px !important;margin-top:9px !important;font-size:11px !important;}
+  /* 2-7. Info sequence */
+  .page-catalog-v2 #catalogGrid .unitCard > .meta{
+    order:2 !important;
+    display:flex !important;
+    flex-direction:column !important;
+    min-width:0 !important;
+    padding:0 !important;
+  }
+  .page-catalog-v2 #catalogGrid .unitCard .metaHeader{
+    order:1 !important;
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:stretch !important;
+    gap:0 !important;
+    min-width:0 !important;
+  }
+  .page-catalog-v2 #catalogGrid .unitCard .metaMain{
+    order:1 !important;
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:center !important;
+    text-align:center !important;
+    min-width:0 !important;
+  }
 
-  .page-catalog-v2 .chipCol{order:4 !important;display:flex !important;flex-direction:row !important;gap:8px !important;align-items:center !important;justify-content:center !important;max-width:none !important;width:100% !important;flex-wrap:nowrap !important;margin-top:10px !important;}
-  .page-catalog-v2 .tag{max-width:32% !important;font-size:11px !important;line-height:1 !important;padding:7px 10px !important;overflow:hidden !important;text-overflow:ellipsis !important;white-space:nowrap !important;}
-  .page-catalog-v2 .tag.kind,.page-catalog-v2 .tag.element,.page-catalog-v2 .tag.rarity{position:static !important;flex:1 1 0 !important;min-width:0 !important;text-align:center !important;}
+  /* 2. Name and 3. Title */
+  .page-catalog-v2 #catalogGrid .unitCard .nameBlock{
+    order:1 !important;
+    width:100% !important;
+    text-align:center !important;
+  }
+  .page-catalog-v2 #catalogGrid .unitCard .unitName{
+    font-size:clamp(19px,5.6vw,24px) !important;
+    line-height:1.08 !important;
+    text-align:center !important;
+    display:-webkit-box !important;
+    -webkit-line-clamp:2;
+    -webkit-box-orient:vertical;
+    overflow:hidden;
+  }
+  .page-catalog-v2 #catalogGrid .unitCard .unitTitle{
+    font-size:clamp(13px,3.9vw,16px) !important;
+    line-height:1.22 !important;
+    text-align:center !important;
+    display:-webkit-box !important;
+    -webkit-line-clamp:2;
+    -webkit-box-orient:vertical;
+    overflow:hidden;
+    max-width:94%;
+    margin:3px auto 0 !important;
+  }
 
-  .page-catalog-v2 .unitDetails{display:block !important;min-width:0 !important;margin-top:11px !important;}
-  .page-catalog-v2 .statLine{display:grid !important;grid-template-columns:repeat(4,minmax(0,1fr)) !important;gap:7px !important;padding:8px !important;margin-top:0 !important;border-radius:16px !important;background:linear-gradient(145deg,rgba(255,255,255,.07),rgba(0,0,0,.14)) !important;}
-  .page-catalog-v2 .stat{border-radius:12px !important;padding:8px 4px !important;min-width:0 !important;text-align:center !important;}
-  .page-catalog-v2 .statLabel{font-size:9px !important;}
-  .page-catalog-v2 .statVal{font-size:12px !important;}
-  .page-catalog-v2 .leaderBlock{display:none !important;}
+  /* 4. Stars */
+  .page-catalog-v2 #catalogGrid .unitCard .stateRow{
+    order:2 !important;
+    display:flex !important;
+    flex-direction:row !important;
+    gap:8px !important;
+    margin-top:10px !important;
+    justify-content:center !important;
+    align-items:center !important;
+  }
+  .page-catalog-v2 #catalogGrid .unitCard .stateBtn{width:25px !important;height:25px !important;}
+
+  /* 5. Switch badge */
+  .page-catalog-v2 #catalogGrid .unitCard .duoFormBtn{
+    order:3 !important;
+    align-self:center !important;
+    max-width:190px !important;
+    min-height:31px !important;
+    padding:7px 12px !important;
+    margin-top:9px !important;
+    font-size:11px !important;
+  }
+
+  /* 6. [Character] [Element] [SSR] */
+  .page-catalog-v2 #catalogGrid .unitCard .chipCol{
+    order:2 !important;
+    display:flex !important;
+    flex-direction:row !important;
+    gap:8px !important;
+    align-items:center !important;
+    justify-content:center !important;
+    width:100% !important;
+    max-width:none !important;
+    flex-wrap:nowrap !important;
+    margin-top:10px !important;
+  }
+  .page-catalog-v2 #catalogGrid .unitCard .chipCol .tag{
+    position:static !important;
+    flex:1 1 0 !important;
+    min-width:0 !important;
+    max-width:none !important;
+    text-align:center !important;
+    font-size:11px !important;
+    line-height:1 !important;
+    padding:7px 10px !important;
+    overflow:hidden !important;
+    text-overflow:ellipsis !important;
+    white-space:nowrap !important;
+  }
+
+  /* 7. [ATK] [HP] [SPD] [COST] */
+  .page-catalog-v2 #catalogGrid .unitCard .unitDetails{
+    order:2 !important;
+    display:block !important;
+    min-width:0 !important;
+    margin-top:11px !important;
+  }
+  .page-catalog-v2 #catalogGrid .unitCard .statLine{
+    display:grid !important;
+    grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+    gap:7px !important;
+    padding:8px !important;
+    margin-top:0 !important;
+    border-radius:16px !important;
+    background:linear-gradient(145deg,rgba(255,255,255,.07),rgba(0,0,0,.14)) !important;
+  }
+  .page-catalog-v2 #catalogGrid .unitCard .stat{border-radius:12px !important;padding:8px 4px !important;min-width:0 !important;text-align:center !important;}
+  .page-catalog-v2 #catalogGrid .unitCard .statLabel{font-size:9px !important;}
+  .page-catalog-v2 #catalogGrid .unitCard .statVal{font-size:12px !important;}
+  .page-catalog-v2 #catalogGrid .unitCard .leaderBlock{display:none !important;}
 }
 
 @media (max-width: 430px){
   .page-catalog-v2 .controls{grid-template-columns:1fr !important;}
-  .page-catalog-v2 .unitCard{padding:13px !important;}
-  .page-catalog-v2 .unitThumb{height:clamp(286px,82vw,390px) !important;}
-  .page-catalog-v2 .chipCol{gap:6px !important;}
-  .page-catalog-v2 .tag{font-size:10px !important;padding:6px 7px !important;}
-  .page-catalog-v2 .statLine{gap:5px !important;padding:7px !important;}
-  .page-catalog-v2 .stat{padding:7px 3px !important;}
-  .page-catalog-v2 .statVal{font-size:11px !important;}
+  .page-catalog-v2 #catalogGrid .unitCard{padding:13px !important;}
+  .page-catalog-v2 #catalogGrid .unitCard > .unitLeft .unitThumb{height:clamp(286px,82vw,390px) !important;}
+  .page-catalog-v2 #catalogGrid .unitCard .chipCol{gap:6px !important;}
+  .page-catalog-v2 #catalogGrid .unitCard .chipCol .tag{font-size:10px !important;padding:6px 7px !important;}
+  .page-catalog-v2 #catalogGrid .unitCard .statLine{gap:5px !important;padding:7px !important;}
+  .page-catalog-v2 #catalogGrid .unitCard .stat{padding:7px 3px !important;}
+  .page-catalog-v2 #catalogGrid .unitCard .statVal{font-size:11px !important;}
 }
