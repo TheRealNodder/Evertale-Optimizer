@@ -1,6 +1,6 @@
 {
 	"Version": 23,
-	"Time": 1780383575,
+	"Time": 1780383899,
 	"AbilityConfig": {
 		"StunSingle200A": {
 			"class": "AbilityConfig",
@@ -45991,7 +45991,7 @@
 			"targetingData": "AllEnemy",
 			"components": ["ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff"],
 			"componentOverrides": [{
-				"buffs": ["RemoveBurn","MegaPoison","BurnImmunityTempForRevenge"],
+				"buffs": ["RemoveBurn","MegaPoison"],
 				"applyToTargetType": "Enemy"
 			},{
 				"buffs": ["SuperStealth","StealthShieldOnce","StoreEnergy","Steal2SpiritForEachPoisonedEnemyEBB"],
@@ -46440,6 +46440,136 @@
 			"abilityEffect": "VictoriaPowerCharge1",
 			"flags": ["NoDamage","GiveTurn"],
 			"useCondition": "NoPowerCharge"
+		},
+		"EnemyBuffALupinRegular": {
+			"class": "AbilityConfig",
+			"targetingData": "AllEnemy",
+			"components": ["ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"buffs": ["RemoveBurn","MegaPoison"],
+				"applyToTargetType": "Enemy"
+			},{
+				"buffs": ["SuperStealth","StealthShieldOnce","StoreEnergy","Steal2SpiritForEachPoisonedEnemyEBB"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs": ["HijikataCounter","HijikataCounterFuseAfterTime"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["LupinRegularActive1Cooldown50"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"applyConditions": "IsHijikataCharged2",
+				"showMissConditions": "ShowNoMiss"	
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "LupinVenom",
+			"flags": ["NoDamage","Poisoner"],
+			"useCondition": "IsNotStealthNotInstantCooldown"
+		},
+		"SingleAttackALupinRegular":{
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["SkipRevengeDamage","ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"damageBoosts": ["SneakAttackDamageBoost"],
+				"drainPercent": 1.0,
+				"drainEffect": "VampireDrain1",
+				"applyToTargetType": "Enemy",
+				"damageFlags": ["IgnoreArmor","Sneak","DoNotWake"]
+			},{
+				"buffs": ["SleepImmunityOnce","TUMinus10"],
+				"buffBackMode": true,
+				"applyConditions": "IsSleepImmunityOnce",
+				"applyToTargetOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs": ["StunImmunityOnce","TUMinus10"],
+				"buffBackMode": true,
+				"applyConditions": "IsStunImmunityOnce",
+				"applyToTargetOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs": ["PoisonImmunityOnce","TUMinus10"],
+				"buffBackMode": true,
+				"applyConditions": "IsPoisonImmunityOnce",
+				"applyToTargetOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs": ["InstantKillImmunityOnce","TUMinus10"],
+				"buffBackMode": true,
+				"applyConditions": "IsInstantKillImmunityOnce",
+				"applyToTargetOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs": ["RemoveSleepImmunityOnce","RemovePoisonImmunityOnce","RemoveStunImmunityOnce","RemoveInstantKillImmunityOnce"],
+				"applyToTargetType": "Enemy",
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"	
+			},{
+				"buffs": ["StoreEnergy"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "LupinShot1",
+			"flags": ["Sneak","StealItem"],
+			"recommendEffectWhenUsable": 1,
+			"useCondition": "IsStealthOrInstantCooldown"
+		},
+		"AllAttackALupinRegular":{
+			"class": "AbilityConfig",
+			"targetingData": "AllEnemy",
+			"components": ["Damage","ApplyBuff"],
+			"componentOverrides":[{
+				"applyToTargetType": "Enemy",
+				"damageFlags": ["IgnoreArmor","IgnoreSkin","HardIgnoreBlockDeath"]
+			},{
+				"buffs": ["RemoveEnergy","GrantAllOtherAlliesTurnEBB"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "LupinAllDamage",
+			"attackScalors": ["TimeInCombat100","TimeInCombat200"],
+			"conditionedAbilityEffects": ["LupinAllDamage","LupinAllDamage","LupinAllDamage"],
+			"flags": ["Duration","GiveTurn"],
+			"recommendEffectWhenUsable": -1,
+			"useCondition": "IsCharged3"
+		},
+		"BigSelfBuffALupinRegular": {
+			"class": "AbilityConfig",
+			"targetingData": "AllAlly",
+			"components": ["ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"buffs": ["HealFull","RemoveBuffs"],
+				"applyToTargetType": "Friendly"
+			},{
+				"buffs": ["AttackAndHasteUp50PercentLupinRegular","SleepImmunityOnce","StunImmunityOnce","InstantKillImmunityOnce","StoreEnergy","StoreEnergy","StoreEnergy"],
+				"applyToTargetType": "Source",
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["Add1LupinRegular02"],
+				"applyToTargetType": "Source",
+				"skipAbilityEffect": true,
+				"applyConditions": "AtLeast2NonSummonedAllies",
+				"showMissConditions": "ShowNoMiss"
+			}],
+			"friendlyEventType": "Finish",
+			"sourceEventType": "Hit",
+			"abilityEffect": "LupinSearchlight",
+			"flags": ["NoDamage","Summon"],
+			"useCondition": "IsLupinActive4ReadyOr1AllyHPBelow50Percent"
 		}
 	}
 }

@@ -1,6 +1,6 @@
 {
 	"Version": 23,
-	"Time": 1780564399,
+	"Time": 1780566102,
 	"Buff": {
 	"RelationshipFlatAttack50": {
 		"class": "Buff",
@@ -86789,10 +86789,12 @@
 				}
 			},{}],
 			"duration": -1,
-			"showAsTimer": false,
+			"showAsPermanent": false,
+			"showAsTimer": true,
+			"statusEffect": "Lupinstance",
 			"noIconShownOnBattleStatus": true,
 			"tags": ["InMegaMode"],
-			"iconSpriteName": "IconYellowKing01"
+			"iconSpriteName": "IconPurpleAttackUpSword01"
 		},
 		"Steal2SpiritForEachPoisonedEnemyEBB": {
 			"class": "Buff",
@@ -87484,6 +87486,274 @@
 			"showAsTimer": true,
 			"showAsPermanent": false,
 			"iconSpriteName": "IconRedCountdownPassiveClock3"
+		},
+		"AttackUp4TargetIsMegaPoisoned": {
+			"class": "Buff",
+			"behaviors": ["ExtraAttackScalor"],
+			"behaviorOverrides": [{
+				"targetCondition": "IsMegaPoisoned",
+				"scalor": 0.15
+			}],
+			"iconSpriteName": "IconYellowAttackUpSword01",
+			"noIconShownOnBattleStatus": true,
+			"duration": -1,
+			"showAsTimer": false,
+			"isWeaponBuff": true
+		},
+		"AttackUp5TargetIsMegaPoisoned": {
+			"class": "Buff",
+			"behaviors": ["ExtraAttackScalor"],
+			"behaviorOverrides": [{
+				"targetCondition": "IsMegaPoisoned",
+				"scalor": 0.25
+			}],
+			"iconSpriteName": "IconYellowAttackUpSword01",
+			"noIconShownOnBattleStatus": true,
+			"duration": -1,
+			"showAsTimer": false,
+			"isWeaponBuff": true
+		},
+		"AttackUp6TargetIsMegaPoisoned": {
+			"class": "Buff",
+			"behaviors": ["ExtraAttackScalor"],
+			"behaviorOverrides": [{
+				"targetCondition": "IsMegaPoisoned",
+				"scalor": 0.35
+			}],
+			"iconSpriteName": "IconYellowAttackUpSword01",
+			"noIconShownOnBattleStatus": true,
+			"duration": -1,
+			"showAsTimer": false,
+			"isWeaponBuff": true
+		},
+		"MasterThiefPassiveALupinRegular": {
+			"class": "Buff",
+			"stackName": "MasterThiefPassiveALupinRegular",
+			"behaviors": ["EnterBattleBuff","BuffWhenMonstersDie","BuffWhenMonstersDie","BuffWhenMonstersDie","BuffWhenMonstersDie","BuffWhenMonstersDie","BuffWhenMonsterHurt","BuffOnMonsterTurnEnd","BuffWhenMonstersDie","ModifyDamage","ModifyDamage","PoisonImmunityFallback","BurnImmunityFallback"],
+				"behaviorOverrides": [{
+				"sourceBuffs": ["PoisonImmunity","BurnImmunity","DisableFallBackImmunity","Charged1Icon","Charged2Icon","Charged3Icon"]
+			},{
+				"sourceBuffs": ["ExtraTurnLupinRegularLV1"],
+				"sameTeam": false,
+				"deadMonsterConditions": "NotTransformingOrMirage",
+				"spreadCondition": "HasNoAwakening"
+			},{
+				"sourceBuffs": ["ExtraTurnLupinRegularLV2"],
+				"sameTeam": false,
+				"deadMonsterConditions": "NotTransformingOrMirage",
+				"spreadCondition": "Has1AwakeningExact"
+			},{
+				"sourceBuffs": ["ExtraTurnLupinRegularLV3"],
+				"sameTeam": false,
+				"deadMonsterConditions": "NotTransformingOrMirage",
+				"spreadCondition": "Has2AwakeningsExact"
+			},{
+				"sourceBuffs": ["ExtraTurnLupinRegularLV4"],
+				"sameTeam": false,
+				"deadMonsterConditions": "NotTransformingOrMirage",
+				"spreadCondition": "Has3AwakeningsExact"
+			},{
+				"sourceBuffs": ["ExtraTurnLupinRegularLV5"],
+				"sameTeam": false,
+				"deadMonsterConditions": "NotTransformingOrMirage",
+				"spreadCondition": "Has4Awakenings"
+			},{
+				"selfBuffs": ["BrideHealOK"],
+				"cancelFromDamageTypes": ["BuffDamage"]
+			},{
+				"selfBuffs": ["BrideHeal25PercentPurifyLupinRegular"],
+				"activeMonsterConditions": "NotAlwaysMyTurn",
+				"spreadCondition": "BrideHealReady"
+			},{
+				"sourceBuffs": ["LupinRegularActive4Ready"],
+				"sameTeam": true,
+				"deadMonsterConditions": "IsNotSummonedOrTransformingOrMirage"
+			},{
+				"percent": 0.65,
+				"cancelFromDamageTypes": ["BuffDamage", "Poison", "Burn"],
+				"cancelFromDamageFlags": ["Sneak", "IgnoreArmor"],
+				"conditions": "HasNoWards"
+			},{
+				"percent": 0.30,
+				"cancelFromDamageTypes": ["BuffDamage", "Poison", "Burn"],
+				"cancelFromDamageFlags": ["Sneak", "IgnoreArmor"],
+				"conditions": "HasAWard"
+			},{},{}],
+			"duration": -1,
+			"showAsPermanent": false,
+			"showAsTimer": true,
+			"isHiddenFromPlayers": true,
+			"tags": ["BigDamageMinus"],
+			"iconSpriteName": "IconPurpleDamageMinus01"
+		},
+		"ExtraTurnLupinRegularLV1": {
+			"class": "Buff",
+			"behaviors": ["EnterBattleBuff"],
+			"behaviorOverrides": [{
+				"selfBuffs": ["PseudoGetTurn","OnExtraTurn","JustGivenTurn"]
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true,
+			"noIconShownOnBattleStatus": true,
+			"applyConditions": "20PercentChance"
+		},
+		"ExtraTurnLupinRegularLV2": {
+			"class": "Buff",
+			"behaviors": ["EnterBattleBuff"],
+			"behaviorOverrides": [{
+				"selfBuffs": ["PseudoGetTurn","OnExtraTurn","JustGivenTurn"]
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true,
+			"noIconShownOnBattleStatus": true,
+			"applyConditions": "40PercentChance"
+		},
+		"ExtraTurnLupinRegularLV3": {
+			"class": "Buff",
+			"behaviors": ["EnterBattleBuff"],
+			"behaviorOverrides": [{
+				"selfBuffs": ["PseudoGetTurn","OnExtraTurn","JustGivenTurn"]
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true,
+			"noIconShownOnBattleStatus": true,
+			"applyConditions": "60PercentChance"
+		},
+		"ExtraTurnLupinRegularLV4": {
+			"class": "Buff",
+			"behaviors": ["EnterBattleBuff"],
+			"behaviorOverrides": [{
+				"selfBuffs": ["PseudoGetTurn","OnExtraTurn","JustGivenTurn"]
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true,
+			"noIconShownOnBattleStatus": true,
+			"applyConditions": "80PercentChance"
+		},
+		"ExtraTurnLupinRegularLV5": {
+			"class": "Buff",
+			"behaviors": ["EnterBattleBuff"],
+			"behaviorOverrides": [{
+				"selfBuffs": ["PseudoGetTurn","OnExtraTurn","JustGivenTurn"]
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true,
+			"noIconShownOnBattleStatus": true
+		},
+		"LupinRegularActive4Ready": {
+			"class": "Buff",
+			"stackName": "LupinRegularActive4Ready",
+			"duration": -1,
+			"isHiddenFromPlayers": true
+		},
+		"BrideHeal25PercentPurifyLupinRegular": {
+			"class": "Buff",
+			"behaviors": ["AdjustHp","RemoveBuffs","RemoveBuffs"],
+			"behaviorOverrides": [{
+				"percent": 0.25,
+				"abilityEffect": "Blank",
+				"hpboosts": [
+					"HealBoost"
+				]
+			},{
+				"name": "BrideHealOK"
+			},{}],
+			"duration": 0,
+			"effectToShowWhenApplied": "LargeHeal1",
+			"textKeyToShowWhenApplied": "HealDoubleANameKey",
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
+		"Add1LupinRegular02": {
+			"class": "Buff",
+			"behaviors": ["SummonMonster"],
+			"behaviorOverrides": [{
+				"monsterType": "LupinRegular02",
+				"cloneSource": true,
+				"cloneSourceStats": true,
+				"cloneSourceWeapon": true,
+				"cloneSourceEquipment": true
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"allowBuffOnDeadTarget": true,
+			"isHiddenFromPlayers": true
+		},
+		"EnteringTheBattlefieldPassiveALupinRegular": {
+			"class": "Buff",
+			"stackName": "EnteringTheBattlefieldPassiveALupinRegular",
+			"behaviors": ["EnterBattleBuff","EnterBattleBuff"],
+			"behaviorOverrides": [{
+				"sourceBuffs": ["HoldGround","KnockbackImmunity","StunImmunityOnce","SleepImmunityOnce","InstantKillImmunityOnce"]
+			},{
+				"selfBuffs": ["SuperStealth","StealthShieldOnce"],
+				"selfAbilityEffect": "Blank",
+				"spreadCondition": "BattleTimeOver1OrAnyDeadMonster"
+			}],
+			"showAsPermanent": false,
+			"showAsTimer": false,
+			"duration": -1
+		},
+		"RemoveInstantKillImmunityOnce": {
+			"class": "Buff",
+			"behaviors": ["RemoveBuffs"],
+			"behaviorOverrides": [{
+				"name": "InstantKillImmunityOnce"
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
+		"AttackAndHasteUp50PercentLupinRegular": {
+			"class": "Buff",
+			"behaviors": ["StatOnly", "StatOnly", "StatOnly", "StatOnly","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+				"conditions": "NotEnraged",
+				"scalorStatBonuses": {
+					"Attack": 0.5
+				}
+			},{
+				"conditions": "IsNotAccelerated",
+				"flatStatBonuses": {
+					"Haste": -999
+				}
+			},{
+				"conditions": "IsAccelerated20Percent",
+				"flatStatBonuses": {
+					"Haste": -749
+				}
+			},{
+				"conditions": "IsAccelerated30Percent",
+				"flatStatBonuses": {
+					"Haste": -570
+				}
+			},{}],
+			"duration": -1,
+			"showAsPermanent": false,
+			"showAsTimer": true,
+			"statusEffect": "Lupinstance",
+			"noIconShownOnBattleStatus": true,
+			"tags": ["InMegaMode"],
+			"iconSpriteName": "IconPurpleAttackUpSword01"
+		},
+		"LupinRegularActive1Cooldown50": {
+			"class": "Buff",
+			"stackName": "InstantCooldown",
+			"duration": 50,
+			"isHiddenFromPlayers": false,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"iconSpriteName": "IconBlueCountdownClock3"
 		}
     }
 }
