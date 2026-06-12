@@ -16,7 +16,10 @@
   let originalControlsNext = null;
 
   function qs(sel, root=document){ return root.querySelector(sel); }
+  function qsa(sel, root=document){ return Array.from(root.querySelectorAll(sel)); }
   function isDesktop(){ return window.innerWidth >= BREAKPOINT; }
+  function safeText(value){ return String(value ?? '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
+  function decodeAttrJson(value){ try { return JSON.parse(decodeURIComponent(value || '')); } catch { return []; } }
 
   function injectStyles(){
     if(document.getElementById('v2-desktop-structure-style')) return;
@@ -26,15 +29,19 @@
       @media (min-width:821px){
         body.page-catalog-v2 .v2-shell.v2-desktop-info-layout{
           display:grid!important;
-          grid-template-columns:minmax(280px,320px) minmax(0,1fr)!important;
+          grid-template-columns:minmax(300px,340px) minmax(0,1fr)!important;
           gap:18px!important;
           align-items:start!important;
         }
         body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-sidebar{
           position:sticky!important;
           top:12px!important;
+          height:calc(100vh - 24px)!important;
           max-height:calc(100vh - 24px)!important;
-          overflow:auto!important;
+          overflow:hidden!important;
+          display:flex!important;
+          flex-direction:column!important;
+          gap:10px!important;
           padding:12px!important;
           border-radius:24px!important;
           background:linear-gradient(180deg,rgba(15,23,42,.92),rgba(8,13,26,.96))!important;
@@ -42,8 +49,9 @@
           box-shadow:0 18px 55px rgba(0,0,0,.34)!important;
         }
         body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-side-title{
+          flex:0 0 auto!important;
           display:block!important;
-          margin:2px 4px 10px!important;
+          margin:2px 4px 2px!important;
           font-size:12px!important;
           letter-spacing:.14em!important;
           text-transform:uppercase!important;
@@ -91,28 +99,37 @@
         body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-description{
           width:100%!important;
           min-width:0!important;
-          margin:0 0 12px!important;
+          margin:0!important;
         }
         body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-selected-card{
+          flex:0 0 auto!important;
           display:flex!important;
           flex-direction:column!important;
-          gap:10px!important;
+          gap:9px!important;
           padding:10px!important;
+          border-radius:24px!important;
+          background:linear-gradient(145deg,rgba(255,255,255,.08),rgba(255,255,255,.03))!important;
+          border:1px solid rgba(255,255,255,.12)!important;
         }
         body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-feature-art{
           width:100%!important;
           min-height:0!important;
-          height:clamp(220px,34vh,360px)!important;
+          height:clamp(300px,43vh,490px)!important;
           border-radius:20px!important;
           overflow:hidden!important;
+          display:flex!important;
+          align-items:center!important;
+          justify-content:center!important;
+          background:radial-gradient(circle at 50% 18%,rgba(255,255,255,.12),rgba(0,0,0,.20) 62%,rgba(0,0,0,.38))!important;
         }
         body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-feature-art img,
         body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-feature-art picture,
         body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-feature-art canvas{
           width:100%!important;
           height:100%!important;
-          object-fit:cover!important;
-          object-position:center top!important;
+          object-fit:contain!important;
+          object-position:center center!important;
+          display:block!important;
         }
         body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-feature-info{
           width:100%!important;
@@ -130,14 +147,109 @@
           line-height:1.2!important;
           margin-top:4px!important;
         }
+        body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-pill-row{
+          display:flex!important;
+          flex-wrap:wrap!important;
+          justify-content:center!important;
+          gap:7px!important;
+          margin-top:8px!important;
+        }
+        body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-pill-row>*{
+          border-radius:999px!important;
+          min-height:30px!important;
+          padding:6px 10px!important;
+        }
         body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-stats{
-          grid-template-columns:repeat(2,minmax(0,1fr))!important;
-          gap:8px!important;
+          display:grid!important;
+          grid-template-columns:repeat(4,minmax(0,1fr))!important;
+          gap:7px!important;
+          margin-top:8px!important;
+        }
+        body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-stat{
+          min-width:0!important;
+          border-radius:14px!important;
+          padding:8px 5px!important;
+          text-align:center!important;
+          background:rgba(255,255,255,.065)!important;
+          border:1px solid rgba(255,255,255,.10)!important;
+        }
+        body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-stat span{
+          display:block!important;
+          font-size:10px!important;
+          letter-spacing:.08em!important;
+          color:var(--muted,#b7c0d8)!important;
+        }
+        body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-stat b{
+          display:block!important;
+          margin-top:2px!important;
+          font-size:13px!important;
+          white-space:nowrap!important;
         }
         body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-description{
-          max-height:34vh!important;
+          flex:1 1 auto!important;
+          min-height:0!important;
+          overflow:hidden!important;
+          display:flex!important;
+          flex-direction:column!important;
+          gap:9px!important;
+          padding:10px!important;
+          border-radius:22px!important;
+          background:rgba(255,255,255,.045)!important;
+          border:1px solid rgba(255,255,255,.10)!important;
+        }
+        body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-desc-head{
+          flex:0 0 auto!important;
+          display:flex!important;
+          flex-direction:column!important;
+          gap:8px!important;
+          align-items:stretch!important;
+        }
+        body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-desc-head h2{
+          margin:0!important;
+          font-size:13px!important;
+          letter-spacing:.12em!important;
+          text-transform:uppercase!important;
+          color:var(--muted,#b7c0d8)!important;
+        }
+        body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-detail-tabs{
+          display:grid!important;
+          grid-template-columns:repeat(2,minmax(0,1fr))!important;
+          gap:7px!important;
+        }
+        body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-detail-tab-btn{
+          min-width:0!important;
+          min-height:34px!important;
+          border-radius:999px!important;
+          border:1px solid color-mix(in srgb,var(--element-primary,#f6ca5e) 54%,rgba(255,255,255,.14))!important;
+          background:rgba(255,255,255,.06)!important;
+          color:#fff!important;
+          font-weight:850!important;
+          font-size:12px!important;
+          cursor:pointer!important;
+        }
+        body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-detail-tab-btn.active{
+          background:linear-gradient(145deg,color-mix(in srgb,var(--element-primary,#f6ca5e) 78%,#fff 22%) 0%,var(--element-primary,#f6ca5e) 46%,color-mix(in srgb,var(--element-secondary,#a855f7) 78%,#111827 22%) 100%)!important;
+          border-color:rgba(255,255,255,.32)!important;
+        }
+        body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-detail-scroll-panel{
+          flex:1 1 auto!important;
+          min-height:0!important;
           overflow:auto!important;
+          overscroll-behavior:contain!important;
+          border-radius:18px!important;
           padding:12px!important;
+          background:rgba(0,0,0,.18)!important;
+          border:1px solid rgba(255,255,255,.10)!important;
+          line-height:1.35!important;
+        }
+        body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-detail-scroll-panel p{
+          margin:0 0 10px!important;
+        }
+        body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-detail-scroll-panel strong{
+          color:#fff!important;
+        }
+        body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-desc-text{
+          display:none!important;
         }
         body.page-catalog-v2 .v2-shell.v2-desktop-info-layout #catalogGrid{
           grid-template-columns:repeat(4,minmax(0,1fr))!important;
@@ -153,6 +265,10 @@
           height:clamp(190px,18vw,260px)!important;
           min-height:190px!important;
           border-radius:16px!important;
+        }
+        body.page-catalog-v2 .v2-shell.v2-desktop-info-layout #catalogGrid .unitCard .unitThumb img{
+          object-fit:contain!important;
+          object-position:center center!important;
         }
         body.page-catalog-v2 .v2-shell.v2-desktop-info-layout #catalogGrid .unitCard .unitThumb::after{
           width:46px!important;
@@ -173,8 +289,12 @@
           display:none!important;
         }
         body.page-catalog-v2 .v2-shell.v2-desktop-info-layout #catalogGrid .unitCard .statLine{
+          grid-template-columns:repeat(4,minmax(0,1fr))!important;
           gap:5px!important;
           padding:6px!important;
+        }
+        body.page-catalog-v2 .v2-shell.v2-desktop-info-layout #catalogGrid .unitCard .stat{
+          border-radius:12px!important;
         }
         body.page-catalog-v2 .v2-shell.v2-desktop-info-layout #catalogGrid .unitCard .statLabel{
           font-size:10px!important;
@@ -185,7 +305,7 @@
       }
       @media (min-width:821px) and (max-width:1180px){
         body.page-catalog-v2 .v2-shell.v2-desktop-info-layout{
-          grid-template-columns:minmax(250px,290px) minmax(0,1fr)!important;
+          grid-template-columns:minmax(270px,310px) minmax(0,1fr)!important;
         }
         body.page-catalog-v2 .v2-shell.v2-desktop-info-layout #catalogGrid{
           grid-template-columns:repeat(3,minmax(0,1fr))!important;
@@ -208,6 +328,107 @@
     panel.className = 'v2-panel v2-filter-panel';
     panel.innerHTML = '<div class="v2-filter-title">Filters</div>';
     return panel;
+  }
+
+  function makeDetailsModule(){
+    const description = qs('.v2-description');
+    if(!description) return;
+    let head = qs('.v2-desc-head', description);
+    if(!head){
+      head = document.createElement('div');
+      head.className = 'v2-desc-head';
+      description.insertBefore(head, description.firstChild);
+    }
+    let title = qs('h2', head);
+    if(!title){
+      title = document.createElement('h2');
+      head.insertBefore(title, head.firstChild);
+    }
+    title.textContent = 'Details';
+    let tabs = qs('.v2-detail-tabs', description);
+    if(!tabs){
+      tabs = document.createElement('div');
+      tabs.className = 'v2-detail-tabs';
+      tabs.innerHTML = [
+        ['description','Description'],
+        ['leader','Leader'],
+        ['active','Active'],
+        ['passive','Passive']
+      ].map(([key,label]) => `<button type="button" class="v2-detail-tab-btn${key==='description'?' active':''}" data-v2-detail-kind="${key}">${label}</button>`).join('');
+      head.appendChild(tabs);
+    }
+    let panel = qs('.v2-detail-scroll-panel', description);
+    if(!panel){
+      panel = document.createElement('div');
+      panel.className = 'v2-detail-scroll-panel';
+      description.appendChild(panel);
+    }
+  }
+
+  function currentSelectedCard(){
+    return qs('#catalogGrid .unitCard.v2-selected') || qs('#catalogGrid .unitCard');
+  }
+
+  function rowsFromCard(card, attr){
+    if(!card) return [];
+    return decodeAttrJson(card.getAttribute(attr));
+  }
+
+  function renderSkillRows(rows){
+    if(!Array.isArray(rows) || !rows.length) return '<p>No skills loaded.</p>';
+    return rows.map(row => {
+      const name = safeText(row?.name || row?.id || 'Skill');
+      const desc = safeText(row?.description || 'No description loaded.');
+      return `<p><strong>${name}</strong><br>${desc}</p>`;
+    }).join('');
+  }
+
+  function leaderHtml(card){
+    if(!card) return '<p>No leader skill loaded.</p>';
+    const block = qs('.leaderBlock', card);
+    const name = qs('.leaderName', block)?.textContent || '';
+    const desc = qs('.leaderDesc', block)?.textContent || '';
+    if(name || desc) return `<p><strong>${safeText(name || 'Leader Skill')}</strong><br>${safeText(desc || 'No leader skill description loaded.')}</p>`;
+    return '<p>No leader skill loaded.</p>';
+  }
+
+  function descriptionHtml(){
+    const text = qs('#v2Desc')?.textContent || '';
+    return `<p>${safeText(text || 'No description loaded.')}</p>`;
+  }
+
+  function activeDetailKind(){
+    return qs('.v2-detail-tab-btn.active')?.getAttribute('data-v2-detail-kind') || 'description';
+  }
+
+  function updateDetailPanel(kind = activeDetailKind()){
+    if(!isDesktop()) return;
+    makeDetailsModule();
+    const panel = qs('.v2-detail-scroll-panel');
+    if(!panel) return;
+    const card = currentSelectedCard();
+    qsa('.v2-detail-tab-btn').forEach(btn => btn.classList.toggle('active', btn.getAttribute('data-v2-detail-kind') === kind));
+    if(kind === 'leader') panel.innerHTML = leaderHtml(card);
+    else if(kind === 'active') panel.innerHTML = renderSkillRows(rowsFromCard(card, 'data-active-skills'));
+    else if(kind === 'passive') panel.innerHTML = renderSkillRows(rowsFromCard(card, 'data-passive-skills'));
+    else panel.innerHTML = descriptionHtml();
+    panel.scrollTop = 0;
+  }
+
+  function attachDetailHandlers(){
+    if(document.__v2DesktopDetailsBound) return;
+    document.__v2DesktopDetailsBound = true;
+    document.addEventListener('click', event => {
+      const tab = event.target.closest('.v2-detail-tab-btn');
+      if(tab){
+        updateDetailPanel(tab.getAttribute('data-v2-detail-kind') || 'description');
+        return;
+      }
+      const card = event.target.closest('#catalogGrid .unitCard');
+      if(card) setTimeout(() => updateDetailPanel(activeDetailKind()), 80);
+    }, true);
+    const desc = qs('#v2Desc');
+    if(desc) new MutationObserver(() => updateDetailPanel(activeDetailKind())).observe(desc, { childList:true, subtree:true, characterData:true });
   }
 
   function applyDesktop(){
@@ -234,6 +455,9 @@
     if(controls.parentNode !== panel) panel.appendChild(controls);
     if(selected.parentNode !== sidebar) sidebar.appendChild(selected);
     if(description && description.parentNode !== sidebar) sidebar.appendChild(description);
+    makeDetailsModule();
+    attachDetailHandlers();
+    setTimeout(() => updateDetailPanel(activeDetailKind()), 90);
     moved = true;
   }
 
