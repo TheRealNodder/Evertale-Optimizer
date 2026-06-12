@@ -3,7 +3,7 @@
    This prevents stale weapon maps from overriding the rebuilt weapons.bundle.json order.
 */
 (function(){
-  const SORT_KEY = 'evertale_catalog_sort_v7';
+  const SORT_KEY = 'evertale_catalog_sort_v8';
   const DEFAULT_SORT = 'newest';
   const KIND_RANK = { characters: 0, weapons: 1, accessories: 2, bosses: 3 };
   const INDEX_FILES = {
@@ -107,8 +107,6 @@
         const cmp=a.name.localeCompare(b.name,undefined,{sensitivity:'base',numeric:true});
         return cmp ? (mode==='az'?cmp:-cmp) : a.index-b.index;
       }
-      const kr=kindRank(a.card)-kindRank(b.card);
-      if(kr) return kr;
       const ao=Number.isFinite(a.order)?a.order:null;
       const bo=Number.isFinite(b.order)?b.order:null;
       if(ao!==null&&bo!==null&&ao!==bo) return mode==='oldest' ? ao-bo : bo-ao;
