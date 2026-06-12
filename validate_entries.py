@@ -9,14 +9,15 @@ from typing import Any, Dict, List
 
 ROOT_MARKERS = ["apkfiles", "tools"]
 CATEGORIES = ["characters", "weapons", "accessories", "bosses"]
-# Must match build_entry_bundles.py. Accessories are not strict-index-only in the current bundle builder.
-STRICT_INDEX_CATEGORIES = {"weapons", "bosses"}
+# Bosses are strict-index bundles. Weapons intentionally collapse raw/state rows into one visible card per weapon family.
+STRICT_INDEX_CATEGORIES = {"bosses"}
 REQUIRED_MARKERS = [
     "run_entry_pipeline_all.marker.json",
     "build_character_image_map.marker.json",
     "sync_character_tags.marker.json",
 ]
 EXCLUDED_PATH_PARTS = {"legacy", "Legacy", "_weapon_duplicate_quarantine", "_boss_duplicate_quarantine", "_duplicate_quarantine"}
+WEAPON_FAMILY_MODE = "weapon_family_handle_source_of_truth"
 
 
 def find_repo_root(start: Path):
@@ -69,6 +70,40 @@ def weapon_overlay_enabled(bundle: Dict[str, Any]) -> bool:
     return bool(overlay.get("enabled"))
 
 
+def weapon_family_bundle_mode(discovery: Dict[str, Any]) -> bool:
+    return str(discovery.get("mode") or "") == WEAPON_FAMILY_MODE
+
+
+def weapon_expected_visible_count(index_count: int, discovery: Dict[str, Any], count: int) -> int:
+    for key in ("count", "familyCount"):
+        value = discovery.get(key)
+        try:
+            if value is not None:
+                return int(value)
+        except Exception:
+            pass
+    return count or index_count
+
+
+def validate_weapon_family_bundle(category: str, index_count: int, count: int, discovery: Dict[str, Any], errors: List[str], warnings: List[str]) -> bool:
+    if category != "weapons" or not weapon_family_bundle_mode(discovery):
+        return False
+
+    expected = weapon_expected_visible_count(index_count, discovery, count)
+    collapsed = int(discovery.get("collapsedStateCount") or 0)
+    family_count = int(discovery.get("familyCount") or expected or 0)
+
+    if count != expected:
+        errors.append(f"[weapons] Family bundle count mismatch: expected={expected}, bundle={count}")
+    if family_count != count:
+        errors.append(f"[weapons] Family discovery count mismatch: familyCount={family_count}, bundle={count}")
+    if index_count < count:
+        errors.append(f"[weapons] Family bundle has more visible cards than indexed raw rows: index={index_count}, bundle={count}")
+    if collapsed <= 0 and index_count > count:
+        warnings.append("[weapons] Family bundle is smaller than index but collapsedStateCount is zero")
+    return True
+
+
 def validate_bundle(base: Path, category: str, index_count: int, errors: List[str], warnings: List[str], bundle_counts: Dict[str, Any]) -> None:
     bundle_path = base / "bundles" / f"{category}.bundle.json"
     if not bundle_path.exists():
@@ -79,6 +114,14 @@ def validate_bundle(base: Path, category: str, index_count: int, errors: List[st
     count = len(entries or []) if isinstance(entries, list) else 0
     discovery = bundle.get("discovery", {}) if isinstance(bundle.get("discovery"), dict) else {}
     bundle_counts[category] = {"schemaVersion": bundle.get("schemaVersion"), "count": count, "sourceIndexCount": bundle.get("sourceIndexCount"), "discovery": discovery}
+
+    if validate_weapon_family_bundle(category, index_count, count, discovery, errors, warnings):
+        if bundle.get("schemaVersion", 0) < 3:
+            errors.append(f"[{category}] Bundle schemaVersion is stale: {bundle.get('schemaVersion')}")
+        if discovery.get("discoveredUnindexedCount", 0):
+            errors.append(f"[{category}] Family bundle discovered unindexed entries: {discovery.get('discoveredUnindexedCount')}")
+        return
+
     if category in STRICT_INDEX_CATEGORIES:
         if bundle.get("schemaVersion", 0) < 3:
             errors.append(f"[{category}] Bundle schemaVersion is stale: {bundle.get('schemaVersion')}")
@@ -95,6 +138,8 @@ def expected_catalog_count(category: str, index_expected: int, bundle_counts: Di
     bundle = bundle_counts.get(category, {}) if isinstance(bundle_counts.get(category), dict) else {}
     discovery = bundle.get("discovery", {}) if isinstance(bundle.get("discovery"), dict) else {}
     overlay = discovery.get("weaponOverlay", {}) if isinstance(discovery.get("weaponOverlay"), dict) else {}
+    if category == "weapons" and weapon_family_bundle_mode(discovery):
+        return int(bundle.get("count") or weapon_expected_visible_count(index_expected, discovery, int(bundle.get("count") or 0)))
     if category == "weapons" and overlay.get("enabled"):
         return int(bundle.get("count") or index_expected)
     return index_expected
