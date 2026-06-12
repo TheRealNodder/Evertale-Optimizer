@@ -33,7 +33,7 @@
     const checks = [
       ['Dark', ['Death', 'Dark', 'IsDeath']],
       ['Light', ['Life', 'Light', 'IsLife']],
-      ['Storm', ['Air', 'Storm', 'Thunder', 'Lightning', 'IsAir']],
+      ['Storm', ['Air', 'Storm', 'Thunder', 'Lightning', 'Electric', 'IsAir']],
       ['Earth', ['Earth', 'Terra', 'Ground', 'IsEarth']],
       ['Water', ['Water', 'Ice', 'IsWater']],
       ['Fire', ['Fire', 'Flame', 'IsFire']]
@@ -44,18 +44,42 @@
     return '';
   }
 
+  function parseLevelPercent(id){
+    const match=String(id||'').match(/(?:Up|Boost)(\d+)/i) || String(id||'').match(/(\d+)(?:Death|Life|Fire|Water|Earth|Air|Storm|Dark|Light)?$/i);
+    const level=match?Number(match[1]):0;
+    if(level>=6) return { attack: 15, hp: 10 };
+    if(level>=5) return { attack: 12, hp: 10 };
+    if(level>=4) return { attack: 10, hp: 8 };
+    if(level>=3) return { attack: 8, hp: 7 };
+    if(level>=2) return { attack: 6, hp: 5 };
+    return { attack: 5, hp: 5 };
+  }
+
+  function conditionText(condition, element){
+    const c=String(condition||'');
+    if(element) return `Allied ${element} element units`;
+    if(/Death/i.test(c)) return 'Allied Dark element units';
+    if(/Life/i.test(c)) return 'Allied Light element units';
+    if(/Fire/i.test(c)) return 'Allied Fire element units';
+    if(/Water/i.test(c)) return 'Allied Water element units';
+    if(/Earth/i.test(c)) return 'Allied Earth element units';
+    if(/Air|Storm|Thunder|Lightning|Electric/i.test(c)) return 'Allied Storm element units';
+    return 'Allied units';
+  }
+
   function decodeLeaderBuffId(id, condition){
     id = norm(id);
     if(!id) return null;
     const element = elementFromLeaderId(id, condition);
-    const scope = element ? `Allied ${element} element units` : 'Allied units';
-    const combo = /AttackAndHPUp|ATKAndHPUp|HPAndATKUp/i.test(id);
-    const hp = /^HPUp|HP.*Up/i.test(id) || combo;
-    const atk = /^AttackUp|^ATKUp|Attack.*Up|ATK.*Up/i.test(id) || combo;
-    if(combo) return { name: `${element ? element + ' ' : ''}ATK & HP Up`, description: `${scope} have their Attack increased by 10% and max HP increased by 7%.`, affected: element };
-    if(atk) return { name: `${element ? element + ' ' : ''}Attack Up`, description: `${scope} have their Attack increased by 15%.`, affected: element };
-    if(hp) return { name: `${element ? element + ' ' : ''}HP Up`, description: `${scope} have their max HP increased by 10%.`, affected: element };
-    return null;
+    const scope = conditionText(condition, element);
+    const pct = parseLevelPercent(id);
+    const combo = /AttackAndHPUp|ATKAndHPUp|HPAndATKUp|Attack.*HP|HP.*Attack/i.test(id);
+    const hp = /HPUp|HP.*Up|HPBoost/i.test(id) || combo;
+    const atk = /AttackUp|ATKUp|Attack.*Up|ATK.*Up|AttackBoost|ATKBoost/i.test(id) || combo;
+    if(combo) return { name: `${element ? element + ' ' : ''}ATK & HP Up`, description: `${scope} have their Attack increased by ${pct.attack}% and max HP increased by ${pct.hp}%.`, affected: element };
+    if(atk) return { name: `${element ? element + ' ' : ''}Attack Up`, description: `${scope} have their Attack increased by ${pct.attack}%.`, affected: element };
+    if(hp) return { name: `${element ? element + ' ' : ''}HP Up`, description: `${scope} have their max HP increased by ${pct.hp}%.`, affected: element };
+    return { name: id.replace(/([a-z])([A-Z])/g,'$1 $2'), description: scope ? `Applies to ${scope}.` : '', affected: element };
   }
 
   function resolveUnitWithMap(unit, payload){
@@ -63,8 +87,9 @@
     const existing = unit.leaderSkill && typeof unit.leaderSkill === 'object' ? unit.leaderSkill : {};
     const raw = unit.raw && typeof unit.raw === 'object' ? unit.raw : {};
     const refs = unit.refs && typeof unit.refs === 'object' ? unit.refs : {};
-    const internalId = norm(existing.internalId || existing.id || refs.leaderBuff || raw.leaderBuff || '');
-    const condition = norm(existing.condition || refs.leaderBuffCondition || raw.leaderBuffCondition || '');
+    const internal = unit.internal && typeof unit.internal === 'object' ? unit.internal : {};
+    const internalId = norm(existing.internalId || existing.id || refs.leaderBuff || raw.leaderBuff || internal.leaderBuff || '');
+    const condition = norm(existing.condition || refs.leaderBuffCondition || raw.leaderBuffCondition || internal.leaderBuffCondition || '');
 
     if(!internalId){
       unit.leaderSkill = { name: 'No Leader Skill', description: 'This unit does not provide a leader skill.', internalId: '', condition: '' };
