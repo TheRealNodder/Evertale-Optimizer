@@ -1,0 +1,98 @@
+name: Evertale Master Control
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "Master Control mode"
+        required: true
+        default: "safe_rebuild"
+        type: choice
+        options:
+          - safe_rebuild
+          - extract
+          - extract_force
+      full_audit:
+        description: "Run full audit after rebuild"
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+concurrency:
+  group: evertale-master-control
+  cancel-in-progress: false
+
+jobs:
+  master-control:
+    name: Run Master Control
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Show selected mode
+        run: |
+          echo "Mode: ${{ inputs.mode }}"
+          echo "Full audit: ${{ inputs.full_audit }}"
+          python --version
+
+      - name: Run Master Control
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [ "${{ inputs.mode }}" = "safe_rebuild" ]; then
+            python MASTER_CONTROL.py
+          elif [ "${{ inputs.mode }}" = "extract" ]; then
+            python MASTER_CONTROL.py --extract
+          elif [ "${{ inputs.mode }}" = "extract_force" ]; then
+            python MASTER_CONTROL.py --extract --force
+          else
+            echo "Unknown mode: ${{ inputs.mode }}"
+            exit 1
+          fi
+
+          if [ "${{ inputs.full_audit }}" = "true" ]; then
+            python MASTER_CONTROL.py --full-audit
+          fi
+
+      - name: Upload reports as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: master-control-reports
+          path: |
+            apkfiles/entries/reports/*.json
+            apkfiles/entries/_markers/*.json
+          if-no-files-found: ignore
+
+      - name: Commit generated changes
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add apkfiles/entries
+          git add live-data-config.js 2>/dev/null || true
+          git add *.json 2>/dev/null || true
+
+          if git diff --cached --quiet; then
+            echo "No generated changes to commit."
+            exit 0
+          fi
+
+          git commit -m "Run Evertale Master Control"
+          git push
