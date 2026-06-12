@@ -1,10 +1,12 @@
-/* catalog-force-sort.js — final safety sorter for all catalog grids.
-   Runs after render and after mutations so every visible catalog path follows the same order rules.
+/* catalog-force-sort.js — final UI guard for catalog grids.
+   Keeps visible catalog cards in the selected order, defaults first load to Characters,
+   and forces card titles underneath names without touching generated data.
 */
 (function(){
   const KIND_RANK = { characters: 0, weapons: 1, accessories: 2, bosses: 3 };
   let sorting = false;
   let timer = null;
+  let defaultTypeApplied = false;
 
   function $(id){ return document.getElementById(id); }
   function clean(v){ return String(v || '').trim().toLowerCase(); }
@@ -32,6 +34,50 @@
     const v = $('catalogSort')?.value || 'newest';
     return ['newest','oldest','az','za'].includes(v) ? v : 'newest';
   }
+  function injectTitleStackStyle(){
+    if(document.getElementById('catalog-title-stack-runtime-style')) return;
+    const style=document.createElement('style');
+    style.id='catalog-title-stack-runtime-style';
+    style.textContent=`
+      #catalogGrid .unitCard .nameBlock,
+      #unitGrid .unitCard .nameBlock{
+        display:flex!important;
+        flex-direction:column!important;
+        align-items:center!important;
+        justify-content:center!important;
+        text-align:center!important;
+        width:100%!important;
+        min-width:0!important;
+        gap:3px!important;
+      }
+      #catalogGrid .unitCard .unitName,
+      #unitGrid .unitCard .unitName{
+        order:1!important;
+        display:block!important;
+        width:100%!important;
+        text-align:center!important;
+        margin:0 auto!important;
+      }
+      #catalogGrid .unitCard .unitTitle,
+      #unitGrid .unitCard .unitTitle{
+        order:2!important;
+        display:block!important;
+        width:100%!important;
+        max-width:94%!important;
+        text-align:center!important;
+        margin:2px auto 0!important;
+        line-height:1.22!important;
+        visibility:visible!important;
+        opacity:1!important;
+      }
+      body.page-catalog-v2 #catalogGrid .unitCard .nameBlock{
+        position:relative!important;
+        padding-left:42px!important;
+        padding-right:42px!important;
+      }
+    `;
+    document.head.appendChild(style);
+  }
   function compareRows(a,b,currentMode){
     if(currentMode === 'az' || currentMode === 'za'){
       const kr = kindRank(a.card) - kindRank(b.card);
@@ -44,7 +90,22 @@
     if(ao !== bo) return currentMode === 'oldest' ? ao - bo : bo - ao;
     return currentMode === 'oldest' ? a.original - b.original : b.original - a.original;
   }
+  function applyDefaultType(){
+    if(defaultTypeApplied) return;
+    const select = $('catalogType');
+    const grid = $('catalogGrid');
+    if(!select || !grid) return;
+    const hasCharacters = Array.from(select.options || []).some(option => option.value === 'characters');
+    if(!hasCharacters) return;
+    if(select.value !== 'all') { defaultTypeApplied = true; return; }
+    if(!grid.querySelector('.unitCard')) return;
+    defaultTypeApplied = true;
+    select.value = 'characters';
+    select.dispatchEvent(new Event('change', { bubbles: true }));
+  }
   function apply(){
+    injectTitleStackStyle();
+    applyDefaultType();
     if(sorting) return;
     const grid = $('catalogGrid');
     if(!grid) return;
@@ -65,6 +126,7 @@
     timer = setTimeout(apply, delay);
   }
   function init(){
+    injectTitleStackStyle();
     const grid = $('catalogGrid');
     if(!grid) return;
     $('catalogSort')?.addEventListener('change', ()=>schedule(0));
@@ -74,6 +136,7 @@
     schedule(0);
     schedule(350);
     schedule(1000);
+    schedule(1800);
   }
   document.addEventListener('DOMContentLoaded', init);
 })();
