@@ -10,7 +10,7 @@
   // Bump this whenever apkfiles/entries/bundles or maps are regenerated.
   // It prevents GitHub Pages/browser cache from serving stale bundles where
   // newly added entries exist on disk but never appear in the roster/catalog.
-  const DATA_VERSION = '2026-05-29-entry-override-fix';
+  const DATA_VERSION = '2026-06-12-master-control-a4aef982';
 
   window.EVERTALE_LIVE_CONFIG = Object.freeze({
     mode: 'live',
