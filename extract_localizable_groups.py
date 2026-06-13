@@ -358,17 +358,34 @@ def load_legacy_leader_skills(repo_root: Path) -> Dict[str, Any]:
 
 
 def build_leader_skill_map(grouped: Dict[str, Dict[str, Any]], repo_root: Path, leader_buff_ids: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
+    """Build the runtime leader-skill map from character leaderBuff IDs only.
+
+    Earlier versions treated every Localizable group that looked leader-skill-like as a
+    runtime leader skill. That polluted leader_skill_localization.json with active and
+    passive skills such as Recovery Mist, which made the frontend resolver unreliable.
+
+    The character entry refs.leaderBuff/raw.leaderBuff IDs are the authority. Localizable
+    is only used to attach readable text to those known IDs.
+    """
     skills: Dict[str, Dict[str, Any]] = {}
     rejected_samples = []
     leader_ids = set(leader_buff_ids)
+
     for base, group in grouped.items():
-        if group.get("category") != "leader_skills":
-            if len(rejected_samples) < 30 and re.search(r"(DamageReduc|DamageReduction|Ready|Guard|Poison|Burn|Sleep|Stun)", base, re.I):
-                rejected_samples.append({"id": base, "name": group.get("name", ""), "description": group.get("description", "")})
+        leader_id = group.get("leaderBuffId") or resolve_leader_id_from_base(base, leader_ids)
+        if not leader_id:
+            if group.get("category") == "leader_skills" and len(rejected_samples) < 30:
+                rejected_samples.append({
+                    "id": base,
+                    "name": group.get("name", ""),
+                    "description": group.get("description", ""),
+                    "reason": "not_referenced_by_character_leaderBuff",
+                })
             continue
-        leader_id = group.get("leaderBuffId") or resolve_leader_id_from_base(base, leader_ids) or base
+
         if not (group.get("name") or group.get("description") or group.get("affected")):
             continue
+
         skills[leader_id] = {
             "id": leader_id,
             "localizableBase": base,
@@ -380,12 +397,13 @@ def build_leader_skill_map(grouped: Dict[str, Dict[str, Any]], repo_root: Path, 
             "rawKeys": group.get("rawKeys", []),
             "source": "Localizable_English",
         }
+
     legacy = load_legacy_leader_skills(repo_root)
     return {
-        "schemaVersion": 6,
+        "schemaVersion": 7,
         "generatedAt": int(time.time()),
         "count": len(skills),
-        "skills": skills,
+        "skills": dict(sorted(skills.items())),
         "leaderBuffSourceCount": len(leader_buff_ids),
         "missingLeaderBuffLocalizations": sorted([lid for lid in leader_buff_ids if lid not in skills]),
         "legacyCount": len(legacy.get("skills", [])),
@@ -395,9 +413,9 @@ def build_leader_skill_map(grouped: Dict[str, Dict[str, Any]], repo_root: Path, 
         "rejectedPassiveSamples": rejected_samples,
         "filter": {
             "leaderBuffAuthority": "character entry refs.leaderBuff",
+            "localizableUsage": "text_only_for_known_leaderBuff_ids",
             "localizableFormats": ["quoted_equals_semicolon", "quoted_equals", "tab", "plain_equals"],
-            "keywords": ["HP", "ATK", "Attack", "ATK & HP", "Fire", "Water", "Storm", "Earth", "Light", "Dark"],
-            "excluded": ["passive-only self buffs", "survivor/status effects"],
+            "excluded": ["active skills", "passive skills", "mechanic buffs not referenced by character leaderBuff"],
         },
     }
 
