@@ -14,10 +14,42 @@
   let originalHeroFirst = null;
   let originalSelectedNext = null;
   let originalControlsNext = null;
+  let applying = false;
+  let structureObserver = null;
+  let reapplyTimer = 0;
 
   function qs(sel, root=document){ return root.querySelector(sel); }
   function qsa(sel, root=document){ return Array.from(root.querySelectorAll(sel)); }
   function isDesktop(){ return window.innerWidth >= BREAKPOINT; }
+  function updateStickyOffset(){
+    const topbar = qs('.topbar');
+    const bottom = topbar ? Math.ceil(topbar.getBoundingClientRect().bottom) : 0;
+    const offset = Math.max(64, bottom + 10);
+    document.documentElement.style.setProperty('--v2-page-viewport-top', `${offset}px`);
+  }
+  function structureIsApplied(){
+    const shell = qs('.v2-shell');
+    const sidebar = qs('.v2-sidebar');
+    const hero = qs('.v2-hero');
+    const selected = qs('.v2-selected-card');
+    const description = qs('.v2-description');
+    const controls = qs('.controls');
+    const panel = qs('.v2-filter-panel');
+    return !!(shell?.classList.contains('v2-desktop-info-layout') &&
+      sidebar && hero && selected && description && controls && panel &&
+      selected.parentNode === sidebar &&
+      description.parentNode === selected &&
+      controls.parentNode === panel &&
+      panel.parentNode === hero);
+  }
+  function scheduleReapply(){
+    if(!isDesktop() || applying) return;
+    clearTimeout(reapplyTimer);
+    reapplyTimer = setTimeout(() => {
+      if(!structureIsApplied()) apply();
+      else updateStickyOffset();
+    }, 30);
+  }
   function safeText(value){ return String(value ?? '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
   function decodeAttrJson(value){ try { return JSON.parse(decodeURIComponent(value || '')); } catch { return []; } }
 
@@ -32,13 +64,14 @@
           grid-template-columns:minmax(320px,360px) minmax(0,1fr)!important;
           gap:18px!important;
           align-items:start!important;
+          min-height:0!important;
         }
         body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-sidebar{
-          --v2-page-viewport-top:72px;
           position:sticky!important;
-          top:var(--v2-page-viewport-top)!important;
-          height:calc(100vh - var(--v2-page-viewport-top))!important;
-          max-height:calc(100vh - var(--v2-page-viewport-top))!important;
+          top:var(--v2-page-viewport-top,72px)!important;
+          align-self:start!important;
+          height:calc(100dvh - var(--v2-page-viewport-top,72px) - 10px)!important;
+          max-height:calc(100dvh - var(--v2-page-viewport-top,72px) - 10px)!important;
           overflow:hidden!important;
           display:flex!important;
           flex-direction:column!important;
@@ -62,7 +95,7 @@
         body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-hero{
           display:block!important;
           position:sticky!important;
-          top:0!important;
+          top:var(--v2-page-viewport-top,72px)!important;
           z-index:50!important;
           margin-bottom:14px!important;
         }
@@ -95,9 +128,9 @@
         body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-selected-card,
         body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-description{ width:100%!important; min-width:0!important; margin:0!important; }
         body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-selected-card{
-          flex:1 1 auto!important; min-height:0!important; height:100%!important; display:flex!important; flex-direction:column!important; gap:8px!important; padding:10px!important; overflow:hidden!important; border-radius:22px!important; background:linear-gradient(145deg,rgba(255,255,255,.08),rgba(255,255,255,.03))!important; border:1px solid rgba(255,255,255,.12)!important;
+          flex:1 1 auto!important; min-height:0!important; height:100%!important; max-height:100%!important; display:flex!important; flex-direction:column!important; gap:8px!important; padding:10px!important; overflow:hidden!important; border-radius:22px!important; background:linear-gradient(145deg,rgba(255,255,255,.08),rgba(255,255,255,.03))!important; border:1px solid rgba(255,255,255,.12)!important;
         }
-        body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-feature-art{ flex:0 0 auto!important; width:100%!important; min-height:0!important; height:clamp(300px,42vh,520px)!important; border-radius:20px!important; overflow:hidden!important; display:flex!important; align-items:center!important; justify-content:center!important; background:radial-gradient(circle at 50% 18%,rgba(255,255,255,.12),rgba(0,0,0,.20) 62%,rgba(0,0,0,.38))!important; }
+        body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-feature-art{ flex:0 0 auto!important; width:100%!important; min-height:0!important; height:clamp(220px,34vh,380px)!important; border-radius:20px!important; overflow:hidden!important; display:flex!important; align-items:center!important; justify-content:center!important; background:radial-gradient(circle at 50% 18%,rgba(255,255,255,.12),rgba(0,0,0,.20) 62%,rgba(0,0,0,.38))!important; }
         body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-feature-art img,
         body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-feature-art picture,
         body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-feature-art canvas{ width:100%!important; height:100%!important; object-fit:contain!important; object-position:center center!important; display:block!important; }
@@ -214,6 +247,8 @@
     if(desc) new MutationObserver(() => updateDetailPanel(activeDetailKind())).observe(desc, { childList:true, subtree:true, characterData:true });
   }
   function applyDesktop(){
+    applying = true;
+    updateStickyOffset();
     const shell = qs('.v2-shell');
     const sidebar = qs('.v2-sidebar');
     const sidebarTitle = qs('.v2-side-title', sidebar);
@@ -221,7 +256,7 @@
     const hero = qs('.v2-hero');
     const selected = qs('.v2-selected-card');
     const description = qs('.v2-description');
-    if(!shell || !sidebar || !controls || !hero || !selected) return;
+    if(!shell || !sidebar || !controls || !hero || !selected){ applying = false; return; }
     if(!originalSidebarParent){ originalSidebarParent = sidebar.parentNode; originalSidebarNext = sidebar.nextSibling; originalHeroParent = hero.parentNode; originalHeroFirst = hero.firstChild; originalSelectedNext = selected.nextSibling; originalControlsNext = controls.nextSibling; }
     shell.classList.add('v2-desktop-info-layout');
     if(sidebarTitle) sidebarTitle.textContent = 'Selected Info';
@@ -234,9 +269,11 @@
     attachDetailHandlers();
     setTimeout(() => updateDetailPanel(activeDetailKind()), 90);
     moved = true;
+    applying = false;
   }
   function restoreMobile(){
-    if(!moved) return;
+    applying = true;
+    if(!moved){ applying = false; return; }
     const shell = qs('.v2-shell');
     const sidebar = qs('.v2-sidebar');
     const sidebarTitle = qs('.v2-side-title', sidebar);
@@ -252,8 +289,28 @@
     const panel = qs('.v2-filter-panel');
     if(panel && !panel.querySelector('.controls')) panel.remove();
     moved = false;
+    applying = false;
   }
-  function apply(){ injectStyles(); if(isDesktop()) applyDesktop(); else restoreMobile(); }
-  function boot(){ apply(); setTimeout(apply, 250); setTimeout(apply, 900); window.addEventListener('resize', () => requestAnimationFrame(apply)); }
+  function apply(){ injectStyles(); updateStickyOffset(); if(isDesktop()) applyDesktop(); else restoreMobile(); }
+  function startStructureGuard(){
+    if(structureObserver) return;
+    structureObserver = new MutationObserver(scheduleReapply);
+    structureObserver.observe(document.body, {
+      childList:true,
+      subtree:true,
+      attributes:true,
+      attributeFilter:['class','style']
+    });
+  }
+  function boot(){
+    apply();
+    startStructureGuard();
+    setTimeout(apply, 250);
+    setTimeout(apply, 900);
+    setTimeout(apply, 1800);
+    window.addEventListener('resize', () => requestAnimationFrame(apply));
+    window.addEventListener('load', () => requestAnimationFrame(apply));
+    window.addEventListener('pageshow', () => requestAnimationFrame(apply));
+  }
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 })();
