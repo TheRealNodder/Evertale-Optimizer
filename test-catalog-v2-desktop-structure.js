@@ -35,15 +35,15 @@
         }
         body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-sidebar{
           position:sticky!important;
-          top:12px!important;
-          height:calc(100vh - 24px)!important;
-          max-height:calc(100vh - 24px)!important;
+          top:0!important;
+          height:100vh!important;
+          max-height:100vh!important;
           overflow:hidden!important;
           display:flex!important;
           flex-direction:column!important;
-          gap:10px!important;
-          padding:12px!important;
-          border-radius:24px!important;
+          gap:8px!important;
+          padding:10px!important;
+          border-radius:0 24px 24px 0!important;
           background:linear-gradient(180deg,rgba(15,23,42,.92),rgba(8,13,26,.96))!important;
           border:1px solid rgba(255,255,255,.12)!important;
           box-shadow:0 18px 55px rgba(0,0,0,.34)!important;
@@ -51,7 +51,7 @@
         body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-side-title{
           flex:0 0 auto!important;
           display:block!important;
-          margin:2px 4px 2px!important;
+          margin:0 4px 2px!important;
           font-size:12px!important;
           letter-spacing:.14em!important;
           text-transform:uppercase!important;
@@ -103,10 +103,10 @@
           height:100%!important;
           display:flex!important;
           flex-direction:column!important;
-          gap:9px!important;
+          gap:8px!important;
           padding:10px!important;
           overflow:hidden!important;
-          border-radius:24px!important;
+          border-radius:22px!important;
           background:linear-gradient(145deg,rgba(255,255,255,.08),rgba(255,255,255,.03))!important;
           border:1px solid rgba(255,255,255,.12)!important;
         }
@@ -114,7 +114,7 @@
           flex:0 0 auto!important;
           width:100%!important;
           min-height:0!important;
-          height:clamp(250px,36vh,430px)!important;
+          height:clamp(300px,42vh,520px)!important;
           border-radius:20px!important;
           overflow:hidden!important;
           display:flex!important;
