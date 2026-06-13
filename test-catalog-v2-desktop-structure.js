@@ -29,24 +29,21 @@
       @media (min-width:821px){
         body.page-catalog-v2 .v2-shell.v2-desktop-info-layout{
           display:grid!important;
-          grid-template-columns:clamp(340px,24vw,430px) minmax(0,1fr)!important;
+          grid-template-columns:minmax(300px,360px) minmax(0,1fr)!important;
           gap:18px!important;
           align-items:start!important;
         }
         body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-sidebar{
-          --v2-page-viewport-top:var(--v2-sidebar-top,72px);
-          --v2-sidebar-bottom-gap:8px;
+          --v2-page-viewport-top:72px;
           position:sticky!important;
           top:var(--v2-page-viewport-top)!important;
-          height:calc(100dvh - var(--v2-page-viewport-top) - var(--v2-sidebar-bottom-gap))!important;
-          max-height:calc(100dvh - var(--v2-page-viewport-top) - var(--v2-sidebar-bottom-gap))!important;
-          min-height:calc(100dvh - var(--v2-page-viewport-top) - var(--v2-sidebar-bottom-gap))!important;
+          height:calc(100dvh - var(--v2-page-viewport-top))!important;
+          max-height:calc(100dvh - var(--v2-page-viewport-top))!important;
           overflow:hidden!important;
-          display:grid!important;
-          grid-template-rows:auto minmax(0,1fr)!important;
+          display:flex!important;
+          flex-direction:column!important;
           gap:8px!important;
           padding:10px!important;
-          box-sizing:border-box!important;
           border-radius:24px!important;
           background:linear-gradient(180deg,rgba(15,23,42,.92),rgba(8,13,26,.96))!important;
           border:1px solid rgba(255,255,255,.12)!important;
@@ -98,24 +95,24 @@
         body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-selected-card,
         body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-description{ width:100%!important; min-width:0!important; margin:0!important; }
         body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-selected-card{
+          flex:1 1 auto!important;
           min-height:0!important;
           height:100%!important;
-          max-height:none!important;
-          display:grid!important;
-          grid-template-rows:auto auto minmax(0,1fr)!important;
+          display:flex!important;
+          flex-direction:column!important;
           gap:8px!important;
           padding:10px!important;
           overflow:hidden!important;
-          box-sizing:border-box!important;
           border-radius:22px!important;
           background:linear-gradient(145deg,rgba(255,255,255,.08),rgba(255,255,255,.03))!important;
           border:1px solid rgba(255,255,255,.12)!important;
         }
         body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-feature-art{
+          flex:0 0 auto!important;
           width:100%!important;
-          min-height:210px!important;
-          height:clamp(220px,34dvh,360px)!important;
-          max-height:none!important;
+          min-height:150px!important;
+          height:clamp(170px,30dvh,300px)!important;
+          max-height:34%!important;
           border-radius:20px!important;
           overflow:hidden!important;
           display:flex!important;
@@ -133,6 +130,7 @@
           display:block!important;
         }
         body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-feature-info{
+          flex:0 0 auto!important;
           width:100%!important;
           min-width:0!important;
           padding:0!important;
@@ -140,7 +138,6 @@
           flex-direction:column!important;
           align-items:stretch!important;
           gap:6px!important;
-          overflow:visible!important;
         }
         body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-kicker{ display:none!important; }
         body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-name{
@@ -205,8 +202,8 @@
         body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-stat span{ display:block!important; font-size:10px!important; letter-spacing:.08em!important; color:var(--muted,#b7c0d8)!important; }
         body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-stat b{ display:block!important; margin-top:2px!important; font-size:13px!important; white-space:nowrap!important; }
         body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-description{
+          flex:1 1 auto!important;
           min-height:0!important;
-          height:100%!important;
           overflow:hidden!important;
           display:flex!important;
           flex-direction:column!important;
@@ -262,9 +259,137 @@
         body.page-catalog-v2 .v2-shell.v2-desktop-info-layout #catalogGrid .unitCard .stat{ border-radius:12px!important; }
         body.page-catalog-v2 .v2-shell.v2-desktop-info-layout #catalogGrid .unitCard .statLabel{ font-size:10px!important; }
         body.page-catalog-v2 .v2-shell.v2-desktop-info-layout #catalogGrid .unitCard .statVal{ font-size:13px!important; }
+
+        /* Stable selected-info authority: keep the sidebar as a full viewport inspector.
+           These rules intentionally do not depend only on .v2-shell.v2-desktop-info-layout
+           because other late passes can rebuild/remove that class while leaving the moved
+           nodes in the sidebar. */
+        body.page-catalog-v2.v2-desktop-info-layout-active .v2-sidebar{
+          --v2-page-viewport-top:72px;
+          position:sticky!important;
+          top:var(--v2-page-viewport-top)!important;
+          height:calc(100dvh - var(--v2-page-viewport-top))!important;
+          min-height:calc(100dvh - var(--v2-page-viewport-top))!important;
+          max-height:calc(100dvh - var(--v2-page-viewport-top))!important;
+          overflow:hidden!important;
+          display:flex!important;
+          flex-direction:column!important;
+          align-self:start!important;
+        }
+        body.page-catalog-v2.v2-desktop-info-layout-active .v2-sidebar .v2-selected-card{
+          flex:1 1 auto!important;
+          height:auto!important;
+          min-height:0!important;
+          max-height:none!important;
+          width:100%!important;
+          display:flex!important;
+          flex-direction:column!important;
+          grid-template-columns:none!important;
+          grid-template-rows:none!important;
+          align-items:stretch!important;
+          justify-content:flex-start!important;
+          gap:8px!important;
+          overflow:hidden!important;
+          padding:10px!important;
+        }
+        body.page-catalog-v2.v2-desktop-info-layout-active .v2-sidebar .v2-feature-art{
+          order:1!important;
+          flex:0 0 clamp(190px,30dvh,310px)!important;
+          width:100%!important;
+          height:clamp(190px,30dvh,310px)!important;
+          min-height:190px!important;
+          max-height:310px!important;
+          display:flex!important;
+          align-items:center!important;
+          justify-content:center!important;
+          overflow:hidden!important;
+        }
+        body.page-catalog-v2.v2-desktop-info-layout-active .v2-sidebar .v2-feature-art img,
+        body.page-catalog-v2.v2-desktop-info-layout-active .v2-sidebar .v2-feature-art picture,
+        body.page-catalog-v2.v2-desktop-info-layout-active .v2-sidebar .v2-feature-art canvas{
+          width:100%!important;
+          height:100%!important;
+          max-height:none!important;
+          object-fit:contain!important;
+          object-position:center center!important;
+          display:block!important;
+        }
+        body.page-catalog-v2.v2-desktop-info-layout-active .v2-sidebar .v2-feature-info{
+          order:2!important;
+          flex:0 0 auto!important;
+          width:100%!important;
+          display:flex!important;
+          flex-direction:column!important;
+          align-items:stretch!important;
+          justify-content:flex-start!important;
+          gap:6px!important;
+          padding:0!important;
+          min-height:0!important;
+        }
+        body.page-catalog-v2.v2-desktop-info-layout-active .v2-sidebar .v2-name,
+        body.page-catalog-v2.v2-desktop-info-layout-active .v2-sidebar .v2-title{
+          text-align:center!important;
+        }
+        body.page-catalog-v2.v2-desktop-info-layout-active .v2-sidebar .v2-awaken-tabs{
+          display:flex!important;
+          flex-wrap:nowrap!important;
+          justify-content:center!important;
+          align-items:center!important;
+          gap:10px!important;
+          width:100%!important;
+          margin:3px 0!important;
+        }
+        body.page-catalog-v2.v2-desktop-info-layout-active .v2-sidebar .v2-pill-row{
+          display:flex!important;
+          flex-wrap:nowrap!important;
+          justify-content:center!important;
+          align-items:center!important;
+          gap:7px!important;
+          width:100%!important;
+        }
+        body.page-catalog-v2.v2-desktop-info-layout-active .v2-sidebar .v2-stats{
+          display:grid!important;
+          grid-template-columns:repeat(4,minmax(0,1fr))!important;
+          gap:6px!important;
+          width:100%!important;
+        }
+        body.page-catalog-v2.v2-desktop-info-layout-active .v2-sidebar .v2-description{
+          order:3!important;
+          flex:1 1 auto!important;
+          height:auto!important;
+          min-height:120px!important;
+          max-height:none!important;
+          overflow:hidden!important;
+          display:flex!important;
+          flex-direction:column!important;
+          width:100%!important;
+        }
+        body.page-catalog-v2.v2-desktop-info-layout-active .v2-sidebar .v2-desc-head{
+          flex:0 0 auto!important;
+          width:100%!important;
+        }
+        body.page-catalog-v2.v2-desktop-info-layout-active .v2-sidebar .v2-detail-tabs{
+          display:grid!important;
+          grid-template-columns:repeat(4,minmax(0,1fr))!important;
+          gap:6px!important;
+          width:100%!important;
+        }
+        body.page-catalog-v2.v2-desktop-info-layout-active .v2-sidebar .v2-detail-tab-btn{
+          min-width:0!important;
+          white-space:nowrap!important;
+          overflow:hidden!important;
+          text-overflow:ellipsis!important;
+        }
+        body.page-catalog-v2.v2-desktop-info-layout-active .v2-sidebar .v2-detail-scroll-panel{
+          flex:1 1 auto!important;
+          min-height:0!important;
+          overflow:auto!important;
+          overscroll-behavior:contain!important;
+        }
+
       }
       @media (min-width:821px) and (max-width:1180px){
-        body.page-catalog-v2 .v2-shell.v2-desktop-info-layout{ grid-template-columns:clamp(320px,34vw,390px) minmax(0,1fr)!important; }
+        body.page-catalog-v2 .v2-shell.v2-desktop-info-layout{ grid-template-columns:minmax(290px,320px) minmax(0,1fr)!important; }
         body.page-catalog-v2 .v2-shell.v2-desktop-info-layout #catalogGrid{ grid-template-columns:repeat(3,minmax(0,1fr))!important; }
       }
       @media (max-width:820px){ body.page-catalog-v2 .v2-filter-panel, body.page-catalog-v2 .v2-filter-title{ display:contents!important; } }
@@ -351,18 +476,6 @@
     const desc = qs('#v2Desc');
     if(desc) new MutationObserver(() => updateDetailPanel(activeDetailKind())).observe(desc, { childList:true, subtree:true, characterData:true });
   }
-
-  function updateSidebarViewportVars(){
-    if(!isDesktop()) return;
-    const sidebar = qs('.v2-sidebar');
-    const topbar = qs('.topbar');
-    if(!sidebar) return;
-    const topbarBottom = topbar ? Math.ceil(topbar.getBoundingClientRect().bottom) : 0;
-    const pageTop = Math.ceil(sidebar.getBoundingClientRect().top);
-    const top = Math.max(topbarBottom + 14, Math.min(pageTop, topbarBottom + 24));
-    document.documentElement.style.setProperty('--v2-sidebar-top', `${top}px`);
-  }
-
   function applyDesktop(){
     const shell = qs('.v2-shell');
     const sidebar = qs('.v2-sidebar');
@@ -374,7 +487,7 @@
     if(!shell || !sidebar || !controls || !hero || !selected) return;
     if(!originalSidebarParent){ originalSidebarParent = sidebar.parentNode; originalSidebarNext = sidebar.nextSibling; originalHeroParent = hero.parentNode; originalHeroFirst = hero.firstChild; originalSelectedNext = selected.nextSibling; originalControlsNext = controls.nextSibling; }
     shell.classList.add('v2-desktop-info-layout');
-    updateSidebarViewportVars();
+    document.body.classList.add('v2-desktop-info-layout-active');
     if(sidebarTitle) sidebarTitle.textContent = 'Selected Info';
     const panel = makeFilterPanel();
     if(!panel.parentNode) hero.insertBefore(panel, hero.firstChild);
@@ -397,6 +510,7 @@
     const selected = qs('.v2-selected-card');
     const description = qs('.v2-description');
     if(shell) shell.classList.remove('v2-desktop-info-layout');
+    document.body.classList.remove('v2-desktop-info-layout-active');
     if(sidebarTitle) sidebarTitle.textContent = 'Filters';
     if(sidebar && controls && controls.parentNode !== sidebar){ if(originalControlsNext && originalControlsNext.parentNode === sidebar) sidebar.insertBefore(controls, originalControlsNext); else sidebar.appendChild(controls); }
     if(hero && selected && selected.parentNode !== hero){ if(originalHeroFirst && originalHeroFirst.parentNode === hero) hero.insertBefore(selected, originalHeroFirst); else hero.insertBefore(selected, hero.firstChild); }
@@ -408,13 +522,12 @@
     if(panel && !panel.querySelector('.controls')) panel.remove();
     moved = false;
   }
-  function apply(){ injectStyles(); updateSidebarViewportVars(); if(isDesktop()) applyDesktop(); else restoreMobile(); }
+  function apply(){ injectStyles(); if(isDesktop()) applyDesktop(); else restoreMobile(); }
   function boot(){
     apply();
     setTimeout(apply, 250);
     setTimeout(apply, 900);
     window.addEventListener('resize', () => requestAnimationFrame(apply));
-    window.addEventListener('orientationchange', () => setTimeout(apply, 120));
     if(!document.__v2DesktopStructureObserver){
       document.__v2DesktopStructureObserver = new MutationObserver(() => {
         if(!isDesktop()) return;
@@ -423,7 +536,8 @@
         const description = qs('.v2-description');
         const controls = qs('.controls');
         const panel = qs('.v2-filter-panel');
-        const needsRepair = selected && sidebar && selected.parentNode !== sidebar
+        const needsRepair = !document.body.classList.contains('v2-desktop-info-layout-active')
+          || selected && sidebar && selected.parentNode !== sidebar
           || description && selected && description.parentNode !== selected
           || controls && panel && controls.parentNode !== panel
           || qs('#v2AwakenTabs') && qs('.v2-feature-info') && qs('#v2AwakenTabs').parentNode !== qs('.v2-feature-info');
