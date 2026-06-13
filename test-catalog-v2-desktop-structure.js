@@ -11,6 +11,7 @@
     fire:['#ef4444','#f97316'], water:['#38bdf8','#2563eb'], storm:['#facc15','#f59e0b'],
     earth:['#22c55e','#15803d'], light:['#f8fafc','#facc15'], dark:['#a855f7','#581c87']
   };
+  const ELEMENT_NAMES = ['Fire','Water','Storm','Earth','Light','Dark'];
   let moved = false;
   let originalSidebarParent = null;
   let originalSidebarNext = null;
@@ -25,6 +26,14 @@
   function safeText(value){ return String(value ?? '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
   function decodeAttrJson(value){ try { return JSON.parse(decodeURIComponent(value || '')); } catch { return []; } }
   function normalizeElement(value){ return String(value || '').trim().toLowerCase().replace(/[^a-z]/g,''); }
+  function displayElement(value){ const n=normalizeElement(value); return ELEMENT_NAMES.find(name=>normalizeElement(name)===n) || 'Element'; }
+  function findElementText(card){
+    const candidates=[card?.getAttribute('data-element'),card?.dataset?.element,qs('#v2Element')?.textContent,qs('#v2Pills [data-sidebar-badge="element"]')?.textContent,qs('#v2Pills .element')?.textContent,qs('#v2Pills .unitElement')?.textContent,card?.querySelector('.unitElement')?.textContent,card?.querySelector('.element')?.textContent,card?.querySelector('[data-element]')?.getAttribute('data-element')];
+    for(const raw of candidates){const n=normalizeElement(raw);if(ELEMENT_COLORS[n])return displayElement(raw);}
+    const text=[card?.textContent,qs('#v2Pills')?.textContent].filter(Boolean).join(' ');
+    const found=ELEMENT_NAMES.find(name=>new RegExp('\\b'+name+'\\b','i').test(text));
+    return found || 'Element';
+  }
 
   function injectStyles(){
     if(document.getElementById('v2-desktop-structure-style')) return;
@@ -115,11 +124,11 @@
   function placeAwakenTabsForDesktop(){const tabs=qs('#v2AwakenTabs');const info=qs('.v2-feature-info');const title=qs('#v2Title');if(!tabs||!info||!title)return;ensureAwakenTabs();if(tabs.parentNode!==info||tabs.previousElementSibling!==title){info.insertBefore(tabs,title.nextSibling);}}
   function makeDetailsModule(){const description=qs('.v2-description');if(!description)return;let head=qs('.v2-desc-head',description);if(!head){head=document.createElement('div');head.className='v2-desc-head';description.insertBefore(head,description.firstChild);}let title=qs('h2',head);if(!title){title=document.createElement('h2');head.insertBefore(title,head.firstChild);}title.textContent='Details';let tabs=qs('.v2-detail-tabs',description);if(!tabs){tabs=document.createElement('div');tabs.className='v2-detail-tabs';tabs.innerHTML=[['leader','Leader Skill'],['active','Active'],['passive','Passive'],['description','Description']].map(([key,label])=>`<button type="button" class="v2-detail-tab-btn${key==='leader'?' active':''}" data-v2-detail-kind="${key}">${label}</button>`).join('');head.appendChild(tabs);}}
   function currentSelectedCard(){return qs('#catalogGrid .unitCard.v2-selected')||qs('#catalogGrid .unitCard');}
-  function selectedElement(){const card=currentSelectedCard();return normalizeElement(card?.getAttribute('data-element')||qs('#v2Pills')?.textContent||card?.querySelector('.tag')?.textContent||'');}
+  function selectedElement(){return normalizeElement(findElementText(currentSelectedCard()));}
   function applySelectedElementColors(){const element=selectedElement();const pair=ELEMENT_COLORS[element]||['#f6ca5e','#a855f7'];const shell=qs('.v2-shell');const sidebar=qs('.v2-sidebar');[document.body,shell,sidebar].filter(Boolean).forEach(node=>{node.style.setProperty('--element-primary',pair[0]);node.style.setProperty('--element-secondary',pair[1]);node.setAttribute('data-selected-element',element||'unknown');});}
   function clickNativeAwaken(index){const tabs=qs('#v2AwakenTabs');const button=qsa('button',tabs)[index];if(button){button.click();return true;}return false;}
   function ensureAwakenTabs(){const tabs=qs('#v2AwakenTabs');if(!tabs)return;const existing=qsa('button',tabs);const states=[['5star','5Star'],['6star','6Star'],['fa','FinalAwakened']];states.forEach(([key,label],index)=>{let btn=existing[index];if(!btn){btn=document.createElement('button');btn.type='button';tabs.appendChild(btn);}btn.setAttribute('data-awaken-state',key);btn.setAttribute('aria-label',label);btn.title=label;btn.dataset.awakenIndex=String(index);});qsa('button',tabs).slice(3).forEach(btn=>btn.remove());}
-  function ensureBadgeRow(){const pills=qs('#v2Pills');if(!pills)return;const selected=currentSelectedCard();const kind=(qs('#v2Kind')?.textContent||selected?.getAttribute('data-kind')||'Character').trim()||'Character';const element=(selected?.getAttribute('data-element')||selected?.querySelector('.tag')?.textContent||'Element').trim()||'Element';const rarity=(selected?.getAttribute('data-rarity')||selected?.querySelector('.rarity')?.textContent||'Rarity').trim()||'Rarity';pills.innerHTML=[kind,element,rarity].map(value=>`<span class="v2-sidebar-badge">${safeText(value)}</span>`).join('');}
+  function ensureBadgeRow(){const pills=qs('#v2Pills');if(!pills)return;const selected=currentSelectedCard();const kind='Character';const element=findElementText(selected);const rarity=(selected?.getAttribute('data-rarity')||selected?.dataset?.rarity||selected?.querySelector('.rarity')?.textContent||qs('#v2Rarity')?.textContent||'Rarity').trim()||'Rarity';pills.innerHTML=[['kind',kind],['element',element],['rarity',rarity]].map(([key,value])=>`<span class="v2-sidebar-badge" data-sidebar-badge="${key}">${safeText(value)}</span>`).join('');}
   function ensureStatOrder(){const stats=qs('.v2-stats');if(!stats)return;const wanted=['v2Atk','v2Hp','v2Spd','v2Cost'];wanted.map(id=>qs('#'+id)?.closest('.v2-stat')).filter(Boolean).forEach(node=>stats.appendChild(node));}
   function ensureSidebarRows(){ensureAwakenTabs();ensureBadgeRow();ensureStatOrder();applySelectedElementColors();}
   function ensureDetailPanel(){const description=qs('.v2-description');if(!description)return;let panel=qs('.v2-detail-scroll-panel',description);if(!panel){panel=document.createElement('div');panel.className='v2-detail-scroll-panel';description.appendChild(panel);}}
