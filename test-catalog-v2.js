@@ -4,6 +4,7 @@
   const CATEGORIES = ['characters','weapons','accessories','bosses'];
   let descMap = null;
   let activeCard = null;
+  let v2AwakenPointerHandled = false;
   const $ = id => document.getElementById(id);
   const clean = v => String(v || '').toLowerCase().replace(/\d+$/,'').replace(/[^a-z0-9]+/g,'');
   const directKey = v => String(v || '').toLowerCase().replace(/[^a-z0-9]+/g,'');
@@ -67,6 +68,8 @@
   function exactStat(card, stat){return card?.querySelector(`.stat[data-stat="${stat}"] .statVal`)?.textContent?.trim()||'—'}
   function pills(card){return [...card.querySelectorAll('.tag')].map(x=>x.textContent.trim()).filter(Boolean).slice(0,5)}
   function activeIdx(card){return parseInt(card.querySelector('.stateBtn.active')?.getAttribute('data-idx')||card.querySelector('.unitThumb img')?.getAttribute('data-state')||card.getAttribute('data-duo-index')||'0',10)||0}
+  function safeIdx(value,max){const n=Number(value);if(!Number.isFinite(n))return 0;return Math.max(0,Math.min(Math.max(max-1,0),Math.floor(n)));}
+  function heroImgHtml(src){return src?`<img src="${src}" alt="" loading="lazy" decoding="async">`:'<div class="v2-feature-empty">No image</div>';}
   function ensureSkillActions(){
     if($('v2SkillActions'))return;
     const stats=$('v2Cost')?.closest('.v2-stats');
@@ -77,7 +80,7 @@
     activeCard=card;
     ensureSkillActions();
     const img=card.querySelector('.unitThumb img')?.src||'';
-    $('v2FeatureArt').innerHTML=img?`<img src="${img}" alt="" loading="lazy" decoding="async">`:'<div class="v2-feature-empty">No image</div>';
+    $('v2FeatureArt').innerHTML=heroImgHtml(img);
     $('v2Kind').textContent=card.getAttribute('data-kind')||card.getAttribute('data-type')||'Catalog';
     $('v2Name').textContent=text('.unitName',card)||'Unknown';
     $('v2Title').textContent=text('.unitTitle',card)||'';
@@ -87,10 +90,43 @@
     $('v2Spd').textContent=exactStat(card,'spd');
     $('v2Cost').textContent=exactStat(card,'cost');
     const idx=Math.min(activeIdx(card),Math.max((rows||[]).length-1,0));
-    $('v2AwakenTabs').innerHTML=(rows||[]).map((r,i)=>`<button type="button" class="${i===idx?'active':''}" data-v2-idx="${i}">${i+1}</button>`).join('');
+    $('v2AwakenTabs').innerHTML=(rows||[]).map((r,i)=>`<button type="button" class="${i===idx?'active':''}" data-v2-idx="${i}" data-awaken-index="${i}" aria-pressed="${i===idx?'true':'false'}">${i+1}</button>`).join('');
     $('v2Desc').textContent=(rows&&rows[idx]&&(rows[idx].description||rows[idx].title||''))||text('.descriptionText',card)||'No description loaded for this state.';
   }
   async function selectCard(card){if(!card)return;document.querySelectorAll('.unitCard.v2-selected').forEach(c=>c.classList.remove('v2-selected'));card.classList.add('v2-selected');const map=await loadDescMap();let rows=[];for(const key of cardKeyList(card)){rows=map.get(key)||[];if(rows.length)break;}setHero(card,rows)}
+  function syncV2TabState(idx){const tabs=$('v2AwakenTabs');if(!tabs)return;[...tabs.children].forEach((b,i)=>{b.classList.toggle('active',i===idx);b.setAttribute('aria-pressed',String(i===idx));b.dataset.v2Idx=String(i);b.dataset.awakenIndex=String(i);});}
+  function setCardImageState(card,idx){
+    const buttons=[...card.querySelectorAll('.stateRow .stateBtn')];
+    const btn=buttons.find(b=>Number(b.getAttribute('data-idx'))===idx)||buttons[idx];
+    if(!btn)return false;
+    const row=btn.closest('.stateRow');
+    let imgs=[];
+    try{imgs=JSON.parse(row?.getAttribute('data-imgs')||'[]');}catch{imgs=[];}
+    const img=card.querySelector('.unitThumb img');
+    if(img&&imgs[idx]){img.src=imgs[idx];img.setAttribute('data-state',String(idx));}
+    buttons.forEach(b=>b.classList.toggle('active',b===btn));
+    card.setAttribute('data-duo-index',String(idx));
+    return true;
+  }
+  async function applyV2AwakenButton(btn){
+    const card=document.querySelector('.unitCard.v2-selected')||activeCard||document.querySelector('.unitCard');
+    if(!btn||!card)return;
+    const max=Math.max($('v2AwakenTabs')?.children.length||0,card.querySelectorAll('.stateRow .stateBtn').length||0,3);
+    const idx=safeIdx(btn.dataset.v2Idx ?? btn.dataset.awakenIndex ?? btn.getAttribute('data-idx') ?? 0,max);
+    setCardImageState(card,idx);
+    syncV2TabState(idx);
+    const img=card.querySelector('.unitThumb img')?.src||'';
+    $('v2FeatureArt').innerHTML=heroImgHtml(img);
+    $('v2Hp').textContent=exactStat(card,'hp');
+    $('v2Atk').textContent=exactStat(card,'atk');
+    $('v2Spd').textContent=exactStat(card,'spd');
+    $('v2Cost').textContent=exactStat(card,'cost');
+    const map=await loadDescMap();
+    let rows=[];
+    for(const key of cardKeyList(card)){rows=map.get(key)||[];if(rows.length)break;}
+    $('v2Desc').textContent=rows[idx]?.description||rows[idx]?.title||text('.descriptionText',card)||'No description loaded for this state.';
+    document.dispatchEvent(new CustomEvent('v2:hero-state-change',{detail:{index:idx,card}}));
+  }
   function ensureSkillPrompt(){
     let pop=$('v2SkillPop');
     if(pop)return pop;
@@ -130,10 +166,12 @@
   function wire(){
     loadElementNormalizer();
     const grid=$('catalogGrid');if(!grid)return;
+    document.addEventListener('pointerdown',e=>{const btn=e.target.closest('#v2AwakenTabs button');if(!btn)return;e.preventDefault();e.stopImmediatePropagation();v2AwakenPointerHandled=true;applyV2AwakenButton(btn);setTimeout(()=>{v2AwakenPointerHandled=false;},220);},true);
+    document.addEventListener('click',e=>{const btn=e.target.closest('#v2AwakenTabs button');if(!btn)return;e.preventDefault();e.stopImmediatePropagation();if(!v2AwakenPointerHandled)applyV2AwakenButton(btn);},true);
     document.addEventListener('click',e=>{const btn=e.target.closest('[data-v2-skill]'); if(btn)openSkillPrompt(btn.getAttribute('data-v2-skill'));});
     grid.addEventListener('click',e=>{const card=e.target.closest('.unitCard');if(card)setTimeout(()=>selectCard(card),70)});
     grid.addEventListener('click',e=>{if(e.target.closest('.stateBtn,.duoFormBtn')){const card=e.target.closest('.unitCard');setTimeout(()=>selectCard(card),120)}});
-    $('v2AwakenTabs')?.addEventListener('click',async e=>{const btn=e.target.closest('button');const card=document.querySelector('.unitCard.v2-selected');if(!btn||!card)return;const map=await loadDescMap();let rows=[];for(const key of cardKeyList(card)){rows=map.get(key)||[];if(rows.length)break;}[...$('v2AwakenTabs').children].forEach((b,i)=>b.classList.toggle('active',i===Number(btn.dataset.v2Idx)));$('v2Desc').textContent=rows[Number(btn.dataset.v2Idx)]?.description||'No description loaded for this state.'});
+    $('v2AwakenTabs')?.addEventListener('click',async e=>{const btn=e.target.closest('button');if(!btn)return;applyV2AwakenButton(btn);});
     new MutationObserver(()=>{const cards=document.querySelectorAll('.unitCard');$('v2Count').textContent=cards.length?`• ${cards.length} visible`:'';if(!document.querySelector('.unitCard.v2-selected')&&cards[0])selectCard(cards[0]);window.EvertaleElementReference?.normalizeAll?.();}).observe(grid,{childList:true});
     setTimeout(()=>{const first=document.querySelector('.unitCard');if(first)selectCard(first);window.EvertaleElementReference?.normalizeAll?.();},1200);
   }
