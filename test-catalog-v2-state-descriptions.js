@@ -7,6 +7,8 @@
   let familyMap = null;
   let forcedIndex = null;
   let forcedUntil = 0;
+  let pendingTimer = null;
+  let lastWriteKey = '';
 
   const qs = (sel, root=document) => root.querySelector(sel);
   const qsa = (sel, root=document) => Array.from(root.querySelectorAll(sel));
@@ -26,7 +28,7 @@
 
   function rememberIndex(value, card){
     forcedIndex = clampIndex(value, card || selectedCard());
-    forcedUntil = Date.now() + 1800;
+    forcedUntil = Date.now() + 1200;
   }
 
   function stateIndex(card){
@@ -87,19 +89,22 @@
 
   function setTextNode(host, text){
     if(!host) return;
-    host.textContent = text || 'No description loaded for this state.';
+    const next = text || 'No description loaded for this state.';
+    if(host.textContent === next) return;
+    host.textContent = next;
   }
 
   function storeRowsOnCard(card, rows, idx, description){
     const panel = qs('.descriptionPanel', card);
-    if(panel){
+    if(panel && panel.getAttribute('data-v2-state-description-ready') !== '1'){
       try{ panel.setAttribute('data-descriptions', encodeURIComponent(JSON.stringify(rows))); }catch{}
+      panel.setAttribute('data-v2-state-description-ready','1');
     }
     const desc = qs('.descriptionText', card);
-    if(desc) desc.textContent = description || '';
+    if(desc && desc.textContent !== (description || '')) desc.textContent = description || '';
     const img = qs('.unitThumb img', card);
-    if(img) img.setAttribute('data-state', String(idx));
-    card?.setAttribute('data-duo-index', String(idx));
+    if(img && img.getAttribute('data-state') !== String(idx)) img.setAttribute('data-state', String(idx));
+    if(card?.getAttribute('data-duo-index') !== String(idx)) card?.setAttribute('data-duo-index', String(idx));
   }
 
   async function hydrate(){
@@ -109,14 +114,21 @@
     if(!rows.length) return;
     const idx = Math.min(stateIndex(card), rows.length - 1);
     const description = rows[idx]?.description || 'No description loaded for this state.';
+    const writeKey = `${card.getAttribute('data-source-id') || card.getAttribute('data-family') || ''}|${idx}|${description}`;
+    if(writeKey === lastWriteKey) return;
+    lastWriteKey = writeKey;
     storeRowsOnCard(card, rows, idx, description);
     setTextNode(qs('#v2Desc'), description);
     if(qs('#v2SidebarDetailTabs button.active')?.dataset?.sidebarDetail === 'description') setTextNode(qs('#v2SidebarDetailPanel'), description);
     if(qs('.v2-detail-tab-btn.active')?.getAttribute('data-v2-detail-kind') === 'description') setTextNode(qs('.v2-detail-scroll-panel'), description);
   }
 
-  function schedule(delay=80){ setTimeout(() => hydrate().catch(console.warn), delay); }
-  function scheduleSeveral(){ schedule(0); schedule(90); schedule(220); schedule(520); }
+  function schedule(delay=70){
+    clearTimeout(pendingTimer);
+    pendingTimer = setTimeout(() => hydrate().catch(console.warn), delay);
+  }
+  function scheduleBackup(){ setTimeout(() => hydrate().catch(console.warn), 240); }
+  function scheduleStable(){ schedule(35); scheduleBackup(); }
 
   function captureIndexFromEvent(event){
     const card = selectedCard();
@@ -130,20 +142,20 @@
   }
 
   window.addEventListener('pointerdown', event => {
-    if(event.target.closest('#v2AwakenTabs button,.stateRow .stateBtn')){ captureIndexFromEvent(event); scheduleSeveral(); }
+    if(event.target.closest('#v2AwakenTabs button,.stateRow .stateBtn')){ captureIndexFromEvent(event); scheduleStable(); }
   }, true);
 
   window.addEventListener('click', event => {
     if(event.target.closest('#v2AwakenTabs button,.stateRow .stateBtn,#catalogGrid .unitCard,.duoFormBtn,#v2SidebarDetailTabs button,.v2-detail-tab-btn')){
       captureIndexFromEvent(event);
-      scheduleSeveral();
+      scheduleStable();
     }
   }, true);
 
   document.addEventListener('v2:hero-state-change', event => {
     if(event?.detail?.index !== undefined) rememberIndex(event.detail.index, event.detail.card || selectedCard());
-    scheduleSeveral();
+    scheduleStable();
   });
 
-  document.addEventListener('DOMContentLoaded', () => { scheduleSeveral(); setTimeout(scheduleSeveral, 900); setTimeout(scheduleSeveral, 1700); });
+  document.addEventListener('DOMContentLoaded', () => { scheduleStable(); setTimeout(scheduleStable, 900); });
 })();
