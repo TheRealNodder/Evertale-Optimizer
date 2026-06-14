@@ -5,11 +5,18 @@
 (function(){
   const FAMILY_BUNDLE = './apkfiles/entries/bundles/character_families.bundle.json';
   let familyMap = null;
+  let forcedIndex = null;
+  let forcedUntil = 0;
 
   const qs = (sel, root=document) => root.querySelector(sel);
   const qsa = (sel, root=document) => Array.from(root.querySelectorAll(sel));
   const key = value => String(value || '').toLowerCase().replace(/\d+$/,'').replace(/[^a-z0-9]+/g,'');
   const selectedCard = () => qs('#catalogGrid .unitCard.v2-selected') || qs('#catalogGrid .unitCard');
+
+  function imgKeyFromCard(card){
+    const src = qs('.unitThumb img', card)?.getAttribute('src') || qs('.unitThumb img', card)?.src || '';
+    return key(String(src).split('/').pop().replace(/\.png(?:\?.*)?$/i,''));
+  }
 
   function clampIndex(value, card){
     const count = Math.max(qsa('#v2AwakenTabs button').length, qsa('.stateRow .stateBtn', card || document).length, 3);
@@ -17,7 +24,13 @@
     return Number.isFinite(n) ? Math.max(0, Math.min(count - 1, Math.floor(n))) : 0;
   }
 
+  function rememberIndex(value, card){
+    forcedIndex = clampIndex(value, card || selectedCard());
+    forcedUntil = Date.now() + 1800;
+  }
+
   function stateIndex(card){
+    if(forcedIndex !== null && Date.now() < forcedUntil) return clampIndex(forcedIndex, card);
     const active = qs('#v2AwakenTabs button.active') || qs('#v2AwakenTabs button[aria-pressed="true"]');
     const tabIndex = active?.dataset?.v2Idx ?? active?.dataset?.awakenIndex;
     if(tabIndex !== undefined && tabIndex !== null && tabIndex !== '') return clampIndex(tabIndex, card);
@@ -56,6 +69,7 @@
       card?.getAttribute('data-duo-active-id'),
       card?.getAttribute('data-source-id'),
       card?.getAttribute('data-id'),
+      imgKeyFromCard(card),
       qs('.unitName', card)?.textContent,
       qs('.unitTitle', card)?.textContent
     ].map(key).filter(Boolean);
@@ -76,6 +90,18 @@
     host.textContent = text || 'No description loaded for this state.';
   }
 
+  function storeRowsOnCard(card, rows, idx, description){
+    const panel = qs('.descriptionPanel', card);
+    if(panel){
+      try{ panel.setAttribute('data-descriptions', encodeURIComponent(JSON.stringify(rows))); }catch{}
+    }
+    const desc = qs('.descriptionText', card);
+    if(desc) desc.textContent = description || '';
+    const img = qs('.unitThumb img', card);
+    if(img) img.setAttribute('data-state', String(idx));
+    card?.setAttribute('data-duo-index', String(idx));
+  }
+
   async function hydrate(){
     const card = selectedCard();
     if(!card) return;
@@ -83,17 +109,41 @@
     if(!rows.length) return;
     const idx = Math.min(stateIndex(card), rows.length - 1);
     const description = rows[idx]?.description || 'No description loaded for this state.';
+    storeRowsOnCard(card, rows, idx, description);
     setTextNode(qs('#v2Desc'), description);
     if(qs('#v2SidebarDetailTabs button.active')?.dataset?.sidebarDetail === 'description') setTextNode(qs('#v2SidebarDetailPanel'), description);
     if(qs('.v2-detail-tab-btn.active')?.getAttribute('data-v2-detail-kind') === 'description') setTextNode(qs('.v2-detail-scroll-panel'), description);
   }
 
-  function schedule(){ setTimeout(() => hydrate().catch(console.warn), 80); }
+  function schedule(delay=80){ setTimeout(() => hydrate().catch(console.warn), delay); }
+  function scheduleSeveral(){ schedule(0); schedule(90); schedule(220); schedule(520); }
 
-  window.addEventListener('pointerdown', event => { if(event.target.closest('#v2AwakenTabs button')) schedule(); }, true);
-  window.addEventListener('click', event => {
-    if(event.target.closest('#v2AwakenTabs button,#catalogGrid .unitCard,.stateRow .stateBtn,.duoFormBtn,#v2SidebarDetailTabs button,.v2-detail-tab-btn')) schedule();
+  function captureIndexFromEvent(event){
+    const card = selectedCard();
+    const sidebarBtn = event.target.closest('#v2AwakenTabs button');
+    if(sidebarBtn){
+      rememberIndex(sidebarBtn.dataset.v2Idx ?? sidebarBtn.dataset.awakenIndex ?? Array.from(sidebarBtn.parentNode.children).indexOf(sidebarBtn), card);
+      return;
+    }
+    const stateBtn = event.target.closest('.stateRow .stateBtn');
+    if(stateBtn) rememberIndex(stateBtn.dataset.idx ?? Array.from(stateBtn.parentNode.children).indexOf(stateBtn), stateBtn.closest('.unitCard') || card);
+  }
+
+  window.addEventListener('pointerdown', event => {
+    if(event.target.closest('#v2AwakenTabs button,.stateRow .stateBtn')){ captureIndexFromEvent(event); scheduleSeveral(); }
   }, true);
-  document.addEventListener('v2:hero-state-change', schedule);
-  document.addEventListener('DOMContentLoaded', () => { schedule(); setTimeout(schedule, 800); setTimeout(schedule, 1600); });
+
+  window.addEventListener('click', event => {
+    if(event.target.closest('#v2AwakenTabs button,.stateRow .stateBtn,#catalogGrid .unitCard,.duoFormBtn,#v2SidebarDetailTabs button,.v2-detail-tab-btn')){
+      captureIndexFromEvent(event);
+      scheduleSeveral();
+    }
+  }, true);
+
+  document.addEventListener('v2:hero-state-change', event => {
+    if(event?.detail?.index !== undefined) rememberIndex(event.detail.index, event.detail.card || selectedCard());
+    scheduleSeveral();
+  });
+
+  document.addEventListener('DOMContentLoaded', () => { scheduleSeveral(); setTimeout(scheduleSeveral, 900); setTimeout(scheduleSeveral, 1700); });
 })();
