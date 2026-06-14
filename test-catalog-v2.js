@@ -52,17 +52,21 @@
     return [{ title:e.title||'', name:e.name||e.displayName||'', description:e.description||e.effect||e.profile||e.raw?.profile||resolvedText||'', sourceId:e.sourceId||e.internal?.sourceId||e.name||e.id||'', image:e.image||'' }];
   }
 
+  function addEntryRows(m,e){
+    const descRows = rowsFromEntry(e).filter(Boolean);
+    [e.family,e.id,e.sourceId,e.internal?.sourceId,e.name,e.displayName,e.title,e.sortName].forEach(v => addMap(m, v, descRows));
+    descRows.forEach(s => [s.sourceId,s.name,s.title].forEach(v => addMap(m, v, descRows)));
+  }
+
   async function loadDescMap(){
     if(descMap) return descMap;
     const m = new Map();
+    const familyBundle = await fetchJson(`${ENTRY_BASE}/bundles/character_families.bundle.json`);
+    (Array.isArray(familyBundle?.entries) ? familyBundle.entries : []).forEach(addEntryRows.bind(null,m));
     for(const cat of CATEGORIES){
       const bundle = await fetchJson(`${ENTRY_BASE}/bundles/${cat}.bundle.json`);
       const rows = Array.isArray(bundle?.entries) ? bundle.entries : [];
-      rows.forEach(e => {
-        const descRows = rowsFromEntry(e).filter(Boolean);
-        [e.family,e.id,e.sourceId,e.internal?.sourceId,e.name,e.displayName,e.title,e.sortName].forEach(v => addMap(m, v, descRows));
-        descRows.forEach(s => [s.sourceId,s.name,s.title].forEach(v => addMap(m, v, descRows)));
-      });
+      rows.forEach(addEntryRows.bind(null,m));
     }
     descMap = m;
     return m;
@@ -70,7 +74,8 @@
 
   function text(sel,root=document){return root.querySelector(sel)?.textContent?.trim()||''}
   function htmlText(sel,root=document){return root.querySelector(sel)?.innerHTML?.trim()||''}
-  function cardKeyList(card){return [card.getAttribute('data-duo-root'),card.getAttribute('data-duo-active-id'),card.getAttribute('data-source-id'),card.getAttribute('data-id'),card.getAttribute('data-family'),text('.unitName',card),text('.unitTitle',card)].flatMap(v=>[v,clean(v),directKey(v)]).filter(Boolean)}
+  function imgKey(card){return clean(String(card?.querySelector('.unitThumb img')?.src||'').split('/').pop()?.replace(/\.png(?:\?.*)?$/i,'')||'')}
+  function cardKeyList(card){return [card.getAttribute('data-duo-root'),card.getAttribute('data-duo-active-id'),card.getAttribute('data-source-id'),card.getAttribute('data-id'),card.getAttribute('data-family'),imgKey(card),text('.unitName',card),text('.unitTitle',card)].flatMap(v=>[v,clean(v),directKey(v)]).filter(Boolean)}
   function exactStat(card, stat){return card?.querySelector(`.stat[data-stat="${stat}"] .statVal`)?.textContent?.trim()||'—'}
   function pills(card){return [...card.querySelectorAll('.tag')].map(x=>x.textContent.trim()).filter(Boolean).slice(0,5)}
   function activeIdx(card){return parseInt(card.querySelector('.stateBtn.active')?.getAttribute('data-idx')||card.querySelector('.unitThumb img')?.getAttribute('data-state')||card.getAttribute('data-duo-index')||'0',10)||0}
@@ -83,6 +88,7 @@
     if(img&&src){if(img.src!==src)img.src=src;return;}
     host.innerHTML=heroImgHtml(src);
   }
+  function setText(id,value){const node=$(id);if(node&&node.textContent!==String(value??''))node.textContent=String(value??'');}
   function safeHtml(v){return String(v??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replace(/\n/g,'<br>');}
 
   function ensureSkillActions(){
@@ -123,10 +129,8 @@
     const card=document.querySelector('.unitCard.v2-selected')||activeCard||document.querySelector('.unitCard');
     activeSidebarDetailKind=kind||'leader';
     document.querySelectorAll('.v2-detail-tab-btn').forEach(btn=>btn.classList.toggle('active',btn.getAttribute('data-v2-detail-kind')===activeSidebarDetailKind));
-    if(activeSidebarDetailKind==='leader')panel.innerHTML=leaderDetailHtml(card);
-    else if(activeSidebarDetailKind==='active')panel.innerHTML=skillDetailHtml(card,'active');
-    else if(activeSidebarDetailKind==='passive')panel.innerHTML=skillDetailHtml(card,'passive');
-    else panel.innerHTML=`<p>${safeHtml($('v2Desc')?.textContent||text('.descriptionText',card)||'No description loaded.')}</p>`;
+    const html=activeSidebarDetailKind==='leader'?leaderDetailHtml(card):activeSidebarDetailKind==='active'?skillDetailHtml(card,'active'):activeSidebarDetailKind==='passive'?skillDetailHtml(card,'passive'):`<p>${safeHtml($('v2Desc')?.textContent||text('.descriptionText',card)||'No description loaded.')}</p>`;
+    if(panel.innerHTML!==html)panel.innerHTML=html;
   }
 
   function setHero(card,rows){
@@ -134,17 +138,19 @@
     ensureSkillActions();
     const img=card.querySelector('.unitThumb img')?.src||'';
     setHeroImage(img);
-    $('v2Kind').textContent=card.getAttribute('data-kind')||card.getAttribute('data-type')||'Catalog';
-    $('v2Name').textContent=text('.unitName',card)||'Unknown';
-    $('v2Title').textContent=text('.unitTitle',card)||'';
-    $('v2Pills').innerHTML=pills(card).map(p=>`<span class="v2-pill">${p}</span>`).join('');
-    $('v2Hp').textContent=exactStat(card,'hp');
-    $('v2Atk').textContent=exactStat(card,'atk');
-    $('v2Spd').textContent=exactStat(card,'spd');
-    $('v2Cost').textContent=exactStat(card,'cost');
+    setText('v2Kind',card.getAttribute('data-kind')||card.getAttribute('data-type')||'Catalog');
+    setText('v2Name',text('.unitName',card)||'Unknown');
+    setText('v2Title',text('.unitTitle',card)||'');
+    const pillsHtml=pills(card).map(p=>`<span class="v2-pill">${p}</span>`).join('');
+    if($('v2Pills')&&$('v2Pills').innerHTML!==pillsHtml)$('v2Pills').innerHTML=pillsHtml;
+    setText('v2Hp',exactStat(card,'hp'));
+    setText('v2Atk',exactStat(card,'atk'));
+    setText('v2Spd',exactStat(card,'spd'));
+    setText('v2Cost',exactStat(card,'cost'));
     const idx=Math.min(activeIdx(card),Math.max((rows||[]).length-1,0));
-    $('v2AwakenTabs').innerHTML=(rows||[]).map((r,i)=>`<button type="button" class="${i===idx?'active':''}" data-v2-idx="${i}" data-awaken-index="${i}" aria-pressed="${i===idx?'true':'false'}">${i+1}</button>`).join('');
-    $('v2Desc').textContent=(rows&&rows[idx]&&(rows[idx].description||rows[idx].title||''))||text('.descriptionText',card)||'No description loaded for this state.';
+    const tabsHtml=(rows||[]).map((r,i)=>`<button type="button" class="${i===idx?'active':''}" data-v2-idx="${i}" data-awaken-index="${i}" aria-pressed="${i===idx?'true':'false'}">${i+1}</button>`).join('');
+    if($('v2AwakenTabs')&&$('v2AwakenTabs').innerHTML!==tabsHtml)$('v2AwakenTabs').innerHTML=tabsHtml;
+    setText('v2Desc',(rows&&rows[idx]&&(rows[idx].description||rows[idx].title||''))||text('.descriptionText',card)||'No description loaded for this state.');
     renderSidebarDetail(activeSidebarDetailKind);
   }
 
@@ -174,14 +180,14 @@
     syncV2TabState(idx);
     const img=card.querySelector('.unitThumb img')?.src||'';
     setHeroImage(img);
-    $('v2Hp').textContent=exactStat(card,'hp');
-    $('v2Atk').textContent=exactStat(card,'atk');
-    $('v2Spd').textContent=exactStat(card,'spd');
-    $('v2Cost').textContent=exactStat(card,'cost');
+    setText('v2Hp',exactStat(card,'hp'));
+    setText('v2Atk',exactStat(card,'atk'));
+    setText('v2Spd',exactStat(card,'spd'));
+    setText('v2Cost',exactStat(card,'cost'));
     const map=await loadDescMap();
     let rows=[];
     for(const key of cardKeyList(card)){rows=map.get(key)||[];if(rows.length)break;}
-    $('v2Desc').textContent=rows[idx]?.description||rows[idx]?.title||text('.descriptionText',card)||'No description loaded for this state.';
+    setText('v2Desc',rows[idx]?.description||rows[idx]?.title||text('.descriptionText',card)||'No description loaded for this state.');
     renderSidebarDetail(activeSidebarDetailKind);
     document.dispatchEvent(new CustomEvent('v2:hero-state-change',{detail:{index:idx,card}}));
   }
