@@ -28,6 +28,23 @@
     `;
     document.head.appendChild(style);
   }
+  function applyV2Shell(){
+    const path=String(location.pathname||'');
+    const isRoster=/roster\.html$/i.test(path);
+    const isOptimizer=/optimizer\.html$/i.test(path);
+    if(!isRoster&&!isOptimizer)return;
+    document.body.classList.add(isRoster?'page-roster-v2':'page-optimizer-v2');
+    if(isOptimizer)document.body.classList.add('page-optimizer');
+    if(!document.querySelector('link[data-v2-site-ui-pass]')){
+      const l=document.createElement('link');
+      l.rel='stylesheet';
+      l.href='./v2-site-ui-pass.css?v=1';
+      l.setAttribute('data-v2-site-ui-pass','1');
+      document.head.appendChild(l);
+    }
+    const sub=document.querySelector('.brandSub');
+    if(sub)sub.textContent='Made By TheRealNodder for Everyone!';
+  }
   function addCredit(){
     const title=document.querySelector('.brandTitle');
     if(!title||document.querySelector('.brandCredit'))return;
@@ -38,6 +55,7 @@
   }
   function build(){
     injectStyles();
+    applyV2Shell();
     addCredit();
     if(document.getElementById('siteSideMenu')) return;
     const overlay=document.createElement('div'); overlay.className='siteMenuOverlay';
@@ -51,6 +69,7 @@
   function close(){ document.body.classList.remove('site-menu-open'); document.getElementById('siteSideMenu')?.setAttribute('aria-hidden','true'); }
   function init(){
     injectStyles();
+    applyV2Shell();
     addCredit();
     const inner=document.querySelector('.topbar-inner');
     if(inner&&!document.querySelector('.siteMenuButton')){
