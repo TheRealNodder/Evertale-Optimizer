@@ -24,11 +24,21 @@
       .siteMenuSubLink{font-size:14px!important;font-weight:800!important;color:var(--muted,#aab1d6)!important;padding:6px 10px 6px 20px!important;}
       .siteMenuSubLink::before{content:'- ';color:#fff!important;}
       .siteMenuMain:hover,.siteMenuSubLink:hover{background:rgba(255,255,255,.10)!important;color:#fff!important;}
+      .brandCredit{font-size:12px!important;line-height:1.2!important;color:var(--muted,#aab1d6)!important;margin-top:2px!important;font-weight:800!important;letter-spacing:.02em!important;}
     `;
     document.head.appendChild(style);
   }
+  function addCredit(){
+    const title=document.querySelector('.brandTitle');
+    if(!title||document.querySelector('.brandCredit'))return;
+    const credit=document.createElement('div');
+    credit.className='brandCredit';
+    credit.textContent='Made By TheRealNodder';
+    title.insertAdjacentElement('afterend',credit);
+  }
   function build(){
     injectStyles();
+    addCredit();
     if(document.getElementById('siteSideMenu')) return;
     const overlay=document.createElement('div'); overlay.className='siteMenuOverlay';
     const aside=document.createElement('aside'); aside.id='siteSideMenu'; aside.className='siteSideMenu'; aside.ariaHidden='true';
@@ -41,6 +51,7 @@
   function close(){ document.body.classList.remove('site-menu-open'); document.getElementById('siteSideMenu')?.setAttribute('aria-hidden','true'); }
   function init(){
     injectStyles();
+    addCredit();
     const inner=document.querySelector('.topbar-inner');
     if(inner&&!document.querySelector('.siteMenuButton')){
       const b=document.createElement('button');
