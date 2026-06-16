@@ -37,35 +37,6 @@
     if(attr)l.setAttribute(attr,'1');
     document.head.appendChild(l);
   }
-  function addPrefetch(href,as){
-    if(!href||document.querySelector(`link[data-site-prefetch="${href}"]`))return;
-    const l=document.createElement('link');
-    l.rel='prefetch';
-    l.href=href;
-    if(as)l.as=as;
-    l.setAttribute('data-site-prefetch',href);
-    document.head.appendChild(l);
-  }
-  function schedule(fn){
-    if('requestIdleCallback' in window)requestIdleCallback(fn,{timeout:1400});
-    else setTimeout(fn,250);
-  }
-  function warmNavigation(){
-    const pages=['./index.html','./roster.html','./optimizer.html'];
-    schedule(()=>pages.forEach(p=>addPrefetch(p,'document')));
-    document.addEventListener('pointerover',e=>{
-      const a=e.target.closest('a[href]');
-      if(!a)return;
-      const href=a.getAttribute('href')||'';
-      if(/^(\.\/)?(index|roster|optimizer)\.html/.test(href))addPrefetch(href.split('#')[0],'document');
-    },{passive:true});
-    document.addEventListener('touchstart',e=>{
-      const a=e.target.closest('a[href]');
-      if(!a)return;
-      const href=a.getAttribute('href')||'';
-      if(/^(\.\/)?(index|roster|optimizer)\.html/.test(href))addPrefetch(href.split('#')[0],'document');
-    },{passive:true});
-  }
   function applyV2Shell(){
     const path=String(location.pathname||'');
     const isRoster=/roster\.html$/i.test(path);
@@ -91,7 +62,6 @@
     injectStyles();
     applyV2Shell();
     addCredit();
-    warmNavigation();
     if(document.getElementById('siteSideMenu')) return;
     const overlay=document.createElement('div'); overlay.className='siteMenuOverlay';
     const aside=document.createElement('aside'); aside.id='siteSideMenu'; aside.className='siteSideMenu'; aside.ariaHidden='true';
@@ -106,7 +76,6 @@
     injectStyles();
     applyV2Shell();
     addCredit();
-    warmNavigation();
     const inner=document.querySelector('.topbar-inner');
     if(inner&&!document.querySelector('.siteMenuButton')){
       const b=document.createElement('button');
