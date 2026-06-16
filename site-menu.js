@@ -28,6 +28,14 @@
     `;
     document.head.appendChild(style);
   }
+  function addCss(href,attr){
+    if(document.querySelector(`link[${attr}]`))return;
+    const l=document.createElement('link');
+    l.rel='stylesheet';
+    l.href=href;
+    l.setAttribute(attr,'1');
+    document.head.appendChild(l);
+  }
   function applyV2Shell(){
     const path=String(location.pathname||'');
     const isRoster=/roster\.html$/i.test(path);
@@ -35,19 +43,15 @@
     if(!isRoster&&!isOptimizer)return;
     document.body.classList.add(isRoster?'page-roster-v2':'page-optimizer-v2');
     if(isOptimizer)document.body.classList.add('page-optimizer');
-    if(!document.querySelector('link[data-v2-site-ui-pass]')){
-      const l=document.createElement('link');
-      l.rel='stylesheet';
-      l.href='./v2-site-ui-pass.css?v=1';
-      l.setAttribute('data-v2-site-ui-pass','1');
-      document.head.appendChild(l);
-    }
+    addCss('./v2-site-ui-pass.css?v=1','data-v2-site-ui-pass');
+    if(isRoster)addCss('./v2-roster-decramp.css?v=1','data-v2-roster-decramp');
     const sub=document.querySelector('.brandSub');
     if(sub)sub.textContent='Made By TheRealNodder for Everyone!';
   }
   function addCredit(){
     const title=document.querySelector('.brandTitle');
-    if(!title||document.querySelector('.brandCredit'))return;
+    const sub=document.querySelector('.brandSub');
+    if(!title||document.querySelector('.brandCredit')||/Made By TheRealNodder/i.test(sub?.textContent||''))return;
     const credit=document.createElement('div');
     credit.className='brandCredit';
     credit.textContent='Made By TheRealNodder';
