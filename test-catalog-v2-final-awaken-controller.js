@@ -1,6 +1,7 @@
 /* test-catalog-v2-final-awaken-controller.js
    Final desktop/sidebar/card awaken controller.
    Captures awaken clicks before older bridge handlers so the selected state does not flash back to 5★.
+   Preserves each card's selected awaken state when changing characters.
    No mobile, data, sorting, card rendering, or badge-count changes.
 */
 (function(){
@@ -13,10 +14,13 @@
   function isDesktop(){return window.innerWidth>=BREAKPOINT;}
   function selectedCard(){return q('#catalogGrid .unitCard.v2-selected')||q('#catalogGrid .unitCard');}
   function cardKey(card){return String(card?.getAttribute('data-id')||card?.getAttribute('data-source-id')||card?.getAttribute('data-family')||q('.unitName',card)?.textContent||'').trim();}
-  function idxFrom(btn){const n=Number(btn?.dataset?.v2Idx??btn?.dataset?.awakenIndex??btn?.getAttribute('data-idx')??0);return Number.isFinite(n)?Math.max(0,Math.min(2,Math.floor(n))):0;}
+  function clamp(v){const n=Number(v);return Number.isFinite(n)?Math.max(0,Math.min(2,Math.floor(n))):0;}
+  function idxFrom(btn){return clamp(btn?.dataset?.v2Idx??btn?.dataset?.awakenIndex??btn?.getAttribute('data-idx')??0);}
+  function currentVisualIndex(card){return clamp(q('.stateRow .stateBtn.active',card)?.getAttribute('data-idx')??q('.unitThumb img',card)?.getAttribute('data-state')??card?.getAttribute('data-duo-index')??0);}
   function imgsFor(card){try{return JSON.parse(decodeURIComponent(q('.stateRow',card)?.getAttribute('data-imgs')||q('.unitThumb img',card)?.getAttribute('data-imgs')||'[]')).filter(Boolean);}catch{return[];}}
   function lock(card,idx){
     if(!card)return;
+    idx=clamp(idx);
     const key=cardKey(card);
     if(key)lockedByCard.set(key,idx);
     lastCardKey=key;
@@ -25,14 +29,15 @@
   }
   function lockedIndex(card, fallback=0){
     const key=cardKey(card);
-    const attr=Number(card?.getAttribute('data-v2-locked-state-index'));
-    if(Number.isFinite(attr))return Math.max(0,Math.min(2,Math.floor(attr)));
-    if(key&&lockedByCard.has(key))return lockedByCard.get(key);
-    if(key&&key===lastCardKey)return lastIndex;
-    return fallback;
+    const attrRaw=card?.getAttribute('data-v2-locked-state-index');
+    if(attrRaw!==null&&attrRaw!==undefined&&attrRaw!=='')return clamp(attrRaw);
+    if(key&&lockedByCard.has(key))return clamp(lockedByCard.get(key));
+    if(key&&key===lastCardKey)return clamp(lastIndex);
+    return clamp(fallback);
   }
   function setActive(idx,card){
     if(!card)return;
+    idx=clamp(idx);
     lock(card,idx);
     qa('#v2AwakenTabs button').forEach((btn,i)=>{
       const on=i===idx;
@@ -65,6 +70,13 @@
     [0,40,120,260,520,900].forEach(delay=>setTimeout(()=>setActive(idx,card),delay));
     requestAnimationFrame(()=>setActive(idx,card));
   }
+  function selectCardState(card){
+    if(!card)return 0;
+    const visual=currentVisualIndex(card);
+    const idx=lockedIndex(card,visual);
+    lock(card,idx);
+    return idx;
+  }
   function handle(event){
     if(!isDesktop())return;
     const sidebarBtn=event.target.closest('#v2AwakenTabs button');
@@ -86,12 +98,29 @@
     if(!isDesktop())return;
     const card=selectedCard();
     if(!card)return;
-    const active=Number(q('.stateRow .stateBtn.active',card)?.getAttribute('data-idx')??q('.unitThumb img',card)?.getAttribute('data-state')??card.getAttribute('data-duo-index')??0);
-    const idx=lockedIndex(card,Number.isFinite(active)?active:0);
-    setActive(idx,card);
+    setActive(selectCardState(card),card);
   }
+  document.addEventListener('pointerdown',event=>{
+    if(!isDesktop())return;
+    const card=event.target.closest('#catalogGrid .unitCard');
+    if(card&&!event.target.closest('.stateRow .stateBtn,.duoFormBtn')){
+      const idx=currentVisualIndex(card);
+      lock(card,idx);
+      setTimeout(()=>setActive(idx,card),90);
+      setTimeout(()=>setActive(idx,card),220);
+    }
+  },true);
   document.addEventListener('pointerdown',handle,true);
   document.addEventListener('click',handle,true);
+  document.addEventListener('click',event=>{
+    if(!isDesktop())return;
+    const card=event.target.closest('#catalogGrid .unitCard');
+    if(card&&!event.target.closest('.stateRow .stateBtn,.duoFormBtn')){
+      const idx=lockedIndex(card,currentVisualIndex(card));
+      setTimeout(()=>setActive(idx,card),110);
+      setTimeout(()=>setActive(idx,card),300);
+    }
+  },true);
   document.addEventListener('v2:hero-state-change',event=>{
     if(!isDesktop())return;
     const card=event?.detail?.card||selectedCard();
