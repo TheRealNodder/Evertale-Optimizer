@@ -14,7 +14,39 @@
   const esc = (s) => String(s ?? "")
     .replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
 
+  function injectProfileStyles() {
+    if ($("rosterProfileAdvancedStyle")) return;
+    const style = document.createElement("style");
+    style.id = "rosterProfileAdvancedStyle";
+    style.textContent = `
+      body:not(.roster-advanced-on) .profileAdvancedOnly{display:none!important;}
+      body.roster-advanced-on .profileAdvancedOnly{display:block!important;}
+      body:not(.roster-advanced-on) .rosterProfilePanel .profileGrid{grid-template-columns:repeat(auto-fit,minmax(130px,1fr))!important;}
+      .rosterProfilePanel{border-radius:18px!important;border:1px solid rgba(255,255,255,.12)!important;background:rgba(5,9,20,.42)!important;padding:12px!important;margin-top:10px!important;}
+      .rosterProfilePanelHead{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:10px!important;margin-bottom:10px!important;}
+      .profileGrid{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(130px,1fr))!important;gap:10px!important;}
+      .profileField,.profileCheck{display:flex!important;flex-direction:column!important;gap:5px!important;min-width:0!important;}
+      .profileCheck{justify-content:center!important;min-height:40px!important;}
+      .profilePreview{display:flex!important;flex-wrap:wrap!important;gap:8px!important;margin-top:10px!important;color:var(--muted,#b7c0d8)!important;}
+      .profilePreview span{border:1px solid rgba(255,255,255,.10)!important;background:rgba(255,255,255,.055)!important;border-radius:999px!important;padding:5px 8px!important;font-size:12px!important;}
+    `;
+    document.head.appendChild(style);
+  }
+
+  function isAdvancedOn() {
+    return document.body.classList.contains("roster-advanced-on");
+  }
+
+  function syncAdvancedFields() {
+    const on = isAdvancedOn();
+    document.querySelectorAll(".profileAdvancedOnly .profileInput").forEach(input => {
+      input.disabled = !on;
+      input.setAttribute("aria-disabled", String(!on));
+    });
+  }
+
   function ensureAccountPanel() {
+    injectProfileStyles();
     if ($("rosterProfileAccountPanel")) return;
 
     const status = $("statusText");
@@ -36,7 +68,7 @@
       </div>
 
       <div class="rosterAccountGrid">
-        <label class="profileField">
+        <label class="profileField profileAdvancedOnly">
           <span>Player Level</span>
           <input id="profilePlayerLevel" class="input" type="number" min="1" max="300" step="1">
         </label>
@@ -55,7 +87,7 @@
       </div>
 
       <div class="rosterDisclaimer">
-        Level scaling is still being refined. These roster values are saved as a local read-only profile layer and used by the optimizer as the best available estimate.
+        Simple mode keeps fellowship and ownership controls visible. Advanced mode opens level, boost, and ascension editing.
       </div>
     `;
 
@@ -83,11 +115,13 @@
       document.body.classList.toggle("roster-advanced-on", next);
       localStorage.setItem("evertale_roster_advanced_v1", next ? "1" : "0");
       syncAdvancedButton();
+      syncAdvancedFields();
     });
 
     $("rosterExportProfiles")?.addEventListener("click", exportProfiles);
     $("rosterImportProfilesBtn")?.addEventListener("click", () => $("rosterImportProfilesFile")?.click());
     $("rosterImportProfilesFile")?.addEventListener("change", importProfiles);
+    syncAdvancedFields();
   }
 
   function syncAdvancedButton() {
@@ -95,6 +129,7 @@
     if (!btn) return;
     const on = document.body.classList.contains("roster-advanced-on");
     btn.textContent = `Advanced: ${on ? "On" : "Off"}`;
+    btn.setAttribute("aria-pressed", String(on));
   }
 
   function saveAccountFromUi() {
@@ -151,7 +186,6 @@
     if (!id) return;
 
     const p = Store.getProfile(id);
-    const estimated = Store.estimateUnitStats(unit, p);
     const smartAsc = Store.smartAscended(p);
 
     const panel = document.createElement("div");
@@ -167,7 +201,7 @@
       </div>
 
       <div class="profileGrid">
-        <label class="profileField">
+        <label class="profileField profileAdvancedOnly">
           <span>Level</span>
           <input class="input profileInput" data-field="level" type="number" min="1" max="200" step="1" value="${esc(p.level)}">
         </label>
@@ -204,6 +238,7 @@
 
     card.appendChild(panel);
     wirePanel(panel, card, unit);
+    syncAdvancedFields();
     updatePreview(card, unit);
   }
 
@@ -227,6 +262,7 @@
   function readPanel(panel) {
     const patch = {};
     panel.querySelectorAll(".profileInput").forEach(input => {
+      if (input.disabled) return;
       const field = input.dataset.field;
       if (!field) return;
       patch[field] = input.type === "checkbox" ? input.checked : Number(input.value);
@@ -263,9 +299,11 @@
 
   function enhanceCards() {
     document.querySelectorAll(".unitCard").forEach(renderEditor);
+    syncAdvancedFields();
   }
 
   function init() {
+    injectProfileStyles();
     ensureAccountPanel();
     enhanceCards();
 
