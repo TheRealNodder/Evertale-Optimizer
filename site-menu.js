@@ -28,13 +28,43 @@
     `;
     document.head.appendChild(style);
   }
-  function addCss(href,attr){
-    if(document.querySelector(`link[${attr}]`))return;
+  function hasStylesheet(file){return Array.from(document.querySelectorAll('link[rel="stylesheet"]')).some(l=>String(l.href||l.getAttribute('href')||'').includes(file));}
+  function addCss(href,attr,file){
+    if((attr&&document.querySelector(`link[${attr}]`))||(file&&hasStylesheet(file)))return;
     const l=document.createElement('link');
     l.rel='stylesheet';
     l.href=href;
-    l.setAttribute(attr,'1');
+    if(attr)l.setAttribute(attr,'1');
     document.head.appendChild(l);
+  }
+  function addPrefetch(href,as){
+    if(!href||document.querySelector(`link[data-site-prefetch="${href}"]`))return;
+    const l=document.createElement('link');
+    l.rel='prefetch';
+    l.href=href;
+    if(as)l.as=as;
+    l.setAttribute('data-site-prefetch',href);
+    document.head.appendChild(l);
+  }
+  function schedule(fn){
+    if('requestIdleCallback' in window)requestIdleCallback(fn,{timeout:1400});
+    else setTimeout(fn,250);
+  }
+  function warmNavigation(){
+    const pages=['./index.html','./roster.html','./optimizer.html'];
+    schedule(()=>pages.forEach(p=>addPrefetch(p,'document')));
+    document.addEventListener('pointerover',e=>{
+      const a=e.target.closest('a[href]');
+      if(!a)return;
+      const href=a.getAttribute('href')||'';
+      if(/^(\.\/)?(index|roster|optimizer)\.html/.test(href))addPrefetch(href.split('#')[0],'document');
+    },{passive:true});
+    document.addEventListener('touchstart',e=>{
+      const a=e.target.closest('a[href]');
+      if(!a)return;
+      const href=a.getAttribute('href')||'';
+      if(/^(\.\/)?(index|roster|optimizer)\.html/.test(href))addPrefetch(href.split('#')[0],'document');
+    },{passive:true});
   }
   function applyV2Shell(){
     const path=String(location.pathname||'');
@@ -43,8 +73,8 @@
     if(!isRoster&&!isOptimizer)return;
     document.body.classList.add(isRoster?'page-roster-v2':'page-optimizer-v2');
     if(isOptimizer)document.body.classList.add('page-optimizer');
-    addCss('./v2-site-ui-pass.css?v=1','data-v2-site-ui-pass');
-    if(isRoster)addCss('./v2-roster-decramp.css?v=1','data-v2-roster-decramp');
+    addCss('./v2-site-ui-pass.css?v=1','data-v2-site-ui-pass','v2-site-ui-pass.css');
+    if(isRoster)addCss('./v2-roster-decramp.css?v=4','data-v2-roster-decramp','v2-roster-decramp.css');
     const sub=document.querySelector('.brandSub');
     if(sub)sub.textContent='Made By TheRealNodder for Everyone!';
   }
@@ -61,6 +91,7 @@
     injectStyles();
     applyV2Shell();
     addCredit();
+    warmNavigation();
     if(document.getElementById('siteSideMenu')) return;
     const overlay=document.createElement('div'); overlay.className='siteMenuOverlay';
     const aside=document.createElement('aside'); aside.id='siteSideMenu'; aside.className='siteSideMenu'; aside.ariaHidden='true';
@@ -75,6 +106,7 @@
     injectStyles();
     applyV2Shell();
     addCredit();
+    warmNavigation();
     const inner=document.querySelector('.topbar-inner');
     if(inner&&!document.querySelector('.siteMenuButton')){
       const b=document.createElement('button');
