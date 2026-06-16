@@ -1,9 +1,9 @@
 /* optimizerRuntimeLoader.js
    Fast runtime chunk loader.
-   - Uses the existing apkfiles/entries/runtime files.
-   - Loads chunks in parallel instead of sequentially.
+   - Uses existing apkfiles/entries/runtime files.
+   - Loads chunks in parallel.
    - Avoids Date.now cache busting so GitHub Pages/browser cache can work.
-   - De-duplicates concurrent load calls so the same large JSON is not fetched twice.
+   - De-duplicates concurrent load calls so the same JSON is not fetched twice.
    - Keeps the old window.loadOptimizerRuntime() API intact.
 */
 
@@ -14,6 +14,7 @@
   const VERSION = LIVE_CONFIG.dataVersion || LIVE_CONFIG.version || 'live';
   const BASE_PATH = LIVE_CONFIG.runtimeBase || './apkfiles/entries/runtime';
   const HEAVY_CHUNKS = new Set(['abilityGraph', 'optimizerKnowledge']);
+  const FAST_OPTIMIZER_CHUNKS = new Set(['weapons', 'accessories']);
 
   let manifestPromise = null;
   let runtimeLoadPromise = null;
@@ -89,7 +90,9 @@
     runtimeLoadPromise = (async () => {
       const manifest = await getManifest();
       const chunks = Object.entries(manifest.chunks || {});
-      const selected = chunks.filter(([key]) => !(skipHeavy && HEAVY_CHUNKS.has(key)));
+      const selected = skipHeavy
+        ? chunks.filter(([key]) => FAST_OPTIMIZER_CHUNKS.has(key))
+        : chunks.filter(([key]) => !HEAVY_CHUNKS.has(key));
 
       await Promise.all(selected.map(([key, info]) => loadOptimizerRuntimeChunk(BASE_PATH, key, info)));
 
@@ -99,6 +102,7 @@
       console.log('[OptimizerRuntime] loaded', {
         chunks: Object.keys(window.OptimizerRuntime.chunks),
         skippedHeavy: skipHeavy,
+        fastChunksOnly: skipHeavy,
         loadedHeavy: window.OptimizerRuntime.loadedHeavy,
         errors: window.OptimizerRuntime.errors
       });
