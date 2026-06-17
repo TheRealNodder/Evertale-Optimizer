@@ -1,6 +1,7 @@
 /* test-catalog-v2-state-descriptions.js
    Description-only bridge for live Catalog.
    Card selection no longer inherits another card's awaken state.
+   Sidebar awaken hydration follows the fast selected-card authority.
 */
 (function(){
   const FAMILY_BUNDLE = './apkfiles/entries/bundles/character_families.bundle.json';
@@ -12,8 +13,9 @@
   const qs = (sel, root=document) => root.querySelector(sel);
   const qsa = (sel, root=document) => Array.from(root.querySelectorAll(sel));
   const key = value => String(value || '').toLowerCase().replace(/\d+$/,'').replace(/[^a-z0-9]+/g,'');
-  const selectedCard = () => qs('#catalogGrid .unitCard.v2-selected') || qs('#catalogGrid .unitCard');
   const cardId = card => String(card?.getAttribute('data-id') || card?.getAttribute('data-source-id') || card?.getAttribute('data-family') || qs('.unitName',card)?.textContent || '').trim();
+  function cardById(id){return id?qs(`#catalogGrid .unitCard[data-id="${CSS.escape(id)}"]`)||qs(`#catalogGrid .unitCard[data-source-id="${CSS.escape(id)}"]`)||qs(`#catalogGrid .unitCard[data-family="${CSS.escape(id)}"]`):null;}
+  const selectedCard = () => cardById(window.__EVERTALE_FAST_SELECTED_CARD_ID) || cardById(qs('#v2AwakenTabs')?.dataset?.v2ActiveCard) || qs('#catalogGrid .unitCard.v2-selected') || qs('#catalogGrid .unitCard');
 
   function imgKeyFromCard(card){
     const src = qs('.unitThumb img', card)?.getAttribute('src') || qs('.unitThumb img', card)?.src || '';
@@ -27,9 +29,10 @@
   }
 
   function rememberIndex(value, card){
-    const id = cardId(card || selectedCard());
+    const target = card || selectedCard();
+    const id = cardId(target);
     if(!id) return;
-    forcedByCard.set(id, clampIndex(value, card || selectedCard()));
+    forcedByCard.set(id, clampIndex(value, target));
   }
 
   function stateIndex(card){
