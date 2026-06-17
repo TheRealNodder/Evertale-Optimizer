@@ -1,9 +1,15 @@
 /* catalog-click-fast-authority.js
-   Loaded live sidebar authority. Kept at this path because index.html already loads it last.
-   Grid renders cards; this script alone owns selection, sidebar awaken state, hero, stats, skills, and descriptions.
+   Loaded live desktop sidebar authority. Kept at this path because index.html already loads it last.
+   Grid renders cards; this script owns desktop selection, sidebar awaken state, hero, stats, skills, and descriptions.
    Performance rules: no document-wide MutationObserver, no per-click bundle refetch, no layout mutation.
+   Mobile exits immediately so the mobile popup/detail flow remains untouched.
 */
 (function(){
+  if(!window.matchMedia('(min-width: 821px)').matches){
+    window.__EVERTALE_DESKTOP_SIDEBAR_AUTHORITY_SKIPPED_ON_MOBILE = true;
+    return;
+  }
+
   const FAMILY_BUNDLE='./apkfiles/entries/bundles/character_families.bundle.json';
   const state={selectedId:'',activeDetail:'leader',awakenById:new Map(),descMap:null,descPromise:null,raf:0,pendingCard:null,renderSeq:0};
   const $=id=>document.getElementById(id);
