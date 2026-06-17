@@ -1,12 +1,11 @@
 /* test-catalog-v2-state-descriptions.js
-   Description-only bridge for Test Catalog V2.
-   Reads awaken-state descriptions from character_families.bundle.json.
+   Description-only bridge for live Catalog.
+   Card selection no longer inherits another card's awaken state.
 */
 (function(){
   const FAMILY_BUNDLE = './apkfiles/entries/bundles/character_families.bundle.json';
   let familyMap = null;
-  let forcedIndex = null;
-  let forcedUntil = 0;
+  const forcedByCard = new Map();
   let pendingTimer = null;
   let lastWriteKey = '';
 
@@ -14,6 +13,7 @@
   const qsa = (sel, root=document) => Array.from(root.querySelectorAll(sel));
   const key = value => String(value || '').toLowerCase().replace(/\d+$/,'').replace(/[^a-z0-9]+/g,'');
   const selectedCard = () => qs('#catalogGrid .unitCard.v2-selected') || qs('#catalogGrid .unitCard');
+  const cardId = card => String(card?.getAttribute('data-id') || card?.getAttribute('data-source-id') || card?.getAttribute('data-family') || qs('.unitName',card)?.textContent || '').trim();
 
   function imgKeyFromCard(card){
     const src = qs('.unitThumb img', card)?.getAttribute('src') || qs('.unitThumb img', card)?.src || '';
@@ -21,21 +21,20 @@
   }
 
   function clampIndex(value, card){
-    const count = Math.max(qsa('#v2AwakenTabs button').length, qsa('.stateRow .stateBtn', card || document).length, 3);
+    const count = Math.max(qsa('.stateRow .stateBtn:not(.v2-state-hidden)', card || document).length, qsa('.stateRow .stateBtn', card || document).length, 1);
     const n = Number(value);
     return Number.isFinite(n) ? Math.max(0, Math.min(count - 1, Math.floor(n))) : 0;
   }
 
   function rememberIndex(value, card){
-    forcedIndex = clampIndex(value, card || selectedCard());
-    forcedUntil = Date.now() + 1200;
+    const id = cardId(card || selectedCard());
+    if(!id) return;
+    forcedByCard.set(id, clampIndex(value, card || selectedCard()));
   }
 
   function stateIndex(card){
-    if(forcedIndex !== null && Date.now() < forcedUntil) return clampIndex(forcedIndex, card);
-    const active = qs('#v2AwakenTabs button.active') || qs('#v2AwakenTabs button[aria-pressed="true"]');
-    const tabIndex = active?.dataset?.v2Idx ?? active?.dataset?.awakenIndex;
-    if(tabIndex !== undefined && tabIndex !== null && tabIndex !== '') return clampIndex(tabIndex, card);
+    const id = cardId(card);
+    if(id && forcedByCard.has(id)) return clampIndex(forcedByCard.get(id), card);
     return clampIndex(qs('.stateRow .stateBtn.active', card)?.dataset?.idx || qs('.unitThumb img', card)?.dataset?.state || card?.getAttribute('data-duo-index') || 0, card);
   }
 
@@ -46,7 +45,7 @@
 
   async function loadFamilies(){
     if(familyMap) return familyMap;
-    const res = await fetch(FAMILY_BUNDLE, { cache:'no-store' });
+    const res = await fetch(FAMILY_BUNDLE, { cache:'default' });
     const json = await res.json();
     const map = new Map();
     (Array.isArray(json?.entries) ? json.entries : []).forEach(entry => {
@@ -94,7 +93,7 @@
     host.textContent = next;
   }
 
-  function storeRowsOnCard(card, rows, idx, description){
+  function storeRowsOnCard(card, rows, description){
     const panel = qs('.descriptionPanel', card);
     if(panel && panel.getAttribute('data-v2-state-description-ready') !== '1'){
       try{ panel.setAttribute('data-descriptions', encodeURIComponent(JSON.stringify(rows))); }catch{}
@@ -102,9 +101,6 @@
     }
     const desc = qs('.descriptionText', card);
     if(desc && desc.textContent !== (description || '')) desc.textContent = description || '';
-    const img = qs('.unitThumb img', card);
-    if(img && img.getAttribute('data-state') !== String(idx)) img.setAttribute('data-state', String(idx));
-    if(card?.getAttribute('data-duo-index') !== String(idx)) card?.setAttribute('data-duo-index', String(idx));
   }
 
   async function hydrate(){
@@ -114,10 +110,10 @@
     if(!rows.length) return;
     const idx = Math.min(stateIndex(card), rows.length - 1);
     const description = rows[idx]?.description || 'No description loaded for this state.';
-    const writeKey = `${card.getAttribute('data-source-id') || card.getAttribute('data-family') || ''}|${idx}|${description}`;
+    const writeKey = `${cardId(card)}|${idx}|${description}`;
     if(writeKey === lastWriteKey) return;
     lastWriteKey = writeKey;
-    storeRowsOnCard(card, rows, idx, description);
+    storeRowsOnCard(card, rows, description);
     setTextNode(qs('#v2Desc'), description);
     if(qs('#v2SidebarDetailTabs button.active')?.dataset?.sidebarDetail === 'description') setTextNode(qs('#v2SidebarDetailPanel'), description);
     if(qs('.v2-detail-tab-btn.active')?.getAttribute('data-v2-detail-kind') === 'description') setTextNode(qs('.v2-detail-scroll-panel'), description);
@@ -127,18 +123,13 @@
     clearTimeout(pendingTimer);
     pendingTimer = setTimeout(() => hydrate().catch(console.warn), delay);
   }
-  function scheduleBackup(){ setTimeout(() => hydrate().catch(console.warn), 240); }
-  function scheduleStable(){ schedule(35); scheduleBackup(); }
+  function scheduleStable(){ schedule(35); setTimeout(() => hydrate().catch(console.warn), 240); }
 
   function captureIndexFromEvent(event){
-    const card = selectedCard();
     const sidebarBtn = event.target.closest('#v2AwakenTabs button');
-    if(sidebarBtn){
-      rememberIndex(sidebarBtn.dataset.v2Idx ?? sidebarBtn.dataset.awakenIndex ?? Array.from(sidebarBtn.parentNode.children).indexOf(sidebarBtn), card);
-      return;
-    }
+    if(sidebarBtn){ rememberIndex(sidebarBtn.dataset.v2Idx ?? sidebarBtn.dataset.awakenIndex ?? Array.from(sidebarBtn.parentNode.children).indexOf(sidebarBtn), selectedCard()); return; }
     const stateBtn = event.target.closest('.stateRow .stateBtn');
-    if(stateBtn) rememberIndex(stateBtn.dataset.idx ?? Array.from(stateBtn.parentNode.children).indexOf(stateBtn), stateBtn.closest('.unitCard') || card);
+    if(stateBtn) rememberIndex(stateBtn.dataset.idx ?? Array.from(stateBtn.parentNode.children).indexOf(stateBtn), stateBtn.closest('.unitCard') || selectedCard());
   }
 
   window.addEventListener('pointerdown', event => {
@@ -146,10 +137,8 @@
   }, true);
 
   window.addEventListener('click', event => {
-    if(event.target.closest('#v2AwakenTabs button,.stateRow .stateBtn,#catalogGrid .unitCard,.duoFormBtn,#v2SidebarDetailTabs button,.v2-detail-tab-btn')){
-      captureIndexFromEvent(event);
-      scheduleStable();
-    }
+    if(event.target.closest('#v2AwakenTabs button,.stateRow .stateBtn')) captureIndexFromEvent(event);
+    if(event.target.closest('#v2AwakenTabs button,.stateRow .stateBtn,#catalogGrid .unitCard,.duoFormBtn,#v2SidebarDetailTabs button,.v2-detail-tab-btn')) scheduleStable();
   }, true);
 
   document.addEventListener('v2:hero-state-change', event => {
