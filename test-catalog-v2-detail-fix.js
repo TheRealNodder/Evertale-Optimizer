@@ -16,10 +16,28 @@
     const style=document.createElement('style');
     style.id='v2-detail-fix-style';
     style.textContent=`
-      body.page-catalog-v2 #catalogGrid .unitCard .skillMini,
-      body.page-catalog-v2 #catalogGrid .unitCard .v2-detail-btn{display:none!important;}
-      body.page-catalog-v2 #catalogGrid .unitCard .stateRow,
-      body.page-catalog-v2 #catalogGrid .unitCard .duoFormBtn{display:flex!important;}
+      @media (min-width:821px){
+        body.page-catalog-v2 #catalogGrid .unitCard .skillMini,
+        body.page-catalog-v2 #catalogGrid .unitCard .v2-detail-btn{display:none!important;}
+        body.page-catalog-v2 #catalogGrid .unitCard .stateRow,
+        body.page-catalog-v2 #catalogGrid .unitCard .duoFormBtn{display:flex!important;}
+      }
+      @media (max-width:820px){
+        body.page-catalog-v2 #catalogGrid .unitCard .v2-detail-btn{display:inline-flex!important;}
+        body.page-catalog-v2 #catalogGrid .unitCard .skillMini button[data-v2-skill]{display:none!important;}
+        body.page-catalog-v2 #catalogGrid .unitCard .stateRow,
+        body.page-catalog-v2 #catalogGrid .unitCard .duoFormBtn{display:flex!important;}
+        body.page-catalog-v2 .v2-detail-backdrop .stateRow{
+          display:flex!important;
+          flex-direction:row!important;
+          flex-wrap:nowrap!important;
+          justify-content:center!important;
+          align-items:center!important;
+          gap:8px!important;
+          width:100%!important;
+        }
+        body.page-catalog-v2 .v2-detail-backdrop .stateRow .stateBtn{flex:0 0 auto!important;}
+      }
       body.page-catalog-v2 .v2-detail-backdrop{
         position:fixed!important;inset:0!important;z-index:3000!important;display:none!important;
         align-items:center!important;justify-content:center!important;padding:22px!important;
@@ -113,6 +131,16 @@
         const pop=popState.closest('.v2-detail-backdrop');
         const host=pop?.closest('.unitCard');
         if(host){setHostCardState(host,popState.dataset.idx||0);ensureDetailPopover(host);try{pop.showPopover();}catch{}}
+        return;
+      }
+      const detailBtn=e.target.closest('#catalogGrid .unitCard .v2-detail-btn');
+      if(detailBtn){
+        const card=detailBtn.closest('.unitCard');
+        if(card){
+          e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();
+          card.classList.add('v2-selected');
+          openDetail(card);
+        }
         return;
       }
       const card=e.target.closest('#catalogGrid .unitCard');
