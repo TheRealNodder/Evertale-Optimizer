@@ -1,7 +1,5 @@
-/* test-catalog-v2-source-badge-authority.js
-   Single badge/state authority for Test Catalog V2.
-   Runs before desktop layout scripts so cards/sidebar start from one rule set.
-   Boss rules are intentionally not customized yet.
+/* Lightweight badge/state authority for live Catalog.
+   Removed document-wide MutationObserver and capture click rescans.
 */
 (function(){
   const STATE_LABELS=['5★','6★','FA'];
@@ -21,7 +19,6 @@
       body.page-catalog-v2 .unitCard[data-kind="accessories"] .tag.element,
       body.page-catalog-v2 #v2AwakenTabs[data-v2-kind="weapons"],
       body.page-catalog-v2 #v2AwakenTabs[data-v2-kind="accessories"]{display:none!important;}
-      body.page-catalog-v2 #v2AwakenTabs button[data-sidebar-synthetic="1"],
       body.page-catalog-v2 #v2AwakenTabs button.v2-state-hidden,
       body.page-catalog-v2 .stateRow .stateBtn.v2-state-hidden{display:none!important;visibility:hidden!important;pointer-events:none!important;}
       body.page-catalog-v2 #v2Pills[data-v2-kind="weapons"],
@@ -31,7 +28,9 @@
   }
   function imageRows(card){try{return JSON.parse(decodeURIComponent(q('.stateRow',card)?.getAttribute('data-imgs')||q('.unitThumb img',card)?.getAttribute('data-imgs')||'[]')).filter(Boolean).slice(0,3);}catch{return[];}}
   function applyCard(card){
-    const kind=card?.getAttribute('data-kind')||'';
+    if(!card||card.dataset.v2BadgeAuthorityDone==='1')return;
+    card.dataset.v2BadgeAuthorityDone='1';
+    const kind=card.getAttribute('data-kind')||'';
     if(!kind||kind==='bosses')return;
     const kindTag=q('.tag.kind',card);if(kindTag)kindTag.textContent=kindLabel(kind);
     if(kind==='weapons'||kind==='accessories'){qa('.tag.element',card).forEach(n=>n.remove());q('.stateRow',card)?.remove();return;}
@@ -42,30 +41,9 @@
       qa('.stateBtn',row).forEach((btn,i)=>{const show=i<count;btn.classList.toggle('v2-state-hidden',!show);btn.hidden=!show;btn.setAttribute('aria-label',STATE_LABELS[i]||`State ${i+1}`);});
     }
   }
-  function sidebarCard(){return q('#catalogGrid .unitCard.v2-selected')||q('#catalogGrid .unitCard');}
-  function syncSidebar(){
-    const card=sidebarCard();if(!card)return;
-    const kind=card.getAttribute('data-kind')||'';if(!kind||kind==='bosses')return;
-    const pills=q('#v2Pills');
-    if(pills){
-      pills.dataset.v2Kind=kind;
-      const rarity=q('.tag.rarity',card)?.textContent?.trim()||'Rarity';
-      let html=`<span class="v2-sidebar-badge" data-sidebar-badge="kind">${kindLabel(kind)}</span>`;
-      if(kind==='characters')html+=`<span class="v2-sidebar-badge" data-sidebar-badge="element">${q('.tag.element',card)?.textContent?.trim()||'Element'}</span>`;
-      html+=`<span class="v2-sidebar-badge" data-sidebar-badge="rarity">${rarity}</span>`;
-      if(pills.innerHTML!==html)pills.innerHTML=html;
-    }
-    const tabs=q('#v2AwakenTabs');if(!tabs)return;
-    tabs.dataset.v2Kind=kind;
-    if(kind==='weapons'||kind==='accessories')return;
-    const count=Math.max(1,Math.min(rarityLimit(card),imageRows(card).length||1,3));
-    qa('button',tabs).forEach((btn,i)=>{const show=i<count&&!btn.dataset.sidebarSynthetic;btn.classList.toggle('v2-state-hidden',!show);btn.hidden=!show;btn.setAttribute('aria-label',STATE_LABELS[i]||`State ${i+1}`);});
-  }
-  let t=null;
-  function run(){inject();qa('#catalogGrid .unitCard').forEach(applyCard);syncSidebar();}
-  function schedule(delay=0){clearTimeout(t);t=setTimeout(run,delay);}
-  document.addEventListener('DOMContentLoaded',()=>{run();setTimeout(run,80);setTimeout(run,260);});
-  document.addEventListener('click',e=>{if(e.target.closest('#catalogGrid,.stateBtn,.duoFormBtn,#v2AwakenTabs'))schedule(0);},true);
-  document.addEventListener('change',e=>{if(e.target.closest('#catalogType,#catalogSort'))setTimeout(run,0);},true);
-  new MutationObserver(()=>schedule(0)).observe(document.documentElement,{childList:true,subtree:true});
+  function syncVisible(){inject();qa('#catalogGrid .unitCard').forEach(applyCard);}
+  document.addEventListener('DOMContentLoaded',()=>setTimeout(syncVisible,0));
+  document.addEventListener('click',e=>{const card=e.target.closest('#catalogGrid .unitCard');if(card)applyCard(card);},true);
+  document.addEventListener('change',e=>{if(e.target.closest('#catalogType,#catalogSort'))setTimeout(syncVisible,0);},true);
+  window.addEventListener('scroll',()=>{if(!syncVisible._t)syncVisible._t=requestAnimationFrame(()=>{syncVisible._t=0;syncVisible();});},{passive:true});
 })();
