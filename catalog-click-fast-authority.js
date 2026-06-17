@@ -22,7 +22,10 @@
   function setText(id,value){const n=$(id);if(n&&n.textContent!==String(value??''))n.textContent=String(value??'');}
   function cardId(card){return String(card?.getAttribute('data-id')||card?.getAttribute('data-source-id')||card?.getAttribute('data-family')||text('.unitName',card)||'').trim();}
   function findCard(id){return id?q(`#catalogGrid .unitCard[data-id="${CSS.escape(id)}"]`)||q(`#catalogGrid .unitCard[data-source-id="${CSS.escape(id)}"]`)||q(`#catalogGrid .unitCard[data-family="${CSS.escape(id)}"]`):null;}
-  function selectedCard(){return findCard(state.selectedId)||findCard(window.__EVERTALE_CATALOG_SELECTED_ID)||findCard(window.__EVERTALE_FAST_SELECTED_CARD_ID)||q('#catalogGrid .unitCard.v2-selected')||q('#catalogGrid .unitCard');}
+  function selectedCard(){
+    const id=String(window.__EVERTALE_CATALOG_SELECTED_ID||state.selectedId||'').trim();
+    return findCard(id)||null;
+  }
   function stat(card,k){return q(`.stat[data-stat="${k}"] .statVal`,card)?.textContent?.trim()||'—';}
   function readRows(card,type){try{const rows=JSON.parse(decodeURIComponent(card?.getAttribute(type==='active'?'data-active-skills':'data-passive-skills')||''));return Array.isArray(rows)?rows:[];}catch{return[];}}
   function currentIndex(card){const id=cardId(card);if(id&&state.awakenById.has(id))return clampIndex(state.awakenById.get(id),card);return clampIndex(q('.stateRow .stateBtn.active',card)?.getAttribute('data-idx')||q('.unitThumb img',card)?.getAttribute('data-state')||card?.getAttribute('data-duo-index')||0,card);}
@@ -135,7 +138,7 @@
 
   document.addEventListener('click',event=>{
     const sidebarBtn=event.target.closest('#v2AwakenTabs button');
-    if(sidebarBtn){event.preventDefault();event.stopImmediatePropagation();setCardState(selectedCard(),sidebarBtn.dataset.v2Idx??sidebarBtn.dataset.awakenIndex??0);return;}
+    if(sidebarBtn){event.preventDefault();event.stopImmediatePropagation();const card=selectedCard();if(card)setCardState(card,sidebarBtn.dataset.v2Idx??sidebarBtn.dataset.awakenIndex??0);return;}
     const detailTab=event.target.closest('.v2-detail-tab-btn');
     if(detailTab){event.preventDefault();event.stopImmediatePropagation();state.activeDetail=detailTab.getAttribute('data-v2-detail-kind')||'leader';renderBase(selectedCard());return;}
     const cardStateBtn=event.target.closest('#catalogGrid .unitCard .stateRow .stateBtn');
@@ -146,5 +149,10 @@
   },true);
 
   document.addEventListener('pointerup',event=>{const card=event.target.closest('#catalogGrid .unitCard');if(card&&!event.target.closest('.stateRow .stateBtn,.duoFormBtn,[data-v2-skill],button,input,select,a'))select(card);},{passive:true});
-  document.addEventListener('DOMContentLoaded',()=>setTimeout(()=>select(selectedCard()),350));
+  document.addEventListener('DOMContentLoaded',()=>{
+    setTimeout(()=>{
+      const seeded=selectedCard();
+      if(seeded)select(seeded);
+    },350);
+  });
 })();
