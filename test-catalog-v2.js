@@ -1,5 +1,6 @@
 /* Live Catalog lightweight hero bridge.
    Removed per-click bundle fetching, delayed reselect timers, and MutationObserver rescans.
+   Sidebar awaken controls resolve through the fast selected-card authority.
 */
 (function(){
   const $=id=>document.getElementById(id);
@@ -13,6 +14,8 @@
   function skillHtml(card,type){const rows=readRows(card,type);return rows.length?rows.map(s=>`<p><strong>${safe(s.name||s.id||'Skill')}</strong>${s.tu||s.sp!==undefined?`<br><span>${safe([s.tu?`${s.tu} TU`:'',s.sp!==undefined?`${Number(s.sp)>0?'+':''}${s.sp} SP`:''].filter(Boolean).join(' • '))}</span>`:''}<br>${safe(s.description||s.desc||'No description loaded.')}</p>`).join(''):'<p>No skills loaded.</p>';}
   function leaderHtml(card){return `<p><strong>${safe(text('.leaderName',card)||'Leader Skill')}</strong><br>${safe(text('.leaderDesc',card)||'No leader skill loaded.')}</p>`;}
   function descHtml(card){return `<p>${safe(card?.getAttribute('data-description')||text('.descriptionText',card)||$('v2Desc')?.textContent||'No description loaded.')}</p>`;}
+  function cardById(id){return id?q(`#catalogGrid .unitCard[data-id="${CSS.escape(id)}"]`)||q(`#catalogGrid .unitCard[data-source-id="${CSS.escape(id)}"]`)||q(`#catalogGrid .unitCard[data-family="${CSS.escape(id)}"]`):null;}
+  function cardId(card){return String(card?.getAttribute('data-id')||card?.getAttribute('data-source-id')||card?.getAttribute('data-family')||text('.unitName',card)||'');}
   function ensureSidebarDetails(){
     const description=q('.v2-description');if(!description)return null;
     let head=q('.v2-desc-head',description);if(!head){head=document.createElement('div');head.className='v2-desc-head';description.insertBefore(head,description.firstChild);}
@@ -33,6 +36,7 @@
   function activeIdx(card){return Number(q('.stateRow .stateBtn.active',card)?.getAttribute('data-idx')||q('.unitThumb img',card)?.getAttribute('data-state')||card?.getAttribute('data-duo-index')||0)||0;}
   function setHero(card){
     if(!card)return;
+    window.__EVERTALE_FAST_SELECTED_CARD_ID=cardId(card);
     const src=q('.unitThumb img',card)?.getAttribute('src')||q('.unitThumb img',card)?.src||'';
     const host=$('v2FeatureArt');
     if(host&&src){const img=q('img',host);if(img){if(img.getAttribute('src')!==src)img.setAttribute('src',src);}else host.innerHTML=`<img src="${src}" alt="" loading="lazy" decoding="async">`;}
@@ -43,16 +47,16 @@
     if(pills){const html=qa('.chipCol .tag,.slotBadges .tag',card).map(x=>`<span class="v2-pill">${safe(x.textContent.trim())}</span>`).join('');if(pills.innerHTML!==html)pills.innerHTML=html;}
     ['hp','atk','spd','cost'].forEach(k=>setText('v2'+k[0].toUpperCase()+k.slice(1),q(`.stat[data-stat="${k}"] .statVal`,card)?.textContent?.trim()||'—'));
     const tabs=$('v2AwakenTabs');
-    const btns=qa('.stateRow .stateBtn',card).filter(b=>!b.hidden);
-    if(tabs){const idx=activeIdx(card);const html=btns.length?btns.map((_,i)=>`<button type="button" class="${i===idx?'active':''}" data-v2-idx="${i}" data-awaken-index="${i}" aria-pressed="${i===idx?'true':'false'}">${i+1}</button>`).join(''):'';if(tabs.innerHTML!==html)tabs.innerHTML=html;}
+    const btns=qa('.stateRow .stateBtn',card).filter(b=>!b.hidden&&!b.classList.contains('v2-state-hidden'));
+    if(tabs){const idx=activeIdx(card);const html=btns.length?btns.map((_,i)=>`<button type="button" class="${i===idx?'active':''}" data-v2-idx="${i}" data-awaken-index="${i}" aria-pressed="${i===idx?'true':'false'}">${i+1}</button>`).join(''):'';if(tabs.innerHTML!==html)tabs.innerHTML=html;tabs.dataset.v2ActiveCard=cardId(card);}
     setText('v2Desc',card.getAttribute('data-description')||'No description loaded.');
     renderSidebar(card,activeSidebarDetailKind);
   }
-  function selectedCard(){return q('#catalogGrid .unitCard.v2-selected')||q('#catalogGrid .unitCard');}
+  function selectedCard(){return cardById(window.__EVERTALE_FAST_SELECTED_CARD_ID)||cardById($('v2AwakenTabs')?.dataset?.v2ActiveCard)||q('#catalogGrid .unitCard.v2-selected')||q('#catalogGrid .unitCard');}
   function selectCard(card){if(!card)return;qa('#catalogGrid .unitCard.v2-selected').forEach(c=>{if(c!==card)c.classList.remove('v2-selected');});card.classList.add('v2-selected');setHero(card);}
   function setCardState(card,idx){
-    const row=q('.stateRow',card),img=q('.unitThumb img',card);let imgs=[];try{imgs=JSON.parse(decodeURIComponent(row?.getAttribute('data-imgs')||img?.getAttribute('data-imgs')||'[]'));}catch{}
-    idx=Math.max(0,Math.min(Number(idx)||0,Math.max(imgs.length-1,0)));
+    const row=q('.stateRow',card),img=q('.unitThumb img',card);let imgs=[];try{imgs=JSON.parse(decodeURIComponent(row?.getAttribute('data-imgs')||img?.getAttribute('data-imgs')||'[]')).filter(Boolean);}catch{}
+    idx=Math.max(0,Math.min(Number(idx)||0,Math.max(imgs.length-1,qa('.stateRow .stateBtn',card).length-1,0)));
     if(img&&imgs[idx]){img.setAttribute('src',imgs[idx]);img.setAttribute('data-state',String(idx));}
     qa('.stateRow .stateBtn',card).forEach((b,i)=>b.classList.toggle('active',i===idx));
     card.setAttribute('data-duo-index',String(idx));
