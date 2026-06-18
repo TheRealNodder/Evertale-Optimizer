@@ -18,6 +18,47 @@
   const safe=v=>String(v??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replace(/\n/g,'<br>');
   const key=v=>String(v||'').toLowerCase().replace(/\d+$/,'').replace(/[^a-z0-9]+/g,'');
 
+  function injectVisualStateCss(){
+    if(document.getElementById('catalog-desktop-badge-active-visuals'))return;
+    const style=document.createElement('style');
+    style.id='catalog-desktop-badge-active-visuals';
+    style.textContent=`
+      @media (min-width:821px){
+        body.page-catalog-v2 #catalogGrid .unitCard .stateRow .stateBtn{
+          opacity:.54!important;
+          filter:saturate(.8) brightness(.82)!important;
+          border:1px solid rgba(255,255,255,.18)!important;
+          background:rgba(255,255,255,.08)!important;
+          box-shadow:inset 0 1px 0 rgba(255,255,255,.10)!important;
+          transition:opacity .12s ease,filter .12s ease,box-shadow .12s ease,transform .12s ease!important;
+        }
+        body.page-catalog-v2 #catalogGrid .unitCard .stateRow .stateBtn.active,
+        body.page-catalog-v2 #catalogGrid .unitCard .stateRow .stateBtn[aria-pressed="true"]{
+          opacity:1!important;
+          filter:saturate(1.35) brightness(1.14)!important;
+          border-color:rgba(255,255,255,.72)!important;
+          background:linear-gradient(145deg,color-mix(in srgb,var(--element-primary,var(--v2-theme-trim,#f6ca5e)) 84%,#fff 16%),var(--element-primary,var(--v2-theme-trim,#f6ca5e)),color-mix(in srgb,var(--element-secondary,#a855f7) 78%,#111827 22%))!important;
+          box-shadow:0 0 0 2px rgba(255,255,255,.22),0 0 18px color-mix(in srgb,var(--element-primary,var(--v2-theme-trim,#f6ca5e)) 56%,transparent),inset 0 1px 0 rgba(255,255,255,.30)!important;
+          transform:translateY(-1px)!important;
+        }
+        body.page-catalog-v2 #catalogGrid .unitCard.v2-selected .stateRow .stateBtn.active,
+        body.page-catalog-v2 #catalogGrid .unitCard.v2-selected .stateRow .stateBtn[aria-pressed="true"]{
+          box-shadow:0 0 0 2px rgba(255,255,255,.32),0 0 24px color-mix(in srgb,var(--element-primary,var(--v2-theme-trim,#f6ca5e)) 70%,transparent),inset 0 1px 0 rgba(255,255,255,.35)!important;
+        }
+        body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-detail-tab-btn{
+          opacity:.72!important;
+          filter:saturate(.9) brightness(.9)!important;
+        }
+        body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-detail-tab-btn.active,
+        body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-detail-tab-btn[aria-pressed="true"]{
+          opacity:1!important;
+          filter:saturate(1.28) brightness(1.1)!important;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
   function text(sel,root=document){return q(sel,root)?.textContent?.trim()||'';}
   function setText(id,value){const n=$(id);if(n&&n.textContent!==String(value??''))n.textContent=String(value??'');}
   function cardId(card){return String(card?.getAttribute('data-id')||card?.getAttribute('data-source-id')||card?.getAttribute('data-family')||text('.unitName',card)||'').trim();}
@@ -180,6 +221,7 @@
 
   document.addEventListener('pointerup',event=>{const card=event.target.closest('#catalogGrid .unitCard');if(card&&!event.target.closest('.stateRow .stateBtn,.duoFormBtn,[data-v2-skill],button,input,select,a'))select(card);},{passive:true});
   document.addEventListener('DOMContentLoaded',()=>{
+    injectVisualStateCss();
     setTimeout(()=>{
       const seeded=selectedCard();
       if(seeded)select(seeded);
