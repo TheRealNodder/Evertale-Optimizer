@@ -72,6 +72,11 @@
   function clampIndex(value,card){const count=Math.max(visibleStateButtons(card||document).length,qa('.stateRow .stateBtn',card||document).length,1);const n=Number(value);return Number.isFinite(n)?Math.max(0,Math.min(count-1,Math.floor(n))):0;}
   function cardKeys(card){const src=q('.unitThumb img',card)?.getAttribute('src')||q('.unitThumb img',card)?.src||'';const imgKey=key(String(src).split('/').pop()?.replace(/\.png(?:\?.*)?$/i,''));return [card?.getAttribute('data-family'),card?.getAttribute('data-duo-root'),card?.getAttribute('data-duo-active-id'),card?.getAttribute('data-source-id'),card?.getAttribute('data-id'),imgKey,text('.unitName',card),text('.unitTitle',card)].map(key).filter(Boolean);}
 
+  function notifyStructureState(card,idx){
+    if(!card)return;
+    try{document.dispatchEvent(new CustomEvent('v2:hero-state-change',{detail:{card,index:idx}}));}catch{}
+  }
+
   function syncCardState(card,requestedIdx=currentIndex(card),writeImage=false){
     if(!card)return 0;
     const id=cardId(card);
@@ -203,6 +208,7 @@
     if(!card)return;
     const activeIdx=syncCardState(card,idx,true);
     syncSidebarAwakenTabs(activeIdx);
+    notifyStructureState(card,activeIdx);
     renderBase(card);
   }
 
