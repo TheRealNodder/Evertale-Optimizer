@@ -11,12 +11,14 @@
   }
 
   const FAMILY_BUNDLE='./apkfiles/entries/bundles/character_families.bundle.json';
-  const state={selectedId:'',activeDetail:'leader',awakenById:new Map(),descMap:null,descPromise:null,raf:0,pendingCard:null,renderSeq:0};
+  const STATE_LABELS=['5★','6★','FA'];
+  const state={selectedId:'',activeDetail:'leader',awakenById:new Map(),descMap:null,descPromise:null,raf:0,pendingCard:null,renderSeq:0,stateObserver:null,syncRaf:0};
   const $=id=>document.getElementById(id);
   const q=(s,r=document)=>r.querySelector(s);
   const qa=(s,r=document)=>Array.from(r.querySelectorAll(s));
   const safe=v=>String(v??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replace(/\n/g,'<br>');
   const key=v=>String(v||'').toLowerCase().replace(/\d+$/,'').replace(/[^a-z0-9]+/g,'');
+  const stateLabel=i=>STATE_LABELS[i]||`State ${i+1}`;
 
   function injectVisualStateCss(){
     if(document.getElementById('catalog-desktop-badge-active-visuals'))return;
@@ -25,25 +27,31 @@
     style.textContent=`
       @media (min-width:821px){
         body.page-catalog-v2 #catalogGrid .unitCard .stateRow .stateBtn{
-          opacity:.54!important;
-          filter:saturate(.8) brightness(.82)!important;
-          border:1px solid rgba(255,255,255,.18)!important;
-          background:rgba(255,255,255,.08)!important;
-          box-shadow:inset 0 1px 0 rgba(255,255,255,.10)!important;
+          opacity:.45!important;
+          filter:saturate(.72) brightness(.78)!important;
+          border:1px solid rgba(255,255,255,.16)!important;
+          background:rgba(255,255,255,.075)!important;
+          box-shadow:inset 0 1px 0 rgba(255,255,255,.08)!important;
+          color:#fff!important;
+          font-size:11px!important;
+          font-weight:950!important;
+          letter-spacing:.01em!important;
+          line-height:1!important;
+          text-indent:0!important;
           transition:opacity .12s ease,filter .12s ease,box-shadow .12s ease,transform .12s ease!important;
         }
         body.page-catalog-v2 #catalogGrid .unitCard .stateRow .stateBtn.active,
         body.page-catalog-v2 #catalogGrid .unitCard .stateRow .stateBtn[aria-pressed="true"]{
           opacity:1!important;
-          filter:saturate(1.35) brightness(1.14)!important;
-          border-color:rgba(255,255,255,.72)!important;
+          filter:saturate(1.45) brightness(1.18)!important;
+          border-color:rgba(255,255,255,.76)!important;
           background:linear-gradient(145deg,color-mix(in srgb,var(--element-primary,var(--v2-theme-trim,#f6ca5e)) 84%,#fff 16%),var(--element-primary,var(--v2-theme-trim,#f6ca5e)),color-mix(in srgb,var(--element-secondary,#a855f7) 78%,#111827 22%))!important;
-          box-shadow:0 0 0 2px rgba(255,255,255,.22),0 0 18px color-mix(in srgb,var(--element-primary,var(--v2-theme-trim,#f6ca5e)) 56%,transparent),inset 0 1px 0 rgba(255,255,255,.30)!important;
+          box-shadow:0 0 0 2px rgba(255,255,255,.22),0 0 22px color-mix(in srgb,var(--element-primary,var(--v2-theme-trim,#f6ca5e)) 68%,transparent),inset 0 1px 0 rgba(255,255,255,.32)!important;
           transform:translateY(-1px)!important;
         }
         body.page-catalog-v2 #catalogGrid .unitCard.v2-selected .stateRow .stateBtn.active,
         body.page-catalog-v2 #catalogGrid .unitCard.v2-selected .stateRow .stateBtn[aria-pressed="true"]{
-          box-shadow:0 0 0 2px rgba(255,255,255,.32),0 0 24px color-mix(in srgb,var(--element-primary,var(--v2-theme-trim,#f6ca5e)) 70%,transparent),inset 0 1px 0 rgba(255,255,255,.35)!important;
+          box-shadow:0 0 0 2px rgba(255,255,255,.34),0 0 28px color-mix(in srgb,var(--element-primary,var(--v2-theme-trim,#f6ca5e)) 78%,transparent),inset 0 1px 0 rgba(255,255,255,.38)!important;
         }
         body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-detail-tab-btn{
           opacity:.72!important;
@@ -72,6 +80,61 @@
   function currentIndex(card){const id=cardId(card);if(id&&state.awakenById.has(id))return clampIndex(state.awakenById.get(id),card);return clampIndex(q('.stateRow .stateBtn.active',card)?.getAttribute('data-idx')||q('.unitThumb img',card)?.getAttribute('data-state')||card?.getAttribute('data-duo-index')||0,card);}
   function clampIndex(value,card){const count=Math.max(qa('.stateRow .stateBtn:not(.v2-state-hidden)',card||document).length,qa('.stateRow .stateBtn',card||document).length,1);const n=Number(value);return Number.isFinite(n)?Math.max(0,Math.min(count-1,Math.floor(n))):0;}
   function cardKeys(card){const src=q('.unitThumb img',card)?.getAttribute('src')||q('.unitThumb img',card)?.src||'';const imgKey=key(String(src).split('/').pop()?.replace(/\.png(?:\?.*)?$/i,''));return [card?.getAttribute('data-family'),card?.getAttribute('data-duo-root'),card?.getAttribute('data-duo-active-id'),card?.getAttribute('data-source-id'),card?.getAttribute('data-id'),imgKey,text('.unitName',card),text('.unitTitle',card)].map(key).filter(Boolean);}
+
+  function imageRows(card){
+    const row=q('.stateRow',card),img=q('.unitThumb img',card);
+    try{return JSON.parse(decodeURIComponent(row?.getAttribute('data-imgs')||img?.getAttribute('data-imgs')||'[]')).filter(Boolean).slice(0,3);}catch{return[];}
+  }
+
+  function visibleStateButtons(card){
+    return qa('.stateRow .stateBtn',card).filter(b=>!b.hidden&&!b.classList.contains('v2-state-hidden'));
+  }
+
+  function syncCardStateButtons(card,requestedIdx=currentIndex(card),writeImage=false){
+    if(!card)return 0;
+    const id=cardId(card);
+    const btns=visibleStateButtons(card);
+    const imgs=imageRows(card);
+    const max=Math.max(btns.length,imgs.length,1);
+    const idx=Math.max(0,Math.min(Number(requestedIdx)||0,max-1));
+    if(id)state.awakenById.set(id,idx);
+    btns.forEach((btn,i)=>{
+      const on=i===idx;
+      const label=stateLabel(i);
+      btn.classList.toggle('active',on);
+      btn.setAttribute('aria-pressed',String(on));
+      btn.setAttribute('aria-label',label);
+      btn.dataset.v2Label=label;
+      if(btn.textContent!==label)btn.textContent=label;
+    });
+    qa('.stateRow .stateBtn',card).filter(b=>b.hidden||b.classList.contains('v2-state-hidden')).forEach((btn,i)=>{
+      btn.classList.remove('active');
+      btn.setAttribute('aria-pressed','false');
+      btn.dataset.v2Label=stateLabel(btn.dataset.idx||i);
+    });
+    const img=q('.unitThumb img',card);
+    if(writeImage&&img&&imgs[idx]){img.setAttribute('src',imgs[idx]);img.setAttribute('data-state',String(idx));}
+    card.setAttribute('data-duo-index',String(idx));
+    return idx;
+  }
+
+  function syncAllCardStateButtons(){
+    qa('#catalogGrid .unitCard').forEach(card=>syncCardStateButtons(card,currentIndex(card),false));
+  }
+
+  function scheduleStateSync(){
+    if(state.syncRaf)return;
+    state.syncRaf=requestAnimationFrame(()=>{state.syncRaf=0;syncAllCardStateButtons();});
+  }
+
+  function installCardStateObserver(){
+    const grid=$('catalogGrid');
+    if(!grid||state.stateObserver)return;
+    state.stateObserver=new MutationObserver(records=>{
+      if(records.some(r=>r.addedNodes&&r.addedNodes.length))scheduleStateSync();
+    });
+    state.stateObserver.observe(grid,{childList:true});
+  }
 
   async function loadDescMap(){
     if(state.descMap)return state.descMap;
@@ -134,6 +197,7 @@
     qa('#catalogGrid .unitCard.v2-selected').forEach(c=>{if(c!==card)c.classList.remove('v2-selected');});
     card.classList.add('v2-selected');
 
+    const activeIdx=syncCardStateButtons(card,currentIndex(card),false);
     const img=q('.unitThumb img',card);const src=img?.getAttribute('src')||img?.src||'';
     const art=$('v2FeatureArt');
     if(art&&src){const hero=q('img',art);if(hero){if(hero.getAttribute('src')!==src)hero.setAttribute('src',src);}else art.innerHTML=`<img src="${src}" alt="" loading="lazy" decoding="async">`;}
@@ -145,9 +209,9 @@
     setText('v2Hp',stat(card,'hp'));setText('v2Atk',stat(card,'atk'));setText('v2Spd',stat(card,'spd'));setText('v2Cost',stat(card,'cost'));
     const tabs=$('v2AwakenTabs');
     if(tabs){
-      const idx=currentIndex(card);
-      const btns=qa('.stateRow .stateBtn',card).filter(b=>!b.hidden&&!b.classList.contains('v2-state-hidden'));
-      const html=btns.length?btns.map((_,i)=>`<button type="button" class="${i===idx?'active':''}" data-v2-idx="${i}" data-awaken-index="${i}" aria-pressed="${i===idx?'true':'false'}">${i+1}</button>`).join(''):'';
+      const idx=activeIdx;
+      const btns=visibleStateButtons(card);
+      const html=btns.length?btns.map((_,i)=>`<button type="button" class="${i===idx?'active':''}" data-v2-idx="${i}" data-awaken-index="${i}" aria-pressed="${i===idx?'true':'false'}">${stateLabel(i)}</button>`).join(''):'';
       if(tabs.innerHTML!==html)tabs.innerHTML=html;
       tabs.dataset.v2ActiveCard=id;
     }
@@ -170,14 +234,7 @@
 
   function setCardState(card,idx){
     if(!card)return;
-    const id=cardId(card);let imgs=[];const row=q('.stateRow',card),img=q('.unitThumb img',card);
-    try{imgs=JSON.parse(decodeURIComponent(row?.getAttribute('data-imgs')||img?.getAttribute('data-imgs')||'[]')).filter(Boolean);}catch{imgs=[];}
-    const max=Math.max(imgs.length,qa('.stateRow .stateBtn',card).length,1);
-    idx=Math.max(0,Math.min(Number(idx)||0,max-1));
-    if(id)state.awakenById.set(id,idx);
-    if(img&&imgs[idx]){img.setAttribute('src',imgs[idx]);img.setAttribute('data-state',String(idx));}
-    qa('.stateRow .stateBtn',card).forEach((b,i)=>{const on=i===idx;b.classList.toggle('active',on);b.setAttribute('aria-pressed',String(on));});
-    card.setAttribute('data-duo-index',String(idx));
+    idx=syncCardStateButtons(card,idx,true);
     renderBase(card);
   }
 
@@ -213,7 +270,7 @@
     if(handleSidebarAwaken(event))return;
     if(handleSidebarDetail(event))return;
     const cardStateBtn=event.target.closest('#catalogGrid .unitCard .stateRow .stateBtn');
-    if(cardStateBtn){event.preventDefault();event.stopImmediatePropagation();setCardState(cardStateBtn.closest('.unitCard'),cardStateBtn.dataset.idx||0);return;}
+    if(cardStateBtn){event.preventDefault();event.stopPropagation();event.stopImmediatePropagation();setCardState(cardStateBtn.closest('.unitCard'),cardStateBtn.dataset.idx||0);return;}
     const card=event.target.closest('#catalogGrid .unitCard');
     if(card&&!event.target.closest('.duoFormBtn,[data-v2-skill],button,input,select,a')){select(card);return;}
     if(card&&event.target.closest('.duoFormBtn'))setTimeout(()=>select(card),0);
@@ -222,6 +279,10 @@
   document.addEventListener('pointerup',event=>{const card=event.target.closest('#catalogGrid .unitCard');if(card&&!event.target.closest('.stateRow .stateBtn,.duoFormBtn,[data-v2-skill],button,input,select,a'))select(card);},{passive:true});
   document.addEventListener('DOMContentLoaded',()=>{
     injectVisualStateCss();
+    installCardStateObserver();
+    scheduleStateSync();
+    setTimeout(scheduleStateSync,350);
+    setTimeout(scheduleStateSync,1200);
     setTimeout(()=>{
       const seeded=selectedCard();
       if(seeded)select(seeded);
