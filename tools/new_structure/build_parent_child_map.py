@@ -224,7 +224,7 @@ def main() -> int:
     parser.add_argument("--entries-root", default="apkfiles/entries")
     args = parser.parse_args()
 
-    repo = find_repo_root(Path.cwd())
+    repo = find_repo_root(Path(__file__).resolve())
     entries_root = (repo / args.entries_root).resolve() if not Path(args.entries_root).is_absolute() else Path(args.entries_root).resolve()
     maps_dir = entries_root / "maps"
     reports_dir = entries_root / "reports"

@@ -314,7 +314,7 @@ def main() -> int:
     parser.add_argument("--category", choices=CATEGORIES, default=None)
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
-    repo = find_repo_root()
+    repo = find_repo_root(Path(__file__).resolve())
     cats = [args.category] if args.category else CATEGORIES
     reports = [sync_category(repo, category, args.dry_run) for category in cats]
     summary = {"schemaVersion": 2, "generatedAt": int(time.time()), "dryRun": args.dry_run, "categories": reports}

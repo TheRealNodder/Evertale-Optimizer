@@ -50,7 +50,7 @@ def scan_obj(obj: Any, found: Dict[str, List[str]], prefix: str = ""):
 
 
 def main() -> int:
-    repo = find_repo_root(Path.cwd())
+    repo = find_repo_root(Path(__file__).resolve())
     raw_root = repo / RAW_ROOT_REL
 
     payload = {

@@ -21,8 +21,13 @@ import time
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Set
 
+from entry_checkpoint import load_marker as load_entry_marker
+from entry_checkpoint import write_marker as write_entry_marker
+
 SCRIPT_VERSION = "6-character-family-states"
+TOOL_NAME = "build_apk_entry_folders"
 IMAGEKIT_BASE = "https://ik.imagekit.io/r8fsa98s9"
+ROOT_MARKERS = ("apkfiles", "tools")
 
 OLD_WEBSITE_FILES = {
     "characters.json", "character_actives.json", "character_passives.json", "character_tags.json",
@@ -71,6 +76,14 @@ RESOLVER_FILES = {
 
 def now_int() -> int:
     return int(time.time())
+
+
+def find_repo_root(start: Path) -> Path:
+    cur = start.resolve()
+    for folder in [cur, *cur.parents]:
+        if all((folder / marker).exists() for marker in ROOT_MARKERS):
+            return folder
+    return start.resolve()
 
 
 def stable_json(data: Any) -> str:
@@ -542,7 +555,31 @@ def update_checkpoint(output_dir: Path, checkpoint: Dict[str, Any]) -> None:
     write_json_if_changed(output_dir / "reports" / "build_checkpoint.json", checkpoint)
 
 
-def build_category(input_dir: Path, output_dir: Path, category: str, resolvers: Dict[str, Dict[str, Any]], force: bool, limit: Optional[int], start_after: Optional[str]) -> Dict[str, Any]:
+def existing_index_row(entry_path: Path, category: str, order_index: int, internal_id: str, display_name: Optional[str], filename: str) -> Dict[str, Any]:
+    existing = try_load_json(entry_path) or {}
+    if not isinstance(existing, dict):
+        existing = {}
+    return {
+        "order": order_index,
+        "sourceId": internal_id,
+        "name": existing.get("name") or display_name or internal_id,
+        "file": f"entries/{filename}",
+        "placeholder": bool(existing.get("placeholder")),
+        "image": existing.get("image") or image_url(category, internal_id),
+    }
+
+
+def build_category(
+    repo_root: Path,
+    input_dir: Path,
+    output_dir: Path,
+    category: str,
+    resolvers: Dict[str, Dict[str, Any]],
+    force: bool,
+    limit: Optional[int],
+    start_after: Optional[str],
+    resume: bool,
+) -> Dict[str, Any]:
     raw_path = find_file(input_dir, CATEGORY_FILES[category])
     if not raw_path:
         return {"category": category, "status": "missing_raw_file", "entriesWritten": 0, "entriesSkipped": 0, "placeholdersWritten": 0}
@@ -561,23 +598,43 @@ def build_category(input_dir: Path, output_dir: Path, category: str, resolvers: 
     category_dir = output_dir / category
     entries_dir = category_dir / "entries"
     entries_dir.mkdir(parents=True, exist_ok=True)
+    effective_start_after = start_after
+    resume_marker = None
+    if resume and not force and not start_after:
+        resume_marker = load_entry_marker(repo_root, TOOL_NAME, category)
+        if resume_marker and resume_marker.get("status") == "partial" and resume_marker.get("lastSourceId"):
+            effective_start_after = str(resume_marker["lastSourceId"])
+
     index_entries = []
     written = skipped = placeholders = processed_this_run = 0
-    start_allowed = start_after is None
-    checkpoint = {"scriptVersion": SCRIPT_VERSION, "category": category, "status": "running", "startedAt": now_int(), "lastCompletedSourceId": None, "lastCompletedOrder": None}
+    last_completed_source_id: Optional[str] = None
+    last_completed_order: Optional[int] = None
+    limit_reached = False
+    start_allowed = effective_start_after is None
+    checkpoint = {"scriptVersion": SCRIPT_VERSION, "category": category, "status": "running", "startedAt": now_int(), "lastCompletedSourceId": None, "lastCompletedOrder": None, "resumeFromSourceId": effective_start_after}
     update_checkpoint(output_dir, checkpoint)
+    write_entry_marker(
+        repo_root,
+        TOOL_NAME,
+        category,
+        status="started",
+        processed_count=0,
+        total_count=len(ordered),
+        extra={"force": force, "resume": resume, "resumeFromSourceId": effective_start_after, "limit": limit},
+    )
     for order_index, (internal_id, display_name) in enumerate(ordered, start=1):
         filename = f"{order_index:04d}_{slugify(internal_id)}.json"
         entry_path = entries_dir / filename
         item = by_id.get(internal_id)
         marker = build_source_marker(item, category, internal_id, order_index, display_name, resolvers)
         if not start_allowed:
-            if internal_id == start_after:
+            if internal_id == effective_start_after:
                 start_allowed = True
-            index_entries.append({"order": order_index, "sourceId": internal_id, "name": display_name or internal_id, "file": f"entries/{filename}", "placeholder": item is None, "image": image_url(category, internal_id)})
+            index_entries.append(existing_index_row(entry_path, category, order_index, internal_id, display_name, filename))
             continue
         if limit is not None and processed_this_run >= limit:
-            index_entries.append({"order": order_index, "sourceId": internal_id, "name": display_name or internal_id, "file": f"entries/{filename}", "placeholder": item is None, "image": image_url(category, internal_id)})
+            limit_reached = True
+            index_entries.append(existing_index_row(entry_path, category, order_index, internal_id, display_name, filename))
             continue
         if existing_marker_matches(entry_path, marker, force):
             skipped += 1
@@ -598,15 +655,44 @@ def build_category(input_dir: Path, output_dir: Path, category: str, resolvers: 
             image = entry.get("image")
         index_entries.append({"order": order_index, "sourceId": internal_id, "name": entry_name, "file": f"entries/{filename}", "placeholder": is_placeholder, "image": image})
         processed_this_run += 1
+        last_completed_source_id = internal_id
+        last_completed_order = order_index
         checkpoint.update({"lastCompletedSourceId": internal_id, "lastCompletedOrder": order_index, "updatedAt": now_int(), "written": written, "skipped": skipped, "placeholders": placeholders})
         update_checkpoint(output_dir, checkpoint)
+        write_entry_marker(
+            repo_root,
+            TOOL_NAME,
+            category,
+            status="partial",
+            last_key=internal_id,
+            last_source_id=internal_id,
+            last_handle=order_index,
+            last_file=f"entries/{filename}",
+            processed_count=order_index,
+            total_count=len(ordered),
+            extra={"written": written, "skipped": skipped, "placeholders": placeholders, "force": force, "resume": resume},
+        )
     write_json_if_changed(category_dir / "index.json", {"schemaVersion": 2, "category": category, "count": len(index_entries), "source": str(raw_path), "entries": index_entries})
     family_report = None
     if category == "characters":
         family_report = build_character_family_files(output_dir, ordered, by_id, resolvers)
-    checkpoint.update({"status": "complete", "finishedAt": now_int(), "written": written, "skipped": skipped, "placeholders": placeholders})
+    final_status = "partial" if limit_reached else "complete"
+    checkpoint.update({"status": final_status, "finishedAt": now_int(), "written": written, "skipped": skipped, "placeholders": placeholders, "limitReached": limit_reached})
     update_checkpoint(output_dir, checkpoint)
-    return {"category": category, "status": "ok", "rawFile": str(raw_path), "rawEntries": len(items), "totalEntries": len(ordered), "entriesWritten": written, "entriesSkipped": skipped, "processedThisRun": processed_this_run, "placeholdersWrittenOrUpdated": placeholders, "familyReport": family_report}
+    write_entry_marker(
+        repo_root,
+        TOOL_NAME,
+        category,
+        status=final_status,
+        last_key=last_completed_source_id or "",
+        last_source_id=last_completed_source_id or "",
+        last_handle=last_completed_order,
+        last_file="",
+        processed_count=(last_completed_order or 0) if limit_reached else len(ordered),
+        total_count=len(ordered),
+        extra={"written": written, "skipped": skipped, "placeholders": placeholders, "force": force, "resume": resume, "limitReached": limit_reached},
+    )
+    return {"category": category, "status": "partial" if limit_reached else "ok", "rawFile": str(raw_path), "rawEntries": len(items), "totalEntries": len(ordered), "entriesWritten": written, "entriesSkipped": skipped, "processedThisRun": processed_this_run, "placeholdersWrittenOrUpdated": placeholders, "resumedFromMarker": bool(effective_start_after and not start_after), "effectiveStartAfter": effective_start_after, "limitReached": limit_reached, "familyReport": family_report}
 
 
 def main() -> int:
@@ -617,14 +703,16 @@ def main() -> int:
     parser.add_argument("--category", choices=["characters", "weapons", "accessories", "bosses"], default=None)
     parser.add_argument("--limit", type=int, default=None)
     parser.add_argument("--start-after", default=None)
+    parser.add_argument("--no-resume", action="store_true", help="Ignore partial marker files and start from the beginning.")
     args = parser.parse_args()
+    repo_root = find_repo_root(Path(__file__).resolve())
     input_dir = Path(args.input).resolve()
     output_dir = Path(args.output).resolve()
     resolvers = load_resolvers(input_dir)
     categories = [args.category] if args.category else ["characters", "weapons", "accessories", "bosses"]
-    report = {"schemaVersion": 2, "scriptVersion": SCRIPT_VERSION, "generatedAt": now_int(), "input": str(input_dir), "output": str(output_dir), "categories": []}
+    report = {"schemaVersion": 3, "scriptVersion": SCRIPT_VERSION, "generatedAt": now_int(), "input": str(input_dir), "output": str(output_dir), "force": args.force, "resume": not args.no_resume, "categories": []}
     for category in categories:
-        report["categories"].append(build_category(input_dir, output_dir, category, resolvers, args.force, args.limit, args.start_after))
+        report["categories"].append(build_category(repo_root, input_dir, output_dir, category, resolvers, args.force, args.limit, args.start_after, not args.no_resume))
     write_json_if_changed(output_dir / "reports" / "build_report.json", report)
     print(json.dumps(report, ensure_ascii=False, indent=2))
     return 0

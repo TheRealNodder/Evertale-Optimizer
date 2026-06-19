@@ -26,14 +26,10 @@ Generated: 2026-05-27 04:52:01
    - Provides a stable way for pages to load derived runtime data.
    - Keeps raw + derived merge logic separate from raw files.
 
-6. Patched `stat-test.html`.
-   - It now loads `live-data-config.js` and `runtime-data-bridge.js`.
-
 ## Suggestions
 
 - Keep `apkfiles/entries` immutable.
 - Put all reverse-engineered calibration data under `apkfiles/derived`.
-- Do not regenerate `stat-test.html` wholesale again. Patch only the engine block or loader block.
 - If GitHub Pages cache ever sticks, update only `window.EVERTALE_LIVE_CONFIG.version`.
 
 

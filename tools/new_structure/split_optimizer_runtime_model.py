@@ -56,7 +56,7 @@ def count_payload(value: Any) -> int:
 
 
 def main() -> int:
-    repo = find_repo_root(Path.cwd())
+    repo = find_repo_root(Path(__file__).resolve())
     runtime_dir = repo / RUNTIME_REL
     source_path = runtime_dir / SOURCE_FILE
     model = load_json(source_path)

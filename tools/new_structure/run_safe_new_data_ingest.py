@@ -14,14 +14,11 @@ REPORT_REL = "apkfiles/entries/reports/safe_new_data_ingest_report.json"
 PIPELINE_SCRIPT = "run_entry_pipeline.py"
 
 FAST_POST_PIPELINE_STEPS = [
+    "extract_optimizer_knowledge.py",
+    "build_optimizer_ability_graph.py",
     "build_optimizer_runtime_model.py",
     "split_optimizer_runtime_model.py",
     "runtime_optimizer_trace.py",
-]
-
-FULL_AUDIT_STEPS = [
-    "deep_dependency_audit.py --include-name-hits",
-    "export_quarantine_plan.py",
 ]
 
 ORDER_REPORTS = {
@@ -134,17 +131,18 @@ def main() -> int:
     parser.add_argument("--raw", default=None, help="Input folder containing Monster.json, Weapon.json, Equipment.json, Boss.json. Defaults to ./apkfiles when --extract is used.")
     parser.add_argument("--extract", action="store_true", help="Run extraction from apkfiles/raw game JSON before rebuilding bundles.")
     parser.add_argument("--force", action="store_true", help="Pass --force into run_entry_pipeline.py extraction step.")
+    parser.add_argument("--no-resume", action="store_true", help="Ignore partial extraction markers. Used only with --extract.")
     parser.add_argument("--skip-post-checks", action="store_true", help="Only run the entry pipeline; skip runtime rebuild/checks.")
-    parser.add_argument("--full-audit", action="store_true", help="Also run slow deep_dependency_audit.py and export_quarantine_plan.py.")
+    parser.add_argument("--full-audit", action="store_true", help="Compatibility flag; audit-only tools were removed from the operational pipeline.")
     parser.add_argument("--dry-run", action="store_true", help="Print intended commands without running them.")
     args = parser.parse_args()
 
-    repo = find_repo_root(Path.cwd())
+    repo = find_repo_root(Path(__file__).resolve())
     tools_dir = repo / "tools" / "new_structure"
     report_path = repo / REPORT_REL
 
     input_folder = Path(args.raw).resolve() if args.raw else (repo / "apkfiles")
-    should_extract = bool(args.extract or args.raw or args.force)
+    should_extract = bool(args.extract or args.raw or args.force or args.no_resume)
 
     steps: List[Dict[str, Any]] = []
     pipeline_cmd = [sys.executable, str(tools_dir / PIPELINE_SCRIPT)]
@@ -153,6 +151,8 @@ def main() -> int:
         pipeline_cmd.extend(["--raw", str(input_folder)])
     if args.force:
         pipeline_cmd.append("--force")
+    if args.no_resume:
+        pipeline_cmd.append("--no-resume")
 
     final_code = 0
     started = int(time.time())
@@ -164,8 +164,6 @@ def main() -> int:
 
     if final_code == 0 and not args.skip_post_checks:
         post_steps = list(FAST_POST_PIPELINE_STEPS)
-        if args.full_audit:
-            post_steps.extend(FULL_AUDIT_STEPS)
         for raw_step in post_steps:
             result = run_command(repo, step_command(tools_dir, raw_step), raw_step.split()[0], args.dry_run)
             steps.append(result)
@@ -184,12 +182,15 @@ def main() -> int:
         "inputFolder": str(input_folder) if should_extract else None,
         "force": args.force,
         "fullAudit": args.full_audit,
+        "fullAuditDeprecated": bool(args.full_audit),
+        "resume": not args.no_resume,
         "rules": [
             "Existing canonical order is preserved.",
             "New entries are appended by sync_category_order_canonical.py.",
             "This wrapper does not delete, quarantine, or overwrite unrelated data.",
             "Runtime outputs are rebuilt after ingest so the site uses the new extracted data.",
-            "Deep dependency audit is intentionally opt-in via --full-audit because it is slow.",
+            "Operational rebuilds regenerate optimizer knowledge, ability graph, runtime model, runtime chunks, and trace report.",
+            "--full-audit is accepted for compatibility but no longer runs deleted audit-only scripts.",
             "Fresh game JSON files are expected in apkfiles by default when extraction is requested."
         ],
         "steps": steps,
@@ -201,7 +202,6 @@ def main() -> int:
             "Review this report first.",
             "Run local server from repo root: python -m http.server 8000.",
             "Test index.html, roster.html, optimizer.html, and test-catalog-v2.html.",
-            "Run with --full-audit only before quarantine/removal decisions.",
             "Only commit/push after local pages work."
         ],
     }

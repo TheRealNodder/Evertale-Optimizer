@@ -82,6 +82,7 @@ def main() -> int:
     parser.add_argument("--category", choices=["characters", "weapons", "accessories", "bosses"], default=None)
     parser.add_argument("--limit", type=int, default=None)
     parser.add_argument("--start-after", default=None)
+    parser.add_argument("--no-resume", action="store_true", help="Ignore partial extraction markers and start from the beginning.")
     args = parser.parse_args()
 
     base = Path(args.base).expanduser().resolve()
@@ -122,6 +123,8 @@ def main() -> int:
         command.extend(["--limit", str(args.limit)])
     if args.start_after:
         command.extend(["--start-after", args.start_after])
+    if args.no_resume:
+        command.append("--no-resume")
 
     print("Detected raw input folder:", input_dir)
     print("Output folder:", output_dir)

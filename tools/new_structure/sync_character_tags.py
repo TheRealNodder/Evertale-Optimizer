@@ -73,7 +73,7 @@ def write_marker(repo: Path, report_payload: Dict[str, Any]) -> None:
 
 
 def main() -> int:
-    repo = find_repo_root(Path.cwd())
+    repo = find_repo_root(Path(__file__).resolve())
     primary = repo / "data/character_tags.json"
     additions = repo / "data/character_tags_additions.json"
     report = repo / "apkfiles/entries/reports/tag_sync_report.json"

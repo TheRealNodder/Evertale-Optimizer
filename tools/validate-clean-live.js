@@ -7,7 +7,6 @@ const required = [
   'index.html',
   'roster.html',
   'optimizer.html',
-  'stat-test.html',
   'live-data-config.js',
   'runtime-data-bridge.js',
   'optimizerRuntimeLoader.js',

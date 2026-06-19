@@ -226,7 +226,7 @@ def main() -> int:
     )
     args = parser.parse_args()
 
-    repo = find_repo_root(Path.cwd())
+    repo = find_repo_root(Path(__file__).resolve())
     scans = [scan_file(repo, rel_path) for rel_path in OPTIMIZER_FILES]
     index = build_symbol_index(scans)
     script_chain = detect_script_chain(scans)

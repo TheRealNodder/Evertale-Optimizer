@@ -11,6 +11,9 @@ Fresh game-data extraction from apkfiles:
 Force extraction from apkfiles:
   python tools/new_structure/MASTER_CONTROL.py --extract --force
 
+Ignore partial resume markers but keep unchanged-entry hash skips:
+  python tools/new_structure/MASTER_CONTROL.py --extract --no-resume
+
 Custom input folder, if ever needed:
   python tools/new_structure/MASTER_CONTROL.py --extract --input ./apkfiles
 """
@@ -86,6 +89,8 @@ def build_safe_ingest_command(repo: Path, args: argparse.Namespace) -> List[str]
         command.append("--force")
     if args.full_audit:
         command.append("--full-audit")
+    if args.no_resume:
+        command.append("--no-resume")
     if args.dry_run:
         command.append("--dry-run")
     return command
@@ -99,14 +104,17 @@ def main() -> int:
     parser.add_argument("--input", help="Optional input folder. Defaults to ./apkfiles when --extract is used.")
     parser.add_argument("--raw", dest="input", help=argparse.SUPPRESS)
     parser.add_argument("--force", action="store_true", help="Force extraction rebuild. Requires --extract.")
-    parser.add_argument("--full-audit", action="store_true", help="Run full dependency/audit checks through safe ingest.")
+    parser.add_argument("--no-resume", action="store_true", help="Ignore partial extraction markers. Requires --extract.")
+    parser.add_argument("--full-audit", action="store_true", help="Compatibility flag; audit-only scripts are no longer part of the operational pipeline.")
     parser.add_argument("--dry-run", action="store_true", help="Print planned steps without running them.")
     args = parser.parse_args()
 
     if args.force and not args.extract:
         raise SystemExit("ERROR: --force requires --extract.")
+    if args.no_resume and not args.extract:
+        raise SystemExit("ERROR: --no-resume requires --extract.")
 
-    repo = find_repo_root()
+    repo = find_repo_root(Path(__file__).resolve())
     safe_ingest = repo / SAFE_INGEST_REL
     if not safe_ingest.exists():
         raise FileNotFoundError(f"Missing safe ingest runner: {safe_ingest}")
@@ -120,12 +128,14 @@ def main() -> int:
         "mode": mode,
         "inputFolder": input_folder,
         "dryRun": bool(args.dry_run),
+        "resume": not args.no_resume,
         "steps": [],
         "notes": [
             "Default mode rebuilds existing apkfiles/entries outputs safely.",
             "Use --extract when fresh Monster.json, Weapon.json, Equipment.json, or Boss.json have been placed in apkfiles.",
             "Extraction input defaults to apkfiles, not raw.",
-            "Use --full-audit before quarantine/removal decisions.",
+            "Use --force with --extract to rebuild all entries and ignore unchanged-entry skips.",
+            "Use --no-resume with --extract to ignore partial markers while still keeping unchanged-entry hash skips.",
         ],
     }
 

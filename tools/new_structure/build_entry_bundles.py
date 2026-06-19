@@ -351,7 +351,7 @@ def main() -> int:
     parser.add_argument("--entries-root", default="apkfiles/entries")
     parser.add_argument("--bundles-root", default=None)
     args = parser.parse_args()
-    repo = find_repo_root(Path.cwd())
+    repo = find_repo_root(Path(__file__).resolve())
     entries_root = (repo / args.entries_root).resolve() if not Path(args.entries_root).is_absolute() else Path(args.entries_root).resolve()
     bundles_dir = Path(args.bundles_root).resolve() if args.bundles_root else entries_root / "bundles"
     bundles_dir.mkdir(parents=True, exist_ok=True)

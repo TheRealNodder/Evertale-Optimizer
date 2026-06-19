@@ -184,7 +184,7 @@ def build_character_links(repo: Path, ability_nodes: Dict[str, Any]) -> Dict[str
 
 
 def main() -> int:
-    repo = find_repo_root(Path.cwd())
+    repo = find_repo_root(Path(__file__).resolve())
     generated_at = int(time.time())
     built = build_ability_nodes(repo)
     links = build_character_links(repo, built["nodes"])
