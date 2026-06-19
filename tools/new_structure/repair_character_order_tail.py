@@ -48,7 +48,7 @@ def write_json(path: Path, data):
 
 
 def main() -> int:
-    repo = find_repo_root(Path.cwd())
+    repo = find_repo_root(Path(__file__).resolve())
     canonical_path = repo / CANONICAL_REL
     rows = []
     seen = set()

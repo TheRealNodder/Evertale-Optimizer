@@ -427,7 +427,7 @@ def main() -> int:
     parser.add_argument("--output", default=None, help="Output folder. Defaults to apkfiles/entries/localization.")
     args = parser.parse_args()
 
-    repo_root = find_repo_root()
+    repo_root = find_repo_root(Path(__file__).resolve())
     input_dir = find_apkfiles(repo_root, args.input)
     entries_root = find_entries(repo_root, input_dir, args.entries)
     output_dir = resolve_path(args.output, repo_root, str(entries_root / "localization")) if args.output else (entries_root / "localization").resolve()

@@ -7,7 +7,6 @@ This build keeps raw APK data immutable and wires the site into the existing `ap
 - `index.html`
 - `roster.html`
 - `optimizer.html`
-- `stat-test.html`
 
 ## Data layout
 

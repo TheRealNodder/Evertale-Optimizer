@@ -6,12 +6,13 @@
   const BREAKPOINT = 821;
   let activeKind = 'leader';
 
-  function qs(sel, root=document){ return root.querySelector(sel); }
-  function qsa(sel, root=document){ return Array.from(root.querySelectorAll(sel)); }
+  function qs(sel, root=document){ return root&&root.querySelector?root.querySelector(sel):null; }
+  function qsa(sel, root=document){ return root&&root.querySelectorAll?Array.from(root.querySelectorAll(sel)):[]; }
   function isDesktop(){ return window.innerWidth >= BREAKPOINT; }
   function safe(value){ return String(value ?? '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replace(/\n/g,'<br>'); }
   function decodeRows(value){ try { const rows = JSON.parse(decodeURIComponent(value || '')); return Array.isArray(rows) ? rows : []; } catch { return []; } }
-  function selectedCard(){ return qs('#catalogGrid .unitCard.v2-selected') || qs('#catalogGrid .unitCard'); }
+  function cardBySelectedId(){ const id = window.EvertaleCatalogV2?.getSelectedId?.() || qs('#v2AwakenTabs')?.dataset?.v2ActiveCard || ''; if(!id) return null; const esc = window.CSS&&window.CSS.escape ? window.CSS.escape(String(id)) : String(id).replace(/"/g,'\\"'); return qs(`#catalogGrid .unitCard[data-id="${esc}"],#catalogGrid .unitCard[data-source-id="${esc}"],#catalogGrid .unitCard[data-family="${esc}"]`); }
+  function selectedCard(){ return window.EvertaleCatalogV2?.selectedCard?.() || qs('#catalogGrid .unitCard.v2-selected') || cardBySelectedId(); }
 
   function injectStyle(){
     if(qs('#v2-sidebar-detail-buttons-style')) return;
@@ -140,6 +141,23 @@
     render(activeKind);
   }
 
+  let ensureRaf = 0;
+  function scheduleEnsure(){
+    if(ensureRaf) return;
+    ensureRaf = requestAnimationFrame(() => {
+      ensureRaf = 0;
+      ensure();
+    });
+  }
+
+  function watchStableSurfaces(){
+    const targets = [qs('#catalogGrid'), qs('.v2-sidebar')].filter(Boolean);
+    if(!targets.length) return false;
+    const observer = new MutationObserver(scheduleEnsure);
+    targets.forEach(target => observer.observe(target, { childList:true }));
+    return true;
+  }
+
   document.addEventListener('click', event => {
     const btn = event.target.closest('#v2SidebarDetailTabs button');
     if(!btn) return;
@@ -148,8 +166,7 @@
     render(btn.dataset.sidebarDetail || 'leader');
   }, true);
 
-  document.addEventListener('v2:hero-state-change', () => setTimeout(() => render(activeKind), 30));
-  document.addEventListener('DOMContentLoaded', () => { ensure(); setTimeout(ensure,250); setTimeout(ensure,900); setTimeout(ensure,1600); });
-  window.addEventListener('resize', () => requestAnimationFrame(() => setTimeout(ensure, 50)));
-  new MutationObserver(() => setTimeout(ensure,80)).observe(document.documentElement,{childList:true,subtree:true});
+  document.addEventListener('v2:hero-state-change', () => requestAnimationFrame(() => render(activeKind)));
+  document.addEventListener('DOMContentLoaded', () => { ensure(); setTimeout(ensure,250); setTimeout(ensure,900); setTimeout(ensure,1600); if(!watchStableSurfaces())setTimeout(watchStableSurfaces,900); });
+  window.addEventListener('resize', scheduleEnsure);
 })();

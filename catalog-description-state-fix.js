@@ -55,8 +55,15 @@
     }
     return '—';
   }
+  function selectedCard(){
+    const id=document.getElementById('v2AwakenTabs')?.dataset?.v2ActiveCard||window.EvertaleCatalogV2?.getSelectedId?.()||'';
+    const esc=id&&(window.CSS&&window.CSS.escape?window.CSS.escape(String(id)):String(id).replace(/"/g,'\\"'));
+    return window.EvertaleCatalogV2?.selectedCard?.()||
+      document.querySelector('.unitCard.v2-selected')||
+      (esc?document.querySelector(`#catalogGrid .unitCard[data-id="${esc}"],#catalogGrid .unitCard[data-source-id="${esc}"],#catalogGrid .unitCard[data-family="${esc}"]`):null);
+  }
   function fixV2HeroStats(){
-    const card=document.querySelector('.unitCard.v2-selected')||document.querySelector('.unitCard');
+    const card=selectedCard();
     if(!card||!document.getElementById('v2Hp'))return;
     document.getElementById('v2Hp').textContent=exactStat(card,'hp');
     document.getElementById('v2Atk').textContent=exactStat(card,'atk');

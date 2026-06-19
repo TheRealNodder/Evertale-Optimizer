@@ -128,7 +128,7 @@ export function reverseRawBase({
   return hi;
 }
 
-// Backwards-compatible name used by older stat-test pages.
+// Backwards-compatible name used by older debug callers.
 export const reverseRefStat200 = reverseRawBase;
 
 export function calculateMasterUnitEngine(config) {

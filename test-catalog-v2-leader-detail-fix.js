@@ -6,7 +6,16 @@
   let cache=null;
   const q=(s,r=document)=>r.querySelector(s);
   const clean=v=>String(v||'').toLowerCase().replace(/\d+$/,'').replace(/[^a-z0-9]+/g,'');
-  function card(){return q('#catalogGrid .unitCard.v2-selected')||q('#catalogGrid .unitCard');}
+  function cardById(id){
+    if(!id)return null;
+    const esc=window.CSS&&window.CSS.escape?window.CSS.escape(String(id)):String(id).replace(/"/g,'\\"');
+    return q(`#catalogGrid .unitCard[data-id="${esc}"],#catalogGrid .unitCard[data-source-id="${esc}"],#catalogGrid .unitCard[data-family="${esc}"]`);
+  }
+  function card(){
+    return window.EvertaleCatalogV2?.selectedCard?.()||
+      q('#catalogGrid .unitCard.v2-selected')||
+      cardById(window.EvertaleCatalogV2?.getSelectedId?.()||q('#v2AwakenTabs')?.dataset?.v2ActiveCard||'');
+  }
   async function data(){
     if(cache)return cache;
     try{const r=await fetch(URL,{cache:'no-store'});const j=await r.json();cache=j&&j.skills?j.skills:{};}catch{cache={};}

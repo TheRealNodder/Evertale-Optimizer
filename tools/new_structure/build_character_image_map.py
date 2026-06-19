@@ -156,7 +156,7 @@ def main() -> int:
     parser.add_argument("--entries", default=None, help="Path to apkfiles/entries. Auto-detected when omitted.")
     parser.add_argument("--image-base", default=IMAGE_BASE, help="Base URL for character PNGs.")
     args = parser.parse_args()
-    repo_root = find_repo_root(Path.cwd())
+    repo_root = find_repo_root(Path(__file__).resolve())
     entries_root = Path(args.entries).resolve() if args.entries else (repo_root / "apkfiles" / "entries").resolve()
     built = build_from_families(entries_root, args.image_base)
     applied_overrides, blocked_overrides = apply_overrides(repo_root, built["map"])

@@ -108,7 +108,7 @@ def index_tags(rows: Iterable[Dict[str, Any]]) -> Dict[str, Dict[str, Any]]:
 
 
 def main() -> int:
-    repo = find_repo_root(Path.cwd())
+    repo = find_repo_root(Path(__file__).resolve())
     entries = repo / "apkfiles" / "entries"
 
     character_families = load_json(entries / "bundles" / "character_families.bundle.json", {})

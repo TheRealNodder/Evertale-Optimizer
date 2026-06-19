@@ -129,7 +129,7 @@ def main() -> int:
     parser.add_argument("--entries", default=None, help="Path to apkfiles/entries. Auto-detected when omitted.")
     args = parser.parse_args()
 
-    repo_root = find_repo_root(Path.cwd())
+    repo_root = find_repo_root(Path(__file__).resolve())
     entries_root = Path(args.entries).resolve() if args.entries else (repo_root / "apkfiles" / "entries").resolve()
     bookmark = build_bookmark(entries_root)
     output_path = entries_root / "maps" / "entry_bookmark.json"

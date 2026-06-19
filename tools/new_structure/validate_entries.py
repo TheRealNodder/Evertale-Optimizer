@@ -191,7 +191,7 @@ def validate_markers(base: Path, warnings: List[str]) -> Dict[str, Any]:
 
 
 def validate() -> int:
-    repo_root = find_repo_root(Path.cwd())
+    repo_root = find_repo_root(Path(__file__).resolve())
     if not repo_root:
         print("ERROR: Could not locate Evertale-Optimizer repo root.")
         return 1

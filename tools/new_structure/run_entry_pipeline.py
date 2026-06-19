@@ -103,6 +103,8 @@ def run_step(repo_root: Path, tools_dir: Path, step: str, args: argparse.Namespa
             command.extend(["--base", str(Path(args.raw).resolve())])
         if args.force:
             command.append("--force")
+        if args.no_resume:
+            command.append("--no-resume")
 
     print("\n" + "=" * 72)
     print(f"STEP: {step}")
@@ -127,15 +129,16 @@ def main() -> int:
     parser.add_argument("--raw", default=None, help="Raw APK extraction base. Used only with --extract.")
     parser.add_argument("--force", action="store_true", help="Force extract_entries. Used only with --extract.")
     parser.add_argument("--extract", action="store_true", help="Run the full extraction pipeline. Default is safe rebuild without extraction.")
+    parser.add_argument("--no-resume", action="store_true", help="Ignore partial extraction markers. Used only with --extract.")
     args = parser.parse_args()
 
-    repo_root = find_repo_root(Path.cwd())
+    repo_root = find_repo_root(Path(__file__).resolve())
     tools_dir = repo_root / "tools" / "new_structure"
     reports_dir = repo_root / "apkfiles" / "entries" / "reports"
     steps = selected_steps(args)
 
-    if (args.raw or args.force) and not args.extract:
-        raise SystemExit("ERROR: --raw and --force require --extract. Safe default does not run extraction.")
+    if (args.raw or args.force or args.no_resume) and not args.extract:
+        raise SystemExit("ERROR: --raw, --force, and --no-resume require --extract. Safe default does not run extraction.")
 
     report: Dict[str, Any] = {
         "pipelineVersion": PIPELINE_VERSION,
@@ -145,7 +148,7 @@ def main() -> int:
     }
 
     final_code = 0
-    write_marker(repo_root, "started", "start", 0, len(steps), {"mode": report["mode"], "raw": args.raw, "force": args.force})
+    write_marker(repo_root, "started", "start", 0, len(steps), {"mode": report["mode"], "raw": args.raw, "force": args.force, "resume": not args.no_resume})
     for idx, step in enumerate(steps, start=1):
         write_marker(repo_root, "partial", step, idx - 1, len(steps), {"currentStep": step, "mode": report["mode"]})
         result = run_step(repo_root, tools_dir, step, args)
