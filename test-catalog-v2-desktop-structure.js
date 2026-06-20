@@ -8,8 +8,8 @@
 (function(){
   const BREAKPOINT = 821;
   const ELEMENT_COLORS = {
-    fire:['#ef4444','#f97316'], water:['#38bdf8','#2563eb'], storm:['#facc15','#f59e0b'],
-    earth:['#22c55e','#15803d'], light:['#f8fafc','#facc15'], dark:['#a855f7','#581c87']
+    fire:['#ff4a32','#ffb13b'], water:['#2d9cff','#55f0ff'], storm:['#ffd328','#7bdcff'],
+    earth:['#35d76a','#d6a34f'], light:['#fff1a8','#ffffff'], dark:['#9b5cff','#ff5fc8']
   };
   const ELEMENT_NAMES = ['Fire','Water','Storm','Earth','Light','Dark'];
   let moved = false;
@@ -131,7 +131,7 @@
   function cardBySelectedId(){const id=window.EvertaleCatalogV2?.getSelectedId?.()||qs('#v2AwakenTabs')?.dataset?.v2ActiveCard||'';if(!id)return null;const esc=window.CSS&&window.CSS.escape?window.CSS.escape(String(id)):String(id).replace(/"/g,'\\"');return qs(`#catalogGrid .unitCard[data-id="${esc}"],#catalogGrid .unitCard[data-source-id="${esc}"],#catalogGrid .unitCard[data-family="${esc}"]`);}
   function currentSelectedCard(){return window.EvertaleCatalogV2?.selectedCard?.()||qs('#catalogGrid .unitCard.v2-selected')||cardBySelectedId();}
   function selectedElement(){return normalizeElement(findElementText(currentSelectedCard()));}
-  function applySelectedElementColors(){const element=selectedElement();const pair=ELEMENT_COLORS[element]||['#f6ca5e','#a855f7'];const shell=qs('.v2-shell');const sidebar=qs('.v2-sidebar');[document.body,shell,sidebar].filter(Boolean).forEach(node=>{node.style.setProperty('--element-primary',pair[0]);node.style.setProperty('--element-secondary',pair[1]);node.setAttribute('data-selected-element',element||'unknown');});}
+  function applySelectedElementColors(){const element=selectedElement();const pair=ELEMENT_COLORS[element]||['#f6ca5e','#a855f7'];const nodes=[document.body,qs('.v2-shell'),qs('.v2-sidebar'),qs('.v2-selected-card'),qs('#v2AwakenTabs'),qs('.v2-description'),qs('.v2-detail-scroll-panel'),qs('#v2Pills')].filter(Boolean);nodes.forEach(node=>{node.style.setProperty('--element-primary',pair[0]);node.style.setProperty('--element-secondary',pair[1]);node.setAttribute('data-selected-element',element||'unknown');});qsa('#v2AwakenTabs button,#v2Pills [data-sidebar-badge="element"]').forEach(node=>node.setAttribute('data-selected-element',element||'unknown'));}
   function selectedStateCount(){
     const card=currentSelectedCard();
     const rows=window.EvertaleCatalogV2?.readStateRows?.(card)||[];
