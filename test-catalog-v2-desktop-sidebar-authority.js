@@ -142,6 +142,9 @@
         body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-feature-info{
           gap:5px!important;
           flex:0 0 auto!important;
+          height:auto!important;
+          max-height:none!important;
+          min-height:0!important;
         }
         body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-name{
           margin-top:0!important;

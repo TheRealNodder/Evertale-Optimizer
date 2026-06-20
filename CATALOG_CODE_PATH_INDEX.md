@@ -21,13 +21,15 @@ Active state/data owners:
   - Emits `v2:hero-state-change` after real state changes.
 - Card badge visibility authority: `test-catalog-v2-source-badge-authority.js?v=3`
   - Reads `data-state-rows`, not old `data-imgs`, before deciding SSR/SR visible state counts.
-- Desktop sidebar behavior authority: `catalog-click-fast-authority.js?v=37`
+- Desktop sidebar behavior authority: `catalog-click-fast-authority.js?v=38`
   - Reads `data-state-rows`.
   - Calls `EvertaleCatalogV2.applyState()` for sidebar awaken clicks.
   - Listens to `v2:hero-state-change` so card-grid state clicks refresh the sidebar.
-- Desktop layout helper: `test-catalog-v2-desktop-structure.js?v=9`
+- Desktop layout helper: `test-catalog-v2-desktop-structure.js?v=10`
   - No longer synthetic-clicks unrelated awaken buttons.
   - Uses the selected card's real state count before creating/sidebar-syncing awaken tabs.
+- Desktop sidebar visual authority: `test-catalog-v2-desktop-sidebar-authority.js?v=2`
+  - Keeps selected info at content height so the details tab row sits immediately below sidebar stats.
 - Mobile popup state guards: `test-catalog-v2-detail-fix.js?v=2` and `test-catalog-v2-mobile-detail-badge-tabs.js?v=3`
   - Use `EvertaleCatalogV2.applyState()` and `data-state-rows` instead of old `data-imgs`.
 
