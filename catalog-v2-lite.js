@@ -128,7 +128,8 @@
     return rows.filter(row=>row.image||row.description||Object.keys(row.stats||{}).length);
   }
   function statLineHtml(stats){const html=Object.entries(stats||{}).filter(([,v])=>v!==''&&v!=null).map(([k,v])=>`<div class="stat" data-stat="${k}"><span class="statLabel">${k.toUpperCase()}</span><span class="statVal">${safe(v)}</span></div>`).join('');return html||'<div class="muted">No stats loaded.</div>';}
-  function stateBtns(states){if(!Array.isArray(states)||states.length<2)return'';const enc=attrJson(states);return`<div class="stateRow" data-states="${enc}">${states.map((_,i)=>`<button type="button" class="stateBtn ${i===0?'active':''}" data-idx="${i}" aria-label="State ${i+1}"></button>`).join('')}</div>`;}
+  function stateLabel(index){return ['5\u2605','6\u2605','FA'][index]||`State ${index+1}`;}
+  function stateBtns(states){if(!Array.isArray(states)||states.length<2)return'';const enc=attrJson(states);return`<div class="stateRow" data-states="${enc}">${states.map((_,i)=>`<button type="button" class="stateBtn ${i===0?'active':''}" data-idx="${i}" data-state-label="${safe(stateLabel(i))}" aria-label="${safe(stateLabel(i))}" aria-pressed="${i===0?'true':'false'}"></button>`).join('')}</div>`;}
   function cardKey(card){return String(card?.getAttribute('data-id')||card?.getAttribute('data-source-id')||card?.getAttribute('data-family')||'');}
   function findCardByKey(key){if(!key)return null;const esc=window.CSS&&window.CSS.escape?window.CSS.escape(String(key)):String(key).replace(/"/g,'\\"');return document.querySelector(`#catalogGrid .unitCard[data-id="${esc}"],#catalogGrid .unitCard[data-source-id="${esc}"],#catalogGrid .unitCard[data-family="${esc}"]`);}
   function selectedCard(){const selected=document.querySelector('#catalogGrid .unitCard.v2-selected');if(selected)return selected;return findCardByKey(state.selectedId);}
@@ -152,7 +153,7 @@
     if(statLine)statLine.innerHTML=statLineHtml(row.stats);
     const panel=card.querySelector('.descriptionPanel');
     if(panel){panel.textContent=row.description||'';try{panel.setAttribute('data-descriptions',encodeURIComponent(JSON.stringify(rows)));}catch{}}
-    card.querySelectorAll('.stateRow .stateBtn').forEach((b,i)=>b.classList.toggle('active',i===idx));
+    card.querySelectorAll('.stateRow .stateBtn').forEach((b,i)=>{const on=i===idx;b.classList.toggle('active',on);b.setAttribute('aria-pressed',String(on));});
     if(notify)document.dispatchEvent(new CustomEvent('v2:hero-state-change',{detail:{card,index:idx,state:row}}));
     return row;
   }
