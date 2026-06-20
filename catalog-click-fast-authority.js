@@ -212,8 +212,10 @@
     const box=q('.v2-description');if(!box)return null;
     let head=q('.v2-desc-head',box);if(!head){head=document.createElement('div');head.className='v2-desc-head';box.insertBefore(head,box.firstChild);}
     let tabs=q('.v2-detail-tabs',box);if(!tabs){tabs=document.createElement('div');tabs.className='v2-detail-tabs';head.appendChild(tabs);}
-    if(!tabs.children.length){
-      tabs.innerHTML=[['leader','Leader Skill'],['active','Active Skill'],['passive','Passive Skill'],['description','Description']].map(([kind,label])=>`<button type="button" class="v2-detail-tab-btn${kind===state.activeDetail?' active':''}" data-v2-detail-kind="${kind}">${label}</button>`).join('');
+    const desired=[['leader','Leader Skill'],['active','Active'],['passive','Passive'],['description','Description']];
+    const buttons=qa('button',tabs);
+    if(buttons.length!==desired.length||desired.some(([kind,label],i)=>buttons[i]?.getAttribute('data-v2-detail-kind')!==kind||buttons[i]?.textContent?.trim()!==label)){
+      tabs.innerHTML=desired.map(([kind,label])=>`<button type="button" class="v2-detail-tab-btn${kind===state.activeDetail?' active':''}" data-v2-detail-kind="${kind}">${label}</button>`).join('');
     }
     let panel=q('.v2-detail-scroll-panel',box);if(!panel){panel=document.createElement('div');panel.className='v2-detail-scroll-panel';box.appendChild(panel);}
     return panel;

@@ -2,6 +2,14 @@
 
 This companion log records small ownership/version updates that need to be reflected in `CATALOG_CODE_PATH_INDEX.md` when the main index is next recompiled.
 
+## 2026-06-20 - Desktop details tab placement final guard
+
+Layout/ownership update:
+
+- Bumped `test-catalog-v2-desktop-structure.js` to `v=10`; it now places `.v2-description` immediately after `.v2-feature-info`, keeping the detail tabs directly below the sidebar stats.
+- Bumped `test-catalog-v2-desktop-sidebar-authority.js` to `v=2`; the selected-info block now stays content-height on desktop instead of stretching the details below the sidebar viewport.
+- Bumped `catalog-click-fast-authority.js` to `v=38`; it normalizes the detail labels to `Leader Skill`, `Active`, `Passive`, and `Description` if that script creates the row first.
+
 ## 2026-06-20 - Element-colored awaken badge illumination
 
 Visual/ownership update:
