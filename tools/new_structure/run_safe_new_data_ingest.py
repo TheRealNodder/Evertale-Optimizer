@@ -19,6 +19,7 @@ FAST_POST_PIPELINE_STEPS = [
     "build_optimizer_runtime_model.py",
     "split_optimizer_runtime_model.py",
     "runtime_optimizer_trace.py",
+    "audit_master_field_contract.py",
 ]
 
 ORDER_REPORTS = {
@@ -31,6 +32,7 @@ ORDER_REPORTS = {
 RUNTIME_MANIFEST = "apkfiles/entries/runtime/optimizer_runtime_manifest.json"
 VALIDATION_REPORT = "apkfiles/entries/reports/validation_report.json"
 ENTRY_PIPELINE_REPORT = "apkfiles/entries/reports/entry_pipeline_report.json"
+FIELD_CONTRACT_REPORT = "apkfiles/entries/reports/master_field_contract_audit_report.json"
 
 
 def find_repo_root(start: Path) -> Path:
@@ -121,6 +123,20 @@ def summarize_validation(repo: Path) -> Dict[str, Any]:
     }
 
 
+def summarize_field_contract(repo: Path) -> Dict[str, Any]:
+    payload = read_json(repo / FIELD_CONTRACT_REPORT, {}) or {}
+    return {
+        "report": FIELD_CONTRACT_REPORT,
+        "status": payload.get("status"),
+        "errorCount": int(payload.get("errorCount") or 0),
+        "warningCount": int(payload.get("warningCount") or 0),
+        "entrySummary": payload.get("entrySummary") or {},
+        "runtimeSummary": payload.get("runtimeSummary") or {},
+        "errors": payload.get("errors", [])[:100] if isinstance(payload.get("errors"), list) else payload.get("errors"),
+        "warnings": payload.get("warnings", [])[:100] if isinstance(payload.get("warnings"), list) else payload.get("warnings"),
+    }
+
+
 def step_command(tools_dir: Path, raw_step: str) -> List[str]:
     parts = raw_step.split()
     return [sys.executable, str(tools_dir / parts[0]), *parts[1:]]
@@ -189,7 +205,7 @@ def main() -> int:
             "New entries are appended by sync_category_order_canonical.py.",
             "This wrapper does not delete, quarantine, or overwrite unrelated data.",
             "Runtime outputs are rebuilt after ingest so the site uses the new extracted data.",
-            "Operational rebuilds regenerate optimizer knowledge, ability graph, runtime model, runtime chunks, and trace report.",
+            "Operational rebuilds regenerate optimizer knowledge, ability graph, runtime model, runtime chunks, trace report, and the Master Control field contract audit.",
             "--full-audit is accepted for compatibility but no longer runs deleted audit-only scripts.",
             "Fresh game JSON files are expected in apkfiles by default when extraction is requested."
         ],
@@ -198,8 +214,10 @@ def main() -> int:
         "orderSummary": summarize_order_reports(repo) if not args.dry_run else {},
         "runtimeSummary": summarize_runtime_manifest(repo) if not args.dry_run else {},
         "validationSummary": summarize_validation(repo) if not args.dry_run else {},
+        "fieldContractSummary": summarize_field_contract(repo) if not args.dry_run else {},
         "nextSteps": [
             "Review this report first.",
+            "Review apkfiles/entries/reports/master_field_contract_audit_report.json before optimizer work.",
             "Run local server from repo root: python -m http.server 8000.",
             "Test index.html, roster.html, optimizer.html, and test-catalog-v2.html.",
             "Only commit/push after local pages work."
@@ -217,6 +235,7 @@ def main() -> int:
         "report": str(report_path),
         "fullAudit": args.full_audit,
         "runtimeSummary": report["runtimeSummary"],
+        "fieldContractSummary": report["fieldContractSummary"],
     }, ensure_ascii=False, indent=2))
     return final_code
 
