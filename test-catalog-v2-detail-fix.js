@@ -24,7 +24,8 @@
       }
       @media (max-width:820px){
         body.page-catalog-v2 #catalogGrid .unitCard .v2-detail-btn{display:inline-flex!important;}
-        body.page-catalog-v2 #catalogGrid .unitCard .skillMini button[data-v2-skill]{display:none!important;}
+        body.page-catalog-v2 #catalogGrid .unitCard .skillMini button[data-v2-skill],
+        body.page-catalog-v2 #catalogGrid .unitCard .skillMini .v2-detail-btn{display:none!important;}
         body.page-catalog-v2 #catalogGrid .unitCard .duoFormBtn{display:flex!important;}
         body.page-catalog-v2 #catalogGrid .unitCard .nameBlock{
           display:flex!important;
