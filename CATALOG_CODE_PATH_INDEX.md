@@ -21,11 +21,11 @@ Active state/data owners:
   - Emits `v2:hero-state-change` after real state changes.
 - Card badge visibility authority: `test-catalog-v2-source-badge-authority.js?v=3`
   - Reads `data-state-rows`, not old `data-imgs`, before deciding SSR/SR visible state counts.
-- Desktop sidebar behavior authority: `catalog-click-fast-authority.js?v=36`
+- Desktop sidebar behavior authority: `catalog-click-fast-authority.js?v=37`
   - Reads `data-state-rows`.
   - Calls `EvertaleCatalogV2.applyState()` for sidebar awaken clicks.
   - Listens to `v2:hero-state-change` so card-grid state clicks refresh the sidebar.
-- Desktop layout helper: `test-catalog-v2-desktop-structure.js?v=8`
+- Desktop layout helper: `test-catalog-v2-desktop-structure.js?v=9`
   - No longer synthetic-clicks unrelated awaken buttons.
   - Uses the selected card's real state count before creating/sidebar-syncing awaken tabs.
 - Mobile popup state guards: `test-catalog-v2-detail-fix.js?v=2` and `test-catalog-v2-mobile-detail-badge-tabs.js?v=3`
@@ -43,7 +43,7 @@ Theme/sitewide customization update:
 
 - `seasonal-theme.js?v=5` centralizes the expanded theme registry.
 - `site-menu.js?v=8` exposes the shared theme picker and swatches.
-- `test-catalog-v2-theme.css?v=5` adds the current desktop sidebar visual pass.
+- `test-catalog-v2-theme.css?v=6` adds the current desktop sidebar visual pass and element-colored awaken badge illumination.
 - `roster.html` and `optimizer.html` now load the same `seasonal-theme.js?v=5` and `site-menu.js?v=8` as Catalog.
 
 ---

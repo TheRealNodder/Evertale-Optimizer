@@ -12,6 +12,11 @@
 
   const FAMILY_BUNDLE='./apkfiles/entries/bundles/character_families.bundle.json';
   const STATE_LABELS=['5\u2605','6\u2605','FA'];
+  const ELEMENT_COLORS={
+    fire:['#ff4a32','#ffb13b'],water:['#2d9cff','#55f0ff'],storm:['#ffd328','#7bdcff'],
+    earth:['#35d76a','#d6a34f'],light:['#fff1a8','#ffffff'],dark:['#9b5cff','#ff5fc8']
+  };
+  const ELEMENT_ALIASES={flame:'fire',ice:'water',air:'storm',wind:'storm',thunder:'storm',lightning:'storm',electric:'storm',terra:'earth',ground:'earth',life:'light',holy:'light',death:'dark',shadow:'dark'};
   const state={selectedId:'',activeDetail:'leader',awakenById:new Map(),descMap:null,descPromise:null,raf:0,pendingCard:null,renderSeq:0};
   const $=id=>document.getElementById(id);
   const q=(s,r=document)=>r.querySelector(s);
@@ -26,24 +31,55 @@
     style.id='catalog-desktop-detail-tab-active-visuals';
     style.textContent=`
       @media (min-width:821px){
-        body.page-catalog-v2 #v2AwakenTabs button{
-          opacity:.46!important;
-          filter:saturate(.7) brightness(.76)!important;
-          border:1px solid rgba(255,255,255,.16)!important;
-          background:rgba(255,255,255,.075)!important;
-          color:rgba(255,255,255,.68)!important;
-          box-shadow:inset 0 1px 0 rgba(255,255,255,.08)!important;
+        body.page-catalog-v2 #v2AwakenTabs button,
+        body.page-catalog-v2.v2-desktop-info-layout-active #v2AwakenTabs button,
+        body.page-catalog-v2 .v2-shell.v2-desktop-info-layout #v2AwakenTabs button{
+          opacity:.36!important;
+          filter:saturate(.48) brightness(.62)!important;
+          border:1px solid color-mix(in srgb,var(--element-primary,var(--v2-theme-trim,#f6ca5e)) 24%,rgba(255,255,255,.13))!important;
+          background:linear-gradient(145deg,rgba(255,255,255,.055),rgba(0,0,0,.24))!important;
+          color:rgba(255,255,255,.56)!important;
+          box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 6px 14px rgba(0,0,0,.20)!important;
+          overflow:hidden!important;
+          isolation:isolate!important;
           transform:none!important;
+          transition:opacity .12s ease,filter .12s ease,box-shadow .12s ease,transform .12s ease,border-color .12s ease!important;
+        }
+        body.page-catalog-v2 #v2AwakenTabs button::before,
+        body.page-catalog-v2.v2-desktop-info-layout-active #v2AwakenTabs button::before,
+        body.page-catalog-v2 .v2-shell.v2-desktop-info-layout #v2AwakenTabs button::before{
+          content:""!important;
+          position:absolute!important;
+          inset:2px!important;
+          border-radius:inherit!important;
+          background:transparent!important;
+          opacity:0!important;
+          pointer-events:none!important;
+          z-index:-1!important;
         }
         body.page-catalog-v2 #v2AwakenTabs button.active,
-        body.page-catalog-v2 #v2AwakenTabs button[aria-pressed="true"]{
+        body.page-catalog-v2 #v2AwakenTabs button[aria-pressed="true"],
+        body.page-catalog-v2.v2-desktop-info-layout-active #v2AwakenTabs button.active,
+        body.page-catalog-v2.v2-desktop-info-layout-active #v2AwakenTabs button[aria-pressed="true"],
+        body.page-catalog-v2 .v2-shell.v2-desktop-info-layout #v2AwakenTabs button.active,
+        body.page-catalog-v2 .v2-shell.v2-desktop-info-layout #v2AwakenTabs button[aria-pressed="true"]{
           opacity:1!important;
-          filter:saturate(1.45) brightness(1.18)!important;
-          border-color:rgba(255,255,255,.78)!important;
+          filter:saturate(1.72) brightness(1.28)!important;
+          border-color:color-mix(in srgb,var(--element-primary,var(--v2-theme-trim,#f6ca5e)) 56%,white 44%)!important;
           background:linear-gradient(145deg,color-mix(in srgb,var(--element-primary,var(--v2-theme-trim,#f6ca5e)) 84%,#fff 16%),var(--element-primary,var(--v2-theme-trim,#f6ca5e)),color-mix(in srgb,var(--element-secondary,#a855f7) 78%,#111827 22%))!important;
           color:#fff!important;
-          box-shadow:0 0 0 2px rgba(255,255,255,.26),0 0 24px color-mix(in srgb,var(--element-primary,var(--v2-theme-trim,#f6ca5e)) 74%,transparent),inset 0 1px 0 rgba(255,255,255,.34)!important;
+          text-shadow:0 1px 2px rgba(0,0,0,.68),0 0 10px rgba(255,255,255,.42)!important;
+          box-shadow:0 0 0 2px rgba(255,255,255,.30),0 0 20px color-mix(in srgb,var(--element-primary,var(--v2-theme-trim,#f6ca5e)) 86%,transparent),0 0 38px color-mix(in srgb,var(--element-secondary,#a855f7) 58%,transparent),inset 0 1px 0 rgba(255,255,255,.42)!important;
           transform:translateY(-1px)!important;
+        }
+        body.page-catalog-v2 #v2AwakenTabs button.active::before,
+        body.page-catalog-v2 #v2AwakenTabs button[aria-pressed="true"]::before,
+        body.page-catalog-v2.v2-desktop-info-layout-active #v2AwakenTabs button.active::before,
+        body.page-catalog-v2.v2-desktop-info-layout-active #v2AwakenTabs button[aria-pressed="true"]::before,
+        body.page-catalog-v2 .v2-shell.v2-desktop-info-layout #v2AwakenTabs button.active::before,
+        body.page-catalog-v2 .v2-shell.v2-desktop-info-layout #v2AwakenTabs button[aria-pressed="true"]::before{
+          background:radial-gradient(circle at 50% 50%,rgba(255,255,255,.48),color-mix(in srgb,var(--element-primary,var(--v2-theme-trim,#f6ca5e)) 42%,transparent) 42%,transparent 74%)!important;
+          opacity:.86!important;
         }
         body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-detail-tab-btn{opacity:.72!important;filter:saturate(.9) brightness(.9)!important;}
         body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-detail-tab-btn.active,
@@ -82,6 +118,31 @@
   function clampIndex(value,card){const count=stateCount(card);const n=Number(value);return Number.isFinite(n)?Math.max(0,Math.min(count-1,Math.floor(n))):0;}
   function cardKeys(card){const src=q('.unitThumb img',card)?.getAttribute('src')||q('.unitThumb img',card)?.src||'';const imgKey=key(String(src).split('/').pop()?.replace(/\.png(?:\?.*)?$/i,''));return [card?.getAttribute('data-family'),card?.getAttribute('data-duo-root'),card?.getAttribute('data-duo-active-id'),card?.getAttribute('data-source-id'),card?.getAttribute('data-id'),imgKey,text('.unitName',card),text('.unitTitle',card)].map(key).filter(Boolean);}
 
+  function normalizeElement(value){const n=String(value||'').trim().toLowerCase().replace(/[^a-z]/g,'');return ELEMENT_ALIASES[n]||n;}
+  function elementFromText(value){const raw=String(value||'');const direct=normalizeElement(raw);if(ELEMENT_COLORS[direct])return direct;return Object.keys(ELEMENT_COLORS).find(el=>new RegExp(`\\b${el}\\b`,'i').test(raw))||'';}
+  function elementFromCard(card){
+    if(!card)return '';
+    const classElement=Object.keys(ELEMENT_COLORS).find(el=>card.classList?.contains(`el-${el}`));
+    if(classElement)return classElement;
+    const candidates=[card.getAttribute('data-element'),card.dataset?.element,text('.tag.element',card),text('.unitElement',card),text('.element',card),text('[data-sidebar-badge="element"]'),text('#v2Pills [data-sidebar-badge="element"]')];
+    for(const raw of candidates){const found=elementFromText(raw);if(found)return found;}
+    return elementFromText(card.textContent);
+  }
+  function displayElement(element){return element?element[0].toUpperCase()+element.slice(1):'Element';}
+  function kindFromCard(card){const raw=String(card?.getAttribute('data-kind')||'Character').trim();return /^characters?$/i.test(raw)?'Character':raw||'Character';}
+  function rarityFromCard(card){return String(card?.getAttribute('data-rarity')||card?.dataset?.rarity||text('.tag.rarity',card)||text('.rarity',card)||'Rarity').trim()||'Rarity';}
+  function applyElementPalette(card){
+    const element=elementFromCard(card);
+    const pair=ELEMENT_COLORS[element]||['#f6ca5e','#a855f7'];
+    const nodes=[document.body,q('.v2-shell'),q('.v2-sidebar'),q('.v2-selected-card'),$('v2AwakenTabs'),q('.v2-description'),q('.v2-detail-scroll-panel'),$('v2Pills')].filter(Boolean);
+    nodes.forEach(node=>{
+      node.style.setProperty('--element-primary',pair[0]);
+      node.style.setProperty('--element-secondary',pair[1]);
+      node.setAttribute('data-selected-element',element||'unknown');
+    });
+    qa('#v2AwakenTabs button,#v2Pills [data-sidebar-badge="element"]').forEach(node=>node.setAttribute('data-selected-element',element||'unknown'));
+  }
+
   function notifyStructureState(card,idx){
     if(!card)return;
     try{document.dispatchEvent(new CustomEvent('v2:hero-state-change',{detail:{card,index:idx}}));}catch{}
@@ -119,6 +180,7 @@
       btn.setAttribute('aria-pressed',String(on));
       btn.setAttribute('data-v2-idx',String(i));
       btn.setAttribute('data-awaken-index',String(i));
+      btn.setAttribute('data-selected-element',tabs.getAttribute('data-selected-element')||document.body.getAttribute('data-selected-element')||'unknown');
     });
   }
 
@@ -182,6 +244,7 @@
     window.__EVERTALE_FAST_SELECTED_CARD_ID=id;
     qa('#catalogGrid .unitCard.v2-selected').forEach(c=>{if(c!==card)c.classList.remove('v2-selected');});
     card.classList.add('v2-selected');
+    applyElementPalette(card);
 
     const activeIdx=syncCardState(card,currentIndex(card),false);
     const img=q('.unitThumb img',card);const src=img?.getAttribute('src')||img?.src||'';
@@ -191,7 +254,13 @@
     setText('v2Name',text('.unitName',card)||'Unknown');
     setText('v2Title',text('.unitTitle',card)||'');
     const pills=$('v2Pills');
-    if(pills){const html=qa('.chipCol .tag,.slotBadges .tag',card).map(x=>`<span class="v2-pill">${safe(x.textContent.trim())}</span>`).join('');if(pills.innerHTML!==html)pills.innerHTML=html;}
+    if(pills){
+      const element=elementFromCard(card);
+      const rows=[['kind',kindFromCard(card)],['element',displayElement(element)],['rarity',rarityFromCard(card)]];
+      const html=rows.map(([kind,value])=>`<span class="v2-pill v2-sidebar-badge" data-sidebar-badge="${kind}"${kind==='element'?` data-selected-element="${element||'unknown'}"`:''}>${safe(value)}</span>`).join('');
+      if(pills.innerHTML!==html)pills.innerHTML=html;
+      applyElementPalette(card);
+    }
     setText('v2Hp',stat(card,'hp'));setText('v2Atk',stat(card,'atk'));setText('v2Spd',stat(card,'spd'));setText('v2Cost',stat(card,'cost'));
     const tabs=$('v2AwakenTabs');
     if(tabs){

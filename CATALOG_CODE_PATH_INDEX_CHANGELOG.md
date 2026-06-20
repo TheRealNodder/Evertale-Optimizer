@@ -2,6 +2,15 @@
 
 This companion log records small ownership/version updates that need to be reflected in `CATALOG_CODE_PATH_INDEX.md` when the main index is next recompiled.
 
+## 2026-06-20 - Element-colored awaken badge illumination
+
+Visual/ownership update:
+
+- Bumped `catalog-click-fast-authority.js` to `v=37`; desktop sidebar selection now exports the selected unit element palette directly onto the awaken tabs and detail sidebar before syncing active state.
+- Bumped `test-catalog-v2-desktop-structure.js` to `v=9`; its element palette now matches `test-catalog-v2-elements.css` and applies to sidebar badge nodes as well as the shell/sidebar containers.
+- Bumped `test-catalog-v2-theme.css` to `v=6`; active card and sidebar awaken badges now glow with the selected unit element colors while inactive badges stay dim.
+- Updated the inline desktop card badge lock in `index.html` to use the same active/inactive illumination values.
+
 ## 2026-06-19 - Full site audit cleanup and awaken state repair
 
 Routing/ownership update:
