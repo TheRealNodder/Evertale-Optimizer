@@ -6,6 +6,48 @@ Last indexed after current `index.html` commit: `fb1342c715998cbcd3519ae81dd7ab5
 
 ---
 
+## 2026-06-19 live audit addendum
+
+This addendum supersedes stale version numbers in the older load-order tables until the full index is regenerated.
+
+Active state/data owners:
+
+- Character state repair guard: `catalog-character-state-repair.js?v=1`
+  - Loaded after `data-loader.js` and `test-catalog-v2-state-preprocess.js`.
+  - Wraps only `EvertaleData.loadEntryCategory('characters')`.
+  - Repairs sparse/new character rows in memory from `character_image_map.json` and `character_families.bundle.json`.
+- Card renderer/state authority: `catalog-v2-lite.js?v=25`
+  - Owns `data-state-rows`, `.stateRow`, `.stateBtn`, card image/title/stats/description state changes.
+  - Emits `v2:hero-state-change` after real state changes.
+- Card badge visibility authority: `test-catalog-v2-source-badge-authority.js?v=3`
+  - Reads `data-state-rows`, not old `data-imgs`, before deciding SSR/SR visible state counts.
+- Desktop sidebar behavior authority: `catalog-click-fast-authority.js?v=36`
+  - Reads `data-state-rows`.
+  - Calls `EvertaleCatalogV2.applyState()` for sidebar awaken clicks.
+  - Listens to `v2:hero-state-change` so card-grid state clicks refresh the sidebar.
+- Desktop layout helper: `test-catalog-v2-desktop-structure.js?v=8`
+  - No longer synthetic-clicks unrelated awaken buttons.
+  - Uses the selected card's real state count before creating/sidebar-syncing awaken tabs.
+- Mobile popup state guards: `test-catalog-v2-detail-fix.js?v=2` and `test-catalog-v2-mobile-detail-badge-tabs.js?v=3`
+  - Use `EvertaleCatalogV2.applyState()` and `data-state-rows` instead of old `data-imgs`.
+
+Retired from `index.html` load order after this audit:
+
+- `test-catalog-v2-final-awaken-controller.js`
+- `test-catalog-v2.js`
+- `test-catalog-v2-state-descriptions.js`
+- `test-catalog-v2-sidebar-detail-buttons.js`
+- `test-catalog-v2-selected-detail-stability.js`
+
+Theme/sitewide customization update:
+
+- `seasonal-theme.js?v=5` centralizes the expanded theme registry.
+- `site-menu.js?v=8` exposes the shared theme picker and swatches.
+- `test-catalog-v2-theme.css?v=5` adds the current desktop sidebar visual pass.
+- `roster.html` and `optimizer.html` now load the same `seasonal-theme.js?v=5` and `site-menu.js?v=8` as Catalog.
+
+---
+
 ## 0. Strict rules for future changes
 
 1. Do not mutate unrelated systems.

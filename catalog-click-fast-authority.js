@@ -11,7 +11,7 @@
   }
 
   const FAMILY_BUNDLE='./apkfiles/entries/bundles/character_families.bundle.json';
-  const STATE_LABELS=['5★','6★','FA'];
+  const STATE_LABELS=['5\u2605','6\u2605','FA'];
   const state={selectedId:'',activeDetail:'leader',awakenById:new Map(),descMap:null,descPromise:null,raf:0,pendingCard:null,renderSeq:0};
   const $=id=>document.getElementById(id);
   const q=(s,r=document)=>r.querySelector(s);
@@ -58,18 +58,28 @@
   function cardId(card){return String(card?.getAttribute('data-id')||card?.getAttribute('data-source-id')||card?.getAttribute('data-family')||text('.unitName',card)||'').trim();}
   function findCard(id){return id?q(`#catalogGrid .unitCard[data-id="${CSS.escape(id)}"]`)||q(`#catalogGrid .unitCard[data-source-id="${CSS.escape(id)}"]`)||q(`#catalogGrid .unitCard[data-family="${CSS.escape(id)}"]`):null;}
   function selectedCard(){
-    const id=String(window.__EVERTALE_CATALOG_SELECTED_ID||state.selectedId||'').trim();
-    return findCard(id)||null;
+    const id=String(window.__EVERTALE_CATALOG_SELECTED_ID||window.EvertaleCatalogV2?.getSelectedId?.()||state.selectedId||'').trim();
+    return findCard(id)||window.EvertaleCatalogV2?.selectedCard?.()||null;
   }
   function stat(card,k){return q(`.stat[data-stat="${k}"] .statVal`,card)?.textContent?.trim()||'—';}
   function readRows(card,type){try{const rows=JSON.parse(decodeURIComponent(card?.getAttribute(type==='active'?'data-active-skills':'data-passive-skills')||''));return Array.isArray(rows)?rows:[];}catch{return[];}}
   function visibleStateButtons(card){return qa('.stateRow .stateBtn',card).filter(b=>!b.hidden&&!b.classList.contains('v2-state-hidden'));}
-  function imageRows(card){
+  function legacyImageRows(card){
     const row=q('.stateRow',card),img=q('.unitThumb img',card);
-    try{return JSON.parse(decodeURIComponent(row?.getAttribute('data-imgs')||img?.getAttribute('data-imgs')||'[]')).filter(Boolean).slice(0,3);}catch{return[];}
+    try{return JSON.parse(decodeURIComponent(row?.getAttribute('data-imgs')||img?.getAttribute('data-imgs')||'[]')).filter(Boolean).slice(0,3).map(image=>({image}));}catch{return[];}
   }
+  function stateRows(card){
+    if(window.EvertaleCatalogV2&&typeof window.EvertaleCatalogV2.readStateRows==='function'){
+      try{return window.EvertaleCatalogV2.readStateRows(card).filter(Boolean).slice(0,3);}catch{}
+    }
+    try{
+      const rows=JSON.parse(decodeURIComponent(card?.getAttribute('data-state-rows')||q('.stateRow',card)?.getAttribute('data-states')||'[]'));
+      return Array.isArray(rows)?rows.filter(Boolean).slice(0,3):[];
+    }catch{return legacyImageRows(card);}
+  }
+  function stateCount(card){return Math.max(stateRows(card).length,visibleStateButtons(card||document).length,qa('.stateRow .stateBtn',card||document).length,1);}
   function currentIndex(card){const id=cardId(card);if(id&&state.awakenById.has(id))return clampIndex(state.awakenById.get(id),card);return clampIndex(q('.stateRow .stateBtn.active',card)?.getAttribute('data-idx')||q('.unitThumb img',card)?.getAttribute('data-state')||card?.getAttribute('data-duo-index')||0,card);}
-  function clampIndex(value,card){const count=Math.max(visibleStateButtons(card||document).length,qa('.stateRow .stateBtn',card||document).length,1);const n=Number(value);return Number.isFinite(n)?Math.max(0,Math.min(count-1,Math.floor(n))):0;}
+  function clampIndex(value,card){const count=stateCount(card);const n=Number(value);return Number.isFinite(n)?Math.max(0,Math.min(count-1,Math.floor(n))):0;}
   function cardKeys(card){const src=q('.unitThumb img',card)?.getAttribute('src')||q('.unitThumb img',card)?.src||'';const imgKey=key(String(src).split('/').pop()?.replace(/\.png(?:\?.*)?$/i,''));return [card?.getAttribute('data-family'),card?.getAttribute('data-duo-root'),card?.getAttribute('data-duo-active-id'),card?.getAttribute('data-source-id'),card?.getAttribute('data-id'),imgKey,text('.unitName',card),text('.unitTitle',card)].map(key).filter(Boolean);}
 
   function notifyStructureState(card,idx){
@@ -80,18 +90,22 @@
   function syncCardState(card,requestedIdx=currentIndex(card),writeImage=false){
     if(!card)return 0;
     const id=cardId(card);
+    const rows=stateRows(card);
     const btns=visibleStateButtons(card);
-    const imgs=imageRows(card);
-    const max=Math.max(btns.length,imgs.length,1);
+    const max=Math.max(btns.length,rows.length,1);
     const idx=Math.max(0,Math.min(Number(requestedIdx)||0,max-1));
     if(id)state.awakenById.set(id,idx);
+    if(writeImage&&rows.length&&window.EvertaleCatalogV2&&typeof window.EvertaleCatalogV2.applyState==='function'){
+      window.EvertaleCatalogV2.applyState(card,idx,false);
+    }
     btns.forEach((btn,i)=>{
       const on=i===idx;
       btn.classList.toggle('active',on);
       btn.setAttribute('aria-pressed',String(on));
     });
     const img=q('.unitThumb img',card);
-    if(writeImage&&img&&imgs[idx]){img.setAttribute('src',imgs[idx]);img.setAttribute('data-state',String(idx));}
+    const legacy=legacyImageRows(card);
+    if(writeImage&&img&&!rows.length&&legacy[idx]?.image){img.setAttribute('src',legacy[idx].image);img.setAttribute('data-state',String(idx));}
     card.setAttribute('data-duo-index',String(idx));
     return idx;
   }
@@ -181,8 +195,8 @@
     setText('v2Hp',stat(card,'hp'));setText('v2Atk',stat(card,'atk'));setText('v2Spd',stat(card,'spd'));setText('v2Cost',stat(card,'cost'));
     const tabs=$('v2AwakenTabs');
     if(tabs){
-      const btns=visibleStateButtons(card);
-      const html=btns.length?btns.map((_,i)=>`<button type="button" class="${i===activeIdx?'active':''}" data-v2-idx="${i}" data-awaken-index="${i}" aria-pressed="${i===activeIdx?'true':'false'}">${stateLabel(i)}</button>`).join(''):'';
+      const count=Math.min(3,Math.max(stateRows(card).length,visibleStateButtons(card).length));
+      const html=count>1?Array.from({length:count},(_,i)=>`<button type="button" class="${i===activeIdx?'active':''}" data-v2-idx="${i}" data-awaken-index="${i}" aria-pressed="${i===activeIdx?'true':'false'}">${stateLabel(i)}</button>`).join(''):'';
       if(tabs.innerHTML!==html)tabs.innerHTML=html;
       tabs.dataset.v2ActiveCard=id;
       syncSidebarAwakenTabs(activeIdx);
@@ -251,6 +265,19 @@
   },true);
 
   document.addEventListener('pointerup',event=>{const card=event.target.closest('#catalogGrid .unitCard');if(card&&!event.target.closest('.stateRow .stateBtn,.duoFormBtn,[data-v2-skill],button,input,select,a'))select(card);},{passive:true});
+  document.addEventListener('v2:hero-state-change',event=>{
+    const card=event?.detail?.card;
+    if(!card||!document.contains(card))return;
+    const idx=clampIndex(event?.detail?.index,card);
+    const id=cardId(card);
+    if(id)state.awakenById.set(id,idx);
+    syncSidebarAwakenTabs(idx);
+    queue(card);
+  });
+  document.addEventListener('v2:card-selected',event=>{
+    const card=event?.detail?.card;
+    if(card&&document.contains(card))select(card);
+  });
   document.addEventListener('DOMContentLoaded',()=>{
     injectDetailTabCss();
     setTimeout(()=>{

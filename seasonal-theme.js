@@ -13,7 +13,25 @@
     independence:['#081f5c','#b22234','#ffffff','#6ea8fe'],
     halloween:['#140b1f','#4a235a','#d35400','#f39c12'],
     thanksgiving:['#2b1a10','#8c4a1f','#d4a373','#f6e7cb'],
-    christmas:['#072a1f','#0f5132','#b22222','#f3fff6']
+    christmas:['#072a1f','#0f5132','#b22222','#f3fff6'],
+    midnight:['#040814','#14213d','#38bdf8','#f4fbff'],
+    aurora:['#071b2f','#123c4d','#67e8f9','#ecfeff'],
+    sakura:['#251321','#6d2848','#f9a8d4','#fff1f7'],
+    ocean:['#031926','#0b4f6c','#2dd4bf','#ecfeff'],
+    ember:['#160b08','#5b1f16','#fb7185','#fff7ed'],
+    royal:['#0f1028','#352069','#facc15','#fff8d6'],
+    cyber:['#050816','#1e1b4b','#22d3ee','#f8fafc'],
+    forest:['#061a12','#14532d','#84cc16','#f7fee7'],
+    cosmic:['#080517','#2d1b69','#c084fc','#faf5ff'],
+    quartz:['#121826','#334155','#f0abfc','#f8fafc'],
+    sunrise:['#1f1307','#9a3412','#fbbf24','#fff7ed']
+  };
+  const themeLabels={
+    spring:'Spring',summer:'Summer',autumn:'Autumn',winter:'Winter',
+    newyear:'New Year',valentine:'Valentine',stpatrick:'St. Patrick',easter:'Easter',
+    independence:'Independence',halloween:'Halloween',thanksgiving:'Thanksgiving',christmas:'Christmas',
+    midnight:'Midnight',aurora:'Aurora',sakura:'Sakura',ocean:'Ocean',ember:'Ember',
+    royal:'Royal',cyber:'Cyber',forest:'Forest',cosmic:'Cosmic',quartz:'Quartz',sunrise:'Sunrise'
   };
   const displayAccents={
     christmas:'#44d17a',
@@ -21,7 +39,18 @@
     valentine:'#ff7aa8',
     stpatrick:'#5dbb63',
     newyear:'#d7c8ff',
-    independence:'#ffffff'
+    independence:'#ffffff',
+    midnight:'#38bdf8',
+    aurora:'#67e8f9',
+    sakura:'#f9a8d4',
+    ocean:'#2dd4bf',
+    ember:'#fb7185',
+    royal:'#facc15',
+    cyber:'#22d3ee',
+    forest:'#84cc16',
+    cosmic:'#c084fc',
+    quartz:'#f0abfc',
+    sunrise:'#fbbf24'
   };
   function dateLA(){
     const parts=new Intl.DateTimeFormat('en-US',{timeZone:TZ,year:'numeric',month:'numeric',day:'numeric'}).formatToParts(new Date());
@@ -103,6 +132,22 @@
     const value=urlPreference()||storedPreference();
     return themes[value]||value==='auto'?value:'auto';
   }
+  function themeConfig(key){
+    const colors=themes[key]||themes.winter;
+    const accent=displayAccents[key]||colors[2];
+    return {
+      key,
+      label:themeLabels[key]||String(key||'Theme').replace(/(^|[-_])\w/g,s=>s.replace(/[-_]/,'').toUpperCase()),
+      bg:colors[0],
+      surface:colors[1],
+      secondary:colors[1],
+      accent,
+      ink:colors[3],
+      gradientA:colors[0],
+      gradientB:colors[1],
+      gradientC:accent
+    };
+  }
   function hexToRgb(hex){
     const clean=String(hex||'').replace('#','').trim();
     const full=clean.length===3?clean.split('').map(ch=>ch+ch).join(''):clean;
@@ -114,11 +159,13 @@
   function applyTheme(){
     const requested=pref();
     const key=requested==='auto'?chooseTheme():requested;
-    const colors=themes[key]||themes.winter;
+    const cfg=themeConfig(key);
+    const colors=[cfg.bg,cfg.surface,cfg.accent,cfg.ink];
     const root=document.documentElement;
-    const accent=displayAccents[key]||colors[2];
-    const ink=colors[3];
+    const accent=cfg.accent;
+    const ink=cfg.ink;
     const rgb=hexToRgb(accent);
+    const surfaceRgb=hexToRgb(cfg.surface);
     setVar(root,'--bg',colors[0]);
     setVar(root,'--season-a',colors[0]);
     setVar(root,'--season-b',colors[1]);
@@ -130,6 +177,11 @@
     setVar(root,'--site-theme-ink',ink);
     setVar(root,'--site-theme-secondary',colors[1]);
     setVar(root,'--site-theme-rgb',rgb);
+    setVar(root,'--site-theme-surface-rgb',surfaceRgb);
+    setVar(root,'--site-theme-gradient-a',cfg.gradientA);
+    setVar(root,'--site-theme-gradient-b',cfg.gradientB);
+    setVar(root,'--site-theme-gradient-c',cfg.gradientC);
+    setVar(root,'--site-theme-glow',`rgba(${rgb},.18)`);
     setVar(root,'--v2-theme-rgb',rgb);
     setVar(root,'--v2-theme-trim',accent);
     setVar(root,'--v2-theme-secondary',colors[1]);
@@ -144,6 +196,7 @@
     if(document.body){
       const now=dateLA();
       document.body.setAttribute('data-theme-key',key);
+      document.body.setAttribute('data-theme-label',cfg.label);
       document.body.setAttribute('data-theme-pref',requested);
       document.body.setAttribute('data-theme-season',['spring','summer','autumn','winter'].includes(key)?key:season(now.month,now.day));
       document.body.setAttribute('data-theme-holiday',['spring','summer','autumn','winter'].includes(key)?'':key);
@@ -153,6 +206,8 @@
   }
   window.EvertaleTheme={
     themes,
+    listThemes(){return Object.keys(themes).map(key=>themeConfig(key));},
+    getActiveTheme(){const requested=pref();const key=requested==='auto'?chooseTheme():requested;return{requested,key,...themeConfig(key)};},
     chooseTheme,
     applyTheme,
     syncThemeLinks,
