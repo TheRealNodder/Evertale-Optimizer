@@ -1,6 +1,7 @@
 /* theme-auto-route-authority.js
    Keeps Auto theme explicit across Catalog, Roster, and Optimizer links.
-   Scope: theme routing only. No layout, data, sidebar, catalog, roster, optimizer, or stat logic ownership.
+   Scope: theme routing only plus loading the shared ImageKit cache helper when a page has not loaded it yet.
+   No layout, data, sidebar, catalog, roster, optimizer, or stat logic ownership.
 */
 (function(){
   const AUTO='auto';
@@ -55,6 +56,14 @@
     }catch{}
   }
 
+  function ensureImageCacheLoader(){
+    if(document.querySelector('script[src*="image-cache-reset.js"]'))return;
+    const script=document.createElement('script');
+    script.src='./image-cache-reset.js?v=2';
+    script.defer=true;
+    document.head.appendChild(script);
+  }
+
   let scheduled=false;
   function schedule(root=document){
     if(scheduled)return;
@@ -69,6 +78,7 @@
   }
 
   function install(){
+    ensureImageCacheLoader();
     syncCurrentUrl();
     syncLinks(document);
     document.addEventListener('evertale:theme-applied',()=>schedule(document),true);
