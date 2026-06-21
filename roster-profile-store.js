@@ -33,6 +33,7 @@
   function defaultProfile() {
     return {
       level: 1,
+      stateIndex: -1,
       awakening: 0,
       ascended: false,
       potential: 0,
@@ -97,6 +98,7 @@
     const next = { ...prev, ...(patch || {}) };
 
     next.level = Math.round(clamp(next.level, 1, 200));
+    next.stateIndex = Math.round(clamp(next.stateIndex, -1, 99));
     next.awakening = Math.round(clamp(next.awakening, 0, 4));
     next.potential = clamp(next.potential, 0, 100);
     next.boost = Math.round(clamp(next.boost, 0, 300));
@@ -147,6 +149,14 @@
     return Number.isFinite(n) ? n : 0;
   }
 
+  function profileRefStat(profile, names) {
+    for (const name of names) {
+      const parsed = Number(profile && profile[name]);
+      if (Number.isFinite(parsed) && parsed > 0) return parsed;
+    }
+    return null;
+  }
+
   function estimateUnitStats(unit, profileOverride) {
     const id = normId(unit && unit.id);
     const account = getAccount();
@@ -171,23 +181,28 @@
     const fellowshipHp = account.fellowshipEnabled ? Number(account.fellowshipHp || 0) : 0;
     const fellowshipAtk = account.fellowshipEnabled ? Number(account.fellowshipAtk || 0) : 0;
 
-    const seedHp = Number(profile.anchorHp ?? baseNumber(unit, "hp"));
-    const seedAtk = Number(profile.anchorAtk ?? baseNumber(unit, "atk"));
+    const seedHp = profileRefStat(profile, ["refHP", "refHp", "refStatHP", "anchorHp"]) ?? baseNumber(unit, "hp");
+    const seedAtk = profileRefStat(profile, ["refATK", "refAtk", "refStatATK", "anchorAtk"]) ?? baseNumber(unit, "atk");
     const spd = baseNumber(unit, "spd");
     const levelScalar = ((level + 10) / 294) * lb;
     const ascended = smartAscended(profile);
 
     const ascHp = ascended ? seedHp * 0.05 : 0;
     const ascAtk = ascended ? seedAtk * 0.05 : 0;
+    const rawHp = seedHp * levelScalar;
+    const rawAtk = seedAtk * levelScalar;
+    const baseStackHp = rawHp + flat.hp + fellowshipHp;
+    const baseStackAtk = rawAtk + flat.atk + fellowshipAtk;
 
-    const hp = Math.round(((seedHp * levelScalar) + flat.hp + fellowshipHp) * awk * pot + ascHp);
-    const atk = Math.round(((seedAtk * levelScalar) + flat.atk + fellowshipAtk) * awk * pot + ascAtk);
+    const hp = Math.round(baseStackHp * awk * pot) + ascHp;
+    const atk = Math.round(baseStackAtk * awk * pot) + ascAtk;
 
     const characterPower = (hp * 12) + (atk * 60);
-    const masteryAnchorHp = ((seedHp * levelScalar) + flat.hp + fellowshipHp) * pot;
-    const masteryAnchorAtk = ((seedAtk * levelScalar) + flat.atk + fellowshipAtk) * pot;
+    const masteryAnchorHp = baseStackHp * pot;
+    const masteryAnchorAtk = baseStackAtk * pot;
     const masteryPower = ((masteryAnchorHp * 12) + (masteryAnchorAtk * 60)) * 0.0025 * clamp(profile.mastery, 0, 40);
-    const totalPower = Math.round(characterPower + masteryPower + rankBp(account.playerLevel) + Number(profile.bonus || 0));
+    const playerRankPower = rankBp(account.playerLevel);
+    const totalPower = Math.round(characterPower + masteryPower + Number(profile.bonus || 0));
 
     return {
       atk,
@@ -201,9 +216,37 @@
       potential: profile.potential,
       boost: profile.boost,
       mastery: profile.mastery,
-      isEstimated: !(profile.anchorHp && profile.anchorAtk),
-      source: "legacy-fallback"
+      refHp: seedHp,
+      refAtk: seedAtk,
+      anchorHp: seedHp,
+      anchorAtk: seedAtk,
+      rawHp,
+      rawAtk,
+      baseStackHp,
+      baseStackAtk,
+      playerRankPower,
+      battalionPower: totalPower + playerRankPower,
+      stateIndex: profile.stateIndex,
+      isEstimated: !(profileRefStat(profile, ["refHP", "refHp", "refStatHP", "anchorHp"]) && profileRefStat(profile, ["refATK", "refAtk", "refStatATK", "anchorAtk"])),
+      source: "legacy-refstat200-fallback"
     };
+  }
+
+  function estimateUnitStates(unit, profileOverride) {
+    const id = normId(unit && unit.id);
+    const account = getAccount();
+    const profile = { ...getProfile(id), ...(profileOverride || {}) };
+
+    if (global.EvertaleRuntimeStatEngine && typeof global.EvertaleRuntimeStatEngine.calculateUnitStates === "function") {
+      try {
+        const states = global.EvertaleRuntimeStatEngine.calculateUnitStates(unit, profile, account);
+        if (Array.isArray(states) && states.length) return states;
+      } catch (err) {
+        console.warn("[roster-profile-store] runtime state stat engine failed; using single fallback estimate", err);
+      }
+    }
+
+    return [estimateUnitStats(unit, profileOverride)];
   }
 
   function applyToUnit(unit) {
@@ -254,6 +297,7 @@
     deleteProfile,
     smartAscended,
     estimateUnitStats,
+    estimateUnitStates,
     applyToUnit,
     exportText,
     importText,

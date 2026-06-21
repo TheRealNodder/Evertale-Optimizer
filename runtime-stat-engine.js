@@ -7,9 +7,9 @@
    This file mirrors that architecture for the website without mutating apkfiles/entries.
 
    It is intentionally conservative:
-   - exact visible formulas still depend on hidden runtime/native details
-   - calibrated anchors win when present
-   - otherwise APK seed stats are converted through a documented approximation
+   - explicit RefStat200 profile overrides win when present
+   - otherwise APK seed stats are treated as the RefStat200 library anchors
+   - rank BP is exposed as battalion context, not folded into per-unit power
 */
 (function(global){
   "use strict";
@@ -63,6 +63,85 @@
     return norm(id).replace(/\d+$/, "");
   }
 
+  function stateLabel(row, index) {
+    const state = norm(row && row.state);
+    const stars = n(row && row.stars);
+    if (state === "final") return "FA";
+    if (stars >= 6) return index >= 2 ? "FA" : "6Star";
+    if (stars >= 5) return "5Star";
+    if (state) return state.replace(/(^|[-_])\w/g, s => s.replace(/[-_]/, "").toUpperCase());
+    return `State ${index + 1}`;
+  }
+
+  function seedFromStats(row, unit) {
+    const stats = row && row.stats ? row.stats : {};
+    return {
+      sourceId: row && (row.dataSourceId || row.sourceId || row.imageSourceId) || unit?.sourceId || unit?.id || "",
+      family: unit?.family || unit?.id || "",
+      baseAttack: stats.atk ?? row?.atk ?? unit?.atk ?? unit?.stats?.atk,
+      baseMaxHp: stats.hp ?? row?.hp ?? unit?.hp ?? unit?.stats?.hp,
+      speed: stats.spd ?? row?.spd ?? unit?.spd ?? unit?.stats?.spd,
+      cost: stats.cost ?? row?.cost ?? unit?.cost ?? unit?.stats?.cost,
+      rarity: row?.rarity || unit?.rarity
+    };
+  }
+
+  function seedForSource(sourceId) {
+    const id = norm(sourceId);
+    return (id && seedBySource.get(id)) || null;
+  }
+
+  function listUnitStates(unit) {
+    const rows = [];
+    const seen = new Set();
+
+    function add(row, source) {
+      if (!row || typeof row !== "object") return;
+      const key = norm(row.dataSourceId || row.sourceId || row.imageSourceId || row.state || source);
+      if (!key || seen.has(key)) return;
+      seen.add(key);
+      const index = rows.length;
+      const fallback = seedFromStats(row, unit);
+      const seed =
+        seedForSource(row.dataSourceId) ||
+        seedForSource(row.sourceId) ||
+        seedForSource(row.imageSourceId) ||
+        fallback;
+      rows.push({
+        index,
+        state: row.state || "",
+        label: stateLabel(row, index),
+        sourceId: row.sourceId || row.imageSourceId || row.dataSourceId || seed?.sourceId || "",
+        dataSourceId: row.dataSourceId || row.sourceId || seed?.sourceId || "",
+        imageSourceId: row.imageSourceId || row.sourceId || "",
+        stars: row.stars,
+        rarity: row.rarity || unit?.rarity || seed?.rarity || "",
+        seed
+      });
+    }
+
+    for (const row of (Array.isArray(unit?.forms) ? unit.forms : [])) add(row, "forms");
+    for (const row of (Array.isArray(unit?.statsByForm) ? unit.statsByForm : [])) add(row, "statsByForm");
+    for (const row of (Array.isArray(unit?.imageVariants) ? unit.imageVariants : [])) add(row, "imageVariants");
+    return rows.filter(row => row.seed && (row.seed.baseMaxHp || row.seed.baseAttack));
+  }
+
+  function selectedStateInfo(unit, profile = {}) {
+    const states = listUnitStates(unit);
+    const sourceWanted = norm(profile.formSourceId || profile.sourceId || profile.dataSourceId);
+    if (sourceWanted) {
+      const exact = states.find(row => [row.sourceId, row.dataSourceId, row.imageSourceId, row.seed?.sourceId].map(norm).includes(sourceWanted));
+      if (exact) return { states, selected: exact };
+    }
+
+    const rawIndex = Number(profile.stateIndex);
+    if (Number.isFinite(rawIndex) && rawIndex >= 0 && states[rawIndex]) {
+      return { states, selected: states[rawIndex] };
+    }
+
+    return { states, selected: states[states.length - 1] || null };
+  }
+
   function installSeedIndex(index) {
     seedIndex = index || null;
     seedBySource = new Map();
@@ -85,8 +164,11 @@
     return json;
   }
 
-  function findSeed(unit) {
+  function findSeed(unit, profile = {}) {
     if (!unit) return null;
+
+    const stateInfo = selectedStateInfo(unit, profile);
+    if (stateInfo.selected && stateInfo.selected.seed) return stateInfo.selected.seed;
 
     const candidates = [
       unit.sourceId,
@@ -151,7 +233,7 @@
   }
 
   function rankBp(playerLevel) {
-    const r = clamp(playerLevel, 1, 300);
+    const r = clamp(playerLevel, 0, 300);
     return (2000000 / 27000000) * Math.pow(r, 3);
   }
 
@@ -162,60 +244,94 @@
     return level > 100 && awakening >= 4;
   }
 
-  function defaultAnchorFromSeed(seed, statName, profile) {
-    // Calibrated anchors are stored as profile.anchorHp/profile.anchorAtk.
-    // If missing, use APK seed as a stable input. The exact hidden transform is
-    // still being mined from runtime/native code, so this is marked estimated.
-    if (statName === "hp") return n(profile && profile.anchorHp, n(seed && seed.baseMaxHp));
-    return n(profile && profile.anchorAtk, n(seed && seed.baseAttack));
+  function profileRefStat(profile, names) {
+    for (const name of names) {
+      const value = profile && profile[name];
+      const parsed = Number(value);
+      if (Number.isFinite(parsed) && parsed > 0) return parsed;
+    }
+    return null;
   }
 
-  function calculateUnit(unit, profile = {}, account = {}) {
-    const seed = findSeed(unit);
+  function refStat200FromSeed(seed, statName, profile) {
+    if (statName === "hp") {
+      return profileRefStat(profile, ["refHP", "refHp", "refStatHP", "anchorHp"]) ?? n(seed && seed.baseMaxHp);
+    }
+    return profileRefStat(profile, ["refATK", "refAtk", "refStatATK", "anchorAtk"]) ?? n(seed && seed.baseAttack);
+  }
+
+  function gearStats(profile, account) {
+    return {
+      wepHP: n(profile?.gear?.wepHP, n(account?.gear?.wepHP)),
+      wepATK: n(profile?.gear?.wepATK, n(account?.gear?.wepATK)),
+      accHP: n(profile?.gear?.accHP, n(account?.gear?.accHP)),
+      accATK: n(profile?.gear?.accATK, n(account?.gear?.accATK)),
+      accSPD: n(profile?.gear?.accSPD, n(account?.gear?.accSPD))
+    };
+  }
+
+  function calculateFromSeed(unit, seed, profile = {}, account = {}, stateInfo = null) {
     const acc = { ...DEFAULTS, ...(account || {}) };
     const level = clamp(profile.level ?? 1, 1, 200);
     const lb = limitBreakMultiplier(level);
     const awkIndex = Math.round(clamp(profile.awakening ?? 0, 0, 4));
     const awk = AWAKENING[awkIndex] || 1;
     const pot = 1 + (clamp(profile.potential ?? 0, 0, 100) / 100);
-    const boost = boostFlat(profile.boost ?? profile.bonus ?? 0);
+    const boost = boostFlat(profile.boost ?? 0);
     const mastery = clamp(profile.mastery ?? 0, 0, 40);
     const fellowshipHp = acc.fellowshipEnabled ? n(acc.fellowshipHp) : 0;
     const fellowshipAtk = acc.fellowshipEnabled ? n(acc.fellowshipAtk) : 0;
     const ascended = smartAscended({ ...profile, level, awakening: awkIndex });
 
-    const anchorHp = defaultAnchorFromSeed(seed, "hp", profile);
-    const anchorAtk = defaultAnchorFromSeed(seed, "atk", profile);
+    const refHp = refStat200FromSeed(seed, "hp", profile);
+    const refAtk = refStat200FromSeed(seed, "atk", profile);
 
     const levelScalar = ((level + 10) / 294) * lb;
-    const rawHp = anchorHp * levelScalar;
-    const rawAtk = anchorAtk * levelScalar;
+    const rawHp = refHp * levelScalar;
+    const rawAtk = refAtk * levelScalar;
 
     const baseStackHp = rawHp + boost.hp + fellowshipHp;
     const baseStackAtk = rawAtk + boost.atk + fellowshipAtk;
 
     // Mastery track: potential yes, awakening no.
-    const anchorTrackHp = baseStackHp * pot;
-    const anchorTrackAtk = baseStackAtk * pot;
-    const anchorPower = (anchorTrackHp * 12) + (anchorTrackAtk * 60);
+    const masteryTrackHp = baseStackHp * pot;
+    const masteryTrackAtk = baseStackAtk * pot;
+    const anchorPower = (masteryTrackHp * 12) + (masteryTrackAtk * 60);
     const masteryPower = anchorPower * 0.0025 * mastery;
 
     // Card track: awakening + potential, rounded before BP conversion.
-    const ascHp = ascended ? anchorHp * 0.05 : 0;
-    const ascAtk = ascended ? anchorAtk * 0.05 : 0;
-    const hp = roundInt(baseStackHp * awk * pot + ascHp);
-    const atk = roundInt(baseStackAtk * awk * pot + ascAtk);
+    const ascHp = ascended ? refHp * 0.05 : 0;
+    const ascAtk = ascended ? refAtk * 0.05 : 0;
+    const hp = Math.round(baseStackHp * awk * pot) + ascHp;
+    const atk = Math.round(baseStackAtk * awk * pot) + ascAtk;
 
     const spd = n(seed && seed.speed, n(unit && (unit.spd ?? unit.stats?.spd)));
     const cost = n(seed && seed.cost, n(unit && (unit.cost ?? unit.stats?.cost), 1));
+    const gear = gearStats(profile, acc);
+    const equipmentHp = gear.wepHP + gear.accHP;
+    const equipmentAtk = gear.wepATK + gear.accATK;
+    const blueHp = hp + equipmentHp;
+    const blueAtk = atk + equipmentAtk;
 
     const characterPower = (hp * 12) + (atk * 60);
+    const equipmentPower =
+      (gear.wepHP * 6) +
+      (gear.wepATK * 30) +
+      (gear.accHP * 6) +
+      (gear.accATK * 30) +
+      (gear.accSPD * 180);
     const playerRankPower = rankBp(acc.playerLevel);
     const flatBonusPower = n(profile.bonus ?? 0);
-    const power = roundInt(characterPower + masteryPower + flatBonusPower + playerRankPower);
+    const power = roundInt(characterPower + masteryPower + equipmentPower + flatBonusPower);
+    const battalionPower = roundInt(power + playerRankPower);
+    const explicitRef = !!(profileRefStat(profile, ["refHP", "refHp", "refStatHP", "anchorHp"]) && profileRefStat(profile, ["refATK", "refAtk", "refStatATK", "anchorAtk"]));
+    const hasSeedRef = !!(seed && (seed.baseMaxHp || seed.baseAttack));
 
     return {
       seed,
+      stateIndex: stateInfo ? stateInfo.index : undefined,
+      stateLabel: stateInfo ? stateInfo.label : "",
+      stateSourceId: stateInfo ? (stateInfo.dataSourceId || stateInfo.sourceId) : (seed && seed.sourceId),
       level,
       limitBreakTier: limitBreakTier(level).tier,
       limitBreakMultiplier: lb,
@@ -225,30 +341,59 @@
       boost: clamp(profile.boost ?? 0, 0, 300),
       mastery,
       ascended,
-      anchorHp,
-      anchorAtk,
+      refHp,
+      refAtk,
+      anchorHp: refHp,
+      anchorAtk: refAtk,
       rawHp,
       rawAtk,
       baseStackHp,
       baseStackAtk,
+      masteryTrackHp,
+      masteryTrackAtk,
       hp,
       atk,
+      cardHP: hp,
+      cardATK: atk,
+      blueHp,
+      blueAtk,
+      equipmentHp,
+      equipmentAtk,
       spd,
       cost,
+      gear,
       characterPower,
       masteryPower,
+      equipmentPower,
       playerRankPower,
+      flatBonusPower,
       power,
-      isEstimated: !(profile.anchorHp && profile.anchorAtk),
-      source: (profile.anchorHp && profile.anchorAtk) ? "calibrated-anchor" : "apk-seed-runtime-estimate"
+      battalionPower,
+      isEstimated: !hasSeedRef && !explicitRef,
+      source: explicitRef ? "profile-refstat200" : hasSeedRef ? "apk-refstat200" : "fallback-estimate"
     };
+  }
+
+  function calculateUnitStates(unit, profile = {}, account = {}) {
+    const stateInfo = selectedStateInfo(unit, profile);
+    return stateInfo.states.map(row => calculateFromSeed(unit, row.seed, { ...profile, stateIndex: row.index }, account, row));
+  }
+
+  function calculateUnit(unit, profile = {}, account = {}) {
+    const stateInfo = selectedStateInfo(unit, profile);
+    const seed = (stateInfo.selected && stateInfo.selected.seed) || findSeed(unit, profile);
+    const result = calculateFromSeed(unit, seed, profile, account, stateInfo.selected);
+    result.states = stateInfo.states.map(row => calculateFromSeed(unit, row.seed, { ...profile, stateIndex: row.index }, account, row));
+    return result;
   }
 
   global.EvertaleRuntimeStatEngine = {
     installSeedIndex,
     loadSeedIndex,
     findSeed,
+    listUnitStates,
     calculateUnit,
+    calculateUnitStates,
     limitBreakTier,
     limitBreakMultiplier,
     boostFlat,
