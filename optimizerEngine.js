@@ -101,6 +101,8 @@
     protect_shield: "barrier",
 
     // Guard / cover (new coverage key)
+    guardian: "guard",
+    protector: "guard",
     taunt: "guard",
     guarding: "guard",
     bodyguard: "guard",
@@ -159,6 +161,14 @@
     shock_apply: "stun_apply",
     stun_bonus: "stun_synergy",
     vs_stunned: "stun_synergy",
+
+    blood_fury: "blood",
+    bloodfury: "blood",
+    blood_thirst: "blood",
+    bloodthirst: "blood",
+    survival: "survivor",
+    vengeance: "revenge",
+    avenge: "revenge",
   };
 
   // Converts unit tags into a canonical + expanded set used by the optimizer.
@@ -223,6 +233,10 @@
     if (has(/ally spirit|enemy spirit|spirit is|spirit to|gain.*spirit|spirit.*doubled/)) pushTag(out, "spirit_synergy");
     if (has(/gain.*spirit|allies gain.*spirit|raises ally spirit/)) pushTag(out, "spirit_gain");
     if (has(/charge|power charge|charges/)) pushTag(out, "charge");
+    if (has(/survivor|survival|after.*300\s*tu|300\s*tu.*surviv/)) pushTag(out, "survivor");
+    if (has(/crisis|low hp|hp.*25%|less than.*hp|desperate/)) pushTag(out, "crisis");
+    if (has(/bloodfury|blood fury|bloodthirst|blood thirst|bloodnova|blood nova|blood.*ally|defeated ally/)) pushTag(out, "blood");
+    if (has(/revenge|avenge|payback|vengeance|when.*defeated/)) pushTag(out, "revenge");
     if (has(/immediately defeated|defeated without damage|instant death|execute/)) pushTag(out, "execute");
     if (has(/enrage|intense rage|attack increased to 1\.5|attack up/)) pushTag(out, "atk_buff");
     if (has(/weaken|attack reduced to 0\.75|attack down/)) pushTag(out, "weaken");
@@ -261,7 +275,7 @@
     if (finisher || lowHpBias) pushTag(out, "ai_finisher");
     if (protectorBias) pushTag(out, "ai_guardian_breaker");
 
-    if (out.has("execute") || out.has("charge") || out.has("burn_synergy") || out.has("poison_synergy") || out.has("sleep_synergy") || out.has("stun_synergy")) pushTag(out, "role_dps");
+    if (out.has("execute") || out.has("charge") || out.has("blood") || out.has("survivor") || out.has("burn_synergy") || out.has("poison_synergy") || out.has("sleep_synergy") || out.has("stun_synergy")) pushTag(out, "role_dps");
     if (out.has("heal") || out.has("purify") || out.has("revive") || out.has("damage_reduction")) pushTag(out, "role_support");
     if (out.has("guard") || out.has("damage_reduction") || out.has("hold_ground")) pushTag(out, "role_tank");
     if (out.has("sleep_apply") || out.has("stun_apply") || out.has("tu_manip") || out.has("weaken") || out.has("dispel")) pushTag(out, "role_control");
@@ -287,6 +301,10 @@
     stealth:{ include:["stealth","super_stealth","stealth_shield"], soft:["tu_manip","heal"], exclude:[] },
     spirit: { include:["spirit_gain","spirit_synergy","spirit_control"], soft:["turn_grant","tu_manip","heal"], exclude:[] },
     charge: { include:["charge"], soft:["execute","turn_grant","tu_manip","heal"], exclude:[] },
+    blood:  { include:["blood"], soft:["revenge","revive","guard","summon_or_entry_synergy","hold_ground"], exclude:[] },
+    crisis: { include:["crisis"], soft:["hold_ground","guard","heal","damage_reduction","revenge"], exclude:[] },
+    survivor:{ include:["survivor"], soft:["hold_ground","guard","heal","tu_manip","revenge"], exclude:[] },
+    guardian:{ include:["guard","barrier","damage_reduction","hold_ground"], soft:["heal","purify","revive"], exclude:[] },
   };
 
   const PRESET_DEFS = {
@@ -298,7 +316,11 @@
     turn:   { include:["tu_manip"], soft:["sleep_apply","stun_apply"], exclude:[] },
     cleanse:{ include:["purify"], soft:["ward_burn","ward_poison","ward_sleep","ward_stun"], exclude:[] },
     hpBuff: { include:["damage_reduction","hold_ground","guard"], soft:["heal","purify","barrier"], exclude:[] },
-    atkBuff:{ include:["atk_buff"], soft:["charge","execute","tu_manip"], exclude:[] }
+    atkBuff:{ include:["atk_buff"], soft:["charge","execute","tu_manip"], exclude:[] },
+    blood:  { include:["blood"], soft:["revenge","revive","guard","hold_ground"], exclude:[] },
+    crisis: { include:["crisis"], soft:["hold_ground","guard","heal","damage_reduction","revenge"], exclude:[] },
+    survivor:{ include:["survivor"], soft:["hold_ground","guard","heal","tu_manip","revenge"], exclude:[] },
+    guardian:{ include:["guard","barrier","damage_reduction","hold_ground"], soft:["heal","purify","revive"], exclude:[] }
   };
   const PRESET_KEYS = Object.keys(PRESET_DEFS).filter(k => k !== "atkBuff");
 
