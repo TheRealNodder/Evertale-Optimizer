@@ -132,6 +132,15 @@
     const value=urlPreference()||storedPreference();
     return themes[value]||value==='auto'?value:'auto';
   }
+  function resolvedTheme(){
+    const requested=pref();
+    const key=requested==='auto'?chooseTheme():requested;
+    const cfg=themeConfig(key);
+    const now=dateLA();
+    const seasonKey=['spring','summer','autumn','winter'].includes(key)?key:season(now.month,now.day);
+    const holidayKey=['spring','summer','autumn','winter'].includes(key)?'':key;
+    return{requested,key,season:seasonKey,holiday:holidayKey,...cfg};
+  }
   function themeConfig(key){
     const colors=themes[key]||themes.winter;
     const accent=displayAccents[key]||colors[2];
@@ -157,9 +166,10 @@
   }
   function setVar(root,name,value){root.style.setProperty(name,value);}
   function applyTheme(){
-    const requested=pref();
-    const key=requested==='auto'?chooseTheme():requested;
-    const cfg=themeConfig(key);
+    const active=resolvedTheme();
+    const requested=active.requested;
+    const key=active.key;
+    const cfg=active;
     const colors=[cfg.bg,cfg.surface,cfg.accent,cfg.ink];
     const root=document.documentElement;
     const accent=cfg.accent;
@@ -193,21 +203,29 @@
     setVar(root,'--gold',accent);
     setVar(root,'--purple',colors[1]);
     setVar(root,'--blue',ink);
+    root.setAttribute('data-theme-key',key);
+    root.setAttribute('data-theme-label',cfg.label);
+    root.setAttribute('data-theme-pref',requested);
+    root.setAttribute('data-theme-season',cfg.season);
+    root.setAttribute('data-theme-holiday',cfg.holiday);
     if(document.body){
-      const now=dateLA();
       document.body.setAttribute('data-theme-key',key);
       document.body.setAttribute('data-theme-label',cfg.label);
       document.body.setAttribute('data-theme-pref',requested);
-      document.body.setAttribute('data-theme-season',['spring','summer','autumn','winter'].includes(key)?key:season(now.month,now.day));
-      document.body.setAttribute('data-theme-holiday',['spring','summer','autumn','winter'].includes(key)?'':key);
+      document.body.setAttribute('data-theme-season',cfg.season);
+      document.body.setAttribute('data-theme-holiday',cfg.holiday);
     }
     syncThemeLinks();
     observeThemeLinks();
+    try{
+      document.dispatchEvent(new CustomEvent('evertale:theme-applied',{detail:{...cfg}}));
+    }catch{}
   }
   window.EvertaleTheme={
     themes,
     listThemes(){return Object.keys(themes).map(key=>themeConfig(key));},
-    getActiveTheme(){const requested=pref();const key=requested==='auto'?chooseTheme():requested;return{requested,key,...themeConfig(key)};},
+    getActiveTheme(){return resolvedTheme();},
+    getResolvedTheme:resolvedTheme,
     chooseTheme,
     applyTheme,
     syncThemeLinks,

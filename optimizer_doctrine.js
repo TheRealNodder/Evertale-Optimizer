@@ -35,6 +35,24 @@ window.OPTIMIZER_DOCTRINE = {
       tieBreakers: ["higherMatchRatio","higherParsedPercent","higherTeamAtk"]
     },
     statusWeights: { poison:5, burn:5, turn:5, sleep:4, stun:4, heal:4, atkBuff:3, hpBuff:3, cleanse:3 },
+    metaTeamRules: {
+      preferredCores: ["burn","poison","sleep","stealth","stun","blood","crisis","survivor"],
+      flexibleSplash: ["stun","guardian","cleanse","turn","spirit"],
+      preferredPairings: [
+        ["sleep","stealth"],
+        ["stun","stealth"],
+        ["stun","sleep"],
+        ["poison","survivor"],
+        ["blood","guardian"],
+        ["crisis","guardian"]
+      ],
+      softClashes: [
+        { pair:["burn","poison"], unless:"status_bridge" },
+        { pair:["sleep","poison"], unless:"status_bridge" },
+        { pair:["burn","sleep"], unless:"frostburn_or_status_bridge" }
+      ],
+      roleBalance: { story:{ dps:2, sustain:1, tank:1, control:1 }, platoon:{ dps:1, sustainOrTank:1, controlOrTempo:1 } }
+    },
     roleRules: {
       deriveRolesFromTags: true,
       storyRequirements: { dpsMin:2, sustainMin:1, controlMin:1, enforcement:"soft_penalty" },

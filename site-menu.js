@@ -38,6 +38,9 @@
     }catch{}
     return window.EvertaleTheme?.getPreference?.()||'auto';
   }
+  function activeResolvedTheme(){
+    return window.EvertaleTheme?.getActiveTheme?.()||null;
+  }
   function setThemePreference(value){
     const next=themeItems().some(item=>item.key===value)||value==='auto'?value:'auto';
     try{
@@ -55,7 +58,9 @@
     if(!select)return;
     const items=themeItems();
     const active=activeThemePreference();
-    select.innerHTML=`<option value="auto">Auto</option>${items.map(item=>`<option value="${item.key}">${item.label}</option>`).join('')}`;
+    const resolved=activeResolvedTheme();
+    const autoLabel=resolved?.label?`Auto (${resolved.label})`:'Auto';
+    select.innerHTML=`<option value="auto">${autoLabel}</option>${items.map(item=>`<option value="${item.key}">${item.label}</option>`).join('')}`;
     select.value=items.some(item=>item.key===active)||active==='auto'?active:'auto';
     if(!select.dataset.bound){
       select.dataset.bound='1';
@@ -63,7 +68,8 @@
     }
     const swatches=root.querySelector('.siteThemeSwatches');
     if(swatches){
-      swatches.innerHTML=items.map(item=>`<button type="button" class="siteThemeSwatch${item.key===select.value?' active':''}" data-theme-key="${item.key}" aria-label="${item.label}" title="${item.label}" style="--swatch-a:${item.bg};--swatch-b:${item.surface};--swatch-c:${item.accent};"></button>`).join('');
+      const resolvedKey=select.value==='auto'?resolved?.key:'';
+      swatches.innerHTML=items.map(item=>`<button type="button" class="siteThemeSwatch${item.key===select.value||item.key===resolvedKey?' active':''}" data-theme-key="${item.key}" aria-label="${item.label}" title="${item.label}" style="--swatch-a:${item.bg};--swatch-b:${item.surface};--swatch-c:${item.accent};"></button>`).join('');
       if(!swatches.dataset.bound){
         swatches.dataset.bound='1';
         swatches.addEventListener('click',event=>{
@@ -168,5 +174,6 @@
     }
     build();
   }
+  document.addEventListener('evertale:theme-applied',()=>hydrateThemeControl(document.getElementById('siteSideMenu')||document));
   document.readyState==='loading'?document.addEventListener('DOMContentLoaded',init,{once:true}):init();
 })();

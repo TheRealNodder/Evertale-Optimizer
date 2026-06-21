@@ -24,7 +24,7 @@ const LS_LOCKS_KEY = "evertale_optimizer_slotLocks_v1";
 const LS_PRIMARY_ARCHETYPE_KEY = "evertale_optimizer_primaryArchetype_v1";
 const LS_SECONDARY_ARCHETYPE_KEY = "evertale_optimizer_secondaryArchetype_v1";
 
-const ARCHETYPE_OPTIONS = new Set(["","none","burn","poison","sleep","stun","heal","turn","cleanse","defense","stealth","spirit","charge"]);
+const ARCHETYPE_OPTIONS = new Set(["","none","burn","poison","sleep","stun","heal","turn","cleanse","defense","guardian","stealth","spirit","charge","blood","crisis","survivor"]);
 
 const STORY_MAIN = 5;
 const STORY_BACK = 3;
@@ -54,7 +54,7 @@ function getTeamTypePref() {
   return (v === "mono" || v === "rainbow" || v === "auto") ? v : "auto";
 }
 function getPresetPref() {
-  const allowed = new Set(["auto","burn","poison","sleep","stun","heal","turn","atkBuff","hpBuff","cleanse"]);
+  const allowed = new Set(["auto","burn","poison","sleep","stun","heal","turn","atkBuff","hpBuff","cleanse","guardian","blood","crisis","survivor"]);
   const v = localStorage.getItem(LS_PRESET_KEY) || "auto";
   return allowed.has(v) ? v : "auto";
 }
@@ -688,33 +688,10 @@ function buildExampleTeam() {
   try {
     if (style === "best") {
       const preferredPreset = (el("presetSelect")?.value || getPresetPref() || "auto");
-      const primaryArchetype = (el("primaryArchetypeSelect")?.value || getPrimaryArchetypePref() || "");
-      const secondaryArchetype = (el("secondaryArchetypeSelect")?.value || getSecondaryArchetypePref() || "none");
-      const candidatePresets = [
-        preferredPreset !== "auto" ? preferredPreset : "",
-        primaryArchetype && primaryArchetype !== "none" ? primaryArchetype : "",
-        secondaryArchetype && secondaryArchetype !== "none" ? secondaryArchetype : "",
-        "burn",
-        "poison",
-        "sleep"
-      ].filter((v, i, arr) => v && arr.indexOf(v) === i);
-      let best = null;
-      let bestScore = -Infinity;
-
-      for (const presetKey of candidatePresets) {
-        const candidate = window.OptimizerEngine.run(examplePool, makeExampleOptions(presetKey));
-        const storyCount = resultUnitIds(candidate?.story?.main).length + resultUnitIds(candidate?.story?.back).length;
-        const platoonCount = Array.isArray(candidate?.platoons)
-          ? candidate.platoons.reduce((sum, p) => sum + resultUnitIds(p?.units || p || []).length, 0)
-          : 0;
-        const score = Number(candidate?.totalScore || 0) + storyCount * 1000 + platoonCount;
-        if (candidate?.story && score > bestScore) {
-          best = candidate;
-          bestScore = score;
-        }
-      }
-
-      result = best;
+      result = window.OptimizerEngine.run(
+        examplePool,
+        makeExampleOptions(preferredPreset !== "auto" ? preferredPreset : "")
+      );
     } else {
       const options = buildExampleOptions();
       options.currentLayout = makeExampleOptions().currentLayout;
