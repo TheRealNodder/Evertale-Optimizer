@@ -1,6 +1,7 @@
 (function(){
   const TZ='America/Los_Angeles';
   const KEY='evertale_theme_pref_v1';
+  const AUTO='auto';
   const themes={
     spring:['#153b2b','#3f7d57','#91d18b','#f1ffe8'],
     summer:['#0b2e4f','#145da0','#f7b733','#fff3b0'],
@@ -52,8 +53,45 @@
     quartz:'#f0abfc',
     sunrise:'#fbbf24'
   };
-  function dateLA(){
-    const parts=new Intl.DateTimeFormat('en-US',{timeZone:TZ,year:'numeric',month:'numeric',day:'numeric'}).formatToParts(new Date());
+  const themeAliases={
+    automatic:AUTO,
+    default:AUTO,
+    fall:'autumn',
+    xmas:'christmas',
+    christmasday:'christmas',
+    newyears:'newyear',
+    newyearsday:'newyear',
+    valentines:'valentine',
+    valentinesday:'valentine',
+    stpaddy:'stpatrick',
+    stpatty:'stpatrick',
+    stpatricks:'stpatrick',
+    stpatricksday:'stpatrick',
+    saintpatrick:'stpatrick',
+    saintpatricksday:'stpatrick',
+    july4:'independence',
+    fourthofjuly:'independence',
+    independenceday:'independence',
+    turkeyday:'thanksgiving'
+  };
+  function compactKey(value){
+    return String(value??'').trim().toLowerCase().replace(/[^a-z0-9]/g,'');
+  }
+  function normalizeThemeKey(value){
+    const raw=String(value??'').trim();
+    if(!raw)return'';
+    const lower=raw.toLowerCase();
+    const compact=compactKey(raw);
+    if(compact===AUTO)return AUTO;
+    if(themes[raw])return raw;
+    if(themes[lower])return lower;
+    const found=Object.keys(themes).find(key=>compactKey(key)===compact);
+    return found||themeAliases[compact]||'';
+  }
+  function dateLA(input=new Date()){
+    const date=input instanceof Date?input:new Date(input);
+    const safe=Number.isNaN(date.getTime())?new Date():date;
+    const parts=new Intl.DateTimeFormat('en-US',{timeZone:TZ,year:'numeric',month:'numeric',day:'numeric'}).formatToParts(safe);
     const get=type=>Number(parts.find(x=>x.type===type)?.value||0);
     return{year:get('year'),month:get('month'),day:get('day')};
   }
@@ -72,8 +110,9 @@
     const a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),mo=Math.floor((h+l-7*m+114)/31),da=((h+l-7*m+114)%31)+1;
     return{month:mo,day:da};
   }
-  function chooseTheme(){
-    const now=dateLA(),ea=easter(now.year);
+  function chooseTheme(input){
+    const now=input&&typeof input==='object'&&'month'in input&&'day'in input?input:dateLA(input);
+    const ea=easter(now.year||dateLA().year);
     if(inRange(now.month,now.day,12,1,12,31))return'christmas';
     if(inRange(now.month,now.day,1,1,1,10))return'newyear';
     if(inRange(now.month,now.day,2,1,2,15))return'valentine';
@@ -86,60 +125,69 @@
   }
   function urlPreference(){
     try{
-      const value=new URLSearchParams(location.search).get('theme');
-      return themes[value]||value==='auto'?value:'';
+      return normalizeThemeKey(new URLSearchParams(location.search).get('theme'));
     }catch{return'';}
   }
   function themedHref(href,theme){
-    if(!theme||theme==='auto')return href;
+    const key=normalizeThemeKey(theme);
     const raw=String(href||'').trim();
     if(!raw||raw.startsWith('#')||/^(mailto|tel|javascript):/i.test(raw))return href;
     try{
       const url=new URL(raw,location.href);
       if(url.origin!==location.origin)return href;
       if(!/\.html$/i.test(url.pathname)&&url.pathname!==location.pathname)return href;
-      url.searchParams.set('theme',theme);
+      if(!key||key===AUTO)url.searchParams.delete('theme');
+      else url.searchParams.set('theme',key);
       const file=url.pathname.slice(url.pathname.lastIndexOf('/')+1)||'index.html';
       return `./${file}${url.search}${url.hash}`;
     }catch{return href;}
   }
+  function linkPreference(){
+    const explicit=urlPreference();
+    return explicit||storedPreference();
+  }
   let observingLinks=false;
   function syncThemeLinks(root=document){
-    const theme=urlPreference();
-    if(!theme||theme==='auto'||!root?.querySelectorAll)return;
+    const theme=linkPreference();
+    if(!root?.querySelectorAll)return;
     root.querySelectorAll('a[href]').forEach(link=>{
       link.setAttribute('href',themedHref(link.getAttribute('href'),theme));
     });
   }
   function observeThemeLinks(){
-    if(observingLinks||!urlPreference()||!window.MutationObserver)return;
+    if(observingLinks||!window.MutationObserver)return;
     observingLinks=true;
     new MutationObserver(records=>{
       records.forEach(record=>{
         record.addedNodes.forEach(node=>{
           if(node?.nodeType!==1)return;
-          if(node.matches?.('a[href]'))node.setAttribute('href',themedHref(node.getAttribute('href'),urlPreference()));
+          if(node.matches?.('a[href]'))node.setAttribute('href',themedHref(node.getAttribute('href'),linkPreference()));
           syncThemeLinks(node);
         });
       });
     }).observe(document.documentElement,{childList:true,subtree:true});
   }
   function storedPreference(){
-    try{return localStorage.getItem(KEY)||'auto';}
-    catch{return'auto';}
+    try{return normalizeThemeKey(localStorage.getItem(KEY))||AUTO;}
+    catch{return AUTO;}
   }
   function pref(){
     const value=urlPreference()||storedPreference();
-    return themes[value]||value==='auto'?value:'auto';
+    return normalizeThemeKey(value)||AUTO;
   }
-  function resolvedTheme(){
-    const requested=pref();
-    const key=requested==='auto'?chooseTheme():requested;
+  function themeState(key,requested,input){
     const cfg=themeConfig(key);
-    const now=dateLA();
+    const now=input&&typeof input==='object'&&'month'in input&&'day'in input?input:dateLA(input);
     const seasonKey=['spring','summer','autumn','winter'].includes(key)?key:season(now.month,now.day);
     const holidayKey=['spring','summer','autumn','winter'].includes(key)?'':key;
-    return{requested,key,season:seasonKey,holiday:holidayKey,...cfg};
+    return{requested,key,mode:requested===AUTO?AUTO:'manual',season:seasonKey,holiday:holidayKey,...cfg};
+  }
+  function autoTheme(input){
+    return themeState(chooseTheme(input),AUTO,input);
+  }
+  function resolvedTheme(input){
+    const requested=pref();
+    return requested===AUTO?autoTheme(input):themeState(requested,requested,input);
   }
   function themeConfig(key){
     const colors=themes[key]||themes.winter;
@@ -206,12 +254,14 @@
     root.setAttribute('data-theme-key',key);
     root.setAttribute('data-theme-label',cfg.label);
     root.setAttribute('data-theme-pref',requested);
+    root.setAttribute('data-theme-mode',cfg.mode);
     root.setAttribute('data-theme-season',cfg.season);
     root.setAttribute('data-theme-holiday',cfg.holiday);
     if(document.body){
       document.body.setAttribute('data-theme-key',key);
       document.body.setAttribute('data-theme-label',cfg.label);
       document.body.setAttribute('data-theme-pref',requested);
+      document.body.setAttribute('data-theme-mode',cfg.mode);
       document.body.setAttribute('data-theme-season',cfg.season);
       document.body.setAttribute('data-theme-holiday',cfg.holiday);
     }
@@ -224,17 +274,26 @@
   window.EvertaleTheme={
     themes,
     listThemes(){return Object.keys(themes).map(key=>themeConfig(key));},
+    listThemeOptions(){
+      const active=autoTheme();
+      return [{...active,key:AUTO,label:`Auto (${active.label})`,auto:true,resolvedKey:active.key},...Object.keys(themes).map(key=>themeConfig(key))];
+    },
     getActiveTheme(){return resolvedTheme();},
     getResolvedTheme:resolvedTheme,
+    getAutoTheme:autoTheme,
+    normalizeThemeKey,
     chooseTheme,
     applyTheme,
     syncThemeLinks,
     getPreference:pref,
     setPreference(value){
-      try{localStorage.setItem(KEY,themes[value]||value==='auto'?value:'auto');}
+      const next=normalizeThemeKey(value)||AUTO;
+      try{localStorage.setItem(KEY,next);}
       catch{}
       applyTheme();
     }
   };
   document.readyState==='loading'?document.addEventListener('DOMContentLoaded',applyTheme,{once:true}):applyTheme();
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&pref()===AUTO)applyTheme();});
+  setInterval(()=>{if(pref()===AUTO)applyTheme();},30*60*1000);
 })();

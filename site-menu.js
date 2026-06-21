@@ -2,25 +2,29 @@
   function currentThemeParam(){
     try{
       const value=new URLSearchParams(location.search).get('theme');
-      return value&&value!=='auto'?value:'';
+      return window.EvertaleTheme?.normalizeThemeKey?.(value)||'';
     }catch{return'';}
   }
-  function themedUrl(href){
-    const theme=currentThemeParam();
-    if(!theme)return href;
+  function currentThemePreference(){
+    return currentThemeParam()||window.EvertaleTheme?.getPreference?.()||'auto';
+  }
+  function themedUrl(href,themeOverride){
+    const theme=window.EvertaleTheme?.normalizeThemeKey?.(themeOverride??currentThemePreference())||'auto';
     try{
       const url=new URL(href,location.href);
       if(url.origin!==location.origin)return href;
       if(!/\.html$/i.test(url.pathname)&&url.pathname!==location.pathname)return href;
-      url.searchParams.set('theme',theme);
+      if(theme==='auto')url.searchParams.delete('theme');
+      else url.searchParams.set('theme',theme);
       const file=url.pathname.slice(url.pathname.lastIndexOf('/')+1)||'index.html';
       return `./${file}${url.search}${url.hash}`;
     }catch{return href;}
   }
   function syncThemeLinks(root=document){
-    if(!currentThemeParam()||!root?.querySelectorAll)return;
+    if(!root?.querySelectorAll)return;
+    const theme=currentThemePreference();
     root.querySelectorAll('a[href]').forEach(link=>{
-      link.setAttribute('href',themedUrl(link.getAttribute('href')));
+      link.setAttribute('href',themedUrl(link.getAttribute('href'),theme));
     });
   }
   function catalogUrl(type){
@@ -42,7 +46,8 @@
     return window.EvertaleTheme?.getActiveTheme?.()||null;
   }
   function setThemePreference(value){
-    const next=themeItems().some(item=>item.key===value)||value==='auto'?value:'auto';
+    const normalized=window.EvertaleTheme?.normalizeThemeKey?.(value)||'auto';
+    const next=themeItems().some(item=>item.key===normalized)||normalized==='auto'?normalized:'auto';
     try{
       const url=new URL(location.href);
       if(next==='auto')url.searchParams.delete('theme');
@@ -57,9 +62,10 @@
     const select=root?.querySelector?.('#siteThemeSelect');
     if(!select)return;
     const items=themeItems();
-    const active=activeThemePreference();
+    const active=window.EvertaleTheme?.normalizeThemeKey?.(activeThemePreference())||'auto';
     const resolved=activeResolvedTheme();
-    const autoLabel=resolved?.label?`Auto (${resolved.label})`:'Auto';
+    const autoResolved=window.EvertaleTheme?.getAutoTheme?.()||resolved;
+    const autoLabel=autoResolved?.label?`Auto (${autoResolved.label})`:'Auto';
     select.innerHTML=`<option value="auto">${autoLabel}</option>${items.map(item=>`<option value="${item.key}">${item.label}</option>`).join('')}`;
     select.value=items.some(item=>item.key===active)||active==='auto'?active:'auto';
     if(!select.dataset.bound){
