@@ -179,6 +179,66 @@
     return { id };
   }
 
+  function fallbackStateLabel(row, index) {
+    const state = String(row?.state || "").trim();
+    const stars = Number(row?.stars || 0);
+    if (state === "final") return "FA";
+    if (stars >= 6) return index >= 2 ? "FA" : "6Star";
+    if (stars >= 5) return "5Star";
+    if (state) return state.replace(/(^|[-_])\w/g, s => s.replace(/[-_]/, "").toUpperCase());
+    return `State ${index + 1}`;
+  }
+
+  function unitStates(unit) {
+    const runtime = global.EvertaleRuntimeStatEngine;
+    if (runtime && typeof runtime.listUnitStates === "function") {
+      try {
+        const states = runtime.listUnitStates(unit);
+        if (Array.isArray(states) && states.length) return states;
+      } catch (_) {}
+    }
+
+    const rows = [];
+    const seen = new Set();
+    function add(row, source) {
+      if (!row || typeof row !== "object") return;
+      const key = String(row.dataSourceId || row.sourceId || row.imageSourceId || row.state || source || rows.length);
+      if (seen.has(key)) return;
+      seen.add(key);
+      const index = rows.length;
+      rows.push({ ...row, index, label: fallbackStateLabel(row, index) });
+    }
+    (Array.isArray(unit?.forms) ? unit.forms : []).forEach(row => add(row, "forms"));
+    (Array.isArray(unit?.statsByForm) ? unit.statsByForm : []).forEach(row => add(row, "statsByForm"));
+    (Array.isArray(unit?.imageVariants) ? unit.imageVariants : []).forEach(row => add(row, "imageVariants"));
+    return rows;
+  }
+
+  function stateOptions(unit, selected) {
+    const selectedIndex = Number.isFinite(Number(selected)) ? Number(selected) : -1;
+    const states = unitStates(unit);
+    const highestSelected = selectedIndex < 0 || !states[selectedIndex];
+    return [
+      `<option value="-1" ${highestSelected ? "selected" : ""}>Highest State</option>`,
+      ...states.map((row, index) => {
+        const label = esc(row.label || fallbackStateLabel(row, index));
+        return `<option value="${index}" ${selectedIndex === index ? "selected" : ""}>${label}</option>`;
+      })
+    ].join("");
+  }
+
+  function refreshStateControls() {
+    document.querySelectorAll(".rosterProfilePanel").forEach(panel => {
+      const card = panel.closest(".unitCard");
+      const select = panel.querySelector('[data-field="stateIndex"]');
+      if (!card || !select) return;
+      const profile = Store.getProfile(card.dataset.unitId);
+      select.innerHTML = stateOptions(unitByCard(card), profile.stateIndex);
+      select.value = String(Number.isFinite(Number(profile.stateIndex)) ? profile.stateIndex : -1);
+      if (!select.value) select.value = "-1";
+    });
+  }
+
   function renderEditor(card) {
     if (!card || card.querySelector(".rosterProfilePanel")) return;
     const unit = unitByCard(card);
@@ -204,6 +264,12 @@
         <label class="profileField profileAdvancedOnly">
           <span>Level</span>
           <input class="input profileInput" data-field="level" type="number" min="1" max="200" step="1" value="${esc(p.level)}">
+        </label>
+        <label class="profileField">
+          <span>Stat State</span>
+          <select class="input profileInput" data-field="stateIndex">
+            ${stateOptions(unit, p.stateIndex)}
+          </select>
         </label>
         <label class="profileField">
           <span>Awakened</span>
@@ -284,12 +350,14 @@
     const preview = card.querySelector(".profilePreview");
     if (!preview) return;
     const estimated = Store.estimateUnitStats(unit);
+    const stateText = estimated.stateLabel || (Number(estimated.stateIndex) >= 0 ? `State ${Number(estimated.stateIndex) + 1}` : "Highest");
     preview.innerHTML = `
+      <span><strong>State</strong> ${esc(stateText)}</span>
       <span><strong>Est. ATK</strong> ${Math.round(estimated.atk).toLocaleString()}</span>
       <span><strong>Est. HP</strong> ${Math.round(estimated.hp).toLocaleString()}</span>
       <span><strong>Power</strong> ${Math.round(estimated.power).toLocaleString()}</span>
       <span><strong>Asc.</strong> ${estimated.ascended ? "Yes" : "No"}</span>
-      ${estimated.isEstimated ? `<span class="warn">Level engine WIP</span>` : ``}
+      ${estimated.isEstimated ? `<span class="warn">Estimated seed</span>` : ``}
     `;
   }
 
@@ -309,7 +377,10 @@
 
     if (global.EvertaleRuntimeStatEngine && typeof global.EvertaleRuntimeStatEngine.loadSeedIndex === "function") {
       global.EvertaleRuntimeStatEngine.loadSeedIndex()
-        .then(() => refreshPreviews())
+        .then(() => {
+          refreshStateControls();
+          refreshPreviews();
+        })
         .catch(err => console.warn("[roster-profile-ui] seed index unavailable", err));
     }
 

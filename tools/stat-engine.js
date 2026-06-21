@@ -4,8 +4,8 @@
  * Key model:
  * - White HP/ATK = character-only stats shown in-game. Note: the game card visually lists ATK first, then HP.
  * - Blue HP/ATK = white stats + locked weapon/accessory stats.
- * - APK raw stats are NOT treated as RawBase automatically.
- * - The hidden current-level RawBase can be reversed from observed white stats.
+ * - RefStat200 is the clean level-200 library anchor before level curve, boost, fellowship, potential, awakenings, and ascension.
+ * - APK seed stats are treated as RefStat200 anchors unless a profile supplies explicit refHP/refATK overrides.
  */
 
 export const AWAKENING_MULTIPLIERS = [1.00, 1.22, 1.44, 1.66, 1.88];
@@ -46,7 +46,7 @@ export function accountRankBP(rank) {
 }
 
 /**
- * Reverse the hidden current-level RawBase from an observed in-game white stat.
+ * Project a clean RefStat200 anchor into an observed white card stat.
  * Use white text only, never blue equipment-modified text.
  */
 export function projectWhiteStatFromRef({
@@ -60,21 +60,19 @@ export function projectWhiteStatFromRef({
 }) {
   const ref = Math.max(0, Number(refStat200) || 0);
   const lvl = clampNumber(level, 1, 200);
-  const awk = AWAKENING_MULTIPLIERS[clampNumber(copies, 0, 4)] || 1.00;
+  const lb = limitBreakState(lvl);
+  const awk = AWAKENING_MULTIPLIERS[Math.round(clampNumber(copies, 0, 4))] || 1.00;
   const potentialScalar = 1 + (clampNumber(potential, 0, 100) / 100);
-  // Current reconstruction treats this value as the hidden current-level
-  // RawBase anchor. It is the value that exists immediately before flat
-  // boost/fellowship additions. Do not scale it a second time by level here.
-  const raw = ref;
+  const raw = ref * ((lvl + 10) / 294) * lb.multiplier;
   const baseStack = raw + Number(boostFlatValue || 0) + Number(fellowshipFlat || 0);
 
   // Engine checkpoint: visible card stat is rounded before BP conversion.
   // Ascension is a flat 5% hidden-base premium compiled after percentage scaling.
-  return Math.round(baseStack * awk * potentialScalar) + Math.round(isAscended ? raw * 0.05 : 0);
+  return Math.round(baseStack * awk * potentialScalar) + (isAscended ? ref * 0.05 : 0);
 }
 
 /**
- * Reverse the hidden current-level RawBase from an observed in-game WHITE stat.
+ * Reverse a clean RefStat200 anchor from an observed in-game WHITE stat.
  * Use white text only, never blue equipment-modified text.
  *
  * This intentionally uses the same checkpoint rounding as the forward engine.
@@ -94,15 +92,14 @@ export function reverseRawBase({
   if (!observed) return 0;
 
   const lvl = clampNumber(level, 1, 200);
-  const awk = AWAKENING_MULTIPLIERS[clampNumber(copies, 0, 4)] || 1.00;
+  const lb = limitBreakState(lvl);
+  const awk = AWAKENING_MULTIPLIERS[Math.round(clampNumber(copies, 0, 4))] || 1.00;
   const potentialScalar = 1 + (clampNumber(potential, 0, 100) / 100);
   const ascensionRate = isAscended ? 0.05 : 0;
+  const levelScalar = ((lvl + 10) / 294) * lb.multiplier;
 
   const nonRefContribution = (Number(boostFlatValue || 0) + Number(fellowshipFlat || 0)) * awk * potentialScalar;
-  // Hidden current-level RawBase contributes directly to the card layer,
-  // plus the ascension premium. The level curve that generated this RawBase
-  // is intentionally not applied here; applying it again causes under-scaling.
-  const refCoefficient = (awk * potentialScalar) + ascensionRate;
+  const refCoefficient = (levelScalar * awk * potentialScalar) + ascensionRate;
   const seed = refCoefficient ? Math.max(0, (observed - nonRefContribution) / refCoefficient) : 0;
 
   let lo = 0;
@@ -133,7 +130,7 @@ export const reverseRefStat200 = reverseRawBase;
 
 export function calculateMasterUnitEngine(config) {
   const level = clampNumber(config.level, 1, 200);
-  const copies = clampNumber(config.copies, 0, 4);
+  const copies = Math.round(clampNumber(config.copies, 0, 4));
   const boost = clampNumber(config.boost, 0, 300);
   const potential = clampNumber(config.potential, 0, 100);
   const mastery = Math.max(0, Number(config.mastery) || 0);
@@ -144,11 +141,9 @@ export function calculateMasterUnitEngine(config) {
   const gear = Object.assign({ wepHP: 0, wepATK: 0, accHP: 0, accATK: 0, accSPD: 0 }, config.gear || {});
 
   const lb = limitBreakState(level);
-  // Hidden RefStat fields currently represent the solved current-level
-  // RawBase values, not APK raw stats and not literal visible level-200 stats.
-  // This avoids double-applying the level curve after reverse calibration.
-  const rawHP = refHP;
-  const rawATK = refATK;
+  const levelScalar = ((level + 10) / 294.0) * lb.multiplier;
+  const rawHP = refHP * levelScalar;
+  const rawATK = refATK * levelScalar;
   const boostStats = boostFlat(boost);
   const baseStackHP = rawHP + boostStats.hp + flatFellowshipHP;
   const baseStackATK = rawATK + boostStats.atk + flatFellowshipATK;
@@ -164,8 +159,8 @@ export function calculateMasterUnitEngine(config) {
   const awakeningMultiplier = AWAKENING_MULTIPLIERS[copies] || 1.00;
   const ascensionHP = config.isAscended ? (refHP * 0.05) : 0;
   const ascensionATK = config.isAscended ? (refATK * 0.05) : 0;
-  const whiteHP = Math.round(baseStackHP * awakeningMultiplier * potentialScalar) + Math.round(ascensionHP);
-  const whiteATK = Math.round(baseStackATK * awakeningMultiplier * potentialScalar) + Math.round(ascensionATK);
+  const whiteHP = Math.round(baseStackHP * awakeningMultiplier * potentialScalar) + ascensionHP;
+  const whiteATK = Math.round(baseStackATK * awakeningMultiplier * potentialScalar) + ascensionATK;
 
   // Blue equipped stats shown in-game after locked platoon equipment.
   const equipmentHP = (Number(gear.wepHP) || 0) + (Number(gear.accHP) || 0);
@@ -203,6 +198,7 @@ export function calculateMasterUnitEngine(config) {
     trace: {
       level, copies, boost, potential, mastery, refHP, refATK,
       limitBreak: lb,
+      levelScalar,
       rawHP, rawATK, boostStats, baseStackHP, baseStackATK,
       anchorHP, anchorATK, anchorBasePower, masteryPower,
       awakeningMultiplier, ascensionHP, ascensionATK,
