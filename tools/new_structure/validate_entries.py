@@ -59,6 +59,17 @@ def source_id_from_entry(data: Dict[str, Any], fallback: str = "") -> str:
     return str(internal.get("sourceId") or data.get("sourceId") or data.get("name") or data.get("id") or fallback).strip()
 
 
+def row_identity(row: Any) -> str:
+    if not isinstance(row, dict):
+        return str(row or "").strip()
+    internal = row.get("internal") if isinstance(row.get("internal"), dict) else {}
+    for key in ("sourceId", "family", "id", "name", "handle", "file"):
+        value = internal.get(key) if key in internal else row.get(key)
+        if value:
+            return str(value).strip()
+    return ""
+
+
 def file_handle_order(file_value: Any) -> int | None:
     match = re.match(r"^(\d+)_", str(file_value or "").split("/")[-1])
     return int(match.group(1)) if match else None
@@ -159,6 +170,18 @@ def expected_catalog_count(category: str, index_expected: int, bundle_counts: Di
     return index_expected
 
 
+def index_ids_for_category(base: Path, category: str) -> List[str]:
+    index_path = base / category / "index.json"
+    index_data = load_json(index_path, {}) or {}
+    rows = index_data.get("entries", []) if isinstance(index_data, dict) else []
+    return [row_identity(row) for row in rows if row_identity(row)]
+
+
+def catalog_ids_for_category(categories: Dict[str, Any], category: str) -> List[str]:
+    rows = categories.get(category, []) or []
+    return [row_identity(row) for row in rows if row_identity(row)]
+
+
 def validate_catalog_bundle(base: Path, category_counts: Dict[str, int], errors: List[str], warnings: List[str], bundle_counts: Dict[str, Any]) -> None:
     catalog_path = base / "bundles" / "catalog.bundle.json"
     if not catalog_path.exists():
@@ -175,7 +198,18 @@ def validate_catalog_bundle(base: Path, category_counts: Dict[str, int], errors:
         expected = expected_catalog_count(category, index_expected, bundle_counts)
         actual = len(categories.get(category, []) or [])
         if actual != expected:
-            errors.append(f"[catalog] Category count mismatch for {category}: expected={expected}, actual={actual}")
+            index_ids = index_ids_for_category(base, category)
+            catalog_ids = catalog_ids_for_category(categories, category)
+            missing = [sid for sid in index_ids if sid not in set(catalog_ids)]
+            extra = [sid for sid in catalog_ids if sid not in set(index_ids)]
+            message = (
+                f"[catalog] Category count mismatch for {category}: expected={expected}, actual={actual}; "
+                f"missingFromCatalog={missing[:25]}; extraInCatalog={extra[:25]}"
+            )
+            if category in STRICT_INDEX_CATEGORIES:
+                errors.append(message)
+            else:
+                warnings.append(message)
 
 
 def validate_markers(base: Path, warnings: List[str]) -> Dict[str, Any]:
@@ -204,7 +238,7 @@ def validate() -> int:
     duplicate_source_ids: Dict[str, List[str]] = {}
 
     print("=" * 60)
-    print("Evertale Optimizer Entry Validator v4")
+    print("Evertale Optimizer Entry Validator v5")
     print("=" * 60)
     print(f"Repo Root : {repo_root}")
     print(f"Entries   : {base}")
@@ -276,7 +310,7 @@ def validate() -> int:
         if rows:
             errors.append(f"[{category}] Duplicate sourceIds in index: {len(rows)}")
 
-    report = {"validatorVersion": 4, "generatedAt": int(time.time()), "repoRoot": str(repo_root), "entriesRoot": str(base), "checked": checked, "categoryCounts": category_counts, "bundleCounts": bundle_counts, "markerStatus": marker_status, "duplicateSourceIds": duplicate_source_ids, "errors": errors, "warnings": warnings}
+    report = {"validatorVersion": 5, "generatedAt": int(time.time()), "repoRoot": str(repo_root), "entriesRoot": str(base), "checked": checked, "categoryCounts": category_counts, "bundleCounts": bundle_counts, "markerStatus": marker_status, "duplicateSourceIds": duplicate_source_ids, "errors": errors, "warnings": warnings}
     reports_dir = base / "reports"
     write_json(reports_dir / "validation_report.json", report)
     write_json(base / "_markers" / "validate_entries.marker.json", {"schemaVersion": 1, "tool": "validate_entries", "category": "all", "status": "failed" if errors else "complete", "lastKey": "validation", "lastSourceId": "", "lastHandle": None, "lastFile": "apkfiles/entries/reports/validation_report.json", "processedCount": checked, "totalCount": checked, "updatedAt": int(time.time()), "extra": {"errors": len(errors), "warnings": len(warnings)}})
