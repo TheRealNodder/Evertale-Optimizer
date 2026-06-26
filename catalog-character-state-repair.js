@@ -106,6 +106,56 @@
     ].filter(Boolean);
   }
 
+  function collectTextHints(value,out=[]){
+    if(value==null)return out;
+    if(typeof value==='string'||typeof value==='number'){
+      const text=String(value);
+      if(text)out.push(text);
+      return out;
+    }
+    if(Array.isArray(value)){
+      value.forEach(v=>collectTextHints(v,out));
+      return out;
+    }
+    if(typeof value==='object'){
+      ['id','name','sourceId','dataSourceId','imageSourceId','family','state','url','image','skill','internalId'].forEach(k=>collectTextHints(value[k],out));
+    }
+    return out;
+  }
+
+  function inferEntryFromSignals(row,map,currentEntry){
+    const currentFamily=cleanKey(currentEntry?.family||familyOf(row));
+    const hints=collectTextHints([
+      row?.sourceId,row?.family,row?.id,
+      row?.activeSkills,row?.passiveSkills,row?.passiveSkillDetails,
+      row?.leaderSkill,row?.refs,row?.forms,row?.imageVariants,row?.statsByForm,row?.descriptionByForm
+    ]).map(cleanKey).filter(Boolean);
+    if(!hints.length)return currentEntry;
+    let best=currentEntry||null;
+    let bestLen=currentFamily.length;
+    const seen=new Set();
+    for(const entry of map.values()){
+      const fam=clean(entry?.family||entry?.sourceId||entry?.id);
+      const key=cleanKey(fam);
+      if(!key||seen.has(key)||key.length<=bestLen)continue;
+      seen.add(key);
+      if(hints.some(h=>h.includes(key))){
+        best=entry;
+        bestLen=key.length;
+      }
+    }
+    return best;
+  }
+
+  function statesMatchFamily(states,family){
+    const key=cleanKey(family);
+    if(!key)return true;
+    return arr(states).some(state=>{
+      const sid=cleanKey(state?.sourceId||state?.imageSourceId||state?.dataSourceId||state?.url||state?.image);
+      return sid.includes(key);
+    });
+  }
+
   function syntheticStates(row,family,rarity){
     const expected=STATE_BY_RARITY[rarity]||[];
     return expected.map(([state,suffix,stars])=>{
@@ -160,6 +210,7 @@
       familyEntry=map.get(cleanKey(candidate));
       if(familyEntry)break;
     }
+    familyEntry=inferEntryFromSignals(row,map,familyEntry);
     const family=clean(familyEntry?.family)||familyOf(row);
     const rarity=inferRarity(row,familyEntry);
     if(!family)return row;
@@ -167,9 +218,9 @@
     const mapStates=arr(familyEntry?.states);
     const fallbackStates=syntheticStates(row,family,rarity);
     const count=Math.min(3,targetCount(row,mapStates.length?mapStates:fallbackStates,rarity));
-    const variants=mergeVariants(row.imageVariants,[...mapStates,...fallbackStates],count);
+    const variants=mergeVariants(statesMatchFamily(row.imageVariants,family)?row.imageVariants:[],[...mapStates,...fallbackStates],count);
     if(variants.length<2)return row;
-    if(arr(row.imageVariants).length>=variants.length&&arr(row.forms).length>=variants.length&&arr(row.statsByForm).length>=variants.length&&arr(row.descriptionByForm).length>=variants.length)return row;
+    if(statesMatchFamily(row.imageVariants,family)&&arr(row.imageVariants).length>=variants.length&&arr(row.forms).length>=variants.length&&arr(row.statsByForm).length>=variants.length&&arr(row.descriptionByForm).length>=variants.length)return row;
 
     const forms=variants.map((variant,index)=>{
       const source=nearestForm(row,variant,index);
@@ -190,6 +241,9 @@
 
     return {
       ...row,
+      id:family||row.id,
+      sourceId:family||row.sourceId,
+      family:family||row.family,
       rarity:row.rarity||familyEntry?.rarity||rarity,
       image:variants[0]?.url||row.image,
       imageVariants:variants,
