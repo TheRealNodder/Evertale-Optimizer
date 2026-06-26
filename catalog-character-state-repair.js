@@ -40,7 +40,8 @@
 
   function familyOf(row){
     const firstImage=String(row?.image||row?.imagesLarge?.[0]||row?.imageVariants?.[0]?.url||row?.imageVariants?.[0]?.image||'').split('/').pop()?.replace(/\.png(?:\?.*)?$/i,'')||'';
-    return clean(row?.family)||stripSuffix(row?.sourceId)||stripSuffix(row?.id)||stripSuffix(firstImage)||stripSuffix(row?.name);
+    const sourceFamily=stripSuffix(row?.sourceId)||stripSuffix(row?.imageVariants?.[0]?.sourceId)||stripSuffix(row?.forms?.[0]?.sourceId)||stripSuffix(firstImage);
+    return sourceFamily||clean(row?.family)||stripSuffix(row?.id)||stripSuffix(row?.name);
   }
 
   function normalizeState(raw,family){
