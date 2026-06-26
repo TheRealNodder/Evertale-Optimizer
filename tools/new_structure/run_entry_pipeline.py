@@ -12,7 +12,7 @@ from typing import Any, Dict, List
 from path_utils import find_repo_root, resolve_repo_path
 
 ROOT_MARKERS = ["apkfiles", "tools"]
-PIPELINE_VERSION = 7
+PIPELINE_VERSION = 8
 
 SAFE_DEFAULT_STEPS = [
     "bookmark_before",
@@ -21,8 +21,8 @@ SAFE_DEFAULT_STEPS = [
     "sync_category_order",
     "build_character_image_map",
     "sync_character_tags",
-    "build_bundles",
     "build_parent_child_map",
+    "build_bundles",
     "validate",
     "bookmark_after",
 ]
@@ -36,8 +36,8 @@ EXTRACT_STEPS = [
     "sync_category_order",
     "build_character_image_map",
     "sync_character_tags",
-    "build_bundles",
     "build_parent_child_map",
+    "build_bundles",
     "validate",
     "bookmark_after",
 ]
@@ -139,6 +139,7 @@ def main() -> int:
         "mode": "extract" if args.extract else "safe_rebuild",
         "startedAt": int(time.time()),
         "steps": [],
+        "stepOrderReason": "build_parent_child_map can update character/accessory indexes; build_bundles must run after it so catalog.bundle.json includes newly indexed entries.",
     }
 
     final_code = 0
