@@ -2,13 +2,10 @@
 """
 Universal launcher for the Evertale APK entry builder.
 
-Use this when you do not want to worry about folder paths.
-
-What it does:
-- Auto-detects raw APK files.
-- Finds Monster.json, Weapon.json, Equipment.json, Boss.json automatically.
-- Writes output to the active runtime folder: apkfiles/entries.
-- Keeps generated entries loadable by data-loader.js without hardwiring JS.
+Strict extraction contract:
+- Raw game JSON files are read from the repo apkfiles folder only unless --base is explicitly passed.
+- Generated site/runtime data is written to apkfiles/entries.
+- This script does not scan unrelated folders or guess alternate raw locations.
 """
 
 from __future__ import annotations
@@ -17,60 +14,44 @@ import argparse
 import subprocess
 import sys
 from pathlib import Path
-from typing import Iterable, Optional
+from typing import Dict, List
 
 from path_utils import find_repo_root, resolve_repo_path
 
 CORE_FILES = ("Monster.json", "Weapon.json", "Equipment.json", "Boss.json")
 SCRIPT_RELATIVE = Path("tools/new_structure/build_apk_entry_folders.py")
+DEFAULT_RAW_RELATIVE = Path("apkfiles")
+DEFAULT_OUTPUT_RELATIVE = Path("apkfiles/entries")
 
 
-def has_core_files(folder: Path) -> int:
-    return sum(1 for name in CORE_FILES if (folder / name).is_file())
+def raw_file_status(folder: Path) -> Dict[str, bool]:
+    return {name: (folder / name).is_file() for name in CORE_FILES}
 
 
-def candidate_folders(start: Path) -> Iterable[Path]:
-    yield start
-    for name in ("raw", "apkfiles", "Full List", "full list"):
-        p = start / name
-        if p.is_dir():
-            yield p
-    for name in ("raw", "apkfiles"):
-        p = start.parent / name
-        if p.is_dir():
-            yield p
-    try:
-        for p in start.rglob("*"):
-            if p.is_dir():
-                depth = len(p.relative_to(start).parts)
-                if depth <= 3:
-                    yield p
-    except Exception:
-        pass
+def print_raw_diagnostics(folder: Path) -> None:
+    print("Raw APK input folder:", folder)
+    print("Raw APK folder exists:", folder.exists())
+    if folder.exists():
+        try:
+            print("Raw APK folder file preview:")
+            for path in sorted(folder.iterdir(), key=lambda p: p.name.lower())[:80]:
+                kind = "dir " if path.is_dir() else "file"
+                print(f"  - {kind} {path.name}")
+        except Exception as exc:
+            print("Could not list raw APK folder:", exc)
+    print("Core raw file status:")
+    for name, exists in raw_file_status(folder).items():
+        print(f"  - {name}: {'FOUND' if exists else 'MISSING'}")
 
 
-def find_best_input(start: Path) -> Optional[Path]:
-    best: Optional[Path] = None
-    best_score = 0
-    seen = set()
-    for folder in candidate_folders(start):
-        folder = folder.resolve()
-        if folder in seen:
-            continue
-        seen.add(folder)
-        score = has_core_files(folder)
-        if score > best_score:
-            best = folder
-            best_score = score
-        if score == len(CORE_FILES):
-            return folder
-    return best if best_score > 0 else None
+def has_all_core_files(folder: Path) -> bool:
+    return all(raw_file_status(folder).values())
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Auto-detect raw APK folder and run the Evertale entry builder.")
-    parser.add_argument("--base", default=None, help="Starting folder to search from. Default: repo apkfiles folder.")
-    parser.add_argument("--output", default=None, help="Optional output folder override.")
+    parser = argparse.ArgumentParser(description="Run the Evertale entry builder from the repo apkfiles folder.")
+    parser.add_argument("--base", default=None, help="Raw APK folder. Default and expected value: repo apkfiles folder.")
+    parser.add_argument("--output", default=None, help="Optional output folder override. Default: repo apkfiles/entries.")
     parser.add_argument("--force", action="store_true", help="Force rebuild all entries.")
     parser.add_argument("--category", choices=["characters", "weapons", "accessories", "bosses"], default=None)
     parser.add_argument("--limit", type=int, default=None)
@@ -79,24 +60,34 @@ def main() -> int:
     args = parser.parse_args()
 
     repo_root = find_repo_root(Path(__file__).resolve())
-    base = resolve_repo_path(repo_root, args.base, "apkfiles")
-    if not base.exists():
-        print(f"ERROR: Base folder does not exist: {base}")
-        return 1
-    if base.is_file():
-        base = base.parent
+    input_dir = resolve_repo_path(repo_root, args.base, DEFAULT_RAW_RELATIVE)
+    output_dir = resolve_repo_path(repo_root, args.output, DEFAULT_OUTPUT_RELATIVE)
 
-    input_dir = find_best_input(base)
-    if not input_dir:
-        print("ERROR: Could not find raw APK files nearby.")
-        for name in CORE_FILES:
-            print(f"  - {name}")
-        print(f"Starting from: {base}")
+    if input_dir.is_file():
+        input_dir = input_dir.parent
+
+    print_raw_diagnostics(input_dir)
+
+    if not input_dir.exists():
+        print(f"ERROR: Raw APK folder does not exist: {input_dir}")
+        print("Expected raw files directly inside repo apkfiles folder.")
+        return 1
+
+    if not has_all_core_files(input_dir):
+        missing: List[str] = [name for name, exists in raw_file_status(input_dir).items() if not exists]
+        print("ERROR: Missing required raw APK files directly inside the raw input folder.")
+        print("Required files must be placed directly in:", input_dir)
+        for name in missing:
+            print(f"  - missing: {name}")
+        print("No fallback folder scan was performed. This is intentional so extraction always comes from apkfiles only.")
         return 1
 
     builder = repo_root / SCRIPT_RELATIVE
-    # IMPORTANT: data-loader.js reads apkfiles/entries, not apkfiles/generated_entries.
-    output_dir = resolve_repo_path(repo_root, args.output, "apkfiles/entries")
+    if not builder.is_file():
+        print(f"ERROR: Builder script does not exist: {builder}")
+        return 1
+
+    output_dir.mkdir(parents=True, exist_ok=True)
 
     command = [sys.executable, str(builder), "--input", str(input_dir), "--output", str(output_dir)]
     if args.force:
@@ -113,6 +104,7 @@ def main() -> int:
     print("Detected raw input folder:", input_dir)
     print("Output folder:", output_dir)
     print("Running builder:", builder)
+    print("Command:", " ".join(command))
     print()
     return subprocess.call(command, cwd=str(repo_root))
 
