@@ -12,10 +12,9 @@ from path_utils import find_repo_root
 
 ROOT_MARKERS = ["apkfiles", "tools"]
 CATEGORIES = ["characters", "weapons", "accessories", "bosses"]
-# Characters and accessories append newly discovered entries to their canonical
-# lists. Weapons use the dedicated file-handle branch below; bosses stay locked
-# because the existing canonical boss map is intentionally curated.
-ORDER_LOCKED_CATEGORIES = {"bosses"}
+# Characters, accessories, and bosses preserve existing canonical order and
+# append newly discovered entries. Weapons use the dedicated file-handle branch.
+ORDER_LOCKED_CATEGORIES = set()
 EXCLUDED_PATH_PARTS = {"legacy", "Legacy", "_weapon_duplicate_quarantine", "_boss_duplicate_quarantine", "_duplicate_quarantine"}
 
 CATEGORY_CONFIG = {
@@ -317,7 +316,7 @@ def main() -> int:
     summary = {"schemaVersion": 2, "generatedAt": int(time.time()), "dryRun": args.dry_run, "categories": reports}
     if not args.dry_run:
         write_json(repo / "apkfiles/entries/reports/category_order_sync_report.json", summary)
-    print(json.dumps(summary, ensure_ascii=False, indent=2))
+    print(json.dumps(summary, ensure_ascii=True, indent=2))
     return 0
 
 

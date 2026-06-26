@@ -463,7 +463,7 @@ def main() -> int:
     write_json(output_dir / "localizable_groups_by_category.json", {"schemaVersion": 6, "categories": by_category})
     write_json(output_dir / "leader_skill_localization.json", leader_skills)
     write_json(output_dir / "localizable_group_report.json", report)
-    print(json.dumps(report, ensure_ascii=False, indent=2))
+    print(json.dumps(report, ensure_ascii=True, indent=2))
     return 0
 
 

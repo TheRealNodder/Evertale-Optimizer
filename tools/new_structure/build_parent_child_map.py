@@ -274,7 +274,7 @@ def main() -> int:
         "outputs": ["apkfiles/entries/maps/character_parent_child_map.json"],
     }
     write_json(reports_dir / "parent_child_map_report.json", report)
-    print(json.dumps(report, ensure_ascii=False, indent=2))
+    print(json.dumps(report, ensure_ascii=True, indent=2))
     return 0 if report["status"] in {"ok", "warning"} else 1
 
 

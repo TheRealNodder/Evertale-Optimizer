@@ -769,7 +769,7 @@ def main() -> int:
     for category in categories:
         report["categories"].append(build_category(repo_root, input_dir, output_dir, category, resolvers, args.force, args.limit, args.start_after, not args.no_resume))
     write_json_if_changed(output_dir / "reports" / "build_report.json", report)
-    print(json.dumps(report, ensure_ascii=False, indent=2))
+    print(json.dumps(report, ensure_ascii=True, indent=2))
     return 0
 
 

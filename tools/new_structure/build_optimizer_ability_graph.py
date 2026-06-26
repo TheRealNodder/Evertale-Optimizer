@@ -211,7 +211,7 @@ def main() -> int:
 
     write_json(repo / OUT_REL, graph)
     write_json(repo / REPORT_REL, report)
-    print(json.dumps(report, ensure_ascii=False, indent=2))
+    print(json.dumps(report, ensure_ascii=True, indent=2))
     return 0
 
 

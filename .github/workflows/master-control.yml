@@ -12,8 +12,13 @@ on:
           - safe_rebuild
           - extract
           - extract_force
+      no_resume:
+        description: "Ignore partial extraction markers"
+        required: false
+        default: false
+        type: boolean
       full_audit:
-        description: "Run full audit after rebuild"
+        description: "Pass compatibility full-audit flag"
         required: false
         default: false
         type: boolean
@@ -22,13 +27,17 @@ permissions:
   contents: write
 
 concurrency:
-  group: evertale-master-control
+  group: evertale-master-control-${{ github.ref }}
   cancel-in-progress: false
+
+env:
+  PYTHONUTF8: "1"
 
 jobs:
   master-control:
     name: Run Master Control
     runs-on: ubuntu-latest
+    timeout-minutes: 45
 
     steps:
       - name: Check out repository
@@ -44,6 +53,7 @@ jobs:
       - name: Show selected mode
         run: |
           echo "Mode: ${{ inputs.mode }}"
+          echo "No resume: ${{ inputs.no_resume }}"
           echo "Full audit: ${{ inputs.full_audit }}"
           python --version
 
@@ -52,32 +62,89 @@ jobs:
         run: |
           set -euo pipefail
 
-          if [ "${{ inputs.mode }}" = "safe_rebuild" ]; then
-            python MASTER_CONTROL.py
-          elif [ "${{ inputs.mode }}" = "extract" ]; then
-            python MASTER_CONTROL.py --extract
-          elif [ "${{ inputs.mode }}" = "extract_force" ]; then
-            python MASTER_CONTROL.py --extract --force
-          else
-            echo "Unknown mode: ${{ inputs.mode }}"
-            exit 1
+          mkdir -p workflow-debug-artifacts
+          command=(python tools/new_structure/MASTER_CONTROL.py)
+
+          case "${{ inputs.mode }}" in
+            safe_rebuild)
+              ;;
+            extract)
+              command+=(--extract)
+              ;;
+            extract_force)
+              command+=(--extract --force)
+              ;;
+            *)
+              echo "Unknown mode: ${{ inputs.mode }}"
+              exit 1
+              ;;
+          esac
+
+          if [ "${{ inputs.no_resume }}" = "true" ]; then
+            command+=(--no-resume)
           fi
 
           if [ "${{ inputs.full_audit }}" = "true" ]; then
-            python MASTER_CONTROL.py --full-audit
+            command+=(--full-audit)
           fi
+
+          printf 'Running: %q ' "${command[@]}" | tee workflow-debug-artifacts/master-control.command.txt
+          echo | tee -a workflow-debug-artifacts/master-control.command.txt
+          "${command[@]}" 2>&1 | tee workflow-debug-artifacts/master-control.log
+
+      - name: Summarize reports
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p workflow-debug-artifacts
+          python - <<'PY' > workflow-debug-artifacts/master-control-summary.txt
+          import json
+          from pathlib import Path
+
+          print("Evertale Master Control Summary")
+          print("===============================")
+          for rel in [
+              "apkfiles/entries/reports/master_control_report.json",
+              "apkfiles/entries/reports/safe_new_data_ingest_report.json",
+              "apkfiles/entries/reports/entry_pipeline_report.json",
+              "apkfiles/entries/reports/bundle_build_report.json",
+              "apkfiles/entries/reports/validation_report.json",
+              "apkfiles/entries/reports/master_field_contract_audit_report.json",
+          ]:
+              path = Path(rel)
+              print(f"\nFILE: {rel}")
+              if not path.exists():
+                  print("missing")
+                  continue
+              data = json.loads(path.read_text(encoding="utf-8-sig"))
+              if path.name == "validation_report.json":
+                  print("checked:", data.get("checked"))
+                  print("errors:", len(data.get("errors", [])))
+                  print("warnings:", len(data.get("warnings", [])))
+                  for item in data.get("errors", [])[:20]:
+                      print("-", item)
+              elif path.name == "bundle_build_report.json":
+                  for row in data.get("categories", []):
+                      print(row.get("category"), "count=", row.get("count"), "status=", row.get("status"))
+              else:
+                  print(json.dumps(data, ensure_ascii=False, indent=2)[:5000])
+          PY
+          cat workflow-debug-artifacts/master-control-summary.txt
 
       - name: Upload reports as artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: master-control-reports
+          name: master-control-reports-${{ github.run_id }}
           path: |
+            workflow-debug-artifacts/
             apkfiles/entries/reports/*.json
             apkfiles/entries/_markers/*.json
           if-no-files-found: ignore
+          retention-days: 14
 
       - name: Commit generated changes
+        if: success()
         shell: bash
         run: |
           set -euo pipefail
@@ -86,13 +153,13 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           git add apkfiles/entries
-          git add live-data-config.js 2>/dev/null || true
-          git add *.json 2>/dev/null || true
+          git add data/character_tags.json 2>/dev/null || true
 
           if git diff --cached --quiet; then
             echo "No generated changes to commit."
             exit 0
           fi
 
+          git status --short
           git commit -m "Run Evertale Master Control"
           git push

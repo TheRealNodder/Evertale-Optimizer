@@ -12,6 +12,7 @@ The marker is intentionally small and human-readable.
 from __future__ import annotations
 
 import json
+import os
 import time
 from pathlib import Path
 from typing import Any, Dict, Optional
@@ -70,7 +71,19 @@ def write_marker(
     }
     if extra:
         payload["extra"] = extra
-    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
+    text = json.dumps(payload, ensure_ascii=False, indent=2) + "\n"
+    try:
+        path.write_text(text, encoding="utf-8", newline="\n")
+    except OSError:
+        temp_path = path.with_name(f".{path.name}.{os.getpid()}.tmp")
+        try:
+            temp_path.write_text(text, encoding="utf-8", newline="\n")
+            temp_path.replace(path)
+        except OSError:
+            try:
+                temp_path.unlink()
+            except OSError:
+                pass
     return path
 
 
