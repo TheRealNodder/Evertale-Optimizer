@@ -46,25 +46,27 @@ jobs:
           echo "Mode: ${{ inputs.mode }}"
           echo "Full audit: ${{ inputs.full_audit }}"
           python --version
+          test -f tools/new_structure/MASTER_CONTROL.py
 
       - name: Run Master Control
         shell: bash
         run: |
           set -euo pipefail
+          MC="tools/new_structure/MASTER_CONTROL.py"
 
           if [ "${{ inputs.mode }}" = "safe_rebuild" ]; then
-            python MASTER_CONTROL.py
+            python "$MC"
           elif [ "${{ inputs.mode }}" = "extract" ]; then
-            python MASTER_CONTROL.py --extract
+            python "$MC" --extract
           elif [ "${{ inputs.mode }}" = "extract_force" ]; then
-            python MASTER_CONTROL.py --extract --force
+            python "$MC" --extract --force
           else
             echo "Unknown mode: ${{ inputs.mode }}"
             exit 1
           fi
 
           if [ "${{ inputs.full_audit }}" = "true" ]; then
-            python MASTER_CONTROL.py --full-audit
+            python "$MC" --full-audit
           fi
 
       - name: Upload reports as artifact
