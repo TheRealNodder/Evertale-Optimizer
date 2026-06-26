@@ -73,7 +73,10 @@
     const states=arr(entry.states).map(state=>normalizeState(state,family)).filter(Boolean).slice(0,3);
     if(!states.length)return;
     const packed={...entry,states};
-    [entry.family,entry.id,entry.sourceId,entry.name,entry.title].forEach(key=>remember(map,key,packed));
+    // Strict identifiers only. Do not register display name/title here because
+    // different units can share a name, e.g. Jeanne and JeanneFusion both display
+    // as "Jeanne". Display-name aliases caused JeanneFusion to inherit Jeanne01/02.
+    [entry.family,entry.id,entry.sourceId].forEach(key=>remember(map,key,packed));
     states.forEach(state=>{
       [state.sourceId,state.dataSourceId,state.imageSourceId,stripSuffix(state.sourceId),stripSuffix(state.dataSourceId)].forEach(key=>remember(map,key,packed));
     });
@@ -95,7 +98,9 @@
     const forms=arr(row?.forms);
     const family=familyOf(row);
     return [
-      family,row?.family,row?.sourceId,row?.id,row?.name,row?.title,
+      // Strict identifiers first. Display name/title are intentionally excluded
+      // because they are not unique stable image-family keys.
+      family,row?.family,row?.sourceId,row?.id,
       stripSuffix(row?.sourceId),variants[0]?.sourceId,variants[0]?.dataSourceId,
       forms[0]?.sourceId,forms[0]?.dataSourceId
     ].filter(Boolean);
