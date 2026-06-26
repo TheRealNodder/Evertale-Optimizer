@@ -98,7 +98,7 @@ def main() -> int:
         }
 
     write_json(runtime_dir / "optimizer_runtime_manifest.json", manifest, compact=False)
-    print(json.dumps({"status": "ok", "chunks": manifest["chunks"]}, ensure_ascii=False, indent=2))
+    print(json.dumps({"status": "ok", "chunks": manifest["chunks"]}, ensure_ascii=True, indent=2))
     return 0
 
 

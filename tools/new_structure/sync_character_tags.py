@@ -86,7 +86,7 @@ def main() -> int:
     write_json(primary, merged)
     write_json(report, payload)
     write_marker(repo, payload)
-    print(json.dumps(payload, ensure_ascii=False, indent=2))
+    print(json.dumps(payload, ensure_ascii=True, indent=2))
     return 0
 
 

@@ -159,7 +159,7 @@ def main() -> int:
     write_json(entries_root / "maps" / "character_image_map.json", payload)
     write_json(entries_root / "reports" / "character_image_map_report.json", report)
     write_marker(entries_root, report)
-    print(json.dumps(report, ensure_ascii=False, indent=2))
+    print(json.dumps(report, ensure_ascii=True, indent=2))
     return 0
 
 

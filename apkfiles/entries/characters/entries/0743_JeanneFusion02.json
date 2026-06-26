@@ -1,0 +1,1652 @@
+{
+  "schemaVersion": 3,
+  "order": 743,
+  "id": "jeanne",
+  "sourceId": "JeanneFusion02",
+  "name": "Jeanne",
+  "title": "The Saint of a Lost Kingdom",
+  "secondName": "The Saint of a Lost Kingdom",
+  "description": "When she was little, Jeanne would run around within the remains of an old tower with her sister and their childhood friend. Whenever they played hide-and-seek, her sister would always be the first to do the seeking, smiling and laughing as she looked for Jeanne and the friend. But now, no matter where Jeanne hides, she will never again hear those cheerful footsteps or that joyful voice calling out her name. \"Mikaela...please find me,\" Jeanne whispers.",
+  "category": "character",
+  "rarity": null,
+  "stars": 6,
+  "evolvedStars": 6,
+  "element": "Storm",
+  "weaponType": "Spear",
+  "stats": {
+    "atk": 1433,
+    "hp": 7255,
+    "spd": 800,
+    "cost": 34
+  },
+  "hp": 7255,
+  "atk": 1433,
+  "spd": 800,
+  "cost": 34,
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/JeanneFusion02.png",
+  "imageVariants": [
+    {
+      "state": "source",
+      "family": "JeanneFusion",
+      "form": 2,
+      "sourceId": "JeanneFusion02",
+      "image": "https://ik.imagekit.io/r8fsa98s9/characters/JeanneFusion02.png"
+    }
+  ],
+  "forms": [
+    {
+      "state": "source",
+      "family": "JeanneFusion",
+      "form": 2,
+      "sourceId": "JeanneFusion02",
+      "image": "https://ik.imagekit.io/r8fsa98s9/characters/JeanneFusion02.png"
+    }
+  ],
+  "activeSkills": [
+    "SingleAttackAJeanneFusion",
+    "AllyBuffAJeanneFusion",
+    "EnemyBuffAJeanneFusion02",
+    "AllAttackAJeanneFusion"
+  ],
+  "passiveSkills": [
+    "GuardianAngelPassiveAJeanneFusion",
+    "LifeForALifePassiveAJeanneFusion",
+    "PlusHPBoostLv3",
+    "PlusAttackBoostLv3",
+    "AttackUpTargetEquippedGreatSwordLv3",
+    "AddWeaponPrefHammer"
+  ],
+  "leaderSkills": [
+    "AttackUpAirD"
+  ],
+  "refs": {
+    "activeSkills": [
+      "SingleAttackAJeanneFusion",
+      "AllyBuffAJeanneFusion",
+      "EnemyBuffAJeanneFusion02",
+      "AllAttackAJeanneFusion"
+    ],
+    "passives": [
+      "GuardianAngelPassiveAJeanneFusion",
+      "LifeForALifePassiveAJeanneFusion",
+      "PlusHPBoostLv3",
+      "PlusAttackBoostLv3",
+      "AttackUpTargetEquippedGreatSwordLv3",
+      "AddWeaponPrefHammer"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": "AttackUpAirD",
+    "leaderBuffCondition": "IsAir",
+    "summonableMonsters": [
+      "JeanneFusion02"
+    ]
+  },
+  "resolved": {
+    "activeSkills": {
+      "SingleAttackAJeanneFusion": {
+        "id": "SingleAttackAJeanneFusion",
+        "found": true,
+        "localization": {
+          "name": "Soaring Strike",
+          "description": "300% damage to 1 enemy. 600% damage instead if 2 or more enemies on the battlefield have their Active Skills disabled. 900% damage instead if all enemies on the battlefield have their Active Skills disabled. This attack ignores damage reduction effects, skin passive skills and the Counter Stance status effect.\n\nWhen this attack hits a non-boss, non-Ephemeral target and that target has 10% or less of max HP remaining after damage, that target is immediately defeated (the user is considered to have defeated the target with an attack if successful). This effect ignores Revenge passive skills, Revival passive skills, and any passive skills or effects of active skills that would prevent the enemy from being defeated.",
+          "selected": "300%+ damage, may immediately defeat"
+        },
+        "ability": {
+          "name": "SingleAttackAJeanneFusion",
+          "class": "Ability",
+          "abilityScalor": 2,
+          "conditionalAbilityScalors": [
+            5,
+            8
+          ],
+          "config": "SingleAttackAJeanneFusion",
+          "tuCost": 50,
+          "useLimit": 0,
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "damageFlags": [
+                "IgnoreArmor",
+                "IgnoreSkin"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "InstantKillAndCreditSource"
+              ],
+              "applyConditions": "On10PercentMaxHPIsNotBossAndNotMirage",
+              "applyToTargetType": "Enemy",
+              "showMissConditions": "ShowNoMiss",
+              "skipAbilityEffect": true,
+              "buffAppliedEffects": [
+                "JeanneFusionInstantdeath1"
+              ]
+            },
+            {
+              "buffs": [
+                "RemoveJeanneFusionActive2Lock"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "JeanneFusionAttack1",
+          "attackScalors": [
+            "GoodWith2DisabledEnemies",
+            "GoodWithAllDisabledEnemies"
+          ],
+          "conditionedAbilityEffects": [
+            "JeanneFusionAttack1",
+            "JeanneFusionAttack1"
+          ],
+          "recommendEffectWhenUsable": -2
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0.7,
+            0.3,
+            0
+          ],
+          "prefabs": [
+            "batfx_ripplebluelow/batfx_ripplebluelow",
+            "batsfx_prefab/batsfx_heal1",
+            "batfx_feather1/batfx_feather1",
+            "batfx_jeanneswap1/batfx_jeanneswap1",
+            "batfx_jeanneswap1/batfx_jeanneswap2",
+            "batsfx_prefab/batsfx_magic1",
+            "batsfx_prefab/batsfx_slash1",
+            "batfx_groundimpactblue/batfx_groundimpactblue",
+            "batfx_JeanneFusion/batfx_slashthunderJF1"
+          ],
+          "sortOrderOffset": [
+            2,
+            -2,
+            4,
+            4,
+            4,
+            0,
+            0,
+            2,
+            2
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle3"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "InstantKillAndCreditSource": {
+            "class": "Buff",
+            "stackName": "InstantKill",
+            "behaviors": [
+              "InstantDeath",
+              "EnterBattleBuff"
+            ],
+            "behaviorOverrides": [
+              {},
+              {
+                "sourceBuffs": [
+                  "Add1Kill"
+                ]
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "RemoveJeanneFusionActive2Lock": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "JeanneFusionActive2Lock"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {
+          "GoodWith2DisabledEnemies": {
+            "class": "AttackScalor",
+            "targetCondition": "AtLeast2AlliesDisabled"
+          },
+          "GoodWithAllDisabledEnemies": {
+            "class": "AttackScalor",
+            "targetCondition": "AllAlliesDisabled"
+          }
+        },
+        "conditions": {
+          "On10PercentMaxHPIsNotBossAndNotMirage": {
+            "class": "MonsterConditions",
+            "hpLessThanPercent": 0.1000001,
+            "not": {
+              "class": "MonsterConditions",
+              "families": [
+                "Mibone",
+                "RedMinotaur",
+                "Eternal",
+                "Norza",
+                "Gyurelle",
+                "Druke",
+                "Luther",
+                "Cetus",
+                "GyurelleInDisguise",
+                "FloatingMageBoss",
+                "MetalDragonBoss",
+                "MaskViola",
+                "DrukeSmall",
+                "FireDragonBoss",
+                "FireLizardLancer",
+                "Gyurelle0",
+                "GyurelleInDisguise0",
+                "AstridBoss",
+                "DeathKnightBoss",
+                "TaotieBoss",
+                "AirCloakKnight",
+                "UndeadMinotaur",
+                "Darna",
+                "NorzaRegularBoss",
+                "GolemBoss",
+                "MechanicalTitan",
+                "DarkRizetteBoss",
+                "FireLich",
+                "NovaBlastDragonBoss",
+                "EarthKaijuBoss",
+                "WindDragonBoss",
+                "BabyDarkDragonBoss",
+                "MetalDragonDemon",
+                "MaskElfWarrior",
+                "DarkLudmillaBoss",
+                "LifeEyeballEX",
+                "GoldAngelEX",
+                "DarkAstridBoss",
+                "LudmillaRegularBoss",
+                "YandereMaidBoss",
+                "BunnySamuraiBoss",
+                "SchoolGirlWarriorBoss",
+                "OniSchoolGirlBoss",
+                "Orcanix",
+                "DarkFinnBoss",
+                "CyrusBoss",
+                "BahamutBoss",
+                "RoundTableKnightBoss",
+                "CrossSwordKnightBoss",
+                "MerlinRegularBoss",
+                "GyurelleRegularBoss",
+                "OssiaDarkBoss",
+                "AstridNewBoss",
+                "IbarahimeRegularBoss",
+                "CinderellaRegularBoss",
+                "SnowWhiteBoss",
+                "DarkRizetteSwimsuitBoss",
+                "LudmillaSchoolGirlBoss",
+                "RolotiaNewBoss",
+                "SnowWhiteBrideBoss",
+                "SnowBlackBrideBoss",
+                "NobunagaRegularBoss",
+                "BurnedGirlRegularBoss",
+                "DeerGirlBoss",
+                "KingArthurRegularBoss",
+                "YandereMaidRaceQueenBoss",
+                "LudmillaRacequeenBoss",
+                "LifeMinionBoss",
+                "JeanneDarkSwimsuitBoss",
+                "JeanneDarkBoss",
+                "JeanneDarkAngelBoss",
+                "HimikoRegularBoss",
+                "KaguyahimeRegularBoss",
+                "OdinRegularBoss",
+                "OdinRavenBoss",
+                "LokiRegularBoss",
+                "FreyaRegularBoss",
+                "AstridBrideBoss",
+                "MechaSisterBrideBoss",
+                "HorseIdolGirlBoss",
+                "AntaresModernBoss",
+                "CatIdolGirlBoss",
+                "MyshaIdolGirlBoss",
+                "CleopatraRegularBoss",
+                "GilgameshRegularBoss",
+                "GokuDarkBoss",
+                "GokuDarkBossClone",
+                "OtohimeRegularBoss",
+                "CinderellaDarkBoss",
+                "CerberusRegularBoss",
+                "LudmillaYukataBoss",
+                "PercivalRegularBoss",
+                "MordredRegularBoss",
+                "IbarahimeSwimsuitBoss",
+                "RapunzelRegularBoss",
+                "LuBuRegularBoss",
+                "MusashiRegularBoss",
+                "KingArthurSwimsuitBoss",
+                "FrankensteinRegularBoss",
+                "FrankensteinRegularDollBoss",
+                "GenieRegularBoss",
+                "CinderellaSwimsuitBoss",
+                "CthulhuGirlRegularBoss",
+                "NapoleonRegularBoss",
+                "CleopatraDarkBoss",
+                "HijikataRegularBoss",
+                "OkitaRegularBoss",
+                "KaguyahimeSwimsuitBoss",
+                "ExcaliburRegularBoss",
+                "TristanRegularBoss",
+                "RoundTableKnightDarkBoss",
+                "LuciferRegularBoss",
+                "CrossSwordKnightDarkBoss",
+                "SnowWhiteMaidBoss",
+                "MurasakiRegularBoss",
+                "MermaidRegularBoss",
+                "GokuBrideBoss",
+                "GoemonRegularBoss",
+                "KojiroRegularBoss",
+                "DaVinciRegularBoss",
+                "SatanRegularBoss",
+                "DragonGirlRegularBoss",
+                "HokusaiRegularBoss",
+                "MechaSisterNewBoss",
+                "YamatoRegularBoss",
+                "ZoroRegularBoss",
+                "KaguyahimeDarkBoss",
+                "KirinGirlRegularBoss",
+                "LudmillaDarkNewBoss",
+                "ElizabethRegularBoss",
+                "YandereMaidDarkBoss",
+                "NikeRegularBoss",
+                "ChronosRegularBoss",
+                "RolotiaDarkBoss",
+                "RizKouhaiRegularBoss",
+                "KongmingRegularBoss",
+                "PinocchioRegularBoss",
+                "MasamuneRegularBoss",
+                "RyomaRegularBoss",
+                "PerryRegularBoss",
+                "OniSchoolDarkBoss",
+                "ElminaModernBoss",
+                "PeachGirlRegularBoss",
+                "KingArthurEvilBoss",
+                "DonQuixoteRegularBoss",
+                "AnastasiaRegularBoss",
+                "BahamutGirlRegularBoss",
+                "ElmKouhaiRegularBoss",
+                "SiegfriedRegularBoss",
+                "ZeusRegularBoss",
+                "RizetteBraveBoss",
+                "VenusRegularBoss",
+                "MusashiDarkBoss",
+                "KenshinRegularBoss",
+                "MyshaKnightBoss",
+                "ThorRegularBoss",
+                "CalKouhaiRegularBoss",
+                "FreyaNewBoss",
+                "MechaSisterBandBoss",
+                "ChopinRegularBoss",
+                "WashingtonRegularBoss",
+                "SnowWhiteNewBoss",
+                "BeautyBeastRegularBoss",
+                "BeautyRegularBoss",
+                "BeastRegularBoss",
+                "KintaroRegularBoss",
+                "LudmillaBalletBoss",
+                "YandereMaidBalletBoss",
+                "VictoriaRegularBoss",
+                "LupinRegularBoss",
+                "JeanneFusionBoss",
+                "BasiliskRegularBoss",
+                "ManchesterRegularBoss"
+              ],
+              "or": {
+                "class": "MonsterConditions",
+                "buffStackNames": [
+                  "MirageMonster"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "AllyBuffAJeanneFusion": {
+        "id": "AllyBuffAJeanneFusion",
+        "found": true,
+        "localization": {
+          "name": "Healing Wings",
+          "description": "The user and 1 other ally are:\n- Purified (negative status effects like sleep, burn or poison are removed)\n- Enraged\n- Healed for 100% of their max HP\n- Granted a Poison Ward and Burn Ward\n\nUnlocked each time the user uses another active skill. This skill is locked again after each use or if the user leaves the battlefield. Usable only if there is at least 1 other ally on the battlefield.\n\nEnraged units have their Attack increased to 1.5x until the end of their next turn. This will overwrite the effects of other Enrage skills on those units. Each Ward prevents their named effect from being applied once, then is removed. Identical Wards cannot stack.",
+          "selected": "Purify, Enrage, Heal & Grant Wards"
+        },
+        "ability": {
+          "name": "AllyBuffAJeanneFusion",
+          "class": "Ability",
+          "config": "AllyBuffAJeanneFusion",
+          "tuCost": 2,
+          "useLimit": 0,
+          "spiritGain": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "oneAllyNotMe",
+          "components": [
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "HealFull",
+                "RemoveBuffs",
+                "AttackPlus50Percent1TurnOnly",
+                "PoisonImmunityOnce",
+                "BurnImmunityOnce"
+              ],
+              "applyToTargetType": "Friendly"
+            },
+            {
+              "buffs": [
+                "HealFull",
+                "RemoveBuffs",
+                "AttackPlus50Percent1TurnOnly",
+                "PoisonImmunityOnce",
+                "BurnImmunityOnce",
+                "JeanneFusionActive2Lock"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "friendlyEventType": "Finish",
+          "sourceEventType": "Finish",
+          "flags": [
+            "Healer",
+            "Purify"
+          ],
+          "abilityEffect": "JeanneFusionHelping",
+          "useCondition": "IsNotJeanneFusionActive2Lock"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "friendlyTargets": 1,
+          "oneAllyNotMe": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.3,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batfx_snowwhitebride1/batfx_blackout1",
+            "batsfx_prefab/batsfx_casting2",
+            "batfx_CrescentEnrage1/batfx_CrescentEnrage1",
+            "batfx_CrescentEnrage1/batfx_CrescentEnrage1",
+            "batsfx_prefab/batsfx_accelerate1",
+            "batfx_JeanneFusion/batfx_featherYellow1",
+            "batfx_JeanneFusion/batfx_featherYellow1",
+            "batfx_jeannebride1/batfx_jeannecast1",
+            "batfx_jeannebride1/batfx_jeannecast1",
+            "batsfx_prefab/batsfx_spiritgain1"
+          ],
+          "sortOrderOffset": [
+            -150,
+            -2,
+            -2,
+            -2,
+            2,
+            1,
+            1,
+            -2,
+            -2,
+            -2
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            false,
+            true,
+            true,
+            false,
+            true,
+            false,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "scale": [
+            0,
+            0,
+            0.4,
+            0.4,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "AttackPlus50Percent1TurnOnly": {
+            "class": "Buff",
+            "stackName": "AttackPlus50Percent",
+            "behaviors": [
+              "RemoveAfterTurnsBehavior",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "turnCount": 1,
+                "scalorStatBonuses": {
+                  "Attack": 0.5
+                }
+              },
+              {
+                "name": "AttackMinus25Percent"
+              }
+            ],
+            "iconSpriteName": "IconRedRage01",
+            "showAsTimer": true,
+            "duration": -1
+          },
+          "BurnImmunityOnce": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity"
+            ],
+            "stackName": "BurnImmunityOnce",
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Burn"
+                ],
+                "useLimit": 1
+              }
+            ],
+            "duration": -1,
+            "showAsTimer": true,
+            "tags": [
+              "BurnImmuneTemp",
+              "ThisIsAWard"
+            ],
+            "iconSpriteName": "IconRedBurnInvalid01"
+          },
+          "HealFull": {
+            "class": "Buff",
+            "behaviors": [
+              "AdjustHp"
+            ],
+            "behaviorOverrides": [
+              {
+                "percent": 1.0,
+                "abilityEffect": "LargeHeal1"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "JeanneFusionActive2Lock": {
+            "class": "Buff",
+            "stackName": "JeanneFusionActive2Lock",
+            "duration": -1,
+            "isHiddenFromPlayers": true,
+            "showAsPermanent": false,
+            "showAsTimer": false
+          },
+          "PoisonImmunityOnce": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity"
+            ],
+            "stackName": "PoisonImmunityOnce",
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Poison"
+                ],
+                "useLimit": 1
+              }
+            ],
+            "duration": -1,
+            "showAsTimer": true,
+            "tags": [
+              "PoisonImmuneTemp",
+              "ThisIsAWard"
+            ],
+            "iconSpriteName": "IconRedPoisonInvalid01"
+          },
+          "RemoveBuffs": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "IsNotJeanneFusionActive2Lock": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "JeanneFusionActive2Lock"
+              ]
+            }
+          }
+        }
+      },
+      "EnemyBuffAJeanneFusion02": {
+        "id": "EnemyBuffAJeanneFusion02",
+        "found": true,
+        "localization": {
+          "name": "EnemyBuffAJeanneFusion02",
+          "description": ""
+        },
+        "ability": {
+          "name": "EnemyBuffAJeanneFusion02",
+          "class": "Ability",
+          "config": "EnemyBuffAJeanneFusion02",
+          "tuCost": 50,
+          "useLimit": 1,
+          "nameKey": "EnemyBuffAJeanneFusion01",
+          "descriptionKey": "EnemyBuffAJeanneFusion01",
+          "spiritCost": 3,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "AllEnemy",
+          "components": [
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "Stun100"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "Add1JeanneFusion02ToNext"
+              ],
+              "applyToTargetType": "Source",
+              "skipAbilityEffect": true,
+              "applyConditions": "AtLeast2NonSummonedAllies",
+              "showMissConditions": "ShowNoMiss"
+            },
+            {
+              "buffs": [
+                "Add1JeanneFusion02ToEndReinforcments"
+              ],
+              "applyToTargetType": "Source",
+              "skipAbilityEffect": true,
+              "applyConditions": "AtLeast3NonSummonedAllies",
+              "showMissConditions": "ShowNoMiss"
+            },
+            {
+              "buffs": [
+                "Add1JeanneFusion02ToRandomReinforcements"
+              ],
+              "applyToTargetType": "Source",
+              "skipAbilityEffect": true,
+              "applyConditions": "AtLeast4NonSummonedAllies",
+              "showMissConditions": "ShowNoMiss"
+            },
+            {
+              "buffs": [
+                "RemoveJeanneFusionActive2Lock"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "sourceEventType": "Finish",
+          "enemyEventType": "Finish",
+          "abilityEffect": "JeanneFusionLight",
+          "flags": [
+            "StunChance",
+            "NoDamage",
+            "Summon"
+          ],
+          "useCondition": "IsNotJeanneFusionActive3Entry50TULock"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "allEnemies": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0.3,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0.3,
+            0.4,
+            0,
+            0.8,
+            0.2,
+            0
+          ],
+          "prefabs": [
+            "batfx_snowwhitebride1/batfx_blackout1",
+            "batsfx_prefab/batsfx_casting1",
+            "batsfx_prefab/batsfx_gravityball",
+            "batfx_jeannebride1/batfx_jb_prep2",
+            "batfx_snowwhitebride1/batfx_blackout1",
+            "batfx_JeanneFusion/batfx_JFSuperLight1",
+            "batsfx_prefab/batsfx_life2",
+            "batsfx_prefab/batsfx_summon1",
+            "batsfx_prefab/batsfx_timestrike1",
+            "batfx_ripplebluelow/batfx_ripplebluelow",
+            "batsfx_prefab/batsfx_heal1",
+            "batfx_jeannebride1/batfx_holytarget2",
+            "batfx_stun2/batfx_stun2",
+            "batsfx_prefab/batsfx_stun1"
+          ],
+          "sortOrderOffset": [
+            -150,
+            2,
+            0,
+            -2,
+            -150,
+            -2,
+            2,
+            2,
+            2,
+            -2,
+            -2,
+            2,
+            2,
+            0
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "audiobundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            false,
+            false,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            true,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "Add1JeanneFusion02ToEndReinforcments": {
+            "class": "Buff",
+            "behaviors": [
+              "SummonMonster"
+            ],
+            "behaviorOverrides": [
+              {
+                "monsterType": "JeanneFusion02",
+                "cloneSource": true,
+                "cloneSourceStats": true,
+                "cloneSourceWeapon": true,
+                "cloneSourceEquipment": true
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "allowBuffOnDeadTarget": true,
+            "isHiddenFromPlayers": true
+          },
+          "Add1JeanneFusion02ToNext": {
+            "class": "Buff",
+            "behaviors": [
+              "SummonMonster"
+            ],
+            "behaviorOverrides": [
+              {
+                "monsterType": "JeanneFusion02",
+                "cloneSource": true,
+                "cloneSourceStats": true,
+                "cloneSourceWeapon": true,
+                "cloneSourceEquipment": true,
+                "frontOfLineup": true
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "allowBuffOnDeadTarget": true,
+            "isHiddenFromPlayers": true
+          },
+          "Add1JeanneFusion02ToRandomReinforcements": {
+            "class": "Buff",
+            "behaviors": [
+              "SummonMonster"
+            ],
+            "behaviorOverrides": [
+              {
+                "monsterType": "JeanneFusion02",
+                "cloneSource": true,
+                "cloneSourceStats": true,
+                "cloneSourceWeapon": true,
+                "cloneSourceEquipment": true,
+                "randomInLineup": true
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "allowBuffOnDeadTarget": true,
+            "isHiddenFromPlayers": true
+          },
+          "RemoveJeanneFusionActive2Lock": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "JeanneFusionActive2Lock"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "Stun100": {
+            "class": "Buff",
+            "stackName": "Stun",
+            "behaviors": [
+              "Stun"
+            ],
+            "behaviorOverrides": [
+              {
+                "stunTU": 100,
+                "abilityEffect": "StunStatus1"
+              }
+            ],
+            "tags": [
+              "Stun"
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "AtLeast2NonSummonedAllies": {
+            "class": "MonsterConditions",
+            "myTeamMonsterConditionMatchesNeeded": {
+              "IsNotSummoned": 2
+            }
+          },
+          "AtLeast3NonSummonedAllies": {
+            "class": "MonsterConditions",
+            "myTeamMonsterConditionMatchesNeeded": {
+              "IsNotSummoned": 3
+            }
+          },
+          "AtLeast4NonSummonedAllies": {
+            "class": "MonsterConditions",
+            "myTeamMonsterConditionMatchesNeeded": {
+              "IsNotSummoned": 4
+            }
+          },
+          "IsNotJeanneFusionActive3Entry50TULock": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "JeanneFusionActive3Entry50TULock"
+              ]
+            }
+          }
+        }
+      },
+      "AllAttackAJeanneFusion": {
+        "id": "AllAttackAJeanneFusion",
+        "found": true,
+        "localization": {
+          "name": "Angelic End",
+          "description": "700% damage to all enemies. This attack ignores the Stealth status effect, any effects of non-boss enemies that would prevent the targets from being defeated and enemy damage reduction effects.\n\nLocked for 100TU after the user has entered the battlefield, and locks again for 100TU after each use. Usable only if there is at least 1 other \"Jeanne, The Saint of a Lost Kingdom\" ally on the battlefield.",
+          "selected": "700% damage, ignores defeat prevention"
+        },
+        "ability": {
+          "name": "AllAttackAJeanneFusion",
+          "class": "Ability",
+          "abilityScalor": 6,
+          "config": "AllAttackAJeanneFusion",
+          "tuCost": 75,
+          "useLimit": 0,
+          "spiritCost": 3,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "AllEnemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "damageFlags": [
+                "HardIgnoreBlockDeath",
+                "IgnoreArmor"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "RemoveJeanneFusionActive2Lock",
+                "JeanneFusionActive4Cooldown100"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "JeanneFusionSP",
+          "flags": [
+            "IgnoreStealth",
+            "Duration"
+          ],
+          "recommendEffectWhenUsable": -2,
+          "useCondition": "JeanneFusionAllyAndTimeInCombat100NotInstantCooldown"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "allEnemies": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0,
+            1,
+            0.5,
+            0,
+            0.4,
+            0,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batfx_Chronos/batfx_tailwindfeatherYellow1",
+            "batsfx_prefab/batsfx_timestrike1",
+            "batfx_jeannebride1/batfx_jb_prep1",
+            "batfx_jeannebride1/batfx_jb_spotlight1",
+            "batfx_JeanneFusion/batfx_JFHolly1",
+            "batfx_jeannebride1/batfx_holytarget2",
+            "batsfx_prefab/batsfx_charge1",
+            "batfx_JeanneFusion/batfx_holybombsmall3",
+            "batfx_jeannebride1/batfx_holyimpact1",
+            "batfx_jeannebride1/batfx_yellowfloor1",
+            "batsfx_prefab/batsfx_bomb1"
+          ],
+          "sortOrderOffset": [
+            -150,
+            0,
+            -2,
+            2,
+            2,
+            2,
+            0,
+            2,
+            2,
+            -2,
+            0
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "JeanneFusionActive4Cooldown100": {
+            "class": "Buff",
+            "stackName": "InstantCooldown",
+            "duration": 100,
+            "isHiddenFromPlayers": false,
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "iconSpriteName": "IconBlueCountdownClock3"
+          },
+          "RemoveJeanneFusionActive2Lock": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "JeanneFusionActive2Lock"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "JeanneFusionAllyAndTimeInCombat100NotInstantCooldown": {
+            "class": "MonsterConditions",
+            "timeInCombat": 100,
+            "myTeamMonsterConditionMatchesNeeded": {
+              "IsJeanneFusion": 2
+            },
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "InstantCooldown"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "passives": {
+      "GuardianAngelPassiveAJeanneFusion": {
+        "id": "GuardianAngelPassiveAJeanneFusion",
+        "found": true,
+        "localization": {
+          "name": "Saint's Deliverance",
+          "description": "This unit cannot fall asleep, or be stunned.\n\nThis unit enters battle with a Poison Ward, and a Burn Ward.\n\nTriggered when this unit enters the battlefield from the allied reinforcements:\n- Stuns 2 random enemies for 50TU.\n- Then disables 2 random enemies' Active Skills for 10TU, plus 10TU per Awakening (up to 50TU if this unit has 4 Awakenings).\nWhen a unit's Active Skills are disabled and they get the turn, they will lose the turn as if they were sleeping. This effect cannot affect boss units, cannot be purified, and will end if this unit is defeated.\n\nWhenever this unit or another ally \"Jeanne, The Saint of a Lost Kingdom\" enters the battlefield, this unit is purified and healed for 100% of its max HP."
+        }
+      },
+      "LifeForALifePassiveAJeanneFusion": {
+        "id": "LifeForALifePassiveAJeanneFusion",
+        "found": true,
+        "localization": {
+          "name": "Unending Grace",
+          "description": "If this unit would be defeated, it instead survives with 1 HP and then cannot be defeated until its next turn. This effect can trigger only once each time this unit enters the battlefield, and is considered a Hold Ground+ effect. Whenever another ally named \"Jeanne, The Saint of a Lost Kingdom\" enters the battlefield, this Hold Ground+ effect is reset so it can trigger again.\n\nEach time this unit takes damage from an attack and survives until after the end of the turn, this unit will be Purified, and heal for 50% of its max HP.\n\nWhenever this unit defeats any number of non-conjured enemies with an attack, this unit adds another Jeanne to the next in line of allied reinforcements. All Jeannes created by this unit will have matching Levels, Limit Breaks, Awakenings, Boosts, Potential, Mastery, Weapons, and Accessories.\n\nIf this unit is conjured, damage dealt to this unit is increased to 2.5 times the normal amount."
+        }
+      },
+      "PlusHPBoostLv3": {
+        "id": "PlusHPBoostLv3",
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv3",
+          "description": "Adds 1200 to this unit's max HP."
+        }
+      },
+      "PlusAttackBoostLv3": {
+        "id": "PlusAttackBoostLv3",
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv3",
+          "description": "Adds 300 to this unit's Attack."
+        }
+      },
+      "AttackUpTargetEquippedGreatSwordLv3": {
+        "id": "AttackUpTargetEquippedGreatSwordLv3",
+        "found": true,
+        "localization": {
+          "name": "G.sword Hunter Lv3",
+          "description": "10% bonus to attacks against units equipped with Greatswords."
+        }
+      },
+      "AddWeaponPrefHammer": {
+        "id": "AddWeaponPrefHammer",
+        "found": true,
+        "localization": {
+          "name": "Hammer Mastery",
+          "description": "Can use weapon skills of Hammers in addition to their original preferred weapon type."
+        }
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": {
+      "class": "MonsterConditions",
+      "elements": [
+        "Air"
+      ]
+    }
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "JeanneFusion02",
+    "family": "JeanneFusion",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "JeanneFusion02",
+    "family": "JeanneFusion",
+    "class": "Monster",
+    "leaderBuff": "AttackUpAirD",
+    "leaderBuffCondition": "IsAir",
+    "activeSkills": {
+      "0": "SingleAttackAJeanneFusion",
+      "1": "AllyBuffAJeanneFusion",
+      "2": "EnemyBuffAJeanneFusion02",
+      "3": "AllAttackAJeanneFusion"
+    },
+    "activeSkillsFamily": {
+      "2": "EnemyBuffAJeanneFusion"
+    },
+    "passives": {
+      "0": "GuardianAngelPassiveAJeanneFusion",
+      "1": "LifeForALifePassiveAJeanneFusion",
+      "2": "PlusHPBoostLv3",
+      "3": "PlusAttackBoostLv3",
+      "4": "AttackUpTargetEquippedGreatSwordLv3",
+      "5": "AddWeaponPrefHammer"
+    },
+    "cost": 34,
+    "baseAttack": 1433,
+    "baseMaxHp": 7255,
+    "speed": 800,
+    "element": "Air",
+    "weaponPref": "Spear",
+    "weaponPivotIndex": 0,
+    "secure": 1,
+    "evolveFrom": "JeanneFusion01",
+    "aiTargetPickWeight": 1,
+    "stars": 6,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 0,
+    "battleOrbImageFlip": 1,
+    "attackType": "Bash",
+    "cosmoName": "JeanneFusion03",
+    "summonableMonsters": [
+      "JeanneFusion02"
+    ],
+    "summonableMatchSource": [
+      true
+    ],
+    "skillVoices": {
+      "0": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "1": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "2": [
+        9,
+        10,
+        11,
+        12
+      ],
+      "3": [
+        13,
+        14,
+        15,
+        16
+      ]
+    },
+    "damageVoices": [
+      17,
+      18,
+      19,
+      20
+    ],
+    "deathVoices": [
+      21,
+      22,
+      23,
+      24
+    ],
+    "victoryVoices": [
+      25,
+      26
+    ],
+    "lineupVoices": [
+      27,
+      28,
+      29,
+      30,
+      31,
+      32
+    ],
+    "evolutionVoices": [
+      38
+    ],
+    "trainVoices": [
+      33,
+      34,
+      35,
+      36,
+      37,
+      39,
+      40,
+      41,
+      42,
+      43
+    ],
+    "titleVoices": [
+      44
+    ],
+    "gachaVoices": [
+      45
+    ],
+    "loginVoices": [
+      46
+    ],
+    "tapVoices": [
+      47,
+      48,
+      49
+    ],
+    "idleVoices": [
+      50
+    ]
+  },
+  "_build": {
+    "scriptVersion": "6-character-family-states",
+    "sourceHash": "4eeca0966beae5f4834dd30ce01bd619fc42302812025946ba276348871fd5f1",
+    "dependencyHash": "5eecc52129bb3b3696ebefa21d1d0e310c37de7a0b174713ec9f238b7f32231f",
+    "generatedAt": 1782456967
+  }
+}

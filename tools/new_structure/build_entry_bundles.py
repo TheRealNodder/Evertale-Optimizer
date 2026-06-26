@@ -12,7 +12,7 @@ from typing import Any, Dict, List, Tuple
 from path_utils import find_repo_root, resolve_repo_path
 
 CATEGORIES = ["characters", "weapons", "accessories", "bosses"]
-ROOT_MARKERS = ["apkfiles"]
+ROOT_MARKERS = ["apkfiles", "tools"]
 EXCLUDED_DIR_NAMES = {"legacy", "Legacy", "_weapon_duplicate_quarantine", "_boss_duplicate_quarantine", "_duplicate_quarantine"}
 TESTLIKE_RE = re.compile(r"(test|debug|prototype|dev|internal|placeholder|sandbox|experimental)", re.I)
 STATE_SUFFIX_RE = re.compile(r"^(.*?)(\d{2})$")
@@ -357,7 +357,7 @@ def main() -> int:
     report = {"schemaVersion": 4, "generatedAt": int(time.time()), "entriesRoot": str(entries_root), "bundlesRoot": str(bundles_dir), "categories": results}
     report_path = entries_root / "reports" / "bundle_build_report.json"
     write_json(report_path, report)
-    print(json.dumps(report, ensure_ascii=False, indent=2))
+    print(json.dumps(report, ensure_ascii=True, indent=2))
     return 0
 
 
