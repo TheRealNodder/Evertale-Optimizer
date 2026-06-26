@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import subprocess
 import sys
 import time
@@ -12,7 +13,7 @@ from typing import Any, Dict, List
 from path_utils import find_repo_root, resolve_repo_path
 
 ROOT_MARKERS = ["apkfiles", "tools"]
-PIPELINE_VERSION = 8
+PIPELINE_VERSION = 9
 
 SAFE_DEFAULT_STEPS = [
     "bookmark_before",
@@ -55,6 +56,13 @@ SCRIPT_MAP = {
     "build_parent_child_map": "build_parent_child_map.py",
     "validate": "validate_entries.py",
 }
+
+
+def subprocess_env() -> Dict[str, str]:
+    env = dict(os.environ)
+    env["PYTHONIOENCODING"] = "utf-8"
+    env.setdefault("PYTHONUTF8", "1")
+    return env
 
 
 def write_json(path: Path, data: Any) -> None:
@@ -105,7 +113,7 @@ def run_step(repo_root: Path, tools_dir: Path, step: str, args: argparse.Namespa
     print("COMMAND:", " ".join(command))
     print("=" * 72)
 
-    result = subprocess.run(command, cwd=str(repo_root))
+    result = subprocess.run(command, cwd=str(repo_root), env=subprocess_env())
     finished = int(time.time())
     return {
         "step": step,
@@ -140,6 +148,7 @@ def main() -> int:
         "startedAt": int(time.time()),
         "steps": [],
         "stepOrderReason": "build_parent_child_map can update character/accessory indexes; build_bundles must run after it so catalog.bundle.json includes newly indexed entries.",
+        "subprocessEncoding": "PYTHONIOENCODING=utf-8",
     }
 
     final_code = 0
