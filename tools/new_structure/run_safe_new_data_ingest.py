@@ -22,6 +22,7 @@ FAST_POST_PIPELINE_STEPS = [
     "split_optimizer_runtime_model.py",
     "runtime_optimizer_trace.py",
     "audit_master_field_contract.py",
+    "update_live_data_config_version.py",
 ]
 
 ORDER_REPORTS = {
@@ -35,6 +36,7 @@ RUNTIME_MANIFEST = "apkfiles/entries/runtime/optimizer_runtime_manifest.json"
 VALIDATION_REPORT = "apkfiles/entries/reports/validation_report.json"
 ENTRY_PIPELINE_REPORT = "apkfiles/entries/reports/entry_pipeline_report.json"
 FIELD_CONTRACT_REPORT = "apkfiles/entries/reports/master_field_contract_audit_report.json"
+LIVE_DATA_CONFIG_REPORT = "apkfiles/entries/reports/live_data_config_version_report.json"
 
 
 def read_json(path: Path, fallback: Any = None) -> Any:
@@ -131,6 +133,10 @@ def summarize_field_contract(repo: Path) -> Dict[str, Any]:
     }
 
 
+def summarize_live_data_config(repo: Path) -> Dict[str, Any]:
+    return read_json(repo / LIVE_DATA_CONFIG_REPORT, {}) or {"report": LIVE_DATA_CONFIG_REPORT, "status": "missing"}
+
+
 def step_command(tools_dir: Path, raw_step: str) -> List[str]:
     parts = raw_step.split()
     return [sys.executable, str(tools_dir / parts[0]), *parts[1:]]
@@ -182,7 +188,7 @@ def main() -> int:
                 break
 
     report = {
-        "schemaVersion": 3,
+        "schemaVersion": 4,
         "purpose": "Single safe runner for append-only new game data ingest and post-ingest checks.",
         "startedAt": started,
         "finishedAt": int(time.time()),
@@ -199,7 +205,7 @@ def main() -> int:
             "New entries are appended by sync_category_order_canonical.py.",
             "This wrapper does not delete, quarantine, or overwrite unrelated data.",
             "Runtime outputs are rebuilt after ingest so the site uses the new extracted data.",
-            "Operational rebuilds regenerate optimizer knowledge, ability graph, runtime model, runtime chunks, trace report, and the Master Control field contract audit.",
+            "Operational rebuilds regenerate optimizer knowledge, ability graph, runtime model, runtime chunks, trace report, the Master Control field contract audit, and the live data cache token.",
             "--full-audit is accepted for compatibility but no longer runs deleted audit-only scripts.",
             "Fresh game JSON files are expected in apkfiles by default when extraction is requested."
         ],
@@ -209,6 +215,7 @@ def main() -> int:
         "runtimeSummary": summarize_runtime_manifest(repo) if not args.dry_run else {},
         "validationSummary": summarize_validation(repo) if not args.dry_run else {},
         "fieldContractSummary": summarize_field_contract(repo) if not args.dry_run else {},
+        "liveDataConfigSummary": summarize_live_data_config(repo) if not args.dry_run else {},
         "nextSteps": [
             "Review this report first.",
             "Review apkfiles/entries/reports/master_field_contract_audit_report.json before optimizer work.",
@@ -228,8 +235,9 @@ def main() -> int:
         "inputFolder": report["inputFolder"],
         "report": str(report_path),
         "fullAudit": args.full_audit,
-        "runtimeSummary": report["runtimeSummary"],
+        "validationSummary": report["validationSummary"],
         "fieldContractSummary": report["fieldContractSummary"],
+        "liveDataConfigSummary": report["liveDataConfigSummary"],
     }, ensure_ascii=False, indent=2))
     return final_code
 
