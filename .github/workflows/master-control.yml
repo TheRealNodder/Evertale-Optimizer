@@ -111,7 +111,7 @@ jobs:
             apkfiles/entries/_markers/*.json
           if-no-files-found: ignore
 
-      - name: Commit generated changes
+      - name: Commit generated live data only
         shell: bash
         run: |
           set -euo pipefail
@@ -119,12 +119,14 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git add apkfiles/entries
+          # Keep commits narrow. Reports/markers/raw scratch files are uploaded as artifacts or ignored.
           git add live-data-config.js 2>/dev/null || true
-          git add *.json 2>/dev/null || true
+          git add apkfiles/entries/characters apkfiles/entries/weapons apkfiles/entries/accessories apkfiles/entries/bosses 2>/dev/null || true
+          git add apkfiles/entries/bundles apkfiles/entries/maps apkfiles/entries/runtime 2>/dev/null || true
+          git add apkfiles/entries/localization/localizable_groups.json apkfiles/entries/localization/leader_skill_localization.json 2>/dev/null || true
 
           if git diff --cached --quiet; then
-            echo "No generated changes to commit."
+            echo "No generated live-data changes to commit."
             exit 0
           fi
 
