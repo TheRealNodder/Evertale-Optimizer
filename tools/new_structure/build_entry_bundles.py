@@ -9,19 +9,13 @@ import time
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
+from path_utils import find_repo_root, resolve_repo_path
+
 CATEGORIES = ["characters", "weapons", "accessories", "bosses"]
 ROOT_MARKERS = ["apkfiles"]
 EXCLUDED_DIR_NAMES = {"legacy", "Legacy", "_weapon_duplicate_quarantine", "_boss_duplicate_quarantine", "_duplicate_quarantine"}
 TESTLIKE_RE = re.compile(r"(test|debug|prototype|dev|internal|placeholder|sandbox|experimental)", re.I)
 STATE_SUFFIX_RE = re.compile(r"^(.*?)(\d{2})$")
-
-
-def find_repo_root(start: Path) -> Path:
-    current = start.resolve()
-    for folder in [current] + list(current.parents):
-        if all((folder / marker).exists() for marker in ROOT_MARKERS):
-            return folder
-    return current
 
 
 def load_json(path: Path) -> Any:
@@ -351,9 +345,9 @@ def main() -> int:
     parser.add_argument("--entries-root", default="apkfiles/entries")
     parser.add_argument("--bundles-root", default=None)
     args = parser.parse_args()
-    repo = find_repo_root(Path(__file__).resolve())
-    entries_root = (repo / args.entries_root).resolve() if not Path(args.entries_root).is_absolute() else Path(args.entries_root).resolve()
-    bundles_dir = Path(args.bundles_root).resolve() if args.bundles_root else entries_root / "bundles"
+    repo = find_repo_root(Path(__file__).resolve(), markers=ROOT_MARKERS)
+    entries_root = resolve_repo_path(repo, args.entries_root, "apkfiles/entries")
+    bundles_dir = resolve_repo_path(repo, args.bundles_root, entries_root / "bundles")
     bundles_dir.mkdir(parents=True, exist_ok=True)
 
     results = [build_category(entries_root, bundles_dir, category) for category in CATEGORIES]

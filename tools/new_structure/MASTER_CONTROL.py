@@ -27,17 +27,11 @@ import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+from path_utils import find_repo_root, resolve_repo_path
+
 MASTER_SCHEMA_VERSION = 2
 SAFE_INGEST_REL = "tools/new_structure/run_safe_new_data_ingest.py"
 REPORT_REL = "apkfiles/entries/reports/master_control_report.json"
-
-
-def find_repo_root(start: Optional[Path] = None) -> Path:
-    cur = (start or Path.cwd()).resolve()
-    for path in [cur, *cur.parents]:
-        if (path / ".git").exists() or (path / "apkfiles").exists():
-            return path
-    return cur
 
 
 def write_json(path: Path, data: Any) -> None:
@@ -82,7 +76,7 @@ def build_safe_ingest_command(repo: Path, args: argparse.Namespace) -> List[str]
     command = [sys.executable, str(script)]
     if args.extract:
         command.append("--extract")
-        command.extend(["--raw", str(Path(args.input or (repo / "apkfiles")).resolve())])
+        command.extend(["--raw", str(resolve_repo_path(repo, args.input, "apkfiles"))])
     elif args.input:
         raise SystemExit("ERROR: --input requires --extract. Use --extract for fresh apkfiles ingest.")
     if args.force:
@@ -120,7 +114,7 @@ def main() -> int:
         raise FileNotFoundError(f"Missing safe ingest runner: {safe_ingest}")
 
     mode = "extract-from-apkfiles" if args.extract else ("full-audit" if args.full_audit else "fast-safe-rebuild")
-    input_folder = str(Path(args.input or (repo / "apkfiles")).resolve()) if args.extract else None
+    input_folder = str(resolve_repo_path(repo, args.input, "apkfiles")) if args.extract else None
     report: Dict[str, Any] = {
         "schemaVersion": MASTER_SCHEMA_VERSION,
         "generatedAt": int(time.time()),
@@ -141,7 +135,7 @@ def main() -> int:
 
     command = build_safe_ingest_command(repo, args)
     try:
-        report["steps"].append(run_step(repo, "safe-new-data-ingest", command, dry_run=False))
+        report["steps"].append(run_step(repo, "safe-new-data-ingest", command, dry_run=args.dry_run))
         report["ok"] = True
     except Exception as exc:
         report["ok"] = False
