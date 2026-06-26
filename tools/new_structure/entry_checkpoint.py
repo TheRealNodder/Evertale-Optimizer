@@ -34,7 +34,7 @@ def load_marker(repo_root: Path, tool_name: str, category: str) -> Optional[Dict
     if not path.exists():
         return None
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
+        return json.loads(path.read_text(encoding="utf-8-sig"))
     except Exception:
         return None
 

@@ -21,6 +21,8 @@ import time
 from pathlib import Path
 from typing import Any, Dict, Optional, Set, Tuple
 
+from path_utils import find_repo_root, resolve_repo_path
+
 # Supports Unity .strings style: "Key" = "Value"; and compact: "Key"="Value"
 KEY_RE = re.compile(r'^\s*"(?P<key>(?:\\.|[^"])*)"\s*=\s*"(?P<value>(?:\\.|[^"])*)"\s*;?\s*$')
 KNOWN_SUFFIXES = [
@@ -60,22 +62,8 @@ def write_json(path: Path, data: Any) -> None:
     path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
 
 
-def find_repo_root(start: Optional[Path] = None) -> Path:
-    cur = (start or Path.cwd()).resolve()
-    for path in [cur, *cur.parents]:
-        if (path / ".git").exists() or (path / "apkfiles").exists():
-            return path
-    return cur
-
-
 def resolve_path(path_text: Optional[str], repo_root: Path, default_rel: str) -> Path:
-    raw = Path(path_text) if path_text else Path(default_rel)
-    if raw.is_absolute():
-        return raw.resolve()
-    cwd_candidate = (Path.cwd() / raw).resolve()
-    if cwd_candidate.exists():
-        return cwd_candidate
-    return (repo_root / raw).resolve()
+    return resolve_repo_path(repo_root, path_text, default_rel)
 
 
 def find_apkfiles(repo_root: Path, explicit: Optional[str]) -> Path:
@@ -83,7 +71,8 @@ def find_apkfiles(repo_root: Path, explicit: Optional[str]) -> Path:
         path = resolve_path(explicit, repo_root, explicit)
         if path.exists():
             return path
-    for path in [repo_root / "apkfiles", Path.cwd() / "apkfiles"]:
+        raise FileNotFoundError(f"Explicit apkfiles folder does not exist: {path}")
+    for path in [repo_root / "apkfiles"]:
         if path.exists() and path.is_dir():
             return path.resolve()
     for path in repo_root.rglob("apkfiles"):
@@ -97,7 +86,8 @@ def find_entries(repo_root: Path, apkfiles: Path, explicit: Optional[str]) -> Pa
         path = resolve_path(explicit, repo_root, explicit)
         if path.exists():
             return path
-    for path in [apkfiles / "entries", repo_root / "apkfiles" / "entries", Path.cwd() / "entries"]:
+        raise FileNotFoundError(f"Explicit entries folder does not exist: {path}")
+    for path in [apkfiles / "entries", repo_root / "apkfiles" / "entries"]:
         if path.exists() and path.is_dir():
             return path.resolve()
     return (apkfiles / "entries").resolve()

@@ -7,16 +7,10 @@ import time
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
+from path_utils import find_repo_root, resolve_repo_path
+
 ROOT_MARKERS = ["apkfiles", "tools"]
 CATEGORIES = ["characters", "weapons", "accessories", "bosses"]
-
-
-def find_repo_root(start: Path) -> Path:
-    current = start.resolve()
-    for folder in [current] + list(current.parents):
-        if all((folder / marker).exists() for marker in ROOT_MARKERS):
-            return folder
-    raise SystemExit("ERROR: Could not locate Evertale-Optimizer repo root. Run from inside the repo.")
 
 
 def load_json(path: Path, fallback: Any = None) -> Any:
@@ -130,7 +124,7 @@ def main() -> int:
     args = parser.parse_args()
 
     repo_root = find_repo_root(Path(__file__).resolve())
-    entries_root = Path(args.entries).resolve() if args.entries else (repo_root / "apkfiles" / "entries").resolve()
+    entries_root = resolve_repo_path(repo_root, args.entries, "apkfiles/entries")
     bookmark = build_bookmark(entries_root)
     output_path = entries_root / "maps" / "entry_bookmark.json"
     report_path = entries_root / "reports" / "entry_bookmark_report.json"

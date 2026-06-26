@@ -7,18 +7,12 @@ import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
+from path_utils import find_repo_root, resolve_repo_path
+
 IMAGE_BASE = "https://ik.imagekit.io/r8fsa98s9/characters"
 STATE_ORDER = ["base", "evolved", "final"]
 OVERRIDES_RELATIVE = "apkfiles/entries/maps/character_image_overrides.json"
 EXCLUDED_PATH_PARTS = {"legacy", "Legacy", "_duplicate_quarantine", "_weapon_duplicate_quarantine", "_boss_duplicate_quarantine"}
-
-
-def find_repo_root(start: Path) -> Path:
-    current = start.resolve()
-    for folder in [current] + list(current.parents):
-        if (folder / "apkfiles" / "entries").exists():
-            return folder
-    return current
 
 
 def load_json(path: Path, fallback: Any = None) -> Any:
@@ -157,7 +151,7 @@ def main() -> int:
     parser.add_argument("--image-base", default=IMAGE_BASE, help="Base URL for character PNGs.")
     args = parser.parse_args()
     repo_root = find_repo_root(Path(__file__).resolve())
-    entries_root = Path(args.entries).resolve() if args.entries else (repo_root / "apkfiles" / "entries").resolve()
+    entries_root = resolve_repo_path(repo_root, args.entries, "apkfiles/entries")
     built = build_from_families(entries_root, args.image_base)
     applied_overrides, blocked_overrides = apply_overrides(repo_root, built["map"])
     payload = {"schemaVersion": 3, "generatedAt": int(time.time()), "imageBase": args.image_base.rstrip("/"), "source": built["source"], "count": len(built["map"]), "families": built["map"]}

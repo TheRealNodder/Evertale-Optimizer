@@ -8,9 +8,14 @@ import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
+from path_utils import find_repo_root
+
 ROOT_MARKERS = ["apkfiles", "tools"]
 CATEGORIES = ["characters", "weapons", "accessories", "bosses"]
-ORDER_LOCKED_CATEGORIES = {"weapons", "accessories", "bosses"}
+# Characters and accessories append newly discovered entries to their canonical
+# lists. Weapons use the dedicated file-handle branch below; bosses stay locked
+# because the existing canonical boss map is intentionally curated.
+ORDER_LOCKED_CATEGORIES = {"bosses"}
 EXCLUDED_PATH_PARTS = {"legacy", "Legacy", "_weapon_duplicate_quarantine", "_boss_duplicate_quarantine", "_duplicate_quarantine"}
 
 CATEGORY_CONFIG = {
@@ -19,14 +24,6 @@ CATEGORY_CONFIG = {
     "accessories": {"index": "apkfiles/entries/accessories/index.json", "canonical": "apkfiles/entries/maps/accessory_order_canonical.txt", "order_map": "apkfiles/entries/maps/accessory_order_map.json", "report": "apkfiles/entries/reports/accessory_order_sync_report.json", "key_field": "sourceId", "display_fields": ["name", "displayName"], "fallback_key_field": "name", "collapse_numeric_forms": False},
     "bosses": {"index": "apkfiles/entries/bosses/index.json", "canonical": "apkfiles/entries/maps/boss_order_canonical.txt", "order_map": "apkfiles/entries/maps/boss_order_map.json", "report": "apkfiles/entries/reports/boss_order_sync_report.json", "key_field": "sourceId", "display_fields": ["name", "displayName"], "fallback_key_field": "name", "collapse_numeric_forms": False},
 }
-
-
-def find_repo_root(start: Optional[Path] = None) -> Path:
-    cur = (start or Path.cwd()).resolve()
-    for path in [cur, *cur.parents]:
-        if all((path / marker).exists() for marker in ROOT_MARKERS):
-            return path
-    raise SystemExit("ERROR: Could not locate Evertale-Optimizer repo root. Run from inside the repo.")
 
 
 def read_text(path: Path) -> str:

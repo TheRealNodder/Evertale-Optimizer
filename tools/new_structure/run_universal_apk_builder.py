@@ -19,21 +19,14 @@ import sys
 from pathlib import Path
 from typing import Iterable, Optional
 
+from path_utils import find_repo_root, resolve_repo_path
+
 CORE_FILES = ("Monster.json", "Weapon.json", "Equipment.json", "Boss.json")
 SCRIPT_RELATIVE = Path("tools/new_structure/build_apk_entry_folders.py")
 
 
 def has_core_files(folder: Path) -> int:
     return sum(1 for name in CORE_FILES if (folder / name).is_file())
-
-
-def find_repo_root(start: Path) -> Optional[Path]:
-    for folder in [start, *start.parents]:
-        if (folder / SCRIPT_RELATIVE).is_file():
-            return folder
-        if (folder / ".git").exists() and (folder / "tools" / "new_structure").exists():
-            return folder
-    return None
 
 
 def candidate_folders(start: Path) -> Iterable[Path]:
@@ -76,7 +69,7 @@ def find_best_input(start: Path) -> Optional[Path]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Auto-detect raw APK folder and run the Evertale entry builder.")
-    parser.add_argument("--base", default=".", help="Starting folder to search from. Default: current folder.")
+    parser.add_argument("--base", default=None, help="Starting folder to search from. Default: repo apkfiles folder.")
     parser.add_argument("--output", default=None, help="Optional output folder override.")
     parser.add_argument("--force", action="store_true", help="Force rebuild all entries.")
     parser.add_argument("--category", choices=["characters", "weapons", "accessories", "bosses"], default=None)
@@ -85,7 +78,8 @@ def main() -> int:
     parser.add_argument("--no-resume", action="store_true", help="Ignore partial extraction markers and start from the beginning.")
     args = parser.parse_args()
 
-    base = Path(args.base).expanduser().resolve()
+    repo_root = find_repo_root(Path(__file__).resolve())
+    base = resolve_repo_path(repo_root, args.base, "apkfiles")
     if not base.exists():
         print(f"ERROR: Base folder does not exist: {base}")
         return 1
@@ -100,19 +94,9 @@ def main() -> int:
         print(f"Starting from: {base}")
         return 1
 
-    repo_root = find_repo_root(Path(__file__).resolve().parent) or find_repo_root(base)
-
-    if repo_root:
-        builder = repo_root / SCRIPT_RELATIVE
-        # IMPORTANT: data-loader.js reads apkfiles/entries, not apkfiles/generated_entries.
-        output_dir = Path(args.output).expanduser().resolve() if args.output else repo_root / "apkfiles" / "entries"
-    else:
-        possible_builder = Path(__file__).resolve().parent / "build_apk_entry_folders.py"
-        if not possible_builder.is_file():
-            print("ERROR: Could not find build_apk_entry_folders.py.")
-            return 1
-        builder = possible_builder
-        output_dir = Path(args.output).expanduser().resolve() if args.output else input_dir / "entries"
+    builder = repo_root / SCRIPT_RELATIVE
+    # IMPORTANT: data-loader.js reads apkfiles/entries, not apkfiles/generated_entries.
+    output_dir = resolve_repo_path(repo_root, args.output, "apkfiles/entries")
 
     command = [sys.executable, str(builder), "--input", str(input_dir), "--output", str(output_dir)]
     if args.force:
@@ -130,7 +114,7 @@ def main() -> int:
     print("Output folder:", output_dir)
     print("Running builder:", builder)
     print()
-    return subprocess.call(command)
+    return subprocess.call(command, cwd=str(repo_root))
 
 
 if __name__ == "__main__":

@@ -27,6 +27,9 @@ VISIBLE_FIELDS = {
 }
 
 STAT_FIELDS = ["atk", "hp", "spd", "cost"]
+FIELD_ALIASES = {
+    "sourceId": ["sourceId", "internal.sourceId"],
+}
 RUNTIME_REL = "apkfiles/entries/runtime/optimizer_runtime_model.json"
 BUNDLE_RELS = {
     "characters": "apkfiles/entries/bundles/characters.bundle.json",
@@ -68,6 +71,14 @@ def nested_get(row: Dict[str, Any], dotted: str) -> Any:
             return None
         cur = cur.get(part)
     return cur
+
+
+def contract_value(row: Dict[str, Any], field: str) -> Any:
+    for candidate in FIELD_ALIASES.get(field, [field]):
+        value = nested_get(row, candidate)
+        if not is_missing(value):
+            return value
+    return None
 
 
 def normalize_entries_payload(payload: Any) -> List[Dict[str, Any]]:
@@ -156,8 +167,10 @@ def audit_entries(repo: Path) -> Tuple[Dict[str, Any], List[str], List[str]]:
             if row.get("placeholder"):
                 placeholder_count += 1
             for field in CRITICAL_FIELDS[category]:
-                if is_missing(nested_get(row, field)):
+                if is_missing(contract_value(row, field)):
                     errors.append(f"[{category}] {key}: critical field {field} is missing")
+                elif field == "sourceId" and is_missing(nested_get(row, "sourceId")):
+                    warnings.append(f"[{category}] {key}: sourceId is supplied by internal.sourceId; regenerate entries to promote top-level sourceId")
             for field in VISIBLE_FIELDS[category]:
                 if is_missing(nested_get(row, field)):
                     warnings.append(f"[{category}] {key}: visible field {field} is missing")

@@ -9,6 +9,8 @@ import time
 from pathlib import Path
 from typing import Any, Dict, List
 
+from path_utils import find_repo_root, resolve_repo_path
+
 ROOT_MARKERS = ["apkfiles", "tools"]
 PIPELINE_VERSION = 7
 
@@ -55,14 +57,6 @@ SCRIPT_MAP = {
 }
 
 
-def find_repo_root(start: Path) -> Path:
-    current = start.resolve()
-    for folder in [current] + list(current.parents):
-        if all((folder / marker).exists() for marker in ROOT_MARKERS):
-            return folder
-    raise SystemExit("ERROR: Could not locate Evertale-Optimizer repo root.")
-
-
 def write_json(path: Path, data: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
@@ -100,7 +94,7 @@ def run_step(repo_root: Path, tools_dir: Path, step: str, args: argparse.Namespa
 
     if step == "extract_entries":
         if args.raw:
-            command.extend(["--base", str(Path(args.raw).resolve())])
+            command.extend(["--base", str(resolve_repo_path(repo_root, args.raw, "apkfiles"))])
         if args.force:
             command.append("--force")
         if args.no_resume:

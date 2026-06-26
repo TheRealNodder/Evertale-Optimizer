@@ -23,6 +23,7 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple, Set
 
 from entry_checkpoint import load_marker as load_entry_marker
 from entry_checkpoint import write_marker as write_entry_marker
+from path_utils import find_repo_root, resolve_repo_path
 
 SCRIPT_VERSION = "6-character-family-states"
 TOOL_NAME = "build_apk_entry_folders"
@@ -76,14 +77,6 @@ RESOLVER_FILES = {
 
 def now_int() -> int:
     return int(time.time())
-
-
-def find_repo_root(start: Path) -> Path:
-    cur = start.resolve()
-    for folder in [cur, *cur.parents]:
-        if all((folder / marker).exists() for marker in ROOT_MARKERS):
-            return folder
-    return start.resolve()
 
 
 def stable_json(data: Any) -> str:
@@ -404,7 +397,52 @@ def resolve_sequence(seq_id: str, resolvers: Dict[str, Dict[str, Any]]) -> Dict[
 
 def make_placeholder(category: str, internal_id: str, display_name: Optional[str], order_index: int, marker: Dict[str, Any]) -> Dict[str, Any]:
     name = display_name or internal_id
-    return {"schemaVersion": 3, "order": order_index, "id": kebab_name(name), "name": name, "category": category[:-1] if category.endswith("s") else category, "image": image_url(category, internal_id), "placeholder": True, "internal": {"sourceId": internal_id, "source": "missing_from_raw_placeholder"}, "_build": {**marker, "generatedAt": now_int()}}
+    stats = {"atk": None, "hp": None, "spd": None, "cost": None}
+    return {
+        "schemaVersion": 3,
+        "order": order_index,
+        "id": kebab_name(name),
+        "sourceId": internal_id,
+        "name": name,
+        "title": "",
+        "secondName": "",
+        "description": "",
+        "category": category[:-1] if category.endswith("s") else category,
+        "rarity": None,
+        "stars": None,
+        "element": None,
+        "stats": stats,
+        "hp": stats["hp"],
+        "atk": stats["atk"],
+        "spd": stats["spd"],
+        "cost": stats["cost"],
+        "image": image_url(category, internal_id),
+        "imageVariants": [],
+        "forms": [],
+        "activeSkills": [],
+        "passiveSkills": [],
+        "leaderSkills": [],
+        "refs": {"activeSkills": [], "passives": [], "leaderBuff": None},
+        "resolved": {"activeSkills": {}, "passives": {}},
+        "placeholder": True,
+        "internal": {"sourceId": internal_id, "family": family_from_internal_id(internal_id), "source": "missing_from_raw_placeholder"},
+        "raw": {"placeholder": True, "sourceId": internal_id, "category": category},
+        "_build": {**marker, "generatedAt": now_int()},
+    }
+
+
+def image_variants_for_entry(category: str, internal_id: str) -> List[Dict[str, Any]]:
+    if category != "characters":
+        return []
+    family = family_from_internal_id(internal_id)
+    form_number = form_number_from_internal_id(internal_id)
+    return [{
+        "state": "source",
+        "family": family,
+        "form": form_number,
+        "sourceId": internal_id,
+        "image": image_url(category, internal_id),
+    }]
 
 
 def normalize_entry(item: Dict[str, Any], category: str, order_index: int, display_name_override: Optional[str], resolvers: Dict[str, Dict[str, Any]], marker: Dict[str, Any]) -> Dict[str, Any]:
@@ -417,12 +455,20 @@ def normalize_entry(item: Dict[str, Any], category: str, order_index: int, displ
     active_ids = [x for x in ordered_values(item.get("activeSkills", [])) if isinstance(x, str)]
     passive_ids = [x for x in ordered_values(item.get("passives", item.get("passiveSkills", []))) if isinstance(x, str)]
     active_ai = item.get("activeSkillsAI", {}) if isinstance(item.get("activeSkillsAI"), dict) else {}
+    leader_skills = [x for x in ordered_values(item.get("leaderSkills", [])) if isinstance(x, str)]
+    leader_buff = item.get("leaderBuff")
+    if isinstance(leader_buff, str) and leader_buff not in leader_skills:
+        leader_skills.append(leader_buff)
+    stats = {"atk": item.get("baseAttack") or item.get("atk"), "hp": item.get("baseMaxHp") or item.get("hp"), "spd": item.get("speed") or item.get("spd"), "cost": item.get("cost")}
+    image_variants = image_variants_for_entry(category, internal_id)
     return {
         "schemaVersion": 3,
         "order": order_index,
         "id": kebab_name(str(display_name)),
+        "sourceId": internal_id,
         "name": display_name,
         "title": title,
+        "secondName": title,
         "description": description,
         "category": category[:-1] if category.endswith("s") else category,
         "rarity": item.get("rarity"),
@@ -430,8 +476,17 @@ def normalize_entry(item: Dict[str, Any], category: str, order_index: int, displ
         "evolvedStars": item.get("evolvedStars"),
         "element": normalize_element(item.get("element")),
         "weaponType": item.get("weaponType") or item.get("weaponPref"),
-        "stats": {"atk": item.get("baseAttack") or item.get("atk"), "hp": item.get("baseMaxHp") or item.get("hp"), "spd": item.get("speed") or item.get("spd"), "cost": item.get("cost")},
+        "stats": stats,
+        "hp": stats["hp"],
+        "atk": stats["atk"],
+        "spd": stats["spd"],
+        "cost": stats["cost"],
         "image": image_url(category, internal_id),
+        "imageVariants": image_variants,
+        "forms": image_variants,
+        "activeSkills": active_ids,
+        "passiveSkills": passive_ids,
+        "leaderSkills": leader_skills,
         "refs": {"activeSkills": active_ids, "passives": passive_ids, "activeSkillsAI": active_ai, "aiSequence": item.get("aiSequence"), "leaderBuff": item.get("leaderBuff"), "leaderBuffCondition": item.get("leaderBuffCondition"), "summonableMonsters": item.get("summonableMonsters")},
         "resolved": {
             "activeSkills": {aid: resolve_ability(aid, resolvers) for aid in active_ids},
@@ -706,8 +761,8 @@ def main() -> int:
     parser.add_argument("--no-resume", action="store_true", help="Ignore partial marker files and start from the beginning.")
     args = parser.parse_args()
     repo_root = find_repo_root(Path(__file__).resolve())
-    input_dir = Path(args.input).resolve()
-    output_dir = Path(args.output).resolve()
+    input_dir = resolve_repo_path(repo_root, args.input, "apkfiles")
+    output_dir = resolve_repo_path(repo_root, args.output, "apkfiles/entries")
     resolvers = load_resolvers(input_dir)
     categories = [args.category] if args.category else ["characters", "weapons", "accessories", "bosses"]
     report = {"schemaVersion": 3, "scriptVersion": SCRIPT_VERSION, "generatedAt": now_int(), "input": str(input_dir), "output": str(output_dir), "force": args.force, "resume": not args.no_resume, "categories": []}

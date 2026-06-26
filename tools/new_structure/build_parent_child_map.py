@@ -8,20 +8,14 @@ import time
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
+from path_utils import find_repo_root, resolve_repo_path
+
 ROOT_MARKERS = ["apkfiles", "tools"]
 STATE_SUFFIX_RE = re.compile(r"^(.*?)(\d{2})$")
 CHILD_HINT_RE = re.compile(r"(rabbit|angel|raven|clone|doll|summon|minion|shadow|imposter|beastshikigami|yandere|maid|exchange|token)", re.I)
 FORCED_PARENT_CHILDREN = {
     "BeautyBeastRegular": ["BeautyRegular", "BeastRegular"],
 }
-
-
-def find_repo_root(start: Path) -> Path:
-    current = start.resolve()
-    for folder in [current] + list(current.parents):
-        if all((folder / marker).exists() for marker in ROOT_MARKERS):
-            return folder
-    raise SystemExit("ERROR: Could not locate Evertale-Optimizer repo root.")
 
 
 def load_json(path: Path, default: Any = None) -> Any:
@@ -225,7 +219,7 @@ def main() -> int:
     args = parser.parse_args()
 
     repo = find_repo_root(Path(__file__).resolve())
-    entries_root = (repo / args.entries_root).resolve() if not Path(args.entries_root).is_absolute() else Path(args.entries_root).resolve()
+    entries_root = resolve_repo_path(repo, args.entries_root, "apkfiles/entries")
     maps_dir = entries_root / "maps"
     reports_dir = entries_root / "reports"
 

@@ -9,6 +9,8 @@ import time
 from pathlib import Path
 from typing import Any, Dict, List
 
+from path_utils import find_repo_root, resolve_repo_path
+
 ROOT_MARKERS = ["apkfiles", "tools"]
 REPORT_REL = "apkfiles/entries/reports/safe_new_data_ingest_report.json"
 PIPELINE_SCRIPT = "run_entry_pipeline.py"
@@ -33,14 +35,6 @@ RUNTIME_MANIFEST = "apkfiles/entries/runtime/optimizer_runtime_manifest.json"
 VALIDATION_REPORT = "apkfiles/entries/reports/validation_report.json"
 ENTRY_PIPELINE_REPORT = "apkfiles/entries/reports/entry_pipeline_report.json"
 FIELD_CONTRACT_REPORT = "apkfiles/entries/reports/master_field_contract_audit_report.json"
-
-
-def find_repo_root(start: Path) -> Path:
-    cur = start.resolve()
-    for folder in [cur, *cur.parents]:
-        if all((folder / marker).exists() for marker in ROOT_MARKERS):
-            return folder
-    raise SystemExit("ERROR: Could not locate repo root. Run this inside Evertale-Optimizer.")
 
 
 def read_json(path: Path, fallback: Any = None) -> Any:
@@ -157,7 +151,7 @@ def main() -> int:
     tools_dir = repo / "tools" / "new_structure"
     report_path = repo / REPORT_REL
 
-    input_folder = Path(args.raw).resolve() if args.raw else (repo / "apkfiles")
+    input_folder = resolve_repo_path(repo, args.raw, "apkfiles")
     should_extract = bool(args.extract or args.raw or args.force or args.no_resume)
 
     steps: List[Dict[str, Any]] = []

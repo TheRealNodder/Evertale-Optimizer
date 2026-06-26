@@ -8,6 +8,8 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Set
 
+from path_utils import find_repo_root, resolve_repo_path
+
 ROOT_MARKERS = ["apkfiles", "tools"]
 DEFAULT_REPORT = "apkfiles/entries/reports/runtime_optimizer_trace.json"
 
@@ -44,14 +46,6 @@ CLASS_RE = re.compile(r"class\s+([A-Za-z_$][\w$]*)\b", re.M)
 SCRIPT_RE = re.compile(r"<script[^>]+src=[\"']([^\"']+)[\"']", re.I)
 FETCH_RE = re.compile(r"fetch\(\s*[`\"']([^`\"']+)[`\"']", re.I)
 CALL_RE_TEMPLATE = r"(?<![\w$]){name}\s*\("
-
-
-def find_repo_root(start: Path) -> Path:
-    cur = start.resolve()
-    for folder in [cur, *cur.parents]:
-        if all((folder / marker).exists() for marker in ROOT_MARKERS):
-            return folder
-    raise SystemExit("ERROR: Could not locate repo root. Run this inside the Evertale-Optimizer repo.")
 
 
 def read_text(path: Path) -> str:
@@ -257,7 +251,7 @@ def main() -> int:
         ],
     }
 
-    out = repo / args.output
+    out = resolve_repo_path(repo, args.output, DEFAULT_REPORT)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
