@@ -48,6 +48,38 @@ jobs:
           python --version
           test -f tools/new_structure/MASTER_CONTROL.py
 
+      - name: Preflight raw APK files
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "Repository root: $(pwd)"
+          echo "Root preview:"
+          ls -la
+          echo "apkfiles preview:"
+          if [ -d apkfiles ]; then
+            ls -la apkfiles
+          else
+            echo "ERROR: apkfiles folder is missing from this checkout."
+            exit 1
+          fi
+          echo "Required raw files directly inside apkfiles:"
+          missing=0
+          for file in Monster.json Weapon.json Equipment.json Boss.json; do
+            if [ -f "apkfiles/$file" ]; then
+              size=$(wc -c < "apkfiles/$file")
+              echo "FOUND apkfiles/$file (${size} bytes)"
+            else
+              echo "MISSING apkfiles/$file"
+              missing=1
+            fi
+          done
+          echo "Nearby raw file search, diagnostic only:"
+          find apkfiles -maxdepth 4 -type f \( -name "Monster.json" -o -name "Weapon.json" -o -name "Equipment.json" -o -name "Boss.json" \) -print || true
+          if [ "${{ inputs.mode }}" != "safe_rebuild" ] && [ "$missing" -ne 0 ]; then
+            echo "ERROR: Extract modes require Monster.json, Weapon.json, Equipment.json, and Boss.json directly inside apkfiles."
+            exit 1
+          fi
+
       - name: Run Master Control
         shell: bash
         run: |
