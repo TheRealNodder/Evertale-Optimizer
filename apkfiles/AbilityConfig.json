@@ -1,6 +1,6 @@
 {
 	"Version": 23,
-	"Time": 1780383899,
+	"Time": 1782120426,
 	"AbilityConfig": {
 		"StunSingle200A": {
 			"class": "AbilityConfig",
@@ -46570,6 +46570,494 @@
 			"abilityEffect": "LupinSearchlight",
 			"flags": ["NoDamage","Summon"],
 			"useCondition": "IsLupinActive4ReadyOr1AllyHPBelow50Percent"
+		},
+		"SingleAttackAJeanneFusionBoss": {
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"damageFlags": ["IgnoreArmor","IgnoreSkin"],
+				"applyToTargetType": "Enemy"
+			},{
+				"buffs": ["InstantKillAndCreditSource"],
+				"applyConditions": "On10PercentMaxHPIsNotBossAndNotMirage",
+				"applyToTargetType": "Enemy",
+				"showMissConditions": "ShowNoMiss",
+				"skipAbilityEffect": true,
+				"buffAppliedEffects": ["JeanneFusionInstantdeath1"]
+			},{
+				"buffs":["RemoveJeanneFusionBossActive2Lock"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "JeanneFusionAttack1",
+			"attackScalors": ["GoodWith2DisabledEnemies","GoodWithAllDisabledEnemies"],
+			"conditionedAbilityEffects": ["JeanneFusionAttack1","JeanneFusionAttack1"],
+			"recommendEffectWhenUsable": -2
+		},
+		"AllyBuffAJeanneFusionBoss": {
+			"class": "AbilityConfig",
+			"targetingData": "oneAllyNotMe",
+			"components": ["ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"buffs": ["1PercentHealMaxHPBoss","RemoveBuffs","AttackPlus50Percent1TurnOnly","PoisonImmunityOnce","BurnImmunityOnce"],
+				"applyToTargetType": "Friendly"
+			},{
+				"buffs": ["1PercentHealMaxHPBoss","RemoveBuffs","AttackPlus50Percent1TurnOnly","PoisonImmunityOnce","BurnImmunityOnce","JeanneFusionBossActive2Lock"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"friendlyEventType": "Finish",
+			"sourceEventType": "Finish",
+			"flags": ["Healer","Purify"],
+			"abilityEffect": "JeanneFusionHelping",
+			"useCondition": "IsNotJeanneFusionActive2Lock"
+		},
+		"EnemyBuffAJeanneFusionBoss01": {
+			"class": "AbilityConfig",
+			"targetingData": "AllEnemy",
+			"components": ["ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"buffs": ["Stun100"],
+				"applyToTargetType": "Enemy"
+			},{
+				"buffs": ["Add1JeanneFusionBoss01ToNext"],
+				"applyToTargetType": "Source",
+				"skipAbilityEffect": true,
+				"applyConditions": "AtLeast2NonSummonedAllies",
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs": ["Add1JeanneFusionBoss01ToEndReinforcments"],
+				"applyToTargetType": "Source",
+				"skipAbilityEffect": true,
+				"applyConditions": "AtLeast3NonSummonedAllies",
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs": ["Add1JeanneFusionBoss01ToRandomReinforcements"],
+				"applyToTargetType": "Source",
+				"skipAbilityEffect": true,
+				"applyConditions": "AtLeast4NonSummonedAllies",
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs":["RemoveJeanneFusionBossActive2Lock"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"sourceEventType": "Finish",
+			"enemyEventType": "Finish",
+			"abilityEffect": "JeanneFusionLight",
+			"flags": ["StunChance","NoDamage","Summon"],
+			"useCondition": "IsNotJeanneFusionActive3Entry50TULock"
+		},
+		"EnemyBuffAJeanneFusionBoss03": {
+			"class": "AbilityConfig",
+			"targetingData": "AllEnemy",
+			"components": ["ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"buffs": ["Stun100"],
+				"applyToTargetType": "Enemy"
+			},{
+				"buffs": ["Add1JeanneFusionBoss03ToNext"],
+				"applyToTargetType": "Source",
+				"skipAbilityEffect": true,
+				"applyConditions": "AtLeast2NonSummonedAllies",
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs": ["Add1JeanneFusionBoss03ToEndReinforcments"],
+				"applyToTargetType": "Source",
+				"skipAbilityEffect": true,
+				"applyConditions": "AtLeast3NonSummonedAllies",
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs": ["Add1JeanneFusionBoss03ToRandomReinforcements"],
+				"applyToTargetType": "Source",
+				"skipAbilityEffect": true,
+				"applyConditions": "AtLeast4NonSummonedAllies",
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs":["RemoveJeanneFusionBossActive2Lock"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"sourceEventType": "Finish",
+			"enemyEventType": "Finish",
+			"abilityEffect": "JeanneFusionLight",
+			"flags": ["StunChance","NoDamage","Summon"],
+			"useCondition": "IsNotJeanneFusionActive3Entry50TULock"
+		},
+		"AllAttackAJeanneFusionBoss":{
+			"class": "AbilityConfig",
+			"targetingData": "AllEnemy",
+			"components": ["Damage","ApplyBuff"],
+			"componentOverrides": [{
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"damageFlags": ["HardIgnoreBlockDeath","IgnoreArmor"],
+				"applyToTargetType": "Enemy"
+			},{
+				"buffs":["RemoveJeanneFusionBossActive2Lock","JeanneFusionBossActive4Cooldown100"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "JeanneFusionSP",
+			"flags": ["IgnoreStealth","Duration"],
+			"recommendEffectWhenUsable": -2,
+			"useCondition": "JeanneFusionBossAllyAndTimeInCombat100NotInstantCooldown"
+		},
+		"DoubleAttackABasiliskRegularBoss":{
+			"class": "AbilityConfig",
+			"targetingData": "2Enemy",
+			"components": ["Damage","ApplyBuff"],
+			"componentOverrides": [{
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"damageFlags": ["HardIgnoreBlockDeath","IgnoreSkin"],
+				"applyToTargetType": "Enemy"
+			},{
+				"buffs":["IgnoreDamageReduction1TurnOnly","Grant1OtherAllyPiercingBasiliskRegularEBB"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "BasiliskSlash",
+			"attackScalors": ["GoodWith4BurningsUnits","GoodIfAllUnitsBurning"],
+			"conditionedAbilityEffects": ["BasiliskSlash","BasiliskSlash"],
+			"recommendEffectWhenUsable": -2
+		},
+		"SingleAttackABasiliskRegularBoss":{
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"damageFlags": ["HardIgnoreBlockDeath","IgnoreSkin"],
+				"applyToTargetType": "Enemy"
+			},{
+				"buffs": ["GiveTurn","OnExtraTurn","JustGivenTurn"],
+				"applyConditions": "IsBurning",
+				"showMissConditions": "ShowNoMiss",
+				"applyToTargetType": "Source",
+				"skipAbilityEffect": true
+			},{
+				"buffs":["RemoveEnergy"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "BasiliskSpecial",
+			"recommendEffectWhenUsable": -1,
+			"attackScalors": ["GoodVsProtector"],
+			"conditionedAbilityEffects": ["BasiliskSpecial","BasiliskSpecial"],
+			"useCondition": "IsCharged3"
+		},
+		"AllyAndEnemyBuffABasiliskRegularBoss": {
+			"class": "AbilityConfig",
+			"targetingData": "All",
+			"components": ["ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"buffs": ["Burn","BurnShieldOnce"],
+				"applyToTargetType": "Enemy"
+			},{
+				"buffs": ["MegaHealingBurn","RemoveMegaHealingBurnApplyHealingBurn","DisableAllBurningEnemiesFor10TUEBBBoss","BasiliskRegularBossActive3Lock"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			}],
+			"enemyEventType": "Hit",
+			"friendlyEventType": "Finish",
+			"sourceEventType": "Finish",
+			"abilityEffect": "BasiliskEyes",
+			"flags": ["NoDamage","Burn","ApplyStatusToSelf"],
+			"useCondition": "IsNotBasiliskRegularActive3LockORDeathLock"
+		},
+		"EnemyBuffABasiliskRegularBoss":{
+			"class": "AbilityConfig",
+			"targetingData": "SelfOnly",
+			"components": ["ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"buffs": ["KillRandomDisabledEnemyEOTAndCreditKillBasiliskRegularBoss"],
+				"showMissConditions": "ShowNoMiss",
+				"applyToTargetType": "Source"
+			},{
+				"buffs": ["SendToFrontOfReinforcements", "RemoveBuffs"],
+				"applyConditions": "AllyHasReinforcements",
+				"applyToTargetType": "Source",
+				"showMissConditions": "ShowNoMiss",
+				"skipAbilityEffect": true,
+				"buffAppliedEffects": ["StepBackEffect"]
+		 	},{
+				"buffs": ["Add4SuperFireMinionNextNotKnockbackImmuneBoss"],
+				"applyConditions": "IsAlone",
+				"applyToTargetType": "Source",
+				"showMissConditions": "ShowNoMiss",
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["Add3SuperFireMinionNextNotKnockbackImmuneBoss"],
+				"applyConditions": "2AlliesLeftNot3",
+				"applyToTargetType": "Source",
+				"showMissConditions": "ShowNoMiss",
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["Add2SuperFireMinionNextNotKnockbackImmuneBoss"],
+				"applyConditions": "3AlliesLeftNot4",
+				"applyToTargetType": "Source",
+				"showMissConditions": "ShowNoMiss",
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["Add1SuperFireMinionNextNotKnockbackImmuneBoss"],
+				"applyConditions": "4AlliesLeftNoReinforcements",
+				"applyToTargetType": "Source",
+				"showMissConditions": "ShowNoMiss",
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["SendToBackOfReinforcements", "RemoveBuffs"],
+				"showMissConditions": "ShowNoMiss",
+				"applyToTargetType": "Source",
+				"skipAbilityEffect": true,
+				"buffAppliedEffects": ["StepBackEffect"]
+			}],
+			"sourceEventType": "Finish",
+			"abilityEffect": "BasiliskFang",
+			"hideTargetingInfo": true,
+			"flags": ["Summon"],
+			"useCondition": "IsBasiliskRegularActive3Lock"
+		},
+		"SingleAttackAManchesterRegularBoss":{
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"damageFlags": ["IgnoreArmor","HardIgnoreBlockDeath","DoNotWake"],
+				"applyToTargetType": "Enemy"
+			},{
+				"buffs": ["Burn"],
+				"applyToTargetType": "Enemy",
+				"showMissConditions": "ShowNoMiss",
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["RemovePoison","PoisonImmunityOnce","SleepImmunityOnce","LoseMomentum","GainMomentum","RemoveActive4LOCKManchesterRegularBoss"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "ManchesterAttack",
+			"attackScalors": ["GoodWithMomentum"],
+			"conditionedAbilityEffects": ["ManchesterAttack","ManchesterAttack"],
+			"recommendEffectWhenUsable": -2
+		},
+		"AllyAndEnemyBuffAManchesterRegularBoss":{
+			"class": "AbilityConfig",
+			"targetingData": "All",
+			"components": ["ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides":[{
+				"buffs": ["EmptyPlaceholder"],
+				"applyToTargetType": "Friendly"
+			},{
+				"buffs": ["HasteUp20Percent"],
+				"applyToTargetType": "Friendly",
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss",
+				"applyConditions": "IsBurning"
+			},{
+				"buffs": ["SpiritLossF"],
+				"applyToTargetType": "Enemy",
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss",
+				"applyConditions": "IsBurning"
+			},{
+				"buffs": ["ManchesterRegularBossActive2Cooldown50"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"friendlyEventType": "Finish",
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"flags": ["NoDamage"],
+			"abilityEffect": "MidFire1",
+			"useCondition": "NotInstantCooldown"
+		},
+		"SelfBuffAManchesterRegularBoss":{
+			"class": "AbilityConfig",
+			"targetingData": "SelfOnly",
+			"components": ["ApplyBuff"],
+			"componentOverrides": [{
+				"buffs": ["RemoveEnergy","FortifyFor3Attacks"],
+				"applyToTargetType": "Source"
+			}],
+			"sourceEventType": "Finish",
+			"abilityEffect": "ManchesterPowerUp",
+			"flags": ["NoDamage"],
+			"useCondition": "IsCharged3"
+		},
+		"AllAttackAManchesterRegularBoss":{
+			"class": "AbilityConfig",
+			"targetingData": "AllEnemy",
+			"components": ["Damage","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"applyToTargetType": "Enemy",
+				"damageFlags": ["HardIgnoreBlockDeath","IgnoreSkin","DoNotWake"]
+			},{
+				"buffs": ["Burn","BurnImmunityTempForRevenge"],
+				"applyToTargetType": "Enemy",
+				"showMissConditions": "ShowNoMiss",
+				"skipAbilityEffect": true
+			},{
+				"buffs":["Active4LOCKManchesterRegularBoss"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Hit",
+			"abilityEffect": "ManchesterSp",
+			"attackScalors": ["GoodVsRandomDamageMark"],
+			"conditionedAbilityEffects": ["ManchesterSp","ManchesterSp"],
+			"recommendEffectWhenUsable": -1,
+			"useCondition": "IsNotActive4LOCKManchesterRegular"
+		},
+		"SingleAttackAJeanneFusion": {
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"damageFlags": ["IgnoreArmor","IgnoreSkin"],
+				"applyToTargetType": "Enemy"
+			},{
+				"buffs": ["InstantKillAndCreditSource"],
+				"applyConditions": "On10PercentMaxHPIsNotBossAndNotMirage",
+				"applyToTargetType": "Enemy",
+				"showMissConditions": "ShowNoMiss",
+				"skipAbilityEffect": true,
+				"buffAppliedEffects": ["JeanneFusionInstantdeath1"]
+			},{
+				"buffs":["RemoveJeanneFusionActive2Lock"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "JeanneFusionAttack1",
+			"attackScalors": ["GoodWith2DisabledEnemies","GoodWithAllDisabledEnemies"],
+			"conditionedAbilityEffects": ["JeanneFusionAttack1","JeanneFusionAttack1"],
+			"recommendEffectWhenUsable": -2
+		},
+		"AllyBuffAJeanneFusion": {
+			"class": "AbilityConfig",
+			"targetingData": "oneAllyNotMe",
+			"components": ["ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"buffs": ["HealFull","RemoveBuffs","AttackPlus50Percent1TurnOnly","PoisonImmunityOnce","BurnImmunityOnce"],
+				"applyToTargetType": "Friendly"
+			},{
+				"buffs": ["HealFull","RemoveBuffs","AttackPlus50Percent1TurnOnly","PoisonImmunityOnce","BurnImmunityOnce","JeanneFusionActive2Lock"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"friendlyEventType": "Finish",
+			"sourceEventType": "Finish",
+			"flags": ["Healer","Purify"],
+			"abilityEffect": "JeanneFusionHelping",
+			"useCondition": "IsNotJeanneFusionActive2Lock"
+		},
+		"EnemyBuffAJeanneFusion01": {
+			"class": "AbilityConfig",
+			"targetingData": "AllEnemy",
+			"components": ["ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"buffs": ["Stun100"],
+				"applyToTargetType": "Enemy"
+			},{
+				"buffs": ["Add1JeanneFusion01ToNext"],
+				"applyToTargetType": "Source",
+				"skipAbilityEffect": true,
+				"applyConditions": "AtLeast2NonSummonedAllies",
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs": ["Add1JeanneFusion01ToEndReinforcments"],
+				"applyToTargetType": "Source",
+				"skipAbilityEffect": true,
+				"applyConditions": "AtLeast3NonSummonedAllies",
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs": ["Add1JeanneFusion01ToRandomReinforcements"],
+				"applyToTargetType": "Source",
+				"skipAbilityEffect": true,
+				"applyConditions": "AtLeast4NonSummonedAllies",
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs":["RemoveJeanneFusionActive2Lock"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"sourceEventType": "Finish",
+			"enemyEventType": "Finish",
+			"abilityEffect": "JeanneFusionLight",
+			"flags": ["StunChance","NoDamage","Summon"],
+			"useCondition": "IsNotJeanneFusionActive3Entry50TULock"
+		},
+		"EnemyBuffAJeanneFusion02": {
+			"class": "AbilityConfig",
+			"targetingData": "AllEnemy",
+			"components": ["ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"buffs": ["Stun100"],
+				"applyToTargetType": "Enemy"
+			},{
+				"buffs": ["Add1JeanneFusion02ToNext"],
+				"applyToTargetType": "Source",
+				"skipAbilityEffect": true,
+				"applyConditions": "AtLeast2NonSummonedAllies",
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs": ["Add1JeanneFusion02ToEndReinforcments"],
+				"applyToTargetType": "Source",
+				"skipAbilityEffect": true,
+				"applyConditions": "AtLeast3NonSummonedAllies",
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs": ["Add1JeanneFusion02ToRandomReinforcements"],
+				"applyToTargetType": "Source",
+				"skipAbilityEffect": true,
+				"applyConditions": "AtLeast4NonSummonedAllies",
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs":["RemoveJeanneFusionActive2Lock"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"sourceEventType": "Finish",
+			"enemyEventType": "Finish",
+			"abilityEffect": "JeanneFusionLight",
+			"flags": ["StunChance","NoDamage","Summon"],
+			"useCondition": "IsNotJeanneFusionActive3Entry50TULock"
+		},
+		"AllAttackAJeanneFusion":{
+			"class": "AbilityConfig",
+			"targetingData": "AllEnemy",
+			"components": ["Damage","ApplyBuff"],
+			"componentOverrides": [{
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"damageFlags": ["HardIgnoreBlockDeath","IgnoreArmor"],
+				"applyToTargetType": "Enemy"
+			},{
+				"buffs":["RemoveJeanneFusionActive2Lock","JeanneFusionActive4Cooldown100"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "JeanneFusionSP",
+			"flags": ["IgnoreStealth","Duration"],
+			"recommendEffectWhenUsable": -2,
+			"useCondition": "JeanneFusionAllyAndTimeInCombat100NotInstantCooldown"
 		}
 	}
 }
