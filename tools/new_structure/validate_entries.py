@@ -7,10 +7,14 @@ import time
 from pathlib import Path
 from typing import Any, Dict, List
 
+from path_utils import configure_utf8_stdio
+
 ROOT_MARKERS = ["apkfiles", "tools"]
 CATEGORIES = ["characters", "weapons", "accessories", "bosses"]
-# Bosses are still strict-index bundles. Weapons now intentionally collapse raw/state rows into one visible card per weapon family.
-STRICT_INDEX_CATEGORIES = {"bosses"}
+# All ordinary categories are append-only. Weapons intentionally collapse raw
+# state rows into one visible card per family and validate through their
+# dedicated family-bundle contract below.
+STRICT_INDEX_CATEGORIES: set[str] = set()
 REQUIRED_MARKERS = [
     "run_entry_pipeline_all.marker.json",
     "build_character_image_map.marker.json",
@@ -70,6 +74,37 @@ def row_identity(row: Any) -> str:
     return ""
 
 
+def entry_file_ids(category_dir: Path) -> Dict[str, str]:
+    discovered: Dict[str, str] = {}
+    entries_dir = category_dir / "entries"
+    if not entries_dir.exists():
+        return discovered
+    for path in sorted(entries_dir.glob("*.json")):
+        if not path.is_file() or is_excluded_path(path):
+            continue
+        data = load_json(path, None)
+        if not isinstance(data, dict):
+            continue
+        source_id = source_id_from_entry(data, path.stem)
+        if source_id:
+            discovered[source_id] = path.name
+    return discovered
+
+
+def published_source_ids(entries: List[Dict[str, Any]], category: str) -> set[str]:
+    published: set[str] = set()
+    for entry in entries:
+        source_id = row_identity(entry)
+        if source_id:
+            published.add(source_id)
+        if category == "weapons":
+            for state in entry.get("states", []) if isinstance(entry, dict) else []:
+                state_id = row_identity(state)
+                if state_id:
+                    published.add(state_id)
+    return published
+
+
 def file_handle_order(file_value: Any) -> int | None:
     match = re.match(r"^(\d+)_", str(file_value or "").split("/")[-1])
     return int(match.group(1)) if match else None
@@ -127,7 +162,7 @@ def validate_weapon_family_bundle(category: str, index_count: int, count: int, d
     return True
 
 
-def validate_bundle(base: Path, category: str, index_count: int, errors: List[str], warnings: List[str], bundle_counts: Dict[str, Any]) -> None:
+def validate_bundle(base: Path, category: str, index_ids: List[str], errors: List[str], warnings: List[str], bundle_counts: Dict[str, Any]) -> None:
     bundle_path = base / "bundles" / f"{category}.bundle.json"
     if not bundle_path.exists():
         errors.append(f"[{category}] Missing bundle: {bundle_path}")
@@ -135,8 +170,13 @@ def validate_bundle(base: Path, category: str, index_count: int, errors: List[st
     bundle = load_json(bundle_path, {}) or {}
     entries = bundle.get("entries") if isinstance(bundle, dict) else []
     count = len(entries or []) if isinstance(entries, list) else 0
+    index_count = len(index_ids)
     discovery = bundle.get("discovery", {}) if isinstance(bundle.get("discovery"), dict) else {}
-    bundle_counts[category] = {"schemaVersion": bundle.get("schemaVersion"), "count": count, "sourceIndexCount": bundle.get("sourceIndexCount"), "discovery": discovery}
+    published_ids = published_source_ids(entries or [], category)
+    missing_from_bundle = sorted(set(index_ids) - published_ids)
+    if missing_from_bundle:
+        errors.append(f"[{category}] Indexed entries missing from public bundle: {missing_from_bundle[:25]}")
+    bundle_counts[category] = {"schemaVersion": bundle.get("schemaVersion"), "count": count, "sourceIndexCount": bundle.get("sourceIndexCount"), "discovery": discovery, "visibleIds": [row_identity(row) for row in entries or [] if row_identity(row)]}
 
     if validate_weapon_family_bundle(category, index_count, count, discovery, errors, warnings):
         if bundle.get("schemaVersion", 0) < 3:
@@ -144,6 +184,9 @@ def validate_bundle(base: Path, category: str, index_count: int, errors: List[st
         if discovery.get("discoveredUnindexedCount", 0):
             errors.append(f"[{category}] Family bundle discovered unindexed entries: {discovery.get('discoveredUnindexedCount')}")
         return
+
+    if count != index_count:
+        errors.append(f"[{category}] Public bundle count mismatch: index={index_count}, bundle={count}")
 
     if category in STRICT_INDEX_CATEGORIES:
         if bundle.get("schemaVersion", 0) < 3:
@@ -167,7 +210,7 @@ def expected_catalog_count(category: str, index_expected: int, bundle_counts: Di
         return int(bundle.get("count") or weapon_expected_visible_count(index_expected, discovery, int(bundle.get("count") or 0)))
     if category == "weapons" and overlay.get("enabled"):
         return int(bundle.get("count") or index_expected)
-    return index_expected
+    return int(bundle.get("count") or index_expected)
 
 
 def index_ids_for_category(base: Path, category: str) -> List[str]:
@@ -197,19 +240,24 @@ def validate_catalog_bundle(base: Path, category_counts: Dict[str, int], errors:
     for category, index_expected in category_counts.items():
         expected = expected_catalog_count(category, index_expected, bundle_counts)
         actual = len(categories.get(category, []) or [])
+        catalog_ids = catalog_ids_for_category(categories, category)
+        bundle_ids = bundle_counts.get(category, {}).get("visibleIds", [])
+        missing_bundle_rows = sorted(set(bundle_ids) - set(catalog_ids))
+        extra_catalog_rows = sorted(set(catalog_ids) - set(bundle_ids))
+        if missing_bundle_rows or extra_catalog_rows:
+            errors.append(
+                f"[catalog] {category} differs from its category bundle; "
+                f"missing={missing_bundle_rows[:25]}; extra={extra_catalog_rows[:25]}"
+            )
         if actual != expected:
             index_ids = index_ids_for_category(base, category)
-            catalog_ids = catalog_ids_for_category(categories, category)
             missing = [sid for sid in index_ids if sid not in set(catalog_ids)]
             extra = [sid for sid in catalog_ids if sid not in set(index_ids)]
             message = (
                 f"[catalog] Category count mismatch for {category}: expected={expected}, actual={actual}; "
                 f"missingFromCatalog={missing[:25]}; extraInCatalog={extra[:25]}"
             )
-            if category in STRICT_INDEX_CATEGORIES:
-                errors.append(message)
-            else:
-                warnings.append(message)
+            errors.append(message)
 
 
 def validate_markers(base: Path, warnings: List[str]) -> Dict[str, Any]:
@@ -225,6 +273,7 @@ def validate_markers(base: Path, warnings: List[str]) -> Dict[str, Any]:
 
 
 def validate() -> int:
+    configure_utf8_stdio()
     repo_root = find_repo_root(Path(__file__).resolve())
     if not repo_root:
         print("ERROR: Could not locate Evertale-Optimizer repo root.")
@@ -238,7 +287,7 @@ def validate() -> int:
     duplicate_source_ids: Dict[str, List[str]] = {}
 
     print("=" * 60)
-    print("Evertale Optimizer Entry Validator v5")
+    print("Evertale Optimizer Entry Validator v6")
     print("=" * 60)
     print(f"Repo Root : {repo_root}")
     print(f"Entries   : {base}")
@@ -265,6 +314,7 @@ def validate() -> int:
             category_counts[category] = 0
             continue
         category_counts[category] = len(entries)
+        index_ids = [row_identity(entry) for entry in entries if row_identity(entry)]
         seen_ids: Dict[str, str] = {}
         last_order = 0
         for entry in entries:
@@ -302,7 +352,12 @@ def validate() -> int:
             for field in ["_build", "image", "refs", "resolved"]:
                 if field not in data:
                     warnings.append(f"[{category}] Missing {field}: {rel_file}")
-        validate_bundle(base, category, category_counts[category], errors, warnings, bundle_counts)
+        generated_files = entry_file_ids(category_dir)
+        missing_from_index = sorted(set(generated_files) - set(index_ids))
+        if missing_from_index:
+            preview = [f"{source_id} ({generated_files[source_id]})" for source_id in missing_from_index[:25]]
+            errors.append(f"[{category}] Generated entry files missing from index: {preview}")
+        validate_bundle(base, category, index_ids, errors, warnings, bundle_counts)
 
     validate_catalog_bundle(base, category_counts, errors, warnings, bundle_counts)
     marker_status = validate_markers(base, warnings)
@@ -310,7 +365,7 @@ def validate() -> int:
         if rows:
             errors.append(f"[{category}] Duplicate sourceIds in index: {len(rows)}")
 
-    report = {"validatorVersion": 5, "generatedAt": int(time.time()), "repoRoot": str(repo_root), "entriesRoot": str(base), "checked": checked, "categoryCounts": category_counts, "bundleCounts": bundle_counts, "markerStatus": marker_status, "duplicateSourceIds": duplicate_source_ids, "errors": errors, "warnings": warnings}
+    report = {"validatorVersion": 6, "generatedAt": int(time.time()), "repoRoot": str(repo_root), "entriesRoot": str(base), "checked": checked, "categoryCounts": category_counts, "bundleCounts": bundle_counts, "markerStatus": marker_status, "duplicateSourceIds": duplicate_source_ids, "errors": errors, "warnings": warnings}
     reports_dir = base / "reports"
     write_json(reports_dir / "validation_report.json", report)
     write_json(base / "_markers" / "validate_entries.marker.json", {"schemaVersion": 1, "tool": "validate_entries", "category": "all", "status": "failed" if errors else "complete", "lastKey": "validation", "lastSourceId": "", "lastHandle": None, "lastFile": "apkfiles/entries/reports/validation_report.json", "processedCount": checked, "totalCount": checked, "updatedAt": int(time.time()), "extra": {"errors": len(errors), "warnings": len(warnings)}})

@@ -585,6 +585,12 @@ def build_character_family_files(output_dir: Path, ordered: List[Tuple[str, Opti
                 "description": loc.get("description") or "",
                 "hasRawForm": state_source_id in by_id,
             })
+        family_source_hash = sha256_data({"family": family, "forms": forms, "states": states})
+        filename = f"{slugify(family)}.json"
+        family_path = families_dir / filename
+        existing_family = try_load_json(family_path) or {}
+        existing_build = existing_family.get("_build", {}) if isinstance(existing_family, dict) else {}
+        generated_at = existing_build.get("generatedAt") if existing_build.get("sourceHash") == family_source_hash else None
         family_entry = {
             "schemaVersion": 1,
             "family": family,
@@ -595,12 +601,11 @@ def build_character_family_files(output_dir: Path, ordered: List[Tuple[str, Opti
             "image": states[0]["image"] if states else image_url("characters", f"{family}01"),
             "states": states,
             "rawFormSourceIds": [get_internal_id(item) for item in forms],
-            "_build": {"scriptVersion": SCRIPT_VERSION, "generatedAt": now_int(), "sourceHash": sha256_data({"family": family, "forms": forms, "states": states})},
+            "_build": {"scriptVersion": SCRIPT_VERSION, "generatedAt": generated_at or now_int(), "sourceHash": family_source_hash},
         }
-        filename = f"{slugify(family)}.json"
-        write_json_if_changed(families_dir / filename, family_entry)
+        if write_json_if_changed(family_path, family_entry):
+            written += 1
         index_entries.append({"order": order_index, "family": family, "name": family_entry["name"], "title": family_entry["title"], "rarity": rarity, "file": f"families/{filename}", "states": len(states)})
-        written += 1
 
     write_json_if_changed(output_dir / "characters" / "families" / "index.json", {"schemaVersion": 1, "count": len(index_entries), "entries": index_entries})
     return {"familiesWritten": written, "familiesTotal": len(index_entries), "output": str(families_dir)}

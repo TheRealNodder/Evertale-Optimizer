@@ -40,7 +40,8 @@
 
   function familyOf(row){
     const firstImage=String(row?.image||row?.imagesLarge?.[0]||row?.imageVariants?.[0]?.url||row?.imageVariants?.[0]?.image||'').split('/').pop()?.replace(/\.png(?:\?.*)?$/i,'')||'';
-    return clean(row?.family)||stripSuffix(row?.sourceId)||stripSuffix(row?.id)||stripSuffix(firstImage)||stripSuffix(row?.name);
+    const sourceFamily=stripSuffix(row?.sourceId)||stripSuffix(row?.imageVariants?.[0]?.sourceId)||stripSuffix(row?.forms?.[0]?.sourceId)||stripSuffix(firstImage);
+    return sourceFamily||clean(row?.family)||stripSuffix(row?.id)||stripSuffix(row?.name);
   }
 
   function normalizeState(raw,family){
@@ -165,14 +166,15 @@
   }
 
   function stateRank(state){
-    const raw=String(state?.state||state?.sourceId||state?.imageSourceId||'').toLowerCase();
-    if(/final|fa|03$/.test(raw))return 2;
-    if(/evolved|awaken|02$/.test(raw))return 1;
+    const raw=[state?.state,state?.sourceId,state?.imageSourceId,state?.dataSourceId,state?.url,state?.image].map(value=>String(value||'')).join(' ').toLowerCase();
+    if(/final|\bfa\b|03(?:\D|$)/.test(raw))return 2;
+    if(/evolved|awaken|02(?:\D|$)/.test(raw))return 1;
     return 0;
   }
 
   function mergeVariants(existing,states,count){
-    const out=[];
+    const ranked=new Map();
+    const overflow=[];
     const seen=new Set();
     const add=variant=>{
       const normalized=normalizeState(variant);
@@ -180,11 +182,17 @@
       const key=`${normalized.state}|${normalized.sourceId}|${normalized.dataSourceId}|${normalized.url}`;
       if(seen.has(key))return;
       seen.add(key);
-      out.push(normalized);
+      const rank=stateRank(normalized);
+      if(!ranked.has(rank))ranked.set(rank,normalized);
+      else overflow.push(normalized);
     };
-    arr(existing).forEach(add);
+    // Family-map states are authoritative. Existing generic "source" variants
+    // may repeat 01/02 and must not displace the real 03 final-awaken state.
     arr(states).forEach(add);
-    return out.sort((a,b)=>stateRank(a)-stateRank(b)).slice(0,count);
+    arr(existing).forEach(add);
+    const out=[...ranked.entries()].sort((a,b)=>a[0]-b[0]).map(([,variant])=>variant);
+    overflow.forEach(variant=>{if(out.length<count)out.push(variant);});
+    return out.slice(0,count);
   }
 
   function nearestForm(row,state,index){

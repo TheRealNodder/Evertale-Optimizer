@@ -12,10 +12,11 @@ from path_utils import find_repo_root
 
 ROOT_MARKERS = ["apkfiles", "tools"]
 CATEGORIES = ["characters", "weapons", "accessories", "bosses"]
-# Characters and accessories append newly discovered entries to their canonical
-# lists. Weapons use the dedicated file-handle branch below; bosses stay locked
-# because the existing canonical boss map is intentionally curated.
-ORDER_LOCKED_CATEGORIES = {"bosses"}
+# Characters, accessories, and bosses append newly discovered entries to their
+# canonical lists. Weapons use the dedicated file-handle branch below. Keeping
+# bosses append-only is important: the extractor can create a new boss entry,
+# and Master Control must not remove it from the index before bundles are built.
+ORDER_LOCKED_CATEGORIES: set[str] = set()
 EXCLUDED_PATH_PARTS = {"legacy", "Legacy", "_weapon_duplicate_quarantine", "_boss_duplicate_quarantine", "_duplicate_quarantine"}
 
 CATEGORY_CONFIG = {

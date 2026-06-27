@@ -12,7 +12,7 @@ from typing import Any, Dict, List, Tuple
 from path_utils import find_repo_root, resolve_repo_path
 
 CATEGORIES = ["characters", "weapons", "accessories", "bosses"]
-ROOT_MARKERS = ["apkfiles"]
+ROOT_MARKERS = ["apkfiles", "tools"]
 EXCLUDED_DIR_NAMES = {"legacy", "Legacy", "_weapon_duplicate_quarantine", "_boss_duplicate_quarantine", "_duplicate_quarantine"}
 TESTLIKE_RE = re.compile(r"(test|debug|prototype|dev|internal|placeholder|sandbox|experimental)", re.I)
 STATE_SUFFIX_RE = re.compile(r"^(.*?)(\d{2})$")
@@ -26,6 +26,26 @@ def load_json(path: Path) -> Any:
 def write_json(path: Path, data: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":")), encoding="utf-8", newline="\n")
+
+
+def write_json_if_changed(path: Path, data: Any) -> bool:
+    text = json.dumps(data, ensure_ascii=False, separators=(",", ":"))
+    if path.exists() and path.read_text(encoding="utf-8-sig") == text:
+        return False
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text, encoding="utf-8", newline="\n")
+    return True
+
+
+def stable_generated_at(path: Path, content_hash: str) -> int:
+    if path.exists():
+        existing = load_json(path)
+        if isinstance(existing, dict) and existing.get("contentHash") == content_hash:
+            try:
+                return int(existing.get("generatedAt"))
+            except (TypeError, ValueError):
+                pass
+    return int(time.time())
 
 
 def stable_hash(data: Any) -> str:
@@ -271,19 +291,20 @@ def build_category(entries_root: Path, bundles_dir: Path, category: str) -> Dict
     source_index_count = len(read_index_entries(category_dir)) if index_path.exists() else 0
     rows, errors, discovery = load_indexed_with_discovery(category_dir, category)
     clean_rows = strip_bundle_markers(rows)
+    content_hash = stable_hash(clean_rows)
+    out_path = bundles_dir / f"{category}.bundle.json"
     bundle = {
         "schemaVersion": 4,
         "category": category,
-        "generatedAt": int(time.time()),
+        "generatedAt": stable_generated_at(out_path, content_hash),
         "sourceIndexCount": source_index_count,
         "discovery": discovery,
         "count": len(clean_rows),
         "errors": errors,
-        "contentHash": stable_hash(clean_rows),
+        "contentHash": content_hash,
         "entries": clean_rows,
     }
-    out_path = bundles_dir / f"{category}.bundle.json"
-    write_json(out_path, bundle)
+    write_json_if_changed(out_path, bundle)
     return {"category": category, "status": "ok" if not errors else "warning", "sourceIndexCount": source_index_count, "count": len(clean_rows), "errors": len(errors), "discovery": discovery, "contentHash": bundle["contentHash"], "output": str(out_path)}
 
 
@@ -312,9 +333,10 @@ def build_character_families(entries_root: Path, bundles_dir: Path) -> Dict[str,
             rows.append(load_json(path))
         except Exception as exc:
             errors.append(f"{rel_file}: {exc}")
-    bundle = {"schemaVersion": 4, "category": "character_families", "generatedAt": int(time.time()), "sourceIndexCount": len(index_rows), "count": len(rows), "errors": errors, "contentHash": stable_hash(rows), "entries": rows}
     out_path = bundles_dir / "character_families.bundle.json"
-    write_json(out_path, bundle)
+    content_hash = stable_hash(rows)
+    bundle = {"schemaVersion": 4, "category": "character_families", "generatedAt": stable_generated_at(out_path, content_hash), "sourceIndexCount": len(index_rows), "count": len(rows), "errors": errors, "contentHash": content_hash, "entries": rows}
+    write_json_if_changed(out_path, bundle)
     return {"category": "character_families", "status": "ok" if not errors else "warning", "sourceIndexCount": len(index_rows), "count": len(rows), "errors": len(errors), "contentHash": bundle["contentHash"], "output": str(out_path)}
 
 
@@ -334,9 +356,10 @@ def build_catalog_bundle(bundles_dir: Path) -> Dict[str, Any]:
     if families_path.exists():
         payload = load_json(families_path)
         character_families = payload.get("entries", []) if isinstance(payload, dict) else []
-    catalog = {"schemaVersion": 4, "generatedAt": int(time.time()), "categories": categories, "characterFamilies": character_families, "missingBundles": missing, "categoryCounts": {c: len(categories.get(c, [])) for c in CATEGORIES}, "characterFamilyCount": len(character_families), "contentHash": stable_hash({"categories": categories, "characterFamilies": character_families})}
     out_path = bundles_dir / "catalog.bundle.json"
-    write_json(out_path, catalog)
+    content_hash = stable_hash({"categories": categories, "characterFamilies": character_families})
+    catalog = {"schemaVersion": 4, "generatedAt": stable_generated_at(out_path, content_hash), "categories": categories, "characterFamilies": character_families, "missingBundles": missing, "categoryCounts": {c: len(categories.get(c, [])) for c in CATEGORIES}, "characterFamilyCount": len(character_families), "contentHash": content_hash}
+    write_json_if_changed(out_path, catalog)
     return {"category": "catalog", "status": "ok" if not missing else "warning", "count": sum(len(v) for v in categories.values()), "characterFamilies": len(character_families), "missingBundles": missing, "categoryCounts": catalog["categoryCounts"], "contentHash": catalog["contentHash"], "output": str(out_path)}
 
 

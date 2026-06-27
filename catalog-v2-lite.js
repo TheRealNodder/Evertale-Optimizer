@@ -11,6 +11,7 @@
   const clean=v=>String(v||'').toLowerCase().replace(/[^a-z0-9]+/g,'');
   const famKey=v=>clean(String(v||'').replace(/\d+$/,''));
   const strip=v=>String(v||'').split('/').pop().replace(/\.json$/i,'').replace(/^\d+_/,'');
+  const sourceFamily=v=>strip(v).replace(/\d+$/,'');
   const num=v=>{const n=Number(v);return Number.isFinite(n)?n:''};
   const val=(e,raw,k,...f)=>num(pick(e?.stats?.[k],e?.[k],...f));
   const order=e=>num(pick(e?.fileHandleOrder,e?.sourceOrder,e?.order,e?.visualOrder,e?.raw?.bundleNumber));
@@ -34,8 +35,8 @@
   function kindLabel(k){return k==='characters'?'Character':k==='weapons'?'Weapon':k==='accessories'?'Accessory':k==='bosses'?'Boss':k;}
   function skillRows(e,type){const key=type==='active'?'activeSkills':'passiveSkillDetails';if(Array.isArray(e?.[key]))return e[key];const src=type==='active'?e?.resolved?.activeSkills:e?.resolved?.passives;const out=[];if(src&&typeof src==='object'){for(const [id,d]of Object.entries(src)){const loc=d?.localization||{};out.push({id,name:loc.name||id,description:loc.description||'',tu:d?.tu,sp:d?.sp});}}return out;}
   function charImgs(u){const raw=Array.isArray(u.imageVariants)?u.imageVariants.map(v=>v&&v.url):Array.isArray(u.imagesLarge)?u.imagesLarge:(u.image?[u.image]:[]);return [...new Set((raw||[]).filter(Boolean))].slice(0,3);}
-  function base(kind,e){const raw=e?.raw||{};const sourceId=String(e?.sourceId??e?.internal?.sourceId??e?.internal?.weaponId??e?.internal?.bossId??raw.name??e?.name??e?.id??'');return{kind,id:String(e?.id??e?.family??sourceId),sourceId,family:String(e?.family??e?.internal?.family??raw.family??strip(sourceId)),file:file(e),order:order(e),name:pick(e?.displayName,e?.title,e?.name,sourceId),subtitle:pick(e?.weaponType,raw.weaponPref,e?.category,e?.subtitle,kindLabel(kind)),description:pick(e?.description,e?.flavorText,e?.profile,e?.effect,raw.profile,''),rarity:pick(e?.rarity,e?.stars,raw.stars,raw.accessoryStars,''),element:displayEl(pick(e?.element,raw.element,'')),stats:{atk:val(e,raw,'atk',raw.flatAttack,raw.baseAttack,raw.attack),hp:val(e,raw,'hp',raw.flatMaxHp,raw.baseMaxHp,raw.hp),spd:val(e,raw,'spd',raw.flatSpeed,raw.speed),cost:val(e,raw,'cost',raw.cost)},statsByForm:Array.isArray(e?.statsByForm)?e.statsByForm:[],imageVariants:Array.isArray(e?.imageVariants)?e.imageVariants:[],forms:Array.isArray(e?.forms)?e.forms:[],activeSkills:skillRows(e,'active'),passiveSkillDetails:skillRows(e,'passive'),descriptionByForm:Array.isArray(e?.descriptionByForm)?e.descriptionByForm:[],leaderSkillName:pick(e?.leaderSkill?.name,''),leaderSkillDesc:pick(e?.leaderSkill?.description,'')};}
-  function characterStateRoot(item){return famKey(item.family||item.sourceId||item.id||item.name);}
+  function base(kind,e){const raw=e?.raw||{};const sourceId=String(pick(e?.sourceId,e?.internal?.sourceId,e?.internal?.weaponId,e?.internal?.bossId,raw.name,e?.name,e?.id));const family=String(pick(e?.family,e?.internal?.family,raw.family,sourceFamily(sourceId)));const id=kind==='characters'?String(pick(family,sourceFamily(sourceId),sourceId,e?.id)):String(pick(e?.id,family,sourceId));return{kind,id,sourceId,family,file:file(e),order:order(e),name:pick(e?.displayName,e?.title,e?.name,sourceId),subtitle:pick(e?.weaponType,raw.weaponPref,e?.category,e?.subtitle,kindLabel(kind)),description:pick(e?.description,e?.flavorText,e?.profile,e?.effect,raw.profile,''),rarity:pick(e?.rarity,e?.stars,raw.stars,raw.accessoryStars,''),element:displayEl(pick(e?.element,raw.element,'')),stats:{atk:val(e,raw,'atk',raw.flatAttack,raw.baseAttack,raw.attack),hp:val(e,raw,'hp',raw.flatMaxHp,raw.baseMaxHp,raw.hp),spd:val(e,raw,'spd',raw.flatSpeed,raw.speed),cost:val(e,raw,'cost',raw.cost)},statsByForm:Array.isArray(e?.statsByForm)?e.statsByForm:[],imageVariants:Array.isArray(e?.imageVariants)?e.imageVariants:[],forms:Array.isArray(e?.forms)?e.forms:[],activeSkills:skillRows(e,'active'),passiveSkillDetails:skillRows(e,'passive'),descriptionByForm:Array.isArray(e?.descriptionByForm)?e.descriptionByForm:[],leaderSkillName:pick(e?.leaderSkill?.name,''),leaderSkillDesc:pick(e?.leaderSkill?.description,'')};}
+  function characterStateRoot(item){return famKey(item.sourceId||item.family||item.id||item.name);}
   function collapseCharacterStates(chars){
     const groups=new Map();
     chars.forEach(item=>{const k=characterStateRoot(item);if(!k){groups.set(Symbol(),[item]);return;}if(!groups.has(k))groups.set(k,[]);groups.get(k).push(item);});
@@ -117,11 +118,11 @@
       const statRow=statsRows[i]||forms[i]||{};
       const descRow=descRows[i]||forms[i]||variant||{};
       rows.push({
-        image:pick(imgs[i],variant.url,variant.image,formText(descRow,'url'),formText(descRow,'image'),item.image),
+        image:pick(variant.url,variant.image,imgs[i],formText(descRow,'url'),formText(descRow,'image'),item.image),
         stats:formStats(statRow)||formStats(variant)||item.stats||{},
         title:pick(formText(descRow,'title'),formText(variant,'title'),item.subtitle),
         description:pick(formText(descRow,'description'),formText(variant,'description'),typeof descRow==='string'?descRow:'',i===0?item.description:''),
-        sourceId:pick(formText(descRow,'sourceId'),formText(variant,'sourceId'),formText(statRow,'sourceId'),item.sourceId),
+        sourceId:pick(formText(variant,'sourceId'),formText(variant,'imageSourceId'),formText(descRow,'imageSourceId'),formText(descRow,'sourceId'),formText(statRow,'sourceId'),item.sourceId),
         state:pick(formText(descRow,'state'),formText(variant,'state'),i===0?'base':String(i))
       });
     }
@@ -130,8 +131,8 @@
   function statLineHtml(stats){const html=Object.entries(stats||{}).filter(([,v])=>v!==''&&v!=null).map(([k,v])=>`<div class="stat" data-stat="${k}"><span class="statLabel">${k.toUpperCase()}</span><span class="statVal">${safe(v)}</span></div>`).join('');return html||'<div class="muted">No stats loaded.</div>';}
   function stateLabel(index){return ['5\u2605','6\u2605','FA'][index]||`State ${index+1}`;}
   function stateBtns(states){if(!Array.isArray(states)||states.length<2)return'';const enc=attrJson(states);return`<div class="stateRow" data-states="${enc}">${states.map((_,i)=>`<button type="button" class="stateBtn ${i===0?'active':''}" data-idx="${i}" data-state-label="${safe(stateLabel(i))}" aria-label="${safe(stateLabel(i))}" aria-pressed="${i===0?'true':'false'}"></button>`).join('')}</div>`;}
-  function cardKey(card){return String(card?.getAttribute('data-id')||card?.getAttribute('data-source-id')||card?.getAttribute('data-family')||'');}
-  function findCardByKey(key){if(!key)return null;const esc=window.CSS&&window.CSS.escape?window.CSS.escape(String(key)):String(key).replace(/"/g,'\\"');return document.querySelector(`#catalogGrid .unitCard[data-id="${esc}"],#catalogGrid .unitCard[data-source-id="${esc}"],#catalogGrid .unitCard[data-family="${esc}"]`);}
+  function cardKey(card){return String(card?.getAttribute('data-source-id')||card?.getAttribute('data-family')||card?.getAttribute('data-id')||'');}
+  function findCardByKey(key){if(!key)return null;const esc=window.CSS&&window.CSS.escape?window.CSS.escape(String(key)):String(key).replace(/"/g,'\\"');return document.querySelector(`#catalogGrid .unitCard[data-source-id="${esc}"],#catalogGrid .unitCard[data-family="${esc}"],#catalogGrid .unitCard[data-id="${esc}"]`);}
   function selectedCard(){const selected=document.querySelector('#catalogGrid .unitCard.v2-selected');if(selected)return selected;return findCardByKey(state.selectedId);}
   function selectCard(card,notify=true){if(!card)return null;state.selectedId=cardKey(card);const tabs=$('v2AwakenTabs');if(tabs)tabs.dataset.v2ActiveCard=state.selectedId;document.querySelectorAll('.unitCard.v2-selected').forEach(c=>{if(c!==card)c.classList.remove('v2-selected');});card.classList.add('v2-selected');if(notify)document.dispatchEvent(new CustomEvent('v2:card-selected',{detail:{card,id:state.selectedId}}));return card;}
   function readStateRows(card){try{const rows=JSON.parse(decodeURIComponent(card?.getAttribute('data-state-rows')||card?.querySelector('.stateRow')?.dataset?.states||''));return Array.isArray(rows)?rows:[];}catch{return[];}}

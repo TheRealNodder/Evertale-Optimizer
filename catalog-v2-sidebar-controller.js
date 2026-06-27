@@ -14,8 +14,8 @@
 
   function text(sel,root=document){return q(sel,root)?.textContent?.trim()||'';}
   function setText(id,value){const n=$(id);if(n&&n.textContent!==String(value??''))n.textContent=String(value??'');}
-  function cardId(card){return String(card?.getAttribute('data-id')||card?.getAttribute('data-source-id')||card?.getAttribute('data-family')||text('.unitName',card)||'').trim();}
-  function findCard(id){return id?q(`#catalogGrid .unitCard[data-id="${CSS.escape(id)}"]`)||q(`#catalogGrid .unitCard[data-source-id="${CSS.escape(id)}"]`)||q(`#catalogGrid .unitCard[data-family="${CSS.escape(id)}"]`):null;}
+  function cardId(card){return String(card?.getAttribute('data-source-id')||card?.getAttribute('data-family')||card?.getAttribute('data-id')||text('.unitName',card)||'').trim();}
+  function findCard(id){return id?q(`#catalogGrid .unitCard[data-source-id="${CSS.escape(id)}"]`)||q(`#catalogGrid .unitCard[data-family="${CSS.escape(id)}"]`)||q(`#catalogGrid .unitCard[data-id="${CSS.escape(id)}"]`):null;}
   function selectedCard(){return findCard(state.selectedId)||q('#catalogGrid .unitCard.v2-selected')||q('#catalogGrid .unitCard');}
   function stat(card,k){return q(`.stat[data-stat="${k}"] .statVal`,card)?.textContent?.trim()||'—';}
   function readRows(card,type){try{const rows=JSON.parse(decodeURIComponent(card?.getAttribute(type==='active'?'data-active-skills':'data-passive-skills')||''));return Array.isArray(rows)?rows:[];}catch{return[];}}

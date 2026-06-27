@@ -22,7 +22,7 @@ import time
 from pathlib import Path
 from typing import Any, Dict, List
 
-from path_utils import find_repo_root, resolve_repo_path
+from path_utils import configure_utf8_stdio, find_repo_root, resolve_repo_path
 
 MASTER_SCHEMA_VERSION = 3
 SAFE_INGEST_REL = "tools/new_structure/run_safe_new_data_ingest.py"
@@ -106,6 +106,7 @@ def build_safe_ingest_command(repo: Path, args: argparse.Namespace) -> List[str]
 
 
 def main() -> int:
+    configure_utf8_stdio()
     parser = argparse.ArgumentParser(
         description="MASTER CONTROL: run safe rebuild or extract fresh Evertale game JSON from apkfiles."
     )

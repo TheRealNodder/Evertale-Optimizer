@@ -1,10 +1,23 @@
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
 from typing import Any, Iterable
 
 DEFAULT_ROOT_MARKERS = ("apkfiles", "tools")
+
+
+def configure_utf8_stdio() -> None:
+    """Keep Windows consoles from failing on localized game text."""
+    for stream_name in ("stdout", "stderr"):
+        stream = getattr(sys, stream_name, None)
+        reconfigure = getattr(stream, "reconfigure", None)
+        if callable(reconfigure):
+            try:
+                reconfigure(encoding="utf-8", errors="replace")
+            except (OSError, ValueError):
+                pass
 
 
 def find_repo_root(start: Path | None = None, markers: Iterable[str] = DEFAULT_ROOT_MARKERS) -> Path:
