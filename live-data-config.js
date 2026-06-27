@@ -10,7 +10,7 @@
   // Bump this whenever apkfiles/entries/bundles or maps are regenerated.
   // It prevents GitHub Pages/browser cache from serving stale bundles where
   // newly added entries exist on disk but never appear in the roster/catalog.
-  const DATA_VERSION = 'entries-1782519101-d5980e03a085';
+  const DATA_VERSION = 'entries-1782519101-d5980e03a085-jeanne-nonduo-v1';
 
   window.EVERTALE_LIVE_CONFIG = Object.freeze({
     mode: 'live',
@@ -30,4 +30,14 @@
     dataVersion: DATA_VERSION,
     noStoreUrls: false,
   });
+
+  // Load before catalog-v2-lite's async data hydrate normally reaches the duo registry.
+  // This keeps state-only characters such as JeanneFusion out of duo/form-switch maps.
+  if (!window.__EVERTALE_NON_DUO_SCRIPT_INJECTED && !document.querySelector('script[src*="catalog-non-duo-guard.js"]')) {
+    window.__EVERTALE_NON_DUO_SCRIPT_INJECTED = true;
+    const script = document.createElement('script');
+    script.defer = true;
+    script.src = `./catalog-non-duo-guard.js?v=${encodeURIComponent(DATA_VERSION)}`;
+    document.head.appendChild(script);
+  }
 })();
