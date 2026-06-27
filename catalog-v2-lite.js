@@ -4,6 +4,7 @@
 (function(){
   const CATEGORIES=['characters','weapons','accessories','bosses'];
   const CATEGORY_LABELS={characters:'Characters',weapons:'Weapons',accessories:'Accessories',bosses:'Bosses'};
+  const NON_DUO_FAMILIES=new Set(['jeannefusion']);
   const state={items:[],filtered:[],q:'',type:'characters',sort:'newest',rendered:0,token:0,pageSize:24,selectedId:'',observer:null,raw:Object.create(null),loading:Object.create(null),registry:null,registryPromise:null,warming:false};
   const $=id=>document.getElementById(id);
   const safe=s=>String(s??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
@@ -66,7 +67,8 @@
     const bosses=(entries.bosses||[]).map(e=>{const x=base('bosses',e);return{...x,image:pick(e.image,x.sourceId?`https://ik.imagekit.io/r8fsa98s9/characters/${x.sourceId.replace(/Boss(?=\d+$)/,'')}.png`:'')}});
     return [...chars,...weapons,...accessories,...bosses].filter(x=>x.id&&x.name);
   }
-  function itemKeys(item){return [item.id,item.sourceId,item.family,item.name,item.subtitle].flatMap(v=>[famKey(v),clean(v)]).filter(Boolean);}
+  function itemKeys(item){return [item.id,item.sourceId,item.family].flatMap(v=>[famKey(v),clean(v)]).filter(Boolean);}
+  function isNonDuoItem(item){return [item.id,item.sourceId,item.family].some(v=>NON_DUO_FAMILIES.has(famKey(v))||NON_DUO_FAMILIES.has(clean(v)));}
   function addSetMap(map,key,value){if(!key||!value||key===value)return;if(!map.has(key))map.set(key,new Set());map.get(key).add(value);}
   function duoCanonical(raw,aliases){const k=famKey(raw);return aliases.get(k)||k;}
   async function loadDuoRegistry(){
@@ -86,22 +88,23 @@
   function canonicalItemKeys(item,registry){return itemKeys(item).map(k=>registry.aliases.get(k)||k).filter(Boolean);}
   function findParentKey(item,registry){for(const k of canonicalItemKeys(item,registry)){if(registry.parentChildren.has(k))return k;}return'';}
   function isChildOnly(item,registry,parentKey){if(parentKey)return false;return canonicalItemKeys(item,registry).some(k=>registry.childParents.has(k));}
-  function buildItemIndex(items,registry){const map=new Map();items.forEach(item=>{if(item.kind!=='characters')return;canonicalItemKeys(item,registry).forEach(k=>{if(!map.has(k))map.set(k,item);});});return map;}
+  function buildItemIndex(items,registry){const map=new Map();items.forEach(item=>{if(item.kind!=='characters'||isNonDuoItem(item))return;canonicalItemKeys(item,registry).forEach(k=>{if(!map.has(k))map.set(k,item);});});return map;}
   function applyDuoRegistry(items,registry){
     const itemIndex=buildItemIndex(items,registry);
-    const out=[];let parentCount=0,attachedChildren=0,skippedChildren=0;
+    const out=[];let parentCount=0,attachedChildren=0,skippedChildren=0,blockedNonDuo=0;
     for(const item of items){
       if(item.kind!=='characters'){out.push(item);continue;}
+      if(isNonDuoItem(item)){delete item.duoForms;blockedNonDuo++;out.push(item);continue;}
       const parentKey=findParentKey(item,registry);
       if(isChildOnly(item,registry,parentKey)){skippedChildren++;continue;}
       if(parentKey){
-        const children=[...(registry.parentChildren.get(parentKey)||[])].map(k=>itemIndex.get(k)).filter(Boolean).filter(child=>child!==item);
-        const unique=[];const seen=new Set();[item,...children].forEach(form=>{const id=famKey(form.family||form.sourceId||form.id||form.name);if(!id||seen.has(id))return;seen.add(id);unique.push(form);});
+        const children=[...(registry.parentChildren.get(parentKey)||[])].map(k=>itemIndex.get(k)).filter(Boolean).filter(child=>child!==item&&!isNonDuoItem(child));
+        const unique=[];const seen=new Set();[item,...children].forEach(form=>{const id=famKey(form.family||form.sourceId||form.id);if(!id||seen.has(id))return;seen.add(id);unique.push(form);});
         if(unique.length>1){item.duoForms=unique.map(f=>({...f,duoForms:undefined}));parentCount++;attachedChildren+=unique.length-1;}
       }
       out.push(item);
     }
-    window.__EVERTALE_V2_DUO_DATA_REPORT={source:registry.source,parents:parentCount,children:attachedChildren,skippedChildren,itemsBefore:items.length,itemsAfter:out.length};
+    window.__EVERTALE_V2_DUO_DATA_REPORT={source:registry.source,parents:parentCount,children:attachedChildren,skippedChildren,blockedNonDuo,itemsBefore:items.length,itemsAfter:out.length};
     return out;
   }
   function formStats(row){return row&&typeof row==='object'&&row.stats&&typeof row.stats==='object'?row.stats:null;}
@@ -129,7 +132,7 @@
     return rows.filter(row=>row.image||row.description||Object.keys(row.stats||{}).length);
   }
   function statLineHtml(stats){const html=Object.entries(stats||{}).filter(([,v])=>v!==''&&v!=null).map(([k,v])=>`<div class="stat" data-stat="${k}"><span class="statLabel">${k.toUpperCase()}</span><span class="statVal">${safe(v)}</span></div>`).join('');return html||'<div class="muted">No stats loaded.</div>';}
-  function stateLabel(index){return ['5\u2605','6\u2605','FA'][index]||`State ${index+1}`;}
+  function stateLabel(index){return ['5★','6★','FA'][index]||`State ${index+1}`;}
   function stateBtns(states){if(!Array.isArray(states)||states.length<2)return'';const enc=attrJson(states);return`<div class="stateRow" data-states="${enc}">${states.map((_,i)=>`<button type="button" class="stateBtn ${i===0?'active':''}" data-idx="${i}" data-state-label="${safe(stateLabel(i))}" aria-label="${safe(stateLabel(i))}" aria-pressed="${i===0?'true':'false'}"></button>`).join('')}</div>`;}
   function cardKey(card){return String(card?.getAttribute('data-source-id')||card?.getAttribute('data-family')||card?.getAttribute('data-id')||'');}
   function findCardByKey(key){if(!key)return null;const esc=window.CSS&&window.CSS.escape?window.CSS.escape(String(key)):String(key).replace(/"/g,'\\"');return document.querySelector(`#catalogGrid .unitCard[data-source-id="${esc}"],#catalogGrid .unitCard[data-family="${esc}"],#catalogGrid .unitCard[data-id="${esc}"]`);}
