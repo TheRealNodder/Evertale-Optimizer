@@ -64,7 +64,31 @@
   async function mapLimit(items, limit, worker) { const results = new Array(items.length); let index = 0; const workers = Array.from({ length: Math.min(limit, items.length) }, async () => { while (index < items.length) { const current = index++; results[current] = await worker(items[current], current); } }); await Promise.all(workers); return results; }
 
   async function getCatalogBundle() { if (catalogBundleCache !== undefined) return catalogBundleCache; const json = await fetchJson(versionedUrl(`${ENTRY_BASE}/bundles/catalog.bundle.json`), true, BUNDLE_CACHE_MODE); catalogBundleCache = json && json.categories ? json : null; return catalogBundleCache; }
-  async function getCategoryBundle(category) { if (categoryBundleCache[category] !== undefined) return categoryBundleCache[category]; const bundle = await fetchJson(versionedUrl(`${ENTRY_BASE}/bundles/${category}.bundle.json`), true, BUNDLE_CACHE_MODE); if (Array.isArray(bundle?.entries)) { categoryBundleMeta[category] = { source:'category-bundle', count:bundle.entries.length, sourceIndexCount:Number(bundle.sourceIndexCount)||bundle.entries.length, contentHash:bundle.contentHash||'' }; categoryBundleCache[category] = bundle.entries; return categoryBundleCache[category]; } const catalog = await getCatalogBundle(); if (catalog?.categories && Array.isArray(catalog.categories[category])) { const rows=catalog.categories[category]; categoryBundleMeta[category] = { source:'catalog-fallback', count:rows.length, sourceIndexCount:rows.length, contentHash:catalog.contentHash||'' }; categoryBundleCache[category] = rows; return categoryBundleCache[category]; } categoryBundleMeta[category] = { source:'index-fallback', count:0, sourceIndexCount:0, contentHash:'' }; categoryBundleCache[category] = null; return categoryBundleCache[category]; }
+  async function getCategoryBundle(category) {
+    if (categoryBundleCache[category] !== undefined) return categoryBundleCache[category];
+    const preferredFile = category === 'characters' ? 'characters.live.bundle.json' : `${category}.bundle.json`;
+    let bundle = await fetchJson(versionedUrl(`${ENTRY_BASE}/bundles/${preferredFile}`), true, BUNDLE_CACHE_MODE);
+    let bundleFile = preferredFile;
+    if (!Array.isArray(bundle?.entries) && preferredFile !== `${category}.bundle.json`) {
+      bundleFile = `${category}.bundle.json`;
+      bundle = await fetchJson(versionedUrl(`${ENTRY_BASE}/bundles/${bundleFile}`), true, BUNDLE_CACHE_MODE);
+    }
+    if (Array.isArray(bundle?.entries)) {
+      categoryBundleMeta[category] = { source:'category-bundle', bundleFile, count:bundle.entries.length, sourceIndexCount:Number(bundle.sourceIndexCount)||bundle.entries.length, contentHash:bundle.contentHash||'' };
+      categoryBundleCache[category] = bundle.entries;
+      return categoryBundleCache[category];
+    }
+    const catalog = await getCatalogBundle();
+    if (catalog?.categories && Array.isArray(catalog.categories[category])) {
+      const rows=catalog.categories[category];
+      categoryBundleMeta[category] = { source:'catalog-fallback', bundleFile:'catalog.bundle.json', count:rows.length, sourceIndexCount:rows.length, contentHash:catalog.contentHash||'' };
+      categoryBundleCache[category] = rows;
+      return categoryBundleCache[category];
+    }
+    categoryBundleMeta[category] = { source:'index-fallback', bundleFile:'', count:0, sourceIndexCount:0, contentHash:'' };
+    categoryBundleCache[category] = null;
+    return categoryBundleCache[category];
+  }
   async function getCategoryBundleStatus(category) { await getCategoryBundle(category); return { ...(categoryBundleMeta[category]||{}) }; }
 
   async function getCharacterOrderMap() { if (characterOrderCache) return characterOrderCache; const json = await fetchJson(versionedUrl(`${ENTRY_BASE}/maps/explorer_character_order.json`), true, MAP_CACHE_MODE); const orderRows = Array.isArray(json?.order) ? json.order : []; const order = new Map(); const names = new Map(); orderRows.forEach((row, idx) => { if (!row || !row.key) return; const key = String(row.key); order.set(key, idx); names.set(key, row.displayName || key); }); characterOrderCache = { order, names }; return characterOrderCache; }

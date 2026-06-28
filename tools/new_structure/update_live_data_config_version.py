@@ -14,10 +14,12 @@ CONFIG_REL = Path("live-data-config.js")
 CATALOG_REL = Path("apkfiles/entries/bundles/catalog.bundle.json")
 REPORT_REL = Path("apkfiles/entries/reports/live_data_config_version_report.json")
 PAGE_RELS = (Path("index.html"), Path("roster.html"), Path("optimizer.html"))
+CHARACTER_PRELOAD_PAGE_RELS = (Path("index.html"), Path("roster.html"))
 BASE_VERSION_RE = re.compile(r"const\s+DATA_VERSION_BASE\s*=\s*(['\"])(.*?)\1;")
 RUNTIME_REVISION_RE = re.compile(r"const\s+RUNTIME_CACHE_REVISION\s*=\s*(['\"])(.*?)\1;")
 VERSION_RE = re.compile(r"const\s+DATA_VERSION\s*=\s*(['\"])(.*?)\1;")
 PAGE_VERSION_RE = re.compile(r"(?P<prefix>live-data-config\.js\?v=)[^\"']+")
+CHARACTER_PRELOAD_VERSION_RE = re.compile(r"(?P<prefix>characters\.live\.bundle\.json\?v=)[^\"']+")
 
 
 def read_json(path: Path, fallback: Any = None) -> Any:
@@ -84,6 +86,11 @@ def update_config(repo: Path) -> int:
             print(f"ERROR: {page_rel} has no versioned live-data-config.js script reference")
             return 1
         next_page_text = PAGE_VERSION_RE.sub(lambda m: f"{m.group('prefix')}{new_version}", page_text)
+        if page_rel in CHARACTER_PRELOAD_PAGE_RELS:
+            if not CHARACTER_PRELOAD_VERSION_RE.search(next_page_text):
+                print(f"ERROR: {page_rel} has no versioned characters.live.bundle.json preload")
+                return 1
+            next_page_text = CHARACTER_PRELOAD_VERSION_RE.sub(lambda m: f"{m.group('prefix')}{new_version}", next_page_text)
         page_updates.append((page_rel, page_path, page_text, next_page_text))
 
     changed_files = []
@@ -107,6 +114,7 @@ def update_config(repo: Path) -> int:
         "runtimeRevision": runtime_revision,
         "newVersion": new_version,
         "pageReferences": [str(path) for path in PAGE_RELS],
+        "characterPreloadPages": [str(path) for path in CHARACTER_PRELOAD_PAGE_RELS],
         "changedFiles": changed_files,
         "reason": "Keep generated data and runtime cache revisions together, and update every page URL so GitHub Pages/browser caches request the new config.",
     }

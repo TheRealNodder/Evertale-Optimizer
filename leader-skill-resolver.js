@@ -9,7 +9,7 @@
 
   async function loadLeaderSkillMap(){
     if(leaderSkillMapPromise) return leaderSkillMapPromise;
-    leaderSkillMapPromise = fetch(versioned('./apkfiles/entries/localization/leader_skill_localization.json'), { cache: 'no-store' })
+    leaderSkillMapPromise = fetch(versioned('./apkfiles/entries/localization/leader_skill_localization.json'), { cache: 'default' })
       .then(r => r.ok ? r.json() : null)
       .then(j => j && typeof j === 'object' ? j : { skills: {} })
       .catch(() => ({ skills: {} }));

@@ -166,12 +166,13 @@
   function detailSkillHtml(rows){return (Array.isArray(rows)&&rows.length)?rows.map(s=>`<p><strong>${safe(s.name||s.id||'Skill')}</strong><br>${safe(s.description||s.desc||'No description loaded.')}</p>`).join(''):'No skills loaded.';}
   function detailSection(label,html){return`<details class="v2-detail-section"><summary class="v2-detail-tab">${safe(label)}</summary><div class="v2-detail-panel">${html||'No details loaded.'}</div></details>`;}
   function detailIdFor(item){return`v2d-${clean(item.id||item.sourceId||item.name)}`;}
-  function renderCard(item){
+  function renderCard(item,renderIndex=999){
     const selected=state.selectedId&&String(item.id)===state.selectedId?' v2-selected':'';
     const imgs=item.images?.length?item.images:(item.image?[item.image]:[]);
     const states=buildStateRows(item,imgs);
     const initial=states[0]||{image:imgs[0],stats:item.stats||{},title:item.subtitle,description:item.description||''};
-    const img=initial.image?`<img src="${safe(initial.image)}" loading="lazy" decoding="async" fetchpriority="low" data-state="0" alt="${safe(item.name)}">`:'<div class="ph">?</div>';
+    const visiblePriority=renderIndex<6;
+    const img=initial.image?`<img src="${safe(initial.image)}" loading="${visiblePriority?'eager':'lazy'}" decoding="async" fetchpriority="${visiblePriority?'high':'low'}" data-state="0" alt="${safe(item.name)}">`:'<div class="ph">?</div>';
     const chips=[`<span class="tag kind">${kindLabel(item.kind)}</span>`];
     if(item.element)chips.push(`<span class="tag element">${safe(item.element)}</span>`);
     if(item.rarity)chips.push(`<span class="tag rarity">${safe(item.rarity)}</span>`);
@@ -187,7 +188,7 @@
   function loadingLabel(){const current=Object.keys(state.loading).filter(k=>state.loading[k]).map(k=>CATEGORY_LABELS[k]||k);return current.length?` | loading ${current.join(', ')}`:'';}
   function updateStatus(){const status=$('statusText');if(status){const warm=coldKinds().length?` | ready ${loadedKinds().length}/${CATEGORIES.length}`:'';status.textContent=`Showing ${Math.min(state.rendered,state.filtered.length)} of ${state.filtered.length}${warm}${loadingLabel()}`;}const s=ensureSentinel();if(s)s.style.display=state.rendered<state.filtered.length?'block':'none';}
   function render(){const grid=$('catalogGrid');if(!grid)return;state.token++;state.filtered=filter();state.rendered=0;grid.innerHTML='';renderMore(state.token,Math.max(state.pageSize,window.innerWidth>=821?36:18));setupAutoLoad();}
-  function renderMore(token=state.token,count=state.pageSize){const grid=$('catalogGrid');if(!grid||token!==state.token)return;const start=state.rendered,end=Math.min(start+count,state.filtered.length);if(end<=start){updateStatus();return;}grid.insertAdjacentHTML('beforeend',state.filtered.slice(start,end).map(renderCard).join(''));state.rendered=end;updateStatus();}
+  function renderMore(token=state.token,count=state.pageSize){const grid=$('catalogGrid');if(!grid||token!==state.token)return;const start=state.rendered,end=Math.min(start+count,state.filtered.length);if(end<=start){updateStatus();return;}grid.insertAdjacentHTML('beforeend',state.filtered.slice(start,end).map((item,index)=>renderCard(item,start+index)).join(''));state.rendered=end;updateStatus();}
   function setupAutoLoad(){const sentinel=ensureSentinel();if(!sentinel)return;if(state.observer)state.observer.disconnect();state.observer=new IntersectionObserver(entries=>{if(entries.some(e=>e.isIntersecting)&&state.rendered<state.filtered.length)idle(()=>renderMore(state.token,state.pageSize));},{rootMargin:'900px 0px'});state.observer.observe(sentinel);}
   async function loadCategory(category,announce=true){
     if(Array.isArray(state.raw[category]))return state.raw[category];

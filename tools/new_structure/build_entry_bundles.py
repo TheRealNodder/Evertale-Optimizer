@@ -16,6 +16,24 @@ ROOT_MARKERS = ["apkfiles", "tools"]
 EXCLUDED_DIR_NAMES = {"legacy", "Legacy", "_weapon_duplicate_quarantine", "_boss_duplicate_quarantine", "_duplicate_quarantine"}
 TESTLIKE_RE = re.compile(r"(test|debug|prototype|dev|internal|placeholder|sandbox|experimental)", re.I)
 STATE_SUFFIX_RE = re.compile(r"^(.*?)(\d{2})$")
+CHARACTER_LIVE_FIELDS = (
+    "schemaVersion", "order", "fileHandleOrder", "sourceOrder", "id", "sourceId",
+    "name", "title", "secondName", "description", "category", "rarity", "stars",
+    "evolvedStars", "element", "weaponType", "stats", "hp", "atk", "spd", "cost",
+    "image", "effect", "profile", "derivedTags", "leaderSkill",
+)
+CHARACTER_LIVE_INTERNAL_FIELDS = (
+    "sourceId", "family", "weaponId", "bossId", "leaderBuff", "leaderBuffCondition",
+)
+CHARACTER_LIVE_REF_FIELDS = (
+    "activeSkills", "passives", "leaderBuff", "leaderBuffCondition", "summonableMonsters",
+)
+CHARACTER_LIVE_RAW_FIELDS = (
+    "name", "family", "element", "weaponPref", "attackType", "stars", "evolvedStars",
+    "accessoryStars", "baseAttack", "flatAttack", "attack", "baseMaxHp", "flatMaxHp",
+    "hp", "speed", "flatSpeed", "cost", "profile", "leaderBuff",
+    "leaderBuffCondition", "summonableMonsters",
+)
 
 
 def load_json(path: Path) -> Any:
@@ -283,6 +301,54 @@ def strip_bundle_markers(rows: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     return [{k: v for k, v in row.items() if not k.startswith("_bundle")} for row in rows]
 
 
+def compact_fields(source: Any, fields: Tuple[str, ...]) -> Dict[str, Any]:
+    if not isinstance(source, dict):
+        return {}
+    return {
+        key: source[key]
+        for key in fields
+        if key in source and source[key] not in (None, "", [], {})
+    }
+
+
+def compact_skill_localization(source: Any) -> Dict[str, Any]:
+    if not isinstance(source, dict):
+        return {}
+    result: Dict[str, Any] = {}
+    for skill_id, detail in source.items():
+        detail = detail if isinstance(detail, dict) else {}
+        localization = compact_fields(detail.get("localization"), ("name", "description"))
+        row: Dict[str, Any] = {}
+        if localization:
+            row["localization"] = localization
+        for key in ("tu", "sp"):
+            if detail.get(key) is not None:
+                row[key] = detail[key]
+        result[str(skill_id)] = row
+    return result
+
+
+def compact_character_live_entry(entry: Dict[str, Any]) -> Dict[str, Any]:
+    result = compact_fields(entry, CHARACTER_LIVE_FIELDS)
+    for key, fields in (
+        ("internal", CHARACTER_LIVE_INTERNAL_FIELDS),
+        ("refs", CHARACTER_LIVE_REF_FIELDS),
+        ("raw", CHARACTER_LIVE_RAW_FIELDS),
+    ):
+        compact = compact_fields(entry.get(key), fields)
+        if compact:
+            result[key] = compact
+    resolved = entry.get("resolved") if isinstance(entry.get("resolved"), dict) else {}
+    compact_resolved: Dict[str, Any] = {}
+    for key in ("activeSkills", "passives"):
+        skills = compact_skill_localization(resolved.get(key))
+        if skills:
+            compact_resolved[key] = skills
+    if compact_resolved:
+        result["resolved"] = compact_resolved
+    return result
+
+
 def build_category(entries_root: Path, bundles_dir: Path, category: str) -> Dict[str, Any]:
     category_dir = entries_root / category
     index_path = category_dir / "index.json"
@@ -306,6 +372,39 @@ def build_category(entries_root: Path, bundles_dir: Path, category: str) -> Dict
     }
     write_json_if_changed(out_path, bundle)
     return {"category": category, "status": "ok" if not errors else "warning", "sourceIndexCount": source_index_count, "count": len(clean_rows), "errors": len(errors), "discovery": discovery, "contentHash": bundle["contentHash"], "output": str(out_path)}
+
+
+def build_character_live_bundle(bundles_dir: Path) -> Dict[str, Any]:
+    source_path = bundles_dir / "characters.bundle.json"
+    if not source_path.exists():
+        return {"category": "characters_live", "status": "missing_source", "count": 0}
+    source = load_json(source_path)
+    source_rows = source.get("entries", []) if isinstance(source, dict) else []
+    rows = [compact_character_live_entry(row) for row in source_rows if isinstance(row, dict)]
+    content_hash = stable_hash(rows)
+    out_path = bundles_dir / "characters.live.bundle.json"
+    bundle = {
+        "schemaVersion": 1,
+        "category": "characters",
+        "purpose": "Fast Catalog and Roster runtime projection",
+        "generatedAt": stable_generated_at(out_path, content_hash),
+        "sourceIndexCount": int(source.get("sourceIndexCount") or len(source_rows)),
+        "sourceContentHash": source.get("contentHash") or "",
+        "count": len(rows),
+        "errors": source.get("errors") or [],
+        "contentHash": content_hash,
+        "entries": rows,
+    }
+    write_json_if_changed(out_path, bundle)
+    return {
+        "category": "characters_live",
+        "status": "ok",
+        "sourceIndexCount": bundle["sourceIndexCount"],
+        "count": len(rows),
+        "errors": len(bundle["errors"]),
+        "contentHash": content_hash,
+        "output": str(out_path),
+    }
 
 
 def resolve_family_path(family_dir: Path, rel_file: str) -> Path:
@@ -374,6 +473,7 @@ def main() -> int:
     bundles_dir.mkdir(parents=True, exist_ok=True)
 
     results = [build_category(entries_root, bundles_dir, category) for category in CATEGORIES]
+    results.append(build_character_live_bundle(bundles_dir))
     results.append(build_character_families(entries_root, bundles_dir))
     results.append(build_catalog_bundle(bundles_dir))
 

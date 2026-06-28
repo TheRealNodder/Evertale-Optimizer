@@ -27,6 +27,37 @@ if (!dataVersionBase || !runtimeRevision) {
   errors.push('live-data-config.js must separate DATA_VERSION_BASE from RUNTIME_CACHE_REVISION');
 }
 
+const themeSource = read('seasonal-theme.js');
+for (const gem of ['gold', 'silver', 'ruby', 'sapphire', 'emerald', 'amethyst', 'diamond', 'pearl', 'platinum', 'opal', 'topaz', 'jade', 'obsidian', 'quartz']) {
+  if (!themeSource.includes(`${gem}:`)) errors.push(`Gem/mineral theme is missing: ${gem}`);
+}
+for (const handheld of ['crimsonblack', 'cobaltblack', 'metallicrose', 'bronzexl', 'blackwhitedsi', 'galaxystyle', 'superfamicom']) {
+  if (!themeSource.includes(`${handheld}:`)) errors.push(`DS/3DS theme is missing: ${handheld}`);
+}
+for (const legendary of [
+  'hooh', 'lugia', 'suicune',
+  'groudon', 'kyogre', 'rayquaza', 'shinyprimalgroudon', 'shinyprimalkyogre', 'shinymegarayquaza',
+  'dialga', 'palkia', 'giratina', 'arceus',
+  'reshiram', 'zekrom', 'blackkyurem', 'whitekyurem',
+  'xerneas', 'yveltal', 'zygarde',
+  'solgaleo', 'lunala', 'ultranecrozma',
+  'zacian', 'zamazenta', 'eternatus',
+  'koraidon', 'miraidon', 'terapagos',
+]) {
+  if (!themeSource.includes(`${legendary}:`)) errors.push(`Legendary theme is missing: ${legendary}`);
+}
+if (!themeSource.includes('data-theme-material') || !themeSource.includes('prefers-reduced-motion')) {
+  errors.push('Gem themes must retain material scoping and reduced-motion handling');
+}
+if (!themeSource.includes('evertale-legendary-outline-pulse') || !themeSource.includes('--legendary-body') || !themeSource.includes('--legendary-energy') || !themeSource.includes('--legendary-detail')) {
+  errors.push('Legendary themes must retain their fixed palette and subtle energy-outline pulse');
+}
+const siteMenuSource = read('site-menu.js');
+for (const group of ['Calendar', 'Pokémon · Versions', 'Pokémon · Hoenn Shiny', 'Pokémon · Paldea', 'Gems & Minerals', 'DS & 3DS', 'Signature']) {
+  if (!themeSource.includes(`'${group}'`)) errors.push(`Theme menu group is missing: ${group}`);
+}
+if (!siteMenuSource.includes('siteThemeSwatchDivider') || !siteMenuSource.includes('groupOrder')) errors.push('Theme swatch category dividers are missing');
+
 for (const page of pages) {
   const html = read(page);
   const refs = [...html.matchAll(/(?:src|href)="\.\/([^"?#]+)/g)].map(match => match[1]);
@@ -35,6 +66,9 @@ for (const page of pages) {
   }
   if (!html.includes(`live-data-config.js?v=${expectedDataVersion}`)) {
     errors.push(`${page} does not use the current full live-data config cache token`);
+  }
+  if (page !== 'optimizer.html' && !html.includes(`characters.live.bundle.json?v=${expectedDataVersion}`)) {
+    errors.push(`${page} does not preload the current live character bundle`);
   }
   const sharedOrder = ['seasonal-theme.js', 'site-menu.js', 'live-data-config.js', 'image-cache-reset.js', 'data-loader.js'];
   let sharedPrevious = -1;
@@ -67,6 +101,31 @@ const catalog = JSON.parse(read('apkfiles/entries/bundles/catalog.bundle.json'))
 for (const category of ['characters', 'weapons', 'accessories', 'bosses']) {
   const count = Array.isArray(catalog.categories?.[category]) ? catalog.categories[category].length : 0;
   if (!count) errors.push(`catalog.bundle.json has no ${category}`);
+}
+
+const fullCharacterBundle = JSON.parse(read('apkfiles/entries/bundles/characters.bundle.json'));
+const liveCharacterBundlePath = 'apkfiles/entries/bundles/characters.live.bundle.json';
+if (!exists(liveCharacterBundlePath)) {
+  errors.push(`Missing fast runtime bundle: ${liveCharacterBundlePath}`);
+} else {
+  const liveCharacterBundle = JSON.parse(read(liveCharacterBundlePath));
+  const fullCount = Array.isArray(fullCharacterBundle.entries) ? fullCharacterBundle.entries.length : 0;
+  const liveCount = Array.isArray(liveCharacterBundle.entries) ? liveCharacterBundle.entries.length : 0;
+  if (!fullCount || liveCount !== fullCount) errors.push(`Fast character bundle count ${liveCount} does not match full count ${fullCount}`);
+  const fullBytes = fs.statSync(path.join(root, 'apkfiles/entries/bundles/characters.bundle.json')).size;
+  const liveBytes = fs.statSync(path.join(root, liveCharacterBundlePath)).size;
+  if (liveBytes >= fullBytes * 0.5) errors.push(`Fast character bundle is unexpectedly large: ${liveBytes} of ${fullBytes} bytes`);
+  const sourceIds = new Set((liveCharacterBundle.entries || []).map(row => String(row?.internal?.sourceId || row?.sourceId || '')));
+  for (const sourceId of ['JeanneFusion01', 'JeanneFusion02']) {
+    if (!sourceIds.has(sourceId)) errors.push(`Fast character bundle is missing identity-sensitive entry: ${sourceId}`);
+  }
+  const jeanneFusion = (liveCharacterBundle.entries || []).find(row => String(row?.internal?.sourceId || row?.sourceId || '') === 'JeanneFusion02');
+  if (!jeanneFusion?.resolved?.activeSkills?.SingleAttackAJeanneFusion?.localization?.description) {
+    errors.push('Fast character bundle lost JeanneFusion active-skill localization');
+  }
+  if (!jeanneFusion?.resolved?.passives?.GuardianAngelPassiveAJeanneFusion?.localization?.description) {
+    errors.push('Fast character bundle lost JeanneFusion passive localization');
+  }
 }
 
 const workflows = ['.github/workflows/entry-safe-rebuild.yml', '.github/workflows/master-control.yml'];

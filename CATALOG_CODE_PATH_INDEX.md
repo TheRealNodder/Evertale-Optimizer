@@ -21,12 +21,27 @@ This addendum supersedes older root-file and version lists below.
   exists.
 - Cleanup ownership and deletion boundaries are recorded in
   `legacy/CLEANUP_MANIFEST_2026-06-28.md`.
-- Theme authority is `seasonal-theme.js?v=8` plus `site-menu.js?v=11` on
+- Theme authority is `seasonal-theme.js?v=13` plus `site-menu.js?v=14` on
   Catalog, Roster, and Optimizer.
   - Auto mode uses the America/Los_Angeles calendar, seasonal fallbacks,
     calculated Easter, and calculated fourth-Thursday Thanksgiving dates.
   - The site menu contains an explicit `Auto · <resolved theme>` button.
-- Data authority remains `data-loader.js`, now loaded as `v=5`.
+  - Calendar, Pokémon by region, Gems & Minerals, DS & 3DS, and Signature
+    themes have separate picker groups and visible swatch dividers.
+  - Gold, Silver, Ruby, Sapphire, Emerald, Diamond, Pearl, and Platinum are the
+    Pokémon group; Amethyst, Opal, Topaz, Jade, Obsidian, and Quartz remain in
+    Gems & Minerals. Both groups retain the reduced-motion-safe material sheen.
+  - Ruby, Sapphire, and Emerald use darkened palettes sampled from the original
+    Generation III game covers so their hues stay recognizable without reducing readability.
+  - Game-defining legendary themes run from Johto through Paldea/Z-A. Each
+    palette stays fixed while panel outlines pulse between its energy color
+    and a slightly darker shade; headings use a stable third detail color.
+    Reduced-motion fallback is included. Hoenn also includes Shiny Primal
+    Groudon, Shiny Primal Kyogre, and Shiny Mega Rayquaza themes.
+  - The curated DS & 3DS group includes Crimson/Black, Cobalt/Black, Metallic
+    Rose, Bronze XL, Pokémon Black & White DSi, Galaxy Style, and Super Famicom.
+    Near-duplicates of existing gem and signature themes are intentionally omitted.
+- Data authority remains `data-loader.js`, now loaded as `v=6`.
   - `live-data-config.js` separates its generated `DATA_VERSION_BASE` from the
     manually owned `RUNTIME_CACHE_REVISION`. The entry pipeline updates the
     base plus the versioned config URL in `index.html`, `roster.html`, and
@@ -43,7 +58,13 @@ This addendum supersedes older root-file and version lists below.
     only performs index repair requests when metadata is absent or short.
   - Character repair and desktop detail layers reuse the loader's cached image
     and family maps instead of parsing duplicate responses.
-- `catalog-v2-lite.js?v=28` warms only small accessory/weapon categories on
+  - `characters.live.bundle.json` is the first-load Catalog/Roster projection.
+    It preserves all 743 identities, visible fields, skills, refs, and state
+    inputs at roughly 2.5 MB instead of parsing the 11.3 MB full authority.
+    The full character bundle remains the automatic fallback.
+  - Catalog and Roster preload the exact versioned live bundle; Master Control
+    updates those preload URLs together with `live-data-config.js`.
+- `catalog-v2-lite.js?v=29` warms only small accessory/weapon categories on
   capable connections. Boss data remains interaction-lazy.
 - `run_entry_pipeline.py` version 10 updates the shared live-data token after
   rebuilding bundles. Both active workflows stage all three page references.
