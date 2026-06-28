@@ -189,10 +189,10 @@
   function render(){const grid=$('catalogGrid');if(!grid)return;state.token++;state.filtered=filter();state.rendered=0;grid.innerHTML='';renderMore(state.token,Math.max(state.pageSize,window.innerWidth>=821?36:18));setupAutoLoad();}
   function renderMore(token=state.token,count=state.pageSize){const grid=$('catalogGrid');if(!grid||token!==state.token)return;const start=state.rendered,end=Math.min(start+count,state.filtered.length);if(end<=start){updateStatus();return;}grid.insertAdjacentHTML('beforeend',state.filtered.slice(start,end).map(renderCard).join(''));state.rendered=end;updateStatus();}
   function setupAutoLoad(){const sentinel=ensureSentinel();if(!sentinel)return;if(state.observer)state.observer.disconnect();state.observer=new IntersectionObserver(entries=>{if(entries.some(e=>e.isIntersecting)&&state.rendered<state.filtered.length)idle(()=>renderMore(state.token,state.pageSize));},{rootMargin:'900px 0px'});state.observer.observe(sentinel);}
-  async function loadCategory(category){
+  async function loadCategory(category,announce=true){
     if(Array.isArray(state.raw[category]))return state.raw[category];
     if(state.loading[category])return state.loading[category];
-    const status=$('statusText');if(status)status.textContent=`Loading ${CATEGORY_LABELS[category]||category}...`;
+    const status=$('statusText');if(announce&&status)status.textContent=`Loading ${CATEGORY_LABELS[category]||category}...`;
     state.loading[category]=window.EvertaleData.loadEntryCategory(category,category!=='characters').then(rows=>{
       state.raw[category]=Array.isArray(rows)?rows:[];
       delete state.loading[category];
@@ -211,9 +211,9 @@
     const rows=normalize(entries);
     state.items=state.registry?applyDuoRegistry(rows,state.registry):rows;
   }
-  async function hydrateCategory(category,shouldRender=true){
+  async function hydrateCategory(category,shouldRender=true,announce=true){
     if(category==='all')return hydrateAll(shouldRender);
-    await loadCategory(category);
+    await loadCategory(category,announce);
     if(category==='characters')await ensureRegistry();
     rebuildItems();
     if(shouldRender)render();
@@ -226,15 +226,20 @@
   }
   function warmColdCategories(){
     if(state.warming)return;
+    const connection=navigator.connection||navigator.mozConnection||navigator.webkitConnection;
+    if(connection?.saveData||/2g|3g/i.test(String(connection?.effectiveType||'')))return;
     state.warming=true;
-    const queue=CATEGORIES.filter(k=>k!=='characters');
+    // Warm only the two small catalogs. Bosses remain truly lazy because that
+    // bundle is several megabytes and can compete with visible card images.
+    const queue=['accessories','weapons'];
     const step=()=>idle(async()=>{
       const next=queue.shift();
       if(!next)return;
-      await hydrateCategory(next,state.type==='all');
+      await hydrateCategory(next,state.type==='all',false);
       step();
     });
-    step();
+    const start=()=>setTimeout(step,1200);
+    document.readyState==='complete'?start():window.addEventListener('load',start,{once:true});
   }
   function readSkills(card,type){let rows=[];try{rows=JSON.parse(decodeURIComponent(card?.getAttribute(type==='active'?'data-active-skills':'data-passive-skills')||''))}catch{}return (Array.isArray(rows)?rows:[]).map(s=>({name:s.name||s.id||'Unnamed Skill',meta:[s.tu?`${s.tu} TU`:'',s.sp!==undefined?`${Number(s.sp)>0?'+':''}${s.sp} SP`:''].filter(Boolean).join(' • '),desc:s.description||''}));}
   function closeCardSkillPanels(except){document.querySelectorAll('.unitCard.v2-skill-open').forEach(c=>{if(c!==except)c.classList.remove('v2-skill-open');});document.querySelectorAll('.v2-card-skill-panel').forEach(p=>{if(!except||!except.contains(p))p.hidden=true;});}

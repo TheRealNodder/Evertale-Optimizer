@@ -13,7 +13,7 @@ from typing import Any, Dict, List
 from path_utils import find_repo_root, resolve_repo_path
 
 ROOT_MARKERS = ["apkfiles", "tools"]
-PIPELINE_VERSION = 9
+PIPELINE_VERSION = 10
 
 SAFE_DEFAULT_STEPS = [
     "bookmark_before",
@@ -24,6 +24,7 @@ SAFE_DEFAULT_STEPS = [
     "sync_character_tags",
     "build_parent_child_map",
     "build_bundles",
+    "update_live_data_config",
     "validate",
     "bookmark_after",
 ]
@@ -39,6 +40,7 @@ EXTRACT_STEPS = [
     "sync_character_tags",
     "build_parent_child_map",
     "build_bundles",
+    "update_live_data_config",
     "validate",
     "bookmark_after",
 ]
@@ -53,6 +55,7 @@ SCRIPT_MAP = {
     "build_character_image_map": "build_character_image_map.py",
     "sync_character_tags": "sync_character_tags.py",
     "build_bundles": "build_entry_bundles.py",
+    "update_live_data_config": "update_live_data_config_version.py",
     "build_parent_child_map": "build_parent_child_map.py",
     "validate": "validate_entries.py",
 }
@@ -147,7 +150,7 @@ def main() -> int:
         "mode": "extract" if args.extract else "safe_rebuild",
         "startedAt": int(time.time()),
         "steps": [],
-        "stepOrderReason": "build_parent_child_map can update character/accessory indexes; build_bundles must run after it so catalog.bundle.json includes newly indexed entries.",
+        "stepOrderReason": "build_parent_child_map can update indexes; bundles rebuild afterward, then the shared cache token and all page references update before validation.",
         "subprocessEncoding": "PYTHONIOENCODING=utf-8",
     }
 

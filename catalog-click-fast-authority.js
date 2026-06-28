@@ -187,10 +187,14 @@
   async function loadDescMap(){
     if(state.descMap)return state.descMap;
     if(state.descPromise)return state.descPromise;
-    state.descPromise=fetch(FAMILY_BUNDLE,{cache:'default'}).then(r=>r.ok?r.json():null).then(json=>{
+    const familySource=typeof window.EvertaleData?.getCharacterFamiliesMap==='function'
+      ?window.EvertaleData.getCharacterFamiliesMap()
+      :fetch(FAMILY_BUNDLE,{cache:'default'}).then(r=>r.ok?r.json():null);
+    state.descPromise=Promise.resolve(familySource).then(json=>{
       const map=new Map();
       const add=(raw,rows)=>{const k=key(raw);if(k&&rows?.length&&!map.has(k))map.set(k,rows);};
-      (Array.isArray(json?.entries)?json.entries:[]).forEach(entry=>{
+      const entries=json instanceof Map?[...json.values()]:(Array.isArray(json?.entries)?json.entries:[]);
+      entries.forEach(entry=>{
         const rows=(Array.isArray(entry?.states)?entry.states:[]).slice(0,3).map(s=>({sourceId:s?.sourceId||s?.dataSourceId||'',name:s?.name||entry?.name||'',title:s?.title||entry?.title||'',description:s?.description||''}));
         if(!rows.length)return;
         [entry?.family,entry?.id,entry?.sourceId,entry?.name,entry?.title].forEach(v=>add(v,rows));

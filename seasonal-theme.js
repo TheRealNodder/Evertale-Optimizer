@@ -110,17 +110,32 @@
     const a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),mo=Math.floor((h+l-7*m+114)/31),da=((h+l-7*m+114)%31)+1;
     return{month:mo,day:da};
   }
+  function nthWeekday(year,month,weekday,nth){
+    const first=new Date(Date.UTC(year,month-1,1)).getUTCDay();
+    return 1+((7+weekday-first)%7)+(nth-1)*7;
+  }
+  function daysFrom(now,target){
+    const a=Date.UTC(now.year,now.month-1,now.day);
+    const b=Date.UTC(now.year,target.month-1,target.day);
+    return Math.round((a-b)/86400000);
+  }
+  function nearDate(now,target,before,after){
+    const delta=daysFrom(now,target);
+    return delta>=-before&&delta<=after;
+  }
   function chooseTheme(input){
     const now=input&&typeof input==='object'&&'month'in input&&'day'in input?input:dateLA(input);
-    const ea=easter(now.year||dateLA().year);
+    const year=now.year||dateLA().year;
+    const ea=easter(year);
+    const thanksgiving={month:11,day:nthWeekday(year,11,4,4)};
     if(inRange(now.month,now.day,12,1,12,31))return'christmas';
     if(inRange(now.month,now.day,1,1,1,10))return'newyear';
     if(inRange(now.month,now.day,2,1,2,15))return'valentine';
     if(inRange(now.month,now.day,3,10,3,18))return'stpatrick';
-    if(inRange(now.month,now.day,ea.month,Math.max(1,ea.day-5),ea.month,Math.min(31,ea.day+2)))return'easter';
+    if(nearDate(now,ea,5,2))return'easter';
     if(inRange(now.month,now.day,7,1,7,7))return'independence';
     if(inRange(now.month,now.day,10,1,10,31))return'halloween';
-    if(inRange(now.month,now.day,11,20,11,30))return'thanksgiving';
+    if(nearDate(now,thanksgiving,4,3))return'thanksgiving';
     return season(now.month,now.day);
   }
   function urlPreference(){
@@ -281,6 +296,10 @@
     getActiveTheme(){return resolvedTheme();},
     getResolvedTheme:resolvedTheme,
     getAutoTheme:autoTheme,
+    getCalendarPreview(year=dateLA().year){
+      const ea=easter(year);
+      return{year,easter:ea,thanksgiving:{month:11,day:nthWeekday(year,11,4,4)}};
+    },
     normalizeThemeKey,
     chooseTheme,
     applyTheme,

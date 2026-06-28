@@ -107,6 +107,13 @@
     loader.loadEntryCategory=async function(category,...rest){
       const rows=await original(category,...rest);
       try{
+        const bundleStatus=typeof loader.getCategoryBundleStatus==='function'?await loader.getCategoryBundleStatus(category):null;
+        if(bundleStatus&&bundleStatus.source==='category-bundle'&&bundleStatus.count>=bundleStatus.sourceIndexCount){
+          const report={status:'bundle-metadata-current',loadedCount:Array.isArray(rows)?rows.length:0,...bundleStatus};
+          REPORT.categories[category]=report;
+          window.__EVERTALE_INDEX_AUTHORITY_REPORT=REPORT;
+          return rows;
+        }
         const {rows:extras,report}=await loadIndexedExtras(category,rows);
         REPORT.categories[category]=report;
         window.__EVERTALE_INDEX_AUTHORITY_REPORT=REPORT;

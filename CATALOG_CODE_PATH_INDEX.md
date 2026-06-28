@@ -6,6 +6,50 @@ Last indexed after current `index.html` commit: `fb1342c715998cbcd3519ae81dd7ab5
 
 ---
 
+## 2026-06-28 workflow, cleanup, theme, and loader addendum
+
+This addendum supersedes older root-file and version lists below.
+
+- Active GitHub data workflows are `.github/workflows/master-control.yml` and
+  `.github/workflows/entry-safe-rebuild.yml`.
+  - They use the Node 24 action generation: `checkout@v6`,
+    `setup-python@v6`, and `upload-artifact@v7`.
+  - Both data writers share one concurrency group.
+  - Timestamp-only reports and markers are artifacts, not auto-committed data.
+- The broken toolbox scraper workflow moved to
+  `legacy/workflows/update_toolbox_data.yml`; its `scraper/` runtime no longer
+  exists.
+- Cleanup ownership and deletion boundaries are recorded in
+  `legacy/CLEANUP_MANIFEST_2026-06-28.md`.
+- Theme authority is `seasonal-theme.js?v=8` plus `site-menu.js?v=11` on
+  Catalog, Roster, and Optimizer.
+  - Auto mode uses the America/Los_Angeles calendar, seasonal fallbacks,
+    calculated Easter, and calculated fourth-Thursday Thanksgiving dates.
+  - The site menu contains an explicit `Auto · <resolved theme>` button.
+- Data authority remains `data-loader.js`, now loaded as `v=5`.
+  - `live-data-config.js` separates its generated `DATA_VERSION_BASE` from the
+    manually owned `RUNTIME_CACHE_REVISION`. The entry pipeline updates the
+    base plus the versioned config URL in `index.html`, `roster.html`, and
+    `optimizer.html`, so future Master Control runs cannot erase loader fixes
+    or leave any page on a stale config URL.
+  - Category bundles are fetched directly and concurrent duplicate requests
+    are coalesced.
+  - `character_families.bundle.json` is preferred before the full catalog
+    fallback.
+  - The 65 MB global localization table is disabled by default because current
+    bundles already contain localized display and skill data. Set
+    `useGlobalLocalization: true` only for legacy data recovery.
+  - `data-loader-index-authority.js?v=2` trusts complete bundle metadata and
+    only performs index repair requests when metadata is absent or short.
+  - Character repair and desktop detail layers reuse the loader's cached image
+    and family maps instead of parsing duplicate responses.
+- `catalog-v2-lite.js?v=28` warms only small accessory/weapon categories on
+  capable connections. Boss data remains interaction-lazy.
+- `run_entry_pipeline.py` version 10 updates the shared live-data token after
+  rebuilding bundles. Both active workflows stage all three page references.
+
+---
+
 ## 2026-06-19 live audit addendum
 
 This addendum supersedes stale version numbers in the older load-order tables until the full index is regenerated.

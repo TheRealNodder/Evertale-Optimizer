@@ -18,7 +18,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: entry-safe-rebuild-${{ github.ref }}
+  group: evertale-generated-data-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -27,12 +27,12 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.11'
 
@@ -73,7 +73,7 @@ jobs:
               Path('apkfiles/entries/reports/entry_pipeline_report.json'),
               Path('apkfiles/entries/reports/validation_report.json'),
               Path('apkfiles/entries/reports/category_order_sync_report.json'),
-              Path('apkfiles/entries/reports/bundle_report.json'),
+              Path('apkfiles/entries/reports/bundle_build_report.json'),
           ]:
               print('\nFILE:', p)
               if not p.exists():
@@ -99,7 +99,7 @@ jobs:
               elif p.name == 'category_order_sync_report.json':
                   for row in data.get('categories', []):
                       print(row.get('category'), 'ordered=', row.get('orderedCount'), 'index=', row.get('indexEntryCount'), 'canonical=', row.get('canonicalExistingCount'), 'missingCanonical=', row.get('missingCanonicalEntries'), 'blockedAppends=', row.get('blockedAppends'))
-              elif p.name == 'bundle_report.json':
+              elif p.name == 'bundle_build_report.json':
                   for row in data.get('categories', []):
                       print(row.get('category'), 'sourceIndexCount=', row.get('sourceIndexCount'), 'count=', row.get('count'), 'errors=', row.get('errors'), 'duplicates=', row.get('duplicateSourceIdCount'))
               else:
@@ -109,7 +109,7 @@ jobs:
 
       - name: Upload pipeline debug artifact
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: entry-safe-rebuild-debug-${{ github.run_id }}
           path: workflow-debug-artifacts/
@@ -139,9 +139,9 @@ jobs:
           python - <<'PY'
           import json
           from pathlib import Path
-          p = Path('apkfiles/entries/reports/bundle_report.json')
+          p = Path('apkfiles/entries/reports/bundle_build_report.json')
           data = json.loads(p.read_text(encoding='utf-8'))
-          print('bundle_report schemaVersion:', data.get('schemaVersion'))
+          print('bundle_build_report schemaVersion:', data.get('schemaVersion'))
           for row in data.get('categories', []):
               print(row.get('category'), 'sourceIndexCount=', row.get('sourceIndexCount'), 'count=', row.get('count'), 'skippedUnindexedCount=', row.get('skippedUnindexedCount'), 'errors=', row.get('errors'))
           PY
@@ -150,10 +150,13 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add apkfiles/entries/bundles apkfiles/entries/reports apkfiles/entries/_markers apkfiles/entries/maps data/character_tags.json
+          # Reports and markers contain run timestamps and are uploaded above.
+          # Commit only website/runtime authorities so a bot commit converges
+          # instead of triggering an endless timestamp-only rebuild loop.
+          git add live-data-config.js index.html roster.html optimizer.html apkfiles/entries/bundles apkfiles/entries/maps apkfiles/entries/runtime data/character_tags.json
           if git diff --cached --quiet; then
             echo "No generated changes to commit."
           else
-            git commit -m "Auto rebuild entry bundles and reports"
+            git commit -m "Auto rebuild entry bundles"
             git push
           fi

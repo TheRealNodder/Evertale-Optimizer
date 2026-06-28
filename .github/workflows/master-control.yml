@@ -22,7 +22,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: evertale-master-control
+  group: evertale-generated-data-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -32,12 +32,12 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
@@ -103,7 +103,7 @@ jobs:
 
       - name: Upload reports as artifact
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: master-control-reports
           path: |
@@ -120,7 +120,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           # Keep commits narrow. Reports/markers/raw scratch files are uploaded as artifacts or ignored.
-          git add live-data-config.js 2>/dev/null || true
+          git add live-data-config.js index.html roster.html optimizer.html 2>/dev/null || true
           git add apkfiles/entries/characters apkfiles/entries/weapons apkfiles/entries/accessories apkfiles/entries/bosses 2>/dev/null || true
           git add apkfiles/entries/bundles apkfiles/entries/maps apkfiles/entries/runtime 2>/dev/null || true
           git add apkfiles/entries/localization/localizable_groups.json apkfiles/entries/localization/leader_skill_localization.json 2>/dev/null || true

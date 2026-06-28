@@ -22,7 +22,6 @@ FAST_POST_PIPELINE_STEPS = [
     "split_optimizer_runtime_model.py",
     "runtime_optimizer_trace.py",
     "audit_master_field_contract.py",
-    "update_live_data_config_version.py",
 ]
 
 ORDER_REPORTS = {

@@ -72,6 +72,16 @@
       select.dataset.bound='1';
       select.addEventListener('change',()=>setThemePreference(select.value));
     }
+    const autoButton=root.querySelector('.siteThemeAuto');
+    if(autoButton){
+      autoButton.textContent=autoResolved?.label?`Auto · ${autoResolved.label}`:'Auto';
+      autoButton.classList.toggle('active',select.value==='auto');
+      autoButton.setAttribute('aria-pressed',String(select.value==='auto'));
+      if(!autoButton.dataset.bound){
+        autoButton.dataset.bound='1';
+        autoButton.addEventListener('click',()=>setThemePreference('auto'));
+      }
+    }
     const swatches=root.querySelector('.siteThemeSwatches');
     if(swatches){
       const resolvedKey=select.value==='auto'?resolved?.key:'';
@@ -113,6 +123,8 @@
       .siteThemePanel{display:flex!important;flex-direction:column!important;gap:9px!important;padding:12px!important;border-radius:14px!important;border:1px solid var(--v2-surface-border,rgba(255,255,255,.12))!important;background:linear-gradient(135deg,var(--v2-theme-soft,rgba(255,255,255,.06)),rgba(255,255,255,.035))!important;}
       .siteThemeLabel{font-size:12px!important;font-weight:950!important;letter-spacing:.08em!important;text-transform:uppercase!important;color:var(--v2-ink,var(--site-theme-ink,#fff))!important;}
       .siteThemeSelect{width:100%!important;min-height:36px!important;border-radius:10px!important;border:1px solid var(--v2-surface-border,rgba(255,255,255,.16))!important;background:rgba(4,7,15,.74)!important;color:var(--v2-ink,var(--site-theme-ink,#fff))!important;padding:8px 10px!important;font-weight:850!important;}
+      .siteThemeAuto{width:100%!important;min-height:36px!important;border-radius:10px!important;border:1px solid var(--v2-surface-border,rgba(255,255,255,.16))!important;background:linear-gradient(135deg,var(--v2-theme-soft,rgba(255,255,255,.08)),rgba(4,7,15,.74))!important;color:var(--v2-ink,var(--site-theme-ink,#fff))!important;padding:8px 10px!important;font-weight:900!important;cursor:pointer!important;}
+      .siteThemeAuto.active{border-color:var(--v2-theme-trim,var(--site-theme-accent,#f6ca5e))!important;box-shadow:0 0 18px var(--v2-theme-soft,rgba(255,255,255,.18))!important;}
       .siteThemeSwatches{display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:7px!important;}
       .siteThemeSwatch{aspect-ratio:1!important;min-width:0!important;border-radius:10px!important;border:1px solid rgba(255,255,255,.20)!important;background:linear-gradient(135deg,var(--swatch-a),var(--swatch-b) 52%,var(--swatch-c))!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 8px 18px rgba(0,0,0,.24)!important;cursor:pointer!important;}
       .siteThemeSwatch.active{outline:2px solid var(--v2-theme-trim,var(--site-theme-accent,#f6ca5e))!important;outline-offset:2px!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 0 20px var(--v2-theme-soft,rgba(255,255,255,.18))!important;}
@@ -158,7 +170,7 @@
     if(existing){hydrateThemeControl(existing);return;}
     const overlay=document.createElement('div'); overlay.className='siteMenuOverlay';
     const aside=document.createElement('aside'); aside.id='siteSideMenu'; aside.className='siteSideMenu'; aside.ariaHidden='true';
-    aside.innerHTML=`<div class="siteMenuHead"><div><div class="siteMenuTitle">Menu</div><div class="siteMenuSub">Pages</div></div><button class="siteMenuClose" type="button" aria-label="Close menu">&times;</button></div><nav class="siteMenuNav" aria-label="Site navigation"><div class="siteMenuSection"><a class="siteMenuMain" href="${themedUrl('./index.html')}">Catalog</a><a class="siteMenuSubLink" href="${catalogUrl('characters')}">Character</a><a class="siteMenuSubLink" href="${catalogUrl('weapons')}">Weapon</a><a class="siteMenuSubLink" href="${catalogUrl('accessories')}">Accessories</a><a class="siteMenuSubLink" href="${catalogUrl('bosses')}">Bosses</a></div><div class="siteMenuSection"><a class="siteMenuMain" href="${themedUrl('./roster.html')}">Roster</a></div><div class="siteMenuSection"><a class="siteMenuMain" href="${themedUrl('./optimizer.html')}">Optimizer</a><a class="siteMenuSubLink" href="${themedUrl('./optimizer.html#storySection')}">Story</a><a class="siteMenuSubLink" href="${themedUrl('./optimizer.html#platoonsSection')}">Platoon</a></div></nav><section class="siteThemePanel" aria-label="Theme"><label class="siteThemeLabel" for="siteThemeSelect">Theme</label><select id="siteThemeSelect" class="siteThemeSelect"></select><div class="siteThemeSwatches"></div></section>`;
+    aside.innerHTML=`<div class="siteMenuHead"><div><div class="siteMenuTitle">Menu</div><div class="siteMenuSub">Pages</div></div><button class="siteMenuClose" type="button" aria-label="Close menu">&times;</button></div><nav class="siteMenuNav" aria-label="Site navigation"><div class="siteMenuSection"><a class="siteMenuMain" href="${themedUrl('./index.html')}">Catalog</a><a class="siteMenuSubLink" href="${catalogUrl('characters')}">Character</a><a class="siteMenuSubLink" href="${catalogUrl('weapons')}">Weapon</a><a class="siteMenuSubLink" href="${catalogUrl('accessories')}">Accessories</a><a class="siteMenuSubLink" href="${catalogUrl('bosses')}">Bosses</a></div><div class="siteMenuSection"><a class="siteMenuMain" href="${themedUrl('./roster.html')}">Roster</a></div><div class="siteMenuSection"><a class="siteMenuMain" href="${themedUrl('./optimizer.html')}">Optimizer</a><a class="siteMenuSubLink" href="${themedUrl('./optimizer.html#storySection')}">Story</a><a class="siteMenuSubLink" href="${themedUrl('./optimizer.html#platoonsSection')}">Platoon</a></div></nav><section class="siteThemePanel" aria-label="Theme"><label class="siteThemeLabel" for="siteThemeSelect">Theme</label><button type="button" class="siteThemeAuto" aria-pressed="false">Auto</button><select id="siteThemeSelect" class="siteThemeSelect"></select><div class="siteThemeSwatches"></div></section>`;
     document.body.append(overlay,aside);
     hydrateThemeControl(aside);
     overlay.addEventListener('click',close); aside.querySelector('.siteMenuClose').addEventListener('click',close); aside.addEventListener('click',e=>{ if(e.target.closest('a')) close(); });

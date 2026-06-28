@@ -7,10 +7,12 @@
   const APK_BASE = './apkfiles';
   const ENTRY_BASE = `${APK_BASE}/entries`;
 
-  // Bump this whenever apkfiles/entries/bundles or maps are regenerated.
-  // It prevents GitHub Pages/browser cache from serving stale bundles where
-  // newly added entries exist on disk but never appear in the roster/catalog.
-  const DATA_VERSION = 'entries-1782519101-d5980e03a085-jeanne-nonduo-v1';
+  // Master Control owns the generated base. Runtime code changes own the
+  // revision. Keeping them separate prevents a data rebuild from silently
+  // removing a loader/cache fix made between game-data releases.
+  const DATA_VERSION_BASE = 'entries-1782519101-d5980e03a085';
+  const RUNTIME_CACHE_REVISION = 'loader-v3-theme-v8';
+  const DATA_VERSION = `${DATA_VERSION_BASE}-${RUNTIME_CACHE_REVISION}`;
 
   window.EVERTALE_LIVE_CONFIG = Object.freeze({
     mode: 'live',
@@ -27,6 +29,9 @@
     cacheMode: 'default',
     bundleCacheMode: 'default',
     mapCacheMode: 'default',
+    // Generated bundles already contain localized display and skill text.
+    // Keep the 65MB global localization table as an explicit legacy fallback.
+    useGlobalLocalization: false,
     dataVersion: DATA_VERSION,
     noStoreUrls: false,
   });

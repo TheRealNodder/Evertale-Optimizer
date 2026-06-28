@@ -85,10 +85,14 @@
 
   async function loadStateMap(){
     if(stateMapPromise)return stateMapPromise;
-    stateMapPromise=Promise.all([readJson(IMAGE_MAP_URL),readJson(FAMILY_BUNDLE_URL)]).then(([imageMap,familyBundle])=>{
+    const loader=window.EvertaleData;
+    const imagePromise=typeof loader?.getCharacterImageMap==='function'?loader.getCharacterImageMap():readJson(IMAGE_MAP_URL);
+    const familyPromise=typeof loader?.getCharacterFamiliesMap==='function'?loader.getCharacterFamiliesMap():readJson(FAMILY_BUNDLE_URL);
+    stateMapPromise=Promise.all([imagePromise,familyPromise]).then(([imageMap,familySource])=>{
       const map=new Map();
       Object.values(imageMap?.families||{}).forEach(entry=>addEntry(map,entry));
-      arr(familyBundle?.entries).forEach(entry=>addEntry(map,entry));
+      const familyEntries=familySource instanceof Map?[...familySource.values()]:arr(familySource?.entries);
+      familyEntries.forEach(entry=>addEntry(map,entry));
       return map;
     }).catch(()=>new Map());
     return stateMapPromise;
