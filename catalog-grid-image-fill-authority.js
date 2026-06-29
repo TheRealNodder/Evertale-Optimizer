@@ -1,9 +1,5 @@
-/* catalog-grid-image-fill-authority.js
-   Visual-only authority for Catalog grid image boxes.
-   Does not mutate data, image paths, state rows, loader output, or sidebar behavior.
-*/
 (function(){
-  const STYLE_ID='catalog-grid-image-fill-authority-style';
+  const STYLE_ID='catalog-grid-image-fill-style';
 
   function inject(){
     if(document.getElementById(STYLE_ID))return;
@@ -57,7 +53,7 @@
       }
     `;
     document.head.appendChild(style);
-    window.__EVERTALE_CATALOG_GRID_IMAGE_FILL_AUTHORITY=true;
+    window.__EVERTALE_CATALOG_GRID_IMAGE_FILL_READY=true;
   }
 
   inject();
