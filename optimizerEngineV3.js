@@ -33,6 +33,7 @@
   }
 
   function tagSet(u){
+    if(u?.__v3?.tags instanceof Set)return u.__v3.tags;
     const out=new Set();
     [...asArray(u?.derivedTags),...asArray(u?.tags),...asArray(u?.passiveTags),...asArray(u?.roles),...asArray(u?.archetypes)].forEach(v=>{const c=canon(v);if(c)out.add(c);});
     const blob=[u?.name,u?.title,u?.description,u?.element,u?.weaponType,u?.weaponPref,u?.family,u?.sourceId,...asArray(u?.activeSkills),...asArray(u?.passiveSkills),...asArray(u?.passiveSkillDetails)].map(v=>typeof v==="object"?JSON.stringify(v):text(v)).join(" ").toLowerCase();
@@ -53,7 +54,12 @@
     return out;
   }
 
-  function unitText(u){return[...tagSet(u)].join(" ");}
+  function unitText(u){
+    if(u?.__v3?.tagText)return u.__v3.tagText;
+    const s=[...tagSet(u)].join(" ");
+    if(u&&typeof u==="object")u.__v3={...(u.__v3||{}),tagText:s};
+    return s;
+  }
   function hasAny(u,rules){const t=unitText(u);return asArray(rules).some(r=>t.includes(canon(r)));}
   function entryPrefix(u){
     const paths=[u?.entryPath,u?.path,u?.file,u?.fileName,u?.sourceFile,u?.__path,u?.raw?.entryPath,u?.raw?.sourceFile].filter(Boolean).map(text);
@@ -70,7 +76,7 @@
     if(g.OptimizerEngineV2&&typeof g.OptimizerEngineV2.enrichOwnedUnits==="function"){
       try{rows=g.OptimizerEngineV2.enrichOwnedUnits(rows)}catch(_){ }
     }
-    return rows.map(u=>{const st=getStats(u);const id=identity(u);const tags=tagSet(u);const clone={...u,__v3:{stats:st,id,tags}};clone.id=text(u?.id||u?.sourceId||id.entry);clone.__v3.base=unitScore(clone,options||{});return clone;}).sort((a,b)=>(b.__v3.base-a.__v3.base)||identity(a).entry.localeCompare(identity(b).entry));
+    return rows.map(u=>{const st=getStats(u);const id=identity(u);const tags=tagSet(u);const tagText=[...tags].join(" ");const clone={...u,__v3:{stats:st,id,tags,tagText}};clone.id=text(u?.id||u?.sourceId||id.entry);clone.__v3.base=unitScore(clone,options||{});return clone;}).sort((a,b)=>(b.__v3.base-a.__v3.base)||identity(a).entry.localeCompare(identity(b).entry));
   }
 
   function unitScore(u,options){
@@ -86,36 +92,25 @@
   }
 
   function resolvePlan(options,units){
+    if(options?.__v3Plan&&SLOT_RULES[options.__v3Plan])return options.__v3Plan;
     const keys=[options?.presetTag,...asArray(options?.archetypes)].map(v=>lc(v)).filter(v=>v&&v!=="auto"&&v!=="none");
     const direct=keys.map(k=>PLAN_ALIAS[k]??k).find(k=>SLOT_RULES[k]);
     if(direct)return direct;
     const checks=["burn","poison","sleep","stun","guardian","blood","crisis","survivor","heal","turn"];
     let best="offense",bestScore=-1;
-    for(const key of checks){const r=SLOT_RULES[key];let hits=0;for(const u of asArray(units)){if(hasAny(u,r.apply))hits+=2;if(hasAny(u,r.payoff))hits+=2;if(hasAny(u,r.support))hits+=1;}if(hits>bestScore){bestScore=hits;best=key;}}
+    const sample=asArray(units).slice(0,120);
+    for(const key of checks){const r=SLOT_RULES[key];let hits=0;for(const u of sample){if(hasAny(u,r.apply))hits+=2;if(hasAny(u,r.payoff))hits+=2;if(hasAny(u,r.support))hits+=1;}if(hits>bestScore){bestScore=hits;best=key;}}
     return best;
   }
 
-  function localKeys(ids,byId){
-    const out={entries:new Set(),families:new Set(),names:new Set()};
-    ids.forEach(id=>{const u=byId.get(text(id));if(!u)return;const k=identity(u);out.entries.add(k.entry);if(k.family)out.families.add(k.family);if(k.name)out.names.add(k.name);});
-    return out;
-  }
-  function localConflict(u,ids,byId){
-    const k=identity(u),keys=localKeys(ids,byId);
-    return keys.entries.has(k.entry)||keys.families.has(k.family)||keys.names.has(k.name);
-  }
-  function allowedByElement(u,ids,byId,options){
-    const mode=options?.doctrineOverrides?.monoVsRainbow?.selectionMode||options?.teamType||"auto";
-    if(mode!=="force_mono")return true;
-    const first=ids.map(id=>byId.get(text(id))).find(Boolean);
-    if(!first)return true;
-    return norm(first.element)===norm(u.element);
-  }
+  function localKeys(ids,byId){const out={entries:new Set(),families:new Set(),names:new Set()};ids.forEach(id=>{const u=byId.get(text(id));if(!u)return;const k=identity(u);out.entries.add(k.entry);if(k.family)out.families.add(k.family);if(k.name)out.names.add(k.name);});return out;}
+  function localConflict(u,ids,byId){const k=identity(u),keys=localKeys(ids,byId);return keys.entries.has(k.entry)||keys.families.has(k.family)||keys.names.has(k.name);}
+  function allowedByElement(u,ids,byId,options){const mode=options?.doctrineOverrides?.monoVsRainbow?.selectionMode||options?.teamType||"auto";if(mode!=="force_mono")return true;const first=ids.map(id=>byId.get(text(id))).find(Boolean);if(!first)return true;return norm(first.element)===norm(u.element);}
 
   function rowScore(ids,byId,options){
     const units=ids.map(id=>byId.get(text(id))).filter(Boolean);let s=units.reduce((a,u)=>a+u.__v3.base,0);
     const plan=resolvePlan(options,units),r=SLOT_RULES[plan]||SLOT_RULES.offense;
-    const has=(rules)=>units.some(u=>hasAny(u,rules));
+    const has=rules=>units.some(u=>hasAny(u,rules));
     if(has(r.apply))s+=4200;else s-=2200;
     if(has(r.payoff))s+=4200;else s-=2200;
     if(has(r.support))s+=2600;
@@ -123,67 +118,37 @@
     if(units.filter(u=>hasAny(u,["role_dps","execute","charge","blood","survivor"])).length>=2)s+=2400;
     if(units.some(u=>hasAny(u,["heal","revive","purify"])))s+=1700;
     if(units.some(u=>hasAny(u,["tu_manip","stun_apply","sleep_apply","stealth"])))s+=1500;
-    const keys=localKeys(ids,byId);const dupPenalty=(ids.length-keys.entries.size)*9000+(ids.length-keys.families.size)*7000+(ids.length-keys.names.size)*5000;
-    return s-dupPenalty;
+    const keys=localKeys(ids,byId);return s-((ids.length-keys.entries.size)*9000+(ids.length-keys.families.size)*7000+(ids.length-keys.names.size)*5000);
   }
 
-  function pickForSlot(ids,pool,used,byId,options,slotRules,allowUsed){
-    let best=null,bestScore=-Infinity,seen=0;
-    for(const u of pool){const id=text(u.id);if(!id||ids.includes(id))continue;if(!allowUsed&&used.has(identity(u).entry))continue;if(localConflict(u,ids,byId))continue;if(!allowedByElement(u,ids,byId,options))continue;if(slotRules&&!hasAny(u,slotRules))continue;if(seen++>120&&best)break;const score=rowScore([...ids,id],byId,options)+u.__v3.base*0.03;if(score>bestScore){best=u;bestScore=score;}}
-    return best;
-  }
-
-  function seedTemplate(ids,pool,used,byId,options,allowUsed){
-    const plan=resolvePlan(options,pool),r=SLOT_RULES[plan]||SLOT_RULES.offense;
-    for(const rules of [r.apply,r.payoff,r.support,r.tank,r.flex]){
-      if(ids.length>=5)break;
-      if(ids.some(id=>hasAny(byId.get(text(id)),rules)))continue;
-      const pick=pickForSlot(ids,pool,used,byId,options,rules,allowUsed);
-      if(pick)ids.push(text(pick.id));
-    }
-    return ids;
-  }
+  function pickForSlot(ids,pool,used,byId,options,slotRules,allowUsed){let best=null,bestScore=-Infinity,seen=0;for(const u of pool){const id=text(u.id);if(!id||ids.includes(id))continue;if(!allowUsed&&used.has(identity(u).entry))continue;if(localConflict(u,ids,byId))continue;if(!allowedByElement(u,ids,byId,options))continue;if(slotRules&&!hasAny(u,slotRules))continue;if(seen++>40&&best)break;const score=rowScore([...ids,id],byId,options)+u.__v3.base*0.03;if(score>bestScore){best=u;bestScore=score;}}return best;}
+  function seedTemplate(ids,pool,used,byId,options,allowUsed){const r=SLOT_RULES[resolvePlan(options,pool)]||SLOT_RULES.offense;for(const rules of [r.apply,r.payoff,r.support,r.tank,r.flex]){if(ids.length>=5)break;if(ids.some(id=>hasAny(byId.get(text(id)),rules)))continue;const pick=pickForSlot(ids,pool,used,byId,options,rules,allowUsed);if(pick)ids.push(text(pick.id));}return ids;}
 
   function beamFill(ids,pool,used,byId,options,size,allowUsed){
-    const width=size>5?20:16,branch=size>5?34:28;let beams=[{ids:[...ids],score:rowScore(ids,byId,options)}];
-    while(beams[0]&&beams[0].ids.length<size){const next=[];for(const beam of beams){let seen=0;for(const u of pool){const id=text(u.id);if(!id||beam.ids.includes(id))continue;if(!allowUsed&&used.has(identity(u).entry))continue;if(localConflict(u,beam.ids,byId))continue;if(!allowedByElement(u,beam.ids,byId,options))continue;if(seen++>=branch)break;const row=[...beam.ids,id];next.push({ids:row,score:rowScore(row,byId,options)});}}if(!next.length)break;next.sort((a,b)=>b.score-a.score);beams=next.slice(0,width);}
-    return (beams[0]?.ids||ids).slice(0,size);
+    const width=size>5?8:6,branch=size>5?16:12;let beams=[{ids:[...ids],score:rowScore(ids,byId,options)}];
+    while(beams[0]&&beams[0].ids.length<size){const next=[];for(const beam of beams){let seen=0;for(const u of pool){const id=text(u.id);if(!id||beam.ids.includes(id))continue;if(!allowUsed&&used.has(identity(u).entry))continue;if(localConflict(u,beam.ids,byId))continue;if(!allowedByElement(u,beam.ids,byId,options))continue;if(seen++>=branch)break;const row=[...beam.ids,id];next.push({ids:row,score:rowScore(row,byId,options)});}}if(!next.length)break;next.sort((a,b)=>b.score-a.score);beams=next.slice(0,width);}return (beams[0]?.ids||ids).slice(0,size);
   }
 
   function buildRow(size,lockedRow,lockedFlags,pool,used,byId,options){
     const locked=[];asArray(lockedRow).slice(0,size).forEach((id,i)=>{if(lockedFlags?.[i]&&id&&byId.has(text(id))&&!locked.includes(text(id)))locked.push(text(id));});
-    let ids=seedTemplate([...locked],pool,used,byId,options,false);
-    ids=beamFill(ids,pool,used,byId,options,size,false);
+    let ids=seedTemplate([...locked],pool,used,byId,options,false);ids=beamFill(ids,pool,used,byId,options,size,false);
     if(ids.length<size){ids=seedTemplate(ids,pool,used,byId,options,true);ids=beamFill(ids,pool,used,byId,options,size,true);}
-    const out=Array(size).fill("");const placed=new Set();asArray(lockedRow).slice(0,size).forEach((id,i)=>{if(lockedFlags?.[i]&&id&&ids.includes(text(id))){out[i]=text(id);placed.add(text(id));}});const q=ids.filter(id=>!placed.has(id));for(let i=0;i<size;i++)if(!out[i])out[i]=q.shift()||"";
-    out.filter(Boolean).forEach(id=>{const u=byId.get(text(id));if(u)used.add(identity(u).entry);});return out;
+    const out=Array(size).fill(""),placed=new Set();asArray(lockedRow).slice(0,size).forEach((id,i)=>{if(lockedFlags?.[i]&&id&&ids.includes(text(id))){out[i]=text(id);placed.add(text(id));}});const q=ids.filter(id=>!placed.has(id));for(let i=0;i<size;i++)if(!out[i])out[i]=q.shift()||"";out.filter(Boolean).forEach(id=>{const u=byId.get(text(id));if(u)used.add(identity(u).entry);});return out;
   }
 
-  function assignStory(ids,byId){
-    const scored=ids.map(id=>{const u=byId.get(text(id));const st=u?.__v3?.stats||getStats(u);return{id,front:st.spd*16+st.hp*.025+(hasAny(u,["role_control","stun_apply","sleep_apply","tu_manip","stealth"])?4200:0)+(hasAny(u,["role_tank","guard","barrier","hold_ground"])?2200:0),back:st.atk*.42+(hasAny(u,["role_dps","execute","blood","survivor","charge"])?4200:0)+(hasAny(u,["revive","heal","purify"])?1700:0)}});
-    scored.sort((a,b)=>b.front-a.front||a.id.localeCompare(b.id));const main=scored.slice(0,STORY_MAIN).map(x=>x.id);const rest=scored.slice(STORY_MAIN).sort((a,b)=>b.back-a.back||a.id.localeCompare(b.id));return{main,back:rest.slice(0,STORY_BACK).map(x=>x.id)};
-  }
-
-  function applyStoryLocks(story,layout,locks){
-    const main=Array(STORY_MAIN).fill(""),back=Array(STORY_BACK).fill(""),locked=new Set();
-    asArray(layout?.storyMain).slice(0,STORY_MAIN).forEach((id,i)=>{if(locks?.storyMain?.[i]&&id){main[i]=text(id);locked.add(text(id));}});
-    asArray(layout?.storyBack).slice(0,STORY_BACK).forEach((id,i)=>{if(locks?.storyBack?.[i]&&id){back[i]=text(id);locked.add(text(id));}});
-    const q=[...asArray(story.main),...asArray(story.back)].map(text).filter(id=>id&&!locked.has(id));for(let i=0;i<STORY_MAIN;i++)if(!main[i])main[i]=q.shift()||"";for(let i=0;i<STORY_BACK;i++)if(!back[i])back[i]=q.shift()||"";return{main,back};
-  }
+  function assignStory(ids,byId){const scored=ids.map(id=>{const u=byId.get(text(id));const st=u?.__v3?.stats||getStats(u);return{id,front:st.spd*16+st.hp*.025+(hasAny(u,["role_control","stun_apply","sleep_apply","tu_manip","stealth"])?4200:0)+(hasAny(u,["role_tank","guard","barrier","hold_ground"])?2200:0),back:st.atk*.42+(hasAny(u,["role_dps","execute","blood","survivor","charge"])?4200:0)+(hasAny(u,["revive","heal","purify"])?1700:0)}});scored.sort((a,b)=>b.front-a.front||a.id.localeCompare(b.id));const main=scored.slice(0,STORY_MAIN).map(x=>x.id);const rest=scored.slice(STORY_MAIN).sort((a,b)=>b.back-a.back||a.id.localeCompare(b.id));return{main,back:rest.slice(0,STORY_BACK).map(x=>x.id)};}
+  function applyStoryLocks(story,layout,locks){const main=Array(STORY_MAIN).fill(""),back=Array(STORY_BACK).fill(""),locked=new Set();asArray(layout?.storyMain).slice(0,STORY_MAIN).forEach((id,i)=>{if(locks?.storyMain?.[i]&&id){main[i]=text(id);locked.add(text(id));}});asArray(layout?.storyBack).slice(0,STORY_BACK).forEach((id,i)=>{if(locks?.storyBack?.[i]&&id){back[i]=text(id);locked.add(text(id));}});const q=[...asArray(story.main),...asArray(story.back)].map(text).filter(id=>id&&!locked.has(id));for(let i=0;i<STORY_MAIN;i++)if(!main[i])main[i]=q.shift()||"";for(let i=0;i<STORY_BACK;i++)if(!back[i])back[i]=q.shift()||"";return{main,back};}
+  function workingPool(enriched,options){const min=STORY_MAIN+STORY_BACK+(PLATOONS*PLATOON_SIZE);const cap=options?.exampleMode?132:160;return enriched.slice(0,Math.min(enriched.length,Math.max(min,cap)));}
 
   function run(units,options){
     try{
-      const opts={...(options||{}),optimizerSearchMode:"v3"};const enriched=enrichUnits(units||[],opts);const byId=new Map(enriched.map(u=>[text(u.id),u]));const layout=opts.currentLayout||{},locks=opts.slotLocks||{},used=new Set();
-      const storyRow=[...asArray(layout.storyMain).slice(0,STORY_MAIN),...asArray(layout.storyBack).slice(0,STORY_BACK)];
-      const storyLocks=[...asArray(locks.storyMain).slice(0,STORY_MAIN),...asArray(locks.storyBack).slice(0,STORY_BACK)];
-      const storyIds=buildRow(STORY_MAIN+STORY_BACK,storyRow,storyLocks,enriched,used,byId,opts);
-      const story=applyStoryLocks(assignStory(storyIds,byId),layout,locks);const storyPlaced=[...story.main,...story.back].filter(Boolean);storyPlaced.forEach(id=>{const u=byId.get(text(id));if(u)used.add(identity(u).entry);});
-      const platoons=[];for(let p=0;p<PLATOONS;p++){const row=asArray(layout.platoons?.[p]).slice(0,PLATOON_SIZE);const flags=asArray(locks.platoons?.[p]).slice(0,PLATOON_SIZE);const ids=buildRow(PLATOON_SIZE,row,flags,enriched,used,byId,opts);platoons.push({name:`Platoon ${p+1}`,units:ids,score:rowScore(ids,byId,opts)});}
-      const totalScore=rowScore(storyPlaced,byId,opts)*2+platoons.reduce((a,p)=>a+num(p.score),0);
-      return{story,platoons,totalScore,engineVersion:"optimizerEngineV3-core-beam",aiAware:true,duplicateKey:"entryPrefix"};
+      const opts={...(options||{}),optimizerSearchMode:"v3"};const enriched=enrichUnits(units||[],opts);const pool=workingPool(enriched,opts);opts.__v3Plan=resolvePlan(opts,pool);const byId=new Map(enriched.map(u=>[text(u.id),u]));const layout=opts.currentLayout||{},locks=opts.slotLocks||{},used=new Set();
+      const storyRow=[...asArray(layout.storyMain).slice(0,STORY_MAIN),...asArray(layout.storyBack).slice(0,STORY_BACK)];const storyLocks=[...asArray(locks.storyMain).slice(0,STORY_MAIN),...asArray(locks.storyBack).slice(0,STORY_BACK)];
+      const storyIds=buildRow(STORY_MAIN+STORY_BACK,storyRow,storyLocks,pool,used,byId,opts);const story=applyStoryLocks(assignStory(storyIds,byId),layout,locks);const storyPlaced=[...story.main,...story.back].filter(Boolean);storyPlaced.forEach(id=>{const u=byId.get(text(id));if(u)used.add(identity(u).entry);});
+      const platoons=[];for(let p=0;p<PLATOONS;p++){const row=asArray(layout.platoons?.[p]).slice(0,PLATOON_SIZE);const flags=asArray(locks.platoons?.[p]).slice(0,PLATOON_SIZE);const ids=buildRow(PLATOON_SIZE,row,flags,pool,used,byId,opts);platoons.push({name:`Platoon ${p+1}`,units:ids,score:rowScore(ids,byId,opts)});}
+      const totalScore=rowScore(storyPlaced,byId,opts)*2+platoons.reduce((a,p)=>a+num(p.score),0);return{story,platoons,totalScore,engineVersion:"optimizerEngineV3-core-beam-fast",aiAware:true,duplicateKey:"entryPrefix"};
     }catch(err){console.warn("[Optimizer] V3 failed; falling back.",err);if(previous&&typeof previous.run==="function")return previous.run(units,options);return{story:{main:[],back:[]},platoons:[],totalScore:0,engineVersion:"optimizerEngineV3-empty"};}
   }
 
-  g.OptimizerEngineV3={run};
-  g.OptimizerEngine=g.OptimizerEngineV3;
+  g.OptimizerEngineV3={run};g.OptimizerEngine=g.OptimizerEngineV3;
 })(window);
