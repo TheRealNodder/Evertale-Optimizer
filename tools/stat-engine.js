@@ -1,210 +1,30 @@
-/**
- * Evertale Stat Engine
- *
- * Key model:
- * - White HP/ATK = character-only stats shown in-game. Note: the game card visually lists ATK first, then HP.
- * - Blue HP/ATK = white stats + locked weapon/accessory stats.
- * - RefStat200 is the clean level-200 library anchor before level curve, boost, fellowship, potential, awakenings, and ascension.
- * - APK seed stats are treated as RefStat200 anchors unless a profile supplies explicit refHP/refATK overrides.
- */
-
-export const AWAKENING_MULTIPLIERS = [1.00, 1.22, 1.44, 1.66, 1.88];
-
-export function clampNumber(value, min, max) {
-  const n = Number(value);
-  if (!Number.isFinite(n)) return min;
-  return Math.min(max, Math.max(min, n));
-}
-
-export function limitBreakState(level) {
-  const lvl = clampNumber(level, 1, 200);
-  if (lvl <= 80) return { state: "Normal", tier: 0, multiplier: 1.00 };
-  if (lvl <= 100) return { state: "Limit Break 1", tier: 1, multiplier: 1.00 };
-  if (lvl <= 120) return { state: "Limit Break 2", tier: 2, multiplier: 1.08 };
-  if (lvl <= 140) return { state: "Limit Break 3", tier: 3, multiplier: 1.16 };
-  if (lvl <= 160) return { state: "Limit Break 4", tier: 4, multiplier: 1.24 };
-  if (lvl <= 180) return { state: "Limit Break 5", tier: 5, multiplier: 1.32 };
-  return { state: "Limit Break 6", tier: 6, multiplier: 1.40 };
-}
-
-export function limitBreakMultiplier(level) {
-  return limitBreakState(level).multiplier;
-}
-
-export function boostFlat(boost) {
-  const b = clampNumber(boost, 0, 300);
-  if (b <= 90) return { hp: b * 14, atk: b * 3 };
-  return {
-    hp: 1260 + ((b - 90) * 311),
-    atk: 270 + ((b - 90) * 73)
-  };
-}
-
-export function accountRankBP(rank) {
-  const safeRank = clampNumber(rank, 0, 300);
-  return (2000000 / 27000000) * Math.pow(safeRank, 3);
-}
-
-/**
- * Project a clean RefStat200 anchor into an observed white card stat.
- * Use white text only, never blue equipment-modified text.
- */
-export function projectWhiteStatFromRef({
-  refStat200,
-  level,
-  copies = 0,
-  potential = 0,
-  boostFlatValue = 0,
-  fellowshipFlat = 0,
-  isAscended = false
-}) {
-  const ref = Math.max(0, Number(refStat200) || 0);
-  const lvl = clampNumber(level, 1, 200);
-  const lb = limitBreakState(lvl);
-  const awk = AWAKENING_MULTIPLIERS[Math.round(clampNumber(copies, 0, 4))] || 1.00;
-  const potentialScalar = 1 + (clampNumber(potential, 0, 100) / 100);
-  const raw = ref * ((lvl + 10) / 294) * lb.multiplier;
-  const baseStack = raw + Number(boostFlatValue || 0) + Number(fellowshipFlat || 0);
-
-  // Engine checkpoint: visible card stat is rounded before BP conversion.
-  // Ascension is a flat 5% hidden-base premium compiled after percentage scaling.
-  return Math.round(baseStack * awk * potentialScalar) + (isAscended ? ref * 0.05 : 0);
-}
-
-/**
- * Reverse a clean RefStat200 anchor from an observed in-game WHITE stat.
- * Use white text only, never blue equipment-modified text.
- *
- * This intentionally uses the same checkpoint rounding as the forward engine.
- * The algebraic value is used only as a seed; the returned value is refined
- * by monotonic binary search so it reproduces the observed integer stat.
- */
-export function reverseRawBase({
-  observedWhiteStat,
-  level,
-  copies = 0,
-  potential = 0,
-  boostFlatValue = 0,
-  fellowshipFlat = 0,
-  isAscended = false
-}) {
-  const observed = Math.max(0, Number(observedWhiteStat) || 0);
-  if (!observed) return 0;
-
-  const lvl = clampNumber(level, 1, 200);
-  const lb = limitBreakState(lvl);
-  const awk = AWAKENING_MULTIPLIERS[Math.round(clampNumber(copies, 0, 4))] || 1.00;
-  const potentialScalar = 1 + (clampNumber(potential, 0, 100) / 100);
-  const ascensionRate = isAscended ? 0.05 : 0;
-  const levelScalar = ((lvl + 10) / 294) * lb.multiplier;
-
-  const nonRefContribution = (Number(boostFlatValue || 0) + Number(fellowshipFlat || 0)) * awk * potentialScalar;
-  const refCoefficient = (levelScalar * awk * potentialScalar) + ascensionRate;
-  const seed = refCoefficient ? Math.max(0, (observed - nonRefContribution) / refCoefficient) : 0;
-
-  let lo = 0;
-  let hi = Math.max(seed * 2, observed * 2, 1000);
-  const forward = ref => projectWhiteStatFromRef({
-    refStat200: ref,
-    level: lvl,
-    copies,
-    potential,
-    boostFlatValue,
-    fellowshipFlat,
-    isAscended
-  });
-
-  while (forward(hi) < observed) hi *= 2;
-
-  for (let i = 0; i < 80; i += 1) {
-    const mid = (lo + hi) / 2;
-    if (forward(mid) >= observed) hi = mid;
-    else lo = mid;
-  }
-
-  return hi;
-}
-
-// Backwards-compatible name used by older debug callers.
-export const reverseRefStat200 = reverseRawBase;
-
-export function calculateMasterUnitEngine(config) {
-  const level = clampNumber(config.level, 1, 200);
-  const copies = Math.round(clampNumber(config.copies, 0, 4));
-  const boost = clampNumber(config.boost, 0, 300);
-  const potential = clampNumber(config.potential, 0, 100);
-  const mastery = Math.max(0, Number(config.mastery) || 0);
-  const refHP = Math.max(0, Number(config.refHP) || 0);
-  const refATK = Math.max(0, Number(config.refATK) || 0);
-  const flatFellowshipHP = Number(config.flatFellowshipHP ?? 4900);
-  const flatFellowshipATK = Number(config.flatFellowshipATK ?? 750);
-  const gear = Object.assign({ wepHP: 0, wepATK: 0, accHP: 0, accATK: 0, accSPD: 0 }, config.gear || {});
-
-  const lb = limitBreakState(level);
-  const levelScalar = ((level + 10) / 294.0) * lb.multiplier;
-  const rawHP = refHP * levelScalar;
-  const rawATK = refATK * levelScalar;
-  const boostStats = boostFlat(boost);
-  const baseStackHP = rawHP + boostStats.hp + flatFellowshipHP;
-  const baseStackATK = rawATK + boostStats.atk + flatFellowshipATK;
-  const potentialScalar = 1 + (potential / 100.0);
-
-  // Track A: unawakened anchor timeline for mastery.
-  const anchorHP = baseStackHP * potentialScalar;
-  const anchorATK = baseStackATK * potentialScalar;
-  const anchorBasePower = (anchorHP * 12) + (anchorATK * 60);
-  const masteryPower = anchorBasePower * 0.0025 * mastery;
-
-  // Track B: awakened white card stats.
-  const awakeningMultiplier = AWAKENING_MULTIPLIERS[copies] || 1.00;
-  const ascensionHP = config.isAscended ? (refHP * 0.05) : 0;
-  const ascensionATK = config.isAscended ? (refATK * 0.05) : 0;
-  const whiteHP = Math.round(baseStackHP * awakeningMultiplier * potentialScalar) + ascensionHP;
-  const whiteATK = Math.round(baseStackATK * awakeningMultiplier * potentialScalar) + ascensionATK;
-
-  // Blue equipped stats shown in-game after locked platoon equipment.
-  const equipmentHP = (Number(gear.wepHP) || 0) + (Number(gear.accHP) || 0);
-  const equipmentATK = (Number(gear.wepATK) || 0) + (Number(gear.accATK) || 0);
-  const blueHP = whiteHP + equipmentHP;
-  const blueATK = whiteATK + equipmentATK;
-
-  const characterPower = (whiteHP * 12) + (whiteATK * 60);
-  const equipmentPower =
-    (Number(gear.wepHP) || 0) * 6 +
-    (Number(gear.wepATK) || 0) * 30 +
-    (Number(gear.accHP) || 0) * 6 +
-    (Number(gear.accATK) || 0) * 30 +
-    (Number(gear.accSPD) || 0) * 180;
-
-  const lockedPlatoonOffset = Number(config.lockedPlatoonOffset) || 0;
-  const unitPower = Math.round(characterPower + masteryPower + equipmentPower + lockedPlatoonOffset);
-  const accountRankPower = config.includeRank ? Math.round(accountRankBP(config.playerRank)) : 0;
-
-  return {
-    whiteHP,
-    whiteATK,
-    cardHP: whiteHP,
-    cardATK: whiteATK,
-    blueHP,
-    blueATK,
-    equipmentHP,
-    equipmentATK,
-    unitPower,
-    battalionPower: unitPower + accountRankPower,
-    accountRankPower,
-    equipmentPower,
-    masteryPower,
-    characterPower,
-    trace: {
-      level, copies, boost, potential, mastery, refHP, refATK,
-      limitBreak: lb,
-      levelScalar,
-      rawHP, rawATK, boostStats, baseStackHP, baseStackATK,
-      anchorHP, anchorATK, anchorBasePower, masteryPower,
-      awakeningMultiplier, ascensionHP, ascensionATK,
-      whiteHP, whiteATK, blueHP, blueATK,
-      equipmentHP, equipmentATK, equipmentPower, characterPower,
-      lockedPlatoonOffset
-    }
-  };
-}
+export const STARS_TO_LEVEL_MAX=[30,30,30,30,60,80,100];
+export const AWAKENING_6_CHARACTER=[1,1.22,1.44,1.66,1.88];
+export const AWAKENING_6_WEAPON=[1,1.19,1.33,1.44,1.55];
+export const AWAKENING_FLAT={4:{hp:201,atk:40},5:{hp:412,atk:82},6:{hp:1239,atk:248}};
+export const AWAKENING_MULTIPLIERS=AWAKENING_6_CHARACTER;
+export function clampNumber(v,min,max){const n=Number(v);return Number.isFinite(n)?Math.min(max,Math.max(min,n)):min;}
+export function clampInt(v,min,max){return Math.round(clampNumber(v,min,max));}
+export function trunc0(v){const n=Number(v)||0;return n<0?Math.ceil(n):Math.floor(n);}
+export function roundEven(v){const n=Number(v)||0,f=Math.floor(n),d=n-f;return Math.abs(d-.5)<=1e-9?(f%2===0?f:f+1):Math.round(n);}
+export function percentScale(value,scalar){const v=Number(value)||0,s=Number(scalar)||0;return s>=0?v*(1+s):v/(1-s);}
+export function maxLevel(stars,evolvedStars,extraEvolves){const s=clampInt(stars,0,6),e=clampInt(evolvedStars,0,6);return (STARS_TO_LEVEL_MAX[s]||30)+(20*clampInt(extraEvolves,0,5))+(s===3&&e===4?20:0);}
+export function extraEvolvesForLevel(level,stars=6,evolvedStars=6){return clampInt(Math.ceil(Math.max(0,clampInt(level,1,200)-maxLevel(stars,evolvedStars,0))/20),0,5);}
+export function limitBreakState(level,stars=6,evolvedStars=6){const x=extraEvolvesForLevel(level,stars,evolvedStars);return{state:x?`Limit Break ${x}`:'Normal',tier:x,multiplier:1+.08*x};}
+export function limitBreakMultiplier(level,stars=6,evolvedStars=6){return limitBreakState(level,stars,evolvedStars).multiplier;}
+export function statFormula({level,levelOverride=0,baseStat,bonusLevels=0}){const l=clampInt(levelOverride||level||1,1,200),e=trunc0(Math.min(1.5*l,l+clampNumber(bonusLevels,0,999)));return (Number(baseStat)||0)*(1+.025*(e-30));}
+export function awakeningBonus(awakening,evolvedStars,forWeapon=false){const a=clampInt(awakening,0,4),e=clampInt(evolvedStars,0,6);if(e===4)return 1+.05*a;if(e===5)return 1+.075*a;if(e===6)return (forWeapon?AWAKENING_6_WEAPON:AWAKENING_6_CHARACTER)[a]||1;return 1;}
+export function awakeningFlat(awakening,evolvedStars,statName){const t=AWAKENING_FLAT[clampInt(evolvedStars,0,6)];return t?(t[statName]||0)*clampInt(awakening,0,4):0;}
+export function characterPlusFlat(pluses){const b=clampInt(pluses,0,300);return b<=90?{hp:b*14,atk:b*3}:{hp:1260+(b-90)*311,atk:270+(b-90)*73};}
+export function weaponPlusFlat(pluses){const b=Math.max(0,clampInt(pluses,0,10000));return{hp:b*14,atk:b*3};}
+export function boostFlat(boost){return characterPlusFlat(boost);}
+export function accountRankBP(rank){const r=clampInt(rank,0,300);return Math.floor(2000000*Math.pow(r,3)/Math.pow(300,3));}
+export function totalPowerRarityScalar(stars){const s=clampInt(stars,0,6);return s===5?1.5:s===6?2:1;}
+export function calculateStatApprox(c){const s=clampInt(c.stars??6,0,6),e=clampInt(c.evolvedStars??s,0,6),x=Number.isFinite(Number(c.extraEvolves))?clampInt(c.extraEvolves,0,5):extraEvolvesForLevel(c.level,s,e),ref=Number.isFinite(Number(c.refine))?clampNumber(c.refine,0,10000):clampNumber(c.potential??0,0,100)*100,p=1+ref/10000,lv=statFormula(c),prog=lv*p*(1+.08*x)*awakeningBonus(c.awakening??0,e,!!c.forWeapon),plus=(c.forWeapon?weaponPlusFlat(c.pluses??0):characterPlusFlat(c.pluses??0))[c.statName]||0,cl=maxLevel(s,e,s>3?5:0),cos=c.cosmo?statFormula({level:cl,levelOverride:cl,baseStat:c.baseStat})*p*.07:0;return trunc0(prog+awakeningFlat(c.awakening??0,e,c.statName)+plus+cos+(Number(c.externalFlat)||0));}
+export function projectWhiteStatFromRef(config){return calculateStatApprox({baseStat:config.baseStat??config.refStat200,statName:config.statName||'hp',level:config.level,stars:config.stars??6,evolvedStars:config.evolvedStars??6,extraEvolves:config.extraEvolves,awakening:config.copies??config.awakening??0,potential:config.potential??0,pluses:config.boostFlatValue??config.pluses??0,externalFlat:config.fellowshipFlat??0,cosmo:!!config.isAscended});}
+export function reverseRawBase(){throw new Error('reverseRawBase requires a captured runtime sample.');}
+export const reverseRefStat200=reverseRawBase;
+export function calculateWeaponEngine(c={}){const level=clampInt(c.level??200,1,200),stars=clampInt(c.stars??6,0,6),evolvedStars=clampInt(c.evolvedStars??stars,0,6),common={level,stars,evolvedStars,extraEvolves:c.extraEvolves,awakening:c.awakening??0,pluses:c.pluses??c.boost??0,refine:c.refine,potential:c.potential??0,bonusLevels:c.bonusLevels??0,forWeapon:true,cosmo:false},hp=calculateStatApprox({...common,statName:'hp',baseStat:c.baseHP??c.baseMaxHp??c.refHP??0}),atk=calculateStatApprox({...common,statName:'atk',baseStat:c.baseATK??c.baseAttack??c.refATK??0});return{hp,atk,power:roundEven(6*hp+30*atk)};}
+export function calculateAccessoryEngine(c={}){const hp=Number(c.hp??c.flatMaxHp??0)||0,atk=Number(c.atk??c.flatAttack??0)||0,spd=Number(c.spd??c.flatSpeed??0)||0;return{hp,atk,spd,power:6*hp+30*atk+180*spd};}
+export function calculateCoreDamage(c={}){const scalar=c.conditionalScalar==null?Number(c.abilityScalar||0):Number(c.conditionalScalar||0),boost=(Array.isArray(c.damageBoosts)?c.damageBoosts:[]).reduce((s,v)=>s+(Number(v)||0),0),base=roundEven(percentScale(Number(c.attack)||0,scalar+boost)),boosted=roundEven(percentScale(base,Number(c.extraAttackScalar)||0));if(c.ignoreElement)return Math.max(0,boosted);return Math.max(0,trunc0(boosted*((Number(c.elementFactor??1)||1)+(Number(c.attackerMastery)||0)-(Number(c.defenderMastery)||0))));}
+export function calculateMasterUnitEngine(c={}){const level=clampInt(c.level,1,200),stars=clampInt(c.stars??6,0,6),evolvedStars=clampInt(c.evolvedStars??stars,0,6),awakening=clampInt(c.copies??c.awakening??0,0,4),pluses=clampInt(c.boost??c.pluses??0,0,300),potential=clampNumber(c.potential??0,0,100),mastery=Math.max(0,Number(c.mastery??c.limitBreakLevel??0)||0),common={level,stars,evolvedStars,extraEvolves:c.extraEvolves,awakening,pluses,potential,refine:c.refine,cosmo:!!c.isAscended},whiteHP=calculateStatApprox({...common,statName:'hp',baseStat:c.baseHP??c.baseMaxHp??c.refHP??0,externalFlat:Number(c.flatFellowshipHP??0)||0}),whiteATK=calculateStatApprox({...common,statName:'atk',baseStat:c.baseATK??c.baseAttack??c.refATK??0,externalFlat:Number(c.flatFellowshipATK??0)||0}),gear=Object.assign({wepHP:0,wepATK:0,accHP:0,accATK:0,accSPD:0},c.gear||{}),equipmentHP=(Number(gear.wepHP)||0)+(Number(gear.accHP)||0),equipmentATK=(Number(gear.wepATK)||0)+(Number(gear.accATK)||0),equipmentPower=(Number(gear.wepHP)||0)*6+(Number(gear.wepATK)||0)*30+(Number(gear.accHP)||0)*6+(Number(gear.accATK)||0)*30+(Number(gear.accSPD)||0)*180,basePower=roundEven((6*whiteHP+30*whiteATK)*totalPowerRarityScalar(stars)),characterPower=roundEven((6*whiteHP+30*whiteATK)*totalPowerRarityScalar(stars)*(1+.005*mastery)),unitPower=characterPower+equipmentPower+(Number(c.lockedPlatoonOffset??c.bonus??0)||0),accountRankPower=c.includeRank?accountRankBP(c.playerRank):0;return{whiteHP,whiteATK,cardHP:whiteHP,cardATK:whiteATK,blueHP:whiteHP+equipmentHP,blueATK:whiteATK+equipmentATK,equipmentHP,equipmentATK,unitPower,battalionPower:unitPower+accountRankPower,accountRankPower,equipmentPower,masteryPower:characterPower-basePower,characterPower,trace:{level,stars,evolvedStars,awakening,pluses,potential,mastery,whiteHP,whiteATK,characterPower,equipmentPower}};}
