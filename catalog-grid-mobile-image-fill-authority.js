@@ -1,4 +1,3 @@
-/* catalog-grid-mobile-image-fill-authority.js — mobile-only visual fill for Catalog grid cards. */
 (function(){
   const STYLE_ID='catalog-grid-mobile-image-fill-authority-style';
   const CSS=`
