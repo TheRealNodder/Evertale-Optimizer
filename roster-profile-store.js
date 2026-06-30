@@ -157,10 +157,11 @@
     return null;
   }
 
-  function estimateUnitStats(unit, profileOverride) {
+  function estimateUnitStats(unit, profileOverride, stateOverride) {
     const id = normId(unit && unit.id);
-    const account = getAccount();
-    const profile = { ...getProfile(id), ...(profileOverride || {}) };
+    const storedState = stateOverride && typeof stateOverride === "object" ? stateOverride : loadState();
+    const account = { ...ACCOUNT_DEFAULTS, ...(storedState.account || {}) };
+    const profile = { ...defaultProfile(), ...(storedState.profiles?.[id] || {}), ...(profileOverride || {}) };
 
     // Preferred path: use the runtime-style engine that mirrors the decompiled
     // MonsterInstance cached-stat architecture. Falls back to the legacy local
@@ -232,10 +233,11 @@
     };
   }
 
-  function estimateUnitStates(unit, profileOverride) {
+  function estimateUnitStates(unit, profileOverride, stateOverride) {
     const id = normId(unit && unit.id);
-    const account = getAccount();
-    const profile = { ...getProfile(id), ...(profileOverride || {}) };
+    const storedState = stateOverride && typeof stateOverride === "object" ? stateOverride : loadState();
+    const account = { ...ACCOUNT_DEFAULTS, ...(storedState.account || {}) };
+    const profile = { ...defaultProfile(), ...(storedState.profiles?.[id] || {}), ...(profileOverride || {}) };
 
     if (global.EvertaleRuntimeStatEngine && typeof global.EvertaleRuntimeStatEngine.calculateUnitStates === "function") {
       try {
@@ -246,7 +248,7 @@
       }
     }
 
-    return [estimateUnitStats(unit, profileOverride)];
+    return [estimateUnitStats(unit, profileOverride, storedState)];
   }
 
   function applyToUnit(unit) {

@@ -50,9 +50,9 @@
     const name=clean([u?.name,u?.title].filter(Boolean).join(' '))||fam||entry(u);
     return {entry:entry(u),family:fam,name,id:txt(u?.id||u?.sourceId||entry(u))};
   }
-  function stats(u){
+  function stats(u,profileState){
     if(g.EvertaleRosterProfiles&&typeof g.EvertaleRosterProfiles.estimateUnitStats==='function'){
-      try{const s=g.EvertaleRosterProfiles.estimateUnitStats(u);return{atk:num(s?.atk),hp:num(s?.hp),spd:num(s?.spd),cost:Math.max(1,num(s?.cost,1)),power:num(s?.power||s?.unitPower)}}catch{}
+      try{const s=g.EvertaleRosterProfiles.estimateUnitStats(u,undefined,profileState);return{atk:num(s?.atk),hp:num(s?.hp),spd:num(s?.spd),cost:Math.max(1,num(s?.cost,1)),power:num(s?.power||s?.unitPower)}}catch{}
     }
     const s=u?.stats||{};
     return{atk:num(s.atk??u?.atk),hp:num(s.hp??u?.hp),spd:num(s.spd??u?.spd),cost:Math.max(1,num(s.cost??u?.cost,1)),power:num(u?.power||u?.unitPower)};
@@ -87,8 +87,9 @@
     if(g.OptimizerEngineV2&&typeof g.OptimizerEngineV2.enrichOwnedUnits==='function'){
       try{rows=g.OptimizerEngineV2.enrichOwnedUnits(rows)}catch{}
     }
+    const profileState=g.EvertaleRosterProfiles&&typeof g.EvertaleRosterProfiles.loadState==='function'?g.EvertaleRosterProfiles.loadState():null;
     const orders=rows.map(metaOrder).filter(v=>v>0),minOrder=orders.length?Math.min(...orders):0,maxOrder=orders.length?Math.max(...orders):0,span=Math.max(1,maxOrder-minOrder);
-    const base=rows.map(u=>{const clone={...u},order=metaOrder(u),newer=order>0?(order-minOrder)/span:0;clone.id=txt(u?.id||u?.sourceId||u?.family||u?.name);clone.__v4={stats:stats(u),blob:tagBlob(u),ident:ident(u),entry:entry(u),meta:{order,newer}};return clone;});
+    const base=rows.map(u=>{const clone={...u},order=metaOrder(u),newer=order>0?(order-minOrder)/span:0;clone.id=txt(u?.id||u?.sourceId||u?.family||u?.name);clone.__v4={stats:stats(u,profileState),blob:tagBlob(u),ident:ident(u),entry:entry(u),meta:{order,newer}};return clone;});
     const plan=planFor(options,base);
     return {plan,rows:base.map(u=>{u.__v4.score=unitBase(u,plan);return u;}).sort((a,b)=>b.__v4.score-a.__v4.score||b.__v4.meta.newer-a.__v4.meta.newer||a.__v4.ident.entry.localeCompare(b.__v4.ident.entry))};
   }

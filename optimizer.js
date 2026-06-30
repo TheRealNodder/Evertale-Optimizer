@@ -33,6 +33,16 @@ const PLATOON_SIZE = 5;
 
 const EQUIPMENT_AFFINITY_TERMS = ["burn","poison","sleep","stun","heal","turn","tu","cleanse","defense","guard","stealth","spirit","charge","blood","crisis","survivor","revenge","ward","armor","attack","damage","hp","speed"];
 
+let equipmentTextCache = new WeakMap();
+let equipmentTagCache = new WeakMap();
+let equipmentRecommendationCache = new WeakMap();
+
+function resetEquipmentCaches() {
+  equipmentTextCache = new WeakMap();
+  equipmentTagCache = new WeakMap();
+  equipmentRecommendationCache = new WeakMap();
+}
+
 const state = {
   all: [],
   ownedIds: new Set(),
@@ -221,6 +231,7 @@ async function loadOptimizerRuntimeIfAvailable() {
   const chunks = window.OptimizerRuntime?.chunks || {};
   const weapons = normalizeRuntimeArray(chunks.weapons);
   const accessories = normalizeRuntimeArray(chunks.accessories);
+  resetEquipmentCaches();
   state.equipmentRuntime = {
     weapons,
     accessories,
@@ -244,6 +255,8 @@ function updateOptimizerRuntimeStatus() {
 }
 
 function textBlobFor(value) {
+  const cacheable = !!value && typeof value === "object";
+  if (cacheable && equipmentTextCache.has(value)) return equipmentTextCache.get(value);
   const parts = [];
   const seen = new Set();
   const walk = (obj, depth = 0) => {
@@ -257,10 +270,14 @@ function textBlobFor(value) {
     if (typeof obj === "object") Object.values(obj).forEach(v => walk(v, depth + 1));
   };
   walk(value);
-  return parts.join(" ").toLowerCase();
+  const text = parts.join(" ").toLowerCase();
+  if (cacheable) equipmentTextCache.set(value, text);
+  return text;
 }
 
 function tagSetFor(value) {
+  const cacheable = !!value && typeof value === "object";
+  if (cacheable && equipmentTagCache.has(value)) return equipmentTagCache.get(value);
   const tags = new Set();
   const add = (v) => { const s = String(v || "").trim().toLowerCase(); if (s) tags.add(s.replace(/^elem_/, "")); };
   for (const key of ["tags", "derivedTags", "passiveTags", "roles", "archetypes"]) {
@@ -270,6 +287,7 @@ function tagSetFor(value) {
   const text = textBlobFor(value);
   EQUIPMENT_AFFINITY_TERMS.forEach(term => { if (text.includes(term)) tags.add(term); });
   ["fire","water","storm","earth","light","dark"].forEach(term => { if (text.includes(term)) tags.add(term); });
+  if (cacheable) equipmentTagCache.set(value, tags);
   return tags;
 }
 
@@ -309,6 +327,8 @@ function scoreEquipmentForUnit(eq, unit, type) {
 
 function recommendBestEquipment(unit, type) {
   if (!unit) return null;
+  const cached = equipmentRecommendationCache.get(unit);
+  if (cached && Object.prototype.hasOwnProperty.call(cached, type)) return cached[type];
   const rows = type === "accessory" ? state.equipmentRuntime.accessories : state.equipmentRuntime.weapons;
   let best = null;
   let bestScore = -Infinity;
@@ -316,7 +336,11 @@ function recommendBestEquipment(unit, type) {
     const score = scoreEquipmentForUnit(eq, unit, type);
     if (score > bestScore) { best = eq; bestScore = score; }
   }
-  return best ? { item: best, score: bestScore, type } : null;
+  const result = best ? { item: best, score: bestScore, type } : null;
+  const next = cached || Object.create(null);
+  next[type] = result;
+  equipmentRecommendationCache.set(unit, next);
+  return result;
 }
 
 function equipmentMiniHTML(rec) {
@@ -348,17 +372,6 @@ function slotCardHTML(slotKey, idx, currentId, poolUnits, locked, ownedIdSet){
   const currentNorm = normId(currentId || "");
   const isPlatoon = String(slotKey).startsWith("platoon_");
 
-  // Build options from the current pool (owned for normal mode, all for example mode)
-  const opts = [];
-  opts.push({ value: "", label: "(empty)" });
-  for (const u of (poolUnits || [])) {
-    const id = normId(u?.id);
-    if (!id) continue;
-    const el = u?.element || "";
-    const rar = u?.rarity || "";
-    opts.push({ value: id, label: `${u?.name || "?"} (${el} ${rar})` });
-  }
-
   const selectedUnit = (poolUnits || []).find(u => normId(u?.id) === currentNorm) || null;
   const equipmentHtml = equipmentPairHTML(selectedUnit);
   const name = selectedUnit?.name || "?";
@@ -378,8 +391,9 @@ function slotCardHTML(slotKey, idx, currentId, poolUnits, locked, ownedIdSet){
     : (isPlatoon ? `<div class="unitPortraitPlaceholder">?</div>` : ``);
 
   const selectHtml = `
-    <select class="slotSelect" data-slot="${slotKey}" data-idx="${idx}">
-      ${opts.map(o => `<option value="${o.value}" ${o.value===currentNorm ? "selected" : ""}>${o.label}</option>`).join("")}
+    <select class="slotSelect" data-slot="${slotKey}" data-idx="${idx}" data-options-ready="false">
+      <option value="">(empty)</option>
+      ${selectedUnit ? `<option value="${currentNorm}" selected>${selectedUnit.name} (${selectedUnit.element || ""} ${selectedUnit.rarity || ""})</option>` : ""}
     </select>
   `;
 
@@ -450,10 +464,22 @@ function setLockFor(slotKey, idx, val) {
   saveLocks();
 }
 
+function hydrateSlotSelect(sel) {
+  if (!sel || sel.dataset.optionsReady === "true") return;
+  const current = normId(sel.value);
+  const pool = state.exampleMode ? state.all : state.ownedUnits;
+  sel.innerHTML = optionList(pool);
+  sel.value = current;
+  sel.dataset.optionsReady = "true";
+}
+
 function wireSelects() {
   document.querySelectorAll("select.slotSelect").forEach(sel => {
     const slot = sel.getAttribute("data-slot");
     const idx = parseInt(sel.getAttribute("data-idx"), 10);
+    const ensureOptions = () => hydrateSlotSelect(sel);
+    sel.addEventListener("pointerdown", ensureOptions, { once: true });
+    sel.addEventListener("focus", ensureOptions, { once: true });
 
     let current = "";
     if (slot === "storyMain") current = state.layout.storyMain[idx] || "";
@@ -573,8 +599,17 @@ function renderAll() {
     }
   }
 
-  renderStory();
-  renderPlatoons();
+  if (state.mode === "story") {
+    renderStory();
+    const platoonsGrid = el("platoonsGrid");
+    if (platoonsGrid) platoonsGrid.innerHTML = "";
+  } else {
+    renderPlatoons();
+    const storyMain = el("storyMain");
+    const storyBack = el("storyBack");
+    if (storyMain) storyMain.innerHTML = "";
+    if (storyBack) storyBack.innerHTML = "";
+  }
   renderStorage();
   wireSelects();
 }
@@ -649,6 +684,7 @@ function buildExampleTeam() {
 
   const poolSig = examplePool.map(u => normId(u?.id)).filter(Boolean).join("|");
   const cacheKey = [
+    state.mode,
     style,
     el("teamTypeSelect")?.value || getTeamTypePref(),
     el("presetSelect")?.value || getPresetPref(),
@@ -801,6 +837,7 @@ function buildEngineOptions() {
   options.archetypes = [primaryArchetype, secondaryArchetype].filter((v, i, arr) => v && arr.indexOf(v) === i);
 
   // Pass current layout + locks so engine can treat locked units as forced picks.
+  options.buildScope = state.mode;
   options.currentLayout = structuredCloneSafe(state.layout);
   options.slotLocks = structuredCloneSafe(state.locks);
 
