@@ -23,12 +23,25 @@
     tank:['guard','guardian','barrier','hold_ground','damage_reduction']
   };
 
+  function pathOrder(value){const m=txt(value).match(/(?:^|\/)(\d{4})_/);return m?num(m[1]):0;}
   function entry(u){
     if(u?.__v4?.entry)return u.__v4.entry;
     const paths=[u?.entryPath,u?.path,u?.file,u?.fileName,u?.sourceFile,u?.__path,u?.raw?.entryPath,u?.raw?.sourceFile];
     for(const p of paths){const m=txt(p).match(/(?:^|\/)(\d{4})_/);if(m)return m[1];}
     for(const v of [u?.entryPrefix,u?.entryKey,u?.order,u?.entryOrder,u?.indexOrder,u?.raw?.order]){if(v!==undefined&&v!==null&&v!==''){const m=txt(v).match(/\d+/);if(m)return m[0].padStart(4,'0').slice(-4);}}
     return 'id_'+clean(u?.id||u?.sourceId||u?.family||u?.name);
+  }
+  function metaOrder(u){
+    if(u?.__v4?.meta&&Number.isFinite(u.__v4.meta.order))return u.__v4.meta.order;
+    const values=[
+      u?.fileHandleOrder,u?.sourceOrder,u?.visualOrder,u?.order,u?.entryOrder,u?.indexOrder,u?.raw?.order,
+      u?.internal?.fileHandleOrder,u?.internal?.sourceOrder,u?.internal?.order,
+      pathOrder(u?.entryPath),pathOrder(u?.path),pathOrder(u?.file),pathOrder(u?.fileName),pathOrder(u?.sourceFile),pathOrder(u?.__path),pathOrder(u?.raw?.entryPath),pathOrder(u?.raw?.sourceFile),
+      ...arr(u?.statsByForm).flatMap(f=>[f?.fileHandleOrder,f?.sourceOrder,f?.visualOrder,f?.order,pathOrder(f?.sourceId),pathOrder(f?.dataSourceId),pathOrder(f?.imageSourceId)]),
+      ...arr(u?.forms).flatMap(f=>[f?.fileHandleOrder,f?.sourceOrder,f?.visualOrder,f?.order,pathOrder(f?.sourceId),pathOrder(f?.dataSourceId),pathOrder(f?.imageSourceId)]),
+      ...arr(u?.imageVariants).flatMap(f=>[f?.fileHandleOrder,f?.sourceOrder,f?.visualOrder,f?.order,pathOrder(f?.sourceId),pathOrder(f?.dataSourceId),pathOrder(f?.imageSourceId)])
+    ].map(v=>num(v,0)).filter(v=>v>0);
+    return values.length?Math.max(...values):0;
   }
   function ident(u){
     if(u?.__v4?.ident)return u.__v4.ident;
@@ -59,13 +72,14 @@
     return best;
   }
   function unitBase(u,plan){
-    const s=u.__v4.stats,b=u.__v4.blob;
+    const s=u.__v4.stats,b=u.__v4.blob,m=u.__v4.meta||{};
     let score=(s.power? s.power*.07:0)+s.atk*.46+s.hp*.05+s.spd*12+(s.atk/Math.max(1,s.cost))*.18;
     if(has(b,plans[plan]||plans.offense))score+=4200;
     if(has(b,roleWords.dps))score+=2100;
     if(has(b,roleWords.support))score+=1500;
     if(has(b,roleWords.control))score+=1400;
     if(has(b,roleWords.tank))score+=1300;
+    score+=(m.newer||0)*3600;
     return score;
   }
   function enrich(units,options){
@@ -73,9 +87,10 @@
     if(g.OptimizerEngineV2&&typeof g.OptimizerEngineV2.enrichOwnedUnits==='function'){
       try{rows=g.OptimizerEngineV2.enrichOwnedUnits(rows)}catch{}
     }
-    const base=rows.map(u=>{const clone={...u};clone.id=txt(u?.id||u?.sourceId||u?.family||u?.name);clone.__v4={stats:stats(u),blob:tagBlob(u),ident:ident(u),entry:entry(u)};return clone;});
+    const orders=rows.map(metaOrder).filter(v=>v>0),minOrder=orders.length?Math.min(...orders):0,maxOrder=orders.length?Math.max(...orders):0,span=Math.max(1,maxOrder-minOrder);
+    const base=rows.map(u=>{const clone={...u},order=metaOrder(u),newer=order>0?(order-minOrder)/span:0;clone.id=txt(u?.id||u?.sourceId||u?.family||u?.name);clone.__v4={stats:stats(u),blob:tagBlob(u),ident:ident(u),entry:entry(u),meta:{order,newer}};return clone;});
     const plan=planFor(options,base);
-    return {plan,rows:base.map(u=>{u.__v4.score=unitBase(u,plan);return u;}).sort((a,b)=>b.__v4.score-a.__v4.score||a.__v4.ident.entry.localeCompare(b.__v4.ident.entry))};
+    return {plan,rows:base.map(u=>{u.__v4.score=unitBase(u,plan);return u;}).sort((a,b)=>b.__v4.score-a.__v4.score||b.__v4.meta.newer-a.__v4.meta.newer||a.__v4.ident.entry.localeCompare(b.__v4.ident.entry))};
   }
   function usedKeys(ids,byId){
     const out={entry:new Set(),family:new Set(),name:new Set()};
@@ -96,7 +111,7 @@
     const need=roleNeed(ids,byId);let best=null,bestScore=-Infinity,seen=0;
     for(const u of pool){
       const id=txt(u.id),k=u.__v4.ident;if(!id||ids.includes(id))continue;if(!allowUsed&&used.has(k.entry))continue;if(conflict(u,ids,byId))continue;if(!monoOk(u,ids,byId,options))continue;
-      let score=u.__v4.score;if(need&&has(u.__v4.blob,need))score+=2600;if(ids.length===0&&has(u.__v4.blob,roleWords.control))score+=1200;
+      let score=u.__v4.score;if(need&&has(u.__v4.blob,need))score+=2600;if(ids.length===0&&has(u.__v4.blob,roleWords.control))score+=1200;score+=(u.__v4.meta?.newer||0)*900;
       if(score>bestScore){best=u;bestScore=score;}if(++seen>60&&best)break;
     }
     return best;
@@ -111,7 +126,7 @@
     return out;
   }
   function storyOrder(ids,byId){
-    const rows=ids.map(id=>{const u=byId.get(txt(id)),s=u?.__v4?.stats||{};const b=u?.__v4?.blob||'';return{id,front:s.spd*14+s.hp*.022+(has(b,roleWords.control)?3400:0)+(has(b,roleWords.tank)?1800:0),back:s.atk*.40+(has(b,roleWords.dps)?3600:0)+(has(b,roleWords.support)?1200:0)}});
+    const rows=ids.map(id=>{const u=byId.get(txt(id)),s=u?.__v4?.stats||{},m=u?.__v4?.meta||{};const b=u?.__v4?.blob||'';return{id,front:s.spd*14+s.hp*.022+(has(b,roleWords.control)?3400:0)+(has(b,roleWords.tank)?1800:0)+(m.newer||0)*900,back:s.atk*.40+(has(b,roleWords.dps)?3600:0)+(has(b,roleWords.support)?1200:0)+(m.newer||0)*900}});
     rows.sort((a,b)=>b.front-a.front||a.id.localeCompare(b.id));
     const main=rows.slice(0,STORY_MAIN).map(x=>x.id),back=rows.slice(STORY_MAIN).sort((a,b)=>b.back-a.back||a.id.localeCompare(b.id)).slice(0,STORY_BACK).map(x=>x.id);
     return {main,back};
@@ -138,9 +153,9 @@
       const storyIds=buildRow(STORY_MAIN+STORY_BACK,storyRow,storyLock,pool,used,byId,opts);
       const story=storyLocks(storyOrder(storyIds,byId),layout,locks);
       const placed=[...story.main,...story.back].filter(Boolean);placed.forEach(id=>{const u=byId.get(id);if(u)used.add(u.__v4.ident.entry);});
-      if(storyMode(opts))return{story,totalScore:scoreIds(placed,byId),engineVersion:'optimizerEngineV4-story',duplicateKey:'entryPrefix'};
+      if(storyMode(opts))return{story,totalScore:scoreIds(placed,byId),engineVersion:'optimizerEngineV4-story-meta',duplicateKey:'entryPrefix'};
       const platoons=[];for(let p=0;p<PLATOONS;p++){const row=arr(layout.platoons?.[p]).slice(0,PLATOON_SIZE),flags=arr(locks.platoons?.[p]).slice(0,PLATOON_SIZE);const ids=buildRow(PLATOON_SIZE,row,flags,pool,used,byId,opts);platoons.push({name:`Platoon ${p+1}`,units:ids,score:scoreIds(ids,byId)});}
-      return{story,platoons,totalScore:scoreIds(placed,byId)*2+platoons.reduce((a,p)=>a+num(p.score),0),engineVersion:'optimizerEngineV4-fast',duplicateKey:'entryPrefix'};
+      return{story,platoons,totalScore:scoreIds(placed,byId)*2+platoons.reduce((a,p)=>a+num(p.score),0),engineVersion:'optimizerEngineV4-fast-meta',duplicateKey:'entryPrefix'};
     }catch(err){console.warn('[Optimizer] V4 failed; falling back.',err);if(previous&&typeof previous.run==='function')return previous.run(units,options);return{story:{main:[],back:[]},totalScore:0,engineVersion:'optimizerEngineV4-empty'};}
   }
   g.OptimizerEngineV4={run};
