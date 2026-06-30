@@ -22,6 +22,9 @@
     control:['sleep','stun','push_back','tu','stealth','dispel'],
     tank:['guard','guardian','barrier','hold_ground','damage_reduction']
   };
+  const META_SCORE_WEIGHT=14000;
+  const META_PICK_WEIGHT=5000;
+  const META_STORY_WEIGHT=3200;
 
   function pathOrder(value){const m=txt(value).match(/(?:^|\/)(\d{4})_/);return m?num(m[1]):0;}
   function entry(u){
@@ -79,8 +82,11 @@
     if(has(b,roleWords.support))score+=1500;
     if(has(b,roleWords.control))score+=1400;
     if(has(b,roleWords.tank))score+=1300;
-    score+=(m.newer||0)*3600;
+    score+=(m.newer||0)*META_SCORE_WEIGHT;
     return score;
+  }
+  function sortRows(rows){
+    return rows.sort((a,b)=>b.__v4.score-a.__v4.score||b.__v4.meta.newer-a.__v4.meta.newer||a.__v4.ident.entry.localeCompare(b.__v4.ident.entry));
   }
   function enrich(units,options){
     let rows=arr(units);
@@ -91,7 +97,19 @@
     const orders=rows.map(metaOrder).filter(v=>v>0),minOrder=orders.length?Math.min(...orders):0,maxOrder=orders.length?Math.max(...orders):0,span=Math.max(1,maxOrder-minOrder);
     const base=rows.map(u=>{const clone={...u},order=metaOrder(u),newer=order>0?(order-minOrder)/span:0;clone.id=txt(u?.id||u?.sourceId||u?.family||u?.name);clone.__v4={stats:stats(u,profileState),blob:tagBlob(u),ident:ident(u),entry:entry(u),meta:{order,newer}};return clone;});
     const plan=planFor(options,base);
-    return {plan,rows:base.map(u=>{u.__v4.score=unitBase(u,plan);return u;}).sort((a,b)=>b.__v4.score-a.__v4.score||b.__v4.meta.newer-a.__v4.meta.newer||a.__v4.ident.entry.localeCompare(b.__v4.ident.entry))};
+    return {plan,rows:sortRows(base.map(u=>{u.__v4.score=unitBase(u,plan);return u;}))};
+  }
+  function workingPool(rows,cap){
+    const list=arr(rows);
+    if(list.length<=cap)return list;
+    const chosen=new Map();
+    const add=u=>{const id=txt(u?.id);if(id&&!chosen.has(id))chosen.set(id,u);};
+    const newerCount=Math.ceil(cap*.35);
+    const scoreCount=Math.max(0,cap-newerCount);
+    list.slice(0,scoreCount).forEach(add);
+    [...list].sort((a,b)=>b.__v4.meta.newer-a.__v4.meta.newer||b.__v4.score-a.__v4.score).slice(0,newerCount).forEach(add);
+    for(const u of list){if(chosen.size>=cap)break;add(u);}
+    return sortRows([...chosen.values()]);
   }
   function usedKeys(ids,byId){
     const out={entry:new Set(),family:new Set(),name:new Set()};
@@ -115,7 +133,7 @@
     const need=roleNeed(ids,byId);let best=null,bestScore=-Infinity,seen=0;
     for(const u of pool){
       const id=txt(u.id),k=u.__v4.ident;if(!id||ids.includes(id))continue;if(!allowUsed&&hasUsedKey(used,k))continue;if(rowConflict(u,ids,byId))continue;if(!monoOk(u,ids,byId,options))continue;
-      let score=u.__v4.score;if(need&&has(u.__v4.blob,need))score+=2600;if(ids.length===0&&has(u.__v4.blob,roleWords.control))score+=1200;score+=(u.__v4.meta?.newer||0)*900;
+      let score=u.__v4.score;if(need&&has(u.__v4.blob,need))score+=2600;if(ids.length===0&&has(u.__v4.blob,roleWords.control))score+=1200;score+=(u.__v4.meta?.newer||0)*META_PICK_WEIGHT;
       if(score>bestScore){best=u;bestScore=score;}if(++seen>60&&best)break;
     }
     return best;
@@ -130,7 +148,7 @@
     return out;
   }
   function storyOrder(ids,byId){
-    const rows=ids.map(id=>{const u=byId.get(txt(id)),s=u?.__v4?.stats||{},m=u?.__v4?.meta||{};const b=u?.__v4?.blob||'';return{id,front:s.spd*14+s.hp*.022+(has(b,roleWords.control)?3400:0)+(has(b,roleWords.tank)?1800:0)+(m.newer||0)*900,back:s.atk*.40+(has(b,roleWords.dps)?3600:0)+(has(b,roleWords.support)?1200:0)+(m.newer||0)*900}});
+    const rows=ids.map(id=>{const u=byId.get(txt(id)),s=u?.__v4?.stats||{},m=u?.__v4?.meta||{};const b=u?.__v4?.blob||'';return{id,front:s.spd*14+s.hp*.022+(has(b,roleWords.control)?3400:0)+(has(b,roleWords.tank)?1800:0)+(m.newer||0)*META_STORY_WEIGHT,back:s.atk*.40+(has(b,roleWords.dps)?3600:0)+(has(b,roleWords.support)?1200:0)+(m.newer||0)*META_STORY_WEIGHT}});
     rows.sort((a,b)=>b.front-a.front||a.id.localeCompare(b.id));
     const main=rows.slice(0,STORY_MAIN).map(x=>x.id),back=rows.slice(STORY_MAIN).sort((a,b)=>b.back-a.back||a.id.localeCompare(b.id)).slice(0,STORY_BACK).map(x=>x.id);
     return {main,back};
@@ -150,16 +168,16 @@
   function run(units,options){
     try{
       const opts={...(options||{}),optimizerSearchMode:'v4'};
-      const data=enrich(units||[],opts),pool=data.rows.slice(0,opts.exampleMode?120:140),byId=new Map(data.rows.map(u=>[txt(u.id),u]));
+      const data=enrich(units||[],opts),pool=workingPool(data.rows,opts.exampleMode?120:140),byId=new Map(data.rows.map(u=>[txt(u.id),u]));
       const layout=opts.currentLayout||{},locks=opts.slotLocks||{},used=newUsed();
       const storyRow=[...arr(layout.storyMain).slice(0,STORY_MAIN),...arr(layout.storyBack).slice(0,STORY_BACK)];
       const storyLock=[...arr(locks.storyMain).slice(0,STORY_MAIN),...arr(locks.storyBack).slice(0,STORY_BACK)];
       const storyIds=buildRow(STORY_MAIN+STORY_BACK,storyRow,storyLock,pool,used,byId,opts,true);
       const story=storyLocks(storyOrder(storyIds,byId),layout,locks);
       const placed=[...story.main,...story.back].filter(Boolean);placed.forEach(id=>{const u=byId.get(id);if(u)addUsedKey(used,u.__v4.ident);});
-      if(storyMode(opts))return{story,totalScore:scoreIds(placed,byId),engineVersion:'optimizerEngineV4-story-nodupes',duplicateKey:'entry-family-name'};
+      if(storyMode(opts))return{story,totalScore:scoreIds(placed,byId),engineVersion:'optimizerEngineV4-story-meta-strong',duplicateKey:'entry-family-name'};
       const platoons=[];for(let p=0;p<PLATOONS;p++){const row=arr(layout.platoons?.[p]).slice(0,PLATOON_SIZE),flags=arr(locks.platoons?.[p]).slice(0,PLATOON_SIZE);const ids=buildRow(PLATOON_SIZE,row,flags,pool,used,byId,opts,false);platoons.push({name:`Platoon ${p+1}`,units:ids,score:scoreIds(ids,byId)});}
-      return{story,platoons,totalScore:scoreIds(placed,byId)*2+platoons.reduce((a,p)=>a+num(p.score),0),engineVersion:'optimizerEngineV4-fast-nodupes',duplicateKey:'entry-family-name'};
+      return{story,platoons,totalScore:scoreIds(placed,byId)*2+platoons.reduce((a,p)=>a+num(p.score),0),engineVersion:'optimizerEngineV4-fast-meta-strong',duplicateKey:'entry-family-name'};
     }catch(err){console.warn('[Optimizer] V4 failed; falling back.',err);if(previous&&typeof previous.run==='function')return previous.run(units,options);return{story:{main:[],back:[]},totalScore:0,engineVersion:'optimizerEngineV4-empty'};}
   }
   g.OptimizerEngineV4={run};
