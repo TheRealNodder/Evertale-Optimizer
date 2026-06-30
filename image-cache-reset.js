@@ -24,23 +24,23 @@
     }
   }
 
+  function addScript(src, attr){
+    if (document.querySelector(`script[${attr}]`)) return;
+    if (document.readyState === 'loading') {
+      document.write(`<script src="${src}" ${attr}="1"><\/script>`);
+      return;
+    }
+    const s = document.createElement('script');
+    s.src = src;
+    s.setAttribute(attr,'1');
+    document.head.appendChild(s);
+  }
+
   function loadRosterHelpers(){
     const path = String(location.pathname || '').toLowerCase();
     if (!/roster\.html$|optimizer\.html$/.test(path)) return;
-    if (!document.querySelector('script[data-roster-parent-filter]')) {
-      const s = document.createElement('script');
-      s.src = './roster-parent-filter-v2.js?v=1';
-      s.defer = true;
-      s.setAttribute('data-roster-parent-filter','1');
-      document.head.appendChild(s);
-    }
-    if (/roster\.html$/.test(path) && !document.querySelector('script[data-roster-import-sync]')) {
-      const s = document.createElement('script');
-      s.src = './roster-import-owned-sync.js?v=1';
-      s.defer = true;
-      s.setAttribute('data-roster-import-sync','1');
-      document.head.appendChild(s);
-    }
+    addScript('./roster-parent-filter-v3.js?v=1','data-roster-parent-filter');
+    if (/roster\.html$/.test(path)) addScript('./roster-import-owned-sync.js?v=1','data-roster-import-sync');
   }
 
   function refreshImages(root){
