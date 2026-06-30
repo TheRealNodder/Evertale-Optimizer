@@ -94,10 +94,13 @@
   }
   function usedKeys(ids,byId){
     const out={entry:new Set(),family:new Set(),name:new Set()};
-    ids.forEach(id=>{const u=byId.get(txt(id));if(!u)return;const k=u.__v4.ident;out.entry.add(k.entry);if(k.family)out.family.add(k.family);if(k.name)out.name.add(k.name);});
+    ids.forEach(id=>{const u=byId.get(txt(id));if(!u)return;addUsedKey(out,u.__v4.ident);});
     return out;
   }
-  function conflict(u,ids,byId){const k=u.__v4.ident,used=usedKeys(ids,byId);return used.entry.has(k.entry)||used.family.has(k.family)||used.name.has(k.name);}
+  function newUsed(){return{entry:new Set(),family:new Set(),name:new Set()};}
+  function addUsedKey(used,k){if(!k)return;used.entry.add(k.entry);if(k.family)used.family.add(k.family);if(k.name)used.name.add(k.name);}
+  function hasUsedKey(used,k){return !!k&&(used.entry.has(k.entry)||used.family.has(k.family)||used.name.has(k.name));}
+  function rowConflict(u,ids,byId){const k=u.__v4.ident,used=usedKeys(ids,byId);return hasUsedKey(used,k);}
   function monoOk(u,ids,byId,options){const mode=options?.doctrineOverrides?.monoVsRainbow?.selectionMode||options?.teamType||'auto';if(mode!=='force_mono')return true;const first=ids.map(id=>byId.get(txt(id))).find(Boolean);return !first||clean(first.element)===clean(u.element);}
   function roleNeed(ids,byId){
     const units=ids.map(id=>byId.get(txt(id))).filter(Boolean),blobs=units.map(u=>u.__v4.blob);
@@ -110,19 +113,19 @@
   function pick(ids,pool,used,byId,options,allowUsed){
     const need=roleNeed(ids,byId);let best=null,bestScore=-Infinity,seen=0;
     for(const u of pool){
-      const id=txt(u.id),k=u.__v4.ident;if(!id||ids.includes(id))continue;if(!allowUsed&&used.has(k.entry))continue;if(conflict(u,ids,byId))continue;if(!monoOk(u,ids,byId,options))continue;
+      const id=txt(u.id),k=u.__v4.ident;if(!id||ids.includes(id))continue;if(!allowUsed&&hasUsedKey(used,k))continue;if(rowConflict(u,ids,byId))continue;if(!monoOk(u,ids,byId,options))continue;
       let score=u.__v4.score;if(need&&has(u.__v4.blob,need))score+=2600;if(ids.length===0&&has(u.__v4.blob,roleWords.control))score+=1200;score+=(u.__v4.meta?.newer||0)*900;
       if(score>bestScore){best=u;bestScore=score;}if(++seen>60&&best)break;
     }
     return best;
   }
-  function buildRow(size,lockedRow,lockedFlags,pool,used,byId,options){
+  function buildRow(size,lockedRow,lockedFlags,pool,used,byId,options,allowReuse){
     const ids=[];arr(lockedRow).slice(0,size).forEach((id,i)=>{id=txt(id);if(lockedFlags?.[i]&&id&&byId.has(id)&&!ids.includes(id))ids.push(id);});
     while(ids.length<size){const p=pick(ids,pool,used,byId,options,false);if(!p)break;ids.push(txt(p.id));}
-    while(ids.length<size){const p=pick(ids,pool,used,byId,options,true);if(!p)break;ids.push(txt(p.id));}
+    if(allowReuse!==false)while(ids.length<size){const p=pick(ids,pool,used,byId,options,true);if(!p)break;ids.push(txt(p.id));}
     const out=Array(size).fill(''),placed=new Set();arr(lockedRow).slice(0,size).forEach((id,i)=>{id=txt(id);if(lockedFlags?.[i]&&ids.includes(id)){out[i]=id;placed.add(id);}});
     const q=ids.filter(id=>!placed.has(id));for(let i=0;i<size;i++)if(!out[i])out[i]=q.shift()||'';
-    out.filter(Boolean).forEach(id=>{const u=byId.get(id);if(u)used.add(u.__v4.ident.entry);});
+    out.filter(Boolean).forEach(id=>{const u=byId.get(id);if(u)addUsedKey(used,u.__v4.ident);});
     return out;
   }
   function storyOrder(ids,byId){
@@ -147,15 +150,15 @@
     try{
       const opts={...(options||{}),optimizerSearchMode:'v4'};
       const data=enrich(units||[],opts),pool=data.rows.slice(0,opts.exampleMode?120:140),byId=new Map(data.rows.map(u=>[txt(u.id),u]));
-      const layout=opts.currentLayout||{},locks=opts.slotLocks||{},used=new Set();
+      const layout=opts.currentLayout||{},locks=opts.slotLocks||{},used=newUsed();
       const storyRow=[...arr(layout.storyMain).slice(0,STORY_MAIN),...arr(layout.storyBack).slice(0,STORY_BACK)];
       const storyLock=[...arr(locks.storyMain).slice(0,STORY_MAIN),...arr(locks.storyBack).slice(0,STORY_BACK)];
-      const storyIds=buildRow(STORY_MAIN+STORY_BACK,storyRow,storyLock,pool,used,byId,opts);
+      const storyIds=buildRow(STORY_MAIN+STORY_BACK,storyRow,storyLock,pool,used,byId,opts,true);
       const story=storyLocks(storyOrder(storyIds,byId),layout,locks);
-      const placed=[...story.main,...story.back].filter(Boolean);placed.forEach(id=>{const u=byId.get(id);if(u)used.add(u.__v4.ident.entry);});
-      if(storyMode(opts))return{story,totalScore:scoreIds(placed,byId),engineVersion:'optimizerEngineV4-story-meta',duplicateKey:'entryPrefix'};
-      const platoons=[];for(let p=0;p<PLATOONS;p++){const row=arr(layout.platoons?.[p]).slice(0,PLATOON_SIZE),flags=arr(locks.platoons?.[p]).slice(0,PLATOON_SIZE);const ids=buildRow(PLATOON_SIZE,row,flags,pool,used,byId,opts);platoons.push({name:`Platoon ${p+1}`,units:ids,score:scoreIds(ids,byId)});}
-      return{story,platoons,totalScore:scoreIds(placed,byId)*2+platoons.reduce((a,p)=>a+num(p.score),0),engineVersion:'optimizerEngineV4-fast-meta',duplicateKey:'entryPrefix'};
+      const placed=[...story.main,...story.back].filter(Boolean);placed.forEach(id=>{const u=byId.get(id);if(u)addUsedKey(used,u.__v4.ident);});
+      if(storyMode(opts))return{story,totalScore:scoreIds(placed,byId),engineVersion:'optimizerEngineV4-story-nodupes',duplicateKey:'entry-family-name'};
+      const platoons=[];for(let p=0;p<PLATOONS;p++){const row=arr(layout.platoons?.[p]).slice(0,PLATOON_SIZE),flags=arr(locks.platoons?.[p]).slice(0,PLATOON_SIZE);const ids=buildRow(PLATOON_SIZE,row,flags,pool,used,byId,opts,false);platoons.push({name:`Platoon ${p+1}`,units:ids,score:scoreIds(ids,byId)});}
+      return{story,platoons,totalScore:scoreIds(placed,byId)*2+platoons.reduce((a,p)=>a+num(p.score),0),engineVersion:'optimizerEngineV4-fast-nodupes',duplicateKey:'entry-family-name'};
     }catch(err){console.warn('[Optimizer] V4 failed; falling back.',err);if(previous&&typeof previous.run==='function')return previous.run(units,options);return{story:{main:[],back:[]},totalScore:0,engineVersion:'optimizerEngineV4-empty'};}
   }
   g.OptimizerEngineV4={run};
