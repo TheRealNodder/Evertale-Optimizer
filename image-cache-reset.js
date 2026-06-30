@@ -24,6 +24,17 @@
     }
   }
 
+  function loadRosterParentFilter(){
+    const path = String(location.pathname || '').toLowerCase();
+    if (!/roster\.html$|optimizer\.html$/.test(path)) return;
+    if (document.querySelector('script[data-roster-parent-filter]')) return;
+    const s = document.createElement('script');
+    s.src = './roster-parent-filter-v2.js?v=1';
+    s.defer = true;
+    s.setAttribute('data-roster-parent-filter','1');
+    document.head.appendChild(s);
+  }
+
   function refreshImages(root){
     if (!IMAGE_VERSION) return;
     const scope = root && root.querySelectorAll ? root : document;
@@ -43,6 +54,7 @@
   }
 
   try {
+    loadRosterParentFilter();
     for (const key of BAD_KEYS) localStorage.removeItem(key);
 
     const originalGetItem = localStorage.getItem.bind(localStorage);
@@ -76,6 +88,7 @@
     });
 
     document.addEventListener('DOMContentLoaded', () => {
+      loadRosterParentFilter();
       scheduleRefresh(document);
       [150, 600, 1400, 3200, 6500].forEach(ms => setTimeout(() => scheduleRefresh(document), ms));
     }, { once: true });
