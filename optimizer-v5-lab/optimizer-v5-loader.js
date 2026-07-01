@@ -6,6 +6,7 @@
     'optimizer-duplicate-guard.js',
     'optimizer-meta-priority.js',
     'optimizer-feature-model.js',
+    'optimizer-v5-selector-feature-bridge.js',
     'optimizer-synergy-graph.js',
     'optimizer-candidate-pool.js',
     'optimizer-team-builder.js',
@@ -14,8 +15,8 @@
     'optimizer-v5-regression-fixtures.js',
     'optimizer-v5-test-harness.js'
   ];
-  const loader={version:'v4',files:files.slice(),ready:null};
-  function url(src){return base+src+'?v=4';}
+  const loader={version:'v5',files:files.slice(),ready:null};
+  function url(src){return base+src+'?v=5';}
   function loadSequential(index=0){
     if(index>=files.length)return Promise.resolve(g.OptimizerEngineV5);
     return new Promise((resolve,reject)=>{
