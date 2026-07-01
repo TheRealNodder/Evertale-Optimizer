@@ -21,26 +21,27 @@
       stun:['stun','shock','time strike','push back'],
       guardian:['guard','guardian','protect','barrier','hold ground'],
       heal:['heal','revive','purify','cleanse','regeneration'],
-      turn:['tu','turn grant','haste','quicken','spirit'],
+      turn:['tu','turn grant','haste','quicken','spirit','overdrive'],
       blood:['blood','revenge','sacrifice','summon'],
+      void:['void','zero spirit','low spirit'],
       crisis:['crisis','low hp'],
       survivor:['survivor','survival'],
       offense:['dps','execute','charge','attack','damage']
     },
-    aliases:{auto:'',atkBuff:'offense',hpBuff:'guardian',defense:'guardian',cleanse:'heal',spirit:'turn',charge:'offense'},
+    aliases:{auto:'',atkbuff:'offense',hpbuff:'guardian',defense:'guardian',cleanse:'heal',spirit:'turn',charge:'offense'},
     roleWords:{
-      anchor:['payoff','drive','eater','devour','blast','fury','survivor','crisis','charge'],
+      anchor:['payoff','drive','eater','devour','blast','fury','survivor','crisis','charge','bloodthirst','nightmare','time_strike','dream_hunt','overdrive','void'],
       dps:['execute','charge','blood','survivor','poison_eater','burn_drive','time_strike','damage'],
-      support:['heal','revive','purify','cleanse','spirit','turn_grant'],
+      support:['heal','revive','purify','cleanse','spirit_gain','turn_grant','tu_reduction'],
       control:['sleep','stun','push_back','tu','stealth','dispel'],
       tank:['guard','guardian','barrier','hold_ground','damage_reduction']
     }
   };
 
-  function pathOrder(value){const m=txt(value).match(/(?:^|\/)(\d{4})_/);return m?num(m[1]):0;}
+  function pathOrder(value){const m=txt(value).match(/(?:^|[\\/])(\d{4})_/);return m?num(m[1]):0;}
   function entryKey(u){
     const paths=[u?.entryPath,u?.path,u?.file,u?.fileName,u?.sourceFile,u?.__path,u?.raw?.entryPath,u?.raw?.sourceFile];
-    for(const p of paths){const m=txt(p).match(/(?:^|\/)(\d{4})_/);if(m)return m[1];}
+    for(const p of paths){const m=txt(p).match(/(?:^|[\\/])(\d{4})_/);if(m)return m[1];}
     for(const v of [u?.entryPrefix,u?.entryKey,u?.order,u?.entryOrder,u?.indexOrder,u?.raw?.order]){
       if(v!==undefined&&v!==null&&v!==''){const m=txt(v).match(/\d+/);if(m)return m[0].padStart(4,'0').slice(-4);}
     }

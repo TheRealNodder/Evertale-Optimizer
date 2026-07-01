@@ -19,6 +19,8 @@ Planned module order:
 6. `optimizer-candidate-pool.js`
 7. `optimizer-team-builder.js`
 8. `optimizerEngineV5.js`
+9. `optimizer-v5-regression-fixtures.js`
+10. `optimizer-v5-test-harness.js`
 
 Optional test wire later:
 
@@ -27,6 +29,23 @@ Optional test wire later:
 ```
 
 Do not add that line until we are ready to test V5 on the live optimizer page.
+
+After loading the lab manually and waiting for `OptimizerV5LabLoader.ready`, run:
+
+```js
+await runOptimizerV5LabTest()
+```
+
+The harness only prints diagnostics and does not apply either result to the page.
+
+Run the isolated engine regression fixtures with:
+
+```js
+runOptimizerV5RegressionFixtures()
+```
+
+The fixtures cover real extracted skill-ID vocabulary, Mono Burn, Multitype Blood,
+Spirit/Void and Sleep/AoE conflicts, strict duplicate keys, and exhausted platoons.
 
 Design rules:
 

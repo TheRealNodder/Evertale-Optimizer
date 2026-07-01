@@ -5,42 +5,68 @@
   if(!S)return;
   const C=S.constants;
 
+  function mode(options){return options?.doctrineOverrides?.monoVsRainbow?.selectionMode||options?.teamType||'auto';}
+  function features(unit){return unit?.__v5?.features||{};}
+  function role(unit,key){return S.num(features(unit)?.roles?.[key]);}
+  function planFit(unit,plan){
+    const f=features(unit);let value=S.num(f.applies?.[plan])+S.num(f.consumes?.[plan]);
+    if(plan==='turn')value+=S.num(f.enables?.spirit)+S.num(f.enables?.turn)+S.num(f.enables?.tu_reduction)+S.num(f.consumes?.spirit)*.6;
+    else if(plan==='guardian')value+=S.num(f.protects?.guard)+S.num(f.protects?.barrier)+S.num(f.protects?.hold_ground);
+    else if(plan==='heal')value+=S.num(f.protects?.heal)+S.num(f.enables?.cleanse)+S.num(f.enables?.revive);
+    else if(plan==='blood')value+=S.num(f.enables?.summon);
+    return value;
+  }
+  function anchorScore(unit,plan){return S.num(unit?.__v5?.score)+role(unit,'anchor')*6200+planFit(unit,plan)*2600+S.num(unit?.__v5?.synergyCenter)*.12+(root.metaPriority?root.metaPriority.boost(unit,'anchor'):0);}
   function monoOk(unit,ids,byId,options){
-    const mode=options?.doctrineOverrides?.monoVsRainbow?.selectionMode||options?.teamType||'auto';
-    if(mode!=='force_mono')return true;
+    if(mode(options)!=='force_mono')return true;
     const first=S.arr(ids).map(id=>byId.get(S.txt(id))).find(Boolean);
-    return !first||S.clean(first.element)===S.clean(unit.element);
+    const target=S.clean(options?.v5MonoElement||first?.element);
+    return !target||target===S.clean(unit.element);
   }
   function roleNeed(ids,byId){
     const units=S.arr(ids).map(id=>byId.get(S.txt(id))).filter(Boolean),roles=units.map(u=>u?.__v5?.features?.roles||{});
-    if(!roles.some(r=>S.num(r.control)>0))return 'control';
     if(!roles.some(r=>S.num(r.anchor)>0||S.num(r.dps)>0))return 'dps';
     if(!roles.some(r=>S.num(r.support)>0))return 'support';
     if(!roles.some(r=>S.num(r.tank)>0))return 'tank';
+    if(!roles.some(r=>S.num(r.control)>0))return 'control';
     return '';
   }
-  function pick(ids,pool,guard,byId,graph,options,allowReuse){
-    const need=roleNeed(ids,byId);let best=null,bestScore=-Infinity,seen=0;
+  function pickAnchor(ids,pool,guard,byId,options,plan){
+    let best=null,bestScore=-Infinity;
     for(const unit of S.arr(pool)){
-      const id=S.txt(unit.id);
-      if(!id||ids.includes(id))continue;
-      if(!allowReuse&&guard.isUsed(unit))continue;
-      if(guard.rowConflict(unit,ids,byId))continue;
-      if(!monoOk(unit,ids,byId,options))continue;
-      let score=S.num(unit?.__v5?.score);
-      score+=root.synergyGraph.teamScore([...ids,id],byId,graph)*.45;
-      if(need&&S.num(unit?.__v5?.features?.roles?.[need])>0)score+=2600;
-      if(ids.length===0)score+=root.metaPriority?root.metaPriority.boost(unit,'anchor'):0;
-      if(score>bestScore){best=unit;bestScore=score;}
-      if(++seen>80&&best)break;
+      const id=S.txt(unit?.id);if(!id||ids.includes(id)||guard.isUsed(unit)||guard.rowConflict(unit,ids,byId)||!monoOk(unit,ids,byId,options))continue;
+      const score=anchorScore(unit,plan);if(score>bestScore){best=unit;bestScore=score;}
     }
     return best;
   }
-  function buildRow(size,lockedRow,lockedFlags,pool,guard,byId,graph,options,allowReuse){
+  function pick(ids,pool,guard,byId,graph,options,plan){
+    const need=roleNeed(ids,byId),before=root.synergyGraph.teamAnalysis(ids,byId,graph);let best=null,bestScore=-Infinity,seen=0;
+    const anchor=S.arr(ids).map(id=>byId.get(S.txt(id))).find(unit=>role(unit,'anchor')>0);
+    for(const unit of S.arr(pool)){
+      const id=S.txt(unit.id);
+      if(!id||ids.includes(id))continue;
+      if(guard.isUsed(unit))continue;
+      if(guard.rowConflict(unit,ids,byId))continue;
+      if(!monoOk(unit,ids,byId,options))continue;
+      let score=S.num(unit?.__v5?.score);
+      const after=root.synergyGraph.teamAnalysis([...ids,id],byId,graph);
+      score+=(after.score-before.score)*.55;
+      if(need&&role(unit,need)>0)score+=2800;
+      if(planFit(unit,plan)>0)score+=features(unit).consumes?.[plan]?3200:2400;
+      else if(role(unit,'support')<=0&&role(unit,'tank')<=0&&role(unit,'cleanser')<=0&&role(unit,'tempo')<=0)score-=900;
+      if(anchor&&(Object.keys(features(unit).protects||{}).length||features(unit).enables?.turn||features(unit).enables?.tu_reduction||features(unit).enables?.spirit))score+=1700;
+      if(mode(options)==='force_rainbow'&&ids.length&& !S.arr(ids).map(x=>S.clean(byId.get(S.txt(x))?.element)).includes(S.clean(unit?.element))&&after.score>before.score)score+=650;
+      score+=root.metaPriority?root.metaPriority.boost(unit,'pick'):0;
+      if(score>bestScore){best=unit;bestScore=score;}
+      if(++seen>110&&best)break;
+    }
+    return best;
+  }
+  function buildRow(size,lockedRow,lockedFlags,pool,guard,byId,graph,options,plan){
     const ids=[];
-    S.arr(lockedRow).slice(0,size).forEach((id,i)=>{id=S.txt(id);if(lockedFlags?.[i]&&id&&byId.has(id)&&!ids.includes(id))ids.push(id);});
-    while(ids.length<size){const unit=pick(ids,pool,guard,byId,graph,options,false);if(!unit)break;ids.push(S.txt(unit.id));}
-    if(allowReuse!==false)while(ids.length<size){const unit=pick(ids,pool,guard,byId,graph,options,true);if(!unit)break;ids.push(S.txt(unit.id));}
+    S.arr(lockedRow).slice(0,size).forEach((id,i)=>{id=S.txt(id);const unit=byId.get(id);if(lockedFlags?.[i]&&unit&&!guard.isUsed(unit)&&!guard.rowConflict(unit,ids,byId)&&monoOk(unit,ids,byId,options))ids.push(id);});
+    if(ids.length<size&&!ids.some(id=>role(byId.get(id),'anchor')>0)){const anchor=pickAnchor(ids,pool,guard,byId,options,plan);if(anchor)ids.push(S.txt(anchor.id));}
+    while(ids.length<size){const unit=pick(ids,pool,guard,byId,graph,options,plan);if(!unit)break;ids.push(S.txt(unit.id));}
     const out=Array(size).fill(''),placed=new Set();
     S.arr(lockedRow).slice(0,size).forEach((id,i)=>{id=S.txt(id);if(lockedFlags?.[i]&&ids.includes(id)){out[i]=id;placed.add(id);}});
     const q=ids.filter(id=>!placed.has(id));
@@ -55,38 +81,56 @@
     const back=rows.slice(C.STORY_MAIN).sort((a,b)=>b.back-a.back||S.txt(a.id).localeCompare(S.txt(b.id))).slice(0,C.STORY_BACK).map(x=>x.id);
     return{main,back};
   }
-  function applyStoryLocks(story,layout,locks){
-    const main=Array(C.STORY_MAIN).fill(''),back=Array(C.STORY_BACK).fill(''),locked=new Set();
-    S.arr(layout?.storyMain).slice(0,C.STORY_MAIN).forEach((id,i)=>{if(locks?.storyMain?.[i]&&id){main[i]=S.txt(id);locked.add(S.txt(id));}});
-    S.arr(layout?.storyBack).slice(0,C.STORY_BACK).forEach((id,i)=>{if(locks?.storyBack?.[i]&&id){back[i]=S.txt(id);locked.add(S.txt(id));}});
+  function applyStoryLocks(story,layout,locks,byId){
+    const main=Array(C.STORY_MAIN).fill(''),back=Array(C.STORY_BACK).fill(''),locked=new Set(),used=root.duplicateGuard.makeSet(),available=new Set([...S.arr(story.main),...S.arr(story.back)].map(S.txt));
+    const place=(row,flags,out)=>S.arr(row).slice(0,out.length).forEach((value,i)=>{const id=S.txt(value),unit=byId.get(id),key=unit&&root.duplicateGuard.keyFor(unit);if(flags?.[i]&&available.has(id)&&key&&!root.duplicateGuard.hasKey(used,key)){out[i]=id;locked.add(id);root.duplicateGuard.addKey(used,key);}});
+    place(layout?.storyMain,locks?.storyMain,main);place(layout?.storyBack,locks?.storyBack,back);
     const q=[...S.arr(story.main),...S.arr(story.back)].filter(id=>id&&!locked.has(id));
     for(let i=0;i<C.STORY_MAIN;i++)if(!main[i])main[i]=q.shift()||'';
     for(let i=0;i<C.STORY_BACK;i++)if(!back[i])back[i]=q.shift()||'';
     return{main,back};
   }
   function scoreIds(ids,byId,graph){return S.arr(ids).reduce((a,id)=>a+S.num(byId.get(S.txt(id))?.__v5?.score),0)+root.synergyGraph.teamScore(ids,byId,graph);}
+  function selectedAnchor(ids,byId,plan){return S.arr(ids).map(id=>byId.get(S.txt(id))).filter(Boolean).sort((a,b)=>anchorScore(b,plan)-anchorScore(a,plan))[0]||null;}
+  function pickReasons(unit,anchor,plan,graph){
+    const f=features(unit),reasons=[];
+    if(anchor&&S.txt(unit?.id)===S.txt(anchor?.id))reasons.push('selected anchor');
+    if(f.applies?.[plan])reasons.push(`${plan} setup`);
+    if(f.consumes?.[plan])reasons.push(`${plan} payoff`);
+    if(Object.keys(f.protects||{}).length)reasons.push('protection');
+    if(f.enables?.spirit)reasons.push('spirit gain');
+    if(f.enables?.turn||f.enables?.tu_reduction)reasons.push('tempo');
+    if(f.enables?.cleanse||f.enables?.revive)reasons.push('team safety');
+    if((unit?.__v5?.meta?.newer||0)>=.75)reasons.push('newer meta priority');
+    if(anchor&&unit!==anchor)reasons.push(...S.arr(graph.edge(anchor,unit).reasons).slice(0,2));
+    return [...new Set(reasons)].length?[...new Set(reasons)]:['highest available balanced fit'];
+  }
   function build(pool,allRows,options){
     const byId=new Map(S.arr(allRows).map(u=>[S.txt(u.id),u]));
     const graph=root.synergyGraph.build(pool);
     const guard=root.duplicateGuard.create();
+    const plan=options?.v5Plan||root.candidatePool.selectPlan(options||{},pool);
     const layout=options?.currentLayout||{},locks=options?.slotLocks||{};
     const storyRow=[...S.arr(layout.storyMain).slice(0,C.STORY_MAIN),...S.arr(layout.storyBack).slice(0,C.STORY_BACK)];
     const storyLock=[...S.arr(locks.storyMain).slice(0,C.STORY_MAIN),...S.arr(locks.storyBack).slice(0,C.STORY_BACK)];
-    const storyIds=buildRow(C.STORY_MAIN+C.STORY_BACK,storyRow,storyLock,pool,guard,byId,graph,options,true);
-    const story=applyStoryLocks(storyOrder(storyIds,byId),layout,locks);
+    const storyIds=buildRow(C.STORY_MAIN+C.STORY_BACK,storyRow,storyLock,pool,guard,byId,graph,options,plan);
+    const story=applyStoryLocks(storyOrder(storyIds,byId),layout,locks,byId);
     const placed=[...story.main,...story.back].filter(Boolean);
     placed.forEach(id=>guard.markId(id,byId));
     const platoons=[];
-    const storyOnly=options?.buildScope==='story'||options?.storyOnly===true||document.getElementById('modeStory')?.classList.contains('active');
+    const storyOnly=!!(options?.buildScope==='story'||options?.storyOnly===true||g.document?.getElementById('modeStory')?.classList.contains('active'));
     if(!storyOnly){
       for(let p=0;p<C.PLATOONS;p++){
         const row=S.arr(layout.platoons?.[p]).slice(0,C.PLATOON_SIZE),flags=S.arr(locks.platoons?.[p]).slice(0,C.PLATOON_SIZE);
-        const ids=buildRow(C.PLATOON_SIZE,row,flags,pool,guard,byId,graph,options,false);
+        const ids=buildRow(C.PLATOON_SIZE,row,flags,pool,guard,byId,graph,options,plan);
         platoons.push({name:`Platoon ${p+1}`,units:ids,score:scoreIds(ids,byId,graph)});
       }
     }
-    return{story,platoons,totalScore:scoreIds(placed,byId,graph)*2+platoons.reduce((a,p)=>a+S.num(p.score),0),diagnostics:{storyOnly,poolSize:pool.length,graphEdges:graph.map.size,duplicateKey:'entry-family-name'}};
+    const anchor=selectedAnchor(placed,byId,plan),analysis=root.synergyGraph.teamAnalysis(placed,byId,graph);
+    const newerMetaContribution=placed.reduce((sum,id)=>sum+(root.metaPriority?root.metaPriority.boost(byId.get(S.txt(id)),'score'):0),0);
+    const storyPicks=placed.map((id,index)=>{const unit=byId.get(S.txt(id));return{id:S.txt(id),name:S.txt(unit?.name||unit?.title||id),slot:index+1,reasons:pickReasons(unit,anchor,plan,graph)};});
+    return{story,platoons,totalScore:scoreIds(placed,byId,graph)*2+platoons.reduce((a,p)=>a+S.num(p.score),0),diagnostics:{storyOnly,poolSize:pool.length,graphEdges:graph.map.size,selectedAnchor:anchor?{id:S.txt(anchor.id),name:S.txt(anchor.name||anchor.title||anchor.id),entry:S.identity(anchor).entry,family:S.identity(anchor).family}:null,selectedEngine:plan,storyPicks,synergyScore:analysis.synergyScore,conflictPenalty:analysis.conflictPenalty,newerMetaContribution,duplicateKey:'entry-family-name'}};
   }
 
-  root.teamBuilder={build,buildRow,pick,storyOrder,scoreIds};
+  root.teamBuilder={build,buildRow,pick,pickAnchor,storyOrder,scoreIds};
 })(window);

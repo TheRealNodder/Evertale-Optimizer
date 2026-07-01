@@ -9,7 +9,11 @@
   }
   function prepare(units,options){
     const profileState=g.EvertaleRosterProfiles&&typeof g.EvertaleRosterProfiles.loadState==='function'?g.EvertaleRosterProfiles.loadState():null;
-    let rows=S.arr(units).map(unit=>{
+    let source=S.arr(units);
+    if(g.OptimizerEngineV2&&typeof g.OptimizerEngineV2.enrichOwnedUnits==='function'){
+      try{source=g.OptimizerEngineV2.enrichOwnedUnits(source)}catch{}
+    }
+    let rows=source.map(unit=>{
       const clone={...unit};
       clone.id=S.txt(unit?.id||unit?.sourceId||unit?.family||unit?.name);
       clone.__v5={...(clone.__v5||{}),identity:S.identity(unit),stats:S.stats(unit,profileState)};
@@ -26,17 +30,22 @@
       const opts={...(options||{}),optimizerSearchMode:'v5-lab'};
       const prepared=prepare(units||[],opts);
       const candidate=root.candidatePool.build(prepared,opts);
-      const result=root.teamBuilder.build(candidate.rows,prepared,opts);
+      const result=root.teamBuilder.build(candidate.rows,prepared,{...opts,v5Plan:candidate.plan,v5MonoElement:candidate.diagnostics?.monoElement||'',v5CandidateDiagnostics:candidate.diagnostics});
       result.engineVersion='optimizerEngineV5-lab';
       result.plan=candidate.plan;
       result.aiAware=true;
       result.duplicateKey='entry-family-name';
-      result.diagnostics={...(result.diagnostics||{}),preparedUnits:prepared.length,candidateCap:candidate.cap,plan:candidate.plan,lab:true};
+      result.diagnostics={...(result.diagnostics||{}),preparedUnits:prepared.length,candidateCap:candidate.cap,candidatePool:candidate.diagnostics,plan:candidate.plan,lab:true};
+      root.lastError=null;
       try{console.info('[Optimizer V5 Lab]',result.diagnostics);}catch{}
       return result;
     }catch(err){
+      root.lastError=err;
       console.warn('[Optimizer V5 Lab] failed; falling back.',err);
-      if(previous&&typeof previous.run==='function')return previous.run(units,options);
+      if(previous&&typeof previous.run==='function'){
+        const fallback=previous.run(units,options)||{};
+        return{...fallback,diagnostics:{...(fallback.diagnostics||{}),v5Failed:true,v5Error:S?.txt(err?.message||err)||'Unknown V5 error',fallbackEngineVersion:fallback.engineVersion||'unknown'}};
+      }
       return{story:{main:[],back:[]},platoons:[],totalScore:0,engineVersion:'optimizerEngineV5-lab-empty'};
     }
   }

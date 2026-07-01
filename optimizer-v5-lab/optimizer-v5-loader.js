@@ -9,13 +9,25 @@
     'optimizer-synergy-graph.js',
     'optimizer-candidate-pool.js',
     'optimizer-team-builder.js',
-    'optimizerEngineV5.js'
+    'optimizerEngineV5.js',
+    'optimizer-v5-regression-fixtures.js',
+    'optimizer-v5-test-harness.js'
   ];
-  function load(src){
-    const url=base+src+'?v=1';
-    if(d.readyState==='loading')d.write('<script src="'+url+'"><\/script>');
-    else{const s=d.createElement('script');s.src=url;d.head.appendChild(s);}
+  const loader={version:'v2',files:files.slice(),ready:null};
+  function url(src){return base+src+'?v=2';}
+  function loadSequential(index=0){
+    if(index>=files.length)return Promise.resolve(g.OptimizerEngineV5);
+    return new Promise((resolve,reject)=>{
+      const s=d.createElement('script');s.src=url(files[index]);s.async=false;
+      s.onload=()=>resolve(loadSequential(index+1));
+      s.onerror=()=>reject(new Error('Optimizer V5 lab failed to load '+files[index]));
+      d.head.appendChild(s);
+    });
   }
-  files.forEach(load);
-  g.OptimizerV5LabLoader={version:'v1',files:files.slice()};
+  if(d.readyState==='loading'){
+    files.forEach(src=>d.write('<script src="'+url(src)+'"><\/script>'));
+    loader.ready=new Promise(resolve=>g.addEventListener('load',()=>resolve(g.OptimizerEngineV5),{once:true}));
+  }else loader.ready=loadSequential();
+  loader.ready.catch(err=>console.error('[Optimizer V5 Lab Loader]',err));
+  g.OptimizerV5LabLoader=loader;
 })(window,document);
