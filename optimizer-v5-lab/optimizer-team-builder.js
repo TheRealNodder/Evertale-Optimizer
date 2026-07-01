@@ -23,13 +23,46 @@
     const target=S.clean(options?.v5MonoElement||first?.element);
     return !target||target===S.clean(unit.element);
   }
-  function roleNeed(ids,byId){
+  function planNeed(ids,byId,plan){
+    const statusPlans=new Set(['burn','poison','sleep','stun','stealth']);
+    const units=S.arr(ids).map(id=>byId.get(S.txt(id))).filter(Boolean);
+    const fs=units.map(features);
+    if(statusPlans.has(plan)){
+      const hasSetup=fs.some(f=>S.num(f.applies?.[plan])>0);
+      const hasPayoff=fs.some(f=>S.num(f.consumes?.[plan])>0);
+      if(!hasSetup)return 'setup';
+      if(!hasPayoff)return 'payoff';
+    }
+    if(plan==='turn'){
+      const hasTempo=fs.some(f=>f.enables?.spirit||f.enables?.turn||f.enables?.tu_reduction);
+      const hasUse=fs.some(f=>f.consumes?.spirit||S.num(f.roles?.anchor)>0||S.num(f.roles?.dps)>0);
+      if(!hasTempo)return 'tempo';
+      if(!hasUse)return 'dps';
+    }
+    if(plan==='blood'){
+      const hasSummon=fs.some(f=>f.enables?.summon);
+      const hasBlood=fs.some(f=>f.consumes?.blood);
+      if(!hasSummon)return 'summon';
+      if(!hasBlood)return 'payoff';
+    }
+    return '';
+  }
+  function roleNeed(ids,byId,plan){
+    const direct=planNeed(ids,byId,plan);if(direct)return direct;
     const units=S.arr(ids).map(id=>byId.get(S.txt(id))).filter(Boolean),roles=units.map(u=>u?.__v5?.features?.roles||{});
     if(!roles.some(r=>S.num(r.anchor)>0||S.num(r.dps)>0))return 'dps';
     if(!roles.some(r=>S.num(r.support)>0))return 'support';
     if(!roles.some(r=>S.num(r.tank)>0))return 'tank';
     if(!roles.some(r=>S.num(r.control)>0))return 'control';
     return '';
+  }
+  function needBonus(unit,need,plan){
+    const f=features(unit);
+    if(need==='setup')return S.num(f.applies?.[plan])>0?6200:0;
+    if(need==='payoff')return S.num(f.consumes?.[plan])>0?6200:0;
+    if(need==='tempo')return (f.enables?.spirit||f.enables?.turn||f.enables?.tu_reduction)?5200:0;
+    if(need==='summon')return f.enables?.summon?5200:0;
+    return role(unit,need)>0?2800:0;
   }
   function pickAnchor(ids,pool,guard,byId,options,plan){
     let best=null,bestScore=-Infinity;
@@ -40,7 +73,7 @@
     return best;
   }
   function pick(ids,pool,guard,byId,graph,options,plan){
-    const need=roleNeed(ids,byId),before=root.synergyGraph.teamAnalysis(ids,byId,graph);let best=null,bestScore=-Infinity,seen=0;
+    const need=roleNeed(ids,byId,plan),before=root.synergyGraph.teamAnalysis(ids,byId,graph);let best=null,bestScore=-Infinity,seen=0;
     const anchor=S.arr(ids).map(id=>byId.get(S.txt(id))).find(unit=>role(unit,'anchor')>0);
     for(const unit of S.arr(pool)){
       const id=S.txt(unit.id);
@@ -51,7 +84,7 @@
       let score=S.num(unit?.__v5?.score);
       const after=root.synergyGraph.teamAnalysis([...ids,id],byId,graph);
       score+=(after.score-before.score)*.55;
-      if(need&&role(unit,need)>0)score+=2800;
+      score+=needBonus(unit,need,plan);
       if(planFit(unit,plan)>0)score+=features(unit).consumes?.[plan]?3200:2400;
       else if(role(unit,'support')<=0&&role(unit,'tank')<=0&&role(unit,'cleanser')<=0&&role(unit,'tempo')<=0)score-=900;
       if(anchor&&(Object.keys(features(unit).protects||{}).length||features(unit).enables?.turn||features(unit).enables?.tu_reduction||features(unit).enables?.spirit))score+=1700;
@@ -137,5 +170,5 @@
     return{story,platoons,totalScore:scoreIds(placed,byId,graph)*2+platoons.reduce((a,p)=>a+S.num(p.score),0),diagnostics:{storyOnly,poolSize:pool.length,graphEdges:graph.map.size,selectedAnchor:anchor?{id:S.txt(anchor.id),name:S.txt(anchor.name||anchor.title||anchor.id),entry:S.identity(anchor).entry,family:S.identity(anchor).family}:null,selectedEngine:plan,storyPicks,synergyScore:analysis.synergyScore,conflictPenalty:analysis.conflictPenalty,newerMetaContribution,duplicateKey:'entry-family-name'}};
   }
 
-  root.teamBuilder={build,buildRow,pick,pickAnchor,storyOrder,scoreIds,wantsStoryOnly};
+  root.teamBuilder={build,buildRow,pick,pickAnchor,storyOrder,scoreIds,wantsStoryOnly,planNeed};
 })(window);
