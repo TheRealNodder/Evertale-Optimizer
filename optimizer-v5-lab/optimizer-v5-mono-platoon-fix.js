@@ -15,17 +15,19 @@
       const candidate=root.candidatePool.build(prepared,opts);
       const monoElement=isPlatoonScope(opts)?'':(candidate.diagnostics?.monoElement||'');
       const result=root.teamBuilder.build(candidate.rows,prepared,{...opts,v5Plan:candidate.plan,v5MonoElement:monoElement,v5CandidateDiagnostics:candidate.diagnostics});
-      result.engineVersion='optimizerEngineV5-live-mono-row';
+      result.engineVersion='optimizerEngineV5-live-doctrine-mono-row';
       result.plan=candidate.plan;
       result.aiAware=true;
       result.duplicateKey='entry-family-name';
-      result.diagnostics={...(result.diagnostics||{}),preparedUnits:prepared.length,candidateCap:candidate.cap,candidatePool:candidate.diagnostics,plan:candidate.plan,monoElementMode:monoElement?'global':'row-scoped',lab:true,active:true,fallbackAvailable:!!fallback};
+      result.diagnostics={...(result.diagnostics||{}),preparedUnits:prepared.length,candidateCap:candidate.cap,candidatePool:candidate.diagnostics,plan:candidate.plan,monoElementMode:monoElement?'global':'row-scoped',doctrine:!!root.doctrine,lab:true,active:true,fallbackAvailable:!!fallback,usedFallback:false};
+      g.__lastOptimizerEngineResult=result;
       return result;
     }catch(err){
       root.lastError=err;
-      console.warn('[Optimizer V5 mono platoon fix] failed; falling back.',err);
-      if(fallback&&typeof fallback.run==='function')return fallback.run(units,options);
-      return{story:{main:[],back:[]},platoons:[],totalScore:0,engineVersion:'optimizerEngineV5-fix-empty'};
+      console.error('[Optimizer V5] failed. V4 fallback was NOT applied silently.',err);
+      const result={story:{main:[],back:[]},platoons:[],totalScore:0,engineVersion:'optimizerEngineV5-error-no-v4-fallback',diagnostics:{v5Failed:true,v5Error:S.txt(err?.message||err),fallbackAvailable:!!fallback,usedFallback:false}};
+      g.__lastOptimizerEngineResult=result;
+      return result;
     }
   }
   root.engine={...base,run,isPlatoonScope};
