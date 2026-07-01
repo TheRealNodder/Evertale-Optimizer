@@ -21,6 +21,7 @@
     });
     rows=root.metaPriority.normalize(rows);
     rows=root.featureModel.attach(rows);
+    if(root.doctrine&&typeof root.doctrine.attach==='function')rows=root.doctrine.attach(rows,options||{});
     return rows;
   }
   function run(units,options){
@@ -31,11 +32,11 @@
       const prepared=prepare(units||[],opts);
       const candidate=root.candidatePool.build(prepared,opts);
       const result=root.teamBuilder.build(candidate.rows,prepared,{...opts,v5Plan:candidate.plan,v5MonoElement:candidate.diagnostics?.monoElement||'',v5CandidateDiagnostics:candidate.diagnostics});
-      result.engineVersion='optimizerEngineV5-live';
+      result.engineVersion='optimizerEngineV5-live-doctrine';
       result.plan=candidate.plan;
       result.aiAware=true;
       result.duplicateKey='entry-family-name';
-      result.diagnostics={...(result.diagnostics||{}),preparedUnits:prepared.length,candidateCap:candidate.cap,candidatePool:candidate.diagnostics,plan:candidate.plan,lab:true,active:true,fallbackAvailable:!!previous};
+      result.diagnostics={...(result.diagnostics||{}),preparedUnits:prepared.length,candidateCap:candidate.cap,candidatePool:candidate.diagnostics,plan:candidate.plan,doctrine:true,lab:true,active:true,fallbackAvailable:!!previous};
       root.lastError=null;
       try{console.info('[Optimizer V5]',result.diagnostics);}catch{}
       return result;
