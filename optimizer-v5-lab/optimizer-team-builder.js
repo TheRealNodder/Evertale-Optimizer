@@ -90,6 +90,11 @@
     for(let i=0;i<C.STORY_BACK;i++)if(!back[i])back[i]=q.shift()||'';
     return{main,back};
   }
+  function wantsStoryOnly(options){
+    if(options?.storyOnly===true)return true;
+    if(options?.buildScope)return options.buildScope==='story';
+    return !!g.document?.getElementById('modeStory')?.classList.contains('active');
+  }
   function scoreIds(ids,byId,graph){return S.arr(ids).reduce((a,id)=>a+S.num(byId.get(S.txt(id))?.__v5?.score),0)+root.synergyGraph.teamScore(ids,byId,graph);}
   function selectedAnchor(ids,byId,plan){return S.arr(ids).map(id=>byId.get(S.txt(id))).filter(Boolean).sort((a,b)=>anchorScore(b,plan)-anchorScore(a,plan))[0]||null;}
   function pickReasons(unit,anchor,plan,graph){
@@ -118,7 +123,7 @@
     const placed=[...story.main,...story.back].filter(Boolean);
     placed.forEach(id=>guard.markId(id,byId));
     const platoons=[];
-    const storyOnly=!!(options?.buildScope==='story'||options?.storyOnly===true||g.document?.getElementById('modeStory')?.classList.contains('active'));
+    const storyOnly=wantsStoryOnly(options);
     if(!storyOnly){
       for(let p=0;p<C.PLATOONS;p++){
         const row=S.arr(layout.platoons?.[p]).slice(0,C.PLATOON_SIZE),flags=S.arr(locks.platoons?.[p]).slice(0,C.PLATOON_SIZE);
@@ -132,5 +137,5 @@
     return{story,platoons,totalScore:scoreIds(placed,byId,graph)*2+platoons.reduce((a,p)=>a+S.num(p.score),0),diagnostics:{storyOnly,poolSize:pool.length,graphEdges:graph.map.size,selectedAnchor:anchor?{id:S.txt(anchor.id),name:S.txt(anchor.name||anchor.title||anchor.id),entry:S.identity(anchor).entry,family:S.identity(anchor).family}:null,selectedEngine:plan,storyPicks,synergyScore:analysis.synergyScore,conflictPenalty:analysis.conflictPenalty,newerMetaContribution,duplicateKey:'entry-family-name'}};
   }
 
-  root.teamBuilder={build,buildRow,pick,pickAnchor,storyOrder,scoreIds};
+  root.teamBuilder={build,buildRow,pick,pickAnchor,storyOrder,scoreIds,wantsStoryOnly};
 })(window);
