@@ -325,22 +325,28 @@ Current optimizer CSS:
 
 Current optimizer JS:
 
-1. `seasonal-theme.js`
-2. `site-menu.js?v=6`
-3. `data-loader.js?v=4`
-4. `duo-source-collapse.js?v=2`
-5. `duo-display.js?v=1`
-6. `optimizerRuntimeLoader.js?v=3`
-7. `optimizer_doctrine.js?v=1770082378`
-8. `runtime-stat-engine.js?v=1`
-9. `roster-profile-store.js?v=2`
-10. `optimizerEngine.js?v=1770082378`
-11. `abilityScoreEngine.js?v=1`
-12. `optimizerEngineV2.js?v=2`
-13. `optimizer-hook.js?v=1770082378`
-14. `optimizerRuntimeBootstrap.js?v=1`
-15. `optimizer.js?v=1770082380`
-16. `optimizer-showcase.js?v=4`
+1. `seasonal-theme.js?v=13`
+2. `site-menu.js?v=14`
+3. `theme-auto-route-authority.js?v=1`
+4. `live-data-config.js`
+5. `image-cache-reset.js?v=4`
+6. `data-loader.js?v=6`
+7. `duo-source-collapse.js?v=2`
+8. `duo-display.js?v=1`
+9. `optimizerRuntimeLoader.js?v=3`
+10. `optimizer_doctrine.js?v=1770082381`
+11. `runtime-stat-engine.js?v=2`
+12. `roster-profile-store.js?v=4`
+13. `optimizerEngine.js?v=1770082381`
+14. `abilityScoreEngine.js?v=1`
+15. `optimizerEngineV2.js?v=3`
+16. `optimizerEngineV3.js?v=2`
+17. `optimizer-legacy/optimizer-v4-fallback-loader.js?v=11`
+18. `optimizer-v5-lab/optimizer-v5-loader.js?v=11`
+19. `optimizer-hook.js?v=1770082379`
+20. `optimizerRuntimeBootstrap.js?v=1`
+21. `optimizer.js?v=1770082388`
+22. `optimizer-showcase.js?v=4`
 
 Optimizer data flow:
 
@@ -352,11 +358,13 @@ optimizer.html
   -> optimizer_doctrine.js exposes doctrine weights/config
   -> runtime-stat-engine.js supports stat calculations
   -> roster-profile-store.js exposes stat profiles
-  -> optimizerEngine.js exposes window.OptimizerEngine.run
+  -> optimizerEngine.js / V2 / V3 provide earlier engine layers and enrichment
   -> abilityScoreEngine.js adds ability scoring
-  -> optimizerEngineV2.js / optimizer-hook.js integrate upgraded scoring/builds
+  -> optimizer-legacy/optimizer-v4-fallback-loader.js keeps V4 available as an explicit fallback
+  -> optimizer-v5-lab/optimizer-v5-loader.js loads V5 modules once and makes V5 the live window.OptimizerEngine
+  -> optimizer-hook.js keeps the compatibility run entrypoint
   -> optimizerRuntimeBootstrap.js starts runtime pieces
-  -> optimizer.js owns DOM, localStorage layout, locks, story/platoons/storage render
+  -> optimizer.js owns DOM, localStorage layout, locks, story/platoons/storage render, and last-run diagnostics
   -> optimizer-showcase.js visual/presentation add-ons
 ```
 

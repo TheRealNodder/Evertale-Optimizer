@@ -15,9 +15,15 @@
     score+=newer;
     return score;
   }
+  function normalizedPlan(value){
+    const C=S.constants,key=C.aliases[S.low(value)]??S.low(value);
+    return key&&key!=='auto'&&key!=='none'&&C.plans[key]?key:'';
+  }
   function selectPlan(options,rows){
     const C=S.constants;
-    const picked=[options?.presetTag,...S.arr(options?.archetypes)].map(v=>C.aliases[S.low(v)]??S.low(v)).find(v=>v&&v!=='auto'&&v!=='none'&&C.plans[v]);
+    const hard=options?.presetMode==='hard'?normalizedPlan(options?.presetTag):'';
+    if(hard)return hard;
+    const picked=[options?.v5Plan,options?.presetTag,...S.arr(options?.archetypes)].map(normalizedPlan).find(Boolean);
     if(picked)return picked;
     let best='offense',score=-1;
     for(const [plan,words] of Object.entries(C.plans)){
@@ -94,5 +100,5 @@
     return{plan,rows:sortRows([...chosen.values()]),cap,diagnostics:{mode,monoElement,inputSize:list.length,poolSize:chosen.size,newestReserved:Math.ceil(cap*.20),lockedReserved:lockedIds(options).length}};
   }
 
-  root.candidatePool={build,unitScore,selectPlan,sortRows,chooseMonoElement};
+  root.candidatePool={build,unitScore,selectPlan,sortRows,chooseMonoElement,normalizedPlan};
 })(window);

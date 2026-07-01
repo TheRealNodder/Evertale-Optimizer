@@ -14,10 +14,7 @@
       unit?.__runtimeV2?.tagText,
       unit?.__runtimeV2?.aiTags,
       unit?.optimizerPlan,
-      unit?.optimizerRole,
-      unit?.name,
-      unit?.title,
-      unit?.description
+      unit?.optimizerRole
     ].flat().map(S.keyText).filter(Boolean);
     const text=[...new Set(values)].join(' ');
     const has=(...needles)=>needles.some(v=>text.includes(S.keyText(v)));

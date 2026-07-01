@@ -143,6 +143,35 @@
     if(anchor&&unit!==anchor)reasons.push(...S.arr(graph.edge(anchor,unit).reasons).slice(0,2));
     return [...new Set(reasons)].length?[...new Set(reasons)]:['highest available balanced fit'];
   }
+  function evidenceText(unit,kind){
+    const values=[];
+    const add=value=>{if(value!=null&&value!=='')values.push(value);};
+    if(kind==='active'){
+      add(unit?.activeSkills);
+      S.arr(unit?.forms).forEach(form=>add(form?.activeSkills));
+      S.arr(unit?.skillsByForm).forEach(form=>add(form?.activeSkills));
+    }else{
+      add(unit?.passiveSkills);add(unit?.passiveSkillDetails);
+      S.arr(unit?.forms).forEach(form=>{add(form?.passiveSkills);add(form?.passiveSkillDetails);});
+      S.arr(unit?.skillsByForm).forEach(form=>{add(form?.passiveSkills);add(form?.passiveSkillDetails);});
+    }
+    return S.keyText(values.map(value=>{try{return typeof value==='string'?value:JSON.stringify(value);}catch{return S.txt(value);}}).join(' '));
+  }
+  function explicitEvidence(unit,plan){
+    const words=[plan,...S.arr(C.plans?.[plan])];
+    return{active:S.has(evidenceText(unit,'active'),words),passive:S.has(evidenceText(unit,'passive'),words)};
+  }
+  function featureBucket(value){return Object.fromEntries(Object.entries(value||{}).filter(([,score])=>S.num(score)>0));}
+  function storyPick(unit,id,index,anchor,plan,graph){
+    const f=features(unit),doctrine=f.doctrine||{},evidence=explicitEvidence(unit,plan);
+    return{
+      id:S.txt(id),name:S.txt(unit?.name||unit?.title||id),element:S.clean(unit?.element),slot:index+1,
+      selectedPlan:plan,doctrinePrimaryEngine:S.txt(doctrine.primary||plan),doctrineSecondaryEngines:S.arr(doctrine.secondary),
+      explicitActiveEvidence:evidence.active,explicitPassiveEvidence:evidence.passive,reasons:pickReasons(unit,anchor,plan,graph),
+      applies:featureBucket(f.applies),consumes:featureBucket(f.consumes),enables:featureBucket(f.enables),
+      protects:featureBucket(f.protects),roleScores:featureBucket(f.roles)
+    };
+  }
   function build(pool,allRows,options){
     const byId=new Map(S.arr(allRows).map(u=>[S.txt(u.id),u]));
     const graph=root.synergyGraph.build(pool);
@@ -166,9 +195,9 @@
     }
     const anchor=selectedAnchor(placed,byId,plan),analysis=root.synergyGraph.teamAnalysis(placed,byId,graph);
     const newerMetaContribution=placed.reduce((sum,id)=>sum+(root.metaPriority?root.metaPriority.boost(byId.get(S.txt(id)),'score'):0),0);
-    const storyPicks=placed.map((id,index)=>{const unit=byId.get(S.txt(id));return{id:S.txt(id),name:S.txt(unit?.name||unit?.title||id),slot:index+1,reasons:pickReasons(unit,anchor,plan,graph)};});
+    const storyPicks=placed.map((id,index)=>storyPick(byId.get(S.txt(id)),id,index,anchor,plan,graph));
     return{story,platoons,totalScore:scoreIds(placed,byId,graph)*2+platoons.reduce((a,p)=>a+S.num(p.score),0),diagnostics:{storyOnly,poolSize:pool.length,graphEdges:graph.map.size,selectedAnchor:anchor?{id:S.txt(anchor.id),name:S.txt(anchor.name||anchor.title||anchor.id),entry:S.identity(anchor).entry,family:S.identity(anchor).family}:null,selectedEngine:plan,storyPicks,synergyScore:analysis.synergyScore,conflictPenalty:analysis.conflictPenalty,newerMetaContribution,duplicateKey:'entry-family-name'}};
   }
 
-  root.teamBuilder={build,buildRow,pick,pickAnchor,storyOrder,scoreIds,wantsStoryOnly,planNeed};
+  root.teamBuilder={build,buildRow,pick,pickAnchor,storyOrder,scoreIds,wantsStoryOnly,planNeed,storyPick,explicitEvidence};
 })(window);

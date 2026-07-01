@@ -18,12 +18,12 @@
   }
   function entryText(unit){
     const parts=[];
-    addText(parts,unit);
-    addText(parts,unit?.raw);
-    addText(parts,unit?.refs);
-    addText(parts,unit?.resolved);
-    addText(parts,unit?.internal);
-    addText(parts,unit?.states);
+    addText(parts,unit?.derivedTags);
+    addText(parts,unit?.tags);
+    addText(parts,unit?.manualTags);
+    addText(parts,unit?.runtimeTags);
+    addText(parts,unit?.__runtimeV2?.tagText);
+    addText(parts,unit?.__runtimeV2?.aiTags);
     return S.keyText(parts.join(' '));
   }
   function has(text,...needles){return needles.some(n=>text.includes(S.keyText(n)));}
@@ -39,15 +39,15 @@
       conflicts:{...(features.conflicts||{})},
       roles:{...(features.roles||{})}
     };
-    const text=entryText(unit);
+    const text=S.keyText([entryText(unit),f.activeSkillBlob,f.passiveSkillBlob].filter(Boolean).join(' '));
 
-    if(has(text,'burn_apply','burning','burned','burn attack','inflict burn','frostburn','ignite'))max(f.applies,'burn',1.4);
-    if(has(text,'poison_apply','poisoned','poison attack','inflict poison','mega poison','lethal poison','venom','toxin'))max(f.applies,'poison',1.4);
-    if(has(text,'sleep_apply','sleeping','sleep attack','inflict sleep','deep sleep','slumber','noxious sleep'))max(f.applies,'sleep',1.4);
-    if(has(text,'stun_apply','stunned','stun attack','inflict stun','shock','push back','pushback'))max(f.applies,'stun',1.4);
+    if(has(text,'burn_apply','burnattack','inflict burn','frostburn','ignite'))max(f.applies,'burn',1.4);
+    if(has(text,'poison_apply','poisonattack','inflict poison','mega poison','lethal poison'))max(f.applies,'poison',1.4);
+    if(has(text,'sleep_apply','sleepattack','inflict sleep','deep sleep','noxious sleep'))max(f.applies,'sleep',1.4);
+    if(has(text,'stun_apply','stunattack','inflict stun','push back','pushback'))max(f.applies,'stun',1.4);
     if(has(text,'stealth','super stealth','hidden'))max(f.applies,'stealth',1.1);
 
-    if(has(text,'burn_synergy','burn drive','burn blast','burning enemy','burning enemies','frostburned enemy','vs burning','isburning'))max(f.consumes,'burn',1.5);
+    if(has(text,'burn_synergy','burn drive','burn blast','burn force','burn frenzy','burn devour','frostburned enemy','isburning'))max(f.consumes,'burn',1.5);
     if(has(text,'poison_synergy','poison eater','poison devour','poisoned enemy','poisoned enemies','mega poison eater','vs poison','ispoisoned'))max(f.consumes,'poison',1.5);
     if(has(text,'sleep_synergy','dream hunter','dreamhunt','dream devour','nightmare','sleeping enemy','sleeping enemies','vs sleep','issleeping'))max(f.consumes,'sleep',1.5);
     if(has(text,'stun_synergy','time strike','time buster','stunned enemy','stunned enemies','vs stunned','isstunned'))max(f.consumes,'stun',1.5);

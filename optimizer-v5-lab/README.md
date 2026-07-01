@@ -1,6 +1,6 @@
 # Optimizer V5 Lab
 
-This folder is a staged sandbox for the next optimizer engine. It is intentionally not wired into `optimizer.html` yet.
+This folder contains the live modular V5 optimizer. `optimizer.html` loads `optimizer-v5-loader.js` directly; the legacy V4 engine remains available only as an explicit fallback.
 
 Goal:
 
@@ -9,26 +9,29 @@ Goal:
 - Make the optimizer faster, easier to tune, and smarter about synergy.
 - Keep newer entry priority strong without breaking duplicate protection or roster profile stats.
 
-Planned module order:
+Live module order:
 
 1. `optimizer-v5-shared.js`
 2. `optimizer-duplicate-guard.js`
 3. `optimizer-meta-priority.js`
 4. `optimizer-feature-model.js`
-5. `optimizer-synergy-graph.js`
-6. `optimizer-candidate-pool.js`
-7. `optimizer-team-builder.js`
-8. `optimizerEngineV5.js`
-9. `optimizer-v5-regression-fixtures.js`
-10. `optimizer-v5-test-harness.js`
+5. `optimizer-v5-entry-intent-layer.js`
+6. `optimizer-v5-battle-intent-layer.js`
+7. `optimizer-v5-selector-feature-bridge.js`
+8. `optimizer-v5-doctrine-layer.js`
+9. `optimizer-synergy-graph.js`
+10. `optimizer-candidate-pool.js`
+11. `optimizer-team-builder.js`
+12. `optimizerEngineV5.js`
+13. `optimizer-v5-mono-platoon-fix.js`
+14. `optimizer-v5-regression-fixtures.js`
+15. `optimizer-v5-test-harness.js`
 
-Optional test wire later:
+Live loader:
 
 ```html
-<script src="./optimizer-v5-lab/optimizer-v5-loader.js?v=1"></script>
+<script src="./optimizer-v5-lab/optimizer-v5-loader.js?v=11"></script>
 ```
-
-Do not add that line until we are ready to test V5 on the live optimizer page.
 
 After loading the lab manually and waiting for `OptimizerV5LabLoader.ready`, run:
 
@@ -44,8 +47,9 @@ Run the isolated engine regression fixtures with:
 runOptimizerV5RegressionFixtures()
 ```
 
-The fixtures cover real extracted skill-ID vocabulary, Mono Burn, Multitype Blood,
-Spirit/Void and Sleep/AoE conflicts, strict duplicate keys, and exhausted platoons.
+The fixtures cover real extracted skill-ID vocabulary, false-positive status metadata,
+Mono Burn, Multitype Blood, Spirit/Void and Sleep/AoE conflicts, strict duplicate keys,
+and exhausted platoons.
 
 Design rules:
 

@@ -43,6 +43,14 @@
       assert(!missed.length,'missed skill vocabulary: '+missed.join(', '));return `${cases.length} vocabulary checks`;
     });
 
+    test('resolved metadata does not invent status engines',()=>{
+      const noisy=unit('metadata-only',2,'light',[{id:'SingleAttackA',name:'Attack',description:'Removes Burn, Poison, Sleep, and Stun immunity metadata.'}],{passives:[{id:'StatusImmunity',name:'Status Immunity',description:'Immune to Burn, Poison, Sleep, and Stun.'}]});
+      const f=feature(noisy),statusKeys=['burn','poison','sleep','stun'];
+      const invented=statusKeys.filter(key=>f.applies?.[key]||f.consumes?.[key]);
+      assert(!invented.length,'metadata invented status engines: '+invented.join(', '));
+      return 'status cleanup and immunity text ignored as engine evidence';
+    });
+
     test('researched synergy and conflict edges',()=>{
       const raw=[unit('battery',1,'storm',['RecklessGainSpiritABlueSeaSerpent']),unit('overdrive',2,'light',['HighSpiritAttackDoubleALifeWhiteKnight']),unit('void',3,'fire',['RoyalVoid']),unit('sleep',4,'water',['SleepSingleAJeanneDarkAngel']),unit('aoe',5,'storm',['RandomAttackAElmKouhaiRegular']),unit('summon',6,'earth',['SummonTokenx2ADeath']),unit('blood',7,'dark',['BloodfuryDoubleASnowWhite'])];
       const prepared=E.prepare(raw,{}),byId=new Map(prepared.map(row=>[row.id,row]));

@@ -5,5 +5,6 @@ This folder keeps older optimizer engines that are still useful as fallbacks or 
 Current legacy file:
 
 - `optimizerEngineV4.js`
+- `optimizer-v4-fallback-loader.js`
 
-V4 remains the fallback path for V5. Do not delete this folder unless the live V5 engine has been stable across Story and Platoon builds.
+`optimizer.html` loads the fallback loader first, then loads V5 directly. V4 is retained as an explicit fallback if V5 cannot load; V5 runtime errors are reported instead of silently substituting V4 results.

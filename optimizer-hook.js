@@ -5,7 +5,8 @@
 
    - Adds window.runOptimizer()
    - Auto-runs optimizer whenever refreshOptimizerFromOwned runs
-   - V5 loading is handled by optimizerEngineV4.js compatibility shim only
+   - V5 is loaded directly by optimizer-v5-lab/optimizer-v5-loader.js
+   - V4 remains available through optimizer-legacy only
    ========================================================= */
 
 (function (global) {

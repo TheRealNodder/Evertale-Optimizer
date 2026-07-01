@@ -11,7 +11,15 @@
     const profileState=g.EvertaleRosterProfiles&&typeof g.EvertaleRosterProfiles.loadState==='function'?g.EvertaleRosterProfiles.loadState():null;
     let source=S.arr(units);
     if(g.OptimizerEngineV2&&typeof g.OptimizerEngineV2.enrichOwnedUnits==='function'){
-      try{source=g.OptimizerEngineV2.enrichOwnedUnits(source)}catch{}
+      try{
+        const originalByKey=new Map();
+        source.forEach(unit=>[unit?.id,unit?.sourceId,unit?.family].map(S.clean).filter(Boolean).forEach(key=>originalByKey.set(key,unit)));
+        source=g.OptimizerEngineV2.enrichOwnedUnits(source).map(unit=>{
+          const original=[unit?.id,unit?.sourceId,unit?.family].map(S.clean).filter(Boolean).map(key=>originalByKey.get(key)).find(Boolean)||unit;
+          const tags=[...new Set([...S.arr(original?.derivedTags),...S.arr(original?.tags)].map(S.txt).filter(Boolean))];
+          return{...unit,derivedTags:tags,tags:tags,__runtimeV2:{...(unit.__runtimeV2||{}),tagText:tags.map(S.keyText).join(' '),aiTags:[],v5TagsSanitized:true}};
+        });
+      }catch{}
     }
     let rows=source.map(unit=>{
       const clone={...unit};
@@ -42,12 +50,8 @@
       return result;
     }catch(err){
       root.lastError=err;
-      console.warn('[Optimizer V5] failed; falling back.',err);
-      if(previous&&typeof previous.run==='function'){
-        const fallback=previous.run(units,options)||{};
-        return{...fallback,diagnostics:{...(fallback.diagnostics||{}),v5Failed:true,v5Error:S?.txt(err?.message||err)||'Unknown V5 error',fallbackEngineVersion:fallback.engineVersion||'unknown'}};
-      }
-      return{story:{main:[],back:[]},platoons:[],totalScore:0,engineVersion:'optimizerEngineV5-empty'};
+      console.error('[Optimizer V5] failed. V4 was not applied silently.',err);
+      return{story:{main:[],back:[]},platoons:[],totalScore:0,engineVersion:'optimizerEngineV5-error-no-v4-fallback',diagnostics:{v5Failed:true,v5Error:S?.txt(err?.message||err)||'Unknown V5 error',fallbackAvailable:!!previous,usedFallback:false}};
     }
   }
 

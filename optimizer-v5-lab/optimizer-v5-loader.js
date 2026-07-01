@@ -1,5 +1,6 @@
 (function(g,d){
   'use strict';
+  if(g.OptimizerV5LabLoader?.version==='v11')return;
   const base='./optimizer-v5-lab/';
   const files=[
     'optimizer-v5-shared.js',
@@ -18,21 +19,37 @@
     'optimizer-v5-regression-fixtures.js',
     'optimizer-v5-test-harness.js'
   ];
-  const loader={version:'v8',files:files.slice(),ready:null};
-  function url(src){return base+src+'?v=8';}
+  const loader={version:'v11',files:files.slice(),ready:null,engine:null,error:null,usedFallback:false};
+  function url(src){return base+src+'?v=11';}
+  function finish(){
+    if(!g.OptimizerEngineV5||typeof g.OptimizerEngineV5.run!=='function')throw new Error('Optimizer V5 modules finished loading without an engine.');
+    loader.engine=g.OptimizerEngineV5;
+    g.OptimizerEngine=loader.engine;
+    d.documentElement.dataset.optimizerEngine='v5';
+    d.documentElement.dataset.optimizerV5Loader='v11';
+    return loader.engine;
+  }
+  function fallback(err){
+    loader.error=String(err?.message||err);
+    loader.usedFallback=true;
+    console.error('[Optimizer V5 Loader] V5 failed to load; activating the explicit V4 legacy fallback.',err);
+    const legacy=g.OptimizerEngineV4FallbackLoader;
+    if(legacy&&typeof legacy.activate==='function')return legacy.activate(loader.error);
+    throw err;
+  }
   function loadSequential(index=0){
-    if(index>=files.length)return Promise.resolve(g.OptimizerEngineV5);
+    if(index>=files.length)return Promise.resolve().then(finish);
     return new Promise((resolve,reject)=>{
-      const s=d.createElement('script');s.src=url(files[index]);s.async=false;
+      const s=d.createElement('script');s.src=url(files[index]);s.async=false;s.dataset.optimizerV5Module=files[index];
       s.onload=()=>resolve(loadSequential(index+1));
       s.onerror=()=>reject(new Error('Optimizer V5 lab failed to load '+files[index]));
       d.head.appendChild(s);
     });
   }
   if(d.readyState==='loading'){
-    files.forEach(src=>d.write('<script src="'+url(src)+'"><\/script>'));
-    loader.ready=new Promise(resolve=>g.addEventListener('load',()=>resolve(g.OptimizerEngineV5),{once:true}));
+    files.forEach(src=>d.write('<script data-optimizer-v5-module="'+src+'" src="'+url(src)+'"><\/script>'));
+    loader.ready=new Promise((resolve,reject)=>g.addEventListener('load',()=>{try{resolve(finish());}catch(err){reject(err);}},{once:true}));
   }else loader.ready=loadSequential();
-  loader.ready.catch(err=>console.error('[Optimizer V5 Lab Loader]',err));
+  loader.ready=loader.ready.catch(fallback);
   g.OptimizerV5LabLoader=loader;
 })(window,document);

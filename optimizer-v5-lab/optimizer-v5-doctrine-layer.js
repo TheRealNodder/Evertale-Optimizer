@@ -22,7 +22,10 @@
   function mode(options){return options?.doctrineOverrides?.monoVsRainbow?.selectionMode||options?.teamType||'auto';}
   function selectedPlan(options){
     const C=S.constants||{};
-    return [options?.v5Plan,options?.presetTag,...S.arr(options?.archetypes)].map(v=>C.aliases?.[S.low(v)]||S.low(v)).find(v=>v&&v!=='auto'&&v!=='none')||'offense';
+    const normalize=v=>C.aliases?.[S.low(v)]||S.low(v);
+    const hard=options?.presetMode==='hard'?normalize(options?.presetTag):'';
+    if(hard&&hard!=='auto'&&hard!=='none'&&C.plans?.[hard])return hard;
+    return [options?.v5Plan,options?.presetTag,...S.arr(options?.archetypes)].map(normalize).find(v=>v&&v!=='auto'&&v!=='none'&&C.plans?.[v])||'offense';
   }
   function feature(unit,key,bucket){return S.num(unit?.__v5?.features?.[bucket]?.[key]);}
   function directScore(unit,key){

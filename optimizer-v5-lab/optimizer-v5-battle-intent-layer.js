@@ -13,21 +13,18 @@
   }
   function unitBattleText(unit){
     const parts=[];
-    addText(parts,unit);
-    addText(parts,unit?.forms);
-    addText(parts,unit?.skillsByForm);
-    addText(parts,unit?.descriptionByForm);
-    addText(parts,unit?.raw);
-    addText(parts,unit?.refs);
-    addText(parts,unit?.resolved);
-    addText(parts,unit?.internal);
+    addText(parts,unit?.derivedTags);addText(parts,unit?.tags);addText(parts,unit?.manualTags);addText(parts,unit?.runtimeTags);
+    addText(parts,unit?.__runtimeV2?.tagText);addText(parts,unit?.__runtimeV2?.aiTags);
     const rt=g.OptimizerRuntime?.chunks||{};
     const keys=[unit?.id,unit?.sourceId,unit?.family,unit?.name,unit?.title,unit?.internal?.sourceId,unit?.internal?.family].map(S.clean).filter(Boolean);
     for(const source of [rt.battleIntent,rt.abilityGraph,rt.characters,rt.characterEntries]){
       const rows=Array.isArray(source)?source:(source&&typeof source==='object'?Object.values(source):[]);
       rows.filter(r=>r&&typeof r==='object').forEach(row=>{
         const rowKeys=[row.id,row.sourceId,row.family,row.internalMonsterId,row.name,row.title].map(S.clean).filter(Boolean);
-        if(rowKeys.some(k=>keys.includes(k)))addText(parts,row);
+        if(rowKeys.some(k=>keys.includes(k))){
+          addText(parts,row?.derivedTags);addText(parts,row?.tags);addText(parts,row?.manualTags);addText(parts,row?.runtimeTags);
+          addText(parts,row?.activeSkills);addText(parts,row?.passiveSkills);
+        }
       });
     }
     return S.keyText(parts.join(' '));
@@ -69,7 +66,7 @@
   function extract(unit){
     const f=base.extract(unit);
     f.applies={...(f.applies||{})};f.consumes={...(f.consumes||{})};f.enables={...(f.enables||{})};f.protects={...(f.protects||{})};f.punishes={...(f.punishes||{})};f.conflicts={...(f.conflicts||{})};f.roles={...(f.roles||{})};
-    const text=unitBattleText(unit);
+    const text=S.keyText([unitBattleText(unit),f.activeSkillBlob,f.passiveSkillBlob].filter(Boolean).join(' '));
     apply(text,f);roles(f);
     f.battleIntent={read:true,textLength:text.length};
     return f;

@@ -724,7 +724,7 @@ function buildExampleTeam() {
   try {
     if (style === "best") {
       const preferredPreset = (el("presetSelect")?.value || getPresetPref() || "auto");
-      result = window.OptimizerEngine.run(
+      result = runSelectedEngine(
         examplePool,
         makeExampleOptions(preferredPreset !== "auto" ? preferredPreset : "")
       );
@@ -733,7 +733,7 @@ function buildExampleTeam() {
       options.currentLayout = makeExampleOptions().currentLayout;
       options.slotLocks = makeExampleOptions().slotLocks;
       options.exampleMode = true;
-      result = window.OptimizerEngine.run(examplePool, options);
+      result = runSelectedEngine(examplePool, options);
     }
   } catch (err) {
     console.error("[Optimizer] Example team build failed.", err);
@@ -782,6 +782,42 @@ function resultUnitIds(values) {
   return Array.isArray(values) ? values.map(resultUnitId).filter(Boolean) : [];
 }
 
+function layoutIds(layout = state.layout) {
+  return {
+    storyMain: Array.from({ length: STORY_MAIN }, (_, i) => normId(layout?.storyMain?.[i] || "")),
+    storyBack: Array.from({ length: STORY_BACK }, (_, i) => normId(layout?.storyBack?.[i] || "")),
+    platoons: Array.from({ length: PLATOON_COUNT }, (_, p) =>
+      Array.from({ length: PLATOON_SIZE }, (_, i) => normId(layout?.platoons?.[p]?.[i] || ""))
+    ),
+  };
+}
+
+function lockSummary(locks = state.locks) {
+  const storyMain = Array.from({ length: STORY_MAIN }, (_, i) => !!locks?.storyMain?.[i]);
+  const storyBack = Array.from({ length: STORY_BACK }, (_, i) => !!locks?.storyBack?.[i]);
+  const platoons = Array.from({ length: PLATOON_COUNT }, (_, p) =>
+    Array.from({ length: PLATOON_SIZE }, (_, i) => !!locks?.platoons?.[p]?.[i])
+  );
+  return {
+    storyMain,
+    storyBack,
+    platoons,
+    lockedStoryMain: storyMain.filter(Boolean).length,
+    lockedStoryBack: storyBack.filter(Boolean).length,
+    lockedStorySlots: storyMain.filter(Boolean).length + storyBack.filter(Boolean).length,
+    lockedPlatoonSlots: platoons.flat().filter(Boolean).length,
+  };
+}
+
+function runSelectedEngine(units, options) {
+  window.__lastOptimizerOptions = structuredCloneSafe(options);
+  window.__optimizerOptions = window.__lastOptimizerOptions;
+  const result = window.OptimizerEngine.run(units, options);
+  window.__lastOptimizerEngineResult = result;
+  window.__optimizerResult = result;
+  return result;
+}
+
 function showOptimizerNotice(message) {
   const status = el("optimizerRuntimeStatus") || el("ownedCount");
   if (status && message) status.textContent = message;
@@ -793,21 +829,66 @@ function applyEngineResult(result) {
   // Apply only into unlocked slots. Locked slots keep what user has.
   const main = resultUnitIds(result.story.main);
   const back = resultUnitIds(result.story.back);
+  const before = layoutIds();
+  const skipped = { storyMain: [], storyBack: [], platoons: [] };
 
   for (let i=0;i<STORY_MAIN;i++) {
     if (!state.locks.storyMain[i]) state.layout.storyMain[i] = main[i] || "";
+    else skipped.storyMain.push({ slot: i + 1, kept: before.storyMain[i], proposed: main[i] || "" });
   }
   for (let i=0;i<STORY_BACK;i++) {
     if (!state.locks.storyBack[i]) state.layout.storyBack[i] = back[i] || "";
+    else skipped.storyBack.push({ slot: i + 1, kept: before.storyBack[i], proposed: back[i] || "" });
   }
 
   if (Array.isArray(result.platoons)) {
     for (let p=0;p<PLATOON_COUNT;p++) {
       const row = resultUnitIds(result.platoons[p]?.units || result.platoons[p] || []);
+      const skippedRow = [];
       for (let i=0;i<PLATOON_SIZE;i++) {
         if (!state.locks.platoons[p][i]) state.layout.platoons[p][i] = row[i] || "";
+        else skippedRow.push({ slot: i + 1, kept: before.platoons[p][i], proposed: row[i] || "" });
       }
+      if (skippedRow.length) skipped.platoons.push({ platoon: p + 1, slots: skippedRow });
     }
+  }
+
+  const after = layoutIds();
+  const locks = lockSummary();
+  const application = {
+    engineVersion: result.engineVersion || "unknown",
+    plan: result.plan || "",
+    selectedEngine: result.diagnostics?.selectedEngine || "",
+    buildScope: window.__lastOptimizerOptions?.buildScope || state.mode,
+    locks,
+    skippedLockedSlots: skipped,
+    skippedLockedCount: skipped.storyMain.length + skipped.storyBack.length + skipped.platoons.reduce((sum, row) => sum + row.slots.length, 0),
+    before,
+    after,
+  };
+  result.diagnostics = { ...(result.diagnostics || {}), application };
+  window.__lastOptimizerEngineResult = result;
+  window.__lastOptimizerVisibleLayout = application;
+  const root = document.documentElement;
+  root.dataset.optimizerEngineVersion = application.engineVersion;
+  root.dataset.optimizerPlan = application.plan;
+  root.dataset.optimizerSelectedEngine = application.selectedEngine;
+  root.dataset.optimizerUsedFallback = String(!!result.diagnostics?.usedFallback);
+  root.dataset.optimizerLockedStorySlots = String(locks.lockedStorySlots);
+  root.dataset.optimizerLockedPlatoonSlots = String(locks.lockedPlatoonSlots);
+  root.dataset.optimizerSkippedLockedCount = String(application.skippedLockedCount);
+  root.dataset.optimizerStoryDiagnostics = JSON.stringify((result.diagnostics?.storyPicks || []).map(pick => ({
+    id: pick.id,
+    active: !!pick.explicitActiveEvidence,
+    passive: !!pick.explicitPassiveEvidence,
+    applies: Object.keys(pick.applies || {}),
+    consumes: Object.keys(pick.consumes || {}),
+    reasons: (pick.reasons || []).slice(0, 4),
+  })));
+  const status = el("optimizerRuntimeStatus") || el("ownedCount");
+  if (status) {
+    status.dataset.engineVersion = application.engineVersion;
+    status.dataset.optimizerPlan = application.plan;
   }
 
   saveLayout();
@@ -840,6 +921,14 @@ function buildEngineOptions() {
   options.buildScope = state.mode;
   options.currentLayout = structuredCloneSafe(state.layout);
   options.slotLocks = structuredCloneSafe(state.locks);
+  options.debugSelection = {
+    selectedTeamType: teamType,
+    selectedCorePlan: preset,
+    selectedPrimaryArchetype: primaryArchetype,
+    selectedSecondaryArchetype: secondaryArchetype,
+    buildScope: options.buildScope,
+    ...lockSummary(options.slotLocks),
+  };
 
   return options;
 }
@@ -850,7 +939,7 @@ function runEngine() {
   const owned = state.ownedUnits || [];
   if (!owned.length || !window.OptimizerEngine || typeof window.OptimizerEngine.run !== "function") return;
   const options = buildEngineOptions();
-  const result = window.OptimizerEngine.run(owned, options);
+  const result = runSelectedEngine(owned, options);
   applyEngineResult(result);
 }
 

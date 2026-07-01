@@ -8,31 +8,57 @@
   function add(out,key,words,blob,weight=1){if(S.has(blob,words))out[key]=Math.max(out[key]||0,weight);}
   function roleScore(blob,words){return S.has(blob,words)?1:0;}
   function count(out,keys){return keys.reduce((n,key)=>n+(out[key]?1:0),0);}
+  function addSkillIds(out,value,depth=0){
+    if(value==null||depth>4)return;
+    if(typeof value==='string'||typeof value==='number'){out.push(String(value));return;}
+    if(Array.isArray(value)){value.forEach(row=>addSkillIds(out,row,depth+1));return;}
+    if(typeof value==='object'){
+      for(const key of ['id','internalId','name','skillId'])if(value[key])out.push(String(value[key]));
+      if(!('id' in value)&&!('name' in value))Object.values(value).forEach(row=>addSkillIds(out,row,depth+1));
+    }
+  }
+  function skillBlob(unit,kind){
+    const out=[],active=kind==='active';
+    const addRow=row=>{
+      addSkillIds(out,active?row?.activeSkills:row?.passiveSkills);
+      if(!active)addSkillIds(out,row?.passiveSkillDetails);
+      addSkillIds(out,active?row?.refs?.activeSkills:row?.refs?.passives);
+      addSkillIds(out,active?row?.raw?.activeSkills:row?.raw?.passives);
+    };
+    addRow(unit);S.arr(unit?.forms).forEach(addRow);S.arr(unit?.skillsByForm).forEach(addRow);
+    return S.keyText(out.join(' '));
+  }
+  function statusAction(applies,key,activeBlob,passiveBlob,blocked){
+    if(activeBlob.includes(key)&&!S.has(activeBlob,blocked))applies[key]=Math.max(applies[key]||0,1);
+    const passivePatterns={[key]:[`${key}_skin`,`${key}skin`,`${key}_revenge`,`${key}revenge`,`auto_${key}`]};
+    add(applies,key,passivePatterns[key],passiveBlob,.9);
+  }
   function extract(unit){
     const blob=S.textBlob(unit);
+    const activeSkillBlob=skillBlob(unit,'active'),passiveSkillBlob=skillBlob(unit,'passive'),skillText=`${activeSkillBlob} ${passiveSkillBlob}`;
     const applies={},consumes={},enables={},protects={},conflicts={},punishes={};
 
-    add(consumes,'burn',['burn_drive','burndrive','burn_blast','burnblast','burn_force','burnforce','burn_frenzy','burnfrenzy','burn_devour','burndevour','burning_enemy','frostburned_enemy'],blob);
-    add(consumes,'poison',['poison_eater','poisoneater','poison_devour','poisondevour','poison_fury','poisonfury','poison_drain','poisondrain','poisoned_enemy','mega_poison_eater'],blob);
-    add(consumes,'sleep',['dream_hunter','dreamhunter','dream_hunt','dreamhunt','dream_devour','dreamdevour','dream_buster','dreambuster','dream_ender','dreamender','nightmare','sleep_killer','killsleep','sleeping_enemy'],blob);
-    add(consumes,'stun',['time_strike','timestrike','time_buster','timebuster','time_charge_buster','timechargebuster','stun_burst','stunned_enemy'],blob);
-    add(consumes,'stealth',['stealth_strike','stealthstrike','stealth_fury'],blob);
-    add(consumes,'blood',['bloodfury','blood_fury','bloodthirst','blood_thirst','bloodnova','blood_nova','sacrifice_payoff'],blob);
-    add(consumes,'survivor',['survivor','survival_fury','survival_burst'],blob);
-    add(consumes,'crisis',['crisis','low_hp','desperate_strike','desperation'],blob);
-    add(consumes,'spirit',['spirit_cost','spiritcost','costs_spirit','consume_spirit','spend_spirit','high_spirit_cost','highspirit','ten_spirit','tenspirit','spirit_blast','spiritblast','spirit_crash','spiritcrash','overdrive'],blob);
-    add(consumes,'void',['void','zero_spirit','zerospirit','low_spirit','lowspirit'],blob);
+    add(consumes,'burn',['burn_drive','burndrive','burn_blast','burnblast','burn_force','burnforce','burn_frenzy','burnfrenzy','burn_devour','burndevour','burn_drain','burndrain','burning_enemy','frostburned_enemy'],skillText);
+    add(consumes,'poison',['poison_eater','poisoneater','poison_devour','poisondevour','poison_fury','poisonfury','poison_drain','poisondrain','poisoned_enemy','mega_poison_eater'],skillText);
+    add(consumes,'sleep',['dream_hunter','dreamhunter','dream_hunt','dreamhunt','dream_devour','dreamdevour','dream_buster','dreambuster','dream_ender','dreamender','nightmare','sleep_killer','killsleep','sleeping_enemy'],skillText);
+    add(consumes,'stun',['time_strike','timestrike','time_buster','timebuster','time_charge_buster','timechargebuster','stun_burst','stun_absorb','stunabsorb','stunned_enemy'],skillText);
+    add(consumes,'stealth',['stealth_strike','stealthstrike','stealth_fury'],skillText);
+    add(consumes,'blood',['bloodfury','blood_fury','bloodthirst','blood_thirst','bloodnova','blood_nova','sacrifice_payoff'],skillText);
+    add(consumes,'survivor',['survivor','survival_fury','survival_burst'],skillText);
+    add(consumes,'crisis',['crisis','low_hp','desperate_strike','desperation'],skillText);
+    add(consumes,'spirit',['spirit_cost','spiritcost','costs_spirit','consume_spirit','spend_spirit','high_spirit_cost','highspirit','ten_spirit','tenspirit','spirit_blast','spiritblast','spirit_crash','spiritcrash','overdrive'],skillText);
+    add(consumes,'void',['void','zero_spirit','zerospirit','low_spirit','lowspirit'],skillText);
 
-    add(applies,'burn',['burn_attack','burnattack','inflict_burn','apply_burn','ignite','frostburn','burning_status'],blob);
-    add(applies,'poison',['poison_attack','poisonattack','inflict_poison','apply_poison','venom','toxin','lethal_poison','mega_poison'],blob);
-    add(applies,'sleep',['sleep_attack','sleepattack','inflict_sleep','apply_sleep','slumber','sleeping_status'],blob);
-    add(applies,'stun',['stun_attack','stunattack','inflict_stun','apply_stun','shock','push_back','pushback'],blob);
-    add(applies,'stealth',['gain_stealth','grant_stealth','enter_stealth','stealth_status','hidden'],blob);
-    if(!consumes.burn)add(applies,'burn',['burn'],blob);
-    if(!consumes.poison)add(applies,'poison',['poison'],blob);
-    if(!consumes.sleep)add(applies,'sleep',['sleep'],blob);
-    if(!consumes.stun)add(applies,'stun',['stun'],blob);
-    if(!consumes.stealth)add(applies,'stealth',['stealth'],blob);
+    add(applies,'burn',['burn_attack','burnattack','inflict_burn','apply_burn','ignite','frostburn','burning_status'],activeSkillBlob);
+    add(applies,'poison',['poison_attack','poisonattack','inflict_poison','apply_poison','venom','toxin','lethal_poison','mega_poison'],activeSkillBlob);
+    add(applies,'sleep',['sleep_attack','sleepattack','inflict_sleep','apply_sleep','slumber','sleeping_status'],activeSkillBlob);
+    add(applies,'stun',['stun_attack','stunattack','inflict_stun','apply_stun','shock','push_back','pushback'],activeSkillBlob);
+    add(applies,'stealth',['gain_stealth','grant_stealth','enter_stealth','stealth_status','hidden'],activeSkillBlob);
+    if(!consumes.burn)statusAction(applies,'burn',activeSkillBlob,passiveSkillBlob,['immunity','immune','killer','clear','remove','purify','resist']);
+    if(!consumes.poison)statusAction(applies,'poison',activeSkillBlob,passiveSkillBlob,['immunity','immune','killer','clear','remove','purify','resist']);
+    if(!consumes.sleep)statusAction(applies,'sleep',activeSkillBlob,passiveSkillBlob,['immunity','immune','killer','clear','remove','purify','resist']);
+    if(!consumes.stun)statusAction(applies,'stun',activeSkillBlob,passiveSkillBlob,['immunity','immune','killer','clear','remove','purify','resist','absorb']);
+    if(!consumes.stealth)statusAction(applies,'stealth',activeSkillBlob,passiveSkillBlob,['immunity','immune','killer','clear','remove','purify','resist']);
 
     add(enables,'spirit',['gain_spirit','gainspirit','spirit_gain','spiritgain','add_spirit','addspirit','spirit_recovery','spiritrecovery','spirit_battery','spiritbattery','spirit_charge','spiritcharge','pain_spirit','painspirit','plus_spirit'],blob);
     add(enables,'turn',['turn_grant','turngrant','give_turn','giveturn','grant_turn','grantturn','ally_turn','allyturn','randomallyturn','bloodturn','my_turn','myturn','next_turn'],blob);
@@ -66,7 +92,7 @@
       tempo:count(enables,['spirit','turn','tu_reduction'])*.45
     };
 
-    return{blob,applies,consumes,enables,protects,punishes,conflicts,roles};
+    return{blob,activeSkillBlob,passiveSkillBlob,applies,consumes,enables,protects,punishes,conflicts,roles};
   }
   function attach(rows){
     return S.arr(rows).map(unit=>{
@@ -76,5 +102,5 @@
     });
   }
 
-  root.featureModel={extract,attach};
+  root.featureModel={extract,attach,skillBlob};
 })(window);

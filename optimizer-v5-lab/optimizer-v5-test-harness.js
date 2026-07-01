@@ -89,17 +89,18 @@
   async function run(){
     const units=await ownedUnits();
     if(!units.length)throw new Error('No owned optimizer units are available. Load the optimizer page and roster first.');
-    if(!g.OptimizerEngine||typeof g.OptimizerEngine.run!=='function')throw new Error('Live V4 OptimizerEngine is unavailable.');
+    const v4Engine=g.OptimizerEngineV4||g.OptimizerFallbackEngine;
+    if(!v4Engine||typeof v4Engine.run!=='function')throw new Error('Legacy V4 fallback engine is unavailable.');
     if(!g.OptimizerEngineV5||typeof g.OptimizerEngineV5.run!=='function')throw new Error('OptimizerEngineV5 is unavailable. Await OptimizerV5LabLoader.ready first.');
     const options=currentOptions(),active=platoonActive(options),liveEngine=g.OptimizerEngine;
     let v4Result=null,v5Result=null,v4Error=null,v5Error=null;
-    let start=now();try{v4Result=liveEngine.run(units,clone(options));}catch(err){v4Error=err;console.error('[Optimizer V5 Lab Test] V4 error',err);}const v4Duration=now()-start;
+    let start=now();try{v4Result=v4Engine.run(units,clone(options));}catch(err){v4Error=err;console.error('[Optimizer V5 Lab Test] V4 error',err);}const v4Duration=now()-start;
     start=now();try{v5Result=g.OptimizerEngineV5.run(units,clone(options));}catch(err){v5Error=err;console.error('[Optimizer V5 Lab Test] V5 error; V4 result remains available.',err);}const v5Duration=now()-start;
-    if(root.lastError&&!v5Error){v5Error=root.lastError;console.error('[Optimizer V5 Lab Test] V5 used its fallback; V4 was not affected.',root.lastError);}
+    if(root.lastError&&!v5Error){v5Error=root.lastError;console.error('[Optimizer V5 Lab Test] V5 reported an error; no silent V4 result was substituted.',root.lastError);}
     const empty={story:{main:[],back:[]},platoons:[],totalScore:0,engineVersion:'error'};
     const v4=profile(v4Result||empty,v4Duration,units,active),v5=profile(v5Result||empty,v5Duration,units,active);
     table(v4,v5);
-    const comparison={storyEqual:sameStory(v4Result,v5Result),platoonsEqual:samePlatoons(v4Result,v5Result,active),platoonMode:active,liveV4Unchanged:g.OptimizerEngine===liveEngine};
+    const comparison={storyEqual:sameStory(v4Result,v5Result),platoonsEqual:samePlatoons(v4Result,v5Result,active),platoonMode:active,liveEngineUnchanged:g.OptimizerEngine===liveEngine,liveV5Active:g.OptimizerEngine===g.OptimizerEngineV5};
     console.info('[Optimizer V5 Lab Test] comparison',comparison);
     console.info('[Optimizer V5 Lab Test] V5 diagnostics',v5.diagnostics);
     return{units:units.length,options,v4,v5,comparison,errors:{v4:v4Error,v5:v5Error}};

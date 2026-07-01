@@ -2,6 +2,15 @@
 
 This companion log records small ownership/version updates that need to be reflected in `CATALOG_CODE_PATH_INDEX.md` when the main index is next recompiled.
 
+## 2026-06-30 - Optimizer V5 live ownership and explicit V4 fallback
+
+Routing/ownership update:
+
+- `optimizer.html` now loads `optimizer-legacy/optimizer-v4-fallback-loader.js?v=11` and then `optimizer-v5-lab/optimizer-v5-loader.js?v=11` directly.
+- The old root `optimizerEngineV4.js` compatibility bootstrap moved into `optimizer-legacy/`; V4 is no longer the ambiguous live entrypoint.
+- V5 sanitizes broad V2-derived status tags before feature extraction so immunity and cleanup metadata cannot make every unit look like Burn, Poison, Sleep, and Stun support.
+- `optimizer.js?v=1770082388` exposes last-run options, engine result, visible layout, and lock-skip diagnostics.
+
 ## 2026-06-20 - Desktop details tab placement final guard
 
 Layout/ownership update:
