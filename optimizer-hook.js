@@ -1,8 +1,9 @@
 /* =========================================================
    optimizer-hook.js — Wiring between optimizer.js and engine
    =========================================================
-   Load this AFTER optimizer.js and optimizerEngine.js.
+   Load this AFTER optimizer engines and BEFORE optimizer.js.
 
+   - Loads the V5 optimizer stack after V4 is available
    - Adds window.runOptimizer()
    - Auto-runs optimizer whenever refreshOptimizerFromOwned runs
    - Does not require modifying optimizer.js
@@ -10,6 +11,10 @@
 
 (function (global) {
   "use strict";
+
+  if (!global.OptimizerV5LabLoader) {
+    document.write('<script src="./optimizer-v5-lab/optimizer-v5-loader.js?v=2"><\/script>');
+  }
 
   function runOptimizerSafe() {
     try {
