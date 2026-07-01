@@ -1,7 +1,7 @@
 (function(g,d){
   'use strict';
   const legacy='./optimizer-legacy/optimizerEngineV4.js?v=1';
-  const v5='./optimizer-v5-lab/optimizer-v5-loader.js?v=5';
+  const v5='./optimizer-v5-lab/optimizer-v5-loader.js?v=6';
   function write(src){d.write('<script src="'+src+'"><\/script>');}
   if(d.readyState==='loading'){
     write(legacy);
@@ -17,5 +17,5 @@
     };
     d.head.appendChild(a);
   }
-  g.OptimizerEngineV4Shim={legacy,v5,version:'v4'};
+  g.OptimizerEngineV4Shim={legacy,v5,version:'v5'};
 })(window,document);
