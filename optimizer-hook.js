@@ -13,7 +13,7 @@
   "use strict";
 
   if (!global.OptimizerV5LabLoader) {
-    document.write('<script src="./optimizer-v5-lab/optimizer-v5-loader.js?v=2"><\/script>');
+    document.write('<script src="./optimizer-v5-lab/optimizer-v5-loader.js?v=3"><\/script>');
   }
 
   function runOptimizerSafe() {
