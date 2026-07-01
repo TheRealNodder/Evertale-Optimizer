@@ -13,8 +13,8 @@
     'optimizer-v5-regression-fixtures.js',
     'optimizer-v5-test-harness.js'
   ];
-  const loader={version:'v2',files:files.slice(),ready:null};
-  function url(src){return base+src+'?v=2';}
+  const loader={version:'v3',files:files.slice(),ready:null};
+  function url(src){return base+src+'?v=3';}
   function loadSequential(index=0){
     if(index>=files.length)return Promise.resolve(g.OptimizerEngineV5);
     return new Promise((resolve,reject)=>{
