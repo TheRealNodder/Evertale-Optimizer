@@ -6,6 +6,7 @@ Strict extraction contract:
 - Raw game JSON files are read from the repo apkfiles folder only unless --base is explicitly passed.
 - Generated site/runtime data is written to apkfiles/entries.
 - This script does not scan unrelated folders or guess alternate raw locations.
+- Character family rarity is resolved through the base-form rarity wrapper.
 """
 
 from __future__ import annotations
@@ -19,7 +20,7 @@ from typing import Dict, List
 from path_utils import find_repo_root, resolve_repo_path
 
 CORE_FILES = ("Monster.json", "Weapon.json", "Equipment.json", "Boss.json")
-SCRIPT_RELATIVE = Path("tools/new_structure/build_apk_entry_folders.py")
+SCRIPT_RELATIVE = Path("tools/new_structure/build_apk_entry_folders_base_rarity.py")
 DEFAULT_RAW_RELATIVE = Path("apkfiles")
 DEFAULT_OUTPUT_RELATIVE = Path("apkfiles/entries")
 
