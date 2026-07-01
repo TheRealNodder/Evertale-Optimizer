@@ -9,6 +9,7 @@
     'optimizer-v5-entry-intent-layer.js',
     'optimizer-v5-battle-intent-layer.js',
     'optimizer-v5-selector-feature-bridge.js',
+    'optimizer-v5-doctrine-layer.js',
     'optimizer-synergy-graph.js',
     'optimizer-candidate-pool.js',
     'optimizer-team-builder.js',
@@ -17,8 +18,8 @@
     'optimizer-v5-regression-fixtures.js',
     'optimizer-v5-test-harness.js'
   ];
-  const loader={version:'v7',files:files.slice(),ready:null};
-  function url(src){return base+src+'?v=7';}
+  const loader={version:'v8',files:files.slice(),ready:null};
+  function url(src){return base+src+'?v=8';}
   function loadSequential(index=0){
     if(index>=files.length)return Promise.resolve(g.OptimizerEngineV5);
     return new Promise((resolve,reject)=>{
