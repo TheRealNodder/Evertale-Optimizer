@@ -3,29 +3,23 @@
    =========================================================
    Load this AFTER optimizer engines and BEFORE optimizer.js.
 
-   - Loads the V5 optimizer stack after V4 is available
    - Adds window.runOptimizer()
    - Auto-runs optimizer whenever refreshOptimizerFromOwned runs
-   - Does not require modifying optimizer.js
+   - V5 loading is handled by optimizerEngineV4.js compatibility shim only
    ========================================================= */
 
 (function (global) {
   "use strict";
-
-  if (!global.OptimizerV5LabLoader) {
-    document.write('<script src="./optimizer-v5-lab/optimizer-v5-loader.js?v=6"><\/script>');
-  }
 
   function runOptimizerSafe() {
     try {
       const owned = global.__optimizerOwnedUnits || [];
       if (!owned.length || !global.OptimizerEngine || typeof global.OptimizerEngine.run !== "function") return;
 
-      const options = global.__optimizerOptions || {}; // optional injection point
+      const options = global.__optimizerOptions || {};
       const result = global.OptimizerEngine.run(owned, options);
       global.__optimizerResult = result;
 
-      // If render functions accept a payload, pass it; else call without args.
       if (typeof global.renderStory === "function") {
         try { global.renderStory(result.story); } catch { global.renderStory(); }
       }
@@ -39,7 +33,6 @@
 
   global.runOptimizer = runOptimizerSafe;
 
-  // Monkeypatch refreshOptimizerFromOwned if present
   const original = global.refreshOptimizerFromOwned;
   if (typeof original === "function") {
     global.refreshOptimizerFromOwned = function () {
@@ -48,7 +41,6 @@
       return r;
     };
   } else {
-    // fallback: run on DOMContentLoaded
     document.addEventListener("DOMContentLoaded", () => runOptimizerSafe());
   }
 
