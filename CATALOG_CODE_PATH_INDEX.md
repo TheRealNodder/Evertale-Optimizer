@@ -341,11 +341,11 @@ Current optimizer JS:
 14. `abilityScoreEngine.js?v=1`
 15. `optimizerEngineV2.js?v=3`
 16. `optimizerEngineV3.js?v=2`
-17. `optimizer-legacy/optimizer-v4-fallback-loader.js?v=11`
-18. `optimizer-v5-lab/optimizer-v5-loader.js?v=11`
+17. `optimizer-legacy/optimizer-v4-fallback-loader.js?v=12`
+18. `optimizer-v5-lab/optimizer-v5-loader.js?v=12`
 19. `optimizer-hook.js?v=1770082379`
 20. `optimizerRuntimeBootstrap.js?v=1`
-21. `optimizer.js?v=1770082388`
+21. `optimizer.js?v=1770082389`
 22. `optimizer-showcase.js?v=4`
 
 Optimizer data flow:

@@ -30,7 +30,7 @@ Live module order:
 Live loader:
 
 ```html
-<script src="./optimizer-v5-lab/optimizer-v5-loader.js?v=11"></script>
+<script src="./optimizer-v5-lab/optimizer-v5-loader.js?v=12"></script>
 ```
 
 After loading the lab manually and waiting for `OptimizerV5LabLoader.ready`, run:
@@ -50,6 +50,14 @@ runOptimizerV5RegressionFixtures()
 The fixtures cover real extracted skill-ID vocabulary, false-positive status metadata,
 Mono Burn, Multitype Blood, Spirit/Void and Sleep/AoE conflicts, strict duplicate keys,
 and exhausted platoons.
+
+Element doctrine rules:
+
+- Direct active/passive evidence defines engine membership and outweighs element.
+- Primary-element affinity adds at most `0.8`; same-element support without direct engine evidence receives only `0.35` and is never labeled setup/payoff.
+- Secondary-element affinity adds `0.3` only when direct engine evidence exists.
+- Mono mode first selects a preferred doctrine element with enough valid engine units; when the owned roster is too small, direct off-element evidence can fill the row.
+- Every Story diagnostic reports doctrine primary/secondary engines, element affinity, and direct-evidence score.
 
 Design rules:
 

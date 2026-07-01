@@ -1,7 +1,7 @@
 (function(g,d){
   'use strict';
   const src='./optimizer-legacy/optimizerEngineV4.js?v=3';
-  const loader={version:'v11',src,ready:null,engine:null,active:false,error:null};
+  const loader={version:'v12',src,ready:null,engine:null,active:false,error:null};
   function finish(){
     if(!g.OptimizerEngineV4||typeof g.OptimizerEngineV4.run!=='function')throw new Error('Legacy Optimizer V4 did not load.');
     loader.engine=g.OptimizerEngineV4;

@@ -2,6 +2,16 @@
 
 This companion log records small ownership/version updates that need to be reflected in `CATALOG_CODE_PATH_INDEX.md` when the main index is next recompiled.
 
+## 2026-06-30 - Elemental optimizer doctrine authority
+
+Optimizer intelligence update:
+
+- Bumped the live V5 and explicit V4 fallback loaders to `v12`.
+- Centralized primary/secondary element affinities, direct engine evidence, support eligibility, overlap pruning, and Mono-element preference in `optimizer-v5-doctrine-layer.js`.
+- Element affinity is now only a bounded score boost; active/passive engine evidence overrides element, and element alone cannot create setup/payoff evidence.
+- Added Story doctrine diagnostics plus regression coverage for off-element evidence, neutral same-element units, secondary-engine pruning, and Mono Burn preferring Fire.
+- Bumped `optimizer.js` to `v=1770082389` so browser-visible debug summaries include doctrine primary/secondary engines plus affinity and direct-evidence scores.
+
 ## 2026-06-30 - Optimizer V5 live ownership and explicit V4 fallback
 
 Routing/ownership update:

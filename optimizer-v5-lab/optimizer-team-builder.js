@@ -16,12 +16,16 @@
     else if(plan==='blood')value+=S.num(f.enables?.summon);
     return value;
   }
-  function anchorScore(unit,plan){return S.num(unit?.__v5?.score)+role(unit,'anchor')*6200+planFit(unit,plan)*2600+S.num(unit?.__v5?.synergyCenter)*.12+(root.metaPriority?root.metaPriority.boost(unit,'anchor'):0);}
+  function doctrineProfile(unit,plan){return root.doctrine?.planProfile?root.doctrine.planProfile(unit,plan):{direct:0,support:0,affinity:0,eligible:false};}
+  function anchorScore(unit,plan){const d=doctrineProfile(unit,plan);return S.num(unit?.__v5?.score)+role(unit,'anchor')*6200+planFit(unit,plan)*2600+d.direct*1100+d.affinity*400+S.num(unit?.__v5?.synergyCenter)*.12+(root.metaPriority?root.metaPriority.boost(unit,'anchor'):0);}
   function monoOk(unit,ids,byId,options){
     if(mode(options)!=='force_mono')return true;
     const first=S.arr(ids).map(id=>byId.get(S.txt(id))).find(Boolean);
     const target=S.clean(options?.v5MonoElement||first?.element);
-    return !target||target===S.clean(unit.element);
+    if(!target||target===S.clean(unit.element))return true;
+    if(options?.v5MonoStrict!==false)return false;
+    const profile=doctrineProfile(unit,options?.v5Plan||'offense');
+    return profile.direct>0||profile.support>0;
   }
   function planNeed(ids,byId,plan){
     const statusPlans=new Set(['burn','poison','sleep','stun','stealth']);
@@ -82,6 +86,7 @@
       if(guard.rowConflict(unit,ids,byId))continue;
       if(!monoOk(unit,ids,byId,options))continue;
       let score=S.num(unit?.__v5?.score);
+      const doctrine=doctrineProfile(unit,plan);
       const after=root.synergyGraph.teamAnalysis([...ids,id],byId,graph);
       score+=(after.score-before.score)*.55;
       score+=needBonus(unit,need,plan);
@@ -89,6 +94,7 @@
       else if(role(unit,'support')<=0&&role(unit,'tank')<=0&&role(unit,'cleanser')<=0&&role(unit,'tempo')<=0)score-=900;
       if(anchor&&(Object.keys(features(unit).protects||{}).length||features(unit).enables?.turn||features(unit).enables?.tu_reduction||features(unit).enables?.spirit))score+=1700;
       if(mode(options)==='force_rainbow'&&ids.length&& !S.arr(ids).map(x=>S.clean(byId.get(S.txt(x))?.element)).includes(S.clean(unit?.element))&&after.score>before.score)score+=650;
+      if(doctrine.eligible)score+=doctrine.direct*900+doctrine.affinity*450+Math.min(2,doctrine.support)*180;
       score+=root.metaPriority?root.metaPriority.boost(unit,'pick'):0;
       if(score>bestScore){best=unit;bestScore=score;}
       if(++seen>110&&best)break;
@@ -166,7 +172,9 @@
     const f=features(unit),doctrine=f.doctrine||{},evidence=explicitEvidence(unit,plan);
     return{
       id:S.txt(id),name:S.txt(unit?.name||unit?.title||id),element:S.clean(unit?.element),slot:index+1,
-      selectedPlan:plan,doctrinePrimaryEngine:S.txt(doctrine.primary||plan),doctrineSecondaryEngines:S.arr(doctrine.secondary),
+      selectedPlan:plan,doctrinePrimary:S.txt(doctrine.primary||plan),doctrineSecondary:S.arr(doctrine.secondary),
+      doctrinePrimaryEngine:S.txt(doctrine.primary||plan),doctrineSecondaryEngines:S.arr(doctrine.secondary),
+      elementAffinityScore:S.num(doctrine.selectedPlanElementAffinityScore),directEvidenceScore:S.num(doctrine.selectedPlanDirectScore),
       explicitActiveEvidence:evidence.active,explicitPassiveEvidence:evidence.passive,reasons:pickReasons(unit,anchor,plan,graph),
       applies:featureBucket(f.applies),consumes:featureBucket(f.consumes),enables:featureBucket(f.enables),
       protects:featureBucket(f.protects),roleScores:featureBucket(f.roles)

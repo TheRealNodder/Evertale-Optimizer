@@ -879,6 +879,12 @@ function applyEngineResult(result) {
   root.dataset.optimizerSkippedLockedCount = String(application.skippedLockedCount);
   root.dataset.optimizerStoryDiagnostics = JSON.stringify((result.diagnostics?.storyPicks || []).map(pick => ({
     id: pick.id,
+    element: pick.element,
+    selectedPlan: pick.selectedPlan,
+    doctrinePrimary: pick.doctrinePrimary,
+    doctrineSecondary: pick.doctrineSecondary,
+    elementAffinityScore: pick.elementAffinityScore,
+    directEvidenceScore: pick.directEvidenceScore,
     active: !!pick.explicitActiveEvidence,
     passive: !!pick.explicitPassiveEvidence,
     applies: Object.keys(pick.applies || {}),

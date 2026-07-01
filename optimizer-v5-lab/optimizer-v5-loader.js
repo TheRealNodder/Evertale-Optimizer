@@ -1,6 +1,6 @@
 (function(g,d){
   'use strict';
-  if(g.OptimizerV5LabLoader?.version==='v11')return;
+  if(g.OptimizerV5LabLoader?.version==='v12')return;
   const base='./optimizer-v5-lab/';
   const files=[
     'optimizer-v5-shared.js',
@@ -19,14 +19,14 @@
     'optimizer-v5-regression-fixtures.js',
     'optimizer-v5-test-harness.js'
   ];
-  const loader={version:'v11',files:files.slice(),ready:null,engine:null,error:null,usedFallback:false};
-  function url(src){return base+src+'?v=11';}
+  const loader={version:'v12',files:files.slice(),ready:null,engine:null,error:null,usedFallback:false};
+  function url(src){return base+src+'?v=12';}
   function finish(){
     if(!g.OptimizerEngineV5||typeof g.OptimizerEngineV5.run!=='function')throw new Error('Optimizer V5 modules finished loading without an engine.');
     loader.engine=g.OptimizerEngineV5;
     g.OptimizerEngine=loader.engine;
     d.documentElement.dataset.optimizerEngine='v5';
-    d.documentElement.dataset.optimizerV5Loader='v11';
+    d.documentElement.dataset.optimizerV5Loader='v12';
     return loader.engine;
   }
   function fallback(err){

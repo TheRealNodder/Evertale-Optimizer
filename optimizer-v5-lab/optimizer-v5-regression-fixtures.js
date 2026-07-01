@@ -51,6 +51,31 @@
       return 'status cleanup and immunity text ignored as engine evidence';
     });
 
+    test('element affinity never replaces direct engine evidence',()=>{
+      const opts=options('story','auto','burn');
+      const rows=E.prepare([
+        unit('water-burn',10,'water',['BurnSelfSpiritChargeBAstridBride']),
+        unit('fire-neutral',11,'fire',['SingleAttackA']),
+        unit('fire-support',12,'fire',['GiveTurnALudmillaRegular']),
+        unit('dual-engine',13,'dark',['BurnSelfSpiritChargeBAstridBride','PoisonTouchRandomDoubleABahamut'])
+      ],opts),byId=new Map(rows.map(row=>[row.id,row]));
+      const water=byId.get('water-burn').__v5.features.doctrine,neutral=byId.get('fire-neutral').__v5.features.doctrine,support=byId.get('fire-support').__v5.features.doctrine,dual=byId.get('dual-engine').__v5.features.doctrine;
+      assert(water.primary==='burn'&&water.selectedPlanDirectScore>0,'off-element direct Burn evidence was rejected');
+      assert(neutral.primary!=='burn'&&neutral.selectedPlanDirectScore===0&&neutral.selectedPlanElementAffinityScore===0,'Fire alone became Burn evidence');
+      assert(support.primary!=='burn'&&support.selectedPlanElementAffinityScore>0,'Fire support did not receive a bounded affinity boost');
+      assert(dual.primary==='burn'&&dual.secondary.includes('poison'),'strong direct secondary evidence was pruned');
+      return 'direct evidence overrides element; affinity remains a support-only boost';
+    });
+
+    test('Mono doctrine prefers the selected engine element',()=>{
+      const fire=Array.from({length:8},(_,i)=>unit(`mono-fire-${i}`,20+i,'fire',[i%2?'BurnDriveAChineseRizette':'BurnSelfSpiritChargeBAstridBride']));
+      const dark=Array.from({length:10},(_,i)=>unit(`mono-dark-${i}`,50+i,'dark',['BurnDriveAChineseRizette'],{atk:1800+i*10}));
+      const opts=options('story','force_mono','burn'),prepared=E.prepare([...fire,...dark],opts),candidate=root.candidatePool.build(prepared,opts);
+      assert(candidate.diagnostics?.monoElement==='fire','Mono Burn did not prefer Fire');
+      assert(candidate.diagnostics?.monoStrict===true,'Mono Burn should be strict with eight valid Fire units');
+      return 'Burn mono selected Fire with eight valid engine units';
+    });
+
     test('researched synergy and conflict edges',()=>{
       const raw=[unit('battery',1,'storm',['RecklessGainSpiritABlueSeaSerpent']),unit('overdrive',2,'light',['HighSpiritAttackDoubleALifeWhiteKnight']),unit('void',3,'fire',['RoyalVoid']),unit('sleep',4,'water',['SleepSingleAJeanneDarkAngel']),unit('aoe',5,'storm',['RandomAttackAElmKouhaiRegular']),unit('summon',6,'earth',['SummonTokenx2ADeath']),unit('blood',7,'dark',['BloodfuryDoubleASnowWhite'])];
       const prepared=E.prepare(raw,{}),byId=new Map(prepared.map(row=>[row.id,row]));
@@ -70,6 +95,7 @@
       assert(new Set(picked.map(id=>byId.get(id).element)).size===1,'Mono Story mixed elements');
       assert(result.diagnostics?.selectedEngine==='burn','Burn was not selected as the engine');
       assert(picked.some(id=>hasFeature(byId.get(id),'applies','burn'))&&picked.some(id=>hasFeature(byId.get(id),'consumes','burn')),'Mono Burn lacks setup/payoff');
+      assert(result.diagnostics?.storyPicks?.every(row=>'elementAffinityScore'in row&&'directEvidenceScore'in row&&'doctrinePrimary'in row),'Story doctrine diagnostics are incomplete');
       return `${picked.length} fire units with Burn setup/payoff`;
     });
 

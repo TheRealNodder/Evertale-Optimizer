@@ -39,7 +39,7 @@
       const opts={...(options||{}),optimizerSearchMode:'v5-lab'};
       const prepared=prepare(units||[],opts);
       const candidate=root.candidatePool.build(prepared,opts);
-      const result=root.teamBuilder.build(candidate.rows,prepared,{...opts,v5Plan:candidate.plan,v5MonoElement:candidate.diagnostics?.monoElement||'',v5CandidateDiagnostics:candidate.diagnostics});
+      const result=root.teamBuilder.build(candidate.rows,prepared,{...opts,v5Plan:candidate.plan,v5MonoElement:candidate.diagnostics?.monoElement||'',v5MonoStrict:candidate.diagnostics?.monoStrict!==false,v5CandidateDiagnostics:candidate.diagnostics});
       result.engineVersion='optimizerEngineV5-live-doctrine';
       result.plan=candidate.plan;
       result.aiAware=true;

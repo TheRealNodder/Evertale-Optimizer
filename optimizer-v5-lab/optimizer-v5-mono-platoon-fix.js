@@ -14,7 +14,7 @@
       const prepared=base.prepare(units||[],opts);
       const candidate=root.candidatePool.build(prepared,opts);
       const monoElement=isPlatoonScope(opts)?'':(candidate.diagnostics?.monoElement||'');
-      const result=root.teamBuilder.build(candidate.rows,prepared,{...opts,v5Plan:candidate.plan,v5MonoElement:monoElement,v5CandidateDiagnostics:candidate.diagnostics});
+      const result=root.teamBuilder.build(candidate.rows,prepared,{...opts,v5Plan:candidate.plan,v5MonoElement:monoElement,v5MonoStrict:candidate.diagnostics?.monoStrict!==false,v5CandidateDiagnostics:candidate.diagnostics});
       result.engineVersion='optimizerEngineV5-live-doctrine-mono-row';
       result.plan=candidate.plan;
       result.aiAware=true;

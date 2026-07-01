@@ -12,6 +12,10 @@
     if(f.roles){score+=S.num(f.roles.anchor)*2400+S.num(f.roles.dps)*1800+S.num(f.roles.support)*1400+S.num(f.roles.control)*1400+S.num(f.roles.tank)*1200;}
     const fit=planValue(unit,plan);if(fit)score+=Math.min(2,fit)*2200;
     if(plan&&f.consumes&&f.consumes[plan])score+=1000;
+    if(root.doctrine&&typeof root.doctrine.planProfile==='function'){
+      const doctrine=root.doctrine.planProfile(unit,plan);
+      if(doctrine.eligible)score+=doctrine.direct*1200+doctrine.affinity*700+Math.min(2,doctrine.support)*220;
+    }
     score+=newer;
     return score;
   }
@@ -60,6 +64,7 @@
     return [...new Set(ids)];
   }
   function chooseMonoElement(rows,plan){
+    if(root.doctrine&&typeof root.doctrine.monoChoice==='function')return root.doctrine.monoChoice(rows,plan,8).element;
     const totals=new Map();
     S.arr(rows).slice(0,60).forEach(unit=>{
       const element=S.clean(unit?.element);if(!element)return;
@@ -83,8 +88,9 @@
     const plan=selectPlan(options||{},list);
     const base=list.map(unit=>{const clone={...unit};clone.__v5={...(clone.__v5||{}),score:unitScore(unit,plan)};return clone;});
     const sorted=sortRows(addCenters(base));
-    const mode=selectionMode(options),monoElement=mode==='force_mono'?chooseMonoElement(sorted,plan):'';
-    if(sorted.length<=cap)return{plan,rows:sorted,cap,diagnostics:{mode,monoElement,inputSize:list.length,poolSize:sorted.length}};
+    const mode=selectionMode(options),monoChoice=mode==='force_mono'&&root.doctrine?.monoChoice?root.doctrine.monoChoice(sorted,plan,8):null,monoElement=mode==='force_mono'?(monoChoice?.element||chooseMonoElement(sorted,plan)):'';
+    const monoDiagnostics={monoElement,monoStrict:!!monoChoice?.strict,monoValidCount:S.num(monoChoice?.validCount),monoPreferred:S.arr(monoChoice?.preferred)};
+    if(sorted.length<=cap)return{plan,rows:sorted,cap,diagnostics:{mode,...monoDiagnostics,inputSize:list.length,poolSize:sorted.length}};
     const byId=new Map(sorted.map(unit=>[S.txt(unit?.id),unit]));
     const chosen=new Map(),add=u=>{const id=S.txt(u?.id);if(id&&chosen.size<cap&&!chosen.has(id))chosen.set(id,u);};
     lockedIds(options).forEach(id=>add(byId.get(id)));
@@ -97,7 +103,7 @@
     if(mode==='force_mono'&&monoElement)sorted.filter(unit=>S.clean(unit?.element)===monoElement).slice(0,Math.ceil(cap*.10)).forEach(add);
     if(mode==='force_rainbow')[...sorted].sort((a,b)=>S.num(b?.__v5?.crossElementSynergy)-S.num(a?.__v5?.crossElementSynergy)).slice(0,Math.ceil(cap*.10)).forEach(add);
     for(const u of sorted){if(chosen.size>=cap)break;add(u);}
-    return{plan,rows:sortRows([...chosen.values()]),cap,diagnostics:{mode,monoElement,inputSize:list.length,poolSize:chosen.size,newestReserved:Math.ceil(cap*.20),lockedReserved:lockedIds(options).length}};
+    return{plan,rows:sortRows([...chosen.values()]),cap,diagnostics:{mode,...monoDiagnostics,inputSize:list.length,poolSize:chosen.size,newestReserved:Math.ceil(cap*.20),lockedReserved:lockedIds(options).length}};
   }
 
   root.candidatePool={build,unitScore,selectPlan,sortRows,chooseMonoElement,normalizedPlan};
