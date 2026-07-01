@@ -31,26 +31,26 @@
       const prepared=prepare(units||[],opts);
       const candidate=root.candidatePool.build(prepared,opts);
       const result=root.teamBuilder.build(candidate.rows,prepared,{...opts,v5Plan:candidate.plan,v5MonoElement:candidate.diagnostics?.monoElement||'',v5CandidateDiagnostics:candidate.diagnostics});
-      result.engineVersion='optimizerEngineV5-lab';
+      result.engineVersion='optimizerEngineV5-live';
       result.plan=candidate.plan;
       result.aiAware=true;
       result.duplicateKey='entry-family-name';
-      result.diagnostics={...(result.diagnostics||{}),preparedUnits:prepared.length,candidateCap:candidate.cap,candidatePool:candidate.diagnostics,plan:candidate.plan,lab:true};
+      result.diagnostics={...(result.diagnostics||{}),preparedUnits:prepared.length,candidateCap:candidate.cap,candidatePool:candidate.diagnostics,plan:candidate.plan,lab:true,active:true,fallbackAvailable:!!previous};
       root.lastError=null;
-      try{console.info('[Optimizer V5 Lab]',result.diagnostics);}catch{}
+      try{console.info('[Optimizer V5]',result.diagnostics);}catch{}
       return result;
     }catch(err){
       root.lastError=err;
-      console.warn('[Optimizer V5 Lab] failed; falling back.',err);
+      console.warn('[Optimizer V5] failed; falling back.',err);
       if(previous&&typeof previous.run==='function'){
         const fallback=previous.run(units,options)||{};
         return{...fallback,diagnostics:{...(fallback.diagnostics||{}),v5Failed:true,v5Error:S?.txt(err?.message||err)||'Unknown V5 error',fallbackEngineVersion:fallback.engineVersion||'unknown'}};
       }
-      return{story:{main:[],back:[]},platoons:[],totalScore:0,engineVersion:'optimizerEngineV5-lab-empty'};
+      return{story:{main:[],back:[]},platoons:[],totalScore:0,engineVersion:'optimizerEngineV5-empty'};
     }
   }
 
-  root.engine={run,prepare,missing};
+  root.engine={run,prepare,missing,previous};
   g.OptimizerEngineV5=root.engine;
-  // Intentional: do not assign g.OptimizerEngine here yet. The lab engine is not live-wired.
+  g.OptimizerEngine=g.OptimizerEngineV5;
 })(window);
