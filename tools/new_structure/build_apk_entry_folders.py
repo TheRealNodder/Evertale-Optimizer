@@ -25,7 +25,7 @@ from entry_checkpoint import load_marker as load_entry_marker
 from entry_checkpoint import write_marker as write_entry_marker
 from path_utils import find_repo_root, resolve_repo_path
 
-SCRIPT_VERSION = "6-character-family-states"
+SCRIPT_VERSION = "7-base-form-rarity"
 TOOL_NAME = "build_apk_entry_folders"
 IMAGEKIT_BASE = "https://ik.imagekit.io/r8fsa98s9"
 ROOT_MARKERS = ("apkfiles", "tools")
@@ -504,18 +504,66 @@ def normalize_entry(item: Dict[str, Any], category: str, order_index: int, displ
 
 
 def infer_family_rarity(forms: List[Dict[str, Any]]) -> str:
-    max_stars = 0
-    for item in forms:
+    """Infer family rarity from the true base form, not evolvedStars.
+
+    Priority:
+    1. Use the explicit Family01/base form when available.
+    2. Fall back to the lowest numbered raw form.
+    3. Fall back to the minimum positive stars in the family.
+    4. Return N when nothing usable exists.
+
+    evolvedStars is intentionally ignored for rarity classification. It is a
+    form/evolution display signal, not the family rarity authority.
+    """
+    if not forms:
+        return "N"
+
+    def safe_int(value: Any) -> int:
         try:
-            max_stars = max(max_stars, int(item.get("stars") or 0), int(item.get("evolvedStars") or 0))
+            return int(value or 0)
         except Exception:
-            pass
-    if max_stars >= 5:
-        return "SSR"
-    if max_stars >= 3:
-        return "SR"
-    if max_stars >= 2:
-        return "R"
+            return 0
+
+    def stars_to_rarity(base_stars: int) -> str:
+        if base_stars >= 5:
+            return "SSR"
+        if base_stars == 4:
+            return "SR"
+        if base_stars == 3:
+            return "R"
+        return "N"
+
+    base_forms = []
+    numbered_forms = []
+    positive_stars = []
+
+    for item in forms:
+        if not isinstance(item, dict):
+            continue
+
+        internal_id = get_internal_id(item)
+        form_number = form_number_from_internal_id(internal_id)
+        stars = safe_int(item.get("stars"))
+
+        if stars > 0:
+            positive_stars.append(stars)
+
+        if form_number == 1:
+            base_forms.append(item)
+
+        if form_number is not None:
+            numbered_forms.append((form_number, item))
+
+    if base_forms:
+        return stars_to_rarity(safe_int(base_forms[0].get("stars")))
+
+    if numbered_forms:
+        numbered_forms.sort(key=lambda row: row[0])
+        return stars_to_rarity(safe_int(numbered_forms[0][1].get("stars")))
+
+    if positive_stars:
+        return stars_to_rarity(min(positive_stars))
+
     return "N"
 
 
