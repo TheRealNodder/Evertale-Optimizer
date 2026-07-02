@@ -589,6 +589,10 @@ def nearest_form_for_state(forms_by_num: Dict[int, Dict[str, Any]], form_num: in
 
 def build_character_family_files(output_dir: Path, ordered: List[Tuple[str, Optional[str]]], by_id: Dict[str, Dict[str, Any]], resolvers: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
     localizable = resolvers["Localizable"]
+    fallback_payload = try_load_json(output_dir / "maps" / "character_image_fallbacks.json") or {}
+    image_fallbacks = fallback_payload.get("sourceAliases", {}) if isinstance(fallback_payload, dict) else {}
+    if not isinstance(image_fallbacks, dict):
+        image_fallbacks = {}
     families_dir = output_dir / "characters" / "families"
     family_order: List[str] = []
     grouped: Dict[str, List[Dict[str, Any]]] = {}
@@ -622,17 +626,25 @@ def build_character_family_files(output_dir: Path, ordered: List[Tuple[str, Opti
             loc = localize_character(localizable, state_source_id, fallback_name)
             nearest = nearest_form_for_state(forms_by_num, form_num) or {}
             nearest_id = get_internal_id(nearest) if nearest else None
-            states.append({
+            has_raw_form = state_source_id in by_id
+            # Keep state identity independent from image identity. Only reuse a
+            # different same-family image after the URL audit confirms that the
+            # expected remote asset is missing.
+            image_source_id = str(image_fallbacks.get(state_source_id) or state_source_id)
+            state_entry = {
                 "state": state_name,
                 "stars": stars,
                 "sourceId": state_source_id,
                 "dataSourceId": nearest_id,
-                "image": image_url("characters", state_source_id),
+                "image": image_url("characters", image_source_id),
                 "name": loc.get("name") or fallback_name,
                 "title": loc.get("title") or fallback_title,
                 "description": loc.get("description") or "",
-                "hasRawForm": state_source_id in by_id,
-            })
+                "hasRawForm": has_raw_form,
+            }
+            if image_source_id != state_source_id:
+                state_entry["imageSourceId"] = image_source_id
+            states.append(state_entry)
         family_source_hash = sha256_data({"family": family, "forms": forms, "states": states})
         filename = f"{slugify(family)}.json"
         family_path = families_dir / filename

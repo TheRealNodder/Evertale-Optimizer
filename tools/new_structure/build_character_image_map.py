@@ -49,9 +49,13 @@ def default_states_for_family(family: str, rarity: str, image_base: str) -> List
 
 def normalize_state(row: Dict[str, Any], family: str, image_base: str) -> Dict[str, Any]:
     source_id = str(row.get("sourceId") or row.get("imageSourceId") or row.get("dataSourceId") or "").strip() or f"{family}01"
-    url = str(row.get("image") or row.get("url") or "").strip() or image_url(source_id, image_base)
+    image_source_id = str(row.get("imageSourceId") or "").strip() or source_id
+    url = str(row.get("image") or row.get("url") or "").strip() or image_url(image_source_id, image_base)
     file_name = str(row.get("file") or Path(url.split("?")[0]).name or f"{source_id}.png")
-    return {"state": row.get("state") or "base", "sourceId": source_id, "dataSourceId": row.get("dataSourceId") or source_id, "file": file_name, "url": url, "stars": row.get("stars"), "title": row.get("title", ""), "description": row.get("description", "")}
+    normalized = {"state": row.get("state") or "base", "sourceId": source_id, "dataSourceId": row.get("dataSourceId") or source_id, "file": file_name, "url": url, "stars": row.get("stars"), "title": row.get("title", ""), "description": row.get("description", "")}
+    if image_source_id != source_id:
+        normalized["imageSourceId"] = image_source_id
+    return normalized
 
 
 def build_from_family_file(path: Path, image_base: str) -> Optional[Dict[str, Any]]:

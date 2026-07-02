@@ -27,7 +27,7 @@
   }
 
   function inferRarity(row,familyEntry){
-    const explicit=clean(row?.rarity||familyEntry?.rarity).toUpperCase();
+    const explicit=clean(familyEntry?.rarity||row?.rarity).toUpperCase();
     if(explicit)return explicit;
     const stars=Number(row?.stars||row?.raw?.stars||0);
     const evolved=Number(row?.evolvedStars||row?.raw?.evolvedStars||0);
@@ -90,7 +90,10 @@
     const familyPromise=typeof loader?.getCharacterFamiliesMap==='function'?loader.getCharacterFamiliesMap():readJson(FAMILY_BUNDLE_URL);
     stateMapPromise=Promise.all([imagePromise,familyPromise]).then(([imageMap,familySource])=>{
       const map=new Map();
-      Object.values(imageMap?.families||{}).forEach(entry=>addEntry(map,entry));
+      // Loader.getCharacterImageMap() returns the families object directly;
+      // the raw JSON fallback returns the outer payload. Accept both shapes so
+      // audited image overrides always win before generated family states.
+      Object.values(imageMap?.families||imageMap||{}).forEach(entry=>addEntry(map,entry));
       const familyEntries=familySource instanceof Map?[...familySource.values()]:arr(familySource?.entries);
       familyEntries.forEach(entry=>addEntry(map,entry));
       return map;
