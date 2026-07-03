@@ -10,7 +10,7 @@
   // Master Control owns the generated base. Runtime code changes own the
   // revision. Keeping them separate prevents a data rebuild from silently
   // removing a loader/cache fix made between game-data releases.
-  const DATA_VERSION_BASE = 'entries-1782968662-e7cfd506bba7';
+  const DATA_VERSION_BASE = 'entries-1783094041-47c9b310b14c';
   const RUNTIME_CACHE_REVISION = 'loader-v4-theme-v9';
   const DATA_VERSION = `${DATA_VERSION_BASE}-${RUNTIME_CACHE_REVISION}`;
 

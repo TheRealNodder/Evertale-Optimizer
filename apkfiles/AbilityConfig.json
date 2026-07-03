@@ -1,6 +1,6 @@
 {
 	"Version": 23,
-	"Time": 1782120426,
+	"Time": 1782789271,
 	"AbilityConfig": {
 		"StunSingle200A": {
 			"class": "AbilityConfig",
@@ -46723,6 +46723,7 @@
 			}],
 			"enemyEventType": "Hit",
 			"sourceEventType": "Finish",
+			"flags": ["BurnForce"],
 			"abilityEffect": "BasiliskSlash",
 			"attackScalors": ["GoodWith4BurningsUnits","GoodIfAllUnitsBurning"],
 			"conditionedAbilityEffects": ["BasiliskSlash","BasiliskSlash"],
@@ -47058,6 +47059,135 @@
 			"flags": ["IgnoreStealth","Duration"],
 			"recommendEffectWhenUsable": -2,
 			"useCondition": "JeanneFusionAllyAndTimeInCombat100NotInstantCooldown"
+		},
+		"DoubleAttackABasiliskRegular":{
+			"class": "AbilityConfig",
+			"targetingData": "2Enemy",
+			"components": ["Damage","ApplyBuff"],
+			"componentOverrides": [{
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"damageFlags": ["HardIgnoreBlockDeath","IgnoreSkin"],
+				"applyToTargetType": "Enemy",
+				"drainPercent": 1.0,
+				"drainEffect": "MerlinSelfHeal1"
+			},{
+				"buffs":["IgnoreDamageReduction1TurnOnly","Grant1OtherAllyPiercingBasiliskRegularEBB"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"flags": ["BurnForce"],
+			"abilityEffect": "BasiliskSlash",
+			"attackScalors": ["GoodWith4BurningsUnits","GoodIfAllUnitsBurning"],
+			"conditionedAbilityEffects": ["BasiliskSlash","BasiliskSlash"],
+			"recommendEffectWhenUsable": -2
+		},
+		"SingleAttackABasiliskRegular":{
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"damageFlags": ["HardIgnoreBlockDeath","IgnoreSkin"],
+				"applyToTargetType": "Enemy",
+				"drainPercent": 1.0,
+				"drainEffect": "MerlinSelfHeal1"
+			},{
+				"buffs": ["GiveTurn","OnExtraTurn","JustGivenTurn"],
+				"applyConditions": "IsBurning",
+				"showMissConditions": "ShowNoMiss",
+				"applyToTargetType": "Source",
+				"skipAbilityEffect": true
+			},{
+				"buffs":["RemoveEnergy"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "BasiliskSpecial",
+			"recommendEffectWhenUsable": -1,
+			"attackScalors": ["GoodVsProtector"],
+			"conditionedAbilityEffects": ["BasiliskSpecial","BasiliskSpecial"],
+			"useCondition": "IsCharged3"
+		},
+		"AllyAndEnemyBuffABasiliskRegular": {
+			"class": "AbilityConfig",
+			"targetingData": "All",
+			"components": ["ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"buffs": ["Burn","BurnShieldOnce"],
+				"applyToTargetType": "Enemy"
+			},{
+				"buffs": ["MegaHealingBurn","RemoveMegaHealingBurnApplyHealingBurn","HealFull"],
+				"applyToTargetType": "Friendly",
+				"showMissConditions": "ShowNoMiss",
+				"applyConditions": "IsMegaHealingBurnFlagOrTagUser"
+			},{
+				"buffs": ["DisableAllBurningEnemiesFor10TUEBB","BasiliskRegularActive3Lock"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			}],
+			"enemyEventType": "Hit",
+			"friendlyEventType": "Finish",
+			"sourceEventType": "Finish",
+			"abilityEffect": "BasiliskEyes",
+			"flags": ["NoDamage","Healer","Burn","ApplyStatusToSelf"],
+			"useCondition": "IsNotBasiliskRegularActive3LockORDeathLock"
+		},
+		"EnemyBuffABasiliskRegular":{
+			"class": "AbilityConfig",
+			"targetingData": "SelfOnly",
+			"components": ["ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"buffs": ["KillRandomDisabledEnemyEOTAndCreditKillBasiliskRegular"],
+				"showMissConditions": "ShowNoMiss",
+				"applyToTargetType": "Source"
+			},{
+				"buffs": ["SendToFrontOfReinforcements", "RemoveBuffs"],
+				"applyConditions": "AllyHasReinforcements",
+				"applyToTargetType": "Source",
+				"showMissConditions": "ShowNoMiss",
+				"skipAbilityEffect": true,
+				"buffAppliedEffects": ["StepBackEffect"]
+		 	},{
+				"buffs": ["Add4SuperFireMinionNextNotKnockbackImmune"],
+				"applyConditions": "IsAlone",
+				"applyToTargetType": "Source",
+				"showMissConditions": "ShowNoMiss",
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["Add3SuperFireMinionNextNotKnockbackImmune"],
+				"applyConditions": "2AlliesLeftNot3",
+				"applyToTargetType": "Source",
+				"showMissConditions": "ShowNoMiss",
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["Add2SuperFireMinionNextNotKnockbackImmune"],
+				"applyConditions": "3AlliesLeftNot4",
+				"applyToTargetType": "Source",
+				"showMissConditions": "ShowNoMiss",
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["Add1SuperFireMinionNextNotKnockbackImmune"],
+				"applyConditions": "4AlliesLeftNoReinforcements",
+				"applyToTargetType": "Source",
+				"showMissConditions": "ShowNoMiss",
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["SendToBackOfReinforcements", "RemoveBuffs"],
+				"showMissConditions": "ShowNoMiss",
+				"applyToTargetType": "Source",
+				"skipAbilityEffect": true,
+				"buffAppliedEffects": ["StepBackEffect"]
+			}],
+			"sourceEventType": "Finish",
+			"abilityEffect": "BasiliskFang",
+			"hideTargetingInfo": true,
+			"flags": ["Summon"],
+			"useCondition": "IsBasiliskRegularActive3Lock"
 		}
 	}
 }
