@@ -1,30 +1,25 @@
 #!/usr/bin/env python3
-"""
-MASTER CONTROL for the Evertale Optimizer extraction/injection pipeline.
+"""Universal Master Control for the Evertale extraction/ingest pipeline.
 
-Universal launch examples:
-  python MASTER_CONTROL.py
-  python MASTER_CONTROL.py --extract --force
-  python tools/new_structure/MASTER_CONTROL.py
-  python tools/new_structure/MASTER_CONTROL.py --extract --force
-
-The script locates the repository root from its own location, then runs every child
-process from the repo root using UTF-8-safe subprocess output handling.
+Local no-argument launches open a small three-choice GUI. Explicit CLI flags
+keep their existing behavior, and CI/GitHub Actions never open the GUI.
 """
 from __future__ import annotations
 
 import argparse
 import json
 import os
+import queue
 import subprocess
 import sys
+import threading
 import time
 from pathlib import Path
 from typing import Any, Dict, List
 
 from path_utils import configure_utf8_stdio, find_repo_root, resolve_repo_path
 
-MASTER_SCHEMA_VERSION = 3
+MASTER_SCHEMA_VERSION = 4
 SAFE_INGEST_REL = "tools/new_structure/run_safe_new_data_ingest.py"
 REPORT_REL = "apkfiles/entries/reports/master_control_report.json"
 
@@ -68,12 +63,11 @@ def run_step(repo: Path, label: str, command: List[str], dry_run: bool = False) 
         capture_output=True,
         env=subprocess_env(),
     )
-    ended = time.time()
     stdout = proc.stdout or ""
     stderr = proc.stderr or ""
     result.update({
         "returnCode": proc.returncode,
-        "durationSeconds": round(ended - started, 3),
+        "durationSeconds": round(time.time() - started, 3),
         "stdoutTail": stdout[-6000:],
         "stderrTail": stderr[-6000:],
     })
@@ -86,14 +80,38 @@ def run_step(repo: Path, label: str, command: List[str], dry_run: bool = False) 
     return result
 
 
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        description="MASTER CONTROL: safely ingest existing data or extract fresh Evertale game JSON."
+    )
+    parser.add_argument("--extract", action="store_true", help="Extract fresh game JSON before rebuilding.")
+    parser.add_argument("--input", help="Optional extraction input folder. Defaults to ./apkfiles.")
+    parser.add_argument("--raw", dest="input", help=argparse.SUPPRESS)
+    parser.add_argument("--force", action="store_true", help="Redo all extraction output. Requires --extract.")
+    parser.add_argument("--no-resume", action="store_true", help="Ignore partial extraction markers. Requires --extract.")
+    parser.add_argument("--full-audit", action="store_true", help="Compatibility flag for older callers.")
+    parser.add_argument("--dry-run", action="store_true", help="Print planned steps without running them.")
+    parser.add_argument("--gui", action="store_true", help="Open the local three-choice GUI.")
+    parser.add_argument("--no-gui", action="store_true", help="Run the default safe ingest in the console.")
+    return parser
+
+
+def validate_args(args: argparse.Namespace) -> None:
+    if args.gui and args.no_gui:
+        raise SystemExit("ERROR: --gui and --no-gui cannot be used together.")
+    if args.force and not args.extract:
+        raise SystemExit("ERROR: --force requires --extract.")
+    if args.no_resume and not args.extract:
+        raise SystemExit("ERROR: --no-resume requires --extract.")
+
+
 def build_safe_ingest_command(repo: Path, args: argparse.Namespace) -> List[str]:
-    script = repo / SAFE_INGEST_REL
-    command = [sys.executable, str(script)]
+    command = [sys.executable, str(repo / SAFE_INGEST_REL)]
     if args.extract:
         command.append("--extract")
         command.extend(["--raw", str(resolve_repo_path(repo, args.input, "apkfiles"))])
     elif args.input:
-        raise SystemExit("ERROR: --input requires --extract. Use --extract for fresh apkfiles ingest.")
+        raise SystemExit("ERROR: --input requires --extract.")
     if args.force:
         command.append("--force")
     if args.full_audit:
@@ -105,57 +123,36 @@ def build_safe_ingest_command(repo: Path, args: argparse.Namespace) -> List[str]
     return command
 
 
-def main() -> int:
-    configure_utf8_stdio()
-    parser = argparse.ArgumentParser(
-        description="MASTER CONTROL: run safe rebuild or extract fresh Evertale game JSON from apkfiles."
-    )
-    parser.add_argument("--extract", action="store_true", help="Extract fresh Monster/Weapon/Equipment/Boss JSON from apkfiles before rebuilding.")
-    parser.add_argument("--input", help="Optional input folder. Defaults to ./apkfiles when --extract is used.")
-    parser.add_argument("--raw", dest="input", help=argparse.SUPPRESS)
-    parser.add_argument("--force", action="store_true", help="Force extraction rebuild. Requires --extract.")
-    parser.add_argument("--no-resume", action="store_true", help="Ignore partial extraction markers. Requires --extract.")
-    parser.add_argument("--full-audit", action="store_true", help="Compatibility flag; audit-only scripts are no longer part of the operational pipeline.")
-    parser.add_argument("--dry-run", action="store_true", help="Print planned steps without running them.")
-    args = parser.parse_args()
-
-    if args.force and not args.extract:
-        raise SystemExit("ERROR: --force requires --extract.")
-    if args.no_resume and not args.extract:
-        raise SystemExit("ERROR: --no-resume requires --extract.")
-
-    repo = find_repo_root(Path(__file__).resolve())
+def run_master_control(repo: Path, args: argparse.Namespace) -> int:
+    validate_args(args)
     safe_ingest = repo / SAFE_INGEST_REL
     if not safe_ingest.exists():
         raise FileNotFoundError(f"Missing safe ingest runner: {safe_ingest}")
 
-    mode = "extract-from-apkfiles" if args.extract else ("full-audit" if args.full_audit else "fast-safe-rebuild")
-    input_folder = str(resolve_repo_path(repo, args.input, "apkfiles")) if args.extract else None
+    mode = "extract-force-redo-all" if args.extract and args.force else "extract-from-apkfiles" if args.extract else "fast-safe-rebuild"
     report: Dict[str, Any] = {
         "schemaVersion": MASTER_SCHEMA_VERSION,
         "generatedAt": int(time.time()),
         "repoRoot": str(repo),
         "launchedFrom": str(Path.cwd()),
         "mode": mode,
-        "inputFolder": input_folder,
+        "inputFolder": str(resolve_repo_path(repo, args.input, "apkfiles")) if args.extract else None,
         "dryRun": bool(args.dry_run),
         "resume": not args.no_resume,
         "subprocessEncoding": "utf-8/errors=replace",
         "steps": [],
         "notes": [
-            "Master Control can be launched from repo root, tools/new_structure, or another working directory.",
-            "Child processes always run from the repo root.",
-            "Child process output is decoded as UTF-8 with replacement so Windows cp1252 consoles do not crash on game text.",
-            "Default mode rebuilds existing apkfiles/entries outputs safely.",
-            "Use --extract when fresh Monster.json, Weapon.json, Equipment.json, or Boss.json have been placed in apkfiles.",
-            "Extraction input defaults to apkfiles, not raw.",
-            "Use --force with --extract to rebuild all entries and ignore unchanged-entry skips.",
-            "Use --no-resume with --extract to ignore partial markers while still keeping unchanged-entry hash skips.",
+            "The launcher works from the repo root, tools/new_structure, or another working directory.",
+            "Local no-argument runs open the GUI; explicit flags retain CLI behavior.",
+            "GitHub Actions and other CI environments never open the GUI.",
+            "Safe Ingest rebuilds the existing apkfiles data without extraction.",
+            "Extract reads fresh source JSON and preserves unchanged-entry skips.",
+            "Extract Force (Redo all) passes --force to rebuild all extraction output.",
         ],
     }
 
-    command = build_safe_ingest_command(repo, args)
     try:
+        command = build_safe_ingest_command(repo, args)
         report["steps"].append(run_step(repo, "safe-new-data-ingest", command, dry_run=args.dry_run))
         report["ok"] = True
     except Exception as exc:
@@ -168,6 +165,109 @@ def main() -> int:
     write_json(repo / REPORT_REL, report)
     print(f"\n[MASTER CONTROL] OK. Report written to {REPORT_REL}")
     return 0
+
+
+def ci_environment() -> bool:
+    return any(str(os.environ.get(name, "")).lower() in {"1", "true", "yes"} for name in ("CI", "GITHUB_ACTIONS"))
+
+
+def gui_args(parser: argparse.ArgumentParser, mode: str) -> argparse.Namespace:
+    choices = {
+        "safe": ["--no-gui"],
+        "extract": ["--extract"],
+        "force": ["--extract", "--force"],
+    }
+    return parser.parse_args(choices[mode])
+
+
+def launch_gui(repo: Path, parser: argparse.ArgumentParser) -> int:
+    try:
+        import tkinter as tk
+        from tkinter import messagebox, ttk
+    except Exception as exc:
+        print(f"[MASTER CONTROL] GUI unavailable ({exc}); running Safe Ingest in the console.")
+        return run_master_control(repo, parser.parse_args(["--no-gui"]))
+
+    root = tk.Tk()
+    root.title("Evertale Optimizer — Master Control")
+    root.geometry("520x330")
+    root.minsize(460, 300)
+    root.columnconfigure(0, weight=1)
+
+    frame = ttk.Frame(root, padding=22)
+    frame.grid(row=0, column=0, sticky="nsew")
+    frame.columnconfigure(0, weight=1)
+    ttk.Label(frame, text="Master Control", font=("Segoe UI", 18, "bold")).grid(row=0, column=0, sticky="w")
+    ttk.Label(frame, text=f"Repository: {repo}", wraplength=470).grid(row=1, column=0, sticky="w", pady=(2, 14))
+
+    status = tk.StringVar(value="Choose one operation.")
+    results: queue.Queue[tuple[int, str, str]] = queue.Queue()
+    buttons: List[Any] = []
+
+    def set_buttons(enabled: bool) -> None:
+        for button in buttons:
+            button.configure(state="normal" if enabled else "disabled")
+
+    def start(mode: str, label: str) -> None:
+        set_buttons(False)
+        status.set(f"Running {label}… This window will stay responsive.")
+
+        def worker() -> None:
+            try:
+                code = run_master_control(repo, gui_args(parser, mode))
+                error = ""
+            except Exception as exc:
+                code, error = 1, str(exc)
+            results.put((code, label, error))
+
+        threading.Thread(target=worker, daemon=True).start()
+
+    options = [
+        ("Safe Ingest", "Rebuild safely from the JSON already in apkfiles.", "safe"),
+        ("Extract", "Extract fresh JSON, then run the safe ingest pipeline.", "extract"),
+        ("Extract Force (Redo all)", "Force extraction and rebuild every output.", "force"),
+    ]
+    for row, (label, description, mode) in enumerate(options, start=2):
+        button = ttk.Button(frame, text=label, command=lambda m=mode, l=label: start(m, l))
+        button.grid(row=row * 2, column=0, sticky="ew", pady=(0, 2))
+        ttk.Label(frame, text=description, wraplength=470).grid(row=row * 2 + 1, column=0, sticky="w", pady=(0, 9))
+        buttons.append(button)
+
+    ttk.Separator(frame).grid(row=10, column=0, sticky="ew", pady=(4, 8))
+    ttk.Label(frame, textvariable=status, wraplength=470).grid(row=11, column=0, sticky="w")
+
+    def poll_results() -> None:
+        try:
+            code, label, error = results.get_nowait()
+        except queue.Empty:
+            root.after(150, poll_results)
+            return
+        set_buttons(True)
+        if code == 0:
+            status.set(f"{label} completed. Report: {REPORT_REL}")
+            messagebox.showinfo("Master Control", f"{label} completed successfully.")
+        else:
+            detail = f" ({error})" if error else ""
+            status.set(f"{label} failed{detail}. See {REPORT_REL} for details.")
+            messagebox.showerror("Master Control", f"{label} failed{detail}. Check the report for details.")
+        root.after(150, poll_results)
+
+    root.after(150, poll_results)
+    root.mainloop()
+    return 0
+
+
+def main() -> int:
+    configure_utf8_stdio()
+    parser = build_parser()
+    argv = sys.argv[1:]
+    args = parser.parse_args(argv)
+    validate_args(args)
+    repo = find_repo_root(Path(__file__).resolve())
+
+    if args.gui or (not argv and not ci_environment()):
+        return launch_gui(repo, parser)
+    return run_master_control(repo, args)
 
 
 if __name__ == "__main__":

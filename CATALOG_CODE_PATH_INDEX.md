@@ -69,6 +69,20 @@ This addendum supersedes older root-file and version lists below.
 - `run_entry_pipeline.py` version 10 updates the shared live-data token after
   rebuilding bundles. Both active workflows stage all three page references.
 
+## 2026-07-05 mobile popup and Master Control addendum
+
+- Mobile popup behavior remains owned by `test-catalog-v2-detail-fix.js`.
+  - The popup uses a manual backdrop with a dedicated `Tap to close` control,
+    preventing backdrop taps from reaching catalog cards underneath.
+  - Awaken changes update the existing popup in place and preserve the active
+    detail tab, popup scroll position, panel scroll position, and page scroll.
+- `tools/new_structure/MASTER_CONTROL.py` is the canonical Master Control.
+  - A local no-argument run opens the three-choice GUI: Safe Ingest, Extract,
+    and Extract Force (Redo all).
+  - Explicit CLI flags and CI/GitHub Actions remain non-GUI.
+- Root `MASTER_CONTROL.py` is a location-independent launcher for the canonical
+  tools implementation; it no longer duplicates pipeline logic.
+
 ---
 
 ## 2026-06-19 live audit addendum

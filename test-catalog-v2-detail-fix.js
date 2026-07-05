@@ -93,7 +93,17 @@
       body.page-catalog-v2 .v2-detail-backdrop:popover-open,
       body.page-catalog-v2 .v2-detail-backdrop[data-v2-open="true"]{display:flex!important;}
       body.page-catalog-v2 .v2-detail-backdrop::backdrop{background:rgba(0,0,0,.35)!important;}
+      body.page-catalog-v2 .v2-popup-close-overlay{
+        position:absolute!important;top:max(8px,env(safe-area-inset-top))!important;left:50%!important;
+        transform:translateX(-50%)!important;z-index:2!important;display:inline-flex!important;
+        align-items:center!important;justify-content:center!important;min-height:34px!important;
+        padding:7px 18px!important;border-radius:999px!important;border:1px solid rgba(255,255,255,.28)!important;
+        background:rgba(8,8,16,.72)!important;color:#fff!important;font-size:12px!important;
+        font-weight:900!important;letter-spacing:.02em!important;box-shadow:0 8px 24px rgba(0,0,0,.35)!important;
+        backdrop-filter:blur(10px)!important;cursor:pointer!important;touch-action:manipulation!important;
+      }
       body.page-catalog-v2 .v2-detail-card{
+        position:relative!important;z-index:1!important;
         width:min(92vw,560px)!important;max-height:min(88vh,780px)!important;overflow:auto!important;
         overscroll-behavior:contain!important;border-radius:26px!important;padding:14px!important;
         border:1px solid color-mix(in srgb,var(--element-primary,#f6ca5e) 48%,rgba(255,255,255,.16))!important;
@@ -147,7 +157,8 @@
     if(!card)return null;
     const id=cardDetailId(card);
     let pop=card.querySelector(`.v2-detail-backdrop#${CSS.escape(id)}`)||document.getElementById(id);
-    if(!pop){pop=document.createElement('div');pop.id=id;pop.className='v2-detail-backdrop';pop.setAttribute('popover','');card.appendChild(pop);}
+    if(!pop){pop=document.createElement('div');pop.id=id;pop.className='v2-detail-backdrop';card.appendChild(pop);}
+    pop.setAttribute('popover','manual');
     const img=q('.unitThumb',card)?.innerHTML||'<div class="ph">?</div>';
     const name=q('.unitName',card)?.textContent?.trim()||'Selected';
     const title=q('.unitTitle',card)?.textContent?.trim()||'';
@@ -162,7 +173,7 @@
       {key:'passive',label:'Passive',id:`${id}-passive`,html:detailSkillHtml(readSkills(card,'passive'))},
       {key:'description',label:'Desc',id:`${id}-description`,html:desc}
     ];
-    pop.innerHTML=`<div class="v2-detail-card ${cardElementClass(card)}"><div class="unitThumb">${img}</div><div class="v2-detail-name">${safe(name)}</div><div class="v2-detail-title">${safe(title)}</div><div class="v2-detail-row">${skillTop}</div><div class="v2-detail-row">${chips}</div>${stats?`<div class="v2-detail-stats">${stats}</div>`:''}${detailTabs(panels)}</div>`;
+    pop.innerHTML=`<button type="button" class="v2-popup-close-overlay" aria-label="Close details">Tap to close</button><div class="v2-detail-card ${cardElementClass(card)}"><div class="unitThumb">${img}</div><div class="v2-detail-name">${safe(name)}</div><div class="v2-detail-title">${safe(title)}</div><div class="v2-detail-row">${skillTop}</div><div class="v2-detail-row">${chips}</div>${stats?`<div class="v2-detail-stats">${stats}</div>`:''}${detailTabs(panels)}</div>`;
     return pop;
   }
   function openDetail(card){
@@ -180,6 +191,13 @@
     if(e.target.closest('.v2-detail-card'))return false;
     open.forEach(closePopover);
     e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();
+    return true;
+  }
+  function guardClickOffPointer(e){
+    if(!isMobile())return false;
+    const open=openPopovers();
+    if(!open.length||e.target.closest('.v2-detail-card'))return false;
+    e.stopPropagation();e.stopImmediatePropagation();
     return true;
   }
 
@@ -218,8 +236,36 @@
     qa('.v2-detail-panel',card).forEach(panel=>panel.classList.toggle('active',panel.id.endsWith(`-${key}`)));
   }
 
+  function syncPopupFromHost(pop,host,idx){
+    if(!pop||!host)return;
+    const detail=q('.v2-detail-card',pop);
+    const cardScroll=detail?.scrollTop||0;
+    const activeKey=q('.v2-popup-tab-btn.active',pop)?.getAttribute('data-v2-popup-tab')||'leader';
+    const panelScroll=new Map(qa('.v2-detail-panel',pop).map(panel=>[panel.id,panel.scrollTop||0]));
+    qa('.stateRow .stateBtn',pop).forEach((btn,i)=>{
+      const on=i===idx;
+      btn.classList.toggle('active',on);
+      btn.setAttribute('aria-pressed',String(on));
+    });
+    const sourceImg=q('.unitThumb img',host);
+    const popupImg=q('.unitThumb img',pop);
+    if(sourceImg&&popupImg){popupImg.setAttribute('src',sourceImg.getAttribute('src')||sourceImg.src||'');popupImg.dataset.state=String(idx);}
+    const sourceTitle=q('.unitTitle',host);
+    const popupTitle=q('.v2-detail-title',pop);
+    if(sourceTitle&&popupTitle)popupTitle.textContent=sourceTitle.textContent||'';
+    const sourceStats=q('.statLine',host);
+    const popupStats=q('.v2-detail-stats',pop);
+    if(sourceStats&&popupStats)popupStats.innerHTML=sourceStats.innerHTML;
+    const descPanel=qa('.v2-detail-panel',pop).find(panel=>panel.id.endsWith('-description'));
+    if(descPanel)descPanel.textContent=cardDescription(host)||'No description loaded.';
+    const activeTab=qa('.v2-popup-tab-btn',pop).find(tab=>tab.getAttribute('data-v2-popup-tab')===activeKey);
+    if(activeTab)activatePopupTab(activeTab);
+    if(detail)detail.scrollTop=cardScroll;
+    qa('.v2-detail-panel',pop).forEach(panel=>{if(panelScroll.has(panel.id))panel.scrollTop=panelScroll.get(panel.id);});
+  }
+
   function attachHandlers(){
-    document.addEventListener('pointerdown',closeWhenClickOff,true);
+    document.addEventListener('pointerdown',guardClickOffPointer,true);
     document.addEventListener('click',e=>{closeWhenClickOff(e);},true);
     document.addEventListener('keydown',e=>{if(e.key==='Escape')openPopovers().forEach(closePopover);},true);
     document.addEventListener('click',e=>{
@@ -251,7 +297,7 @@
         e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();
         const pop=popState.closest('.v2-detail-backdrop');
         const host=pop?.closest('.unitCard');
-        if(host){setHostCardState(host,popState.dataset.idx||0);ensureDetailPopover(host);try{pop.showPopover();}catch{}pop.dataset.v2Open='true';}
+        if(host){const idx=Number(popState.dataset.idx||0)||0;setHostCardState(host,idx);syncPopupFromHost(pop,host,idx);pop.dataset.v2Open='true';}
         return;
       }
       const detailBtn=e.target.closest('#catalogGrid .unitCard .v2-detail-btn');
