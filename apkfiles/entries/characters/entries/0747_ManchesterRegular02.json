@@ -1,0 +1,2219 @@
+{
+  "schemaVersion": 3,
+  "order": 747,
+  "id": "manchester",
+  "sourceId": "ManchesterRegular02",
+  "name": "Manchester",
+  "title": "Exorcist Knight of the West",
+  "secondName": "Exorcist Knight of the West",
+  "description": "She was the eldest daughter of her family. With her parents gone, she had to care for her many younger brothers.\nTo make sure they could all eat their fill, she prioritized efficiency above all else in her work, heading directly home as soon as she completed an exorcism.\nBecause of this, more than a few people have assumed her to be an aloof and uncaring knight.",
+  "category": "character",
+  "rarity": null,
+  "stars": 6,
+  "evolvedStars": 6,
+  "element": "Earth",
+  "weaponType": "GreatSword",
+  "stats": {
+    "atk": 1407,
+    "hp": 7385,
+    "spd": 568,
+    "cost": 34
+  },
+  "hp": 7385,
+  "atk": 1407,
+  "spd": 568,
+  "cost": 34,
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/ManchesterRegular02.png",
+  "imageVariants": [
+    {
+      "state": "source",
+      "family": "ManchesterRegular",
+      "form": 2,
+      "sourceId": "ManchesterRegular02",
+      "image": "https://ik.imagekit.io/r8fsa98s9/characters/ManchesterRegular02.png"
+    }
+  ],
+  "forms": [
+    {
+      "state": "source",
+      "family": "ManchesterRegular",
+      "form": 2,
+      "sourceId": "ManchesterRegular02",
+      "image": "https://ik.imagekit.io/r8fsa98s9/characters/ManchesterRegular02.png"
+    }
+  ],
+  "activeSkills": [
+    "SingleAttackAManchesterRegular",
+    "AllyAndEnemyBuffAManchesterRegular",
+    "SelfBuffAManchesterRegular",
+    "AllAttackAManchesterRegular"
+  ],
+  "passiveSkills": [
+    "GrassRootsPassiveAManchesterRegular",
+    "BattlewornPassiveAManchesterRegular",
+    "PlusHPBoostLv3",
+    "PlusAttackBoostLv3",
+    "Sleep20TUMinus",
+    "AddWeaponPrefGreatAxe"
+  ],
+  "leaderSkills": [
+    "AttackAndHPUp6Earth"
+  ],
+  "refs": {
+    "activeSkills": [
+      "SingleAttackAManchesterRegular",
+      "AllyAndEnemyBuffAManchesterRegular",
+      "SelfBuffAManchesterRegular",
+      "AllAttackAManchesterRegular"
+    ],
+    "passives": [
+      "GrassRootsPassiveAManchesterRegular",
+      "BattlewornPassiveAManchesterRegular",
+      "PlusHPBoostLv3",
+      "PlusAttackBoostLv3",
+      "Sleep20TUMinus",
+      "AddWeaponPrefGreatAxe"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": "AttackAndHPUp6Earth",
+    "leaderBuffCondition": "IsEarth",
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "SingleAttackAManchesterRegular": {
+        "id": "SingleAttackAManchesterRegular",
+        "found": true,
+        "localization": {
+          "name": "Crushing Blade",
+          "description": "400% damage to 1 enemy. 800% damage instead every second time this skill is activated while on the battlefield. This attack ignores enemy damage reduction effects and any effects of non-boss enemies that would prevent the target from being defeated.\n\nRemoves Poison (including Lethal Poison) from the user, and grants the user a Poison Ward and Sleep Ward. Each Ward prevents their named effect from being applied once, then is removed. Identical Wards cannot stack.",
+          "selected": "400%+ damage, Removes Poison & Grants Wards"
+        },
+        "ability": {
+          "name": "SingleAttackAManchesterRegular",
+          "class": "Ability",
+          "abilityScalor": 3,
+          "conditionalAbilityScalors": [
+            7
+          ],
+          "config": "SingleAttackAManchesterRegular",
+          "tuCost": 100,
+          "useLimit": 0,
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "damageFlags": [
+                "IgnoreArmor",
+                "HardIgnoreBlockDeath",
+                "DoNotWake"
+              ],
+              "applyToTargetType": "Enemy",
+              "drainPercent": 1.0,
+              "drainEffect": "VampireDrain1"
+            },
+            {
+              "buffs": [
+                "SleepForcedThorns",
+                "BurnImmunityTempForRevenge"
+              ],
+              "applyToTargetType": "Enemy",
+              "showMissConditions": "ShowNoMiss",
+              "skipAbilityEffect": true,
+              "applyConditions": "AtLeast2WaterEnemies"
+            },
+            {
+              "buffs": [
+                "LethalPoison",
+                "BurnImmunityTempForRevenge"
+              ],
+              "applyToTargetType": "Enemy",
+              "showMissConditions": "ShowNoMiss",
+              "skipAbilityEffect": true,
+              "applyConditions": "AtLeast2DeathEnemies"
+            },
+            {
+              "randomBuffFromList": [
+                "SleepForcedThorns",
+                "LethalPoison"
+              ],
+              "buffs": [
+                "BurnImmunityTempForRevenge"
+              ],
+              "applyToTargetType": "Enemy",
+              "showMissConditions": "ShowNoMiss",
+              "skipAbilityEffect": true,
+              "applyConditions": "Not2WaterOrDeathEnemiesOnTheBattlefield"
+            },
+            {
+              "buffs": [
+                "RemovePoison",
+                "PoisonImmunityOnce",
+                "SleepImmunityOnce",
+                "LoseMomentum",
+                "GainMomentum",
+                "RemoveActive4LOCKManchesterRegular"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "ManchesterAttack",
+          "attackScalors": [
+            "GoodWithMomentum"
+          ],
+          "conditionedAbilityEffects": [
+            "ManchesterAttack",
+            "ManchesterAttack"
+          ],
+          "recommendEffectWhenUsable": -2
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.4,
+            0,
+            0.7,
+            0,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batfx_Murasaki/batfx_footJumpDash",
+            "batsfx_prefab/batsfx_specialattacksfx1",
+            "batfx_Manchester/batfx_slashBlue01",
+            "batfx_Manchester/batfx_impactrock1_2",
+            "batfx_Manchester/batfx_groundimpactblue1",
+            "batsfx_prefab/batsfx_slash1"
+          ],
+          "sortOrderOffset": [
+            4,
+            0,
+            1,
+            3,
+            -1,
+            2
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            false,
+            false,
+            true
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "BurnImmunityTempForRevenge": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Burn",
+                  "BurnAfterTurn",
+                  "BurnAtEndOfTurn"
+                ],
+                "dontShowText": true
+              },
+              {
+                "name": "BurnAfterTurn"
+              },
+              {
+                "name": "BurnSelfOnHit"
+              }
+            ],
+            "duration": 1,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "tags": [
+              "BurnImmune"
+            ],
+            "stackName": "BurnImmunityTempForRevenge",
+            "isHiddenFromPlayers": true
+          },
+          "GainMomentum": {
+            "class": "Buff",
+            "stackName": "MomentumReady",
+            "duration": -1,
+            "isHiddenFromPlayers": true,
+            "applyConditions": "NotLostMomentum"
+          },
+          "LethalPoison": {
+            "class": "Buff",
+            "stackName": "Poison",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "DamageOverTime"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Poison",
+                  "SuperPoison",
+                  "MegaPoison",
+                  "PoisonDelay",
+                  "PoisonDelayedMegaPoisonChance",
+                  "Sleep",
+                  "SleepDelayed",
+                  "Armor",
+                  "Stance",
+                  "Decay",
+                  "SpiritLeaking",
+                  "SpiritLeakReady"
+                ],
+                "dontShowText": true
+              },
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "percentOfAttack": 0.005,
+                "damageColor": "Green",
+                "abilityEffect": "PoisonDamageRed",
+                "extraDamageFlag": "LethalPoison"
+              }
+            ],
+            "tags": [
+              "Poison",
+              "LethalPoison"
+            ],
+            "duration": 999,
+            "showAsTimer": false,
+            "statusEffect": "PoisonStatusRed",
+            "statusEffectOffset": 0.1,
+            "damageType": "Poison",
+            "noIconShownOnBattleStatus": true,
+            "iconSpriteName": "IconPurplePoison01",
+            "applyConditions": "IsNotBurningNotBoss"
+          },
+          "LoseMomentum": {
+            "class": "Buff",
+            "stackName": "LoseMomentum",
+            "duration": 0,
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "MomentumReady"
+              }
+            ],
+            "isHiddenFromPlayers": true,
+            "applyConditions": "HasDamagedWithAttack"
+          },
+          "PoisonImmunityOnce": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity"
+            ],
+            "stackName": "PoisonImmunityOnce",
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Poison"
+                ],
+                "useLimit": 1
+              }
+            ],
+            "duration": -1,
+            "showAsTimer": true,
+            "tags": [
+              "PoisonImmuneTemp",
+              "ThisIsAWard"
+            ],
+            "iconSpriteName": "IconRedPoisonInvalid01"
+          },
+          "RemoveActive4LOCKManchesterRegular": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "Active4LOCKManchesterRegular"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "RemovePoison": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "Poison"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "SleepForcedThorns": {
+            "class": "Buff",
+            "stackName": "Sleep",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "LoseTurn",
+              "RemoveOnHurt"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Poison"
+                ]
+              },
+              {
+                "name": "PurifyChain"
+              },
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "name": "AutoPurifyAfterTurnNoSleep"
+              },
+              {},
+              {
+                "ignoreIfHurtBySelf": true,
+                "cancelFromDamageFlags": [
+                  "DoNotWake",
+                  "DreamDamage"
+                ]
+              }
+            ],
+            "duration": 200,
+            "applyConditions": "IsNotBurning",
+            "showAsTimer": true,
+            "statusEffect": "CursedSleep",
+            "tags": [
+              "EarthSleep",
+              "CursedSleep"
+            ],
+            "statusEffectOffset": 0.1,
+            "iconSpriteName": "IconWhiteSleepZs01",
+            "canBePurified": true
+          },
+          "SleepImmunityOnce": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity"
+            ],
+            "stackName": "SleepImmunityOnce",
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Sleep"
+                ],
+                "useLimit": 1
+              }
+            ],
+            "duration": -1,
+            "showAsTimer": true,
+            "tags": [
+              "SleepImmuneTemp",
+              "ThisIsAWard"
+            ],
+            "iconSpriteName": "IconRedSleepInvalidZs01"
+          }
+        },
+        "attackScalors": {
+          "GoodWithMomentum": {
+            "class": "AttackScalor",
+            "sourceCondition": "HasDamagedWithAttack"
+          }
+        },
+        "conditions": {
+          "AtLeast2DeathEnemies": {
+            "class": "MonsterConditions",
+            "checkEnemyTeamOfMonster": true,
+            "enemyTeamMonsterConditionMatchesNeeded": {
+              "IsDeath": 2
+            }
+          },
+          "AtLeast2WaterEnemies": {
+            "class": "MonsterConditions",
+            "checkEnemyTeamOfMonster": true,
+            "enemyTeamMonsterConditionMatchesNeeded": {
+              "IsWater": 2
+            }
+          },
+          "Not2WaterOrDeathEnemiesOnTheBattlefield": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "checkEnemyTeamOfMonster": true,
+              "enemyTeamMonsterConditionMatchesNeeded": {
+                "IsWater": 2,
+                "or": {
+                  "class": "MonsterConditions",
+                  "checkEnemyTeamOfMonster": true,
+                  "enemyTeamMonsterConditionMatchesNeeded": {
+                    "IsDeath": 2
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "AllyAndEnemyBuffAManchesterRegular": {
+        "id": "AllyAndEnemyBuffAManchesterRegular",
+        "found": true,
+        "localization": {
+          "name": "Earth's Exorcism",
+          "description": "All allies on the battlefield heal for 500% of the user's attack.\n\nAll non-burning allies on the battlefield will have the TU costs for all of their skills reduced by 30%, this will overwrite the effects of other Quicken skills. The enemy team lose 1 Spirit for each non-burning enemy on the battlefield.\n\nThen if enemy Spirit is 0, there is a 20% chance, plus 20% per Awakening (up to 100% chance if this unit has 4 Awakenings) for a random non-boss, non-Ephemeral enemy on the battlefield to be immediately defeated (the user is considered to have defeated that enemy with an attack). This effect ignores Revenge passive skills, Revival passive skills, and any passive skills or effects of active skills that would prevent the random enemy from being defeated.\n\nThis skill becomes locked for 50TU after use. Usable 10 times per battle.",
+          "selected": "Heals, may Quicken & Immediately Defeat"
+        },
+        "ability": {
+          "name": "AllyAndEnemyBuffAManchesterRegular",
+          "class": "Ability",
+          "config": "AllyAndEnemyBuffAManchesterRegular",
+          "tuCost": 1,
+          "useLimit": 10,
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "All",
+          "components": [
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "Heal500Percent"
+              ],
+              "applyToTargetType": "Friendly"
+            },
+            {
+              "buffs": [
+                "HasteUp30Percent"
+              ],
+              "applyToTargetType": "Friendly",
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss",
+              "applyConditions": "IsNotBurning"
+            },
+            {
+              "buffs": [
+                "SpiritLossF"
+              ],
+              "applyToTargetType": "Enemy",
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss",
+              "applyConditions": "IsNotBurning"
+            },
+            {
+              "buffs": [
+                "ManchesterRegularActive2Cooldown50"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "KillRandomEnemyAndCreditKillManchesterRegularLV1"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss",
+              "applyConditions": "HasNoAwakening"
+            },
+            {
+              "buffs": [
+                "KillRandomEnemyAndCreditKillManchesterRegularLV2"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss",
+              "applyConditions": "Has1AwakeningExact"
+            },
+            {
+              "buffs": [
+                "KillRandomEnemyAndCreditKillManchesterRegularLV3"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss",
+              "applyConditions": "Has2AwakeningsExact"
+            },
+            {
+              "buffs": [
+                "KillRandomEnemyAndCreditKillManchesterRegularLV4"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss",
+              "applyConditions": "Has3AwakeningsExact"
+            },
+            {
+              "buffs": [
+                "KillRandomEnemyAndCreditKillManchesterRegularLV5"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss",
+              "applyConditions": "Has4Awakenings"
+            }
+          ],
+          "friendlyEventType": "Finish",
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "flags": [
+            "Healer",
+            "NoDamage"
+          ],
+          "abilityEffect": "ManchesterHeal1",
+          "useCondition": "NotInstantCooldown"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "all": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0,
+            0.6,
+            0.2,
+            0.2,
+            0
+          ],
+          "prefabs": [
+            "batfx_RizetteBrave/batfx_blackout2Sec",
+            "batfx_mechasisswim1/batfx_castbase1",
+            "batsfx_prefab/batsfx_dreamhunt1",
+            "batfx_Manchester/batfx_Manchesterheal1",
+            "batfx_Manchester/batfx_healtarget1",
+            "batfx_healbottom1/batfx_healbottom1",
+            "batfx_healtop2/batfx_healtop2",
+            "batsfx_prefab/batsfx_heal1"
+          ],
+          "sortOrderOffset": [
+            -100,
+            -2,
+            2,
+            -2,
+            -1,
+            2,
+            2,
+            -2
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            false,
+            false,
+            false,
+            false,
+            true
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "HasteUp30Percent": {
+            "class": "Buff",
+            "behaviors": [
+              "StatOnly"
+            ],
+            "behaviorOverrides": [
+              {
+                "flatStatBonuses": {
+                  "Haste": -429
+                }
+              }
+            ],
+            "duration": -1,
+            "showAsTimer": false,
+            "stackName": "Accelerated",
+            "tags": [
+              "Accelerated30Percent"
+            ],
+            "noIconShownOnBattleStatus": true,
+            "iconSpriteName": "IconBrownSpeedUpClock01"
+          },
+          "Heal500Percent": {
+            "class": "Buff",
+            "behaviors": [
+              "AdjustHp"
+            ],
+            "behaviorOverrides": [
+              {
+                "percentOfSourceAttack": 5.0,
+                "abilityEffect": "SmallHeal1",
+                "hpboosts": [
+                  "HealBoost"
+                ]
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "KillRandomEnemyAndCreditKillManchesterRegularLV1": {
+            "class": "Buff",
+            "behaviors": [
+              "EnterBattleBuff"
+            ],
+            "behaviorOverrides": [
+              {
+                "randomEnemyBuffs": [
+                  "PT2InstantKillAndCreditKillManchester"
+                ],
+                "numRandomToBuff": 1,
+                "spreadCondition": "IsNotBossAndNotMirage"
+              }
+            ],
+            "showAsPermanent": false,
+            "showAsTimer": false,
+            "duration": 0,
+            "isHiddenFromPlayers": true,
+            "applyConditions": "EnemySpirit0And20PercentChance"
+          },
+          "KillRandomEnemyAndCreditKillManchesterRegularLV2": {
+            "class": "Buff",
+            "behaviors": [
+              "EnterBattleBuff"
+            ],
+            "behaviorOverrides": [
+              {
+                "randomEnemyBuffs": [
+                  "PT2InstantKillAndCreditKillManchester"
+                ],
+                "numRandomToBuff": 1,
+                "spreadCondition": "IsNotBossAndNotMirage"
+              }
+            ],
+            "showAsPermanent": false,
+            "showAsTimer": false,
+            "duration": 0,
+            "isHiddenFromPlayers": true,
+            "applyConditions": "EnemySpirit0And40PercentChance"
+          },
+          "KillRandomEnemyAndCreditKillManchesterRegularLV3": {
+            "class": "Buff",
+            "behaviors": [
+              "EnterBattleBuff"
+            ],
+            "behaviorOverrides": [
+              {
+                "randomEnemyBuffs": [
+                  "PT2InstantKillAndCreditKillManchester"
+                ],
+                "numRandomToBuff": 1,
+                "spreadCondition": "IsNotBossAndNotMirage"
+              }
+            ],
+            "showAsPermanent": false,
+            "showAsTimer": false,
+            "duration": 0,
+            "isHiddenFromPlayers": true,
+            "applyConditions": "EnemySpirit0And60PercentChance"
+          },
+          "KillRandomEnemyAndCreditKillManchesterRegularLV4": {
+            "class": "Buff",
+            "behaviors": [
+              "EnterBattleBuff"
+            ],
+            "behaviorOverrides": [
+              {
+                "randomEnemyBuffs": [
+                  "PT2InstantKillAndCreditKillManchester"
+                ],
+                "numRandomToBuff": 1,
+                "spreadCondition": "IsNotBossAndNotMirage"
+              }
+            ],
+            "showAsPermanent": false,
+            "showAsTimer": false,
+            "duration": 0,
+            "isHiddenFromPlayers": true,
+            "applyConditions": "EnemySpirit0And80PercentChance"
+          },
+          "KillRandomEnemyAndCreditKillManchesterRegularLV5": {
+            "class": "Buff",
+            "behaviors": [
+              "EnterBattleBuff"
+            ],
+            "behaviorOverrides": [
+              {
+                "randomEnemyBuffs": [
+                  "PT2InstantKillAndCreditKillManchester"
+                ],
+                "numRandomToBuff": 1,
+                "spreadCondition": "IsNotBossAndNotMirage"
+              }
+            ],
+            "showAsPermanent": false,
+            "showAsTimer": false,
+            "duration": 0,
+            "isHiddenFromPlayers": true,
+            "applyConditions": "EnemySpirit0"
+          },
+          "ManchesterRegularActive2Cooldown50": {
+            "class": "Buff",
+            "duration": 50,
+            "stackName": "InstantCooldown",
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "iconSpriteName": "IconBlueCountdownClock3"
+          },
+          "SpiritLossF": {
+            "class": "Buff",
+            "behaviors": [
+              "AddSpirit"
+            ],
+            "behaviorOverrides": [
+              {
+                "percentOfMax": -0.1
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "Has1AwakeningExact": {
+            "class": "MonsterConditions",
+            "monsterTags": [
+              "awkBonus"
+            ],
+            "or": {
+              "class": "MonsterConditions",
+              "monsterTags": [
+                "awkHP"
+              ],
+              "or": {
+                "class": "MonsterConditions",
+                "monsterTags": [
+                  "awkAtk"
+                ],
+                "or": {
+                  "class": "MonsterConditions",
+                  "monsterTags": [
+                    "awkWep"
+                  ]
+                }
+              }
+            },
+            "not": {
+              "class": "MonsterConditions",
+              "monsterTags": [
+                "awkBonus",
+                "awkAtk"
+              ],
+              "or": {
+                "class": "MonsterConditions",
+                "monsterTags": [
+                  "awkAtk",
+                  "awkHP"
+                ],
+                "or": {
+                  "class": "MonsterConditions",
+                  "monsterTags": [
+                    "awkHP",
+                    "awkWep"
+                  ],
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "awkWep",
+                      "awkBonus"
+                    ],
+                    "or": {
+                      "class": "MonsterConditions",
+                      "monsterTags": [
+                        "awkHP",
+                        "awkBonus"
+                      ],
+                      "or": {
+                        "class": "MonsterConditions",
+                        "monsterTags": [
+                          "awkAtk",
+                          "awkWep"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "Has2AwakeningsExact": {
+            "class": "MonsterConditions",
+            "monsterTags": [
+              "awkBonus",
+              "awkAtk"
+            ],
+            "or": {
+              "class": "MonsterConditions",
+              "monsterTags": [
+                "awkAtk",
+                "awkHP"
+              ],
+              "or": {
+                "class": "MonsterConditions",
+                "monsterTags": [
+                  "awkHP",
+                  "awkWep"
+                ],
+                "or": {
+                  "class": "MonsterConditions",
+                  "monsterTags": [
+                    "awkWep",
+                    "awkBonus"
+                  ],
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "awkHP",
+                      "awkBonus"
+                    ],
+                    "or": {
+                      "class": "MonsterConditions",
+                      "monsterTags": [
+                        "awkAtk",
+                        "awkWep"
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            "not": {
+              "class": "MonsterConditions",
+              "monsterTags": [
+                "awkBonus",
+                "awkAtk",
+                "awkHP"
+              ],
+              "or": {
+                "class": "MonsterConditions",
+                "monsterTags": [
+                  "awkBonus",
+                  "awkAtk",
+                  "awkWep"
+                ],
+                "or": {
+                  "class": "MonsterConditions",
+                  "monsterTags": [
+                    "awkWep",
+                    "awkAtk",
+                    "awkHP"
+                  ],
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "awkWep",
+                      "awkBonus",
+                      "awkHP"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "Has3AwakeningsExact": {
+            "class": "MonsterConditions",
+            "monsterTags": [
+              "awkBonus",
+              "awkAtk",
+              "awkHP"
+            ],
+            "or": {
+              "class": "MonsterConditions",
+              "monsterTags": [
+                "awkBonus",
+                "awkAtk",
+                "awkWep"
+              ],
+              "or": {
+                "class": "MonsterConditions",
+                "monsterTags": [
+                  "awkWep",
+                  "awkAtk",
+                  "awkHP"
+                ],
+                "or": {
+                  "class": "MonsterConditions",
+                  "monsterTags": [
+                    "awkWep",
+                    "awkBonus",
+                    "awkHP"
+                  ]
+                }
+              }
+            },
+            "not": {
+              "class": "MonsterConditions",
+              "monsterTags": [
+                "awkBonus",
+                "awkAtk",
+                "awkHP",
+                "awkWep"
+              ]
+            }
+          },
+          "Has4Awakenings": {
+            "class": "MonsterConditions",
+            "monsterTags": [
+              "awkBonus",
+              "awkAtk",
+              "awkHP",
+              "awkWep"
+            ]
+          },
+          "HasNoAwakening": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "monsterTags": [
+                "awkBonus"
+              ],
+              "or": {
+                "class": "MonsterConditions",
+                "monsterTags": [
+                  "awkHP"
+                ],
+                "or": {
+                  "class": "MonsterConditions",
+                  "monsterTags": [
+                    "awkAtk"
+                  ],
+                  "or": {
+                    "class": "MonsterConditions",
+                    "monsterTags": [
+                      "awkWep"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "IsNotBurning": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "Burn"
+              ]
+            }
+          },
+          "NotInstantCooldown": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "InstantCooldown"
+              ]
+            }
+          }
+        }
+      },
+      "SelfBuffAManchesterRegular": {
+        "id": "SelfBuffAManchesterRegular",
+        "found": true,
+        "localization": {
+          "name": "Mighty Resolve",
+          "description": "The user is Fortified, and granted Earthen Might for 100TU.\n\nUsable only if the user has stored 3 Charges, and is not burning. Consumes all Charges on the user. Usable 3 times per battle.\n\nA Fortified unit has 50% damage reduction from attacks. This reduction cannot be ignored by attacks that do not specifically ignore Fortify. Fortify will be removed after reducing damage 3 times since applying, and will be reset if reapplied. This is not a status effect. A unit with Earthen Might has 0.5x of their original Attack added to their Attack while they are not burning. This attack increase does stack on top of Enrage effects, and other Attack increases (e.g. 1.5x + 0.5x => 2.0x total), but cannot stack with Earthen Might effects. Earthen Might ends if the unit who granted it leaves the battlefield, and is removed from units that leave the battlefield.",
+          "selected": "User is Fortified & Gains Earthen Might"
+        },
+        "ability": {
+          "name": "SelfBuffAManchesterRegular",
+          "class": "Ability",
+          "config": "SelfBuffAManchesterRegular",
+          "tuCost": 50,
+          "useLimit": 3,
+          "spiritGain": 0,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "SelfOnly",
+          "components": [
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "RemoveEnergy",
+                "FortifyFor3Attacks",
+                "PartyModeAttackUP50PercentManchesterRegular"
+              ],
+              "applyToTargetType": "Source"
+            }
+          ],
+          "sourceEventType": "Finish",
+          "abilityEffect": "ManchesterPowerUp",
+          "flags": [
+            "NoDamage"
+          ],
+          "useCondition": "IsCharged3AndNotBurning"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "selfOnly": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0.4,
+            0,
+            0,
+            0.3,
+            0,
+            0,
+            0.1
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batsfx_prefab/batsfx_whoosh2",
+            "batfx_tailwindblue/batfx_tailwindblue",
+            "batfx_cleopatra1/batfx_quickcharge1",
+            "batfx_ripplebluelow/batfx_ripplebluelow",
+            "batsfx_prefab/batsfx_earth2",
+            "batfx_Kongming/batfx_impactrockRed1",
+            "batfx_Manchester/batfx_BlueEnergy1",
+            "batfx_Thor/batfx_tailwindrocks3_1",
+            "batfx_Manchester/batfx_BlueEnergy2"
+          ],
+          "sortOrderOffset": [
+            2,
+            2,
+            -100,
+            2,
+            2,
+            2,
+            2,
+            -2,
+            100,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            true,
+            false,
+            true
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            true,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "FortifyFor3Attacks": {
+            "class": "Buff",
+            "behaviors": [
+              "EnterBattleBuff"
+            ],
+            "behaviorOverrides": [
+              {
+                "selfBuffs": [
+                  "FortifyFor3AttacksPart3",
+                  "FortifyFor3AttacksPart2",
+                  "FortifyFor3AttacksPart1"
+                ]
+              }
+            ],
+            "showAsPermanent": false,
+            "showAsTimer": false,
+            "duration": 0,
+            "isHiddenFromPlayers": true
+          },
+          "PartyModeAttackUP50PercentManchesterRegular": {
+            "class": "Buff",
+            "behaviors": [
+              "StatOnly",
+              "RemoveOnSourceDeath"
+            ],
+            "behaviorOverrides": [
+              {
+                "conditions": "IsNotBurningOrEarthernMight1",
+                "scalorStatBonuses": {
+                  "Attack": 0.5
+                }
+              },
+              {}
+            ],
+            "stackName": "PartyModeManchesterRegular",
+            "duration": 100,
+            "showAsPermanent": false,
+            "showAsTimer": true,
+            "statusEffect": "EarthernMightStatus1",
+            "iconSpriteName": "IconPurpleAttackUpSword01"
+          },
+          "RemoveEnergy": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "StoreEnergy"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "IsCharged3AndNotBurning": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "StoreEnergy"
+            ],
+            "buffStackCounts": [
+              3
+            ],
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "Burn"
+              ]
+            }
+          }
+        }
+      },
+      "AllAttackAManchesterRegular": {
+        "id": "AllAttackAManchesterRegular",
+        "found": true,
+        "localization": {
+          "name": "Wrecking Slash",
+          "description": "Targets all enemies. 1000% damage to 1 random enemy. 500% damage to all other targets. This attack ignores any effects of non-boss enemies that would prevent the targets from being defeated, the Counter Stance Status Effect, and the effects of Skin passive skills.\n\nUnlocked each time the user uses Crushing Blade. This skill is locked again after each use or if the user leaves the battlefield.",
+          "selected": "500%+ damage, ignores defeat prevention"
+        },
+        "ability": {
+          "name": "AllAttackAManchesterRegular",
+          "class": "Ability",
+          "abilityScalor": 4,
+          "conditionalAbilityScalors": [
+            9
+          ],
+          "config": "AllAttackAManchesterRegular",
+          "tuCost": 100,
+          "useLimit": 0,
+          "spiritCost": 3,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "AllEnemy",
+          "components": [
+            "Damage",
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "applyToTargetType": "Enemy",
+              "damageFlags": [
+                "HardIgnoreBlockDeath",
+                "IgnoreSkin",
+                "DoNotWake"
+              ],
+              "drainPercent": 1.0,
+              "drainEffect": "VampireDrain1"
+            },
+            {
+              "buffs": [
+                "SleepForcedThorns",
+                "BurnImmunityTempForRevenge"
+              ],
+              "applyToTargetType": "Enemy",
+              "showMissConditions": "ShowNoMiss",
+              "skipAbilityEffect": true,
+              "applyConditions": "AtLeast2WaterEnemies"
+            },
+            {
+              "buffs": [
+                "LethalPoison",
+                "BurnImmunityTempForRevenge"
+              ],
+              "applyToTargetType": "Enemy",
+              "showMissConditions": "ShowNoMiss",
+              "skipAbilityEffect": true,
+              "applyConditions": "AtLeast2DeathEnemies"
+            },
+            {
+              "randomBuffFromList": [
+                "SleepForcedThorns",
+                "LethalPoison"
+              ],
+              "buffs": [
+                "BurnImmunityTempForRevenge"
+              ],
+              "applyToTargetType": "Enemy",
+              "showMissConditions": "ShowNoMiss",
+              "skipAbilityEffect": true,
+              "applyConditions": "Not2WaterOrDeathEnemiesOnTheBattlefield"
+            },
+            {
+              "buffs": [
+                "Active4LOCKManchesterRegular"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Hit",
+          "abilityEffect": "ManchesterSp",
+          "attackScalors": [
+            "GoodVsRandomDamageMark"
+          ],
+          "conditionedAbilityEffects": [
+            "ManchesterSp",
+            "ManchesterSp"
+          ],
+          "recommendEffectWhenUsable": -1,
+          "useCondition": "IsNotActive4LOCKManchesterRegular"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "allEnemies": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.2,
+            0.55,
+            0,
+            0,
+            0,
+            0.7,
+            0,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batfx_Elizabeth/batfx_tailwindblueblue",
+            "batfx_Manchester/batfx_Kenshinbigslash1",
+            "batsfx_prefab/batsfx_swordslash",
+            "batfx_Manchester/batfx_multiSlashBlue1",
+            "batsfx_prefab/batsfx_multislash1",
+            "batfx_Manchester/batfx_slashBlue01",
+            "batfx_Manchester/batfx_impactrock1_2",
+            "batfx_Manchester/batfx_groundimpactblue1",
+            "batsfx_prefab/batsfx_slash1"
+          ],
+          "sortOrderOffset": [
+            -100,
+            100,
+            0,
+            100,
+            0,
+            1,
+            3,
+            -1,
+            -2
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false
+          ],
+          "positionInBattlefieldCenter": [
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "Active4LOCKManchesterRegular": {
+            "class": "Buff",
+            "stackName": "Active4LOCKManchesterRegular",
+            "duration": -1,
+            "isHiddenFromPlayers": true,
+            "showAsPermanent": false,
+            "showAsTimer": false
+          },
+          "BurnImmunityTempForRevenge": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Burn",
+                  "BurnAfterTurn",
+                  "BurnAtEndOfTurn"
+                ],
+                "dontShowText": true
+              },
+              {
+                "name": "BurnAfterTurn"
+              },
+              {
+                "name": "BurnSelfOnHit"
+              }
+            ],
+            "duration": 1,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "tags": [
+              "BurnImmune"
+            ],
+            "stackName": "BurnImmunityTempForRevenge",
+            "isHiddenFromPlayers": true
+          },
+          "LethalPoison": {
+            "class": "Buff",
+            "stackName": "Poison",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "DamageOverTime"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Poison",
+                  "SuperPoison",
+                  "MegaPoison",
+                  "PoisonDelay",
+                  "PoisonDelayedMegaPoisonChance",
+                  "Sleep",
+                  "SleepDelayed",
+                  "Armor",
+                  "Stance",
+                  "Decay",
+                  "SpiritLeaking",
+                  "SpiritLeakReady"
+                ],
+                "dontShowText": true
+              },
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "percentOfAttack": 0.005,
+                "damageColor": "Green",
+                "abilityEffect": "PoisonDamageRed",
+                "extraDamageFlag": "LethalPoison"
+              }
+            ],
+            "tags": [
+              "Poison",
+              "LethalPoison"
+            ],
+            "duration": 999,
+            "showAsTimer": false,
+            "statusEffect": "PoisonStatusRed",
+            "statusEffectOffset": 0.1,
+            "damageType": "Poison",
+            "noIconShownOnBattleStatus": true,
+            "iconSpriteName": "IconPurplePoison01",
+            "applyConditions": "IsNotBurningNotBoss"
+          },
+          "SleepForcedThorns": {
+            "class": "Buff",
+            "stackName": "Sleep",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "LoseTurn",
+              "RemoveOnHurt"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Poison"
+                ]
+              },
+              {
+                "name": "PurifyChain"
+              },
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "name": "AutoPurifyAfterTurnNoSleep"
+              },
+              {},
+              {
+                "ignoreIfHurtBySelf": true,
+                "cancelFromDamageFlags": [
+                  "DoNotWake",
+                  "DreamDamage"
+                ]
+              }
+            ],
+            "duration": 200,
+            "applyConditions": "IsNotBurning",
+            "showAsTimer": true,
+            "statusEffect": "CursedSleep",
+            "tags": [
+              "EarthSleep",
+              "CursedSleep"
+            ],
+            "statusEffectOffset": 0.1,
+            "iconSpriteName": "IconWhiteSleepZs01",
+            "canBePurified": true
+          }
+        },
+        "attackScalors": {
+          "GoodVsRandomDamageMark": {
+            "class": "AttackScalor",
+            "targetCondition": "IsMarkedForRandomDamage"
+          }
+        },
+        "conditions": {
+          "AtLeast2DeathEnemies": {
+            "class": "MonsterConditions",
+            "checkEnemyTeamOfMonster": true,
+            "enemyTeamMonsterConditionMatchesNeeded": {
+              "IsDeath": 2
+            }
+          },
+          "AtLeast2WaterEnemies": {
+            "class": "MonsterConditions",
+            "checkEnemyTeamOfMonster": true,
+            "enemyTeamMonsterConditionMatchesNeeded": {
+              "IsWater": 2
+            }
+          },
+          "IsNotActive4LOCKManchesterRegular": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "Active4LOCKManchesterRegular"
+              ]
+            }
+          },
+          "Not2WaterOrDeathEnemiesOnTheBattlefield": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "checkEnemyTeamOfMonster": true,
+              "enemyTeamMonsterConditionMatchesNeeded": {
+                "IsWater": 2,
+                "or": {
+                  "class": "MonsterConditions",
+                  "checkEnemyTeamOfMonster": true,
+                  "enemyTeamMonsterConditionMatchesNeeded": {
+                    "IsDeath": 2
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "passives": {
+      "GrassRootsPassiveAManchesterRegular": {
+        "id": "GrassRootsPassiveAManchesterRegular",
+        "found": true,
+        "localization": {
+          "name": "Grassroots Defiance",
+          "description": "This unit can't have its Active Skills disabled by enemy passive skills.\n\nThis unit cannot be stunned or be sent to the reinforcements from the battlefield.\n\nWhenever this unit defeats a non-conjured unit on the battlefield with an attack, heals all allies on the battlefield for 100% of their max HP, and ends any enemy effects that are currently disabling the Active Skills of allies on the battlefield.\n\nWhenever another ally on the battlefield damages any number of non-burning units with an attack, this unit is granted Sleep Thorns and has its current TU reduced by 50TU. If this triggers 5 times within 50TU, this effect cannot trigger again until 50TU advances.\n\nThis unit's attacks heal this unit for 100% of total damage dealt, will not wake sleeping enemies, and grant hit targets:\n- Cursed Sleep for 200TU if this unit has 2 or more Water Allies on the battlefield.\n- Lethal Poison for 999TU if this unit has 2 or more Dark Allies on the battlefield.\n- Randomly either Cursed Sleep for 200TU or Lethal Poison for 999TU if this unit does not have 2 Water or 2 Dark Allies on the battlefield.\n\nWhen a unit with Sleep Thorns is dealt damage by an attack, that unit's Sleep Thorns will be consumed to immediately grant the Cursed Sleep status effect for 200TU to the attacker. Burn or attacks that grant Burn will remove Sleep Thorns and prevent Cursed Sleep from applying. Cursed Sleep will overwrite status effects other than Burn, cannot be overwritten by Poison, can be applied repeatedly to units that have already slept while on the battlefield, and will not end from damage caused by Dream Hunter type active skills. Lethal Poison will overwrite other status effects on that enemy, cannot be overwritten by status effects other than Burn or Stealth, and cannot be Purified. Lethal Poison deals 2 times the damage of normal Poison and ignores passive skills or effects of active skills that would prevent the target from being defeated, other than those which specifically prevent defeat from Poison or non-attack damage. Lethal Poison cannot apply to Burning units or Boss units."
+        }
+      },
+      "BattlewornPassiveAManchesterRegular": {
+        "id": "BattlewornPassiveAManchesterRegular",
+        "found": true,
+        "localization": {
+          "name": "Exorcist Knight",
+          "description": "This unit enters battle Fortified, and with a Sleep Ward, Poison Ward, and an Instant Death Ward.\n\nIf this unit would be defeated by an enemy attack or a status effect while having more than 1 HP, it instead survives with 1 HP.\n\nEach time a non-burning ally gets the turn, this unit is healed for 50% of max HP. Each time a poisoned or sleeping enemy gets the turn, this unit is healed for 50% of max HP.\n\nEach time this unit takes damage from an attack and survives until after the end of the turn, this unit will be granted a Charge, and heal for 50% of its max HP. Certain skills are affected by and may consume charges. A unit can store a maximum of 3 charges, and all charges are removed from a unit that leaves the battlefield.\n\nAn Instant Death Ward prevents this unit from being immediately defeated without damage by a non-boss enemy once, then is removed. Instant Death Wards cannot be ignored and cannot stack."
+        }
+      },
+      "PlusHPBoostLv3": {
+        "id": "PlusHPBoostLv3",
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv3",
+          "description": "Adds 1200 to this unit's max HP."
+        }
+      },
+      "PlusAttackBoostLv3": {
+        "id": "PlusAttackBoostLv3",
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv3",
+          "description": "Adds 300 to this unit's Attack."
+        }
+      },
+      "Sleep20TUMinus": {
+        "id": "Sleep20TUMinus",
+        "found": true,
+        "localization": {
+          "name": "Sleep Resist Lv3",
+          "description": "Reduces the duration of any enemy sleep effects on this unit by 20TU."
+        }
+      },
+      "AddWeaponPrefGreatAxe": {
+        "id": "AddWeaponPrefGreatAxe",
+        "found": true,
+        "localization": {
+          "name": "Greataxe Mastery",
+          "description": "Can use weapon skills of Greataxes in addition to their original preferred weapon type."
+        }
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": {
+      "class": "MonsterConditions",
+      "elements": [
+        "Earth"
+      ]
+    }
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "ManchesterRegular02",
+    "family": "ManchesterRegular",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "ManchesterRegular02",
+    "family": "ManchesterRegular",
+    "class": "Monster",
+    "leaderBuff": "AttackAndHPUp6Earth",
+    "leaderBuffCondition": "IsEarth",
+    "activeSkills": {
+      "0": "SingleAttackAManchesterRegular",
+      "1": "AllyAndEnemyBuffAManchesterRegular",
+      "2": "SelfBuffAManchesterRegular",
+      "3": "AllAttackAManchesterRegular"
+    },
+    "passives": {
+      "0": "GrassRootsPassiveAManchesterRegular",
+      "1": "BattlewornPassiveAManchesterRegular",
+      "2": "PlusHPBoostLv3",
+      "3": "PlusAttackBoostLv3",
+      "4": "Sleep20TUMinus",
+      "5": "AddWeaponPrefGreatAxe"
+    },
+    "cost": 34,
+    "baseAttack": 1407,
+    "baseMaxHp": 7385,
+    "speed": 568,
+    "element": "Earth",
+    "weaponPref": "GreatSword",
+    "weaponPivotIndex": 0,
+    "secure": 1,
+    "evolveFrom": "ManchesterRegular01",
+    "aiTargetPickWeight": 1,
+    "stars": 6,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 0,
+    "battleOrbImageFlip": 0,
+    "attackType": "Bash",
+    "cosmoName": "ManchesterRegular03",
+    "skillVoices": {
+      "0": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "1": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "2": [
+        9,
+        10,
+        11,
+        12
+      ],
+      "3": [
+        13,
+        14,
+        15,
+        16
+      ]
+    },
+    "damageVoices": [
+      17,
+      18,
+      19,
+      20
+    ],
+    "deathVoices": [
+      21,
+      22,
+      23,
+      24
+    ],
+    "victoryVoices": [
+      25,
+      26
+    ],
+    "lineupVoices": [
+      27,
+      28,
+      29,
+      30,
+      31,
+      32
+    ],
+    "evolutionVoices": [
+      38
+    ],
+    "trainVoices": [
+      33,
+      34,
+      35,
+      36,
+      37,
+      39,
+      40,
+      41,
+      42,
+      43
+    ],
+    "titleVoices": [
+      44
+    ],
+    "gachaVoices": [
+      45
+    ],
+    "loginVoices": [
+      46
+    ],
+    "tapVoices": [
+      47,
+      48,
+      49
+    ],
+    "idleVoices": [
+      50
+    ]
+  },
+  "_build": {
+    "scriptVersion": "7-base-form-rarity",
+    "sourceHash": "6451fcecf1f8935d7707ff046b87efd0bc6a153fa39ec68610ed1087920650eb",
+    "dependencyHash": "6b1ed3db612139dde7394b30ea2689ee448ec8f00b9195f8bb9b84fef1e4ae47",
+    "generatedAt": 1783659324
+  }
+}

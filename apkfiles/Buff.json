@@ -1,6 +1,6 @@
 {
 	"Version": 23,
-	"Time": 1783074383,
+	"Time": 1783403749,
 	"Buff": {
 	"RelationshipFlatAttack50": {
 		"class": "Buff",
@@ -89012,6 +89012,407 @@
 			"duration": 0,
 			"showAsTimer": false,
 			"isHiddenFromPlayers": true
-        }
+		},
+		"AttackUp4SleepingOrPoisoned2": {
+			"class": "Buff",
+			"behaviors": ["ExtraAttackScalor"],
+			"stackName": "AttackBoosted",
+			"behaviorOverrides": [{
+				"attackerCondition": "2EnemiesPoisonedAndOrSleeping",
+				"scalor": 0.15
+			}],
+			"iconSpriteName": "IconYellowAttackUpSword01",
+			"noIconShownOnBattleStatus": true,
+			"duration": -1,
+			"showAsTimer": false,
+			"isWeaponBuff": true
+		},
+		"AttackUp5SleepingOrPoisoned2": {
+			"class": "Buff",
+			"behaviors": ["ExtraAttackScalor"],
+			"stackName": "AttackBoosted",
+			"behaviorOverrides": [{
+				"attackerCondition": "2EnemiesPoisonedAndOrSleeping",
+				"scalor": 0.20
+			}],
+			"iconSpriteName": "IconYellowAttackUpSword01",
+			"noIconShownOnBattleStatus": true,
+			"duration": -1,
+			"showAsTimer": false,
+			"isWeaponBuff": true
+		},
+		"AttackUp6SleepingOrPoisoned2": {
+			"class": "Buff",
+			"behaviors": ["ExtraAttackScalor"],
+			"stackName": "AttackBoosted",
+			"behaviorOverrides": [{
+				"attackerCondition": "2EnemiesPoisonedAndOrSleeping",
+				"scalor": 0.25
+			}],
+			"iconSpriteName": "IconYellowAttackUpSword01",
+			"noIconShownOnBattleStatus": true,
+			"duration": -1,
+			"showAsTimer": false,
+			"isWeaponBuff": true
+		},
+		"GrassRootsPassiveAManchesterRegular": {
+			"class": "Buff",
+			"stackName": "GrassRootsPassiveAManchesterRegular",
+			"behaviors": ["EnterBattleBuff","BuffWhenMonstersDie","BuffWhenMonstersDie","BuffOnMonsterTurn","EnterBattleBuff","OthersEnterBattle","StunImmunityFallback"],
+			"behaviorOverrides": [{
+				"sourceBuffs": ["KnockbackImmunity","StunImmunity","Active4LOCKManchesterRegular","PassiveBlockGiveTurnImmunity","DisableFallBackImmunity"]
+			},{
+				"sourceBuffs": ["HealFullAndRemoveDisableFromAllAlliesEOT","FudgeUsed"],
+				"sameTeam": false,
+				"spreadCondition": "KillsMoreThanSkillUsed",
+				"deadMonsterConditions": "IsNotSummonedOrTransformingOrMirage"
+			},{
+				"sourceBuffs": ["FudgeUsedAtEndOfTurn"],
+				"sameTeam": false,
+				"spreadCondition": "KillsMoreThanSkillUsed"
+			},{
+				"randomEnemyBuffs": ["MarkedForRandomDamage"],
+				"numRandomToBuff": 1
+			},{
+				"allyBuffs": ["HitEnemyReduceSourceTU50AndSleepThornsManchester"]
+			},{
+				"sameTeam": true,
+				"contextBuffs": ["HitEnemyReduceSourceTU50AndSleepThornsManchester"]
+			},{}],
+			"duration": -1,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true
+		},
+		"HitEnemyReduceSourceTU50AndSleepThornsManchester": {
+			"class": "Buff",
+			"behaviors": ["BuffChanceOnHit","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+				"sourceBuffs": ["TUMinus50","SleepThorns","LargeHijikataCounter","LargeHijikataCounterFuseAfterTime","ManchesterRegularBigPassiveLock","ManchesterRegularSmallPassiveLock"],
+				"chance": 1.0,
+				"targetCondition": "IsNotBurning",
+				"spreadCondition": "IsNotManchesterRegularPassiveLock"
+			},{}],
+			"duration": -1,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true
+		},
+		"PassiveBlockGiveTurnImmunity": {
+			"class": "Buff",
+			"stackName": "PassiveBlockGiveTurnImmunity",
+			"behaviors": ["Immunity"],
+			"behaviorOverrides": [{
+				"stackNamesToBlock": ["BlockGiveTurnFor10TUPassive","BlockGiveTurnFor20TUPassive","BlockGiveTurnFor30TUPassive","BlockGiveTurnFor40TUPassive","BlockGiveTurnFor50TUPassive","BlockGiveTurnFor60TUPassive","BlockGiveTurnFor80TUPassive","BlockGiveTurnFor100TUPassive"]
+			}],
+			"duration": -1,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true,
+			"tags": ["PassiveBlockGiveTurnImmunity"],
+			"iconSpriteName": "IconRedDisabled01"
+		},
+		"LargeHijikataCounter": {
+			"class": "Buff",
+			"stackName": "LargeDriveCounter",
+			"stackLimit": 5,
+			"duration": -1,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"noIconShownOnBattleStatus": true,
+			"isHiddenFromPlayers": true
+		},
+		"LargeHijikataCounterFuseAfterTime":{
+			"class": "Buff",
+			"duration": 50,
+			"behaviors": ["BuffAfterTime"],
+			"behaviorOverrides":[{
+				"selfBuffs": ["LargeHijikataCounterDecrease"],
+				"fuse": 50
+			}],
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"noIconShownOnBattleStatus": true,
+			"isHiddenFromPlayers": true
+		},
+		"LargeHijikataCounterDecrease": {
+			"class": "Buff",
+			"behaviors": ["RemoveBuffs"],
+			"behaviorOverrides": [{
+				"name": "LargeDriveCounter",
+				"decreaseCount": 1
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"noIconShownOnBattleStatus": true,
+			"isHiddenFromPlayers": true
+		},
+		"ManchesterRegularBigPassiveLock": {
+			"class": "Buff",
+			"stackName": "ManchesterRegularBigPassiveLock",
+			"duration": 50,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"iconSpriteName": "IconRedCountdownPassiveClock3",
+			"applyConditions": "IsLargeHijikataCharged5"
+		},
+		"ManchesterRegularSmallPassiveLock": {
+			"class": "Buff",
+			"stackName": "ManchesterRegularSmallPassiveLock",
+			"duration": 0,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"noIconShownOnBattleStatus": true,
+			"isHiddenFromPlayers": true
+		},
+		"HealFullAndRemoveDisableFromAllAlliesEOT": {
+			"class": "Buff",
+			"stackName": "HealFullAndRemoveDisableFromAllAlliesEOT",
+			"behaviors": ["BuffOnMonsterTurnEnd"],
+			"behaviorOverrides": [{
+				"randomAllyBuffs": ["HealFull","RemoveBlockGiveTurn"],
+				"numRandomToBuff": 4
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true
+		},
+		"RemoveBlockGiveTurn": {
+			"class": "Buff",
+			"behaviors": ["RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs"],
+			"behaviorOverrides": [{
+					"name": "BlockGiveTurnFor10TU"
+				},{
+					"name": "BlockGiveTurnFor20TU"
+				},{
+					"name": "BlockGiveTurnFor30TU"
+				},{
+					"name": "BlockGiveTurnFor40TU"
+				},{
+					"name": "BlockGiveTurnFor50TU"
+				},{
+					"name": "BlockGiveTurnFor60TU"
+				},{
+					"name": "BlockGiveTurnFor80TU"
+				},{
+					"name": "BlockGiveTurnFor100TU"
+				},{
+					"name": "BlockGiveTurnFor50TUZeusReady"
+				},{
+					"name": "BlockGiveTurnChronos"
+			},{
+					"name": "BlockGiveTurnFor10TUPassive"
+				},{
+					"name": "BlockGiveTurnFor20TUPassive"
+				},{
+					"name": "BlockGiveTurnFor30TUPassive"
+				},{
+					"name": "BlockGiveTurnFor40TUPassive"
+				},{
+					"name": "BlockGiveTurnFor50TUPassive"
+				},{
+					"name": "BlockGiveTurnFor60TUPassive"
+				},{
+					"name": "BlockGiveTurnFor80TUPassive"
+				},{
+					"name": "BlockGiveTurnFor100TUPassive"
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
+		"SleepThornsAndReduceTUby50TUEOT": {
+			"class": "Buff",
+			"stackName": "SleepThornsAndReduceTUby50TUEOT",
+			"behaviors": ["BuffOnMonsterTurnEnd"],
+			"behaviorOverrides": [{
+				"selfBuffs": ["TUMinus50","SleepThorns"],
+				"activeMonsterConditions": "NotAlwaysMyTurn"
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true
+		},
+		"BattlewornPassiveAManchesterRegular": {
+			"class": "Buff",
+			"stackName": "BattlewornPassiveAManchesterRegular",
+			"behaviors": ["EnterBattleBuff","BuffOnMonsterTurn","BuffOnMonsterTurn","BuffWhenMonsterHurt","BuffOnMonsterTurnEnd"],
+			"behaviorOverrides": [{
+				"sourceBuffs": ["HoldGround","FortifyFor3Attacks","InstantKillImmunityOnce","SleepImmunityOnce","PoisonImmunityOnce","Charged1Icon","Charged2Icon","Charged3Icon"]
+			},{
+				"selfBuffs": ["HealHalf"],
+				"sameTeam": true,
+				"activeMonsterConditions": "IsNotBurning"
+			},{
+				"selfBuffs": ["HealHalf"],
+				"sameTeam": false,
+				"activeMonsterConditions": "IsPoisonedOrSleeping"
+			},{
+				"selfBuffs": ["BrideHealOK"],
+				"cancelFromDamageTypes": ["BuffDamage"]
+			},{
+				"selfBuffs": ["StoreEnergy","BrideHeal50PercentManchesterRegular"],
+				"activeMonsterConditions": "NotAlwaysMyTurn",
+				"spreadCondition": "BrideHealReady"
+			}],
+			"duration": -1,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true
+		},
+		"PartyModeAttackUP50PercentManchesterRegular": {
+			"class": "Buff",
+			"behaviors": ["StatOnly","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+				"conditions": "IsNotBurningOrEarthernMight1",
+				"scalorStatBonuses": {
+					"Attack": 0.5
+				}
+			},{}],
+			"stackName": "PartyModeManchesterRegular",
+			"duration": 100,
+			"showAsPermanent": false,
+			"showAsTimer": true,
+			"statusEffect": "EarthernMightStatus1",
+			"iconSpriteName": "IconPurpleAttackUpSword01"
+		},
+		"BrideHeal50PercentManchesterRegular": {
+			"class": "Buff",
+			"behaviors": ["AdjustHp","RemoveBuffs"],
+			"behaviorOverrides": [{
+				"percent": 0.50,
+				"abilityEffect": "Blank",
+				"hpboosts": [
+					"HealBoost"
+				]
+			},{
+				"name": "BrideHealOK"
+			}],
+			"duration": 0,
+			"effectToShowWhenApplied": "LargeHeal1",
+			"textKeyToShowWhenApplied": "HealDoubleANameKey",
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
+		"KillRandomEnemyAndCreditKillManchesterRegularLV1":{
+			"class": "Buff",
+			"behaviors": ["EnterBattleBuff"],
+			"behaviorOverrides": [{
+				"randomEnemyBuffs": ["PT2InstantKillAndCreditKillManchester"],
+				"numRandomToBuff": 1,
+				"spreadCondition": "IsNotBossAndNotMirage"
+			}],
+			"showAsPermanent": false,
+			"showAsTimer": false,
+			"duration": 0,
+			"isHiddenFromPlayers": true,
+			"applyConditions": "EnemySpirit0And20PercentChance"
+		},
+		"KillRandomEnemyAndCreditKillManchesterRegularLV2":{
+			"class": "Buff",
+			"behaviors": ["EnterBattleBuff"],
+			"behaviorOverrides": [{
+				"randomEnemyBuffs": ["PT2InstantKillAndCreditKillManchester"],
+				"numRandomToBuff": 1,
+				"spreadCondition": "IsNotBossAndNotMirage"
+			}],
+			"showAsPermanent": false,
+			"showAsTimer": false,
+			"duration": 0,
+			"isHiddenFromPlayers": true,
+			"applyConditions": "EnemySpirit0And40PercentChance"
+		},
+		"KillRandomEnemyAndCreditKillManchesterRegularLV3":{
+			"class": "Buff",
+			"behaviors": ["EnterBattleBuff"],
+			"behaviorOverrides": [{
+				"randomEnemyBuffs": ["PT2InstantKillAndCreditKillManchester"],
+				"numRandomToBuff": 1,
+				"spreadCondition": "IsNotBossAndNotMirage"
+			}],
+			"showAsPermanent": false,
+			"showAsTimer": false,
+			"duration": 0,
+			"isHiddenFromPlayers": true,
+			"applyConditions": "EnemySpirit0And60PercentChance"
+		},
+		"KillRandomEnemyAndCreditKillManchesterRegularLV4":{
+			"class": "Buff",
+			"behaviors": ["EnterBattleBuff"],
+			"behaviorOverrides": [{
+				"randomEnemyBuffs": ["PT2InstantKillAndCreditKillManchester"],
+				"numRandomToBuff": 1,
+				"spreadCondition": "IsNotBossAndNotMirage"
+			}],
+			"showAsPermanent": false,
+			"showAsTimer": false,
+			"duration": 0,
+			"isHiddenFromPlayers": true,
+			"applyConditions": "EnemySpirit0And80PercentChance"
+		},
+		"KillRandomEnemyAndCreditKillManchesterRegularLV5":{
+			"class": "Buff",
+			"behaviors": ["EnterBattleBuff"],
+			"behaviorOverrides": [{
+				"randomEnemyBuffs": ["PT2InstantKillAndCreditKillManchester"],
+				"numRandomToBuff": 1,
+				"spreadCondition": "IsNotBossAndNotMirage"
+			}],
+			"showAsPermanent": false,
+			"showAsTimer": false,
+			"duration": 0,
+			"isHiddenFromPlayers": true,
+			"applyConditions": "EnemySpirit0"
+		},
+		"PT2InstantKillAndCreditKillManchester": {
+			"class": "Buff",
+			"stackName": "InstantKill",
+			"behaviors": ["EnterBattleBuff","EnterBattleBuff","InstantDeath"],
+			"behaviorOverrides": [{
+				"selfBuffs": ["ManchesterRegularInstantDeathFXBuff"]
+			},{	
+				"sourceBuffs": ["Add1Kill"]
+			},{}],
+			"duration": 0,
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
+		"ManchesterRegularInstantDeathFXBuff": {
+			"class": "Buff",
+			"isHiddenFromPlayers": true,
+			"duration": 0,
+			"effectToShowWhenApplied": "ManchesterInstantdeath1",
+			"showAsTimer": false,
+			"showAsPermanent": false
+		},
+		"Active4LOCKManchesterRegular":{
+			"class": "Buff",
+			"stackName": "Active4LOCKManchesterRegular",
+			"duration": -1,
+			"isHiddenFromPlayers": true,
+			"showAsPermanent": false,
+			"showAsTimer": false
+		},
+		"RemoveActive4LOCKManchesterRegular": {
+			"class": "Buff",
+			"behaviors": ["RemoveBuffs"],
+			"behaviorOverrides": [{
+				"name": "Active4LOCKManchesterRegular"
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
+		"ManchesterRegularActive2Cooldown50":{
+			"class": "Buff",
+			"duration": 50,
+			"stackName": "InstantCooldown",
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"iconSpriteName": "IconBlueCountdownClock3"
+		}
     }
 }

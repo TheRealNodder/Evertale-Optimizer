@@ -1,6 +1,6 @@
 {
 	"Version": 23,
-	"Time": 1782789271,
+	"Time": 1783384228,
 	"AbilityConfig": {
 		"StunSingle200A": {
 			"class": "AbilityConfig",
@@ -47188,6 +47188,163 @@
 			"hideTargetingInfo": true,
 			"flags": ["Summon"],
 			"useCondition": "IsBasiliskRegularActive3Lock"
+		},
+		"SingleAttackAManchesterRegular":{
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage","ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"damageFlags": ["IgnoreArmor","HardIgnoreBlockDeath","DoNotWake"],
+				"applyToTargetType": "Enemy",
+				"drainPercent": 1.0,
+				"drainEffect": "VampireDrain1"
+			},{
+				"buffs": ["SleepForcedThorns","BurnImmunityTempForRevenge"],
+				"applyToTargetType": "Enemy",
+				"showMissConditions": "ShowNoMiss",
+				"skipAbilityEffect": true,
+				"applyConditions": "AtLeast2WaterEnemies"
+			},{
+				"buffs": ["LethalPoison","BurnImmunityTempForRevenge"],
+				"applyToTargetType": "Enemy",
+				"showMissConditions": "ShowNoMiss",
+				"skipAbilityEffect": true,
+				"applyConditions": "AtLeast2DeathEnemies"
+			},{
+				"randomBuffFromList": ["SleepForcedThorns","LethalPoison"],
+				"buffs": ["BurnImmunityTempForRevenge"],
+				"applyToTargetType": "Enemy",
+				"showMissConditions": "ShowNoMiss",
+				"skipAbilityEffect": true,
+				"applyConditions": "Not2WaterOrDeathEnemiesOnTheBattlefield"
+			},{
+				"buffs": ["RemovePoison","PoisonImmunityOnce","SleepImmunityOnce","LoseMomentum","GainMomentum","RemoveActive4LOCKManchesterRegular"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "ManchesterAttack",
+			"attackScalors": ["GoodWithMomentum"],
+			"conditionedAbilityEffects": ["ManchesterAttack","ManchesterAttack"],
+			"recommendEffectWhenUsable": -2
+		},
+		"AllyAndEnemyBuffAManchesterRegular":{
+			"class": "AbilityConfig",
+			"targetingData": "All",
+			"components": ["ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides":[{
+				"buffs": ["Heal500Percent"],
+				"applyToTargetType": "Friendly"
+			},{
+				"buffs": ["HasteUp30Percent"],
+				"applyToTargetType": "Friendly",
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss",
+				"applyConditions": "IsNotBurning"
+			},{
+				"buffs": ["SpiritLossF"],
+				"applyToTargetType": "Enemy",
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss",
+				"applyConditions": "IsNotBurning"
+			},{
+				"buffs": ["ManchesterRegularActive2Cooldown50"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["KillRandomEnemyAndCreditKillManchesterRegularLV1"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss",
+				"applyConditions": "HasNoAwakening"
+			},{
+				"buffs": ["KillRandomEnemyAndCreditKillManchesterRegularLV2"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss",
+				"applyConditions": "Has1AwakeningExact"
+			},{
+				"buffs": ["KillRandomEnemyAndCreditKillManchesterRegularLV3"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss",
+				"applyConditions": "Has2AwakeningsExact"
+			},{
+				"buffs": ["KillRandomEnemyAndCreditKillManchesterRegularLV4"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss",
+				"applyConditions": "Has3AwakeningsExact"
+			},{
+				"buffs": ["KillRandomEnemyAndCreditKillManchesterRegularLV5"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss",
+				"applyConditions": "Has4Awakenings"
+			}],
+			"friendlyEventType": "Finish",
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"flags": ["Healer","NoDamage"],
+			"abilityEffect": "ManchesterHeal1",
+			"useCondition": "NotInstantCooldown"
+		},
+		"SelfBuffAManchesterRegular":{
+			"class": "AbilityConfig",
+			"targetingData": "SelfOnly",
+			"components": ["ApplyBuff"],
+			"componentOverrides": [{
+				"buffs": ["RemoveEnergy","FortifyFor3Attacks","PartyModeAttackUP50PercentManchesterRegular"],
+				"applyToTargetType": "Source"
+			}],
+			"sourceEventType": "Finish",
+			"abilityEffect": "ManchesterPowerUp",
+			"flags": ["NoDamage"],
+			"useCondition": "IsCharged3AndNotBurning"
+		},
+		"AllAttackAManchesterRegular":{
+			"class": "AbilityConfig",
+			"targetingData": "AllEnemy",
+			"components": ["Damage","ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"applyToTargetType": "Enemy",
+				"damageFlags": ["HardIgnoreBlockDeath","IgnoreSkin","DoNotWake"],
+				"drainPercent": 1.0,
+				"drainEffect": "VampireDrain1"
+			},{
+				"buffs": ["SleepForcedThorns","BurnImmunityTempForRevenge"],
+				"applyToTargetType": "Enemy",
+				"showMissConditions": "ShowNoMiss",
+				"skipAbilityEffect": true,
+				"applyConditions": "AtLeast2WaterEnemies"
+			},{
+				"buffs": ["LethalPoison","BurnImmunityTempForRevenge"],
+				"applyToTargetType": "Enemy",
+				"showMissConditions": "ShowNoMiss",
+				"skipAbilityEffect": true,
+				"applyConditions": "AtLeast2DeathEnemies"
+			},{
+				"randomBuffFromList": ["SleepForcedThorns","LethalPoison"],
+				"buffs": ["BurnImmunityTempForRevenge"],
+				"applyToTargetType": "Enemy",
+				"showMissConditions": "ShowNoMiss",
+				"skipAbilityEffect": true,
+				"applyConditions": "Not2WaterOrDeathEnemiesOnTheBattlefield"
+			},{
+				"buffs":["Active4LOCKManchesterRegular"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Hit",
+			"abilityEffect": "ManchesterSp",
+			"attackScalors": ["GoodVsRandomDamageMark"],
+			"conditionedAbilityEffects": ["ManchesterSp","ManchesterSp"],
+			"recommendEffectWhenUsable": -1,
+			"useCondition": "IsNotActive4LOCKManchesterRegular"
 		}
 	}
 }

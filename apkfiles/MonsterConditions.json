@@ -1,6 +1,6 @@
 {
 	"Version": 23,
-    "Time": 1783074383,
+    "Time": 1783403692,
 	"MonsterConditions": {
 	"IsFire": {
 		"class": "MonsterConditions",
@@ -3922,6 +3922,13 @@
 		"checkEnemyTeamOfMonster": true,
 		"enemyTeamMonsterConditionMatchesNeeded": {
 			"IsWater": 1
+		}
+	},
+	"AtLeast2WaterEnemies": {
+		"class": "MonsterConditions",
+		"checkEnemyTeamOfMonster": true,
+		"enemyTeamMonsterConditionMatchesNeeded": {
+			"IsWater": 2
 		}
 	},
 	"AtLeast3WaterEnemies": {
@@ -30855,6 +30862,142 @@
 		"not":{
 			"class": "MonsterConditions",
 			"buffStackNames": ["InstantCooldown"]
+		}
+	},
+	"Not2WaterOrDeathEnemiesOnTheBattlefield": {
+		"class": "MonsterConditions",
+		"not": {
+			"class": "MonsterConditions",
+			"checkEnemyTeamOfMonster": true,
+			"enemyTeamMonsterConditionMatchesNeeded": {
+				"IsWater": 2,
+			"or": {
+				"class": "MonsterConditions",
+				"checkEnemyTeamOfMonster": true,
+				"enemyTeamMonsterConditionMatchesNeeded": {
+					"IsDeath": 2
+					}
+				}
+			}
+		}
+	},
+	"2UnitsNotBurningOnBattlefield": {
+		"class": "MonsterConditions",
+		"not": {
+			"class": "MonsterConditions",
+			"myTeamMonsterConditionMatchesNeeded": {
+				"IsBurning": 2
+			},
+			"or": {
+				"class": "MonsterConditions",
+				"checkEnemyTeamOfMonster": true,
+				"enemyTeamMonsterConditionMatchesNeeded": {
+					"IsBurning": 2
+					},
+					"or": {
+						"class": "MonsterConditions",
+						"myTeamMonsterConditionMatchesNeeded": {
+							"IsBurning": 1
+						},
+						"and": {
+							"class": "MonsterConditions",
+							"checkEnemyTeamOfMonster": true,
+							"enemyTeamMonsterConditionMatchesNeeded": {
+								"IsBurning": 1
+						}
+					}
+				}
+			}
+		}
+	},
+	"IsCharged3AndNotBurning": {
+		"class": "MonsterConditions",
+		"buffStackNames": ["StoreEnergy"],
+		"buffStackCounts": [3],
+		"not":{
+			"class": "MonsterConditions",
+			"buffStackNames": ["Burn"]
+		}
+	},
+	"IsLargeHijikataCharged5": {
+		"class": "MonsterConditions",
+		"buffStackNames": ["LargeDriveCounter"],
+		"buffStackCounts": [5]
+	},
+	"IsNotManchesterRegularPassiveLock": {
+		"class": "MonsterConditions",
+		"not":{
+			"class": "MonsterConditions",
+			"buffStackNames": ["ManchesterRegularBigPassiveLock"],
+			"or":{
+				"class": "MonsterConditions",
+				"buffStackNames": ["ManchesterRegularSmallPassiveLock"]
+			}
+		}
+	},
+	"EnemySpirit0And20PercentChance": {
+		"class": "MonsterConditions",
+		"enemyTeamSpiritLessThan": 100,
+		"chance": 0.20
+	},
+	"EnemySpirit0And40PercentChance": {
+		"class": "MonsterConditions",
+		"enemyTeamSpiritLessThan": 100,
+		"chance": 0.40
+	},
+	"EnemySpirit0And60PercentChance": {
+		"class": "MonsterConditions",
+		"enemyTeamSpiritLessThan": 100,
+		"chance": 0.60
+	},
+	"EnemySpirit0And80PercentChance": {
+		"class": "MonsterConditions",
+		"enemyTeamSpiritLessThan": 100,
+		"chance": 0.80
+	},
+	"IsEarthernMightAKAPartyMode": {
+		"class": "MonsterConditions",
+		"buffStackNames": ["PartyModeElmKouhaiRegular"],
+		"or":{
+			"class": "MonsterConditions",
+			"buffStackNames": ["PartyModeManchesterRegular"]
+		}
+	},
+	"IsNotBurningOrEarthernMight1":{
+		"class": "MonsterConditions",
+		"not":{
+			"class": "MonsterConditions",
+			"buffStackNames": ["Burn"],
+			"or":{
+				"class": "MonsterConditions",
+				"buffStackNames": ["PartyModeElmKouhaiRegular"]
+			}
+		}
+	},
+	"IsNotFortifiedOrEarthernMight1Or2":{
+		"class": "MonsterConditions",
+		"not":{
+			"class": "MonsterConditions",
+			"monsterTags": ["Fortify"],
+			"or":{
+				"class": "MonsterConditions",
+				"buffStackNames": ["PartyModeElmKouhaiRegular"],
+				"or":{
+					"class": "MonsterConditions",
+					"buffStackNames": ["PartyModeManchesterRegular"]
+				}
+			}
+		}
+	},
+	"IsNotEarthernMightAKAPartyMode": {
+		"class": "MonsterConditions",
+		"not": {
+			"class": "MonsterConditions",
+			"buffStackNames": ["PartyModeElmKouhaiRegular"],
+			"and":{
+				"class": "MonsterConditions",
+				"buffStackNames": ["PartyModeManchesterRegular"]
+			}
 		}
 	}
 }
