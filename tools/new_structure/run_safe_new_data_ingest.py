@@ -21,6 +21,7 @@ FAST_POST_PIPELINE_STEPS = [
     "build_optimizer_runtime_model.py",
     "split_optimizer_runtime_model.py",
     "runtime_optimizer_trace.py",
+    "validate_entries.py",
     "audit_master_field_contract.py",
 ]
 

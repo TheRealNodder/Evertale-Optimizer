@@ -212,14 +212,14 @@ def audit_runtime(repo: Path) -> Tuple[Dict[str, Any], List[str], List[str]]:
     runtime = read_json(path, None)
     if not isinstance(runtime, dict):
         return {"present": False}, [f"[runtime] {RUNTIME_REL}: missing or invalid"], []
-    required = ["characters", "characterEntries", "weapons", "accessories", "bosses", "tags", "runtimeFlags"]
+    required = ["characters", "characterEntries", "weapons", "accessories", "bosses", "tags", "tagAuthority", "featureEvidence", "runtimeFlags"]
     errors: List[str] = []
     warnings: List[str] = []
     for field in required:
         if field not in runtime:
             errors.append(f"[runtime] missing {field}")
     flags = runtime.get("runtimeFlags") if isinstance(runtime.get("runtimeFlags"), dict) else {}
-    for flag in ("usesAI", "usesScalers", "usesStatuses", "usesPassives", "usesLeaderSkills", "usesSummons", "usesTags"):
+    for flag in ("usesAI", "usesScalers", "usesStatuses", "usesPassives", "usesLeaderSkills", "usesSummons", "usesTags", "usesFeatureEvidence"):
         if flag not in flags:
             warnings.append(f"[runtime] runtimeFlags.{flag} missing")
     return {
@@ -231,6 +231,7 @@ def audit_runtime(repo: Path) -> Tuple[Dict[str, Any], List[str], List[str]]:
         "accessories": len(runtime.get("accessories") or {}),
         "bosses": len(runtime.get("bosses") or {}),
         "tags": len(runtime.get("tags") or {}),
+        "featureEvidence": len(runtime.get("featureEvidence") or {}),
     }, errors, warnings
 
 
@@ -245,7 +246,7 @@ def main() -> int:
     report = {
         "schemaVersion": 1,
         "generatedAt": int(time.time()),
-        "status": "ok" if not errors else "failed",
+        "status": "failed" if errors else "warning" if warnings else "ok",
         "purpose": "Master Control field contract audit for Catalog, Roster, and Optimizer readiness.",
         "entrySummary": entry_summary,
         "bundleSummary": bundle_summary,

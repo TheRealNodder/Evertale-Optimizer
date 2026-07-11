@@ -103,6 +103,9 @@ def run_step(repo_root: Path, tools_dir: Path, step: str, args: argparse.Namespa
     started = int(time.time())
     command = [sys.executable, str(script_path)]
 
+    if step == "validate":
+        command.append("--structural-only")
+
     if step == "extract_entries":
         if args.raw:
             command.extend(["--base", str(resolve_repo_path(repo_root, args.raw, "apkfiles"))])

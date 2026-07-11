@@ -14,10 +14,16 @@
     try {
       if (typeof window.loadOptimizerRuntime === 'function') {
         setStatus('Runtime: loading...');
-        const runtime = await window.loadOptimizerRuntime({ skipHeavy: true });
+        const runtime = await window.loadOptimizerRuntime({ profile: 'optimizer-foundation' });
         const chunks = Object.keys(runtime && runtime.chunks ? runtime.chunks : {}).length;
-        setStatus('Runtime: loaded (' + chunks + ' chunks)');
-        window.__optimizerRuntimeReady = true;
+        const contract = runtime && runtime.contracts ? runtime.contracts : {};
+        const optimizerFoundationReady = contract.optimizerFoundationReady === true;
+        const missing = Array.isArray(contract.missingFoundationChunks) ? contract.missingFoundationChunks : [];
+        setStatus(optimizerFoundationReady
+          ? 'Runtime: foundation ready (' + chunks + ' chunks)'
+          : 'Runtime: incomplete (' + missing.join(', ') + ')');
+        window.__optimizerRuntimeReady = optimizerFoundationReady;
+        window.__optimizerRuntimeDiagnostics = { optimizerFoundationReady, missing, errors: { ...(runtime.errors || {}) } };
         return runtime;
       }
       setStatus('Runtime: loader unavailable');

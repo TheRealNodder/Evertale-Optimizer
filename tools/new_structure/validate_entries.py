@@ -272,7 +272,157 @@ def validate_markers(base: Path, warnings: List[str]) -> Dict[str, Any]:
     return marker_status
 
 
-def validate() -> int:
+def semantic_source_id(row: Dict[str, Any]) -> str:
+    internal = row.get("internal") if isinstance(row.get("internal"), dict) else {}
+    return str(row.get("sourceId") or internal.get("sourceId") or "").strip()
+
+
+def semantic_family(row: Dict[str, Any]) -> str:
+    internal = row.get("internal") if isinstance(row.get("internal"), dict) else {}
+    source_id = semantic_source_id(row)
+    return str(row.get("family") or internal.get("family") or re.sub(r"\d+$", "", source_id)).strip()
+
+
+def semantic_form_number(row: Dict[str, Any]) -> int:
+    match = re.search(r"(\d+)$", semantic_source_id(row))
+    return int(match.group(1)) if match else 0
+
+
+def semantic_stars(row: Dict[str, Any]) -> int:
+    raw = row.get("raw") if isinstance(row.get("raw"), dict) else {}
+    try:
+        return int(raw.get("stars") if raw.get("stars") is not None else row.get("stars") or 0)
+    except (TypeError, ValueError):
+        return 0
+
+
+def semantic_rarity(stars: int) -> str:
+    if stars >= 5:
+        return "SSR"
+    if stars == 4:
+        return "SR"
+    if stars == 3:
+        return "R"
+    return "N"
+
+
+def append_semantic_failure(errors: List[str], label: str, rows: List[str]) -> None:
+    if rows:
+        errors.append(f"[semantic] {label}: {len(rows)}; sample={rows[:10]}")
+
+
+def validate_optimizer_semantics(repo: Path, base: Path, errors: List[str], warnings: List[str]) -> Dict[str, Any]:
+    character_bundle = load_json(base / "bundles" / "characters.bundle.json", {})
+    family_bundle = load_json(base / "bundles" / "character_families.bundle.json", {})
+    runtime = load_json(base / "runtime" / "optimizer_runtime_model.json", {})
+    manifest = load_json(base / "runtime" / "optimizer_runtime_manifest.json", {})
+    tag_report = load_json(base / "reports" / "tag_sync_report.json", {})
+    runtime_report = load_json(base / "reports" / "optimizer_runtime_model_report.json", {})
+    entries = [row for row in character_bundle.get("entries", []) if isinstance(row, dict)]
+    families = [row for row in family_bundle.get("entries", []) if isinstance(row, dict)]
+    family_map = {str(row.get("family") or ""): row for row in families}
+    grouped: Dict[str, List[Dict[str, Any]]] = {}
+    for row in entries:
+        grouped.setdefault(semantic_family(row), []).append(row)
+
+    family_rarity_errors: List[str] = []
+    entry_rarity_errors: List[str] = []
+    state_star_errors: List[str] = []
+    leader_count = 0
+    for family, forms in grouped.items():
+        ordered = sorted(forms, key=lambda row: (semantic_form_number(row) or 9999, semantic_source_id(row)))
+        base_form = next((row for row in ordered if semantic_form_number(row) == 1), ordered[0])
+        expected = semantic_rarity(semantic_stars(base_form))
+        family_row = family_map.get(family, {})
+        if family_row.get("rarity") != expected:
+            family_rarity_errors.append(f"{family}:{family_row.get('rarity')}!={expected}")
+        states = family_row.get("states") if isinstance(family_row.get("states"), list) else []
+        state_map = {str(state.get("sourceId") or state.get("dataSourceId") or ""): state for state in states if isinstance(state, dict)}
+        for form in forms:
+            source_id = semantic_source_id(form)
+            if form.get("rarity") != expected:
+                entry_rarity_errors.append(f"{source_id}:{form.get('rarity')}!={expected}")
+            number = semantic_form_number(form)
+            if 0 < number <= 3:
+                state = state_map.get(source_id)
+                if not state or int(state.get("stars") or 0) != semantic_stars(form):
+                    state_star_errors.append(f"{source_id}:state={state.get('stars') if state else None},raw={semantic_stars(form)}")
+            refs = form.get("refs") if isinstance(form.get("refs"), dict) else {}
+            raw = form.get("raw") if isinstance(form.get("raw"), dict) else {}
+            if refs.get("leaderBuff") or raw.get("leaderBuff") or form.get("leaderSkills"):
+                leader_count += 1
+
+    append_semantic_failure(errors, "family rarity/base-stars mismatch", family_rarity_errors)
+    append_semantic_failure(errors, "entry rarity/family mismatch", entry_rarity_errors)
+    append_semantic_failure(errors, "family state/raw-form stars mismatch", state_star_errors)
+
+    expected_entry_keys = {semantic_source_id(row) for row in entries if semantic_source_id(row)}
+    runtime_entries = runtime.get("characterEntries") if isinstance(runtime.get("characterEntries"), dict) else {}
+    runtime_entry_keys = set(runtime_entries)
+    if runtime_entry_keys != expected_entry_keys:
+        errors.append(f"[semantic] runtime characterEntries keys/count mismatch: runtime={len(runtime_entry_keys)} source={len(expected_entry_keys)}")
+    collisions = runtime.get("identityCollisions") if isinstance(runtime.get("identityCollisions"), list) else []
+    if collisions:
+        errors.append(f"[semantic] runtime identity collisions: {len(collisions)}")
+
+    flags = runtime.get("runtimeFlags") if isinstance(runtime.get("runtimeFlags"), dict) else {}
+    tags = runtime.get("tags") if isinstance(runtime.get("tags"), dict) else {}
+    evidence = runtime.get("featureEvidence") if isinstance(runtime.get("featureEvidence"), dict) else {}
+    evidence_count = sum(len(rows) for rows in evidence.values() if isinstance(rows, list))
+    if bool(tags) != bool(flags.get("usesTags")):
+        errors.append("[semantic] runtimeFlags.usesTags is not truthful")
+    if bool(evidence) != bool(flags.get("usesFeatureEvidence")):
+        errors.append("[semantic] runtimeFlags.usesFeatureEvidence is not truthful")
+    if not evidence:
+        errors.append("[semantic] resolved character data produced no feature evidence")
+    if not tags:
+        warnings.append("[semantic] curated tags are empty; feature evidence is the active fallback authority")
+    if tag_report.get("status") not in {"ok", "warning", "failed"}:
+        errors.append("[semantic] tag sync report has no explicit status")
+    if runtime_report.get("status") not in {"ok", "warning", "failed"}:
+        errors.append("[semantic] runtime model report has no explicit status")
+
+    manifest_chunks = manifest.get("chunks") if isinstance(manifest.get("chunks"), dict) else {}
+    for chunk in ("characters", "characterEntries", "featureEvidence", "tags", "optimizerKnowledge"):
+        if chunk not in manifest_chunks:
+            errors.append(f"[semantic] runtime manifest missing {chunk} chunk")
+    if manifest_chunks.get("characterEntries", {}).get("count") != len(expected_entry_keys):
+        errors.append("[semantic] runtime manifest characterEntries count is stale")
+    if manifest_chunks.get("featureEvidence", {}).get("count") != len(evidence):
+        errors.append("[semantic] runtime manifest featureEvidence count is stale")
+    if leader_count and not flags.get("usesLeaderSkills"):
+        errors.append("[semantic] leader authority exists but runtimeFlags.usesLeaderSkills is false")
+
+    doctrine = (repo / "optimizer_doctrine.js").read_text(encoding="utf-8")
+    shared = (repo / "optimizer-v5-lab" / "optimizer-v5-shared.js").read_text(encoding="utf-8")
+    duplicate_guard = (repo / "optimizer-v5-lab" / "optimizer-duplicate-guard.js").read_text(encoding="utf-8")
+    policy_checks = {
+        "story5Main3Back": "story: { main: 5, back: 3 }" in doctrine and "STORY_MAIN:5" in shared and "STORY_BACK:3" in shared,
+        "platoons20x5": "platoons: { count: 20, size: 5 }" in doctrine and "PLATOONS:20" in shared and "PLATOON_SIZE:5" in shared,
+        "leaderAll8BestOnly": 'appliesTo: "all_8"' in doctrine and 'stacking: "best_only"' in doctrine,
+        "rainbowMinimum4": "storyDistinctElementsMin:4" in doctrine,
+        "strictDuplicateIdentity": all(token in duplicate_guard for token in ("entry", "family", "name")),
+    }
+    for name, passed in policy_checks.items():
+        if not passed:
+            errors.append(f"[semantic] optimizer policy contract failed: {name}")
+
+    return {
+        "characterEntries": len(entries),
+        "characterFamilies": len(families),
+        "runtimeCharacterEntries": len(runtime_entry_keys),
+        "runtimeTags": len(tags),
+        "featureEvidenceEntries": len(evidence),
+        "featureEvidenceItems": evidence_count,
+        "leaderEntries": leader_count,
+        "familyRarityMismatches": len(family_rarity_errors),
+        "entryRarityMismatches": len(entry_rarity_errors),
+        "stateStarMismatches": len(state_star_errors),
+        "policyChecks": policy_checks,
+    }
+
+
+def validate(include_optimizer_semantics: bool = True) -> int:
     configure_utf8_stdio()
     repo_root = find_repo_root(Path(__file__).resolve())
     if not repo_root:
@@ -365,10 +515,12 @@ def validate() -> int:
         if rows:
             errors.append(f"[{category}] Duplicate sourceIds in index: {len(rows)}")
 
-    report = {"validatorVersion": 6, "generatedAt": int(time.time()), "repoRoot": str(repo_root), "entriesRoot": str(base), "checked": checked, "categoryCounts": category_counts, "bundleCounts": bundle_counts, "markerStatus": marker_status, "duplicateSourceIds": duplicate_source_ids, "errors": errors, "warnings": warnings}
+    semantic_summary = validate_optimizer_semantics(repo_root, base, errors, warnings) if include_optimizer_semantics else {"status": "deferred_until_runtime_rebuild"}
+    status = "failed" if errors else "warning" if warnings else "ok"
+    report = {"validatorVersion": 7, "generatedAt": int(time.time()), "status": status, "repoRoot": str(repo_root), "entriesRoot": str(base), "checked": checked, "categoryCounts": category_counts, "bundleCounts": bundle_counts, "markerStatus": marker_status, "duplicateSourceIds": duplicate_source_ids, "semanticSummary": semantic_summary, "errors": errors, "warnings": warnings}
     reports_dir = base / "reports"
     write_json(reports_dir / "validation_report.json", report)
-    write_json(base / "_markers" / "validate_entries.marker.json", {"schemaVersion": 1, "tool": "validate_entries", "category": "all", "status": "failed" if errors else "complete", "lastKey": "validation", "lastSourceId": "", "lastHandle": None, "lastFile": "apkfiles/entries/reports/validation_report.json", "processedCount": checked, "totalCount": checked, "updatedAt": int(time.time()), "extra": {"errors": len(errors), "warnings": len(warnings)}})
+    write_json(base / "_markers" / "validate_entries.marker.json", {"schemaVersion": 2, "tool": "validate_entries", "category": "all", "status": status, "lastKey": "validation", "lastSourceId": "", "lastHandle": None, "lastFile": "apkfiles/entries/reports/validation_report.json", "processedCount": checked, "totalCount": checked, "updatedAt": int(time.time()), "extra": {"errors": len(errors), "warnings": len(warnings)}})
 
     print(f"Checked Entries : {checked}")
     print(f"Errors          : {len(errors)}")
@@ -382,4 +534,8 @@ def validate() -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(validate())
+    import argparse
+    parser = argparse.ArgumentParser(description="Validate generated Evertale entry and optimizer authorities.")
+    parser.add_argument("--structural-only", action="store_true", help="Defer optimizer runtime semantic checks until runtime chunks are rebuilt.")
+    args = parser.parse_args()
+    raise SystemExit(validate(include_optimizer_semantics=not args.structural_only))
