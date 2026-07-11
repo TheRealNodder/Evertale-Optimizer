@@ -26,6 +26,7 @@ from entry_checkpoint import write_marker as write_entry_marker
 from path_utils import find_repo_root, resolve_repo_path
 
 SCRIPT_VERSION = "8-semantic-authorities"
+LEGACY_CATEGORY_SCRIPT_VERSION = "7-base-form-rarity"
 TOOL_NAME = "build_apk_entry_folders"
 IMAGEKIT_BASE = "https://ik.imagekit.io/r8fsa98s9"
 ROOT_MARKERS = ("apkfiles", "tools")
@@ -77,6 +78,11 @@ RESOLVER_FILES = {
 
 def now_int() -> int:
     return int(time.time())
+
+
+def category_script_version(category: str) -> str:
+    """Limit character-authority invalidation to character outputs."""
+    return SCRIPT_VERSION if category == "characters" else LEGACY_CATEGORY_SCRIPT_VERSION
 
 
 def stable_json(data: Any) -> str:
@@ -355,9 +361,10 @@ def dependency_fingerprint_for_ability(ability_id: str, resolvers: Dict[str, Dic
 
 
 def build_source_marker(item: Optional[Dict[str, Any]], category: str, internal_id: str, order_index: int, display_name: Optional[str], resolvers: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
+    script_version = category_script_version(category)
     if item is None:
-        material = {"placeholder": True, "category": category, "internalId": internal_id, "order": order_index, "displayName": display_name, "scriptVersion": SCRIPT_VERSION}
-        return {"scriptVersion": SCRIPT_VERSION, "sourceHash": sha256_data(material), "dependencyHash": None}
+        material = {"placeholder": True, "category": category, "internalId": internal_id, "order": order_index, "displayName": display_name, "scriptVersion": script_version}
+        return {"scriptVersion": script_version, "sourceHash": sha256_data(material), "dependencyHash": None}
     active_ids = [x for x in ordered_values(item.get("activeSkills", [])) if isinstance(x, str)]
     passive_ids = [x for x in ordered_values(item.get("passives", item.get("passiveSkills", []))) if isinstance(x, str)]
     dependency_material = {
@@ -365,8 +372,8 @@ def build_source_marker(item: Optional[Dict[str, Any]], category: str, internal_
         "characterLocalization": localize_character(resolvers["Localizable"], internal_id, str(item.get("name") or internal_id)) if category == "characters" else None,
         "leaderCondition": resolvers["MonsterConditions"].get(item.get("leaderBuffCondition")) if isinstance(item.get("leaderBuffCondition"), str) else None,
     }
-    source_material = {"category": category, "internalId": internal_id, "order": order_index, "displayName": display_name, "raw": item, "scriptVersion": SCRIPT_VERSION}
-    return {"scriptVersion": SCRIPT_VERSION, "sourceHash": sha256_data(source_material), "dependencyHash": sha256_data(dependency_material)}
+    source_material = {"category": category, "internalId": internal_id, "order": order_index, "displayName": display_name, "raw": item, "scriptVersion": script_version}
+    return {"scriptVersion": script_version, "sourceHash": sha256_data(source_material), "dependencyHash": sha256_data(dependency_material)}
 
 
 def existing_marker_matches(path: Path, marker: Dict[str, Any], force: bool) -> bool:

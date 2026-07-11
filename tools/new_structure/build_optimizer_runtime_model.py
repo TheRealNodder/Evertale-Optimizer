@@ -79,7 +79,7 @@ def entry_key(row: Dict[str, Any]) -> str:
 
 
 def generic_key(row: Dict[str, Any]) -> str:
-    return str(row.get("family") or row.get("id") or row.get("sourceId") or internal(row).get("sourceId") or "").strip()
+    return str(row.get("sourceId") or internal(row).get("sourceId") or row.get("family") or row.get("id") or "").strip()
 
 
 def index_unique(
