@@ -11,12 +11,15 @@ for(const file of [
   'optimizer-v6-feature-model.js',
   'optimizer-v6-team-evaluator.js',
   'optimizer-v6-story-search.js',
+  'optimizer-v6-platoon-generator.js',
+  'optimizer-v6-platoon-allocator.js',
   'optimizer-v6-engine.js',
   'optimizer-v6-regression-fixtures.js',
-  'optimizer-v6-story-regression-fixtures.js'
+  'optimizer-v6-story-regression-fixtures.js',
+  'optimizer-v6-platoon-regression-fixtures.js'
 ])require(path.join(__dirname,'..','optimizer-v6',file));
 
-for(const [name,run] of [['foundation',global.runOptimizerV6RegressionFixtures],['story',global.runOptimizerV6StoryRegressionFixtures]]){
+for(const [name,run] of [['foundation',global.runOptimizerV6RegressionFixtures],['story',global.runOptimizerV6StoryRegressionFixtures],['platoon',global.runOptimizerV6PlatoonRegressionFixtures]]){
   const report=run();
   for(const row of report.results)console.log(`${row.pass?'PASS':'FAIL'} ${row.name}: ${row.detail}`);
   console.log(`V6 ${name} fixtures: ${report.passed}/${report.total} passed`);
