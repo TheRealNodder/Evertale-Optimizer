@@ -7,7 +7,6 @@ on:
       - main
     paths:
       - 'tools/new_structure/**'
-      - 'apkfiles/entries/**'
       - 'data/character_tags.json'
       - 'data/character_tags_additions.json'
       - 'weapon_order.txt'
@@ -36,22 +35,24 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Run safe entry pipeline
+      # Raw APK extraction is intentionally manual through master-control.yml.
+      # Automatic runs rebuild only from the checked-in authorities.
+      - name: Run supported Master Control safe rebuild
         id: pipeline
         shell: bash
         continue-on-error: true
         run: |
           mkdir -p workflow-debug-artifacts
           set +e
-          python tools/new_structure/run_entry_pipeline.py > workflow-debug-artifacts/run_entry_pipeline.stdout.log 2> workflow-debug-artifacts/run_entry_pipeline.stderr.log
+          python tools/new_structure/MASTER_CONTROL.py --no-gui > workflow-debug-artifacts/master_control.stdout.log 2> workflow-debug-artifacts/master_control.stderr.log
           status=$?
-          echo "$status" > workflow-debug-artifacts/run_entry_pipeline.exitcode.txt
+          echo "$status" > workflow-debug-artifacts/master_control.exitcode.txt
           echo "PIPELINE_EXIT_CODE=$status" >> "$GITHUB_ENV"
           echo "Pipeline exit code: $status"
           echo "--- STDOUT TAIL ---"
-          tail -n 250 workflow-debug-artifacts/run_entry_pipeline.stdout.log || true
+          tail -n 250 workflow-debug-artifacts/master_control.stdout.log || true
           echo "--- STDERR TAIL ---"
-          tail -n 250 workflow-debug-artifacts/run_entry_pipeline.stderr.log || true
+          tail -n 250 workflow-debug-artifacts/master_control.stderr.log || true
           exit 0
 
       - name: Collect debug reports
@@ -69,7 +70,9 @@ jobs:
           print('Entry Safe Rebuild Debug Summary')
           print('================================')
           for p in [
-              Path('workflow-debug-artifacts/run_entry_pipeline.exitcode.txt'),
+              Path('workflow-debug-artifacts/master_control.exitcode.txt'),
+              Path('apkfiles/entries/reports/master_control_report.json'),
+              Path('apkfiles/entries/reports/safe_new_data_ingest_report.json'),
               Path('apkfiles/entries/reports/entry_pipeline_report.json'),
               Path('apkfiles/entries/reports/validation_report.json'),
               Path('apkfiles/entries/reports/category_order_sync_report.json'),

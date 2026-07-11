@@ -85,20 +85,20 @@ jobs:
         run: |
           set -euo pipefail
           MC="tools/new_structure/MASTER_CONTROL.py"
+          EXTRA=()
+          if [ "${{ inputs.full_audit }}" = "true" ]; then
+            EXTRA+=(--full-audit)
+          fi
 
           if [ "${{ inputs.mode }}" = "safe_rebuild" ]; then
-            python "$MC"
+            python "$MC" --no-gui "${EXTRA[@]}"
           elif [ "${{ inputs.mode }}" = "extract" ]; then
-            python "$MC" --extract
+            python "$MC" --extract "${EXTRA[@]}"
           elif [ "${{ inputs.mode }}" = "extract_force" ]; then
-            python "$MC" --extract --force
+            python "$MC" --extract --force "${EXTRA[@]}"
           else
             echo "Unknown mode: ${{ inputs.mode }}"
             exit 1
-          fi
-
-          if [ "${{ inputs.full_audit }}" = "true" ]; then
-            python "$MC" --full-audit
           fi
 
       - name: Upload reports as artifact
