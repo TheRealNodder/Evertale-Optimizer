@@ -5,8 +5,8 @@
 
    - Adds window.runOptimizer()
    - Auto-runs optimizer whenever refreshOptimizerFromOwned runs
-   - V5 is loaded directly by optimizer-v5-lab/optimizer-v5-loader.js
-   - V4 remains available through optimizer-legacy only
+   - V6 is the public async engine; V5 remains loaded for comparison fixtures
+   - V4 remains available as an explicit legacy module and is never auto-activated
    ========================================================= */
 
 (function (global) {

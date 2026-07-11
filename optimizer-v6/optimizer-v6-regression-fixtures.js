@@ -22,6 +22,7 @@
     g.OptimizerRuntime=previous;
     return attached;
   }
+  function expectedFailure(run){const original=console.error;console.error=()=>{};try{return run();}finally{console.error=original;}}
 
   function run(){
     const results=[];
@@ -97,6 +98,25 @@
       assert(good.valid,'Complete mechanical team was rejected');
       assert(!bad.valid&&bad.score===0,'Neutral newer unit overrode mandatory setup');
       return 'mechanical completeness remains mandatory';
+    });
+
+    test('missing runtime authority fails without fallback',()=>{
+      const previous=g.OptimizerRuntime;g.OptimizerRuntime={contracts:{optimizerFoundationReady:false},chunks:{}};
+      const report=expectedFailure(()=>root.engine.run(makeTeam('MissingRuntime'),{buildScope:'story',presetMode:'hard',presetTag:'burn'}));g.OptimizerRuntime=previous;
+      assert(report.diagnostics.v6Failed&&report.diagnostics.usedFallback===false,'Missing runtime did not fail safely');
+      return report.engineVersion;
+    });
+
+    test('insufficient roster fails without changing format contracts',()=>{
+      const previous=g.OptimizerRuntime;g.OptimizerRuntime={contracts:{optimizerFoundationReady:true},chunks:{featureEvidence:{}}};
+      const report=expectedFailure(()=>root.engine.run(makeTeam('Short').slice(0,7),{buildScope:'story',presetMode:'hard',presetTag:'burn'}));g.OptimizerRuntime=previous;
+      assert(report.diagnostics.v6Failed&&/Insufficient owned roster/.test(report.diagnostics.v6Error),'Insufficient roster was concealed');return report.diagnostics.v6Error;
+    });
+
+    test('invalid locked unit is reported and V4 remains unused',()=>{
+      const raw=makeTeam('BadLock'),store={};raw.forEach((row,index)=>store[row.sourceId]=[evidence(index%2?'payoff_burn':'applies_burn')]);const prepared=withStore(store,raw),previous=g.OptimizerRuntime;
+      g.OptimizerRuntime={contracts:{optimizerFoundationReady:true},chunks:{featureEvidence:store}};const report=expectedFailure(()=>root.engine.run(prepared,{preparedV6:true,buildScope:'story',presetMode:'hard',presetTag:'burn',currentLayout:{storyMain:['MissingUnit','','','',''],storyBack:['','','']},slotLocks:{storyMain:[true,false,false,false,false],storyBack:[false,false,false]}}));g.OptimizerRuntime=previous;
+      assert(report.diagnostics.v6Failed&&report.diagnostics.usedFallback===false&&/Locked Story unit/.test(report.diagnostics.v6Error),'Invalid lock did not fail explicitly');return report.diagnostics.v6Error;
     });
 
     const failed=results.filter(row=>!row.pass);

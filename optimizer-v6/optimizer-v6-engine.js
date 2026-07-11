@@ -14,7 +14,8 @@
   }
 
   function selectedPlan(options,prepared){
-    const explicit=P.key(options?.plan||options?.presetTag||'');
+    const aliases={heal:'guardian',cleanse:'guardian',hp_buff:'guardian',hpbuff:'guardian',turn:'tempo',spirit:'tempo',atk_buff:'hybrid',atkbuff:'hybrid',offense:'hybrid'};
+    const raw=P.key(options?.plan||options?.presetTag||''),explicit=aliases[raw]||raw;
     if(explicit&&explicit!=='auto'&&explicit!=='none')return explicit;
     const v5=g.OptimizerV5Lab?.candidatePool;
     if(v5&&typeof v5.selectPlan==='function')return P.key(v5.selectPlan(options||{},prepared))||'hybrid';
@@ -53,7 +54,8 @@
       for(const plan of plans)add(plan==='hybrid'?'hybrid':'plan',plan,S.search(prepared,{...options,plan,format:'auto',strictFormat:false}));
     }
     candidates.sort((a,b)=>b.score-a.score||a.format.localeCompare(b.format)||a.plan.localeCompare(b.plan)||a.element.localeCompare(b.element));
-    return{selected:candidates[0]||null,alternatives:candidates.slice(1,6),candidates};
+    const distinct=[];for(const candidate of candidates){const ids=new Set(candidate.best.ordered.map(uid));if(distinct.every(other=>other.best.ordered.filter(unit=>ids.has(uid(unit))).length<=6))distinct.push(candidate);if(distinct.length>=6)break;}
+    return{selected:candidates[0]||null,alternatives:distinct.filter(row=>row!==candidates[0]).slice(0,5),candidates};
   }
 
   function emptyResult(error){return{story:{main:[],back:[]},platoons:[],totalScore:0,engineVersion:'optimizerEngineV6-error-no-fallback',diagnostics:{v6Failed:true,v6Error:P.txt(error?.message||error),usedFallback:false}};}
@@ -82,7 +84,7 @@
         platoons:platoonDiagnostics,durationMs:Date.now()-started,usedFallback:false,policyVersion:P.version,selectedEngine:winner.plan
       };
       const platoonScore=platoonDiagnostics?.objective?.total||0;
-      return{story,platoons,totalScore:winner.score+platoonScore,score:winner.score,plan:winner.plan,format:winner.format,alternatives:diagnostics.alternatives,engineVersion:'optimizerEngineV6-foundation',diagnostics};
+      return{story,platoons,totalScore:winner.score+platoonScore,score:winner.score,plan:winner.plan,format:winner.format,alternatives:diagnostics.alternatives,engineVersion:'optimizerEngineV6-live',diagnostics};
     }catch(error){console.error('[Optimizer V6] failed without fallback.',error);return emptyResult(error);}
   }
 

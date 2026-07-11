@@ -31,10 +31,8 @@
   }
   function fallback(err){
     loader.error=String(err?.message||err);
-    loader.usedFallback=true;
-    console.error('[Optimizer V5 Loader] V5 failed to load; activating the explicit V4 legacy fallback.',err);
-    const legacy=g.OptimizerEngineV4FallbackLoader;
-    if(legacy&&typeof legacy.activate==='function')return legacy.activate(loader.error);
+    loader.usedFallback=false;
+    console.error('[Optimizer V5 Loader] V5 failed to load. No legacy fallback was activated.',err);
     throw err;
   }
   function loadSequential(index=0){
