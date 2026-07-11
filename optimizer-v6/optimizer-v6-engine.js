@@ -45,13 +45,14 @@
   function tournament(prepared,options={}){
     const mode=selectedMode(options),hard=options?.presetMode==='hard',primary=selectedPlan(options,prepared),plans=hard?[primary]:['burn','poison','sleep','stun','blood','crisis','survivor','guardian','tempo','hybrid'];
     const candidates=[];let completed=0;const total=mode==='force_mono'||mode==='force_rainbow'?plans.length:plans.length+2;
-    const add=(kind,plan,result)=>{const row=candidateRecord(kind,plan,result);if(row)candidates.push(row);completed++;if(typeof options.onProgress==='function')options.onProgress({type:'progress',stage:'format-tournament',completed,total,percent:Math.min(100,Math.round(completed/Math.max(1,total)*100)),message:`Evaluating ${kind} ${plan}`});};
+    const add=(kind,plan,result)=>{const row=candidateRecord(kind,plan,result);if(row)candidates.push(row);completed++;if(typeof options.onProgress==='function')options.onProgress({type:'progress',stage:'format-tournament',completed,total,percent:Math.min(100,Math.round(completed/Math.max(1,total)*100)),message:`Evaluating ${kind} ${plan}`,firstValid:candidates.length===1,candidate:row?{format:row.format,plan:row.plan,element:row.element,score:row.score}:null});};
     if(mode==='force_mono')for(const plan of plans)add('mono',plan,S.bestMono(prepared,{...options,plan}));
     else if(mode==='force_rainbow')for(const plan of plans)add('rainbow',plan,S.rainbow(prepared,{...options,plan}));
     else{
+      add(primary==='hybrid'?'hybrid':'plan',primary,S.search(prepared,{...options,plan:primary,format:'auto',strictFormat:false}));
       add('mono',primary,S.bestMono(prepared,{...options,plan:primary}));
       add('rainbow',primary,S.rainbow(prepared,{...options,plan:primary}));
-      for(const plan of plans)add(plan==='hybrid'?'hybrid':'plan',plan,S.search(prepared,{...options,plan,format:'auto',strictFormat:false}));
+      for(const plan of plans)if(plan!==primary)add(plan==='hybrid'?'hybrid':'plan',plan,S.search(prepared,{...options,plan,format:'auto',strictFormat:false}));
     }
     candidates.sort((a,b)=>b.score-a.score||a.format.localeCompare(b.format)||a.plan.localeCompare(b.plan)||a.element.localeCompare(b.element));
     const distinct=[];for(const candidate of candidates){const ids=new Set(candidate.best.ordered.map(uid));if(distinct.every(other=>other.best.ordered.filter(unit=>ids.has(uid(unit))).length<=6))distinct.push(candidate);if(distinct.length>=6)break;}
