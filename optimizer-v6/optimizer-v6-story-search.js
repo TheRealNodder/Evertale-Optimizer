@@ -1,0 +1,186 @@
+(function(g){
+  'use strict';
+
+  const root=g.OptimizerV6=g.OptimizerV6||{};
+  const P=root.policy,F=root.featureModel,T=root.teamEvaluator;
+  if(!P||!F||!T)return;
+
+  const rows=value=>Array.isArray(value)?value:[];
+  const num=value=>Number.isFinite(Number(value))?Number(value):0;
+  const uid=unit=>P.txt(unit?.id||unit?.sourceId||unit?.family||unit?.name);
+  const modeOf=options=>options?.format||options?.doctrineOverrides?.monoVsRainbow?.selectionMode||'auto';
+  const requiredPlan=plan=>['burn','poison','sleep','stun','blood'].includes(plan);
+
+  function progress(options,stage,completed,total,message){
+    if(typeof options?.onProgress==='function')options.onProgress({type:'progress',stage,completed,total,percent:total?Math.round(completed/total*100):0,message});
+  }
+
+  function abortIfNeeded(options){if(options?.signal?.aborted||options?.cancelled?.())throw new Error('Optimizer V6 search cancelled');}
+
+  function lockedSlots(options){
+    const layout=options?.currentLayout||{},locks=options?.slotLocks||{},slots=[];
+    const add=(values,flags,offset)=>rows(values).forEach((id,index)=>{if(flags?.[index]&&id)slots.push({position:offset+index,id:P.txt(id)});});
+    add(layout.storyMain,locks.storyMain,0);add(layout.storyBack,locks.storyBack,P.story.main);
+    return slots;
+  }
+
+  function byAnyId(units){
+    const map=new Map();
+    for(const unit of rows(units))for(const value of [unit?.id,unit?.sourceId,unit?.family,unit?.internal?.sourceId]){const text=P.txt(value);if(text&&!map.has(text))map.set(text,unit);}
+    return map;
+  }
+
+  function lockedSeed(units,options){
+    const map=byAnyId(units),slots=lockedSlots(options),selected=[];
+    for(const slot of slots){const unit=map.get(slot.id);if(!unit)throw new Error(`Locked Story unit is invalid or unowned: ${slot.id}`);if(!selected.includes(unit))selected.push(unit);}
+    if(!P.distinctIdentity(selected))throw new Error('Locked Story units contain a duplicate identity');
+    return{slots,selected};
+  }
+
+  function planSignals(unit,plan){
+    const evidence=unit?.__v6?.evidence||{};
+    return{setup:F.mechanical(evidence,plan,'setup'),payoff:F.mechanical(evidence,plan,'payoff')};
+  }
+
+  function unitPotential(unit,plan){
+    const roles=unit?.__v6?.roles||{},signals=planSignals(unit,plan);
+    const role=Math.max(num(roles.damage),num(roles.protection),num(roles.sustain),num(roles.control),num(roles.tempo),num(roles.setup));
+    return P.clamp(num(unit?.__v6?.baseValue)*.48+Math.min(100,(signals.setup+signals.payoff)*36)*.27+role*.20+num(unit?.__v6?.metaPrior)*.05);
+  }
+
+  function candidatePool(units,plan,format,targetElement,options){
+    let source=rows(units).filter(unit=>uid(unit));
+    if(targetElement)source=source.filter(unit=>(unit?.__v6?.element||P.key(unit?.element))===targetElement);
+    const cap=Math.max(P.story.total,Number(options?.candidateCap)||P.search.storyCandidateCap),chosen=new Map();
+    const add=unit=>{if(unit&&!chosen.has(uid(unit))&&chosen.size<cap)chosen.set(uid(unit),unit);};
+    const sorted=[...source].sort((a,b)=>unitPotential(b,plan)-unitPotential(a,plan)||P.identity(a).entry.localeCompare(P.identity(b).entry));
+    lockedSeed(units,options).selected.forEach(add);
+    sorted.slice(0,Math.ceil(cap*.45)).forEach(add);
+    if(requiredPlan(plan)){
+      [...sorted].sort((a,b)=>planSignals(b,plan).setup-planSignals(a,plan).setup).slice(0,12).forEach(add);
+      [...sorted].sort((a,b)=>planSignals(b,plan).payoff-planSignals(a,plan).payoff).slice(0,12).forEach(add);
+    }
+    for(const role of ['damage','protection','sustain','control','tempo','setup']){
+      [...sorted].sort((a,b)=>num(b?.__v6?.roles?.[role])-num(a?.__v6?.roles?.[role])||unitPotential(b,plan)-unitPotential(a,plan)).slice(0,6).forEach(add);
+    }
+    if(format==='rainbow'||format==='force_rainbow')for(const element of P.elements)sorted.filter(unit=>(unit?.__v6?.element||P.key(unit?.element))===element).slice(0,8).forEach(add);
+    sorted.forEach(add);
+    return [...chosen.values()].sort((a,b)=>unitPotential(b,plan)-unitPotential(a,plan)||P.identity(a).entry.localeCompare(P.identity(b).entry));
+  }
+
+  function stateSummary(selected,plan){
+    const elements=new Set(),roles={damage:0,protection:0,sustain:0,control:0,tempo:0,setup:0};
+    let base=0,setup=0,payoff=0,confidence=0;
+    for(const unit of selected){
+      elements.add(unit?.__v6?.element||P.key(unit?.element));base+=num(unit?.__v6?.baseValue);confidence+=num(unit?.__v6?.evidence?.confidence)*100;
+      const signals=planSignals(unit,plan);setup+=signals.setup;payoff+=signals.payoff;
+      for(const role of Object.keys(roles))roles[role]=Math.max(roles[role],num(unit?.__v6?.roles?.[role]));
+    }
+    const roleCoverage=Object.values(roles).reduce((sum,value)=>sum+value,0)/Object.keys(roles).length;
+    const engine=requiredPlan(plan)?(setup>0?28:0)+(payoff>0?32:0):Math.max(setup,payoff)*24;
+    const heuristic=P.clamp((selected.length?base/selected.length:0)*.42+roleCoverage*.28+engine*.25+(selected.length?confidence/selected.length:0)*.05);
+    return{elements,roles,base,setup,payoff,confidence,heuristic};
+  }
+
+  function canAdd(selected,unit){return !selected.some(other=>P.identityConflicts(other,unit));}
+
+  function partialFeasible(selected,pool,remaining,plan,format,targetElement){
+    const summary=stateSummary(selected,plan);
+    if(targetElement&&[...summary.elements].some(element=>element!==targetElement))return false;
+    if(requiredPlan(plan)){
+      if(!summary.setup&&!pool.some(unit=>canAdd(selected,unit)&&planSignals(unit,plan).setup))return false;
+      if(!summary.payoff&&!pool.some(unit=>canAdd(selected,unit)&&planSignals(unit,plan).payoff))return false;
+    }
+    if(format==='rainbow'||format==='force_rainbow'){
+      const available=new Set(summary.elements);
+      for(const unit of pool)if(canAdd(selected,unit))available.add(unit?.__v6?.element||P.key(unit?.element));
+      if(available.size<P.rainbow.preferredDistinct||summary.elements.size+remaining<P.rainbow.preferredDistinct)return false;
+    }
+    return true;
+  }
+
+  function stateToken(selected){return selected.map(unit=>P.identity(unit).entry).sort().join('|');}
+
+  function expandBeam(units,plan,format,targetElement,options={}){
+    const seed=lockedSeed(units,options),pool=candidatePool(units,plan,format,targetElement,options),width=Math.max(10,Number(options.beamWidth)||P.search.storyBeamWidth);
+    if(seed.selected.length>P.story.total)return{teams:[],diagnostics:{reason:'too-many-locked-units'}};
+    let beam=[{selected:seed.selected,summary:stateSummary(seed.selected,plan)}],generated=0,pruned=0;
+    for(let depth=seed.selected.length;depth<P.story.total;depth++){
+      abortIfNeeded(options);const next=new Map(),remaining=P.story.total-(depth+1);
+      for(const state of beam){
+        for(const unit of pool){
+          if(!canAdd(state.selected,unit))continue;
+          const selected=[...state.selected,unit];generated++;
+          if(!partialFeasible(selected,pool,remaining,plan,format,targetElement)){pruned++;continue;}
+          const token=stateToken(selected),summary=stateSummary(selected,plan),existing=next.get(token);
+          if(!existing||existing.summary.heuristic<summary.heuristic)next.set(token,{selected,summary});
+        }
+      }
+      beam=[...next.values()].sort((a,b)=>b.summary.heuristic-a.summary.heuristic||stateToken(a.selected).localeCompare(stateToken(b.selected))).slice(0,width);
+      progress(options,'story-search',depth+1,P.story.total,`Searching Story candidates (${depth+1}/${P.story.total})`);
+      if(!beam.length)break;
+    }
+    return{teams:beam.map(state=>state.selected),diagnostics:{poolSize:pool.length,beamWidth:width,generatedStates:generated,prunedStates:pruned,completeStates:beam.length,lockedUnits:seed.selected.length,targetElement:targetElement||''}};
+  }
+
+  function scoreRank(values,value){const sorted=[...values].sort((a,b)=>a-b),index=sorted.filter(row=>row<=value).length;return sorted.length?index/sorted.length*100:0;}
+  function placementValues(units){
+    const speeds=units.map(unit=>num(unit?.__v6?.stats?.spd));
+    return new Map(units.map(unit=>{
+      const role=unit?.__v6?.roles||{},blob=P.key([unit?.description,unit?.passiveSkills,unit?.passiveSkillDetails].map(value=>{try{return JSON.stringify(value);}catch{return P.txt(value);}}).join(' '));
+      const entry=/entry|reinforce|from_reserve|when_entering|revenge|reviv/.test(blob)?45:0;
+      return[unit,{front:scoreRank(speeds,num(unit?.__v6?.stats?.spd))*.38+num(role.control)*.28+num(role.protection)*.22+num(role.setup)*.12-entry*.55,back:num(role.damage)*.38+num(role.sustain)*.28+num(role.tempo)*.14+entry}];
+    }));
+  }
+
+  function combinations(values,count,start=0,picked=[],out=[]){
+    if(picked.length===count){out.push([...picked]);return out;}
+    for(let i=start;i<=values.length-(count-picked.length);i++){picked.push(values[i]);combinations(values,count,i+1,picked,out);picked.pop();}
+    return out;
+  }
+
+  function fillSlots(fixed,positions,units,scoreKey){
+    const out=Array(positions.length).fill(null),open=[];positions.forEach((position,index)=>{if(fixed.has(position))out[index]=fixed.get(position);else open.push(index);});
+    const values=placementValues([...fixed.values(),...units]);
+    [...units].sort((a,b)=>num(values.get(b)?.[scoreKey])-num(values.get(a)?.[scoreKey])||P.identity(a).entry.localeCompare(P.identity(b).entry)).forEach((unit,index)=>{out[open[index]]=unit;});
+    return out;
+  }
+
+  function optimizePlacement(selected,options){
+    const map=byAnyId(selected),fixed=new Map();for(const slot of lockedSlots(options)){const unit=map.get(slot.id);if(unit)fixed.set(slot.position,unit);}
+    const lockedUnits=new Set(fixed.values()),remaining=selected.filter(unit=>!lockedUnits.has(unit));
+    const mainFixed=[...fixed.keys()].filter(position=>position<P.story.main).length,backFixed=fixed.size-mainFixed,needMain=P.story.main-mainFixed,needBack=P.story.back-backFixed;
+    if(needMain<0||needBack<0||needMain+needBack!==remaining.length)return null;
+    const candidates=combinations(remaining,needMain),mainPositions=[0,1,2,3,4],backPositions=[5,6,7];let best=null;
+    for(const mainPick of candidates){
+      const mainSet=new Set(mainPick),backPick=remaining.filter(unit=>!mainSet.has(unit));
+      const main=fillSlots(fixed,mainPositions,mainPick,'front'),back=fillSlots(fixed,backPositions,backPick,'back'),ordered=[...main,...back];
+      const evaluation=T.evaluate(ordered,options);if(evaluation.valid&&(!best||evaluation.score>best.evaluation.score))best={ordered,story:{main,back},evaluation};
+    }
+    return best;
+  }
+
+  function search(units,options={}){
+    const started=Date.now(),plan=P.key(options.plan||'hybrid')||'hybrid',format=modeOf(options),target=P.key(options.targetElement||'');
+    const beam=expandBeam(units,plan,format,target,options),complete=[];
+    for(const selected of beam.teams){abortIfNeeded(options);const placed=optimizePlacement(selected,{...options,plan,format});if(placed)complete.push(placed);}
+    complete.sort((a,b)=>b.evaluation.score-a.evaluation.score||stateToken(a.ordered).localeCompare(stateToken(b.ordered)));
+    const distinct=[];for(const candidate of complete){const ids=new Set(candidate.ordered.map(uid));if(distinct.every(other=>other.ordered.filter(unit=>ids.has(uid(unit))).length<=6))distinct.push(candidate);if(distinct.length>=P.search.alternatives)break;}
+    return{best:complete[0]||null,alternatives:distinct.slice(1),diagnostics:{...beam.diagnostics,plan,format,durationMs:Date.now()-started,evaluatedTeams:complete.length}};
+  }
+
+  function bestMono(units,options={}){
+    const candidates=[];for(const element of P.elements){const result=search(units,{...options,format:'force_mono',targetElement:element,strictFormat:true});if(result.best)candidates.push({...result.best,element,searchDiagnostics:result.diagnostics});}
+    candidates.sort((a,b)=>b.evaluation.score-a.evaluation.score||a.element.localeCompare(b.element));
+    return{best:candidates[0]||null,alternatives:candidates.slice(1,4),diagnostics:{evaluatedElements:P.elements,candidateElements:candidates.map(row=>row.element)}};
+  }
+
+  function rainbow(units,options={}){
+    const strict=search(units,{...options,format:'force_rainbow',strictFormat:true});
+    if(strict.best)return{...strict,rainbowStrict:true,requestedDistinctElements:P.rainbow.preferredDistinct,actualDistinctElements:strict.best.evaluation.element.distinctElements};
+    const relaxed=search(units,{...options,format:'force_rainbow',strictFormat:false});
+    return{...relaxed,rainbowStrict:false,requestedDistinctElements:P.rainbow.preferredDistinct,actualDistinctElements:relaxed.best?.evaluation?.element?.distinctElements||0,relaxationReason:relaxed.best?'fourth element breaks engine or role coherence':'no legal eight-unit rainbow team'};
+  }
+
+  root.storySearch={lockedSlots,lockedSeed,planSignals,unitPotential,candidatePool,stateSummary,expandBeam,placementValues,optimizePlacement,search,bestMono,rainbow};
+})(window);

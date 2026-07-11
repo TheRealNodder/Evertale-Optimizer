@@ -118,7 +118,7 @@
   function positionFlow(units){
     const main=units.slice(0,P.story.main),back=units.slice(P.story.main);
     const front=mean(main.map(unit=>P.clamp(num(unit?.__v6?.stats?.spd)*.8+num(unit?.__v6?.roles?.control)*.45+num(unit?.__v6?.roles?.protection)*.45)));
-    const reserve=mean(back.map(unit=>P.clamp(num(unit?.__v6?.roles?.damage)*.55+num(unit?.__v6?.roles?.sustain)*.45+(/entry|reinforce|revenge|reviv/.test(P.key(unit?.description))?20:0))));
+    const reserve=mean(back.map(unit=>P.clamp(num(unit?.__v6?.roles?.damage)*.55+num(unit?.__v6?.roles?.sustain)*.45+(/entry|reinforce|revenge|reviv/.test(P.key(unit?.description))?40:0))));
     return{score:P.clamp(front*.58+reserve*.42),main:front,back:reserve};
   }
 

@@ -10,10 +10,15 @@ for(const file of [
   'optimizer-v6-evidence.js',
   'optimizer-v6-feature-model.js',
   'optimizer-v6-team-evaluator.js',
-  'optimizer-v6-regression-fixtures.js'
+  'optimizer-v6-story-search.js',
+  'optimizer-v6-engine.js',
+  'optimizer-v6-regression-fixtures.js',
+  'optimizer-v6-story-regression-fixtures.js'
 ])require(path.join(__dirname,'..','optimizer-v6',file));
 
-const report=global.runOptimizerV6RegressionFixtures();
-for(const row of report.results)console.log(`${row.pass?'PASS':'FAIL'} ${row.name}: ${row.detail}`);
-console.log(`V6 foundation fixtures: ${report.passed}/${report.total} passed`);
-if(report.failed)process.exitCode=1;
+for(const [name,run] of [['foundation',global.runOptimizerV6RegressionFixtures],['story',global.runOptimizerV6StoryRegressionFixtures]]){
+  const report=run();
+  for(const row of report.results)console.log(`${row.pass?'PASS':'FAIL'} ${row.name}: ${row.detail}`);
+  console.log(`V6 ${name} fixtures: ${report.passed}/${report.total} passed`);
+  if(report.failed)process.exitCode=1;
+}
