@@ -17,6 +17,7 @@ CHUNKS = {
     "accessories": "optimizer_runtime_accessories.json",
     "bosses": "optimizer_runtime_bosses.json",
     "tags": "optimizer_runtime_tags.json",
+    "featureEvidence": "optimizer_runtime_feature_evidence.json",
     "optimizerKnowledge": "optimizer_runtime_knowledge.json",
 }
 

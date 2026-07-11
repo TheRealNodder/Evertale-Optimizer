@@ -7,10 +7,6 @@
   const IMAGE_MAP_URL='./apkfiles/entries/maps/character_image_map.json';
   const FAMILY_BUNDLE_URL='./apkfiles/entries/bundles/character_families.bundle.json';
   const IMG_BASE='https://ik.imagekit.io/r8fsa98s9/characters/';
-  const STATE_BY_RARITY={
-    SSR:[['base','01',5],['evolved','02',6],['final','03',6]],
-    SR:[['base','01',3],['evolved','02',4]]
-  };
   let stateMapPromise=null;
 
   const arr=value=>Array.isArray(value)?value:[];
@@ -30,11 +26,9 @@
     const explicit=clean(familyEntry?.rarity||row?.rarity).toUpperCase();
     if(explicit)return explicit;
     const stars=Number(row?.stars||row?.raw?.stars||0);
-    const evolved=Number(row?.evolvedStars||row?.raw?.evolvedStars||0);
-    const max=Math.max(stars,evolved);
-    if(max>=5)return 'SSR';
-    if(max>=3)return 'SR';
-    if(max>=2)return 'R';
+    if(stars>=5)return 'SSR';
+    if(stars===4)return 'SR';
+    if(stars===3)return 'R';
     return 'N';
   }
 
@@ -164,12 +158,19 @@
     });
   }
 
-  function syntheticStates(row,family,rarity){
-    const expected=STATE_BY_RARITY[rarity]||[];
-    return expected.map(([state,suffix,stars])=>{
-      const sourceId=`${family}${suffix}`;
-      return normalizeState({state,sourceId,dataSourceId:sourceId,imageSourceId:sourceId,url:imageUrl(sourceId),stars,title:row?.subtitle||row?.title||'',description:''},family);
-    }).filter(Boolean);
+  function syntheticStates(row,family){
+    const candidates=[...arr(row?.forms),...arr(row?.statsByForm),...arr(row?.descriptionByForm),...arr(row?.imageVariants)];
+    const states=[],seen=new Set();
+    candidates.forEach((candidate,index)=>{
+      const sourceId=clean(candidate?.sourceId||candidate?.dataSourceId||candidate?.imageSourceId);
+      if(!sourceId||!cleanKey(sourceId).includes(cleanKey(family)))return;
+      const normalized=normalizeState({...candidate,state:candidate?.state||(index===0?'base':String(index)),sourceId,dataSourceId:candidate?.dataSourceId||sourceId,imageSourceId:candidate?.imageSourceId||sourceId,url:candidate?.url||candidate?.image||imageUrl(sourceId),stars:candidate?.stars},family);
+      const key=cleanKey(normalized?.sourceId||normalized?.dataSourceId);
+      if(normalized&&key&&!seen.has(key)){seen.add(key);states.push(normalized);}
+    });
+    if(states.length)return states.slice(0,3);
+    const sourceId=clean(row?.sourceId||row?.internal?.sourceId||family);
+    return [normalizeState({state:'base',sourceId,dataSourceId:sourceId,imageSourceId:sourceId,url:row?.image||imageUrl(sourceId),stars:row?.stars??row?.raw?.stars,title:row?.subtitle||row?.title||'',description:row?.description||''},family)].filter(Boolean);
   }
 
   function stateRank(state){
@@ -210,12 +211,8 @@
     return exact||forms[Math.min(index,Math.max(forms.length-1,0))]||statsRows[Math.min(index,Math.max(statsRows.length-1,0))]||forms[forms.length-1]||statsRows[statsRows.length-1]||{};
   }
 
-  function targetCount(row,states,rarity){
-    if(states?.length>=3)return 3;
-    if(states?.length>=2)return 2;
-    if(rarity==='SSR')return 3;
-    if(rarity==='SR')return 2;
-    return Math.max(arr(row?.imageVariants).length,arr(row?.imagesLarge).length,1);
+  function targetCount(row,states){
+    return Math.min(3,Math.max(arr(states).length,arr(row?.forms).length,arr(row?.statsByForm).length,arr(row?.imageVariants).length,arr(row?.imagesLarge).length,1));
   }
 
   function repairRow(row,map){
@@ -231,8 +228,8 @@
     if(!family)return row;
 
     const mapStates=arr(familyEntry?.states);
-    const fallbackStates=syntheticStates(row,family,rarity);
-    const count=Math.min(3,targetCount(row,mapStates.length?mapStates:fallbackStates,rarity));
+    const fallbackStates=syntheticStates(row,family);
+    const count=targetCount(row,mapStates.length?mapStates:fallbackStates);
     const variants=mergeVariants(statesMatchFamily(row.imageVariants,family)?row.imageVariants:[],[...mapStates,...fallbackStates],count);
     if(variants.length<2)return row;
     if(statesMatchFamily(row.imageVariants,family)&&arr(row.imageVariants).length>=variants.length&&arr(row.forms).length>=variants.length&&arr(row.statsByForm).length>=variants.length&&arr(row.descriptionByForm).length>=variants.length)return row;

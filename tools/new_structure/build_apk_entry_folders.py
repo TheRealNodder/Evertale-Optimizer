@@ -25,7 +25,7 @@ from entry_checkpoint import load_marker as load_entry_marker
 from entry_checkpoint import write_marker as write_entry_marker
 from path_utils import find_repo_root, resolve_repo_path
 
-SCRIPT_VERSION = "7-base-form-rarity"
+SCRIPT_VERSION = "8-semantic-authorities"
 TOOL_NAME = "build_apk_entry_folders"
 IMAGEKIT_BASE = "https://ik.imagekit.io/r8fsa98s9"
 ROOT_MARKERS = ("apkfiles", "tools")
@@ -249,6 +249,23 @@ def normalize_element(element: Any) -> Optional[str]:
     return {"Death": "Dark", "Life": "Light", "Air": "Storm"}.get(element, element)
 
 
+def safe_int(value: Any) -> int:
+    try:
+        return int(value or 0)
+    except (TypeError, ValueError):
+        return 0
+
+
+def stars_to_rarity(base_stars: int) -> str:
+    if base_stars >= 5:
+        return "SSR"
+    if base_stars == 4:
+        return "SR"
+    if base_stars == 3:
+        return "R"
+    return "N"
+
+
 def image_name_for_boss(internal_id: str) -> str:
     return re.sub(r"Boss(?=\d+$)", "", internal_id) + ".png"
 
@@ -395,7 +412,7 @@ def resolve_sequence(seq_id: str, resolvers: Dict[str, Dict[str, Any]]) -> Dict[
     return {"id": seq_id, "found": bool(seq), "sequence": seq} if seq else {"id": seq_id, "found": False}
 
 
-def make_placeholder(category: str, internal_id: str, display_name: Optional[str], order_index: int, marker: Dict[str, Any]) -> Dict[str, Any]:
+def make_placeholder(category: str, internal_id: str, display_name: Optional[str], order_index: int, marker: Dict[str, Any], resolved_rarity: Optional[str] = None) -> Dict[str, Any]:
     name = display_name or internal_id
     stats = {"atk": None, "hp": None, "spd": None, "cost": None}
     return {
@@ -408,7 +425,7 @@ def make_placeholder(category: str, internal_id: str, display_name: Optional[str
         "secondName": "",
         "description": "",
         "category": category[:-1] if category.endswith("s") else category,
-        "rarity": None,
+        "rarity": resolved_rarity,
         "stars": None,
         "element": None,
         "stats": stats,
@@ -445,7 +462,7 @@ def image_variants_for_entry(category: str, internal_id: str) -> List[Dict[str, 
     }]
 
 
-def normalize_entry(item: Dict[str, Any], category: str, order_index: int, display_name_override: Optional[str], resolvers: Dict[str, Dict[str, Any]], marker: Dict[str, Any]) -> Dict[str, Any]:
+def normalize_entry(item: Dict[str, Any], category: str, order_index: int, display_name_override: Optional[str], resolvers: Dict[str, Dict[str, Any]], marker: Dict[str, Any], resolved_rarity: Optional[str] = None) -> Dict[str, Any]:
     internal_id = get_internal_id(item)
     localizable = resolvers["Localizable"]
     char_loc = localize_character(localizable, internal_id, str(item.get("displayName") or item.get("name") or internal_id)) if category == "characters" else {}
@@ -471,7 +488,7 @@ def normalize_entry(item: Dict[str, Any], category: str, order_index: int, displ
         "secondName": title,
         "description": description,
         "category": category[:-1] if category.endswith("s") else category,
-        "rarity": item.get("rarity"),
+        "rarity": resolved_rarity if category == "characters" else item.get("rarity"),
         "stars": item.get("stars"),
         "evolvedStars": item.get("evolvedStars"),
         "element": normalize_element(item.get("element")),
@@ -518,21 +535,6 @@ def infer_family_rarity(forms: List[Dict[str, Any]]) -> str:
     if not forms:
         return "N"
 
-    def safe_int(value: Any) -> int:
-        try:
-            return int(value or 0)
-        except Exception:
-            return 0
-
-    def stars_to_rarity(base_stars: int) -> str:
-        if base_stars >= 5:
-            return "SSR"
-        if base_stars == 4:
-            return "SR"
-        if base_stars == 3:
-            return "R"
-        return "N"
-
     base_forms = []
     numbered_forms = []
     positive_stars = []
@@ -567,12 +569,45 @@ def infer_family_rarity(forms: List[Dict[str, Any]]) -> str:
     return "N"
 
 
-def state_specs_for_rarity(rarity: str) -> List[Tuple[str, int, int]]:
+def state_specs_for_forms(forms_by_num: Dict[int, Dict[str, Any]], rarity: str) -> List[Tuple[str, int, int]]:
+    """Build display states from raw forms without reinterpreting rarity.
+
+    Exact raw form stars always win. A missing evolved image state may use the
+    base form's explicit evolvedStars value, and SSR keeps its established
+    third final-awaken image while reusing the nearest raw form's real stars.
+    """
+    if not forms_by_num:
+        return []
+    available = sorted(number for number in forms_by_num if 0 < number <= 3)
+    first_number = available[0] if available else min(forms_by_num)
+    base = forms_by_num.get(1) or forms_by_num[first_number]
+    target_count = max(available or [1])
+    if safe_int(base.get("evolvedStars")) > safe_int(base.get("stars")):
+        target_count = max(target_count, 2)
     if rarity == "SSR":
-        return [("base", 1, 5), ("evolved", 2, 6), ("final", 3, 6)]
-    if rarity == "SR":
-        return [("base", 1, 3), ("evolved", 2, 4)]
-    return [("base", 1, 1)]
+        target_count = max(target_count, 3)
+    target_count = min(3, max(1, target_count))
+
+    specs: List[Tuple[str, int, int]] = []
+    labels = {1: "base", 2: "evolved", 3: "final"}
+    for form_num in range(1, target_count + 1):
+        exact = forms_by_num.get(form_num)
+        nearest = nearest_form_for_state(forms_by_num, form_num) or base
+        if exact is not None:
+            stars = safe_int(exact.get("stars"))
+        elif form_num > 1:
+            stars = safe_int(nearest.get("evolvedStars")) or safe_int(nearest.get("stars"))
+        else:
+            stars = safe_int(nearest.get("stars"))
+        specs.append((labels[form_num], form_num, stars))
+    return specs
+
+
+def character_family_rarities(items: Iterable[Dict[str, Any]]) -> Dict[str, str]:
+    grouped: Dict[str, List[Dict[str, Any]]] = {}
+    for item in items:
+        grouped.setdefault(family_from_internal_id(get_internal_id(item)), []).append(item)
+    return {family: infer_family_rarity(forms) for family, forms in grouped.items() if family}
 
 
 def nearest_form_for_state(forms_by_num: Dict[int, Dict[str, Any]], form_num: int) -> Optional[Dict[str, Any]]:
@@ -621,7 +656,7 @@ def build_character_family_files(output_dir: Path, ordered: List[Tuple[str, Opti
         fallback_name = display_overrides.get(family) or first_loc.get("name") or str(first_form.get("name") or family)
         fallback_title = first_loc.get("title") or ""
         states = []
-        for state_name, form_num, stars in state_specs_for_rarity(rarity):
+        for state_name, form_num, stars in state_specs_for_forms(forms_by_num, rarity):
             state_source_id = f"{family}{form_num:02d}"
             loc = localize_character(localizable, state_source_id, fallback_name)
             nearest = nearest_form_for_state(forms_by_num, form_num) or {}
@@ -706,6 +741,7 @@ def build_category(
     raw = load_json(raw_path)
     items = extract_list(raw, category)
     by_id = {get_internal_id(item): item for item in items}
+    family_rarities = character_family_rarities(items) if category == "characters" else {}
     ordered: List[Tuple[str, Optional[str]]] = []
     seen: Set[str] = set()
     for internal_id, display_name in load_order(input_dir, category):
@@ -746,6 +782,7 @@ def build_category(
         filename = f"{order_index:04d}_{slugify(internal_id)}.json"
         entry_path = entries_dir / filename
         item = by_id.get(internal_id)
+        resolved_rarity = family_rarities.get(family_from_internal_id(internal_id)) if category == "characters" else None
         marker = build_source_marker(item, category, internal_id, order_index, display_name, resolvers)
         if not start_allowed:
             if internal_id == effective_start_after:
@@ -764,10 +801,10 @@ def build_category(
             image = existing.get("image") or image_url(category, internal_id)
         else:
             if item is None:
-                entry = make_placeholder(category, internal_id, display_name, order_index, marker)
+                entry = make_placeholder(category, internal_id, display_name, order_index, marker, resolved_rarity)
                 placeholders += 1
             else:
-                entry = normalize_entry(item, category, order_index, display_name, resolvers, marker)
+                entry = normalize_entry(item, category, order_index, display_name, resolvers, marker, resolved_rarity)
             write_json_if_changed(entry_path, entry)
             written += 1
             entry_name = entry.get("name")
