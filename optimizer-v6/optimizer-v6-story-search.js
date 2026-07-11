@@ -139,10 +139,10 @@
     return out;
   }
 
-  function fillSlots(fixed,positions,units,scoreKey){
+  function fillSlots(fixed,positions,units,scoreKey,values=null){
     const out=Array(positions.length).fill(null),open=[];positions.forEach((position,index)=>{if(fixed.has(position))out[index]=fixed.get(position);else open.push(index);});
-    const values=placementValues([...fixed.values(),...units]);
-    [...units].sort((a,b)=>num(values.get(b)?.[scoreKey])-num(values.get(a)?.[scoreKey])||P.identity(a).entry.localeCompare(P.identity(b).entry)).forEach((unit,index)=>{out[open[index]]=unit;});
+    const scores=values||placementValues([...fixed.values(),...units]);
+    [...units].sort((a,b)=>num(scores.get(b)?.[scoreKey])-num(scores.get(a)?.[scoreKey])||P.identity(a).entry.localeCompare(P.identity(b).entry)).forEach((unit,index)=>{out[open[index]]=unit;});
     return out;
   }
 
@@ -151,19 +151,21 @@
     const lockedUnits=new Set(fixed.values()),remaining=selected.filter(unit=>!lockedUnits.has(unit));
     const mainFixed=[...fixed.keys()].filter(position=>position<P.story.main).length,backFixed=fixed.size-mainFixed,needMain=P.story.main-mainFixed,needBack=P.story.back-backFixed;
     if(needMain<0||needBack<0||needMain+needBack!==remaining.length)return null;
-    const candidates=combinations(remaining,needMain),mainPositions=[0,1,2,3,4],backPositions=[5,6,7];let best=null;
+    const candidates=combinations(remaining,needMain),mainPositions=[0,1,2,3,4],backPositions=[5,6,7],values=placementValues(selected),placements=[];let best=null;
     for(const mainPick of candidates){
       const mainSet=new Set(mainPick),backPick=remaining.filter(unit=>!mainSet.has(unit));
-      const main=fillSlots(fixed,mainPositions,mainPick,'front'),back=fillSlots(fixed,backPositions,backPick,'back'),ordered=[...main,...back];
-      const evaluation=T.evaluate(ordered,options);if(evaluation.valid&&(!best||evaluation.score>best.evaluation.score))best={ordered,story:{main,back},evaluation};
+      const main=fillSlots(fixed,mainPositions,mainPick,'front',values),back=fillSlots(fixed,backPositions,backPick,'back',values),ordered=[...main,...back];
+      const quick=main.reduce((sum,unit)=>sum+num(values.get(unit)?.front),0)+back.reduce((sum,unit)=>sum+num(values.get(unit)?.back),0);placements.push({main,back,ordered,quick});
     }
+    placements.sort((a,b)=>b.quick-a.quick||stateToken(a.ordered).localeCompare(stateToken(b.ordered)));
+    for(const placement of placements.slice(0,Number(options?.placementCombinations)||P.search.placementCombinations)){const evaluation=T.evaluate(placement.ordered,options);if(evaluation.valid&&(!best||evaluation.score>best.evaluation.score))best={...placement,story:{main:placement.main,back:placement.back},evaluation};}
     return best;
   }
 
   function search(units,options={}){
     const started=Date.now(),plan=P.key(options.plan||'hybrid')||'hybrid',format=modeOf(options),target=P.key(options.targetElement||'');
     const beam=expandBeam(units,plan,format,target,options),complete=[];
-    for(const selected of beam.teams){abortIfNeeded(options);const placed=optimizePlacement(selected,{...options,plan,format});if(placed)complete.push(placed);}
+    for(const selected of beam.teams.slice(0,Number(options?.placementFinalists)||P.search.storyPlacementFinalists)){abortIfNeeded(options);const placed=optimizePlacement(selected,{...options,plan,format});if(placed)complete.push(placed);}
     complete.sort((a,b)=>b.evaluation.score-a.evaluation.score||stateToken(a.ordered).localeCompare(stateToken(b.ordered)));
     const distinct=[];for(const candidate of complete){const ids=new Set(candidate.ordered.map(uid));if(distinct.every(other=>other.ordered.filter(unit=>ids.has(uid(unit))).length<=6))distinct.push(candidate);if(distinct.length>=P.search.alternatives)break;}
     return{best:complete[0]||null,alternatives:distinct.slice(1),diagnostics:{...beam.diagnostics,plan,format,durationMs:Date.now()-started,evaluatedTeams:complete.length}};

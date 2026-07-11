@@ -656,7 +656,7 @@ function buildExampleOptions() {
   return options;
 }
 
-function buildExampleTeam() {
+async function buildExampleTeam() {
   if (!window.OptimizerEngine || typeof window.OptimizerEngine.run !== "function") {
     showOptimizerNotice("Example Team: optimizer engine is not available.");
     return;
@@ -724,7 +724,7 @@ function buildExampleTeam() {
   try {
     if (style === "best") {
       const preferredPreset = (el("presetSelect")?.value || getPresetPref() || "auto");
-      result = runSelectedEngine(
+      result = await runSelectedEngine(
         examplePool,
         makeExampleOptions(preferredPreset !== "auto" ? preferredPreset : "")
       );
@@ -733,7 +733,7 @@ function buildExampleTeam() {
       options.currentLayout = makeExampleOptions().currentLayout;
       options.slotLocks = makeExampleOptions().slotLocks;
       options.exampleMode = true;
-      result = runSelectedEngine(examplePool, options);
+      result = await runSelectedEngine(examplePool, options);
     }
   } catch (err) {
     console.error("[Optimizer] Example team build failed.", err);
@@ -809,10 +809,10 @@ function lockSummary(locks = state.locks) {
   };
 }
 
-function runSelectedEngine(units, options) {
+async function runSelectedEngine(units, options) {
   window.__lastOptimizerOptions = structuredCloneSafe(options);
   window.__optimizerOptions = window.__lastOptimizerOptions;
-  const result = window.OptimizerEngine.run(units, options);
+  const result = await Promise.resolve(window.OptimizerEngine.run(units, options));
   window.__lastOptimizerEngineResult = result;
   window.__optimizerResult = result;
   return result;
@@ -939,14 +939,44 @@ function buildEngineOptions() {
   return options;
 }
 
-function runEngine() {
+function setOptimizerBusy(active) {
+  const build = el("buildBest");
+  const example = el("buildExample");
+  const cancel = el("cancelOptimizer");
+  const progress = el("optimizerProgress");
+  if (build) build.disabled = !!active;
+  if (example) example.disabled = !!active;
+  if (cancel) cancel.hidden = !active;
+  if (progress) progress.hidden = !active;
+}
+
+function updateOptimizerProgress(detail = {}) {
+  const bar = el("optimizerProgressBar");
+  const text = el("optimizerProgressText");
+  if (bar) bar.value = Math.max(0, Math.min(100, Number(detail.percent) || 0));
+  if (text) text.textContent = detail.message || detail.stage || "Optimizing";
+}
+
+async function runEngine() {
   // normal optimizer = owned-only
   state.exampleMode = false;
   const owned = state.ownedUnits || [];
   if (!owned.length || !window.OptimizerEngine || typeof window.OptimizerEngine.run !== "function") return;
   const options = buildEngineOptions();
-  const result = runSelectedEngine(owned, options);
-  applyEngineResult(result);
+  options.onProgress = updateOptimizerProgress;
+  setOptimizerBusy(true);
+  updateOptimizerProgress({ percent: 0, message: "Preparing data" });
+  try {
+    const result = await runSelectedEngine(owned, options);
+    if (!result || !result.story || result.diagnostics?.v6Failed) throw new Error(result?.diagnostics?.v6Error || "No valid optimizer result returned");
+    applyEngineResult(result);
+  } catch (err) {
+    const message = String(err?.message || err);
+    showOptimizerNotice(/cancel/i.test(message) ? "Optimizer cancelled; previous layout preserved." : `Optimizer failed: ${message}. Previous layout preserved.`);
+    console.error("[Optimizer] Build failed without changing the layout.", err);
+  } finally {
+    setOptimizerBusy(false);
+  }
 }
 
 function structuredCloneSafe(obj) {
@@ -1006,7 +1036,7 @@ window.refreshOptimizerFromOwned = function refreshOptimizerFromOwned() {
 };
 
 window.runOptimizer = function runOptimizer() {
-  runEngine();
+  return runEngine();
 };
 
 async function init() {
@@ -1023,7 +1053,10 @@ async function init() {
 
   el("buildBest")?.addEventListener("click", runEngine);
   el("buildExample")?.addEventListener("click", buildExampleTeam);
+  el("cancelOptimizer")?.addEventListener("click", () => window.OptimizerV6?.controller?.cancel());
   el("clearTeams")?.addEventListener("click", clearTeams);
+
+  window.addEventListener("optimizer-v6-progress", event => updateOptimizerProgress(event.detail || {}));
 
   el("lockFilledStory")?.addEventListener("click", lockFilledStorySlots);
   el("lockFilledPlatoons")?.addEventListener("click", lockFilledPlatoons);

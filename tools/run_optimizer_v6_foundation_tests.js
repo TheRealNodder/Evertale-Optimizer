@@ -14,6 +14,7 @@ for(const file of [
   'optimizer-v6-platoon-generator.js',
   'optimizer-v6-platoon-allocator.js',
   'optimizer-v6-engine.js',
+  'optimizer-v6-controller.js',
   'optimizer-v6-regression-fixtures.js',
   'optimizer-v6-story-regression-fixtures.js',
   'optimizer-v6-platoon-regression-fixtures.js'

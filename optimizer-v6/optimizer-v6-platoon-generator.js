@@ -25,8 +25,15 @@
     if(!P.distinctIdentity(seed))throw new Error('Locked platoon row contains duplicate identity');
     const strictMono=format==='force_mono'||format==='mono',target=P.key(element||seed[0]?.element||'');
     if(strictMono&&seed.some(unit=>(unit?.__v6?.element||P.key(unit?.element))!==target))throw new Error('Locked mono platoon row contains multiple elements');
-    const pool=rows(units).filter(unit=>!strictMono||(unit?.__v6?.element||P.key(unit?.element))===target)
+    const sorted=rows(units).filter(unit=>!strictMono||(unit?.__v6?.element||P.key(unit?.element))===target)
       .sort((a,b)=>S.unitPotential(b,plan)-S.unitPotential(a,plan)||P.identity(a).entry.localeCompare(P.identity(b).entry));
+    const chosen=new Map(),add=unit=>{if(unit&&!chosen.has(uid(unit))&&chosen.size<55)chosen.set(uid(unit),unit);};seed.forEach(add);sorted.slice(0,28).forEach(add);
+    if(['burn','poison','sleep','stun','blood'].includes(plan)){
+      [...sorted].sort((a,b)=>S.planSignals(b,plan).setup-S.planSignals(a,plan).setup).slice(0,8).forEach(add);
+      [...sorted].sort((a,b)=>S.planSignals(b,plan).payoff-S.planSignals(a,plan).payoff).slice(0,8).forEach(add);
+    }
+    for(const role of ['damage','protection','sustain','control','tempo'])[...sorted].sort((a,b)=>num(b?.__v6?.roles?.[role])-num(a?.__v6?.roles?.[role])).slice(0,4).forEach(add);
+    sorted.forEach(add);const pool=[...chosen.values()];
     let beam=[seed];
     for(let depth=seed.length;depth<P.platoons.size;depth++){
       const next=new Map();for(const selected of beam)for(const unit of pool){if(!canAdd(selected,unit))continue;const value=[...selected,unit],key=token(value),evaluation=rowEvaluation(value,plan),existing=next.get(key);if(!existing||rowEvaluation(existing,plan).score<evaluation.score)next.set(key,value);}

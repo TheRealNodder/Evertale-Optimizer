@@ -13,7 +13,7 @@
     elements:['fire','water','storm','earth','light','dark'],
     rainbow:{preferredDistinct:4,minimumContribution:0.18},
     mono:{strictWhenFeasible:true},
-    search:{storyBeamWidth:160,storyCandidateCap:90,alternatives:5,platoonRowsPerPlan:8},
+    search:{storyBeamWidth:32,storyCandidateCap:40,storyPlacementFinalists:6,placementCombinations:3,alternatives:5,platoonRowsPerPlan:8},
     timeBudgetMs:{storyFirst:500,storyFinal:2000,platoonsUseful:3000,platoonsFinal:9000},
     evidence:{
       minimumMechanicalConfidence:0.8,
