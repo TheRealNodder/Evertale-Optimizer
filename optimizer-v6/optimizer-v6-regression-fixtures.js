@@ -48,6 +48,25 @@
       return 'revengeEffectsToSkip provenance rejected';
     });
 
+    test('AI, Frostburn, and healthy substrings cannot invent features',()=>{
+      const raw=[unit('FrostOnly01','Water'),unit('AiHint01','Storm'),unit('HealthyOnly01','Light')],store={
+        FrostOnly01:[evidence('applies_burn',1.6,.98,'resolved.activeSkills.FrostburnAttack.localization.description')],
+        AiHint01:[evidence('payoff_stun',1.5,.98,'resolved.activeSkillsAI.0.ai.EnemyHasTimestrikerNoProtector')],
+        HealthyOnly01:[evidence('role_healer',1.25,.98,'resolved.activeSkills.HighSpiritHealthyBlast#identifier')]
+      },prepared=withStore(store,raw);
+      assert(F.mechanical(prepared[0].__v6.evidence,'burn','setup')===0,'Frostburn became normal Burn setup');
+      assert(F.mechanical(prepared[1].__v6.evidence,'stun','payoff')===0,'AI target hint became Stun payoff');
+      assert(F.roleEvidence(prepared[2].__v6.evidence,'healer')===0,'healthy substring became healing');
+      return 'context-invalid evidence rejected';
+    });
+
+    test('cross-element direct evidence remains authoritative',()=>{
+      const water=withStore({WaterBurn01:[evidence('applies_burn',1.6,.98,'resolved.activeSkills.WardBurnAlly#identifier')]},[unit('WaterBurn01','Water')])[0];
+      assert(F.mechanical(water.__v6.evidence,'burn','setup')>0,'Direct cross-element Burn evidence was discarded');
+      assert(!water.__v6.evidence.affinities.burn,'Water received Fire-only affinity');
+      return 'mechanics outrank element without inventing affinity';
+    });
+
     test('all evaluator components and penalties are bounded',()=>{
       const raw=makeTeam('Bounded');
       const store={};raw.forEach((row,index)=>store[row.sourceId]=[evidence(index%2?'payoff_burn':'applies_burn'),evidence(index%3?'role_healer':'role_guardian')]);

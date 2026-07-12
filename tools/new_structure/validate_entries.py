@@ -369,12 +369,42 @@ def validate_optimizer_semantics(repo: Path, base: Path, errors: List[str], warn
     tags = runtime.get("tags") if isinstance(runtime.get("tags"), dict) else {}
     evidence = runtime.get("featureEvidence") if isinstance(runtime.get("featureEvidence"), dict) else {}
     evidence_count = sum(len(rows) for rows in evidence.values() if isinstance(rows, list))
+    feature_counts: Dict[str, int] = {}
+    invalid_feature_sources: List[str] = []
+    for source_id, evidence_rows in evidence.items():
+        for item in evidence_rows if isinstance(evidence_rows, list) else []:
+            if not isinstance(item, dict):
+                continue
+            feature = str(item.get("feature") or "")
+            feature_counts[feature] = feature_counts.get(feature, 0) + 1
+            source_blob = " ".join(str(value) for value in item.get("sources") or []).lower()
+            if any(token in source_blob for token in ("activeskillsai", "revengeeffectstoskip", "immunitylist")):
+                invalid_feature_sources.append(f"{source_id}:{feature}:negative-or-AI-context")
+            if feature == "applies_burn" and "frostburn" in source_blob:
+                invalid_feature_sources.append(f"{source_id}:{feature}:frostburn-is-not-burn-setup")
+            if feature == "role_healer" and "healthy" in source_blob:
+                invalid_feature_sources.append(f"{source_id}:{feature}:healthy-substring")
     if bool(tags) != bool(flags.get("usesTags")):
         errors.append("[semantic] runtimeFlags.usesTags is not truthful")
     if bool(evidence) != bool(flags.get("usesFeatureEvidence")):
         errors.append("[semantic] runtimeFlags.usesFeatureEvidence is not truthful")
     if not evidence:
         errors.append("[semantic] resolved character data produced no feature evidence")
+    append_semantic_failure(errors, "context-invalid feature evidence", invalid_feature_sources)
+    required_features = {
+        "applies_burn", "payoff_burn", "applies_poison", "payoff_poison",
+        "applies_sleep", "payoff_sleep", "applies_stun", "payoff_stun",
+        "summon", "payoff_blood", "payoff_crisis", "payoff_survivor",
+        "role_guardian", "role_healer", "role_cleanser", "role_reviver",
+        "resource_spirit", "tempo_turn", "leader",
+    }
+    missing_features = sorted(required_features - set(feature_counts))
+    if missing_features:
+        errors.append(f"[semantic] runtime feature authorities missing: {missing_features}")
+    if entries and feature_counts.get("payoff_stun", 0) >= len(entries) * 0.25:
+        errors.append("[semantic] Time Strike evidence is implausibly broad; check AI target metadata")
+    if entries and feature_counts.get("role_healer", 0) >= len(entries) * 0.60:
+        errors.append("[semantic] healer evidence is implausibly broad; check healthy substring matching")
     if not tags:
         warnings.append("[semantic] curated tags are empty; feature evidence is the active fallback authority")
     if tag_report.get("status") not in {"ok", "warning", "failed"}:
@@ -392,6 +422,23 @@ def validate_optimizer_semantics(repo: Path, base: Path, errors: List[str], warn
         errors.append("[semantic] runtime manifest featureEvidence count is stale")
     if leader_count and not flags.get("usesLeaderSkills"):
         errors.append("[semantic] leader authority exists but runtimeFlags.usesLeaderSkills is false")
+
+    parent_child = load_json(base / "maps" / "character_parent_child_map.json", {})
+    parent_edges = {
+        str(parent): {str(child) for child in children}
+        for parent, children in (parent_child.get("parents") or {}).items()
+        if isinstance(children, list)
+    }
+    reciprocal_parent_edges = sorted(
+        (parent, child)
+        for parent, children in parent_edges.items()
+        for child in children
+        if parent < child and parent in parent_edges.get(child, set())
+    )
+    if reciprocal_parent_edges:
+        errors.append(
+            f"[semantic] reciprocal parent/child directions hide both playable forms: {reciprocal_parent_edges[:10]}"
+        )
 
     doctrine = (repo / "optimizer_doctrine.js").read_text(encoding="utf-8")
     shared = (repo / "optimizer-v5-lab" / "optimizer-v5-shared.js").read_text(encoding="utf-8")
@@ -414,10 +461,13 @@ def validate_optimizer_semantics(repo: Path, base: Path, errors: List[str], warn
         "runtimeTags": len(tags),
         "featureEvidenceEntries": len(evidence),
         "featureEvidenceItems": evidence_count,
+        "featureEvidenceByFeature": dict(sorted(feature_counts.items())),
+        "contextInvalidFeatureEvidence": len(invalid_feature_sources),
         "leaderEntries": leader_count,
         "familyRarityMismatches": len(family_rarity_errors),
         "entryRarityMismatches": len(entry_rarity_errors),
         "stateStarMismatches": len(state_star_errors),
+        "reciprocalParentChildEdges": len(reciprocal_parent_edges),
         "policyChecks": policy_checks,
     }
 

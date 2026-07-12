@@ -20,7 +20,7 @@
   }
   async function loadMap(){
     if(cached)return cached;
-    try{const res=await fetch(mapUrl,{cache:'default'});cached=addForcedParents(res.ok?await res.json():null);}
+    try{const res=await fetch(mapUrl,{cache:'no-store'});cached=addForcedParents(res.ok?await res.json():null);}
     catch{cached=addForcedParents(null);}
     return cached;
   }

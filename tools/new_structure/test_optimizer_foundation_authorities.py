@@ -135,6 +135,60 @@ class OptimizerFoundationAuthorityTests(unittest.TestCase):
         self.assertIn("featureEvidence", chunks)
         self.assertEqual(chunks["featureEvidence"].get("count"), len(evidence))
 
+    def test_runtime_feature_evidence_is_context_aware(self) -> None:
+        evidence = self.runtime.get("featureEvidence") or {}
+
+        def features(source: str) -> set[str]:
+            return {str(row.get("feature") or "") for row in evidence.get(source, []) if isinstance(row, dict)}
+
+        expected = {
+            "AstridNew02": {"applies_burn", "payoff_burn"},
+            "NobunagaRegular02": {"applies_burn", "payoff_burn"},
+            "UnicornRegular02": {"applies_stun", "payoff_survivor", "tempo_turn", "role_cleanser"},
+            "CallenBride02": {"applies_sleep", "payoff_sleep", "role_healer"},
+            "KingArthurRegular02": {"applies_poison", "payoff_poison", "summon"},
+        }
+        for source, required in expected.items():
+            self.assertTrue(required <= features(source), f"{source} missing {sorted(required - features(source))}")
+
+        self.assertNotIn("applies_burn", features("AnastasiaRegular02"), "Frostburn must not become normal Burn setup")
+        self.assertNotIn("applies_burn", features("WashingtonRegular02"), "Frostburn must not become normal Burn setup")
+        self.assertNotIn("payoff_stun", features("FireBird02"), "AI target hints must not invent Time Strike payoff")
+        self.assertNotIn("applies_poison", features("HoodedFrog01"), "status immunity lists must not invent Poison setup")
+
+        forbidden_sources = ("activeskillsai", "revengeeffectstoskip", "immunitylist")
+        problems = []
+        for source_id, rows in evidence.items():
+            for row in rows if isinstance(rows, list) else []:
+                source_blob = " ".join(str(value) for value in row.get("sources") or []).lower()
+                if any(token in source_blob for token in forbidden_sources):
+                    problems.append(f"{source_id}:{row.get('feature')}:{source_blob}")
+                if row.get("feature") == "applies_burn" and "frostburn" in source_blob:
+                    problems.append(f"{source_id}: Frostburn setup leak")
+                if row.get("feature") == "role_healer" and "healthy" in source_blob:
+                    problems.append(f"{source_id}: healthy/heal substring leak")
+        self.assertEqual(problems, [], "Context-invalid evidence:\n" + "\n".join(problems[:50]))
+
+    def test_runtime_feature_coverage_is_bounded_and_complete(self) -> None:
+        evidence = self.runtime.get("featureEvidence") or {}
+        counts: Dict[str, int] = {}
+        for rows in evidence.values():
+            for row in rows if isinstance(rows, list) else []:
+                feature = str(row.get("feature") or "")
+                counts[feature] = counts.get(feature, 0) + 1
+        required = {
+            "applies_burn", "payoff_burn", "applies_poison", "payoff_poison",
+            "applies_sleep", "payoff_sleep", "applies_stun", "payoff_stun",
+            "summon", "payoff_blood", "payoff_crisis", "payoff_survivor",
+            "role_guardian", "role_healer", "role_cleanser", "role_reviver",
+            "resource_spirit", "tempo_turn", "leader",
+        }
+        self.assertTrue(required <= set(counts), f"Missing feature authorities: {sorted(required - set(counts))}")
+        entry_count = len(self.entries)
+        self.assertLess(counts["payoff_stun"], entry_count * 0.25, "Time Strike evidence collapsed into generic AI metadata")
+        self.assertLess(counts["role_healer"], entry_count * 0.60, "Heal evidence is too broad")
+        self.assertLess(counts["applies_burn"], entry_count * 0.25, "Burn setup evidence is too broad")
+
     def test_frontend_declares_and_checks_foundation_chunks(self) -> None:
         loader = (REPO / "optimizerRuntimeLoader.js").read_text(encoding="utf-8")
         bootstrap = (REPO / "optimizerRuntimeBootstrap.js").read_text(encoding="utf-8")
@@ -149,6 +203,21 @@ class OptimizerFoundationAuthorityTests(unittest.TestCase):
             self.assertIn(report.get("status"), {"ok", "warning", "failed"}, name)
             self.assertIsInstance(report.get("errors"), list, name)
             self.assertIsInstance(report.get("warnings"), list, name)
+
+    def test_parent_child_authority_never_hides_both_reciprocal_forms(self) -> None:
+        payload = read_json(ENTRIES / "maps" / "character_parent_child_map.json")
+        parents = {key: set(value) for key, value in payload.get("parents", {}).items()}
+        reciprocal = sorted(
+            (parent, child)
+            for parent, children in parents.items()
+            for child in children
+            if parent in parents.get(child, set()) and parent < child
+        )
+        self.assertEqual([], reciprocal)
+        self.assertIn("FrankensteinRegularDoll", parents.get("FrankensteinRegular", set()))
+        self.assertNotIn("FrankensteinRegular", parents.get("FrankensteinRegularDoll", set()))
+        frontend_filter = (REPO / "roster-parent-filter-v3.js").read_text(encoding="utf-8")
+        self.assertIn("cache:'no-store'", frontend_filter)
 
 
 if __name__ == "__main__":

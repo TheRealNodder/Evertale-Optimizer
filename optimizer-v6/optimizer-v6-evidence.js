@@ -28,18 +28,23 @@
     return .65;
   }
 
-  function rejectedSource(source){
+  function rejectedSource(source,feature=''){
     const value=P.key(source);
-    return P.evidence.rejectedSourceFragments.some(fragment=>value.includes(P.key(fragment)));
+    if(P.evidence.rejectedSourceFragments.some(fragment=>value.includes(P.key(fragment))))return true;
+    const kind=P.key(feature);
+    if(kind==='applies_burn'&&value.includes('frostburn'))return true;
+    if(kind==='role_healer'&&value.includes('healthy'))return true;
+    return false;
   }
 
   function normalizeItem(item){
+    const feature=P.key(item?.feature);
     const sources=(Array.isArray(item?.sources)?item.sources:[]).map(P.txt).filter(Boolean);
-    const usable=sources.filter(source=>!rejectedSource(source));
+    const usable=sources.filter(source=>!rejectedSource(source,feature));
     const quality=usable.length?Math.max(...usable.map(sourceQuality)):0;
     const confidence=P.clamp(Math.min(Number(item?.confidence)||0,quality||0)/.01)/100;
     return{
-      feature:P.key(item?.feature),
+      feature,
       strength:Math.max(0,Number(item?.strength)||0),
       confidence,
       sources:usable,

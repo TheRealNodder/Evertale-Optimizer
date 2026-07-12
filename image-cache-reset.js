@@ -39,7 +39,7 @@
   function loadRosterHelpers(){
     const path = String(location.pathname || '').toLowerCase();
     if (!/roster\.html$|optimizer\.html$/.test(path)) return;
-    addScript('./roster-parent-filter-v3.js?v=1','data-roster-parent-filter');
+    addScript('./roster-parent-filter-v3.js?v=2','data-roster-parent-filter');
     if (/roster\.html$/.test(path)) addScript('./roster-import-owned-sync.js?v=1','data-roster-import-sync');
   }
 

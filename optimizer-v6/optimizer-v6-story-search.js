@@ -9,7 +9,9 @@
   const num=value=>Number.isFinite(Number(value))?Number(value):0;
   const uid=unit=>P.txt(unit?.id||unit?.sourceId||unit?.family||unit?.name);
   const modeOf=options=>options?.format||options?.doctrineOverrides?.monoVsRainbow?.selectionMode||'auto';
-  const requiredPlan=plan=>['burn','poison','sleep','stun','blood'].includes(plan);
+  const pairedPlan=plan=>['burn','poison','sleep','stun','blood'].includes(plan);
+  const payoffOnlyPlan=plan=>['crisis','survivor'].includes(plan);
+  const mechanicalPlan=plan=>pairedPlan(plan)||payoffOnlyPlan(plan);
 
   function progress(options,stage,completed,total,message){
     if(typeof options?.onProgress==='function')options.onProgress({type:'progress',stage,completed,total,percent:total?Math.round(completed/total*100):0,message});
@@ -45,7 +47,9 @@
   function unitPotential(unit,plan){
     const roles=unit?.__v6?.roles||{},signals=planSignals(unit,plan);
     const role=Math.max(num(roles.damage),num(roles.protection),num(roles.sustain),num(roles.control),num(roles.tempo),num(roles.setup));
-    return P.clamp(num(unit?.__v6?.baseValue)*.48+Math.min(100,(signals.setup+signals.payoff)*36)*.27+role*.20+num(unit?.__v6?.metaPrior)*.05);
+    const direct=Math.min(100,(signals.setup+signals.payoff)*36);
+    if(mechanicalPlan(plan))return P.clamp(num(unit?.__v6?.baseValue)*.28+direct*.45+role*.22+num(unit?.__v6?.metaPrior)*.05);
+    return P.clamp(num(unit?.__v6?.baseValue)*.48+direct*.27+role*.20+num(unit?.__v6?.metaPrior)*.05);
   }
 
   function candidatePool(units,plan,format,targetElement,options){
@@ -56,8 +60,8 @@
     const sorted=[...source].sort((a,b)=>unitPotential(b,plan)-unitPotential(a,plan)||P.identity(a).entry.localeCompare(P.identity(b).entry));
     lockedSeed(units,options).selected.forEach(add);
     sorted.slice(0,Math.ceil(cap*.45)).forEach(add);
-    if(requiredPlan(plan)){
-      [...sorted].sort((a,b)=>planSignals(b,plan).setup-planSignals(a,plan).setup).slice(0,12).forEach(add);
+    if(mechanicalPlan(plan)){
+      if(pairedPlan(plan))[...sorted].sort((a,b)=>planSignals(b,plan).setup-planSignals(a,plan).setup).slice(0,12).forEach(add);
       [...sorted].sort((a,b)=>planSignals(b,plan).payoff-planSignals(a,plan).payoff).slice(0,12).forEach(add);
     }
     for(const role of ['damage','protection','sustain','control','tempo','setup']){
@@ -70,16 +74,19 @@
 
   function stateSummary(selected,plan){
     const elements=new Set(),roles={damage:0,protection:0,sustain:0,control:0,tempo:0,setup:0};
-    let base=0,setup=0,payoff=0,confidence=0;
+    let base=0,setup=0,payoff=0,contributors=0,confidence=0;
     for(const unit of selected){
       elements.add(unit?.__v6?.element||P.key(unit?.element));base+=num(unit?.__v6?.baseValue);confidence+=num(unit?.__v6?.evidence?.confidence)*100;
-      const signals=planSignals(unit,plan);setup+=signals.setup;payoff+=signals.payoff;
+      const signals=planSignals(unit,plan);setup+=signals.setup;payoff+=signals.payoff;if(signals.setup||signals.payoff)contributors++;
       for(const role of Object.keys(roles))roles[role]=Math.max(roles[role],num(unit?.__v6?.roles?.[role]));
     }
     const roleCoverage=Object.values(roles).reduce((sum,value)=>sum+value,0)/Object.keys(roles).length;
-    const engine=requiredPlan(plan)?(setup>0?28:0)+(payoff>0?32:0):Math.max(setup,payoff)*24;
-    const heuristic=P.clamp((selected.length?base/selected.length:0)*.42+roleCoverage*.28+engine*.25+(selected.length?confidence/selected.length:0)*.05);
-    return{elements,roles,base,setup,payoff,confidence,heuristic};
+    let engine;
+    if(pairedPlan(plan))engine=(setup>0?18:0)+(payoff>0?20:0)+Math.min(22,contributors*3.2);
+    else if(payoffOnlyPlan(plan))engine=(payoff>0?30:0)+Math.min(30,contributors*7.5);
+    else engine=Math.max(setup,payoff)*24;
+    const heuristic=P.clamp((selected.length?base/selected.length:0)*.32+roleCoverage*.23+engine*.40+(selected.length?confidence/selected.length:0)*.05);
+    return{elements,roles,base,setup,payoff,contributors,confidence,heuristic};
   }
 
   function canAdd(selected,unit){return !selected.some(other=>P.identityConflicts(other,unit));}
@@ -87,8 +94,10 @@
   function partialFeasible(selected,pool,remaining,plan,format,targetElement){
     const summary=stateSummary(selected,plan);
     if(targetElement&&[...summary.elements].some(element=>element!==targetElement))return false;
-    if(requiredPlan(plan)){
+    if(pairedPlan(plan)){
       if(!summary.setup&&!pool.some(unit=>canAdd(selected,unit)&&planSignals(unit,plan).setup))return false;
+      if(!summary.payoff&&!pool.some(unit=>canAdd(selected,unit)&&planSignals(unit,plan).payoff))return false;
+    }else if(payoffOnlyPlan(plan)){
       if(!summary.payoff&&!pool.some(unit=>canAdd(selected,unit)&&planSignals(unit,plan).payoff))return false;
     }
     if(format==='rainbow'||format==='force_rainbow'){
@@ -184,5 +193,5 @@
     return{...relaxed,rainbowStrict:false,requestedDistinctElements:P.rainbow.preferredDistinct,actualDistinctElements:relaxed.best?.evaluation?.element?.distinctElements||0,relaxationReason:relaxed.best?'fourth element breaks engine or role coherence':'no legal eight-unit rainbow team'};
   }
 
-  root.storySearch={lockedSlots,lockedSeed,planSignals,unitPotential,candidatePool,stateSummary,expandBeam,placementValues,optimizePlacement,search,bestMono,rainbow};
+  root.storySearch={pairedPlan,payoffOnlyPlan,mechanicalPlan,lockedSlots,lockedSeed,planSignals,unitPotential,candidatePool,stateSummary,expandBeam,placementValues,optimizePlacement,search,bestMono,rainbow};
 })(window);

@@ -39,14 +39,18 @@
   function engineState(units,plan){
     const setup=units.map(unit=>F.mechanical(unit?.__v6?.evidence,plan,'setup')).filter(Boolean).sort((a,b)=>b-a);
     const payoff=units.map(unit=>F.mechanical(unit?.__v6?.evidence,plan,'payoff')).filter(Boolean).sort((a,b)=>b-a);
-    const required=['burn','poison','sleep','stun','blood'].includes(plan);
+    const paired=['burn','poison','sleep','stun','blood'].includes(plan),payoffOnly=['crisis','survivor'].includes(plan);
+    const requiresSetup=paired,requiresPayoff=paired||payoffOnly,required=requiresSetup||requiresPayoff;
+    const contributorCount=units.filter(unit=>F.mechanical(unit?.__v6?.evidence,plan,'setup')||F.mechanical(unit?.__v6?.evidence,plan,'payoff')).length;
+    const coverage=units.length?contributorCount/units.length:0;
     let score;
-    if(required)score=setup.length&&payoff.length?70+Math.min(15,setup.slice(0,3).reduce((s,v,i)=>s+v*[7,4,2][i],0))+Math.min(15,payoff.slice(0,3).reduce((s,v,i)=>s+v*[7,4,2][i],0)):0;
+    if(paired)score=setup.length&&payoff.length?45+Math.min(15,setup.slice(0,3).reduce((s,v,i)=>s+v*[7,4,2][i],0))+Math.min(15,payoff.slice(0,3).reduce((s,v,i)=>s+v*[7,4,2][i],0))+coverage*25:0;
+    else if(payoffOnly)score=payoff.length?55+Math.min(25,payoff.slice(0,4).reduce((s,v,i)=>s+v*[10,5,2,1][i],0))+coverage*20:0;
     else if(plan==='guardian')score=P.clamp(diminishing(units.map(unit=>num(unit?.__v6?.roles?.protection)))/1.45);
     else if(plan==='tempo')score=P.clamp(mean(units.map(unit=>num(unit?.__v6?.roles?.tempo)))*1.8+Math.max(...units.map(unit=>num(unit?.__v6?.roles?.damage)),0)*.35);
-    else if(plan==='crisis'||plan==='survivor')score=P.clamp(Math.max(...units.map(unit=>num(unit?.__v6?.roles?.damage)),0)*.8+mean(units.map(unit=>num(unit?.__v6?.roles?.sustain)))*.2);
     else score=P.clamp(Math.max(...['burn','poison','sleep','stun','blood'].map(candidate=>engineState(units,candidate).score),0));
-    return{plan,required,setupCount:setup.length,payoffCount:payoff.length,complete:!required||(setup.length>0&&payoff.length>0),score:P.clamp(score)};
+    const complete=(!requiresSetup||setup.length>0)&&(!requiresPayoff||payoff.length>0);
+    return{plan,required,requiresSetup,requiresPayoff,setupCount:setup.length,payoffCount:payoff.length,contributorCount,coverage,complete,score:P.clamp(score)};
   }
 
   function diminishing(values,weights=[1,.5,.2,.1]){
@@ -139,7 +143,7 @@
 
   function counterCoverage(roles){return P.clamp(roles.safety*.45+roles.tempo*.35+roles.damage*.20);}
 
-  function penalties(units,plan,engine,roles){
+  function penalties(units,plan,engine,roles,options={}){
     const setups=['burn','poison','sleep','stun'].filter(name=>units.some(unit=>F.mechanical(unit?.__v6?.evidence,name,'setup')));
     const guardians=units.filter(unit=>num(unit?.__v6?.roles?.protection)>=35).length;
     const uncertainty=100-mean(units.map(unit=>num(unit?.__v6?.evidence?.confidence)*100));
@@ -148,6 +152,7 @@
       roleRedundancy:P.clamp(Math.max(0,guardians-2)*20+Math.max(0,roles.damage<25?20:0)),
       resourceConflicts:plan==='tempo'&&units.every(unit=>!E.strength(unit?.__v6?.evidence?.resources?.spirit))?45:0,
       unsupportedPayoffs:engine.required&&!engine.complete?100:0,
+      planDilution:options?.presetMode==='hard'&&engine.required?P.clamp(Math.max(0,units.length-engine.contributorCount-2)/Math.max(1,units.length-2)*100):0,
       evidenceUncertainty:P.clamp(uncertainty)
     };
   }
@@ -167,15 +172,15 @@
       positionFlow:position.score,elementStrategy:element.score,counterCoverage:counterCoverage(roles),
       boundedMetaPrior:mean(units.map(unit=>num(unit?.__v6?.metaPrior))),evidenceConfidence:mean(units.map(unit=>num(unit?.__v6?.evidence?.confidence)*100))
     });
-    const penaltyValues=P.boundedComponents(penalties(units,plan,engine,roles));
+    const penaltyValues=P.boundedComponents(penalties(units,plan,engine,roles,options));
     const formatError=(format==='rainbow'||format==='force_rainbow'||format==='mono'||format==='force_mono')&&options.strictFormat!==false&&!element.strict;
     const errors=[...validation.errors];
-    if(engine.required&&!engine.complete&&options.requirePlanComplete!==false)errors.push(`${plan} requires both setup and payoff evidence`);
+    if(engine.required&&!engine.complete&&options.requirePlanComplete!==false)errors.push(engine.requiresSetup?`${plan} requires both setup and payoff evidence`:`${plan} requires direct payoff evidence`);
     if(formatError&&!errors.some(error=>/mono|rainbow/i.test(error)))errors.push(`${format} coherence contract failed`);
     return{
       valid:errors.length===0,errors,score:errors.length?0:weightedScore(components,penaltyValues),components,penalties:penaltyValues,
       plan,format,engine,roles,resource,pairs,leader,position,element,
-      unmetNeeds:[engine.required&&!engine.setupCount?'setup':'',engine.required&&!engine.payoffCount?'payoff':'',roles.damage<25?'damage':'',roles.safety<25?'protection/sustain':'',roles.tempo<20?'control/tempo':''].filter(Boolean)
+      unmetNeeds:[engine.requiresSetup&&!engine.setupCount?'setup':'',engine.requiresPayoff&&!engine.payoffCount?'payoff':'',roles.damage<25?'damage':'',roles.safety<25?'protection/sustain':'',roles.tempo<20?'control/tempo':''].filter(Boolean)
     };
   }
 

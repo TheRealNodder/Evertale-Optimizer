@@ -36,6 +36,21 @@
       const fixture=burnRoster(),prepared=attach(fixture.units,fixture.store),result=S.bestMono(prepared,{plan:'burn',beamWidth:50,candidateCap:20});
       assert(result.best?.element==='water',`Expected stronger Water complete team, got ${result.best?.element}`);assert(result.best.story.main.concat(result.best.story.back).every(row=>P.key(row.element)==='water'),'Mono result mixed elements');return `selected ${result.best.element}`;
     });
+    test('hard plan cohesion beats a mostly neutral higher-stat mono team',()=>{
+      const units=[],store={};
+      for(let i=0;i<8;i++){
+        const id=`DarkBlood${String.fromCharCode(65+i)}01`;units.push(unit(id,'Dark',1050+i*10));
+        store[id]=[i<6?ev('summon'):i===6?ev('payoff_blood'):ev('role_guardian')];
+      }
+      for(let i=0;i<8;i++){
+        const id=`StormBlood${String.fromCharCode(65+i)}01`;units.push(unit(id,'Storm',1900+i*10));
+        store[id]=[i<2?ev('summon'):i===2?ev('payoff_blood'):ev('role_healer')];
+      }
+      const prepared=attach(units,store),result=S.bestMono(prepared,{plan:'blood',presetMode:'hard',beamWidth:60,candidateCap:20});
+      assert(result.best?.element==='dark',`Mostly neutral high-stat team beat coherent Blood team: ${result.best?.element}`);
+      assert(result.best.evaluation.engine.contributorCount>=7,'Blood cohesion coverage was not retained');
+      return `${result.best.element} with ${result.best.evaluation.engine.contributorCount}/8 direct contributors`;
+    });
     test('rainbow search produces four coherent elements',()=>{
       const fixture=rainbowRoster(),prepared=attach(fixture.units,fixture.store),result=S.rainbow(prepared,{plan:'hybrid',beamWidth:70,candidateCap:20,requirePlanComplete:false});
       assert(result.best&&result.rainbowStrict,'Strict rainbow not found');assert(result.best.evaluation.element.contributingElements.length>=4,'Rainbow contains color-only element');return `${result.best.evaluation.element.distinctElements} elements`;

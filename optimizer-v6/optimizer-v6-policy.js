@@ -7,7 +7,7 @@
   const key=value=>txt(value).toLowerCase().replace(/[\u2019']/g,'').replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');
 
   const policy={
-    version:'optimizer-v6-policy-1',
+    version:'optimizer-v6-policy-3',
     story:{main:5,back:3,total:8,leaderScope:8,leaderStacking:'best_only'},
     platoons:{rows:20,size:5,storyExcluded:true,allowBlankAfterExhaustion:true},
     elements:['fire','water','storm','earth','light','dark'],
@@ -19,7 +19,7 @@
       minimumMechanicalConfidence:0.8,
       minimumRoleConfidence:0.72,
       elementAffinityMaximum:0.12,
-      rejectedSourceFragments:['revengeeffectstoskip','immunitylist','excludedbuffs']
+      rejectedSourceFragments:['revengeeffectstoskip','immunitylist','excludedbuffs','activeskillsai']
     },
     componentWeights:{
       baseUnitValue:0.16,
@@ -40,6 +40,7 @@
       roleRedundancy:0.04,
       resourceConflicts:0.04,
       unsupportedPayoffs:0.08,
+      planDilution:0.07,
       evidenceUncertainty:0.04
     },
     plans:['burn','poison','sleep','stun','blood','crisis','survivor','guardian','tempo','hybrid'],

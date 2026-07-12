@@ -11,27 +11,92 @@ ROOT_MARKERS = ["apkfiles", "tools"]
 OUT_REL = "apkfiles/entries/runtime/optimizer_runtime_model.json"
 REPORT_REL = "apkfiles/entries/reports/optimizer_runtime_model_report.json"
 
-FEATURE_RULES: Dict[str, Tuple[List[str], float]] = {
-    "applies_burn": (["burnattack", "applyburn", "inflictburn", "frostburn", "burnskin"], 1.6),
-    "applies_poison": (["poisonattack", "applypoison", "inflictpoison", "megapoison", "lethalpoison"], 1.6),
-    "applies_sleep": (["sleepattack", "applysleep", "inflictsleep", "deepsleep", "noxioussleep"], 1.6),
-    "applies_stun": (["stunattack", "applystun", "inflictstun", "pushback"], 1.6),
-    "payoff_burn": (["burndrive", "burnblast", "burnforce", "burnfrenzy", "burningenemy"], 1.5),
-    "payoff_poison": (["poisoneater", "poisondevour", "poisonfury", "poisonedenemy"], 1.5),
-    "payoff_sleep": (["dreamhunt", "dreamhunter", "dreamdevour", "sleepingenemy", "nightmare"], 1.5),
-    "payoff_stun": (["timestrike", "timebuster", "stunnedenemy", "stunburst"], 1.5),
-    "role_guardian": (["guardian", "autoprotect", "protectteammates", "redirectdamage"], 1.35),
-    "role_cleanser": (["purify", "cleanse", "removenegative", "removedebuff"], 1.35),
-    "role_healer": (["heal", "restorehp", "recoverhp", "regeneration", "lifesteal"], 1.25),
-    "role_reviver": (["revive", "resurrect", "returntobattlefield"], 1.35),
-    "resource_spirit": (["gainspirit", "addspirit", "spiritrecovery", "painspirit"], 1.3),
-    "tempo_turn": (["grantturn", "giveturn", "allyturn", "tureduction", "accelerate", "haste"], 1.3),
-    "summon": (["summonablemonsters", "summon", "createminion", "spawnminion"], 1.2),
-    "leader": (["leaderbuff", "leaderbuffcondition", "leaderskill"], 1.1),
+FEATURE_STRENGTH: Dict[str, float] = {
+    "applies_burn": 1.6,
+    "applies_poison": 1.6,
+    "applies_sleep": 1.6,
+    "applies_stun": 1.6,
+    "payoff_burn": 1.5,
+    "payoff_poison": 1.5,
+    "payoff_sleep": 1.5,
+    "payoff_stun": 1.5,
+    "summon": 1.2,
+    "payoff_blood": 1.5,
+    "payoff_crisis": 1.45,
+    "payoff_survivor": 1.45,
+    "role_guardian": 1.35,
+    "role_cleanser": 1.35,
+    "role_healer": 1.25,
+    "role_reviver": 1.35,
+    "resource_spirit": 1.3,
+    "tempo_turn": 1.3,
+    "leader": 1.1,
 }
 
-APPLY_FEATURES = {"applies_burn", "applies_poison", "applies_sleep", "applies_stun"}
-NEGATIVE_APPLY_WORDS = ("immune", "immunity", "resist", "remove", "purify", "cleanse", "killer")
+# These rules operate on explicit ability/passive identifiers, not arbitrary
+# nested configuration text.  The previous global substring scan treated AI
+# target hints, immunity lists, negative conditions, and even "healthy" as
+# mechanical features.  Keep the identifiers conservative and use localized
+# descriptions below only for precise action/condition phrases.
+IDENTIFIER_RULES: Dict[str, Tuple[str, ...]] = {
+    "applies_burn": (
+        "burnself", "burnboth", "burnally", "burnall", "ignition", "heating",
+        "burnskin", "burnrevenge", "burnentrance", "burnstart", "autoburn",
+        "prepareburn", "burnchance", "grantburn", "burnenemy",
+    ),
+    "payoff_burn": (
+        "burnblast", "burndrive", "burnforce", "burnfrenzy", "burndevour",
+        "burnboosted", "hasburned", "burntimestrike", "burndrain", "ifburn",
+        "whileburn", "burningallies", "burnarmor", "unlessburning",
+        "burninggoddess", "burningjourney", "burnregeneration", "regeneratewhenburn",
+    ),
+    "applies_poison": (
+        "poisontouch", "poisonattack", "poisonskin", "poisonrevenge", "poisontrap",
+        "poisonentrance", "megapoisontouch", "megapoisonjolt", "megapoisonpassive",
+        "megapoisonaura", "superpoisontouch", "superpoisonskin", "lethalpoison",
+        "poisonparalysis", "hypnosis",
+    ),
+    "payoff_poison": (
+        "poisoneater", "poisondevour", "poisonfury", "poisondrain", "poisoncharge",
+        "poisonmomentum", "momentumstrikepoison", "poisonkiller", "poisonlust",
+        "poisonturn", "enemypoisoned", "whileenemypoisoned",
+    ),
+    "applies_sleep": (
+        "sleepsingle", "sleepdouble", "sleepbomb", "sleepattack", "forcesleep",
+        "massforcesleep", "sleepwave", "sleeprevenge", "sleepskin", "sleepentrance",
+        "sleepchance", "hypnosis",
+    ),
+    "payoff_sleep": (
+        "dreamhunt", "dreamhunter", "dreambuster", "dreamdevour", "nightmare",
+        "killsleep", "sleepstrike", "sleepingenemy",
+    ),
+    "payoff_stun": ("timestrike", "timebuster", "stunburst", "stunnedenemy"),
+    "summon": ("summontoken", "summonangel", "summonminion", "summonmass", "summonmagical", "summondoll", "summonsnow", "summonjeanne"),
+    "payoff_blood": ("bloodfury", "bloodthirst", "vicariousblood"),
+    "payoff_crisis": ("crisis", "lowhp", "hp25", "desperate"),
+    "payoff_survivor": ("survivor",),
+    "role_guardian": (
+        "autoprotect", "protectteammates", "grantprotectteammates", "promisedguard",
+        "puppeteerguard", "emergencyprotect", "protectallies", "guardianangel",
+        "guardpassive", "guardblockade", "guardianevasion",
+    ),
+    "role_cleanser": ("purify", "cleanse", "removenegative", "removedebuff"),
+    "role_reviver": ("revive", "revival", "resurrect", "returntobattlefield"),
+    "resource_spirit": (
+        "gainspirit", "spiritgain", "addspirit", "spiritrecovery", "painspirit",
+        "alliesgainspirit", "spiritthief", "energyconverter",
+    ),
+    "tempo_turn": (
+        "grantturn", "giveturn", "allyturn", "randomallyturn", "instantturn",
+        "extraturn", "gainturn", "getturn", "tureduc", "accelerate", "haste",
+        "turnreprise",
+    ),
+}
+
+STUN_SETUP_EXCLUSIONS = (
+    "immunity", "immune", "absorber", "absorb", "minus", "reduc", "ward",
+    "killer", "buster", "timestrike", "tough", "nostun", "antistun",
+)
 
 
 def find_repo_root(start: Path) -> Path:
@@ -159,57 +224,169 @@ def normalized(value: Any) -> str:
     return re.sub(r"[^a-z0-9]+", "", str(value or "").lower())
 
 
-def scalar_evidence(value: Any, path: str, depth: int = 0) -> Iterable[Tuple[str, str]]:
-    if value is None or depth > 7:
+def iter_scalar_identifiers(value: Any, path: str, depth: int = 0) -> Iterable[Tuple[str, str]]:
+    """Yield explicit referenced identifiers without treating dictionary keys as facts."""
+    if value is None or depth > 4:
         return
-    if isinstance(value, (str, int, float, bool)):
-        yield path, str(value)
+    if isinstance(value, str):
+        if value.strip():
+            yield path, value
         return
     if isinstance(value, list):
         for index, item in enumerate(value):
-            yield from scalar_evidence(item, f"{path}[{index}]", depth + 1)
+            yield from iter_scalar_identifiers(item, f"{path}[{index}]", depth + 1)
         return
     if isinstance(value, dict):
         for key, item in value.items():
-            yield f"{path}.{key}#key", str(key)
-            yield from scalar_evidence(item, f"{path}.{key}", depth + 1)
+            yield from iter_scalar_identifiers(item, f"{path}.{key}", depth + 1)
 
 
-def confidence_for_path(path: str) -> float:
-    lower = path.lower()
-    if ".config" in lower or ".buffs" in lower or ".conditions" in lower:
-        return 0.98
-    if ".ability" in lower or lower.startswith("refs.activeskills"):
-        return 0.94
-    if "passive" in lower or "ai" in lower:
-        return 0.88
-    if "localization" in lower or "description" in lower:
-        return 0.72
-    return 0.65
+def identifier_features(identifier: Any) -> List[str]:
+    token = normalized(identifier)
+    if not token:
+        return []
+    features = {
+        feature
+        for feature, patterns in IDENTIFIER_RULES.items()
+        if any(pattern in token for pattern in patterns)
+    }
+    if "stun" in token and not any(fragment in token for fragment in STUN_SETUP_EXCLUSIONS):
+        features.add("applies_stun")
+    if (
+        ("heal" in token or "regenerat" in token or "lifesteal" in token)
+        and "healthy" not in token
+        and "healthboost" not in token
+    ):
+        features.add("role_healer")
+    return sorted(features)
+
+
+def description_features(description: Any) -> List[str]:
+    text = re.sub(r"\s+", " ", str(description or "")).strip().lower()
+    if not text:
+        return []
+    features = set()
+    sentences = [sentence.strip() for sentence in re.split(r"[.!?]+", text) if sentence.strip()]
+
+    setup_patterns = {
+        "applies_burn": (
+            r"\bgrant(?:s|ed)?\b.{0,100}\bburn status effect\b",
+            r"\bburns\b.{0,70}\b(?:ally|allies|enemy|enemies|target|unit|user)\b",
+        ),
+        "applies_poison": (
+            r"\bgrant(?:s|ed)?\b.{0,100}\b(?:mega |super |lethal )?poison(?: status effect)?\b",
+            r"\bpoisons?\b.{0,70}\b(?:enemy|enemies|target|unit)\b",
+        ),
+        "applies_sleep": (
+            r"\bgrant(?:s|ed)?\b.{0,100}\b(?:deep )?sleep status effect\b",
+            r"\bput(?:s)?\b.{0,70}\bto sleep\b",
+        ),
+        "applies_stun": (
+            r"\bstuns?\b.{0,100}\b(?:enemy|enemies|target|unit)\b",
+            r"\b(?:enemy|enemies|target|unit)\b.{0,100}\bstunned for\b",
+        ),
+    }
+    blocked_setup = {
+        "applies_burn": ("frostburn", "burn ward", "cannot be burned", "burn immunity"),
+        "applies_poison": ("poison ward", "cannot be poisoned", "poison immunity"),
+        "applies_sleep": ("sleep ward", "cannot be put to sleep", "sleep immunity"),
+        "applies_stun": ("stun ward", "cannot be stunned", "stun immunity", "stun absorber"),
+    }
+    for feature, patterns in setup_patterns.items():
+        for sentence in sentences:
+            # Frostburn is its own delayed sleep/control mechanic.  It must not
+            # satisfy the normal Burn setup contract merely because its help
+            # text describes a later conversion into Burn.
+            if feature == "applies_burn" and "frostburn" in sentence:
+                continue
+            scrubbed = sentence
+            if any(fragment in scrubbed for fragment in blocked_setup[feature]):
+                continue
+            if any(re.search(pattern, scrubbed) for pattern in patterns):
+                features.add(feature)
+                break
+
+    payoff_statuses = {
+        "payoff_burn": ("burning", "burned", "burn status"),
+        "payoff_poison": ("poisoned", "poison status", "mega poison", "super poison", "lethal poison"),
+        "payoff_sleep": ("sleeping", "asleep", "sleep status"),
+        "payoff_stun": ("stunned", "stun status"),
+    }
+    benefit_words = ("damage", "attack", "heal", "spirit", "next turn", "tu cost", "usable", "unlocked", "increased", "reduced")
+    condition_words = (" if ", " when ", " while ", " against ", " for each ", " per ", " targets that ", " target is ", " user has ")
+    for feature, statuses in payoff_statuses.items():
+        for sentence in sentences:
+            if not any(status in sentence for status in statuses):
+                continue
+            if any(blocked in sentence for blocked in ("immunity", " ward", "cannot be", "prevents ")):
+                continue
+            if any(word in sentence for word in benefit_words) and any(word in f" {sentence} " for word in condition_words):
+                features.add(feature)
+                break
+
+    if any(re.search(pattern, text) for pattern in (
+        r"\bheals?\b.{0,80}\b(?:user|ally|allies|unit)\b",
+        r"\b(?:user|ally|allies|unit)\b.{0,80}\bheals?\b",
+        r"\brecovers? hp\b",
+        r"\brestores?\b.{0,50}\bhp\b",
+    )):
+        features.add("role_healer")
+    if re.search(r"\bpurif(?:y|ies)\b", text) or "removes negative status effects" in text:
+        features.add("role_cleanser")
+    if re.search(r"\b(?:allies|ally|the user|user) gain(?:s)? (?:\d+ |one )?spirit\b", text):
+        features.add("resource_spirit")
+    if re.search(r"\b(?:give|gives|grant|grants)\b.{0,100}\bnext turn\b", text) or re.search(r"\breduc(?:e|es|ing)\b.{0,100}\btu to 0\b", text):
+        features.add("tempo_turn")
+    if re.search(r"\badds? \d+\b.{0,100}\ballied reinforcements\b", text) or re.search(r"\bsummons?\b", text):
+        features.add("summon")
+    return sorted(features)
 
 
 def feature_evidence_for_entry(row: Dict[str, Any]) -> List[Dict[str, Any]]:
+    refs = row.get("refs") if isinstance(row.get("refs"), dict) else {}
+    resolved = row.get("resolved") if isinstance(row.get("resolved"), dict) else {}
     raw = row.get("raw") if isinstance(row.get("raw"), dict) else {}
-    projected_raw = {key: raw.get(key) for key in ("activeSkills", "passives", "leaderBuff", "leaderBuffCondition", "summonableMonsters")}
-    sources = [
-        *scalar_evidence(row.get("refs", {}), "refs"),
-        *scalar_evidence(row.get("resolved", {}), "resolved"),
-        *scalar_evidence(projected_raw, "raw"),
-    ]
     matched: Dict[str, Dict[str, Any]] = {}
-    for path, text in sources:
-        token = normalized(text)
-        if not token:
-            continue
-        for feature, (patterns, strength) in FEATURE_RULES.items():
-            if not any(pattern in token for pattern in patterns):
+
+    def add(feature: str, source: str, confidence: float) -> None:
+        if feature not in FEATURE_STRENGTH:
+            return
+        current = matched.setdefault(feature, {
+            "feature": feature,
+            "strength": FEATURE_STRENGTH[feature],
+            "confidence": 0.0,
+            "sources": [],
+        })
+        current["confidence"] = max(float(current["confidence"]), confidence)
+        if source not in current["sources"] and len(current["sources"]) < 12:
+            current["sources"].append(source)
+
+    for collection_name, identifier_confidence in (("activeSkills", 0.98), ("passives", 0.90)):
+        abilities = resolved.get(collection_name) if isinstance(resolved.get(collection_name), dict) else {}
+        for ability_id, ability in abilities.items():
+            source_base = f"resolved.{collection_name}.{ability_id}"
+            for feature in identifier_features(ability_id):
+                add(feature, f"{source_base}#identifier", identifier_confidence)
+            if not isinstance(ability, dict):
                 continue
-            if feature in APPLY_FEATURES and any(word in token for word in NEGATIVE_APPLY_WORDS):
-                continue
-            current = matched.setdefault(feature, {"feature": feature, "strength": strength, "confidence": 0.0, "sources": []})
-            current["confidence"] = max(float(current["confidence"]), confidence_for_path(path))
-            if path not in current["sources"] and len(current["sources"]) < 8:
-                current["sources"].append(path)
+            localization = ability.get("localization") if isinstance(ability.get("localization"), dict) else {}
+            description = localization.get("description")
+            if description:
+                for feature in description_features(description):
+                    add(feature, f"{source_base}.localization.description", 0.84)
+
+    for collection_name, confidence in (("activeSkills", 0.94), ("passives", 0.88)):
+        for source, identifier in iter_scalar_identifiers(refs.get(collection_name), f"refs.{collection_name}"):
+            for feature in identifier_features(identifier):
+                add(feature, source, confidence)
+        for source, identifier in iter_scalar_identifiers(raw.get(collection_name), f"raw.{collection_name}"):
+            for feature in identifier_features(identifier):
+                add(feature, source, confidence)
+
+    if raw.get("summonableMonsters") or refs.get("summonableMonsters"):
+        add("summon", "raw.summonableMonsters", 1.0)
+    if raw.get("leaderBuff") or refs.get("leaderBuff") or row.get("leaderSkills"):
+        add("leader", "raw.leaderBuff", 1.0)
     return sorted(matched.values(), key=lambda item: item["feature"])
 
 
@@ -273,6 +450,30 @@ def main() -> int:
     evidence_count = sum(len(rows) for rows in feature_evidence.values())
     if not feature_evidence:
         errors.append("Resolved character data produced no feature evidence")
+    feature_counts: Dict[str, int] = {}
+    feature_element_counts: Dict[str, Dict[str, int]] = {}
+    suspicious_evidence: List[Dict[str, Any]] = []
+    for source_id, items in feature_evidence.items():
+        element = str(entry_index.get(source_id, {}).get("element") or "unknown").lower()
+        for item in items:
+            feature = str(item.get("feature") or "")
+            feature_counts[feature] = feature_counts.get(feature, 0) + 1
+            by_element = feature_element_counts.setdefault(feature, {})
+            by_element[element] = by_element.get(element, 0) + 1
+            source_blob = " ".join(str(source) for source in item.get("sources") or []).lower()
+            reasons = []
+            if "activeskillsai" in source_blob:
+                reasons.append("AI targeting metadata")
+            if feature == "applies_burn" and "frostburn" in source_blob:
+                reasons.append("Frostburn classified as normal Burn setup")
+            if feature == "role_healer" and "healthy" in source_blob:
+                reasons.append("healthy substring classified as healing")
+            if feature.startswith("applies_") and any(token in source_blob for token in ("immunitylist", "revengeeffectstoskip")):
+                reasons.append("negative/excluded status list")
+            if reasons:
+                suspicious_evidence.append({"sourceId": source_id, "feature": feature, "reasons": reasons, "sources": item.get("sources") or []})
+    if suspicious_evidence:
+        errors.append(f"Context-invalid feature evidence detected: {len(suspicious_evidence)}")
 
     report = {
         "schemaVersion": 1,
@@ -291,9 +492,12 @@ def main() -> int:
             "tagRows": len(tag_rows),
             "featureEvidenceEntries": len(feature_evidence),
             "featureEvidenceItems": evidence_count,
+            "featureEvidenceByFeature": dict(sorted(feature_counts.items())),
+            "featureEvidenceByElement": {feature: dict(sorted(counts.items())) for feature, counts in sorted(feature_element_counts.items())},
         },
         "tagSources": tag_sources,
         "identityCollisions": collisions,
+        "suspiciousFeatureEvidence": suspicious_evidence,
         "output": str(repo / OUT_REL),
     }
     write_json(repo / REPORT_REL, report)

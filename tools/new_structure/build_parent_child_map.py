@@ -182,13 +182,57 @@ def apply_forced_directions(edges: Dict[str, set[str]], labels: Dict[str, str], 
     return applied
 
 
-def build_edges(repo: Path, aliases: Dict[str, str]) -> Tuple[Dict[str, set[str]], Dict[str, str], List[Dict[str, Any]], List[str], List[Dict[str, Any]]]:
+def resolve_reciprocal_edges(
+    edges: Dict[str, set[str]],
+    explicit_edges: set[Tuple[str, str]],
+) -> List[Dict[str, str]]:
+    """Choose one display direction when broad Duo data links both ways.
+
+    Duo.json describes connected forms and can contain A -> B and B -> A.
+    The roster filter consumes a directional authority, so preserving both
+    edges hides both playable forms. DuoDisplay.parentCards is authoritative
+    when it declares the preferred parent.
+    """
+    repairs: List[Dict[str, str]] = []
+    visited: set[Tuple[str, str]] = set()
+    for parent, children in list(edges.items()):
+        for child in list(children):
+            pair = tuple(sorted((parent, child)))
+            if pair in visited or parent not in edges.get(child, set()):
+                continue
+            visited.add(pair)
+
+            forward_explicit = (parent, child) in explicit_edges
+            reverse_explicit = (child, parent) in explicit_edges
+            if forward_explicit != reverse_explicit:
+                keep_parent, keep_child = (parent, child) if forward_explicit else (child, parent)
+                reason = "DuoDisplay.parentCards"
+            else:
+                parent_child_hint = bool(CHILD_HINT_RE.search(parent))
+                child_child_hint = bool(CHILD_HINT_RE.search(child))
+                if parent_child_hint != child_child_hint:
+                    keep_parent, keep_child = (child, parent) if parent_child_hint else (parent, child)
+                    reason = "child-name-hint"
+                else:
+                    keep_parent, keep_child = pair
+                    reason = "deterministic-fallback"
+
+            edges.setdefault(keep_parent, set()).add(keep_child)
+            edges.get(keep_child, set()).discard(keep_parent)
+            if not edges.get(keep_child):
+                edges.pop(keep_child, None)
+            repairs.append({"parent": keep_parent, "child": keep_child, "reason": reason})
+    return repairs
+
+
+def build_edges(repo: Path, aliases: Dict[str, str]) -> Tuple[Dict[str, set[str]], Dict[str, str], List[Dict[str, Any]], List[str], List[Dict[str, Any]], List[Dict[str, str]]]:
     duo = load_json(repo / "apkfiles" / "Duo.json", {}) or {}
     display = load_json(repo / "apkfiles" / "DuoDisplay.json", {}) or {}
     edges: Dict[str, set[str]] = {}
     labels: Dict[str, str] = {}
     issues: List[Dict[str, Any]] = []
     source_maps: List[str] = []
+    explicit_edges: set[Tuple[str, str]] = set()
 
     parent_cards = display.get("parentCards", {}) if isinstance(display, dict) else {}
     if isinstance(parent_cards, dict):
@@ -200,6 +244,8 @@ def build_edges(repo: Path, aliases: Dict[str, str]) -> Tuple[Dict[str, set[str]
             for child_raw in children if isinstance(children, list) else []:
                 child = canonical(child_raw, aliases)
                 add_edge(edges, parent, child)
+                if parent and child and parent != child:
+                    explicit_edges.add((parent, child))
 
     if isinstance(duo, dict):
         for map_name, mapping in duo.items():
@@ -210,7 +256,8 @@ def build_edges(repo: Path, aliases: Dict[str, str]) -> Tuple[Dict[str, set[str]
                 source_maps.append(f"Duo.{map_name}")
 
     forced = apply_forced_directions(edges, labels, aliases)
-    return edges, labels, issues, source_maps, forced
+    reciprocal_repairs = resolve_reciprocal_edges(edges, explicit_edges)
+    return edges, labels, issues, source_maps, forced, reciprocal_repairs
 
 
 def main() -> int:
@@ -224,7 +271,7 @@ def main() -> int:
     reports_dir = entries_root / "reports"
 
     aliases, families = build_aliases(repo, entries_root)
-    edges, labels, issues, source_maps, forced = build_edges(repo, aliases)
+    edges, labels, issues, source_maps, forced, reciprocal_repairs = build_edges(repo, aliases)
 
     parents = {parent: sorted(children) for parent, children in sorted(edges.items()) if children}
     child_to_parents: Dict[str, List[str]] = {}
@@ -248,6 +295,7 @@ def main() -> int:
         "generatedAt": int(time.time()),
         "source": source_maps,
         "forcedDirections": forced,
+        "reciprocalRepairs": reciprocal_repairs,
         "parents": parents,
         "children": children,
         "groups": groups,
@@ -269,6 +317,7 @@ def main() -> int:
         "counts": payload["counts"],
         "issues": issues,
         "forcedDirections": forced,
+        "reciprocalRepairs": reciprocal_repairs,
         "sourceMaps": source_maps,
         "victoriaPresentInAliases": "victoriaregular" in aliases,
         "outputs": ["apkfiles/entries/maps/character_parent_child_map.json"],

@@ -74,14 +74,23 @@ def main() -> int:
 
     for key, filename in CHUNKS.items():
         payload = model.get(key, {} if key != "optimizerKnowledge" else {"sources": []})
+        chunk_path = runtime_dir / filename
+        existing = load_json(chunk_path) if chunk_path.exists() else {}
+        unchanged = (
+            isinstance(existing, dict)
+            and existing.get("schemaVersion") == 1
+            and existing.get("chunk") == key
+            and existing.get("count") == count_payload(payload)
+            and existing.get("data") == payload
+        )
         chunk = {
             "schemaVersion": 1,
-            "generatedAt": generated_at,
+            "generatedAt": existing.get("generatedAt", generated_at) if unchanged else generated_at,
             "chunk": key,
             "count": count_payload(payload),
             "data": payload,
         }
-        write_json(runtime_dir / filename, chunk, compact=True)
+        write_json(chunk_path, chunk, compact=True)
         manifest["chunks"][key] = {
             "file": filename,
             "count": chunk["count"],
