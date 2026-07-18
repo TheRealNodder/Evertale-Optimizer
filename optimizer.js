@@ -23,6 +23,7 @@ const LS_PRESET_KEY = "evertale_optimizer_preset_v1";
 const LS_LOCKS_KEY = "evertale_optimizer_slotLocks_v1";
 const LS_PRIMARY_ARCHETYPE_KEY = "evertale_optimizer_primaryArchetype_v1";
 const LS_SECONDARY_ARCHETYPE_KEY = "evertale_optimizer_secondaryArchetype_v1";
+const LS_META_WEIGHT_KEY = "evertale_optimizer_metaWeight_v1";
 
 const ARCHETYPE_OPTIONS = new Set(["","none","burn","poison","sleep","stun","heal","turn","cleanse","defense","guardian","stealth","spirit","charge","blood","crisis","survivor"]);
 
@@ -80,6 +81,11 @@ function getSecondaryArchetypePref() {
 }
 function setPrimaryArchetypePref(v) { localStorage.setItem(LS_PRIMARY_ARCHETYPE_KEY, ARCHETYPE_OPTIONS.has(v) ? v : ""); }
 function setSecondaryArchetypePref(v) { localStorage.setItem(LS_SECONDARY_ARCHETYPE_KEY, (v && ARCHETYPE_OPTIONS.has(v)) ? v : "none"); }
+function getMetaWeightPref() {
+  const v = localStorage.getItem(LS_META_WEIGHT_KEY) || "balanced";
+  return (v === "off" || v === "balanced" || v === "strong") ? v : "balanced";
+}
+function setMetaWeightPref(v) { localStorage.setItem(LS_META_WEIGHT_KEY, (v === "off" || v === "strong") ? v : "balanced"); }
 
 function defaultLocks() {
   return {
@@ -130,10 +136,12 @@ function initSharedOptimizerFiltersUI() {
   const presetSel = el("presetSelect");
   const primarySel = el("primaryArchetypeSelect");
   const secondarySel = el("secondaryArchetypeSelect");
+  const metaWeightSel = el("metaWeightSelect");
   if (teamSel) teamSel.value = getTeamTypePref();
   if (presetSel) presetSel.value = getPresetPref();
   if (primarySel) primarySel.value = getPrimaryArchetypePref();
   if (secondarySel) secondarySel.value = getSecondaryArchetypePref() || "none";
+  if (metaWeightSel) metaWeightSel.value = getMetaWeightPref();
   syncArchetypeDropdowns();
   teamSel?.addEventListener("change", (e) => setTeamTypePref(e.target.value || "auto"));
   presetSel?.addEventListener("change", (e) => setPresetPref(e.target.value || "auto"));
@@ -145,6 +153,7 @@ function initSharedOptimizerFiltersUI() {
     setSecondaryArchetypePref(e.target.value || "none");
     syncArchetypeDropdowns();
   });
+  metaWeightSel?.addEventListener("change", (e) => setMetaWeightPref(e.target.value || "balanced"));
 }
 
 function getOwnedIds() {
@@ -966,6 +975,9 @@ function buildEngineOptions() {
   const primaryArchetype = (el("primaryArchetypeSelect")?.value || getPrimaryArchetypePref() || "");
   const secondaryArchetypeRaw = (el("secondaryArchetypeSelect")?.value || getSecondaryArchetypePref() || "none");
   const secondaryArchetype = secondaryArchetypeRaw === "none" ? "" : secondaryArchetypeRaw;
+  const metaWeight = (el("metaWeightSelect")?.value || getMetaWeightPref());
+  setMetaWeightPref(metaWeight);
+  options.metaWeight = metaWeight;
   options.archetypes = [primaryArchetype, secondaryArchetype].filter((v, i, arr) => v && arr.indexOf(v) === i);
 
   // Pass current layout + locks so engine can treat locked units as forced picks.
@@ -977,6 +989,7 @@ function buildEngineOptions() {
     selectedCorePlan: preset,
     selectedPrimaryArchetype: primaryArchetype,
     selectedSecondaryArchetype: secondaryArchetype,
+    selectedMetaWeight: metaWeight,
     buildScope: options.buildScope,
     ...lockSummary(options.slotLocks),
   };

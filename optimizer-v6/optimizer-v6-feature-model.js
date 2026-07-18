@@ -63,7 +63,7 @@
       const meta=P.clamp(number(unit?.__v5?.meta?.newer)*100);
       clone.__v6={
         identity:P.identity(unit),stats:stats(unit),baseValue:baseValue(unit,population),evidence,
-        roles:roleScores(evidence),skillProfile:R.unitProfile(unit,skillStore),metaPrior:P.clamp(meta*.05),element:P.key(unit?.element)
+        roles:roleScores(evidence),skillProfile:R.unitProfile(unit,skillStore),metaPrior:meta,element:P.key(unit?.element)
       };
       return clone;
     });

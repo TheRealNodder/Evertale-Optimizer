@@ -158,8 +158,15 @@
     };
   }
 
-  function weightedScore(components,penaltyValues){
-    let score=0;for(const [name,weight] of Object.entries(P.componentWeights))score+=num(components[name])*weight;
+  function resolvedComponentWeights(options={}){
+    const profile=P.metaProfile(options),baseEntries=Object.entries(P.componentWeights).filter(([name])=>name!=='boundedMetaPrior');
+    const baseTotal=baseEntries.reduce((sum,[,weight])=>sum+num(weight),0),baseScale=baseTotal?(1-profile.scoreWeight)/baseTotal:0;
+    return Object.fromEntries([...baseEntries.map(([name,weight])=>[name,num(weight)*baseScale]),['boundedMetaPrior',profile.scoreWeight]]);
+  }
+
+  function weightedScore(components,penaltyValues,options={}){
+    const weights=resolvedComponentWeights(options);
+    let score=0;for(const [name,weight] of Object.entries(weights))score+=num(components[name])*weight;
     for(const [name,weight] of Object.entries(P.penaltyWeights))score-=num(penaltyValues[name])*weight;
     return P.clamp(score);
   }
@@ -178,12 +185,13 @@
     const errors=[...validation.errors];
     if(engine.required&&!engine.complete&&options.requirePlanComplete!==false)errors.push(engine.requiresSetup?`${plan} requires both setup and payoff evidence`:`${plan} requires direct payoff evidence`);
     if(formatError&&!errors.some(error=>/mono|rainbow/i.test(error)))errors.push(`${format} coherence contract failed`);
+    const componentWeights=resolvedComponentWeights(options),metaWeighting=P.metaProfile(options);
     return{
-      valid:errors.length===0,errors,score:errors.length?0:weightedScore(components,penaltyValues),components,penalties:penaltyValues,
+      valid:errors.length===0,errors,score:errors.length?0:weightedScore(components,penaltyValues,options),components,componentWeights,metaWeighting,penalties:penaltyValues,
       plan,format,engine,roles,resource,pairs,leader,position,element,
       unmetNeeds:[engine.requiresSetup&&!engine.setupCount?'setup':'',engine.requiresPayoff&&!engine.payoffCount?'payoff':'',roles.damage<25?'damage':'',roles.safety<25?'protection/sustain':'',roles.tempo<20?'control/tempo':''].filter(Boolean)
     };
   }
 
-  root.teamEvaluator={validateStory,engineState,roleCoverage,resourceBalance,pairValue,pairSynergy,leaderCandidates,leaderValue,positionFlow,elementStrategy,penalties,weightedScore,evaluate};
+  root.teamEvaluator={validateStory,engineState,roleCoverage,resourceBalance,pairValue,pairSynergy,leaderCandidates,leaderValue,positionFlow,elementStrategy,penalties,resolvedComponentWeights,weightedScore,evaluate};
 })(window);

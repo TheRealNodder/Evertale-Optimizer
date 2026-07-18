@@ -8,6 +8,7 @@
   const rows=value=>Array.isArray(value)?value:[];
   const num=value=>Number.isFinite(Number(value))?Number(value):0;
   const rounded=value=>Math.round(num(value)*10)/10;
+  const roundedWeight=value=>Math.round(num(value)*1000)/1000;
 
   function explain(team,evaluation,context={}){
     const units=rows(team),strengths=[],warnings=[],resource=evaluation?.resource||{};
@@ -16,6 +17,7 @@
     if(num(evaluation?.roles?.safety)>=50)strengths.push('Protection and sustain coverage is above the team-safety threshold.');
     if(num(evaluation?.roles?.tempo)>=50)strengths.push('The selected team has meaningful control or turn-tempo coverage.');
     if(evaluation?.leader?.selected)strengths.push(`${evaluation.leader.selected.unitId} supplies the best leader effect among the selected eight.`);
+    if(evaluation?.metaWeighting?.level!=='off')strengths.push(`Newer-unit weighting is ${evaluation.metaWeighting.level} (${Math.round(num(evaluation.metaWeighting.scoreWeight)*100)}% bounded prior).`);
     strengths.push(...rows(resource.strengths));
 
     warnings.push(...rows(resource.warnings));
@@ -31,7 +33,10 @@
     for(const [name,value] of Object.entries(evaluation?.penalties||{}))if(num(value)>=25&&penaltyLabels[name])warnings.push(`${penaltyLabels[name]} (${rounded(value)}/100)`);
     if(resource.source!=='structured-skill-profiles')warnings.push('Opening-order conclusions are limited because structured skill facts were unavailable.');
 
-    const receipts=Object.entries(evaluation?.components||{}).map(([component,score])=>({component,score:rounded(score)})).sort((a,b)=>b.score-a.score||a.component.localeCompare(b.component));
+    const receipts=Object.entries(evaluation?.components||{}).map(([component,score])=>{
+      const weight=num(evaluation?.componentWeights?.[component]);
+      return{component,score:rounded(score),weight:roundedWeight(weight),weightedContribution:rounded(num(score)*weight)};
+    }).sort((a,b)=>b.weightedContribution-a.weightedContribution||a.component.localeCompare(b.component));
     const distinct=Number(evaluation?.element?.distinctElements)||0;
     const summary=`${context.format||evaluation?.format||'auto'} ${context.plan||evaluation?.plan||'hybrid'} team scored ${rounded(evaluation?.score)}/100 with ${distinct} element${distinct===1?'':'s'}.`;
     return{
@@ -48,7 +53,7 @@
         openingNet:resource.openingNet==null?null:rounded(resource.openingNet),minimumReserve:resource.minimumReserve==null?null:rounded(resource.minimumReserve),
         generatorBeforeSpender:resource.generatorBeforeSpender
       },
-      receipts,confidence:rounded(evaluation?.components?.evidenceConfidence),policyVersion:P.version
+      receipts,metaWeighting:evaluation?.metaWeighting||P.metaProfile(context),confidence:rounded(evaluation?.components?.evidenceConfidence),policyVersion:P.version
     };
   }
 

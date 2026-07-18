@@ -7,7 +7,7 @@
   const key=value=>txt(value).toLowerCase().replace(/[\u2019']/g,'').replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');
 
   const policy={
-    version:'optimizer-v6-policy-4',
+    version:'optimizer-v6-policy-5',
     story:{main:5,back:3,total:8,leaderScope:8,leaderStacking:'best_only'},
     platoons:{rows:20,size:5,storyExcluded:true,allowBlankAfterExhaustion:true},
     elements:['fire','water','storm','earth','light','dark'],
@@ -21,6 +21,14 @@
       elementAffinityMaximum:0.12,
       rejectedSourceFragments:['revengeeffectstoskip','immunitylist','excludedbuffs','activeskillsai']
     },
+    metaWeighting:{
+      defaultLevel:'balanced',
+      levels:{
+        off:{scoreWeight:0,searchWeight:0,candidateReserve:0},
+        balanced:{scoreWeight:0.05,searchWeight:0.05,candidateReserve:0.10},
+        strong:{scoreWeight:0.10,searchWeight:0.10,candidateReserve:0.20}
+      }
+    },
     componentWeights:{
       baseUnitValue:0.16,
       engineCompletion:0.15,
@@ -32,7 +40,7 @@
       positionFlow:0.07,
       elementStrategy:0.07,
       counterCoverage:0.05,
-      boundedMetaPrior:0.02,
+      boundedMetaPrior:0,
       evidenceConfidence:0.02
     },
     penaltyWeights:{
@@ -82,5 +90,12 @@
     return Object.fromEntries(Object.entries(components||{}).map(([name,value])=>[name,clamp(value)]));
   }
 
-  root.policy={...policy,clamp,txt,key,identity,identityConflicts,distinctIdentity,boundedComponents};
+  function metaProfile(options={}){
+    const aliases={none:'off',disabled:'off',normal:'balanced',default:'balanced',high:'strong',enabled:'balanced'};
+    const raw=typeof options==='string'?options:options?.metaWeight;
+    const requested=aliases[key(raw)]||key(raw),level=policy.metaWeighting.levels[requested]?requested:policy.metaWeighting.defaultLevel;
+    return{level,...policy.metaWeighting.levels[level]};
+  }
+
+  root.policy={...policy,clamp,txt,key,identity,identityConflicts,distinctIdentity,boundedComponents,metaProfile};
 })(window);

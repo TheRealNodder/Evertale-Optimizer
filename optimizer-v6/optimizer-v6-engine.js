@@ -82,7 +82,7 @@
         alternatives:contest.alternatives.map(row=>({format:row.format,plan:row.plan,element:row.element,score:row.score})),
         scoreComponents:winner.best.evaluation.components,penalties:winner.best.evaluation.penalties,leader:winner.best.evaluation.leader,
         elementStrategy:winner.best.evaluation.element,unmetNeeds:winner.best.evaluation.unmetNeeds,
-        storySearch:winner.result.diagnostics||winner.best.searchDiagnostics||{},preparedUnits:prepared.length,
+        storySearch:winner.result.diagnostics||winner.best.searchDiagnostics||{},preparedUnits:prepared.length,metaWeighting:winner.best.evaluation.metaWeighting,
         platoons:platoonDiagnostics,durationMs:Date.now()-started,usedFallback:false,policyVersion:P.version,selectedEngine:winner.plan
       };
       const explanation=X.explain(winner.best.ordered,winner.best.evaluation,{format:winner.format,plan:winner.plan});

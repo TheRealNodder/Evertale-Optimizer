@@ -51,13 +51,14 @@
     return{setup:F.mechanical(evidence,plan,'setup'),payoff:F.mechanical(evidence,plan,'payoff')};
   }
 
-  function unitPotential(unit,plan){
-    const key=P.key(plan),cached=unit&&typeof unit==='object'?potentialCache.get(unit):null;
+  function unitPotential(unit,plan,options={}){
+    const profile=P.metaProfile(options),key=`${P.key(plan)}|${profile.level}`,cached=unit&&typeof unit==='object'?potentialCache.get(unit):null;
     if(cached?.has(key))return cached.get(key);
     const roles=unit?.__v6?.roles||{},signals=planSignals(unit,plan);
     const role=Math.max(num(roles.damage),num(roles.protection),num(roles.sustain),num(roles.control),num(roles.tempo),num(roles.setup));
     const direct=Math.min(100,(signals.setup+signals.payoff)*36);
-    const value=mechanicalPlan(plan)?P.clamp(num(unit?.__v6?.baseValue)*.28+direct*.45+role*.22+num(unit?.__v6?.metaPrior)*.05):P.clamp(num(unit?.__v6?.baseValue)*.48+direct*.27+role*.20+num(unit?.__v6?.metaPrior)*.05);
+    const core=mechanicalPlan(plan)?(num(unit?.__v6?.baseValue)*.28+direct*.45+role*.22)/.95:(num(unit?.__v6?.baseValue)*.48+direct*.27+role*.20)/.95;
+    const value=P.clamp(core*(1-profile.searchWeight)+num(unit?.__v6?.metaPrior)*profile.searchWeight);
     if(unit&&typeof unit==='object'){const next=cached||new Map();next.set(key,value);if(!cached)potentialCache.set(unit,next);}
     return value;
   }
@@ -67,26 +68,27 @@
     if(targetElement)source=source.filter(unit=>(unit?.__v6?.element||P.key(unit?.element))===targetElement);
     const cap=Math.max(P.story.total,Number(options?.candidateCap)||P.search.storyCandidateCap),chosen=new Map();
     const add=unit=>{if(unit&&!chosen.has(uid(unit))&&chosen.size<cap)chosen.set(uid(unit),unit);};
-    const sorted=[...source].sort((a,b)=>unitPotential(b,plan)-unitPotential(a,plan)||P.identity(a).entry.localeCompare(P.identity(b).entry));
+    const profile=P.metaProfile(options),sorted=[...source].sort((a,b)=>unitPotential(b,plan,options)-unitPotential(a,plan,options)||P.identity(a).entry.localeCompare(P.identity(b).entry));
     lockedSeed(units,options).selected.forEach(add);
     sorted.slice(0,Math.ceil(cap*.45)).forEach(add);
+    if(profile.candidateReserve>0)[...source].sort((a,b)=>num(b?.__v6?.metaPrior)-num(a?.__v6?.metaPrior)||P.identity(a).entry.localeCompare(P.identity(b).entry)).slice(0,Math.ceil(cap*profile.candidateReserve)).forEach(add);
     if(mechanicalPlan(plan)){
       if(pairedPlan(plan))[...sorted].sort((a,b)=>planSignals(b,plan).setup-planSignals(a,plan).setup).slice(0,12).forEach(add);
       [...sorted].sort((a,b)=>planSignals(b,plan).payoff-planSignals(a,plan).payoff).slice(0,12).forEach(add);
     }
     for(const role of ['damage','protection','sustain','control','tempo','setup']){
-      [...sorted].sort((a,b)=>num(b?.__v6?.roles?.[role])-num(a?.__v6?.roles?.[role])||unitPotential(b,plan)-unitPotential(a,plan)).slice(0,6).forEach(add);
+      [...sorted].sort((a,b)=>num(b?.__v6?.roles?.[role])-num(a?.__v6?.roles?.[role])||unitPotential(b,plan,options)-unitPotential(a,plan,options)).slice(0,6).forEach(add);
     }
     if(format==='rainbow'||format==='force_rainbow')for(const element of P.elements)sorted.filter(unit=>(unit?.__v6?.element||P.key(unit?.element))===element).slice(0,8).forEach(add);
     sorted.forEach(add);
-    return [...chosen.values()].sort((a,b)=>unitPotential(b,plan)-unitPotential(a,plan)||P.identity(a).entry.localeCompare(P.identity(b).entry));
+    return [...chosen.values()].sort((a,b)=>unitPotential(b,plan,options)-unitPotential(a,plan,options)||P.identity(a).entry.localeCompare(P.identity(b).entry));
   }
 
-  function stateSummary(selected,plan){
+  function stateSummary(selected,plan,options={}){
     const elements=new Set(),roles={damage:0,protection:0,sustain:0,control:0,tempo:0,setup:0};
-    let base=0,setup=0,payoff=0,contributors=0,confidence=0;
+    let base=0,setup=0,payoff=0,contributors=0,confidence=0,meta=0;
     for(const unit of selected){
-      elements.add(unit?.__v6?.element||P.key(unit?.element));base+=num(unit?.__v6?.baseValue);confidence+=num(unit?.__v6?.evidence?.confidence)*100;
+      elements.add(unit?.__v6?.element||P.key(unit?.element));base+=num(unit?.__v6?.baseValue);confidence+=num(unit?.__v6?.evidence?.confidence)*100;meta+=num(unit?.__v6?.metaPrior);
       const signals=planSignals(unit,plan);setup+=signals.setup;payoff+=signals.payoff;if(signals.setup||signals.payoff)contributors++;
       for(const role of Object.keys(roles))roles[role]=Math.max(roles[role],num(unit?.__v6?.roles?.[role]));
     }
@@ -95,8 +97,9 @@
     if(pairedPlan(plan))engine=(setup>0?18:0)+(payoff>0?20:0)+Math.min(22,contributors*3.2);
     else if(payoffOnlyPlan(plan))engine=(payoff>0?30:0)+Math.min(30,contributors*7.5);
     else engine=Math.max(setup,payoff)*24;
-    const heuristic=P.clamp((selected.length?base/selected.length:0)*.32+roleCoverage*.23+engine*.40+(selected.length?confidence/selected.length:0)*.05);
-    return{elements,roles,base,setup,payoff,contributors,confidence,heuristic};
+    const core=(selected.length?base/selected.length:0)*.32+roleCoverage*.23+engine*.40+(selected.length?confidence/selected.length:0)*.05,profile=P.metaProfile(options),metaPrior=selected.length?meta/selected.length:0;
+    const heuristic=P.clamp(core*(1-profile.searchWeight)+metaPrior*profile.searchWeight);
+    return{elements,roles,base,setup,payoff,contributors,confidence,meta,metaPrior,heuristic};
   }
 
   function canAdd(selected,unit){return !selected.some(other=>P.identityConflicts(other,unit));}
@@ -123,13 +126,13 @@
   function expandBeam(units,plan,format,targetElement,options={}){
     const seed=lockedSeed(units,options),pool=candidatePool(units,plan,format,targetElement,options),width=Math.max(10,Number(options.beamWidth)||P.search.storyBeamWidth);
     if(seed.selected.length>P.story.total)return{teams:[],diagnostics:{reason:'too-many-locked-units'}};
-    let beam=[{selected:seed.selected,summary:stateSummary(seed.selected,plan)}],generated=0,pruned=0;
+    let beam=[{selected:seed.selected,summary:stateSummary(seed.selected,plan,options)}],generated=0,pruned=0;
     for(let depth=seed.selected.length;depth<P.story.total;depth++){
       abortIfNeeded(options);const next=new Map(),remaining=P.story.total-(depth+1);
       for(const state of beam){
         for(const unit of pool){
           if(!canAdd(state.selected,unit))continue;
-          const selected=[...state.selected,unit],summary=stateSummary(selected,plan);generated++;
+          const selected=[...state.selected,unit],summary=stateSummary(selected,plan,options);generated++;
           if(!partialFeasible(selected,pool,remaining,plan,format,targetElement,summary)){pruned++;continue;}
           const token=stateToken(selected),existing=next.get(token);
           if(!existing||existing.summary.heuristic<summary.heuristic)next.set(token,{selected,summary});

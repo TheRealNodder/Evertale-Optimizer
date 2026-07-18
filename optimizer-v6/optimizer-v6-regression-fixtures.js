@@ -115,10 +115,38 @@
       const complete=withStore(store,raw);
       const neutral=unit('NewestNeutral01','Fire',{stats:{atk:999999,hp:999999,spd:999,cost:1}});
       const replaced=withStore(store,[neutral,...raw.slice(1)]);
-      const good=T.evaluate(complete,{plan:'burn',format:'auto'}),bad=T.evaluate(replaced,{plan:'burn',format:'auto'});
+      const good=T.evaluate(complete,{plan:'burn',format:'auto',metaWeight:'strong'}),bad=T.evaluate(replaced,{plan:'burn',format:'auto',metaWeight:'strong'});
       assert(good.valid,'Complete mechanical team was rejected');
       assert(!bad.valid&&bad.score===0,'Neutral newer unit overrode mandatory setup');
-      return 'mechanical completeness remains mandatory';
+      return 'mechanical completeness remains mandatory at strong newer-unit weight';
+    });
+
+    test('newer-unit weighting is configurable and bounded',()=>{
+      const older=makeTeam('OlderMeta').map(row=>({...row,__v5:{meta:{newer:0}}}));
+      const newer=makeTeam('NewerMeta').map(row=>({...row,__v5:{meta:{newer:1}}}));
+      const oldTeam=withStore({},older),newTeam=withStore({},newer),evaluate=(team,metaWeight)=>T.evaluate(team,{plan:'hybrid',format:'auto',metaWeight,requirePlanComplete:false});
+      const offOld=evaluate(oldTeam,'off'),offNew=evaluate(newTeam,'off'),balancedOld=evaluate(oldTeam,'balanced'),balancedNew=evaluate(newTeam,'balanced'),strongOld=evaluate(oldTeam,'strong'),strongNew=evaluate(newTeam,'strong');
+      const balancedGain=balancedNew.score-balancedOld.score,strongGain=strongNew.score-strongOld.score;
+      assert(Math.abs(offNew.score-offOld.score)<.001,'Off mode still changed score by release recency');
+      assert(balancedGain>0&&strongGain>balancedGain,'Higher setting did not increase the bounded recency preference');
+      assert(strongNew.metaWeighting.scoreWeight===.10&&strongNew.componentWeights.boundedMetaPrior===.10,'Strong mode exceeded or missed the 10% contract');
+      assert(strongNew.score<=100,'Strong meta weighting escaped the normalized score range');
+      return `off ${offNew.score.toFixed(2)}, balanced gain ${balancedGain.toFixed(2)}, strong gain ${strongGain.toFixed(2)}`;
+    });
+
+    test('strong newer-unit weight preserves unique safety and leader value',()=>{
+      const compare=({feature,leader=false})=>{
+        const raw=makeTeam(`Required${feature||'Leader'}`),store={};
+        if(feature)store[raw[0].sourceId]=[evidence(feature)];
+        if(leader)raw[0].leaderSkill={internalId:'AllAllies20Percent',description:'All allies gain 20% Attack'};
+        raw[0].__v5={meta:{newer:0}};
+        const neutral=unit(`NewestNeutral${feature||'Leader'}01`,raw[0].element,{__v5:{meta:{newer:1}}});
+        const good=T.evaluate(withStore(store,raw),{plan:'hybrid',format:'auto',metaWeight:'strong',requirePlanComplete:false});
+        const bad=T.evaluate(withStore(store,[neutral,...raw.slice(1)]),{plan:'hybrid',format:'auto',metaWeight:'strong',requirePlanComplete:false});
+        assert(good.score>bad.score,`Strong recency displaced unique ${feature||'leader'} value`);
+      };
+      compare({feature:'role_guardian'});compare({feature:'role_cleanser'});compare({leader:true});
+      return 'guardian, cleanser, and leader contributions remain ahead of a neutral newer replacement';
     });
 
     test('structured Spirit facts produce an evidence-backed opening forecast',()=>{
