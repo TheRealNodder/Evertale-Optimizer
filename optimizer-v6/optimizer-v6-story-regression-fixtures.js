@@ -6,7 +6,7 @@
   const assert=(value,message)=>{if(!value)throw new Error(message);};
   const ev=(feature,strength=1.5)=>({feature,strength,confidence:.98,sources:['raw.activeSkills[0]']});
   const unit=(id,element,atk=1000,extra={})=>({id,sourceId:id,family:id.replace(/\d+$/,''),name:id,element,stats:{atk,hp:5000,spd:100,cost:20},...extra});
-  function attach(units,store){const previous=g.OptimizerRuntime;g.OptimizerRuntime={contracts:{optimizerFoundationReady:true},chunks:{featureEvidence:store}};const out=F.attach(units);g.OptimizerRuntime=previous;return out;}
+  function attach(units,store){const previous=g.OptimizerRuntime;g.OptimizerRuntime={contracts:{optimizerFoundationReady:true},chunks:{featureEvidence:store,skillProfiles:{}}};const out=F.attach(units);g.OptimizerRuntime=previous;return out;}
   function burnRoster(){
     const units=[],store={};
     for(const [element,prefix,atk] of [['Fire','Fire',1200],['Water','Water',1800]])for(let i=0;i<8;i++){

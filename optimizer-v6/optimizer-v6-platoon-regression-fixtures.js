@@ -5,7 +5,7 @@
   const assert=(value,message)=>{if(!value)throw new Error(message);};
   const ev=feature=>({feature,strength:1.5,confidence:.98,sources:['raw.activeSkills[0]']});
   const unit=(id,element='Fire',atk=1000)=>({id,sourceId:id,family:id,name:id,element,stats:{atk,hp:5000,spd:100,cost:20}});
-  function attach(units,store){const previous=g.OptimizerRuntime;g.OptimizerRuntime={chunks:{featureEvidence:store}};const out=F.attach(units);g.OptimizerRuntime=previous;return out;}
+  function attach(units,store){const previous=g.OptimizerRuntime;g.OptimizerRuntime={chunks:{featureEvidence:store,skillProfiles:{}}};const out=F.attach(units);g.OptimizerRuntime=previous;return out;}
   function roster(counts={Fire:15,Water:10}){const units=[],store={};for(const [element,count] of Object.entries(counts))for(let i=0;i<count;i++){const id=`${element}Unit${String(i).padStart(2,'0')}`;units.push(unit(id,element,1000+i*20));store[id]=[ev(i%2?'payoff_burn':'applies_burn'),ev(i%3?'role_healer':'role_guardian')];}return{units,store};}
   function candidate(name,units,score){return{token:name,units,unitIds:units.map(row=>row.id),plan:'hybrid',element:'',format:'auto',score,viable:true};}
 

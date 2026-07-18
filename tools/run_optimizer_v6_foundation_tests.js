@@ -3,13 +3,15 @@
 const path=require('path');
 
 global.window=global;
-global.OptimizerRuntime={chunks:{featureEvidence:{}}};
+global.OptimizerRuntime={chunks:{featureEvidence:{},skillProfiles:{}}};
 
 for(const file of [
   'optimizer-v6-policy.js',
   'optimizer-v6-evidence.js',
+  'optimizer-v6-resource-reasoner.js',
   'optimizer-v6-feature-model.js',
   'optimizer-v6-team-evaluator.js',
+  'optimizer-v6-explanations.js',
   'optimizer-v6-story-search.js',
   'optimizer-v6-platoon-generator.js',
   'optimizer-v6-platoon-allocator.js',

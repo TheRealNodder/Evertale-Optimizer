@@ -2,8 +2,8 @@
   'use strict';
 
   const root=g.OptimizerV6=g.OptimizerV6||{};
-  const P=root.policy,F=root.featureModel,S=root.storySearch;
-  if(!P||!F||!S)return;
+  const P=root.policy,F=root.featureModel,S=root.storySearch,X=root.explanations;
+  if(!P||!F||!S||!X)return;
 
   const rows=value=>Array.isArray(value)?value:[];
   const uid=unit=>P.txt(unit?.id||unit?.sourceId||unit?.family||unit?.name);
@@ -26,6 +26,7 @@
     if(options.preparedV6===true&&rows(units).every(unit=>unit?.__v6))return rows(units);
     if(g.OptimizerRuntime?.contracts?.optimizerFoundationReady!==true)throw new Error('Optimizer V6 runtime foundation is not ready');
     if(!g.OptimizerRuntime?.chunks?.featureEvidence)throw new Error('Optimizer V6 feature-evidence chunk is missing');
+    if(!g.OptimizerRuntime?.chunks?.skillProfiles)throw new Error('Optimizer V6 structured skill-profile chunk is missing');
     const source=rows(units),shared=g.OptimizerV5Lab?.shared;let profileState=null;
     try{profileState=g.EvertaleRosterProfiles?.loadState?.()||null;}catch{}
     const orders=source.map(unit=>Number(shared?.metaOrder?.(unit))||0).filter(value=>value>0),minimum=orders.length?Math.min(...orders):0,maximum=orders.length?Math.max(...orders):0,span=Math.max(1,maximum-minimum);
@@ -84,8 +85,10 @@
         storySearch:winner.result.diagnostics||winner.best.searchDiagnostics||{},preparedUnits:prepared.length,
         platoons:platoonDiagnostics,durationMs:Date.now()-started,usedFallback:false,policyVersion:P.version,selectedEngine:winner.plan
       };
+      const explanation=X.explain(winner.best.ordered,winner.best.evaluation,{format:winner.format,plan:winner.plan});
+      diagnostics.reasoning=explanation;
       const platoonScore=platoonDiagnostics?.objective?.total||0;
-      return{story,platoons,totalScore:winner.score+platoonScore,score:winner.score,plan:winner.plan,format:winner.format,alternatives:diagnostics.alternatives,engineVersion:'optimizerEngineV6-live',diagnostics};
+      return{story,platoons,totalScore:winner.score+platoonScore,score:winner.score,plan:winner.plan,format:winner.format,alternatives:diagnostics.alternatives,explanation,engineVersion:'optimizerEngineV6-live',diagnostics};
     }catch(error){console.error('[Optimizer V6] failed without fallback.',error);return emptyResult(error);}
   }
 

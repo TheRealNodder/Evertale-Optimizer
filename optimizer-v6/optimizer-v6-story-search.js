@@ -12,6 +12,7 @@
   const pairedPlan=plan=>['burn','poison','sleep','stun','blood'].includes(plan);
   const payoffOnlyPlan=plan=>['crisis','survivor'].includes(plan);
   const mechanicalPlan=plan=>pairedPlan(plan)||payoffOnlyPlan(plan);
+  const signalCache=new WeakMap(),potentialCache=new WeakMap();
 
   function progress(options,stage,completed,total,message){
     if(typeof options?.onProgress==='function')options.onProgress({type:'progress',stage,completed,total,percent:total?Math.round(completed/total*100):0,message});
@@ -40,16 +41,25 @@
   }
 
   function planSignals(unit,plan){
+    if(unit&&typeof unit==='object'){
+      const key=P.key(plan),cached=signalCache.get(unit);
+      if(cached?.has(key))return cached.get(key);
+      const evidence=unit?.__v6?.evidence||{},value={setup:F.mechanical(evidence,key,'setup'),payoff:F.mechanical(evidence,key,'payoff')};
+      const next=cached||new Map();next.set(key,value);if(!cached)signalCache.set(unit,next);return value;
+    }
     const evidence=unit?.__v6?.evidence||{};
     return{setup:F.mechanical(evidence,plan,'setup'),payoff:F.mechanical(evidence,plan,'payoff')};
   }
 
   function unitPotential(unit,plan){
+    const key=P.key(plan),cached=unit&&typeof unit==='object'?potentialCache.get(unit):null;
+    if(cached?.has(key))return cached.get(key);
     const roles=unit?.__v6?.roles||{},signals=planSignals(unit,plan);
     const role=Math.max(num(roles.damage),num(roles.protection),num(roles.sustain),num(roles.control),num(roles.tempo),num(roles.setup));
     const direct=Math.min(100,(signals.setup+signals.payoff)*36);
-    if(mechanicalPlan(plan))return P.clamp(num(unit?.__v6?.baseValue)*.28+direct*.45+role*.22+num(unit?.__v6?.metaPrior)*.05);
-    return P.clamp(num(unit?.__v6?.baseValue)*.48+direct*.27+role*.20+num(unit?.__v6?.metaPrior)*.05);
+    const value=mechanicalPlan(plan)?P.clamp(num(unit?.__v6?.baseValue)*.28+direct*.45+role*.22+num(unit?.__v6?.metaPrior)*.05):P.clamp(num(unit?.__v6?.baseValue)*.48+direct*.27+role*.20+num(unit?.__v6?.metaPrior)*.05);
+    if(unit&&typeof unit==='object'){const next=cached||new Map();next.set(key,value);if(!cached)potentialCache.set(unit,next);}
+    return value;
   }
 
   function candidatePool(units,plan,format,targetElement,options){
@@ -91,8 +101,8 @@
 
   function canAdd(selected,unit){return !selected.some(other=>P.identityConflicts(other,unit));}
 
-  function partialFeasible(selected,pool,remaining,plan,format,targetElement){
-    const summary=stateSummary(selected,plan);
+  function partialFeasible(selected,pool,remaining,plan,format,targetElement,preparedSummary=null){
+    const summary=preparedSummary||stateSummary(selected,plan);
     if(targetElement&&[...summary.elements].some(element=>element!==targetElement))return false;
     if(pairedPlan(plan)){
       if(!summary.setup&&!pool.some(unit=>canAdd(selected,unit)&&planSignals(unit,plan).setup))return false;
@@ -119,9 +129,9 @@
       for(const state of beam){
         for(const unit of pool){
           if(!canAdd(state.selected,unit))continue;
-          const selected=[...state.selected,unit];generated++;
-          if(!partialFeasible(selected,pool,remaining,plan,format,targetElement)){pruned++;continue;}
-          const token=stateToken(selected),summary=stateSummary(selected,plan),existing=next.get(token);
+          const selected=[...state.selected,unit],summary=stateSummary(selected,plan);generated++;
+          if(!partialFeasible(selected,pool,remaining,plan,format,targetElement,summary)){pruned++;continue;}
+          const token=stateToken(selected),existing=next.get(token);
           if(!existing||existing.summary.heuristic<summary.heuristic)next.set(token,{selected,summary});
         }
       }

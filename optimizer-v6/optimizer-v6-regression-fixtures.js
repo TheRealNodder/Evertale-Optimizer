@@ -2,8 +2,8 @@
   'use strict';
 
   const root=g.OptimizerV6=g.OptimizerV6||{};
-  const P=root.policy,F=root.featureModel,T=root.teamEvaluator;
-  if(!P||!F||!T)return;
+  const P=root.policy,F=root.featureModel,T=root.teamEvaluator,R=root.resourceReasoner,X=root.explanations;
+  if(!P||!F||!T||!R||!X)return;
 
   function assert(condition,message){if(!condition)throw new Error(message);}
   function unit(id,element='Fire',extra={}){
@@ -15,9 +15,11 @@
   function makeTeam(prefix='Unit'){
     return Array.from({length:8},(_,index)=>unit(`${prefix}${String.fromCharCode(65+index)}01`,['Fire','Water','Storm','Earth'][index%4]));
   }
-  function withStore(store,units){
+  function skill(id,extra={}){return{id,name:id,description:'',tuCost:100,spiritGain:0,spiritCost:0,useLimit:null,targeting:'1Enemy',useCondition:'',flags:[],components:['Damage'],source:`resolved.activeSkills.${id}`,...extra};}
+  function skillStore(units,skillsById={}){const out={};for(const row of units)out[row.sourceId]={sourceId:row.sourceId,family:row.family,skills:skillsById[row.sourceId]||[skill(`Attack${row.sourceId}`)]};return out;}
+  function withStore(store,units,profiles={}){
     const previous=g.OptimizerRuntime;
-    g.OptimizerRuntime={...(previous||{}),chunks:{...(previous?.chunks||{}),featureEvidence:store}};
+    g.OptimizerRuntime={...(previous||{}),chunks:{...(previous?.chunks||{}),featureEvidence:store,skillProfiles:profiles}};
     const attached=F.attach(units);
     g.OptimizerRuntime=previous;
     return attached;
@@ -119,6 +121,56 @@
       return 'mechanical completeness remains mandatory';
     });
 
+    test('structured Spirit facts produce an evidence-backed opening forecast',()=>{
+      const raw=makeTeam('Spirit');raw[0].stats.spd=220;raw[1].stats.spd=180;
+      const store={
+        [raw[0].sourceId]:[evidence('resource_spirit',1.3,.98,'resolved.activeSkills.GainTwo#identifier')],
+        [raw[1].sourceId]:[evidence('payoff_burn',1.5,.98,'resolved.activeSkills.BurnPayoff#identifier')]
+      };
+      const profiles=skillStore(raw,{[raw[0].sourceId]:[skill('GainTwo',{tuCost:80,spiritGain:2})],[raw[1].sourceId]:[skill('BurnPayoff',{tuCost:100,spiritCost:3})]});
+      const forecast=R.teamForecast(withStore(store,raw,profiles),'burn');
+      assert(forecast.source==='structured-skill-profiles','Structured authority was not used');
+      assert(forecast.minimumReserve===1&&forecast.generatorBeforeSpender===true,`Unexpected forecast: ${JSON.stringify(forecast)}`);
+      assert(forecast.openingSequence[0].skillId==='GainTwo','Speed-ordered generator was not first');
+      return `reserve ${forecast.minimumReserve}, opening ${forecast.openingSequence.map(row=>row.skillId).join(' -> ')}`;
+    });
+
+    test('Spirit sequencing rewards generator before spender',()=>{
+      const build=(generatorSpeed,spenderSpeed)=>{
+        const raw=makeTeam('Order');raw[0].stats.spd=generatorSpeed;raw[1].stats.spd=spenderSpeed;
+        const profiles=skillStore(raw,{[raw[0].sourceId]:[skill('Generator',{spiritGain:2})],[raw[1].sourceId]:[skill('Spender',{spiritCost:3})]});
+        return R.teamForecast(withStore({},raw,profiles),'hybrid');
+      };
+      const good=build(220,180),bad=build(180,220);
+      assert(good.minimumReserve<bad.minimumReserve,'Ordering did not change required reserve');
+      assert(good.score>bad.score,'Resource score did not reward safer sequencing');
+      return `${good.score.toFixed(1)} before vs ${bad.score.toFixed(1)} after`;
+    });
+
+    test('multiple high-cost opening actions raise a visible warning',()=>{
+      const raw=makeTeam('Pressure'),profiles=skillStore(raw,{
+        [raw[0].sourceId]:[skill('CostlyOne',{spiritCost:3})],
+        [raw[1].sourceId]:[skill('CostlyTwo',{spiritCost:4})]
+      });
+      const forecast=R.teamForecast(withStore({},raw,profiles),'hybrid');
+      assert(forecast.competingHighCostActions===2,'High-cost actions were not counted');
+      assert(forecast.warnings.some(value=>/compete for Spirit/.test(value)),'Conflict warning was omitted');
+      return forecast.warnings.join(' ');
+    });
+
+    test('team explanation cites only structured skills and exposes receipts',()=>{
+      const raw=makeTeam('Explain'),store={};
+      store[raw[0].sourceId]=[evidence('applies_burn',1.6,.98,'resolved.activeSkills.Ignite#identifier')];
+      store[raw[1].sourceId]=[evidence('payoff_burn',1.5,.98,'resolved.activeSkills.BurnBlast#identifier')];
+      const profiles=skillStore(raw,{[raw[0].sourceId]:[skill('Ignite',{spiritGain:1})],[raw[1].sourceId]:[skill('BurnBlast',{spiritCost:2})]});
+      const team=withStore(store,raw,profiles),evaluation=T.evaluate(team,{plan:'burn',format:'auto'}),report=X.explain(team,evaluation,{plan:'burn',format:'hybrid'});
+      const allowed=new Set(Object.values(profiles).flatMap(row=>row.skills.map(value=>value.id)));
+      assert(report.openingSequence.every(action=>allowed.has(action.skillId)),'Explanation invented a skill');
+      assert(report.receipts.length===Object.keys(evaluation.components).length,'Score receipts are incomplete');
+      assert(report.method==='deterministic-evidence-reasoning','Explanation method is not explicit');
+      return `${report.openingSequence.length} sourced actions, ${report.receipts.length} receipts`;
+    });
+
     test('missing runtime authority fails without fallback',()=>{
       const previous=g.OptimizerRuntime;g.OptimizerRuntime={contracts:{optimizerFoundationReady:false},chunks:{}};
       const report=expectedFailure(()=>root.engine.run(makeTeam('MissingRuntime'),{buildScope:'story',presetMode:'hard',presetTag:'burn'}));g.OptimizerRuntime=previous;
@@ -127,14 +179,14 @@
     });
 
     test('insufficient roster fails without changing format contracts',()=>{
-      const previous=g.OptimizerRuntime;g.OptimizerRuntime={contracts:{optimizerFoundationReady:true},chunks:{featureEvidence:{}}};
+      const previous=g.OptimizerRuntime;g.OptimizerRuntime={contracts:{optimizerFoundationReady:true},chunks:{featureEvidence:{},skillProfiles:{}}};
       const report=expectedFailure(()=>root.engine.run(makeTeam('Short').slice(0,7),{buildScope:'story',presetMode:'hard',presetTag:'burn'}));g.OptimizerRuntime=previous;
       assert(report.diagnostics.v6Failed&&/Insufficient owned roster/.test(report.diagnostics.v6Error),'Insufficient roster was concealed');return report.diagnostics.v6Error;
     });
 
     test('invalid locked unit is reported and V4 remains unused',()=>{
       const raw=makeTeam('BadLock'),store={};raw.forEach((row,index)=>store[row.sourceId]=[evidence(index%2?'payoff_burn':'applies_burn')]);const prepared=withStore(store,raw),previous=g.OptimizerRuntime;
-      g.OptimizerRuntime={contracts:{optimizerFoundationReady:true},chunks:{featureEvidence:store}};const report=expectedFailure(()=>root.engine.run(prepared,{preparedV6:true,buildScope:'story',presetMode:'hard',presetTag:'burn',currentLayout:{storyMain:['MissingUnit','','','',''],storyBack:['','','']},slotLocks:{storyMain:[true,false,false,false,false],storyBack:[false,false,false]}}));g.OptimizerRuntime=previous;
+      g.OptimizerRuntime={contracts:{optimizerFoundationReady:true},chunks:{featureEvidence:store,skillProfiles:{}}};const report=expectedFailure(()=>root.engine.run(prepared,{preparedV6:true,buildScope:'story',presetMode:'hard',presetTag:'burn',currentLayout:{storyMain:['MissingUnit','','','',''],storyBack:['','','']},slotLocks:{storyMain:[true,false,false,false,false],storyBack:[false,false,false]}}));g.OptimizerRuntime=previous;
       assert(report.diagnostics.v6Failed&&report.diagnostics.usedFallback===false&&/Locked Story unit/.test(report.diagnostics.v6Error),'Invalid lock did not fail explicitly');return report.diagnostics.v6Error;
     });
 

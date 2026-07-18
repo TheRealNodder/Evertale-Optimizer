@@ -2,8 +2,8 @@
   'use strict';
 
   const root=g.OptimizerV6=g.OptimizerV6||{};
-  const P=root.policy,E=root.evidence;
-  if(!P||!E)return;
+  const P=root.policy,E=root.evidence,R=root.resourceReasoner;
+  if(!P||!E||!R)return;
 
   const number=value=>Number.isFinite(Number(value))?Number(value):0;
   const rows=value=>Array.isArray(value)?value:[];
@@ -56,14 +56,14 @@
   }
 
   function attach(units){
-    const source=rows(units),population=populationStats(source),store=E.runtimeStore();
+    const source=rows(units),population=populationStats(source),store=E.runtimeStore(),skillStore=R.runtimeStore();
     return source.map(unit=>{
       const clone={...unit};
       const evidence=E.summarize(unit,store);
       const meta=P.clamp(number(unit?.__v5?.meta?.newer)*100);
       clone.__v6={
         identity:P.identity(unit),stats:stats(unit),baseValue:baseValue(unit,population),evidence,
-        roles:roleScores(evidence),metaPrior:P.clamp(meta*.05),element:P.key(unit?.element)
+        roles:roleScores(evidence),skillProfile:R.unitProfile(unit,skillStore),metaPrior:P.clamp(meta*.05),element:P.key(unit?.element)
       };
       return clone;
     });

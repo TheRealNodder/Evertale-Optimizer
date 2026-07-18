@@ -250,6 +250,8 @@ function updateOptimizerRuntimeStatus() {
     `weapons ${state.equipmentRuntime?.weapons?.length || 0}`,
     `accessories ${state.equipmentRuntime?.accessories?.length || 0}`,
     `tags ${counts.tags || normalizeRuntimeArray(chunks.tags).length || 0}`,
+    `skills ${counts.skillProfiles || normalizeRuntimeArray(chunks.skillProfiles).length || 0}`,
+    `evidence ${counts.featureEvidence || normalizeRuntimeArray(chunks.featureEvidence).length || 0}`,
   ];
   status.textContent = `Runtime: ${parts.join(" • ")}`;
 }
@@ -823,6 +825,48 @@ function showOptimizerNotice(message) {
   if (status && message) status.textContent = message;
 }
 
+function renderOptimizerReasoning(result) {
+  const panel = el("optimizerReasoningPanel");
+  const reasoning = result?.explanation || result?.diagnostics?.reasoning;
+  if (!panel || !reasoning) return;
+  panel.hidden = false;
+  window.__lastOptimizerReasoning = reasoning;
+
+  const summary = el("optimizerReasoningSummary");
+  const forecast = reasoning.resourceForecast || {};
+  if (summary) {
+    const reserve = forecast.minimumReserve == null ? "not calculated" : `${forecast.minimumReserve} Spirit`;
+    summary.textContent = `${reasoning.summary} Opening reserve: ${reserve}. Evidence confidence: ${reasoning.confidence ?? 0}/100.`;
+  }
+
+  const renderList = (targetId, title, values) => {
+    const target = el(targetId);
+    if (!target) return;
+    target.replaceChildren();
+    if (!Array.isArray(values) || !values.length) return;
+    const heading = document.createElement("div");
+    heading.className = "teamSubTitle";
+    heading.textContent = title;
+    const list = document.createElement("ul");
+    list.className = "muted";
+    for (const value of values) {
+      const item = document.createElement("li");
+      item.textContent = String(value);
+      list.appendChild(item);
+    }
+    target.append(heading, list);
+  };
+
+  renderList("optimizerReasoningStrengths", "Strengths", reasoning.strengths || []);
+  renderList("optimizerReasoningWarnings", "Warnings", reasoning.warnings || []);
+  renderList("optimizerReasoningOpening", "Evidence-backed opening", (reasoning.openingSequence || []).map((action, index) => {
+    const tu = action.tuCost == null ? "TU unknown" : `${action.tuCost} TU`;
+    const spirit = `Spirit +${action.spiritGain || 0}/-${action.spiritCost || 0}`;
+    const condition = action.conditional ? `, conditional: ${action.useCondition || "yes"}` : "";
+    return `${index + 1}. ${action.unitId}: ${action.skillName || action.skillId} (${tu}, ${spirit}${condition}) — ${action.reason}`;
+  }));
+}
+
 function applyEngineResult(result) {
   if (!result || !result.story) return;
 
@@ -897,6 +941,7 @@ function applyEngineResult(result) {
     status.dataset.optimizerPlan = application.plan;
   }
 
+  renderOptimizerReasoning(result);
   saveLayout();
   renderAll();
 }

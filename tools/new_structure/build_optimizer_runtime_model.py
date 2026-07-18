@@ -400,6 +400,65 @@ def build_feature_evidence(entries: Iterable[Dict[str, Any]]) -> Dict[str, List[
     return result
 
 
+def finite_number(value: Any, fallback: Any = None) -> Any:
+    if isinstance(value, bool) or value is None:
+        return fallback
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return fallback
+    if number != number or number in (float("inf"), float("-inf")):
+        return fallback
+    return int(number) if number.is_integer() else number
+
+
+def skill_profile_for_entry(row: Dict[str, Any]) -> Dict[str, Any]:
+    resolved = row.get("resolved") if isinstance(row.get("resolved"), dict) else {}
+    active = resolved.get("activeSkills") if isinstance(resolved.get("activeSkills"), dict) else {}
+    requested_order = row.get("activeSkills") if isinstance(row.get("activeSkills"), list) else []
+    ordered_ids = [str(value) for value in requested_order if str(value) in active]
+    ordered_ids.extend(str(value) for value in active if str(value) not in ordered_ids)
+    skills: List[Dict[str, Any]] = []
+    for skill_id in ordered_ids:
+        payload = active.get(skill_id)
+        if not isinstance(payload, dict) or payload.get("found") is False:
+            continue
+        ability = payload.get("ability") if isinstance(payload.get("ability"), dict) else {}
+        config = payload.get("config") if isinstance(payload.get("config"), dict) else {}
+        localization = payload.get("localization") if isinstance(payload.get("localization"), dict) else {}
+        flags = config.get("flags") if isinstance(config.get("flags"), list) else []
+        components = config.get("components") if isinstance(config.get("components"), list) else []
+        use_limit = finite_number(ability.get("useLimit"), 0)
+        skills.append({
+            "id": str(payload.get("id") or skill_id),
+            "name": str(localization.get("name") or payload.get("id") or skill_id),
+            "description": str(localization.get("description") or ""),
+            "tuCost": finite_number(ability.get("tuCost")),
+            "spiritGain": max(0, finite_number(ability.get("spiritGain"), 0)),
+            "spiritCost": max(0, finite_number(ability.get("spiritCost"), 0)),
+            "useLimit": use_limit if use_limit and use_limit > 0 else None,
+            "targeting": str(config.get("targetingData") or ""),
+            "useCondition": str(config.get("useCondition") or ""),
+            "flags": [str(value) for value in flags if str(value).strip()],
+            "components": [str(value) for value in components if str(value).strip()],
+            "source": f"resolved.activeSkills.{skill_id}",
+        })
+    return {
+        "sourceId": entry_key(row),
+        "family": family_key(row),
+        "skills": skills,
+    }
+
+
+def build_skill_profiles(entries: Iterable[Dict[str, Any]]) -> Dict[str, Dict[str, Any]]:
+    result: Dict[str, Dict[str, Any]] = {}
+    for row in entries:
+        profile = skill_profile_for_entry(row)
+        if profile["sourceId"] and profile["skills"]:
+            result[profile["sourceId"]] = profile
+    return result
+
+
 def main() -> int:
     repo = find_repo_root(Path(__file__).resolve())
     entries_root = repo / "apkfiles" / "entries"
@@ -447,9 +506,36 @@ def main() -> int:
         errors.append(f"Runtime identity collisions detected: {len(collisions)}")
 
     feature_evidence = build_feature_evidence(character_rows)
+    skill_profiles = build_skill_profiles(character_rows)
     evidence_count = sum(len(rows) for rows in feature_evidence.values())
+    skill_profile_skills = sum(len(row.get("skills") or []) for row in skill_profiles.values())
+    skill_profiles_with_spirit_gain = sum(
+        1 for row in skill_profiles.values() for skill in row.get("skills") or []
+        if finite_number(skill.get("spiritGain"), 0) > 0
+    )
+    skill_profiles_with_spirit_cost = sum(
+        1 for row in skill_profiles.values() for skill in row.get("skills") or []
+        if finite_number(skill.get("spiritCost"), 0) > 0
+    )
+    skill_profiles_with_tu = sum(
+        1 for row in skill_profiles.values() for skill in row.get("skills") or []
+        if finite_number(skill.get("tuCost")) is not None
+    )
+    skill_profile_entries_by_element: Dict[str, int] = {}
+    skill_profile_gain_by_element: Dict[str, int] = {}
+    skill_profile_cost_by_element: Dict[str, int] = {}
+    for source_id, profile in skill_profiles.items():
+        element = str(entry_index.get(source_id, {}).get("element") or "unknown").lower()
+        skill_profile_entries_by_element[element] = skill_profile_entries_by_element.get(element, 0) + 1
+        for skill in profile.get("skills") or []:
+            if finite_number(skill.get("spiritGain"), 0) > 0:
+                skill_profile_gain_by_element[element] = skill_profile_gain_by_element.get(element, 0) + 1
+            if finite_number(skill.get("spiritCost"), 0) > 0:
+                skill_profile_cost_by_element[element] = skill_profile_cost_by_element.get(element, 0) + 1
     if not feature_evidence:
         errors.append("Resolved character data produced no feature evidence")
+    if not skill_profiles:
+        errors.append("Resolved character data produced no structured skill profiles")
     feature_counts: Dict[str, int] = {}
     feature_element_counts: Dict[str, Dict[str, int]] = {}
     suspicious_evidence: List[Dict[str, Any]] = []
@@ -476,7 +562,7 @@ def main() -> int:
         errors.append(f"Context-invalid feature evidence detected: {len(suspicious_evidence)}")
 
     report = {
-        "schemaVersion": 1,
+        "schemaVersion": 2,
         "generatedAt": int(time.time()),
         "status": "failed" if errors else "warning" if warnings else "ok",
         "errors": errors,
@@ -494,6 +580,14 @@ def main() -> int:
             "featureEvidenceItems": evidence_count,
             "featureEvidenceByFeature": dict(sorted(feature_counts.items())),
             "featureEvidenceByElement": {feature: dict(sorted(counts.items())) for feature, counts in sorted(feature_element_counts.items())},
+            "skillProfileEntries": len(skill_profiles),
+            "skillProfileSkills": skill_profile_skills,
+            "skillProfilesWithSpiritGain": skill_profiles_with_spirit_gain,
+            "skillProfilesWithSpiritCost": skill_profiles_with_spirit_cost,
+            "skillProfilesWithTU": skill_profiles_with_tu,
+            "skillProfileEntriesByElement": dict(sorted(skill_profile_entries_by_element.items())),
+            "skillProfilesWithSpiritGainByElement": dict(sorted(skill_profile_gain_by_element.items())),
+            "skillProfilesWithSpiritCostByElement": dict(sorted(skill_profile_cost_by_element.items())),
         },
         "tagSources": tag_sources,
         "identityCollisions": collisions,
@@ -506,7 +600,7 @@ def main() -> int:
         return 1
 
     runtime = {
-        "schemaVersion": 3,
+        "schemaVersion": 4,
         "generatedAt": int(time.time()),
         "characters": families_index,
         "characterEntries": entry_index,
@@ -522,6 +616,7 @@ def main() -> int:
             "errors": [error for error in errors if "tag" in error.lower()],
         },
         "featureEvidence": feature_evidence,
+        "skillProfiles": skill_profiles,
         "optimizerKnowledge": knowledge,
         "identityCollisions": [],
         "runtimeFlags": {
@@ -533,10 +628,12 @@ def main() -> int:
             "usesSummons": True,
             "usesTags": bool(tags),
             "usesFeatureEvidence": bool(feature_evidence),
+            "usesSkillProfiles": bool(skill_profiles),
         },
         "sources": {
             "tags": tag_sources,
             "featureEvidence": "characters.bundle.json resolved refs/configuration/localization",
+            "skillProfiles": "characters.bundle.json resolved.activeSkills structured ability/config/localization fields",
             "knowledge": "apkfiles/entries/runtime/optimizer_knowledge.json",
         },
     }

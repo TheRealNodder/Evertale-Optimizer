@@ -2,8 +2,8 @@
   'use strict';
 
   const root=g.OptimizerV6=g.OptimizerV6||{};
-  const P=root.policy,F=root.featureModel,E=root.evidence;
-  if(!P||!F||!E)return;
+  const P=root.policy,F=root.featureModel,E=root.evidence,R=root.resourceReasoner;
+  if(!P||!F||!E||!R)return;
 
   const rows=value=>Array.isArray(value)?value:[];
   const num=value=>Number.isFinite(Number(value))?Number(value):0;
@@ -67,9 +67,7 @@
   }
 
   function resourceBalance(units,plan){
-    const spirit=diminishing(units.map(unit=>E.strength(unit?.__v6?.evidence?.resources?.spirit)),[1,.5,.2]);
-    const need=['tempo','hybrid'].includes(plan)?1:.4;
-    return{score:P.clamp(55+Math.min(35,spirit*25)-Math.max(0,need-spirit)*25),spiritGeneration:spirit};
+    return R.teamForecast(units,plan);
   }
 
   function pairValue(a,b,plan){
@@ -143,14 +141,17 @@
 
   function counterCoverage(roles){return P.clamp(roles.safety*.45+roles.tempo*.35+roles.damage*.20);}
 
-  function penalties(units,plan,engine,roles,options={}){
+  function penalties(units,plan,engine,roles,resource,options={}){
     const setups=['burn','poison','sleep','stun'].filter(name=>units.some(unit=>F.mechanical(unit?.__v6?.evidence,name,'setup')));
     const guardians=units.filter(unit=>num(unit?.__v6?.roles?.protection)>=35).length;
     const uncertainty=100-mean(units.map(unit=>num(unit?.__v6?.evidence?.confidence)*100));
     return{
       statusConflicts:P.clamp(Math.max(0,setups.length-2)*22+(setups.includes('sleep')&&setups.some(x=>x!=='sleep')?18:0)),
       roleRedundancy:P.clamp(Math.max(0,guardians-2)*20+Math.max(0,roles.damage<25?20:0)),
-      resourceConflicts:plan==='tempo'&&units.every(unit=>!E.strength(unit?.__v6?.evidence?.resources?.spirit))?45:0,
+      resourceConflicts:P.clamp(Math.max(
+        plan==='tempo'&&units.every(unit=>!E.strength(unit?.__v6?.evidence?.resources?.spirit))?45:0,
+        resource?.source==='structured-skill-profiles'?(num(resource.minimumReserve)*18+num(resource.competingHighCostActions)*8+(resource.conditionalGeneration>0&&!resource.reliableGeneration?25:0)):0
+      )),
       unsupportedPayoffs:engine.required&&!engine.complete?100:0,
       planDilution:options?.presetMode==='hard'&&engine.required?P.clamp(Math.max(0,units.length-engine.contributorCount-2)/Math.max(1,units.length-2)*100):0,
       evidenceUncertainty:P.clamp(uncertainty)
@@ -172,7 +173,7 @@
       positionFlow:position.score,elementStrategy:element.score,counterCoverage:counterCoverage(roles),
       boundedMetaPrior:mean(units.map(unit=>num(unit?.__v6?.metaPrior))),evidenceConfidence:mean(units.map(unit=>num(unit?.__v6?.evidence?.confidence)*100))
     });
-    const penaltyValues=P.boundedComponents(penalties(units,plan,engine,roles,options));
+    const penaltyValues=P.boundedComponents(penalties(units,plan,engine,roles,resource,options));
     const formatError=(format==='rainbow'||format==='force_rainbow'||format==='mono'||format==='force_mono')&&options.strictFormat!==false&&!element.strict;
     const errors=[...validation.errors];
     if(engine.required&&!engine.complete&&options.requirePlanComplete!==false)errors.push(engine.requiresSetup?`${plan} requires both setup and payoff evidence`:`${plan} requires direct payoff evidence`);

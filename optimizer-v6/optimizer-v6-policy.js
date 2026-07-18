@@ -7,7 +7,7 @@
   const key=value=>txt(value).toLowerCase().replace(/[\u2019']/g,'').replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');
 
   const policy={
-    version:'optimizer-v6-policy-3',
+    version:'optimizer-v6-policy-4',
     story:{main:5,back:3,total:8,leaderScope:8,leaderStacking:'best_only'},
     platoons:{rows:20,size:5,storyExcluded:true,allowBlankAfterExhaustion:true},
     elements:['fire','water','storm','earth','light','dark'],

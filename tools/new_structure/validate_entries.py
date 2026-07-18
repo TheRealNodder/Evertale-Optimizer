@@ -368,7 +368,99 @@ def validate_optimizer_semantics(repo: Path, base: Path, errors: List[str], warn
     flags = runtime.get("runtimeFlags") if isinstance(runtime.get("runtimeFlags"), dict) else {}
     tags = runtime.get("tags") if isinstance(runtime.get("tags"), dict) else {}
     evidence = runtime.get("featureEvidence") if isinstance(runtime.get("featureEvidence"), dict) else {}
+    skill_profiles = runtime.get("skillProfiles") if isinstance(runtime.get("skillProfiles"), dict) else {}
     evidence_count = sum(len(rows) for rows in evidence.values() if isinstance(rows, list))
+    skill_count = 0
+    skill_gain_count = 0
+    skill_cost_count = 0
+    skill_tu_count = 0
+    invalid_skill_profiles: List[str] = []
+    skill_profile_fact_mismatches: List[str] = []
+    skill_profile_entries_by_element: Dict[str, int] = {}
+
+    def runtime_number(value: Any, fallback: Any = None) -> Any:
+        if isinstance(value, bool) or value is None:
+            return fallback
+        try:
+            number = float(value)
+        except (TypeError, ValueError):
+            return fallback
+        if number != number or number in (float("inf"), float("-inf")):
+            return fallback
+        return int(number) if number.is_integer() else number
+
+    for source_id, profile in skill_profiles.items():
+        if source_id not in expected_entry_keys:
+            invalid_skill_profiles.append(f"{source_id}:unknown-entry")
+        skills = profile.get("skills") if isinstance(profile, dict) and isinstance(profile.get("skills"), list) else []
+        for skill in skills:
+            if not isinstance(skill, dict):
+                invalid_skill_profiles.append(f"{source_id}:non-object-skill")
+                continue
+            skill_count += 1
+            source = str(skill.get("source") or "")
+            if "activeSkillsAI" in source or not source.startswith("resolved.activeSkills."):
+                invalid_skill_profiles.append(f"{source_id}:{skill.get('id')}:invalid-source")
+            for field in ("spiritGain", "spiritCost"):
+                value = skill.get(field)
+                if not isinstance(value, (int, float)) or isinstance(value, bool) or value < 0 or value > 99:
+                    invalid_skill_profiles.append(f"{source_id}:{skill.get('id')}:{field}={value}")
+            tu = skill.get("tuCost")
+            if tu is not None and (not isinstance(tu, (int, float)) or isinstance(tu, bool) or tu < 0 or tu > 10000):
+                invalid_skill_profiles.append(f"{source_id}:{skill.get('id')}:tuCost={tu}")
+            skill_gain_count += int((skill.get("spiritGain") or 0) > 0)
+            skill_cost_count += int((skill.get("spiritCost") or 0) > 0)
+            skill_tu_count += int(tu is not None)
+        source_entry = runtime_entries.get(source_id) if isinstance(runtime_entries.get(source_id), dict) else {}
+        element = str(source_entry.get("element") or "unknown").lower()
+        skill_profile_entries_by_element[element] = skill_profile_entries_by_element.get(element, 0) + 1
+
+    for entry in entries:
+        source_id = semantic_source_id(entry)
+        profile = skill_profiles.get(source_id) if isinstance(skill_profiles.get(source_id), dict) else {}
+        resolved = entry.get("resolved") if isinstance(entry.get("resolved"), dict) else {}
+        active = resolved.get("activeSkills") if isinstance(resolved.get("activeSkills"), dict) else {}
+        actual_skills = {
+            str(skill.get("id") or ""): skill
+            for skill in profile.get("skills") or []
+            if isinstance(skill, dict) and str(skill.get("id") or "")
+        }
+        expected_ids = {
+            str(payload.get("id") or skill_id)
+            for skill_id, payload in active.items()
+            if isinstance(payload, dict) and payload.get("found") is not False
+        }
+        if set(actual_skills) != expected_ids:
+            skill_profile_fact_mismatches.append(f"{source_id}:skill-ids")
+            continue
+        if profile.get("sourceId") != source_id or profile.get("family") != semantic_family(entry):
+            skill_profile_fact_mismatches.append(f"{source_id}:profile-identity")
+        for skill_id, payload in active.items():
+            if not isinstance(payload, dict) or payload.get("found") is False:
+                continue
+            expected_id = str(payload.get("id") or skill_id)
+            actual = actual_skills.get(expected_id, {})
+            ability = payload.get("ability") if isinstance(payload.get("ability"), dict) else {}
+            config = payload.get("config") if isinstance(payload.get("config"), dict) else {}
+            localization = payload.get("localization") if isinstance(payload.get("localization"), dict) else {}
+            use_limit = runtime_number(ability.get("useLimit"), 0)
+            expected = {
+                "name": str(localization.get("name") or expected_id),
+                "description": str(localization.get("description") or ""),
+                "tuCost": runtime_number(ability.get("tuCost")),
+                "spiritGain": max(0, runtime_number(ability.get("spiritGain"), 0)),
+                "spiritCost": max(0, runtime_number(ability.get("spiritCost"), 0)),
+                "useLimit": use_limit if use_limit and use_limit > 0 else None,
+                "targeting": str(config.get("targetingData") or ""),
+                "useCondition": str(config.get("useCondition") or ""),
+                "flags": [str(value) for value in config.get("flags") or []] if isinstance(config.get("flags"), list) else [],
+                "components": [str(value) for value in config.get("components") or []] if isinstance(config.get("components"), list) else [],
+                "source": f"resolved.activeSkills.{skill_id}",
+            }
+            for field, expected_value in expected.items():
+                if actual.get(field) != expected_value:
+                    skill_profile_fact_mismatches.append(f"{source_id}:{expected_id}:{field}")
+                    break
     feature_counts: Dict[str, int] = {}
     invalid_feature_sources: List[str] = []
     for source_id, evidence_rows in evidence.items():
@@ -388,8 +480,14 @@ def validate_optimizer_semantics(repo: Path, base: Path, errors: List[str], warn
         errors.append("[semantic] runtimeFlags.usesTags is not truthful")
     if bool(evidence) != bool(flags.get("usesFeatureEvidence")):
         errors.append("[semantic] runtimeFlags.usesFeatureEvidence is not truthful")
+    if bool(skill_profiles) != bool(flags.get("usesSkillProfiles")):
+        errors.append("[semantic] runtimeFlags.usesSkillProfiles is not truthful")
     if not evidence:
         errors.append("[semantic] resolved character data produced no feature evidence")
+    if not skill_profiles:
+        errors.append("[semantic] resolved character data produced no structured skill profiles")
+    append_semantic_failure(errors, "invalid structured skill profiles", invalid_skill_profiles)
+    append_semantic_failure(errors, "structured skill profile/raw fact mismatch", skill_profile_fact_mismatches)
     append_semantic_failure(errors, "context-invalid feature evidence", invalid_feature_sources)
     required_features = {
         "applies_burn", "payoff_burn", "applies_poison", "payoff_poison",
@@ -413,13 +511,15 @@ def validate_optimizer_semantics(repo: Path, base: Path, errors: List[str], warn
         errors.append("[semantic] runtime model report has no explicit status")
 
     manifest_chunks = manifest.get("chunks") if isinstance(manifest.get("chunks"), dict) else {}
-    for chunk in ("characters", "characterEntries", "featureEvidence", "tags", "optimizerKnowledge"):
+    for chunk in ("characters", "characterEntries", "featureEvidence", "skillProfiles", "tags", "optimizerKnowledge"):
         if chunk not in manifest_chunks:
             errors.append(f"[semantic] runtime manifest missing {chunk} chunk")
     if manifest_chunks.get("characterEntries", {}).get("count") != len(expected_entry_keys):
         errors.append("[semantic] runtime manifest characterEntries count is stale")
     if manifest_chunks.get("featureEvidence", {}).get("count") != len(evidence):
         errors.append("[semantic] runtime manifest featureEvidence count is stale")
+    if manifest_chunks.get("skillProfiles", {}).get("count") != len(skill_profiles):
+        errors.append("[semantic] runtime manifest skillProfiles count is stale")
     if leader_count and not flags.get("usesLeaderSkills"):
         errors.append("[semantic] leader authority exists but runtimeFlags.usesLeaderSkills is false")
 
@@ -462,6 +562,14 @@ def validate_optimizer_semantics(repo: Path, base: Path, errors: List[str], warn
         "featureEvidenceEntries": len(evidence),
         "featureEvidenceItems": evidence_count,
         "featureEvidenceByFeature": dict(sorted(feature_counts.items())),
+        "skillProfileEntries": len(skill_profiles),
+        "skillProfileSkills": skill_count,
+        "skillProfilesWithSpiritGain": skill_gain_count,
+        "skillProfilesWithSpiritCost": skill_cost_count,
+        "skillProfilesWithTU": skill_tu_count,
+        "invalidSkillProfiles": len(invalid_skill_profiles),
+        "skillProfileFactMismatches": len(skill_profile_fact_mismatches),
+        "skillProfileEntriesByElement": dict(sorted(skill_profile_entries_by_element.items())),
         "contextInvalidFeatureEvidence": len(invalid_feature_sources),
         "leaderEntries": leader_count,
         "familyRarityMismatches": len(family_rarity_errors),
@@ -487,7 +595,7 @@ def validate(include_optimizer_semantics: bool = True) -> int:
     duplicate_source_ids: Dict[str, List[str]] = {}
 
     print("=" * 60)
-    print("Evertale Optimizer Entry Validator v6")
+    print("Evertale Optimizer Entry Validator v8")
     print("=" * 60)
     print(f"Repo Root : {repo_root}")
     print(f"Entries   : {base}")
@@ -567,7 +675,7 @@ def validate(include_optimizer_semantics: bool = True) -> int:
 
     semantic_summary = validate_optimizer_semantics(repo_root, base, errors, warnings) if include_optimizer_semantics else {"status": "deferred_until_runtime_rebuild"}
     status = "failed" if errors else "warning" if warnings else "ok"
-    report = {"validatorVersion": 7, "generatedAt": int(time.time()), "status": status, "repoRoot": str(repo_root), "entriesRoot": str(base), "checked": checked, "categoryCounts": category_counts, "bundleCounts": bundle_counts, "markerStatus": marker_status, "duplicateSourceIds": duplicate_source_ids, "semanticSummary": semantic_summary, "errors": errors, "warnings": warnings}
+    report = {"validatorVersion": 8, "generatedAt": int(time.time()), "status": status, "repoRoot": str(repo_root), "entriesRoot": str(base), "checked": checked, "categoryCounts": category_counts, "bundleCounts": bundle_counts, "markerStatus": marker_status, "duplicateSourceIds": duplicate_source_ids, "semanticSummary": semantic_summary, "errors": errors, "warnings": warnings}
     reports_dir = base / "reports"
     write_json(reports_dir / "validation_report.json", report)
     write_json(base / "_markers" / "validate_entries.marker.json", {"schemaVersion": 2, "tool": "validate_entries", "category": "all", "status": status, "lastKey": "validation", "lastSourceId": "", "lastHandle": None, "lastFile": "apkfiles/entries/reports/validation_report.json", "processedCount": checked, "totalCount": checked, "updatedAt": int(time.time()), "extra": {"errors": len(errors), "warnings": len(warnings)}})
