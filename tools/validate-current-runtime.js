@@ -81,6 +81,23 @@ for (const page of pages) {
 }
 
 const catalogHtml = read('index.html');
+const desktopCatalogSource = read('test-catalog-v2-desktop-structure.js');
+if (!catalogHtml.includes('test-catalog-v2-desktop-structure.js?v=12')) {
+  errors.push('index.html does not use the current desktop catalog state-sync cache token');
+}
+if (!desktopCatalogSource.includes('awakenIndexFromCard(card)')) {
+  errors.push('Desktop catalog selection does not derive the awakened index from the selected card');
+}
+const awakenedSelectionSyncs = desktopCatalogSource.match(/selectedAwakenIndex\s*=\s*awakenIndexFromCard\(card\)/g) || [];
+if (awakenedSelectionSyncs.length < 2) {
+  errors.push('Desktop catalog card handlers do not both preserve the card awakened index');
+}
+if (!desktopCatalogSource.includes('setTimeout(()=>{if(card!==currentSelectedCard())return;selectedAwakenIndex=awakenIndexFromCard(card)')) {
+  errors.push('Desktop catalog delayed state sync can overwrite a newer rapid card selection');
+}
+if (/v2:card-selected[\s\S]{0,300}selectedAwakenIndex\s*=\s*0/.test(desktopCatalogSource)) {
+  errors.push('Desktop catalog selection still resets awakened state to the default index');
+}
 const catalogOrder = [
   'live-data-config.js',
   'data-loader.js',
