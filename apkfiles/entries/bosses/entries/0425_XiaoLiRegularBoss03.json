@@ -1,0 +1,1626 @@
+{
+  "schemaVersion": 3,
+  "order": 425,
+  "id": "mega-xiao-li",
+  "sourceId": "XiaoLiRegularBoss03",
+  "name": "Mega Xiao Li",
+  "title": "",
+  "secondName": "",
+  "description": "",
+  "category": "bosse",
+  "rarity": null,
+  "stars": 6,
+  "evolvedStars": 6,
+  "element": "Water",
+  "weaponType": "Hammer",
+  "stats": {
+    "atk": 3000,
+    "hp": 178000,
+    "spd": 599,
+    "cost": 999
+  },
+  "hp": 178000,
+  "atk": 3000,
+  "spd": 599,
+  "cost": 999,
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/XiaoLiRegular03.png",
+  "imageVariants": [],
+  "forms": [],
+  "activeSkills": [
+    "SingleAttackAXiaoLiRegularBoss",
+    "DoubleAttackAXiaoLiRegularBoss",
+    "SelfBuffAXiaoLiRegularBoss",
+    "SpecialAttackAXiaoLiRegularBoss"
+  ],
+  "passiveSkills": [
+    "ComboTimePassiveAXiaoLiRegularBoss",
+    "HoldStrongPassiveAXiaoLiRegularBoss"
+  ],
+  "leaderSkills": [],
+  "refs": {
+    "activeSkills": [
+      "SingleAttackAXiaoLiRegularBoss",
+      "DoubleAttackAXiaoLiRegularBoss",
+      "SelfBuffAXiaoLiRegularBoss",
+      "SpecialAttackAXiaoLiRegularBoss"
+    ],
+    "passives": [
+      "ComboTimePassiveAXiaoLiRegularBoss",
+      "HoldStrongPassiveAXiaoLiRegularBoss"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": null,
+    "leaderBuffCondition": null,
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "SingleAttackAXiaoLiRegularBoss": {
+        "id": "SingleAttackAXiaoLiRegularBoss",
+        "found": true,
+        "localization": {
+          "name": "Opening Smash",
+          "description": "400% damage to 1 enemy, plus 200% for each time this skill has already been used while on the battlefield (max of 1000% total damage after this skill has already been used 3 or more times).\n\nThen the target hit has all Stealth status effects removed (including Super Stealth).\n\nThe user is granted a Charge. Certain skills are affected by and may consume charges. A unit can store up to 3 charges and all charges are removed from a unit that leaves the battlefield.",
+          "selected": "400%+ damage, removes Stealth"
+        },
+        "ability": {
+          "name": "SingleAttackAXiaoLiRegularBoss",
+          "class": "Ability",
+          "abilityScalor": 3,
+          "conditionalAbilityScalors": [
+            5,
+            7,
+            9
+          ],
+          "config": "SingleAttackAXiaoLiRegularBoss",
+          "tuCost": 50,
+          "useLimit": 0,
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "applyToTargetType": "Enemy",
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "damageFlags": [
+                "RemoveXiaoLiDefeatBuff",
+                "IgnoreArmor",
+                "HardIgnoreBlockDeath",
+                "IgnoreSkin",
+                "DoNotWake"
+              ]
+            },
+            {
+              "buffs": [
+                "RemoveStealth"
+              ],
+              "applyToTargetType": "Enemy",
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss"
+            },
+            {
+              "buffs": [
+                "StoreEnergy",
+                "UsedAbilityCounter"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "GiveTurn",
+                "OnExtraTurn",
+                "JustGivenTurn",
+                "XiaoLiBossExtraTurn50TUTrigger"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss",
+              "applyConditions": "IsNotXiaoLiExtraTurn50TUTrigger"
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Hit",
+          "abilityEffect": "XiaoLiAttack1",
+          "attackScalors": [
+            "GoodIfUsedOnce",
+            "GoodIfUsedTwice",
+            "GoodIfUsedThrice"
+          ],
+          "conditionedAbilityEffects": [
+            "XiaoLiAttack1",
+            "XiaoLiAttack1",
+            "XiaoLiAttack1"
+          ],
+          "recommendEffectWhenUsable": -2
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            1.1,
+            0,
+            0,
+            0,
+            0.5,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_ring2",
+            "batfx_cleopatra1/batfx_quickcharge1",
+            "batfx_XiaoLi/batfx_LiquidUpWater1",
+            "batsfx_prefab/batsfx_water2",
+            "batfx_ludmillasplash2/batfx_ludmillasplash2",
+            "batfx_DaVinci/batfx_impactrockBlue",
+            "batfx_cinderellaSwim/batfx_splashimpact1",
+            "batsfx_prefab/batsfx_water2"
+          ],
+          "sortOrderOffset": [
+            -2,
+            2,
+            2,
+            -2,
+            20,
+            20,
+            20,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            true,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            true,
+            false,
+            false,
+            false,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "GiveTurn": {
+            "class": "Buff",
+            "behaviors": [
+              "GiveTurn"
+            ],
+            "behaviorOverrides": [
+              {}
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "textKeyToShowWhenApplied": "TurnGivenKey",
+            "isHiddenFromPlayers": true
+          },
+          "JustGivenTurn": {
+            "class": "Buff",
+            "duration": 1,
+            "stackName": "JustGivenTurnBuff",
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "isHiddenFromPlayers": true,
+            "noIconShownOnBattleStatus": true
+          },
+          "OnExtraTurn": {
+            "class": "Buff",
+            "stackName": "OnExtraTurn",
+            "duration": 1,
+            "isHiddenFromPlayers": true
+          },
+          "RemoveStealth": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "StoreEnergy": {
+            "class": "Buff",
+            "stackLimit": 3,
+            "duration": -1,
+            "showAsTimer": false,
+            "stackName": "StoreEnergy",
+            "noIconShownOnBattleStatus": true,
+            "usesStackCountDescription": true,
+            "iconSpriteName": "IconPinkCharge01"
+          },
+          "UsedAbilityCounter": {
+            "class": "Buff",
+            "stackName": "MoveUsedCounter",
+            "stackLimit": 3,
+            "duration": -1,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "noIconShownOnBattleStatus": true,
+            "isHiddenFromPlayers": true
+          },
+          "XiaoLiBossExtraTurn50TUTrigger": {
+            "class": "Buff",
+            "duration": 50,
+            "stackName": "XiaoLiExtraTurnTrigger",
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "iconSpriteName": "IconRedCountdownPassiveClock3"
+          }
+        },
+        "attackScalors": {
+          "GoodIfUsedOnce": {
+            "class": "AttackScalor",
+            "sourceCondition": "UsedAbilityCounter1Exact"
+          },
+          "GoodIfUsedThrice": {
+            "class": "AttackScalor",
+            "sourceCondition": "UsedAbilityCounter3"
+          },
+          "GoodIfUsedTwice": {
+            "class": "AttackScalor",
+            "sourceCondition": "UsedAbilityCounter2Exact"
+          }
+        },
+        "conditions": {
+          "IsNotXiaoLiExtraTurn50TUTrigger": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "XiaoLiExtraTurnTrigger"
+              ]
+            }
+          },
+          "OnExtraTurn": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "OnExtraTurn"
+            ]
+          }
+        }
+      },
+      "DoubleAttackAXiaoLiRegularBoss": {
+        "id": "DoubleAttackAXiaoLiRegularBoss",
+        "found": true,
+        "localization": {
+          "name": "Knockout Blaster",
+          "description": "500% damage to 2 enemies, plus 100% for each time this skill has already been used while on the battlefield (max of 1000% total damage after this skill has already been used 5 or more times). The user is granted a Charge.\n\nThen all targets hit have their Sleep Wards removed, burn removed (including Mega Healing Burn) and are granted Deep Sleep for 100TU. Deep Sleep will overwrite other status effects, cannot be overwritten by Burn or Sleep status effects, and cannot be Purified.\n\nUsable only if the user has stored exactly one charge.",
+          "selected": "500% damage, removes Sleep Wards & Burn\n(Will overwrite other status effects)"
+        },
+        "ability": {
+          "name": "DoubleAttackAXiaoLiRegularBoss",
+          "class": "Ability",
+          "abilityScalor": 4,
+          "conditionalAbilityScalors": [
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "config": "DoubleAttackAXiaoLiRegularBoss",
+          "tuCost": 50,
+          "useLimit": 0,
+          "spiritCost": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "applyToTargetType": "Enemy",
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "damageFlags": [
+                "RemoveXiaoLiDefeatBuff",
+                "IgnoreArmor",
+                "HardIgnoreBlockDeath",
+                "IgnoreSkin",
+                "DoNotWake"
+              ]
+            },
+            {
+              "buffs": [
+                "RemoveBurn",
+                "RemoveSleepImmunityOnce",
+                "ColdSleepForced100TU"
+              ],
+              "applyToTargetType": "Enemy",
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss"
+            },
+            {
+              "buffs": [
+                "StoreEnergy",
+                "GoodGirlBuffCounter"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "GiveTurn",
+                "OnExtraTurn",
+                "JustGivenTurn",
+                "XiaoLiBossExtraTurn50TUTrigger"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss",
+              "applyConditions": "IsNotXiaoLiExtraTurn50TUTrigger"
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "XiaoLiThrow",
+          "attackScalors": [
+            "GoodIfGain1GoodBuff",
+            "GoodIfGain2GoodBuff",
+            "GoodIfGain3GoodBuff",
+            "GoodIfGain4GoodBuff",
+            "GoodIfGain5GoodBuff"
+          ],
+          "conditionedAbilityEffects": [
+            "XiaoLiThrow",
+            "XiaoLiThrow",
+            "XiaoLiThrow",
+            "XiaoLiThrow",
+            "XiaoLiThrow"
+          ],
+          "flags": [
+            "StealthWorthy"
+          ],
+          "recommendEffectWhenUsable": -2,
+          "useCondition": "IsCharged1Exact"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0,
+            0.5,
+            0,
+            0.25,
+            0,
+            0,
+            0,
+            0,
+            0.3,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_timestrike1",
+            "batfx_tailwindblue/batfx_tailwindblue",
+            "batfx_Tristan/batfx_whirlwind2",
+            "batfx_himiko1/batfx_fanprep1",
+            "batfx_XiaoLi/batfx_DragonBiteBlue1",
+            "batsfx_prefab/batsfx_fire4",
+            "batfx_snowwhiteswimsuit1/batfx_throwwaterorb1",
+            "batfx_XiaoLi/batfx_throwparticle13_1",
+            "batfx_Perry/batfx_ludmillasplash4",
+            "batsfx_prefab/batsfx_air1",
+            "batfx_common/batfx_empty",
+            "batfx_bombblue3/batfx_bombblue3",
+            "batfx_toonstars3/batfx_toonstars3",
+            "batsfx_prefab/batsfx_water3"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -100,
+            -10,
+            2,
+            2,
+            3,
+            3,
+            3,
+            2,
+            3,
+            2,
+            2,
+            2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle1",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            true,
+            true,
+            false,
+            false,
+            false,
+            false,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "isProjectileFX": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "projectileFlightDuration": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0.35,
+            0.3,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "projectileStartOffsetX": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            150,
+            150,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "projectileStartOffsetY": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            150,
+            150,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "ColdSleepForced100TU": {
+            "class": "Buff",
+            "stackName": "Sleep",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "LoseTurn",
+              "RemoveOnHurt"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Burn",
+                  "BurnAfterTurn",
+                  "BurnAtEndOfTurn",
+                  "Sleep",
+                  "SleepDelayed"
+                ],
+                "dontShowText": true
+              },
+              {
+                "name": "PurifyChain"
+              },
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Poison"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "name": "AutoPurifyAfterTurnNoSleep"
+              },
+              {},
+              {
+                "ignoreIfHurtBySelf": true,
+                "cancelFromDamageFlags": [
+                  "DoNotWake"
+                ]
+              }
+            ],
+            "tags": [
+              "ColdSleep"
+            ],
+            "duration": 100,
+            "showAsTimer": true,
+            "statusEffect": "Deepsleep",
+            "statusEffectOffset": 0.1,
+            "iconSpriteName": "IconWhiteSleepZs01",
+            "textKeyToShowWhenApplied": "SleepKey"
+          },
+          "GiveTurn": {
+            "class": "Buff",
+            "behaviors": [
+              "GiveTurn"
+            ],
+            "behaviorOverrides": [
+              {}
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "textKeyToShowWhenApplied": "TurnGivenKey",
+            "isHiddenFromPlayers": true
+          },
+          "GoodGirlBuffCounter": {
+            "class": "Buff",
+            "stackName": "GoodGirlBuffCounter",
+            "stackLimit": 5,
+            "duration": -1,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "noIconShownOnBattleStatus": true,
+            "isHiddenFromPlayers": true
+          },
+          "JustGivenTurn": {
+            "class": "Buff",
+            "duration": 1,
+            "stackName": "JustGivenTurnBuff",
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "isHiddenFromPlayers": true,
+            "noIconShownOnBattleStatus": true
+          },
+          "OnExtraTurn": {
+            "class": "Buff",
+            "stackName": "OnExtraTurn",
+            "duration": 1,
+            "isHiddenFromPlayers": true
+          },
+          "RemoveBurn": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "RemoveMegaHealingBurnApplyHealingBurn"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "RemoveSleepImmunityOnce": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "SleepImmunityOnce"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "StoreEnergy": {
+            "class": "Buff",
+            "stackLimit": 3,
+            "duration": -1,
+            "showAsTimer": false,
+            "stackName": "StoreEnergy",
+            "noIconShownOnBattleStatus": true,
+            "usesStackCountDescription": true,
+            "iconSpriteName": "IconPinkCharge01"
+          },
+          "XiaoLiBossExtraTurn50TUTrigger": {
+            "class": "Buff",
+            "duration": 50,
+            "stackName": "XiaoLiExtraTurnTrigger",
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "iconSpriteName": "IconRedCountdownPassiveClock3"
+          }
+        },
+        "attackScalors": {
+          "GoodIfGain1GoodBuff": {
+            "class": "AttackScalor",
+            "sourceCondition": "Has1GoodGirlBuffExactly"
+          },
+          "GoodIfGain2GoodBuff": {
+            "class": "AttackScalor",
+            "sourceCondition": "Has2GoodGirlBuffExactly"
+          },
+          "GoodIfGain3GoodBuff": {
+            "class": "AttackScalor",
+            "sourceCondition": "Has3GoodGirlBuffExactly"
+          },
+          "GoodIfGain4GoodBuff": {
+            "class": "AttackScalor",
+            "sourceCondition": "Has4GoodGirlBuffExactly"
+          },
+          "GoodIfGain5GoodBuff": {
+            "class": "AttackScalor",
+            "sourceCondition": "Has5GoodGirlBuff"
+          }
+        },
+        "conditions": {
+          "IsCharged1Exact": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "StoreEnergy"
+            ],
+            "buffStackCounts": [
+              1
+            ],
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "StoreEnergy"
+              ],
+              "buffStackCounts": [
+                2
+              ]
+            }
+          },
+          "IsNotXiaoLiExtraTurn50TUTrigger": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "XiaoLiExtraTurnTrigger"
+              ]
+            }
+          },
+          "OnExtraTurn": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "OnExtraTurn"
+            ]
+          }
+        }
+      },
+      "SelfBuffAXiaoLiRegularBoss": {
+        "id": "SelfBuffAXiaoLiRegularBoss",
+        "found": true,
+        "localization": {
+          "name": "Unleash Strength",
+          "description": "The user is granted a Charge, Stun Ward, and becomes Enraged. Usable only if the user has stored exactly two charges.\n\nThis will overwrite the effects of other Enrage skills on the user. Enraged units have their Attack increased to 1.5x until the end of their next turn. A Stun Ward prevents Stun from being applied once, then is removed. Stun Wards cannot stack. ",
+          "selected": "Enraged and Gains Charge & Ward"
+        },
+        "ability": {
+          "name": "SelfBuffAXiaoLiRegularBoss",
+          "class": "Ability",
+          "config": "SelfBuffAXiaoLiRegularBoss",
+          "tuCost": 1,
+          "useLimit": 0,
+          "spiritGain": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "SelfOnly",
+          "components": [
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "StunImmunityOnce",
+                "StoreEnergy",
+                "AttackPlus50Percent1TurnOnly"
+              ],
+              "applyToTargetType": "Source"
+            }
+          ],
+          "sourceEventType": "Finish",
+          "abilityEffect": "XiaoLiOnmyou",
+          "useCondition": "IsCharged2Exact"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "selfOnly": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0.5,
+            0
+          ],
+          "prefabs": [
+            "batfx_RizetteBrave/batfx_blackout2Sec",
+            "batfx_XiaoLi/batfx_EnergyCharge1",
+            "batsfx_prefab/batsfx_magic1",
+            "batfx_XiaoLi/batfx_Onmyou1",
+            "batsfx_prefab/batsfx_ring1"
+          ],
+          "sortOrderOffset": [
+            -100,
+            1,
+            2,
+            -1,
+            2
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            true,
+            false,
+            true,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            false,
+            true,
+            false,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            true,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "AttackPlus50Percent1TurnOnly": {
+            "class": "Buff",
+            "stackName": "AttackPlus50Percent",
+            "behaviors": [
+              "RemoveAfterTurnsBehavior",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "turnCount": 1,
+                "scalorStatBonuses": {
+                  "Attack": 0.5
+                }
+              },
+              {
+                "name": "AttackMinus25Percent"
+              }
+            ],
+            "iconSpriteName": "IconRedRage01",
+            "showAsTimer": true,
+            "duration": -1
+          },
+          "StoreEnergy": {
+            "class": "Buff",
+            "stackLimit": 3,
+            "duration": -1,
+            "showAsTimer": false,
+            "stackName": "StoreEnergy",
+            "noIconShownOnBattleStatus": true,
+            "usesStackCountDescription": true,
+            "iconSpriteName": "IconPinkCharge01"
+          },
+          "StunImmunityOnce": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity"
+            ],
+            "stackName": "StunImmunityOnce",
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Stun",
+                  "StunNoAbsorb"
+                ],
+                "useLimit": 1
+              }
+            ],
+            "duration": -1,
+            "showAsTimer": true,
+            "tags": [
+              "StunImmuneTemp",
+              "ThisIsAWard"
+            ],
+            "iconSpriteName": "IconRedStunInvalidLightning01"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "IsCharged2Exact": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "StoreEnergy"
+            ],
+            "buffStackCounts": [
+              2
+            ],
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "StoreEnergy"
+              ],
+              "buffStackCounts": [
+                3
+              ]
+            }
+          }
+        }
+      },
+      "SpecialAttackAXiaoLiRegularBoss": {
+        "id": "SpecialAttackAXiaoLiRegularBoss",
+        "found": true,
+        "localization": {
+          "name": "Dragon Finisher",
+          "description": "1000% damage to 1 enemy. If damage from this attack defeats an enemy, all other enemies on the battlefield will be Weakened and granted Deep Sleep for 100TU.\n\nUsable only if the user has stored 3 Charges. Consumes all Charges on the user.\n\nWeakened units have their Attack reduced to 0.75x until the end of their next turn. The effect of Weakening may be diminished if the affected unit's Attack is increased by other effects and it can be overwritten by Enrage effects.",
+          "selected": "1000% damage, may Weaken & Sleep\n(Will overwrite other status effects)"
+        },
+        "ability": {
+          "name": "SpecialAttackAXiaoLiRegularBoss",
+          "class": "Ability",
+          "abilityScalor": 9,
+          "config": "SpecialAttackAXiaoLiRegularBoss",
+          "tuCost": 50,
+          "useLimit": 0,
+          "spiritCost": 3,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "damageFlags": [
+                "IgnoreArmor",
+                "HardIgnoreBlockDeath",
+                "IgnoreSkin",
+                "DoNotWake"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "RemoveEnergy"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "GiveTurn",
+                "OnExtraTurn",
+                "JustGivenTurn",
+                "XiaoLiBossExtraTurn50TUTrigger"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss",
+              "applyConditions": "IsNotXiaoLiExtraTurn50TUTrigger"
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "XiaoLiSP",
+          "useCondition": "IsCharged3"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0.4,
+            0,
+            0.15,
+            0,
+            0.2,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0.75,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batfx_tailwindenergy/batfx_tailwindenergy",
+            "batsfx_prefab/batsfx_accelerate1",
+            "batfx_XiaoLi/batfx_Onmyou2",
+            "batfx_jumpsmoke1/batfx_jumpsmoke1",
+            "batsfx_prefab/batsfx_earth1",
+            "batfx_XiaoLi/batfx_dragonBlue1",
+            "batfx_XiaoLi/batfx_dragonBlue2",
+            "batsfx_prefab/batsfx_fire4",
+            "batfx_astridnew1/batfx_bitelarge3",
+            "batfx_Manchester/batfx_groundimpactblue1",
+            "batfx_DaVinci/batfx_impactrockBlue",
+            "batsfx_prefab/batsfx_bluntimpact1",
+            "batfx_Gokubride/batfx_castingSmoke3",
+            "batfx_astridnew1/batfx_dragonnuke1",
+            "batfx_common/batfx_whiteout1",
+            "batsfx_prefab/batsfx_bomb1",
+            "batfx_deadlyvampire1/batfx_camerashake1"
+          ],
+          "sortOrderOffset": [
+            -80,
+            -2,
+            -2,
+            2,
+            0,
+            -2,
+            30,
+            0,
+            3,
+            -2,
+            1,
+            0,
+            2,
+            30,
+            50,
+            -2,
+            2
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle2"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            true,
+            false,
+            false,
+            true,
+            false
+          ],
+          "positionInBattlefieldCenter": [
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "GiveTurn": {
+            "class": "Buff",
+            "behaviors": [
+              "GiveTurn"
+            ],
+            "behaviorOverrides": [
+              {}
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "textKeyToShowWhenApplied": "TurnGivenKey",
+            "isHiddenFromPlayers": true
+          },
+          "JustGivenTurn": {
+            "class": "Buff",
+            "duration": 1,
+            "stackName": "JustGivenTurnBuff",
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "isHiddenFromPlayers": true,
+            "noIconShownOnBattleStatus": true
+          },
+          "OnExtraTurn": {
+            "class": "Buff",
+            "stackName": "OnExtraTurn",
+            "duration": 1,
+            "isHiddenFromPlayers": true
+          },
+          "RemoveEnergy": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "StoreEnergy"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "XiaoLiBossExtraTurn50TUTrigger": {
+            "class": "Buff",
+            "duration": 50,
+            "stackName": "XiaoLiExtraTurnTrigger",
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "iconSpriteName": "IconRedCountdownPassiveClock3"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "IsCharged3": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "StoreEnergy"
+            ],
+            "buffStackCounts": [
+              3
+            ]
+          },
+          "IsNotXiaoLiExtraTurn50TUTrigger": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "XiaoLiExtraTurnTrigger"
+              ]
+            }
+          },
+          "OnExtraTurn": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "OnExtraTurn"
+            ]
+          }
+        }
+      }
+    },
+    "passives": {
+      "ComboTimePassiveAXiaoLiRegularBoss": {
+        "id": "ComboTimePassiveAXiaoLiRegularBoss",
+        "found": true,
+        "localization": {
+          "name": "Combo Adept",
+          "description": "This unit will immediately get the next turn after using Opening Smash, Knockout Blaster or Dragon Finisher. Then this effect cannot trigger again until 50TU advances.\n\nWhen this unit enters the battlefield, for 100TU this unit:\n- Cannot fall asleep.\n- Has 80% damage reduction from attacks.\n\nThis unit will ignore attacks that would damage exactly 2 targets (attacks that target All allies will not be ignored). If this unit gains the Stealth status effect, it will not be lost when ignoring attacks in this way.\n\nThis unit's attacks will not wake sleeping enemies, and ignore:\n- damage reduction effects.\n- any effects of non-boss enemies that would prevent targets from being defeated.\n- skin passive skills, and the Counter Stance status effect."
+        }
+      },
+      "HoldStrongPassiveAXiaoLiRegularBoss": {
+        "id": "HoldStrongPassiveAXiaoLiRegularBoss",
+        "found": true,
+        "localization": {
+          "name": "True Warrior",
+          "description": "This unit enters battle with a Stun Ward.\n\nIf this unit would be defeated by an enemy attack or a status effect while having more than 1 HP, it instead survives with 1 HP.\n\nThis unit cannot be sent to the reinforcements from the battlefield, and cannot be defeated by damage from Poison or Burn status effects.\n\nAt the end of each sleeping enemy turn, this unit will have its current TU reduced by 50TU. This TU reduction may trigger before or after other effects that adjust the turn order. If this triggers 5 times within 50TU, this effect cannot trigger again until 50TU advances."
+        }
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": null
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "XiaoLiRegularBoss03",
+    "family": "XiaoLiRegularBoss",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "XiaoLiRegularBoss03",
+    "class": "Monster",
+    "family": "XiaoLiRegularBoss",
+    "activeSkills": {
+      "0": "SingleAttackAXiaoLiRegularBoss",
+      "1": "DoubleAttackAXiaoLiRegularBoss",
+      "2": "SelfBuffAXiaoLiRegularBoss",
+      "3": "SpecialAttackAXiaoLiRegularBoss"
+    },
+    "passives": {
+      "0": "ComboTimePassiveAXiaoLiRegularBoss",
+      "1": "HoldStrongPassiveAXiaoLiRegularBoss"
+    },
+    "cost": 999,
+    "baseAttack": 3000,
+    "baseMaxHp": 178000,
+    "speed": 599,
+    "element": "Water",
+    "weaponPref": "Hammer",
+    "weaponPivotIndex": 0,
+    "walkSound": "TestSound",
+    "secure": 1,
+    "aiTargetPickWeight": 1,
+    "stars": 6,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 1,
+    "battleOrbImageFlip": 0,
+    "skillVoices": {
+      "0": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "1": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "2": [
+        9,
+        10,
+        11,
+        12
+      ],
+      "3": [
+        13,
+        14,
+        15,
+        16
+      ]
+    },
+    "damageVoices": [
+      17,
+      18,
+      19,
+      20
+    ],
+    "deathVoices": [
+      21,
+      22,
+      23,
+      24
+    ]
+  },
+  "_build": {
+    "scriptVersion": "7-base-form-rarity",
+    "sourceHash": "db6ac8eeb2cb5d9a83e3ca60b32271ef1fa34777cd0b8bbbe947fc15433865e0",
+    "dependencyHash": "792d6cd1f72877831f533ec88fc132a5ddc7b4682c305968f4587751afd14b44",
+    "generatedAt": 1785391441
+  }
+}

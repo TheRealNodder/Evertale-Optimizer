@@ -1,6 +1,6 @@
 {
 	"Version": 23,
-	"Time": 1783403749,
+	"Time": 1785228851,
 	"Buff": {
 	"RelationshipFlatAttack50": {
 		"class": "Buff",
@@ -89413,6 +89413,673 @@
 			"showAsTimer": true,
 			"showAsPermanent": false,
 			"iconSpriteName": "IconBlueCountdownClock3"
+		},
+		"StrongStartPassiveALuBuDarkBoss": {
+			"class": "Buff",
+			"stackName": "StrongStartPassiveALuBuDark",
+			"behaviors": ["EnterBattleBuff","BuffOnMonsterTurn","BuffWhenMonsterHurt","StunImmunityFallback"],
+			"behaviorOverrides": [{
+				"sourceBuffs": ["KnockbackImmunity","StunImmunity","FortifyFor3Attacks","SleepImmunityOnce","PoisonImmunityOnce","PassiveBlockGiveTurnImmunity","DisableFallBackImmunity"]
+			},{
+				"enemyBuffs": ["RemoveLuBuDarkBossKillBuff"],
+				"selfBuffs": ["LuBuDarkBossKillsMoreThanSkillsUsed","PloyWillSucceed100Percent"]
+			},{
+				"selfBuffs": ["PseudoGetTurn","OnExtraTurn","JustGivenTurn","MarkedLuBuDarkBoss"],
+				"cancelFromDamageTypes": ["BuffDamage"],
+				"spreadCondition": "IsNotBurningOrMarkedLuBuDark"
+			},{}],
+			"duration": -1,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true
+		},
+		"PloyWillSucceed100Percent":{
+			"class": "Buff",
+			"duration": 0,
+			"stackName": "PloyWillSucceed",
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true
+		},
+		"MarkedLuBuDarkBoss":{
+			"class": "Buff",
+			"stackName": "MarkedLuBuDark",
+			"duration": -1,
+			"isHiddenFromPlayers": true,
+			"showAsPermanent": false,
+			"showAsTimer": false
+		},
+		"LuBuDarkBossKillsMoreThanSkillsUsed": {
+			"class": "Buff",
+			"stackName": "LuBuDarkKillsMoreThanSkillsUsed",
+			"behaviors": ["BuffWhenMonstersDie", "BuffWhenMonstersDie"],
+			"behaviorOverrides": [{
+				"sourceBuffs": ["FortifyFor3Attacks","LuBuDarkBossActive4Lock"],
+				"sameTeam": false,
+				"spreadCondition": "KillsMoreThanSkillUsedAltAlt",
+				"deadMonsterConditions": "IsNotSummonedOrTransformingOrMirage"
+			},{
+				"sourceBuffs": ["FudgeUsedAltAlt"],
+				"sameTeam": false,
+				"spreadCondition": "KillsMoreThanSkillUsedAltAlt"
+			}],
+			"isHiddenFromPlayers": true,
+			"duration": 0
+		},
+		"RemoveLuBuDarkBossKillBuff":{
+			"class": "Buff",
+			"behaviors": ["BuffWhenMonsterHurt"],
+			"behaviorOverrides":[{
+				"allyBuffs": ["RemoveLuBuDarkBossKillsMoreThanSkillsUsed"],
+				"onlyFromDamageFlags": ["RemoveLuBuDarkDefeatBuff"]
+			}],
+			"duration": 0,
+			"isHiddenFromPlayers": true,
+			"allowBuffOnDeadTarget": true
+		},
+		"RemoveLuBuDarkBossKillsMoreThanSkillsUsed":{
+			"class": "Buff",
+			"behaviors": ["RemoveBuffs"],
+			"behaviorOverrides": [{
+				"name": "LuBuDarkKillsMoreThanSkillsUsed"
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
+		"LuBuDarkBossActive4Lock": {
+			"class": "Buff",
+			"stackName": "LuBuDarkActive4Lock",
+			"duration": 100,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"iconSpriteName": "IconBlueCountdownClock3Numbered04"
+		},
+		"BattlePassiveALuBuDarkBoss": {
+			"class": "Buff",
+			"stackName": "BattlePassiveALuBuDark",
+			"behaviors": ["EnterBattleBuff","ModifyDamage","OthersEnterBattle"],
+			"behaviorOverrides": [{
+				"sourceBuffs": ["HoldGroundBoss"]
+			},{
+				"percent": 0.50,
+				"cancelFromDamageTypes": ["BuffDamage", "Poison", "Burn"],
+				"cancelFromDamageFlags": ["Sneak", "IgnoreArmor"],
+				"conditions": "1EnemyPoisonedAndOrSleeping"
+			},{
+				"chance": 1.0,
+				"selfBuffs": ["SleepImmunityOnce","PoisonImmunityOnce","1PercentHealMaxHPBoss"],
+				"spreadCondition": "BattleTimeOver1OrAnyDeadMonster"
+			}],
+			"duration": -1,
+			"showAsPermanent": false,
+			"showAsTimer": true,
+			"isHiddenFromPlayers": true,
+			"tags": ["BigDamageMinus"],
+			"iconSpriteName": "IconPurpleDamageMinus01"
+		},
+		"MaybeGrantSelfTurnLuBuDarkEBB": {
+			"class": "Buff",
+			"behaviors": ["EnterBattleBuff"],
+			"behaviorOverrides": [{
+				"selfBuffs": ["GiveTurn","OnExtraTurn","JustGivenTurn","AttackPlus50Percent1TurnOnly"]
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true,
+			"applyConditions": "1EnemyIsNotSleepingOrPoisoned"
+		},
+		"LuBuDarkBossCooldown100":{
+			"class": "Buff",
+			"duration": 100,
+			"stackName": "InstantCooldown",
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"iconSpriteName": "IconBlueCountdownClock3Numbered02"
+		},
+		"HitTargetPassiveAWhiteSnakeGirlDarkBoss": {
+			"class": "Buff",
+			"stackName": "HitTargetPassiveAWhiteSnakeGirlDark",
+			"behaviors": ["EnterBattleBuff","BuffChanceOnHit","BuffOnMonsterTurnEnd","BuffWhenMonstersDie","BuffWhenMonstersDie"],
+			"behaviorOverrides": [{
+				"sourceBuffs": ["50PercentDamageReduction","Stun50TUMinus","KnockbackImmunity","BlockDeathByPoisonDamage","Active2LOCKWhiteSnakeGirlDarkBoss","Active3LOCKWhiteSnakeGirlDarkBoss","Active4LOCKWhiteSnakeGirlDarkBoss","Charged1Icon","Charged2Icon","Charged3Icon"]
+			},{
+				"selfBuffs": ["PseudoGetTurn","OnExtraTurn","JustGivenTurn","HijikataCounterFuseAfterTime","HijikataCounter","WhiteSnakeGirlDarkBossSmallPassiveLock"],
+				"chance": 1.0,
+				"targetCondition": "IsNotSummoned",
+				"spreadCondition":"IsNotWhiteSnakeGirlDarkTrigger"
+			},{
+				"selfBuffs": ["WhiteSnakeGirlDarkBossPassiveExtraTurnLocked"],
+				"spreadCondition":"IsHijikataCharged3NotWhiteSnakeGirlDarkTriggered"	
+			},{
+				"sourceBuffs": ["RemoveActive2LOCKWhiteSnakeGirlDarkBoss","WorldDeathCounter","GoodGirlBuffCounter"],
+				"deadMonsterConditions": "IsNotSummonedOrTransformingOrMirage"
+			},{
+				"sameTeam": false,
+				"sourceBuffs": ["RemoveActive4LOCKWhiteSnakeGirlDarkBoss"],
+				"deadMonsterConditions": "IsNotSummonedOrTransformingOrMirage"
+			}],
+			"showAsPermanent": false,
+			"showAsTimer": true,
+			"duration": -1,
+			"iconSpriteName": "IconExtraTurnReady01"
+		},
+		"WhiteSnakeGirlDarkBossSmallPassiveLock": {
+			"class": "Buff",
+			"stackName": "WhiteSnakeGirlDarkSmallPassiveLock",
+			"duration": 0,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"noIconShownOnBattleStatus": true,
+			"isHiddenFromPlayers": true
+		},
+		"WhiteSnakeGirlDarkBossPassiveExtraTurnLocked":{
+			"class": "Buff",
+			"duration": 50,
+			"stackName": "WhiteSnakeGirlDarkTrigger",
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"iconSpriteName": "IconRedCountdownPassiveClock3"
+		},
+		"BecomeDeathPassiveAWhiteSnakeGirlDarkBoss": {
+			"class": "Buff",
+			"stackName": "BecomeDeathPassiveAWhiteSnakeGirlDark",
+			"behaviors": ["EnterBattleBuff","BuffWhenMonsterHurt","BuffOnMonsterTurnEnd"],
+			"behaviorOverrides": [{
+				"sourceBuffs": ["HoldGroundBoss","SuperStealth"]
+			},{
+				"selfBuffs": ["BrideHealOK"],
+				"cancelFromDamageTypes": ["BuffDamage"]
+			},{
+				"selfBuffs": ["BridePurifyWhiteSnakeGirlDarkBoss"],
+				"activeMonsterConditions": "NotAlwaysMyTurn",
+				"spreadCondition": "BrideHealReady"
+			}],
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true,
+			"duration": -1
+		},
+		"BridePurifyWhiteSnakeGirlDarkBoss": {
+			"class": "Buff",
+			"behaviors": ["RemoveBuffs","RemoveBuffs"],
+			"behaviorOverrides": [{
+				"name": "BrideHealOK"
+			},{}],
+			"duration": 0,
+			"effectToShowWhenApplied": "LargeHeal1",
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
+		"GrantAllOtherKills1AlliesTurnEBB": {
+			"class": "Buff",
+			"behaviors": ["EnterBattleBuff"],
+			"behaviorOverrides": [{
+				"allAlliesButSelfBuffs": ["GiveTurn","OnExtraTurn","JustGivenTurn"],
+				"spreadCondition": "Kills1"
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true
+		},
+		"KillRandomEnemyEOTAndCreditKillWhiteSnakeGirlDarkBoss":{
+			"class": "Buff",
+			"behaviors": ["EnterBattleBuff"],
+			"behaviorOverrides": [{
+				"randomEnemyBuffs": ["PT2InstantKillAndCreditKillWhiteSnakeGirlDarkBoss"],
+				"numRandomToBuff": 1,
+				"spreadCondition": "IsNotBossAndNotMirage"
+			}],
+			"showAsPermanent": false,
+			"showAsTimer": false,
+			"duration": 0,
+			"isHiddenFromPlayers": true
+		},
+		"PT2InstantKillAndCreditKillWhiteSnakeGirlDarkBoss": {
+			"class": "Buff",
+			"stackName": "InstantKill",
+			"behaviors": ["EnterBattleBuff","EnterBattleBuff","InstantDeath"],
+			"behaviorOverrides": [{
+				"selfBuffs": ["WhiteSnakeGirlDarkInstantDeathFXBuff"]
+			},{	
+				"sourceBuffs": ["Add1Kill"]
+			},{}],
+			"duration": 0,
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
+		"WhiteSnakeGirlDarkInstantDeathFXBuff": {
+			"class": "Buff",
+			"isHiddenFromPlayers": true,
+			"duration": 0,
+			"effectToShowWhenApplied": "WhiteSnakeGirlDarkInstantdeath1",
+			"showAsTimer": false,
+			"showAsPermanent": false
+		},
+		"Active1LOCKWhiteSnakeGirlDarkBoss":{
+			"class": "Buff",
+			"stackName": "Active1LOCKWhiteSnakeGirlDark",
+			"duration": -1,
+			"isHiddenFromPlayers": true,
+			"showAsPermanent": false,
+			"showAsTimer": false
+		},
+		"RemoveActive1LOCKWhiteSnakeGirlDarkBoss": {
+			"class": "Buff",
+			"behaviors": ["RemoveBuffs"],
+			"behaviorOverrides": [{
+				"name": "Active1LOCKWhiteSnakeGirlDark"
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
+		"Active3LOCKWhiteSnakeGirlDarkBoss":{
+			"class": "Buff",
+			"stackName": "Active3LOCKWhiteSnakeGirlDark",
+			"duration": -1,
+			"isHiddenFromPlayers": true,
+			"showAsPermanent": false,
+			"showAsTimer": false
+		},
+		"RemoveActive3LOCKWhiteSnakeGirlDarkBoss": {
+			"class": "Buff",
+			"behaviors": ["RemoveBuffs"],
+			"behaviorOverrides": [{
+				"name": "Active3LOCKWhiteSnakeGirlDark"
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
+		"Active2LOCKWhiteSnakeGirlDarkBoss":{
+			"class": "Buff",
+			"stackName": "Active2LOCKWhiteSnakeGirlDark",
+			"duration": -1,
+			"isHiddenFromPlayers": true,
+			"showAsPermanent": false,
+			"showAsTimer": false
+		},
+		"RemoveActive2LOCKWhiteSnakeGirlDarkBoss": {
+			"class": "Buff",
+			"behaviors": ["RemoveBuffs"],
+			"behaviorOverrides": [{
+				"name": "Active2LOCKWhiteSnakeGirlDark"
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
+		"Active4LOCKWhiteSnakeGirlDarkBoss":{
+			"class": "Buff",
+			"stackName": "Active4LOCKWhiteSnakeGirlDark",
+			"duration": -1,
+			"isHiddenFromPlayers": true,
+			"showAsPermanent": false,
+			"showAsTimer": false
+		},
+		"RemoveActive4LOCKWhiteSnakeGirlDarkBoss": {
+			"class": "Buff",
+			"behaviors": ["RemoveBuffs"],
+			"behaviorOverrides": [{
+				"name": "Active4LOCKWhiteSnakeGirlDark"
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
+        "ComboTimePassiveAXiaoLiRegularBoss":{
+			"class": "Buff",
+			"stackName": "ComboTimePassiveAXiaoLiRegular",
+			"behaviors": ["EnterBattleBuff","BuffOnMonsterTurn","SleepImmunityFallback"],
+			"behaviorOverrides": [{
+					"sourceBuffs": ["80PercentDamageReductionFor100TU","SleepImmunityFor100TU","DodgeDoubleTargetAttack","DisableFallBackImmunity","Charged1Icon","Charged2Icon","Charged3Icon"]
+				},{
+					"enemyBuffs": ["RemoveXiaoLiBossKillBuff"],
+					"selfBuffs": ["XiaoLiRegularBossKillsMoreThanSkillsUsed"]
+			},{},{}],
+			"duration": -1,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true,
+			"noIconShownOnBattleStatus": true
+		},
+		"RemoveXiaoLiBossKillBuff":{
+			"class": "Buff",
+			"behaviors": ["BuffWhenMonsterHurt"],
+			"behaviorOverrides":[{
+				"allyBuffs": ["RemoveXiaoLiRegularBossKillsMoreThanSkillsUsed"],
+				"onlyFromDamageFlags": ["RemoveXiaoLiDefeatBuff"]
+			}],
+			"duration": 0,
+			"isHiddenFromPlayers": true,
+			"allowBuffOnDeadTarget": true
+		},
+		"XiaoLiRegularBossKillsMoreThanSkillsUsed": {
+			"class": "Buff",
+			"stackName": "XiaoLiRegularKillsMoreThanSkillsUsed",
+			"behaviors": ["BuffWhenMonstersDie", "BuffWhenMonstersDie"],
+			"behaviorOverrides": [{
+				"sourceBuffs": ["WeakenAndColdSleepAllEnemiesEBB"],
+				"sameTeam": false,
+				"spreadCondition": "KillsMoreThanSkillUsedAltAlt",
+				"deadMonsterConditions": "NotTransformingOrMirage"
+			},{
+				"sourceBuffs": ["FudgeUsedAltAlt"],
+				"sameTeam": false,
+				"spreadCondition": "KillsMoreThanSkillUsedAltAlt"
+			}],
+			"isHiddenFromPlayers": true,
+			"duration": 0
+		},
+		"WeakenAndColdSleepAllEnemiesEBB": {
+			"class": "Buff",
+			"stackName": "WeakenAllEnemiesEBB",
+			"behaviors": ["EnterBattleBuff"],
+			"behaviorOverrides": [{
+				"randomEnemyBuffs": ["ColdSleepForced100TU","AttackMinus25Percent1TurnOnly","WeakFX"],
+				"numRandomToBuff": 4
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
+		"RemoveXiaoLiRegularBossKillsMoreThanSkillsUsed":{
+			"class": "Buff",
+			"behaviors": ["RemoveBuffs"],
+			"behaviorOverrides": [{
+				"name": "XiaoLiRegularKillsMoreThanSkillsUsed"
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
+		"HoldStrongPassiveAXiaoLiRegularBoss":{
+			"class": "Buff",
+			"stackName": "HoldStrongPassiveAXiaoLiRegular",
+			"behaviors": ["EnterBattleBuff","BuffOnMonsterTurnEnd"],
+			"behaviorOverrides": [{
+				"sourceBuffs": ["HoldGroundBoss","KnockbackImmunity","StunImmunityOnce","BlockDeathByBuffDamage"]
+			},{
+				"sourceBuffs": ["TUMinus50","LargeHijikataCounter","LargeHijikataCounterFuseAfterTime","XiaoLiRegularBossPassiveLock"],
+				"sameTeam": false,
+				"activeMonsterConditions": "IsSleeping",
+				"spreadCondition": "IsNotXiaoLiRegularPassiveLock"
+			}],
+			"duration": -1,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true,
+			"noIconShownOnBattleStatus": true
+		},
+		"XiaoLiRegularBossPassiveLock": {
+			"class": "Buff",
+			"stackName": "XiaoLiRegularPassiveLock",
+			"duration": 50,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"iconSpriteName": "IconRedCountdownPassiveClock3",
+			"applyConditions": "IsLargeHijikataCharged5"
+		},
+		"XiaoLiBossExtraTurn50TUTrigger":{
+			"class": "Buff",
+			"duration": 50,
+			"stackName": "XiaoLiExtraTurnTrigger",
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"iconSpriteName": "IconRedCountdownPassiveClock3"
+		},
+		"AttackUp4EnemyIsHypnotized1": {
+			"class": "Buff",
+			"behaviors": ["ExtraAttackScalor"],
+			"stackName": "AttackBoosted",
+			"behaviorOverrides": [{
+				"targetCondition": "PloyingEnemy",
+				"scalor": 0.15
+			}],
+			"iconSpriteName": "IconYellowAttackUpSword01",
+			"noIconShownOnBattleStatus": true,
+			"duration": -1,
+			"showAsTimer": false,
+			"isWeaponBuff": true
+		},
+		"AttackUp5EnemyIsHypnotized1": {
+			"class": "Buff",
+			"behaviors": ["ExtraAttackScalor"],
+			"stackName": "AttackBoosted",
+			"behaviorOverrides": [{
+				"targetCondition": "PloyingEnemy",
+				"scalor": 0.20
+			}],
+			"iconSpriteName": "IconYellowAttackUpSword01",
+			"noIconShownOnBattleStatus": true,
+			"duration": -1,
+			"showAsTimer": false,
+			"isWeaponBuff": true
+		},
+		"AttackUp6EnemyIsHypnotized1": {
+			"class": "Buff",
+			"behaviors": ["ExtraAttackScalor"],
+			"stackName": "AttackBoosted",
+			"behaviorOverrides": [{
+				"targetCondition": "PloyingEnemy",
+				"scalor": 0.25
+			}],
+			"iconSpriteName": "IconYellowAttackUpSword01",
+			"noIconShownOnBattleStatus": true,
+			"duration": -1,
+			"showAsTimer": false,
+			"isWeaponBuff": true
+		},
+		"StrongStartPassiveALuBuDark": {
+			"class": "Buff",
+			"stackName": "StrongStartPassiveALuBuDark",
+			"behaviors": ["EnterBattleBuff","BuffOnMonsterTurn","BuffWhenMonsterHurt","StunImmunityFallback"],
+			"behaviorOverrides": [{
+				"sourceBuffs": ["KnockbackImmunity","StunImmunity","FortifyFor3Attacks","InstantKillImmunityOnce","SleepImmunityOnce","PoisonImmunityOnce","PassiveBlockGiveTurnImmunity","DisableFallBackImmunity"]
+			},{
+				"enemyBuffs": ["RemoveLuBuDarkKillBuff"],
+				"selfBuffs": ["LuBuDarkKillsMoreThanSkillsUsed","PloyWillSucceedA0","PloyWillSucceedA1","PloyWillSucceedA2","PloyWillSucceedA3","PloyWillSucceedA4"]
+			},{
+				"selfBuffs": ["PseudoGetTurn","OnExtraTurn","JustGivenTurn","MarkedLuBuDark"],
+				"cancelFromDamageTypes": ["BuffDamage"],
+				"spreadCondition": "IsNotBurningOrMarkedLuBuDark"
+			},{}],
+			"duration": -1,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true
+		},
+		"MarkedLuBuDark":{
+			"class": "Buff",
+			"stackName": "MarkedLuBuDark",
+			"duration": -1,
+			"isHiddenFromPlayers": true,
+			"showAsPermanent": false,
+			"showAsTimer": false
+		},
+		"LuBuDarkKillsMoreThanSkillsUsed": {
+			"class": "Buff",
+			"stackName": "LuBuDarkKillsMoreThanSkillsUsed",
+			"behaviors": ["BuffWhenMonstersDie", "BuffWhenMonstersDie"],
+			"behaviorOverrides": [{
+				"sourceBuffs": ["FortifyFor3Attacks","LuBuDarkActive4Lock"],
+				"sameTeam": false,
+				"spreadCondition": "KillsMoreThanSkillUsedAltAlt",
+				"deadMonsterConditions": "IsNotSummonedOrTransformingOrMirage"
+			},{
+				"sourceBuffs": ["FudgeUsedAltAlt"],
+				"sameTeam": false,
+				"spreadCondition": "KillsMoreThanSkillUsedAltAlt"
+			}],
+			"isHiddenFromPlayers": true,
+			"duration": 0
+		},
+		"RemoveLuBuDarkKillBuff":{
+			"class": "Buff",
+			"behaviors": ["BuffWhenMonsterHurt"],
+			"behaviorOverrides":[{
+				"allyBuffs": ["RemoveLuBuDarkKillsMoreThanSkillsUsed"],
+				"onlyFromDamageFlags": ["RemoveLuBuDarkDefeatBuff"]
+			}],
+			"duration": 0,
+			"isHiddenFromPlayers": true,
+			"allowBuffOnDeadTarget": true
+		},
+		"RemoveLuBuDarkKillsMoreThanSkillsUsed":{
+			"class": "Buff",
+			"behaviors": ["RemoveBuffs"],
+			"behaviorOverrides": [{
+				"name": "LuBuDarkKillsMoreThanSkillsUsed"
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
+		"LuBuDarkActive4Lock": {
+			"class": "Buff",
+			"stackName": "LuBuDarkActive4Lock",
+			"duration": 100,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"iconSpriteName": "IconBlueCountdownClock3Numbered04"
+		},
+		"BattlePassiveALuBuDark": {
+			"class": "Buff",
+			"stackName": "BattlePassiveALuBuDark",
+			"behaviors": ["EnterBattleBuff","ModifyDamage","OthersEnterBattle","BuffWhenMonsterHurt","BuffOnMonsterTurnEnd"],
+			"behaviorOverrides": [{
+				"sourceBuffs": ["HoldGround"]
+			},{
+				"percent": 0.50,
+				"cancelFromDamageTypes": ["BuffDamage", "Poison", "Burn"],
+				"cancelFromDamageFlags": ["Sneak", "IgnoreArmor"],
+				"conditions": "1EnemyPoisonedAndOrSleeping"
+			},{
+				"chance": 1.0,
+				"selfBuffs": ["InstantKillImmunityOnce","HealFull"],
+				"spreadCondition": "BattleTimeOver1OrAnyDeadMonster"
+			},{
+				"selfBuffs": ["BrideHealOK"],
+				"cancelFromDamageTypes": ["BuffDamage"]
+			},{
+				"selfBuffs": ["BrideHeal50PercentLuBuDark"],
+				"activeMonsterConditions": "NotAlwaysMyTurn",
+				"spreadCondition": "BrideHealReady"
+			}],
+			"duration": -1,
+			"showAsPermanent": false,
+			"showAsTimer": true,
+			"isHiddenFromPlayers": true,
+			"tags": ["BigDamageMinus"],
+			"iconSpriteName": "IconPurpleDamageMinus01"
+		},
+		"BrideHeal50PercentLuBuDark": {
+			"class": "Buff",
+			"behaviors": ["AdjustHp","RemoveBuffs"],
+			"behaviorOverrides": [{
+				"percent": 0.50,
+				"abilityEffect": "Blank",
+				"hpboosts": [
+					"HealBoost"
+				]
+			},{
+				"name": "BrideHealOK"
+			}],
+			"duration": 0,
+			"effectToShowWhenApplied": "LargeHeal1",
+			"textKeyToShowWhenApplied": "HealDoubleANameKey",
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
+		"LuBuDark3TurnsPloy":{
+			"class": "Buff",
+			"stackName": "Ploy",
+			"behaviors":["EnterBattleBuff","BuffOnMonsterTurn","LoseTurn","RemoveOnSourceDeath","RemoveAfterTurnsBehavior","BuffOnMonsterTurnEnd"],
+			"behaviorOverrides":[{
+				"selfBuffs": ["IntenseHypnosisIcon3"]
+			},{
+				"selfBuffs": ["GiveTurnUserFX"],
+				"sourceBuffs": ["RemoveBuffs", "GiveTurn", "GiveTurnTargetFX"]
+			},{},{},{
+				"turnCount": 3
+			},{
+				"selfBuffs": ["RemovePloy"],
+				"spreadCondition": "NoPloyingEnemy",
+				"activeMonsterConditions": "AlwaysTrue"
+			}],
+			"duration": -1,
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true,
+			"applyConditions": "IsNotBoss"
+		},
+		"IntenseHypnosisIcon3": {
+			"class": "Buff",
+			"stackName": "IntenseHypnosisIcon3",
+			"behaviors": ["BuffOnMonsterTurn","RemoveAfterTurnsBehavior"],
+			"behaviorOverrides": [{
+				"selfBuffs": ["IntenseHypnosisIcon2"]
+			},{
+				"turnCount": 1
+			}],
+			"duration": -1,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"iconSpriteName": "IconIntenselyHypnotizedCount03"
+		},
+		"IntenseHypnosisIcon2": {
+			"class": "Buff",
+			"stackName": "IntenseHypnosisIcon2",
+			"behaviors": ["BuffOnMonsterTurn","RemoveAfterTurnsBehavior"],
+			"behaviorOverrides": [{
+				"selfBuffs": ["IntenseHypnosisIcon1"]
+			},{
+				"turnCount": 1
+			}],
+			"duration": -1,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"iconSpriteName": "IconIntenselyHypnotizedCount02"
+		},
+		"IntenseHypnosisIcon1": {
+			"class": "Buff",
+			"stackName": "IntenseHypnosisIcon1",
+			"behaviors": ["RemoveAfterTurnsBehavior"],
+			"behaviorOverrides": [{
+				"turnCount": 1
+			}],
+			"duration": -1,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"iconSpriteName": "IconIntenselyHypnotizedCount01"
+		},
+		"LuBuDarkPloying":{
+			"class": "Buff",
+			"duration": -1,
+			"stackName": "Ploying",
+			"behaviors": ["BuffOnMonsterTurnEnd", "BuffWhenMonstersDie"],
+			"behaviorOverrides":[{
+				"selfBuffs": ["RemovePloying"],
+				"spreadCondition": "NoPloyedEnemy",
+				"activeMonsterConditions": "AlwaysTrue"
+			},{
+				"selfBuffs": ["RemovePloying"],
+				"spreadCondition": "NoPloyedEnemy"
+			}],
+			"applyConditions": "PloySucceeded",
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"iconSpriteName": "IconBlueHypnotizer01"
+		},
+		"LuBuDarkCooldown100":{
+			"class": "Buff",
+			"duration": 100,
+			"stackName": "InstantCooldown",
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"iconSpriteName": "IconBlueCountdownClock3Numbered02"
 		}
     }
 }

@@ -1,6 +1,6 @@
 {
 	"Version": 23,
-	"Time": 1783384228,
+	"Time": 1785308486,
 	"AbilityConfig": {
 		"StunSingle200A": {
 			"class": "AbilityConfig",
@@ -47345,6 +47345,412 @@
 			"conditionedAbilityEffects": ["ManchesterSp","ManchesterSp"],
 			"recommendEffectWhenUsable": -1,
 			"useCondition": "IsNotActive4LOCKManchesterRegular"
+		},
+		"DoubleAttackALuBuDarkBoss":{
+			"class": "AbilityConfig",
+			"targetingData": "2Enemy",
+			"components": ["Damage","ApplyBuff"],
+			"componentOverrides": [{
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"applyToTargetType": "Enemy",
+				"damageFlags": ["RemoveLuBuDarkDefeatBuff","HardIgnoreBlockDeath","IgnoreArmor","IgnoreSkin","DoNotWake"]
+			},{
+				"buffs":["PowerCharge"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Hit",
+			"abilityEffect": "LubuDarkAttack1",
+			"flags": ["IgnoreStealth"],
+			"attackScalors": ["GoodWithPoisonEnemy","GoodWithSleepingEnemy","GoodWithAllSleepingOrPoisonedEnemies"],
+			"conditionedAbilityEffects": ["LubuDarkAttack1","LubuDarkAttack1","LubuDarkAttack1","LubuDarkAttack1"],
+			"recommendEffectWhenUsable": -2
+		},
+		"EnemyBuffALuBuDarkBoss":{
+			"class": "AbilityConfig",
+			"targetingData": "AllEnemy",
+			"components": ["ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides":[{
+				"buffs": ["EmptyPlaceholder"],
+				"applyToTargetType": "Enemy"
+			},{
+				"buffs": ["SleepForcedThorns"],
+				"applyToTargetType": "Enemy",
+				"skipAbilityEffect": true,
+				"applyConditions": "NotPoisoned",
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs": ["MegaPoison"],
+				"applyToTargetType": "Enemy",
+				"skipAbilityEffect": true,
+				"applyConditions": "IsNotSleeping",
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs":["MaybeGrantSelfTurnLuBuDarkEBB","RemovePowerCharge"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"enemyEventType": "Finish",
+			"sourceEventType": "Finish",
+			"flags": ["NoDamage"],
+			"abilityEffect": "LubuDarkHeal1",
+			"useCondition": "HasPowerCharge"
+		},
+		"RandomEnemyBuffALuBuDarkBoss":{
+			"class": "AbilityConfig",
+			"targetingData": "RandomEnemy",
+			"components": ["ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"buffs": ["LuBuDarkBossCooldown100","LokiPloying"],
+				"skipAbilityEffect": true,
+				"applyToTargetType": "Source"
+			},{
+				"buffs": ["LokiPloy"],
+				"applyConditions": "EnemyPloySucceeded",
+				"skipAbilityEffect": true,
+				"applyToTargetType": "Enemy"
+			},{
+				"buffs": ["EmptyPlaceholder"],
+				"applyToTargetType": "Enemy"
+			}],
+			"useCondition": "NotInstantCooldownNoPloyingAllyEnemyNotAlone",
+			"enemyEventType": "Finish",
+			"sourceEventType": "Hit",
+			"abilityEffect": "LubuDarkOfuda1",
+			"flags": ["NoDamage", "StealthWorthy"]
+		},
+		"SingleAttackALuBuDarkBoss":{
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage"],
+			"componentOverrides": [{
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"damageFlags": ["HardIgnoreBlockDeath","IgnoreArmor","DoNotWake"],
+				"applyToTargetType": "Enemy"
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "MidEarth1",
+			"attackScalors": ["GoodVsProtector"],
+			"conditionedAbilityEffects": ["LubuDarkSP","LubuDarkSP"],
+			"useCondition": "NotLockedAndEnemyHasNonBurningProtector"
+		},
+		"SingleAttackAWhiteSnakeGirlDarkBoss":{
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage","ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"damageFlags": ["IgnoreArmor","HardIgnoreBlockDeath","IgnoreSkin"],
+				"applyToTargetType": "Enemy",
+				"drainPercent": 0.01,
+				"drainEffect": "VampireDrain1"
+			},{
+				"buffs": ["RemoveBurn"],
+				"applyToTargetType": "Enemy",
+				"showMissConditions": "ShowNoMiss",
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["SpiritDrainDContra"],
+				"applyConditions": "AllySpirit1OrMore",
+				"buffBackMode": true,
+				"skipAbilityEffect": true,
+				"applyToTargetType": "Enemy",
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs":["Active1LOCKWhiteSnakeGirlDarkBoss","RemoveActive3LOCKWhiteSnakeGirlDarkBoss"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "WhiteSnakeGirlDarkSnake",
+			"attackScalors": ["GoodIfGain1GoodBuff","GoodIfGain2GoodBuff","GoodIfGain3GoodBuff","GoodIfGain4GoodBuff","GoodIfGain5GoodBuff"],
+			"conditionedAbilityEffects": ["WhiteSnakeGirlDarkSnake","WhiteSnakeGirlDarkSnake","WhiteSnakeGirlDarkSnake","WhiteSnakeGirlDarkSnake","WhiteSnakeGirlDarkAttack1"],
+			"recommendEffectWhenUsable": -2,
+			"useCondition": "IsNotActive1LOCKWhiteSnakeGirlDark"
+		},
+		"AllyBuffAWhiteSnakeGirlDarkBoss":{
+			"class": "AbilityConfig",
+			"targetingData": "AllAlly",
+			"components": ["ApplyBuff","ApplyBuff"],
+			"componentOverrides":[{
+				"buffs": ["SuperStealth"],
+				"applyToTargetType": "Friendly"
+			},{
+				"buffs": ["GrantAllOtherKills1AlliesTurnEBB","Active2LOCKWhiteSnakeGirlDarkBoss"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"friendlyEventType": "Finish",
+			"sourceEventType": "Finish",
+			"flags": ["NoDamage","GiveTurn"],
+			"abilityEffect": "WhiteSnakeGirlDarkArmor",
+			"useCondition": "IsNotActive2LOCKWhiteSnakeGirlDark"
+		},
+		"DoubleAttackAWhiteSnakeGirlDarkBoss":{
+			"class": "AbilityConfig",
+			"targetingData": "2Enemy",
+			"components": ["Damage","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"applyToTargetType": "Enemy",
+				"damageFlags": ["IgnoreArmor","HardIgnoreBlockDeath"],
+				"drainPercent": 0.01,
+				"drainEffect": "VampireDrain1"
+			},{
+				"buffs": ["RemovePoisonImmunityOnce","MegaPoison","BurnImmunityTempForRevenge"],
+				"applyToTargetType": "Enemy",
+				"showMissConditions": "ShowNoMiss",
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["Active3LOCKWhiteSnakeGirlDarkBoss","RemoveActive1LOCKWhiteSnakeGirlDarkBoss","LoseMomentum","GainMomentum"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Hit",
+			"abilityEffect": "WhiteSnakeGirlDarkAttack1",
+			"attackScalors": ["GoodWithMomentum"],
+			"conditionedAbilityEffects": ["WhiteSnakeGirlDarkAttack1","WhiteSnakeGirlDarkAttack1"],
+			"recommendEffectWhenUsable": -2,
+			"flags": ["Poisoner"],
+			"useCondition": "IsNotActive3LOCKWhiteSnakeGirlDark"
+		},
+		"RandomEnemyBuffAWhiteSnakeGirlDarkBoss":{
+			"class": "AbilityConfig",
+			"targetingData": "AllEnemy",
+			"components": ["ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides":[{
+				"buffs": ["EmptyPlaceholder"],
+				"applyToTargetType": "Enemy"
+			},{
+				"buffs": ["KillRandomEnemyEOTAndCreditKillWhiteSnakeGirlDarkBoss"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss",
+				"applyConditions": "IsWorldDeathCounter1"
+			},{
+				"buffs": ["KillRandomEnemyEOTAndCreditKillWhiteSnakeGirlDarkBoss"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss",
+				"applyConditions": "IsWorldDeathCounter2"
+			},{
+				"buffs": ["KillRandomEnemyEOTAndCreditKillWhiteSnakeGirlDarkBoss"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss",
+				"applyConditions": "IsWorldDeathCounter3"
+			},{
+				"buffs": ["KillRandomEnemyEOTAndCreditKillWhiteSnakeGirlDarkBoss"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss",
+				"applyConditions": "IsWorldDeathCounter4"
+			},{
+				"buffs": ["KillRandomEnemyEOTAndCreditKillWhiteSnakeGirlDarkBoss"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss",
+				"applyConditions": "IsWorldDeathCounter5"
+			}],
+			"enemyEventType": "Finish",
+			"sourceEventType": "Finish",
+			"flags": ["NoDamage"],
+			"abilityEffect": "WhiteSnakeGirlDarkAllAttack",
+			"useCondition": "TimeInCombat100NotActive4LOCKWhiteSnakeGirlDark"
+		},
+		"SingleAttackAXiaoLiRegularBoss": {
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage","ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"applyToTargetType": "Enemy",
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"damageFlags": ["RemoveXiaoLiDefeatBuff","IgnoreArmor","HardIgnoreBlockDeath","IgnoreSkin","DoNotWake"]
+			},{
+				"buffs": ["RemoveStealth"],
+				"applyToTargetType": "Enemy",
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs": ["StoreEnergy","UsedAbilityCounter"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["GiveTurn","OnExtraTurn","JustGivenTurn","XiaoLiBossExtraTurn50TUTrigger"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss",
+				"applyConditions": "IsNotXiaoLiExtraTurn50TUTrigger"
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Hit",
+			"abilityEffect": "XiaoLiAttack1",
+			"attackScalors": ["GoodIfUsedOnce","GoodIfUsedTwice","GoodIfUsedThrice"],
+			"conditionedAbilityEffects": ["XiaoLiAttack1","XiaoLiAttack1","XiaoLiAttack1"],
+			"recommendEffectWhenUsable": -2
+		},
+		"DoubleAttackAXiaoLiRegularBoss": {
+			"class": "AbilityConfig",
+			"targetingData": "2Enemy",
+			"components": ["Damage", "ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides":[{
+				"applyToTargetType": "Enemy",
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"damageFlags": ["RemoveXiaoLiDefeatBuff","IgnoreArmor","HardIgnoreBlockDeath","IgnoreSkin","DoNotWake"]
+			},{
+				"buffs": ["RemoveBurn","RemoveSleepImmunityOnce","ColdSleepForced100TU"],
+				"applyToTargetType": "Enemy",
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs": ["StoreEnergy","GoodGirlBuffCounter"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["GiveTurn","OnExtraTurn","JustGivenTurn","XiaoLiBossExtraTurn50TUTrigger"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss",
+				"applyConditions": "IsNotXiaoLiExtraTurn50TUTrigger"
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "XiaoLiThrow",
+			"attackScalors": ["GoodIfGain1GoodBuff","GoodIfGain2GoodBuff","GoodIfGain3GoodBuff","GoodIfGain4GoodBuff","GoodIfGain5GoodBuff"],
+			"conditionedAbilityEffects": ["XiaoLiThrow","XiaoLiThrow","XiaoLiThrow","XiaoLiThrow","XiaoLiThrow"],
+			"flags": ["StealthWorthy"],
+			"recommendEffectWhenUsable": -2,
+			"useCondition": "IsCharged1Exact"
+		},
+		"SelfBuffAXiaoLiRegularBoss": {
+			"class": "AbilityConfig",
+			"targetingData": "SelfOnly",
+			"components": ["ApplyBuff"],
+			"componentOverrides":[{
+				"buffs": ["StunImmunityOnce","StoreEnergy","AttackPlus50Percent1TurnOnly"],
+				"applyToTargetType": "Source"
+			}],
+			"sourceEventType": "Finish",
+			"abilityEffect": "XiaoLiOnmyou",
+			"useCondition": "IsCharged2Exact"
+		},
+		"SpecialAttackAXiaoLiRegularBoss": {
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage","ApplyBuff","ApplyBuff"],
+			"componentOverrides":[{
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"damageFlags": ["IgnoreArmor","HardIgnoreBlockDeath","IgnoreSkin","DoNotWake"],
+				"applyToTargetType": "Enemy"
+			},{
+				"buffs": ["RemoveEnergy"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["GiveTurn","OnExtraTurn","JustGivenTurn","XiaoLiBossExtraTurn50TUTrigger"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss",
+				"applyConditions": "IsNotXiaoLiExtraTurn50TUTrigger"
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "XiaoLiSP",
+			"useCondition": "IsCharged3"
+		},
+		"DoubleAttackALuBuDark":{
+			"class": "AbilityConfig",
+			"targetingData": "2Enemy",
+			"components": ["Damage","ApplyBuff"],
+			"componentOverrides": [{
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"applyToTargetType": "Enemy",
+				"damageFlags": ["RemoveLuBuDarkDefeatBuff","HardIgnoreBlockDeath","IgnoreArmor","IgnoreSkin","DoNotWake"]
+			},{
+				"buffs":["PowerCharge"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Hit",
+			"abilityEffect": "LubuDarkAttack1",
+			"flags": ["IgnoreStealth"],
+			"attackScalors": ["GoodWithPoisonEnemy","GoodWithSleepingEnemy","GoodWithAllSleepingOrPoisonedEnemies"],
+			"conditionedAbilityEffects": ["LubuDarkAttack1","LubuDarkAttack1","LubuDarkAttack1","LubuDarkAttack1"],
+			"recommendEffectWhenUsable": -2
+		},
+		"EnemyBuffALuBuDark":{
+			"class": "AbilityConfig",
+			"targetingData": "AllEnemy",
+			"components": ["ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides":[{
+				"buffs": ["EmptyPlaceholder"],
+				"applyToTargetType": "Enemy"
+			},{
+				"buffs": ["SleepForcedThorns"],
+				"applyToTargetType": "Enemy",
+				"skipAbilityEffect": true,
+				"applyConditions": "NotPoisoned",
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs": ["MegaPoison"],
+				"applyToTargetType": "Enemy",
+				"skipAbilityEffect": true,
+				"applyConditions": "IsNotSleeping",
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs":["MaybeGrantSelfTurnLuBuDarkEBB","RemovePowerCharge"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"enemyEventType": "Finish",
+			"sourceEventType": "Finish",
+			"flags": ["NoDamage","PoisonChance","SleepChance"],
+			"abilityEffect": "LubuDarkHeal1",
+			"useCondition": "HasPowerCharge"
+		},
+		"RandomEnemyBuffALuBuDark":{
+			"class": "AbilityConfig",
+			"targetingData": "RandomEnemy",
+			"components": ["ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"buffs": ["LuBuDarkCooldown100","LuBuDarkPloying"],
+				"skipAbilityEffect": true,
+				"applyToTargetType": "Source"
+			},{
+				"buffs": ["LuBuDark3TurnsPloy"],
+				"applyConditions": "EnemyPloySucceeded",
+				"skipAbilityEffect": true,
+				"applyToTargetType": "Enemy"
+			},{
+				"buffs": ["EmptyPlaceholder"],
+				"applyToTargetType": "Enemy"
+			}],
+			"useCondition": "NotInstantCooldownNoPloyingAllyEnemyNotAlone",
+			"enemyEventType": "Finish",
+			"sourceEventType": "Hit",
+			"abilityEffect": "LubuDarkOfuda1",
+			"flags": ["NoDamage", "StealthWorthy"]
+		},
+		"SingleAttackALuBuDark":{
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage"],
+			"componentOverrides": [{
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"damageFlags": ["HardIgnoreBlockDeath","IgnoreArmor","DoNotWake"],
+				"applyToTargetType": "Enemy"
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "MidEarth1",
+			"attackScalors": ["GoodVsProtector"],
+			"conditionedAbilityEffects": ["LubuDarkSP","LubuDarkSP"],
+			"useCondition": "NotLockedAndEnemyHasNonBurningProtector"
 		}
 	}
 }
