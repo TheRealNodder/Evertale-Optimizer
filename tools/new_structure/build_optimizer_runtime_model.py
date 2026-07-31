@@ -307,16 +307,19 @@ def description_features(description: Any) -> List[str]:
                 break
 
     payoff_statuses = {
-        "payoff_burn": ("burning", "burned", "burn status"),
-        "payoff_poison": ("poisoned", "poison status", "mega poison", "super poison", "lethal poison"),
-        "payoff_sleep": ("sleeping", "asleep", "sleep status"),
-        "payoff_stun": ("stunned", "stun status"),
+        # Word boundaries are mandatory here: plain substring matching made
+        # "burned" match inside "frostburned" and fabricated normal-Burn
+        # payoff evidence for Frostburn-only skills.
+        "payoff_burn": (r"(?<!frost)(?<!non-)(?<!not )\bburning\b", r"(?<!frost)(?<!non-)(?<!not )\bburned\b", r"\bburn status\b"),
+        "payoff_poison": (r"(?<!non-)(?<!not )\bpoisoned\b", r"\bpoison status\b", r"\bmega poison\b", r"\bsuper poison\b", r"\blethal poison\b"),
+        "payoff_sleep": (r"(?<!non-)(?<!not )\bsleeping\b", r"(?<!not )\basleep\b", r"\bsleep status\b"),
+        "payoff_stun": (r"(?<!non-)(?<!not )\bstunned\b", r"\bstun status\b"),
     }
     benefit_words = ("damage", "attack", "heal", "spirit", "next turn", "tu cost", "usable", "unlocked", "increased", "reduced")
-    condition_words = (" if ", " when ", " while ", " against ", " for each ", " per ", " targets that ", " target is ", " user has ")
+    condition_words = (" if ", " when ", " while ", " against ", " for each ", " per ", " targets that ", " target is ", " allies that ", " user has ")
     for feature, statuses in payoff_statuses.items():
         for sentence in sentences:
-            if not any(status in sentence for status in statuses):
+            if not any(re.search(status, sentence) for status in statuses):
                 continue
             if any(blocked in sentence for blocked in ("immunity", " ward", "cannot be", "prevents ")):
                 continue
@@ -335,7 +338,7 @@ def description_features(description: Any) -> List[str]:
         features.add("role_cleanser")
     if re.search(r"\b(?:allies|ally|the user|user) gain(?:s)? (?:\d+ |one )?spirit\b", text):
         features.add("resource_spirit")
-    if re.search(r"\b(?:give|gives|grant|grants)\b.{0,100}\bnext turn\b", text) or re.search(r"\breduc(?:e|es|ing)\b.{0,100}\btu to 0\b", text):
+    if re.search(r"\b(?:give|gives|grant|grants)\b.{0,100}\bnext turns?\b", text) or re.search(r"\breduc(?:e|es|ing)\b.{0,100}\btu to 0\b", text):
         features.add("tempo_turn")
     if re.search(r"\badds? \d+\b.{0,100}\ballied reinforcements\b", text) or re.search(r"\bsummons?\b", text):
         features.add("summon")

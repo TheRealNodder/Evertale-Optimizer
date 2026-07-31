@@ -66,7 +66,7 @@
   function candidatePool(units,plan,format,targetElement,options){
     let source=rows(units).filter(unit=>uid(unit));
     if(targetElement)source=source.filter(unit=>(unit?.__v6?.element||P.key(unit?.element))===targetElement);
-    const cap=Math.max(P.story.total,Number(options?.candidateCap)||P.search.storyCandidateCap),chosen=new Map();
+    const intelligence=P.intelligenceProfile(options),cap=Math.max(P.story.total,Number(options?.candidateCap)||intelligence.storyCandidateCap),chosen=new Map();
     const add=unit=>{if(unit&&!chosen.has(uid(unit))&&chosen.size<cap)chosen.set(uid(unit),unit);};
     const profile=P.metaProfile(options),sorted=[...source].sort((a,b)=>unitPotential(b,plan,options)-unitPotential(a,plan,options)||P.identity(a).entry.localeCompare(P.identity(b).entry));
     lockedSeed(units,options).selected.forEach(add);
@@ -124,7 +124,7 @@
   function stateToken(selected){return selected.map(unit=>P.identity(unit).entry).sort().join('|');}
 
   function expandBeam(units,plan,format,targetElement,options={}){
-    const seed=lockedSeed(units,options),pool=candidatePool(units,plan,format,targetElement,options),width=Math.max(10,Number(options.beamWidth)||P.search.storyBeamWidth);
+    const intelligence=P.intelligenceProfile(options),seed=lockedSeed(units,options),pool=candidatePool(units,plan,format,targetElement,options),width=Math.max(10,Number(options.beamWidth)||intelligence.storyBeamWidth);
     if(seed.selected.length>P.story.total)return{teams:[],diagnostics:{reason:'too-many-locked-units'}};
     let beam=[{selected:seed.selected,summary:stateSummary(seed.selected,plan,options)}],generated=0,pruned=0;
     for(let depth=seed.selected.length;depth<P.story.total;depth++){
@@ -142,7 +142,7 @@
       progress(options,'story-search',depth+1,P.story.total,`Searching Story candidates (${depth+1}/${P.story.total})`);
       if(!beam.length)break;
     }
-    return{teams:beam.map(state=>state.selected),diagnostics:{poolSize:pool.length,beamWidth:width,generatedStates:generated,prunedStates:pruned,completeStates:beam.length,lockedUnits:seed.selected.length,targetElement:targetElement||''}};
+    return{teams:beam.map(state=>state.selected),diagnostics:{poolSize:pool.length,beamWidth:width,generatedStates:generated,prunedStates:pruned,completeStates:beam.length,lockedUnits:seed.selected.length,targetElement:targetElement||'',searchIntelligence:intelligence.level}};
   }
 
   function scoreRank(values,value){const sorted=[...values].sort((a,b)=>a-b),index=sorted.filter(row=>row<=value).length;return sorted.length?index/sorted.length*100:0;}
@@ -169,6 +169,7 @@
   }
 
   function optimizePlacement(selected,options){
+    const intelligence=P.intelligenceProfile(options);
     const map=byAnyId(selected),fixed=new Map();for(const slot of lockedSlots(options)){const unit=map.get(slot.id);if(unit)fixed.set(slot.position,unit);}
     const lockedUnits=new Set(fixed.values()),remaining=selected.filter(unit=>!lockedUnits.has(unit));
     const mainFixed=[...fixed.keys()].filter(position=>position<P.story.main).length,backFixed=fixed.size-mainFixed,needMain=P.story.main-mainFixed,needBack=P.story.back-backFixed;
@@ -180,17 +181,20 @@
       const quick=main.reduce((sum,unit)=>sum+num(values.get(unit)?.front),0)+back.reduce((sum,unit)=>sum+num(values.get(unit)?.back),0);placements.push({main,back,ordered,quick});
     }
     placements.sort((a,b)=>b.quick-a.quick||stateToken(a.ordered).localeCompare(stateToken(b.ordered)));
-    for(const placement of placements.slice(0,Number(options?.placementCombinations)||P.search.placementCombinations)){const evaluation=T.evaluate(placement.ordered,options);if(evaluation.valid&&(!best||evaluation.score>best.evaluation.score))best={...placement,story:{main:placement.main,back:placement.back},evaluation};}
+    const placementLimit=Math.max(1,Number(options?.placementCombinations)||intelligence.placementCombinations);
+    for(const placement of placements.slice(0,placementLimit)){const evaluation=T.evaluate(placement.ordered,options);if(evaluation.valid&&(!best||evaluation.score>best.evaluation.score))best={...placement,story:{main:placement.main,back:placement.back},evaluation};}
     return best;
   }
 
   function search(units,options={}){
-    const started=Date.now(),plan=P.key(options.plan||'hybrid')||'hybrid',format=modeOf(options),target=P.key(options.targetElement||'');
+    const started=Date.now(),intelligence=P.intelligenceProfile(options),plan=P.key(options.plan||'hybrid')||'hybrid',format=modeOf(options),target=P.key(options.targetElement||'');
     const beam=expandBeam(units,plan,format,target,options),complete=[];
-    for(const selected of beam.teams.slice(0,Number(options?.placementFinalists)||P.search.storyPlacementFinalists)){abortIfNeeded(options);const placed=optimizePlacement(selected,{...options,plan,format});if(placed)complete.push(placed);}
+    const finalistLimit=Math.max(1,Number(options?.placementFinalists)||intelligence.storyPlacementFinalists);
+    const placementLimit=Math.max(1,Number(options?.placementCombinations)||intelligence.placementCombinations);
+    for(const selected of beam.teams.slice(0,finalistLimit)){abortIfNeeded(options);const placed=optimizePlacement(selected,{...options,plan,format});if(placed)complete.push(placed);}
     complete.sort((a,b)=>b.evaluation.score-a.evaluation.score||stateToken(a.ordered).localeCompare(stateToken(b.ordered)));
     const distinct=[];for(const candidate of complete){const ids=new Set(candidate.ordered.map(uid));if(distinct.every(other=>other.ordered.filter(unit=>ids.has(uid(unit))).length<=6))distinct.push(candidate);if(distinct.length>=P.search.alternatives)break;}
-    return{best:complete[0]||null,alternatives:distinct.slice(1),diagnostics:{...beam.diagnostics,plan,format,durationMs:Date.now()-started,evaluatedTeams:complete.length}};
+    return{best:complete[0]||null,alternatives:distinct.slice(1),diagnostics:{...beam.diagnostics,plan,format,durationMs:Date.now()-started,evaluatedTeams:complete.length,placementFinalists:finalistLimit,placementCombinations:placementLimit}};
   }
 
   function bestMono(units,options={}){

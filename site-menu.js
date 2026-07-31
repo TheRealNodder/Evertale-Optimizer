@@ -88,7 +88,17 @@
     const swatches=root.querySelector('.siteThemeSwatches');
     if(swatches){
       const resolvedKey=select.value==='auto'?resolved?.key:'';
-      swatches.innerHTML=grouped.map(row=>`<section class="siteThemeSwatchGroup" data-theme-group="${row.group}"><div class="siteThemeSwatchDivider">${row.group}</div><div class="siteThemeSwatchGrid">${row.items.map(item=>`<button type="button" class="siteThemeSwatch${item.material==='gem'?' gem':item.material==='legendary'?' legendary':''}${item.key===select.value||item.key===resolvedKey?' active':''}" data-theme-key="${item.key}" aria-label="${item.label}" title="${item.label}" style="--swatch-a:${item.bg};--swatch-b:${item.surface};--swatch-c:${item.accent};"></button>`).join('')}</div></section>`).join('');
+      const activeKey=select.value==='auto'?resolvedKey:select.value;
+      const existing=Array.from(swatches.querySelectorAll('[data-theme-key]'));
+      if(existing.length!==items.length){
+        swatches.innerHTML=grouped.map(row=>`<section class="siteThemeSwatchGroup" data-theme-group="${row.group}"><div class="siteThemeSwatchDivider">${row.group}</div><div class="siteThemeSwatchGrid">${row.items.map(item=>`<button type="button" class="siteThemeSwatch${item.material==='gem'?' gem':item.material==='legendary'?' legendary':item.material==='handheld'?' handheld':''}${item.key===activeKey?' active':''}" data-theme-key="${item.key}" aria-label="${item.label}" aria-pressed="${item.key===activeKey}" title="${item.label}" style="--swatch-a:${item.bg};--swatch-b:${item.surface};--swatch-c:${item.accent};"></button>`).join('')}</div></section>`).join('');
+      }else{
+        existing.forEach(button=>{
+          const selected=button.dataset.themeKey===activeKey;
+          button.classList.toggle('active',selected);
+          button.setAttribute('aria-pressed',String(selected));
+        });
+      }
       if(!swatches.dataset.bound){
         swatches.dataset.bound='1';
         swatches.addEventListener('click',event=>{

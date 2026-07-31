@@ -6,37 +6,46 @@
   const HOLIDAY_KEYS=new Set(['newyear','valentine','stpatrick','easter','independence','halloween','thanksgiving','christmas']);
   const GEM_KEYS=new Set(['gold','silver','ruby','sapphire','emerald','amethyst','diamond','pearl','platinum','opal','topaz','jade','obsidian','quartz']);
   const POKEMON_KEYS=new Set(['gold','silver','ruby','sapphire','emerald','diamond','pearl','platinum']);
-  const HANDHELD_KEYS=new Set(['crimsonblack','cobaltblack','metallicrose','bronzexl','blackwhitedsi','galaxystyle','superfamicom']);
+  const HANDHELD_META={
+    crimsonblack:{effect:'ds-lite',finish:'gloss-crimson',hardware:'ds-lite',aura:'Gloss crimson lid over a matte black body'},
+    cobaltblack:{effect:'ds-lite',finish:'gloss-cobalt',hardware:'ds-lite',aura:'Gloss cobalt lid over a matte black body'},
+    metallicrose:{effect:'dsi-xl',finish:'metallic-rose',hardware:'dsi-xl',aura:'Metallic pink shell with a luminous modern sheen'},
+    bronzexl:{effect:'dsi-xl',finish:'bronze',hardware:'dsi-xl',aura:'Dark bronze upper shell with a warm matte base'},
+    blackwhitedsi:{effect:'dsi-split',finish:'black-white',hardware:'dsi',aura:'Paired black and white DSi edition shells with restrained dual-dragon traces'},
+    galaxystyle:{effect:'galaxy-shell',finish:'galaxy',hardware:'new-3ds-xl',aura:'Deep navy and violet galaxy lid over a black inner shell'},
+    superfamicom:{effect:'super-famicom',finish:'warm-plastic',hardware:'new-3ds-ll',aura:'Warm grey hardware with the four Super Famicom button colors'}
+  };
+  const HANDHELD_KEYS=new Set(Object.keys(HANDHELD_META));
   const LEGENDARY_META={
-    hooh:{group:'Pokémon · Johto',body:'#e84a32',energy:'#f4c84a',detail:'#3c9a68'},
-    lugia:{group:'Pokémon · Johto',body:'#e7edf0',energy:'#4d65a8',detail:'#d76b72'},
-    suicune:{group:'Pokémon · Johto',body:'#74bbc2',energy:'#9d72c5',detail:'#f5f7ef'},
-    groudon:{group:'Pokémon · Hoenn',body:'#d83c2f',energy:'#00d9ff',detail:'#f5d44c'},
-    kyogre:{group:'Pokémon · Hoenn',body:'#0964a8',energy:'#ff315f',detail:'#eef7ff'},
-    rayquaza:{group:'Pokémon · Hoenn',body:'#247b4d',energy:'#f2cf3f',detail:'#df5872'},
-    shinyprimalgroudon:{group:'Pokémon · Hoenn Shiny',body:'#24231f',energy:'#fff0b5',detail:'#f0a8a0'},
-    shinyprimalkyogre:{group:'Pokémon · Hoenn Shiny',body:'#17191d',energy:'#f3dc54',detail:'#9a4da4'},
-    shinymegarayquaza:{group:'Pokémon · Hoenn Shiny',body:'#171719',energy:'#ffb63d',detail:'#ff5a46'},
-    dialga:{group:'Pokémon · Sinnoh',body:'#486187',energy:'#7cd9e8',detail:'#e2edf4'},
-    palkia:{group:'Pokémon · Sinnoh',body:'#e7dfe4',energy:'#e88bc1',detail:'#8f6eb2'},
-    giratina:{group:'Pokémon · Sinnoh',body:'#b9b4aa',energy:'#e2c451',detail:'#c9534e'},
-    arceus:{group:'Pokémon · Sinnoh',body:'#e7e8e4',energy:'#c8ae52',detail:'#6fbf87'},
-    reshiram:{group:'Pokémon · Unova',body:'#e9f3f1',energy:'#ff8450',detail:'#8eb6e8'},
-    zekrom:{group:'Pokémon · Unova',body:'#24272b',energy:'#35d5e6',detail:'#ef4b5d'},
-    blackkyurem:{group:'Pokémon · Unova',body:'#343a3d',energy:'#35b8e8',detail:'#f59e47'},
-    whitekyurem:{group:'Pokémon · Unova',body:'#f4f1ec',energy:'#ff7048',detail:'#63c7e8'},
-    xerneas:{group:'Pokémon · Kalos / Z-A',body:'#597ab6',energy:'#73e3d1',detail:'#e26b6b'},
-    yveltal:{group:'Pokémon · Kalos / Z-A',body:'#e73725',energy:'#252a35',detail:'#eff1f5'},
-    zygarde:{group:'Pokémon · Kalos / Z-A',body:'#373a30',energy:'#a7db3d',detail:'#5fd7d7'},
-    solgaleo:{group:'Pokémon · Alola',body:'#f8f7ef',energy:'#e8b945',detail:'#d75135'},
-    lunala:{group:'Pokémon · Alola',body:'#3b2c7b',energy:'#dc62e4',detail:'#d6c771'},
-    ultranecrozma:{group:'Pokémon · Alola',body:'#fff2a3',energy:'#5ed7ff',detail:'#e85fc3'},
-    zacian:{group:'Pokémon · Galar',body:'#4687c2',energy:'#e1b951',detail:'#d28d7b'},
-    zamazenta:{group:'Pokémon · Galar',body:'#ac3f45',energy:'#e1b446',detail:'#2f416f'},
-    eternatus:{group:'Pokémon · Galar',body:'#3c2756',energy:'#ff2f92',detail:'#56d6e5'},
-    koraidon:{group:'Pokémon · Paldea',body:'#e94841',energy:'#1680cf',detail:'#f5efe7'},
-    miraidon:{group:'Pokémon · Paldea',body:'#37328a',energy:'#f9ef80',detail:'#7edcf1'},
-    terapagos:{group:'Pokémon · Paldea',body:'#67bda9',energy:'#8070dc',detail:'#f0f7ff'}
+    hooh:{group:'Pokémon · Johto',body:'#d84a32',energy:'#f6c94e',detail:'#32a976',effect:'rebirth',aura:'Prismatic feather arcs and a warm rekindling pulse'},
+    lugia:{group:'Pokémon · Johto',body:'#eef4f5',energy:'#4e88c3',detail:'#80d7e5',effect:'abyss-wind',aura:'Deep-water caustics and broad atmospheric pressure waves'},
+    suicune:{group:'Pokémon · Johto',body:'#315fb8',energy:'#8ce8f1',detail:'#7658c9',effect:'aurora-water',aura:'North-wind ribbons and clear purification ripples'},
+    groudon:{group:'Pokémon · Hoenn',body:'#a62d29',energy:'#e0b34b',detail:'#c99736',effect:'magma',aura:'Fault lines, ground heat, and drought pressure'},
+    kyogre:{group:'Pokémon · Hoenn',body:'#125aa2',energy:'#8ddff0',detail:'#e9f7fb',effect:'ocean-pressure',aura:'Rain bands, ocean pressure rings, and underwater caustics'},
+    rayquaza:{group:'Pokémon · Hoenn',body:'#168657',energy:'#e6c14b',detail:'#b42e35',effect:'delta-stream',aura:'High-altitude streams, ozone currents, and sparse meteors'},
+    shinyprimalgroudon:{group:'Pokémon · Hoenn Shiny',body:'#241313',energy:'#ffd45a',detail:'#f05a24',effect:'magma',aura:'Molten fissures, convection, and harsh solar pressure'},
+    shinyprimalkyogre:{group:'Pokémon · Hoenn Shiny',body:'#531442',energy:'#32e3ee',detail:'#f4faff',effect:'ocean-pressure',aura:'Magenta primal body light, cyan lines, heavy rain, and broad ocean swells'},
+    shinymegarayquaza:{group:'Pokémon · Hoenn Shiny',body:'#080a09',energy:'#ffd84b',detail:'#e33d37',effect:'delta-stream',aura:'Black form, gold tendrils, red trim, and a controlled high-altitude vortex'},
+    dialga:{group:'Pokémon · Sinnoh',body:'#476f9a',energy:'#78d8e8',detail:'#c8d6df',effect:'time-rings',aura:'Concentric temporal rings and stepped time scans'},
+    palkia:{group:'Pokémon · Sinnoh',body:'#f0ecec',energy:'#d17ba7',detail:'#9175c5',effect:'space-rift',aura:'Parallax planes and a subtle spatial seam'},
+    giratina:{group:'Pokémon · Sinnoh',body:'#17151b',energy:'#c79a38',detail:'#a82837',effect:'distortion',aura:'Reverse-falling particles and folded broken planes'},
+    arceus:{group:'Pokémon · Sinnoh',body:'#f2f0e4',energy:'#d6b64a',detail:'#ffffff',effect:'creation',aura:'Ordered cosmic rings and a calm creation halo'},
+    reshiram:{group:'Pokémon · Unova',body:'#f2f0e8',energy:'#f17b45',detail:'#bfe8f3',effect:'white-flame',aura:'Atmospheric convection and a white-hot turbine spiral'},
+    zekrom:{group:'Pokémon · Unova',body:'#11151b',energy:'#41d2e5',detail:'#2879c8',effect:'thunder-generator',aura:'Cloud pressure and a restrained electric generator pulse'},
+    blackkyurem:{group:'Pokémon · Unova',body:'#1d242c',energy:'#87e6f3',detail:'#398dde',effect:'freeze-shock',aura:'Electric bridges through angular frozen structures'},
+    whitekyurem:{group:'Pokémon · Unova',body:'#e9f4f3',energy:'#f07a3e',detail:'#89ddeb',effect:'ice-burn',aura:'Warm light moving beneath cold crystalline layers'},
+    xerneas:{group:'Pokémon · Kalos / Z-A',body:'#13213c',energy:'#73e3d1',detail:'#d0aa42',effect:'life-antlers',aura:'Structured antler light rising from root-like lines'},
+    yveltal:{group:'Pokémon · Kalos / Z-A',body:'#a92232',energy:'#101014',detail:'#d2cbd0',effect:'cocoon-drain',aura:'Particles drawn inward toward a wing-shaped shadow'},
+    zygarde:{group:'Pokémon · Kalos / Z-A',body:'#101414',energy:'#74d84d',detail:'#d33b42',effect:'cell-grid',aura:'Cells assembling on a corrective hex grid'},
+    solgaleo:{group:'Pokémon · Alola',body:'#f5f3e9',energy:'#f3c445',detail:'#67bfd7',effect:'solar-corona',aura:'A breathing solar corona and clean radiant flare'},
+    lunala:{group:'Pokémon · Alola',body:'#111637',energy:'#b847a4',detail:'#4cc7d7',effect:'lunar-phase',aura:'Moon halo, constellation edges, and slow phase breathing'},
+    ultranecrozma:{group:'Pokémon · Alola',body:'#fff2a4',energy:'#58d9e9',detail:'#f9d834',effect:'prism-rays',aura:'Hard-edged refraction from brilliant crystalline facets'},
+    zacian:{group:'Pokémon · Galar',body:'#4ebccb',energy:'#e8be4d',detail:'#b44985',effect:'blade-trail',aura:'Poised directional streaks and a single clean blade trail'},
+    zamazenta:{group:'Pokémon · Galar',body:'#b12e3d',energy:'#ddb94e',detail:'#5db9c9',effect:'shield-wave',aura:'Stable shield geometry and a rebounding pressure wave'},
+    eternatus:{group:'Pokémon · Galar',body:'#090b18',energy:'#cb2c79',detail:'#5acad7',effect:'dynamax-core',aura:'Skeletal radial limbs around a controlled energy core'},
+    koraidon:{group:'Pokémon · Paldea',body:'#c83e35',energy:'#e65c37',detail:'#e8d5b5',effect:'ancient-pulse',aura:'Organic rhythm, sunlight, and grounded dust pulses'},
+    miraidon:{group:'Pokémon · Paldea',body:'#6b4acb',energy:'#43d8e4',detail:'#d9e655',effect:'future-grid',aura:'Smooth hover energy, plasma rings, and an electric terrain grid'},
+    terapagos:{group:'Pokémon · Paldea',body:'#42c9c5',energy:'#8070dc',detail:'#ebffff',effect:'stellar-crystal',aura:'Crystal tessellation and slow stellar refraction'}
   };
   const LEGENDARY_KEYS=new Set(Object.keys(LEGENDARY_META));
   const THEME_GROUP_ORDER=[
@@ -81,22 +90,22 @@
     topaz:['#211205','#854d0e','#f59e0b','#fff7d6'],
     jade:['#061d17','#176b51','#6ee7b7','#edfff8'],
     obsidian:['#030308','#1c1628','#8b5cf6','#f5f3ff'],
-    crimsonblack:['#050609','#3b0b14','#c51f36','#f7f5f4'],
-    cobaltblack:['#04070e','#10245b','#315fc4','#f2f6ff'],
-    metallicrose:['#180d15','#6f3651','#d58aaa','#fff2f7'],
-    bronzexl:['#15110c','#59432f','#a7835f','#f8ead7'],
-    blackwhitedsi:['#050608','#3c4147','#e8ecec','#ffffff'],
-    galaxystyle:['#050821','#193b8a','#c451d5','#f1f4ff'],
-    superfamicom:['#17171c','#575762','#9b85c5','#f7f6f2'],
+    crimsonblack:['#050609','#361017','#c63d48','#f7f5f4'],
+    cobaltblack:['#04070e','#132551','#315ea4','#f2f6ff'],
+    metallicrose:['#180d15','#6b3a50','#d69bad','#fff2f7'],
+    bronzexl:['#15110c','#4b3027','#a67850','#e9decb'],
+    blackwhitedsi:['#090a0c','#27292d','#aeb3b8','#f4f3ef'],
+    galaxystyle:['#050617','#161b57','#a84c9a','#f1f4ff'],
+    superfamicom:['#202024','#4d4d52','#c94238','#f7f3e9'],
     hooh:['#1c0806','#713025','#f2b13d','#fff0df'],
     lugia:['#080c1c','#38436d','#6fa7ff','#f3f6ff'],
     suicune:['#07171d','#356f78','#a26bc2','#effcff'],
-    groudon:['#230605','#8e231c','#00d9ff','#fff0ea'],
-    kyogre:['#03152b','#07579a','#ff315f','#edf7ff'],
+    groudon:['#230605','#8e231c','#e0b34b','#fff0ea'],
+    kyogre:['#03152b','#07579a','#8ddff0','#edf7ff'],
     rayquaza:['#04180f','#24754c','#f2cf3f','#efffe9'],
     shinyprimalgroudon:['#070706','#292724','#fff0b5','#fffaf0'],
-    shinyprimalkyogre:['#04060a','#20232a','#f3dc54','#f5f8ff'],
-    shinymegarayquaza:['#050505','#41231f','#ffb63d','#fff2e6'],
+    shinyprimalkyogre:['#09030c','#4a123f','#32e3ee','#fff5fb'],
+    shinymegarayquaza:['#050505','#1e1715','#ffd84b','#fff2e6'],
     dialga:['#071322','#2f4d74','#7cd9e8','#effbff'],
     palkia:['#160c1c','#665467','#e88bc1','#fff4fb'],
     giratina:['#120e0a','#4e4640','#e2c451','#fff6e4'],
@@ -129,8 +138,8 @@
     amethyst:'Amethyst',diamond:'Diamond',pearl:'Pearl',platinum:'Platinum',opal:'Opal',topaz:'Topaz',jade:'Jade',obsidian:'Obsidian',
     crimsonblack:'DS Lite · Crimson/Black',cobaltblack:'DS Lite · Cobalt/Black',
     metallicrose:'DSi XL · Metallic Rose',bronzexl:'DSi XL · Bronze',
-    blackwhitedsi:'Pokémon Black & White DSi',galaxystyle:'New 3DS XL · Galaxy',
-    superfamicom:'New 3DS · Super Famicom',
+    blackwhitedsi:'DSi · Pokémon Black / White Editions',galaxystyle:'New 3DS XL · Galaxy',
+    superfamicom:'New 3DS LL · Super Famicom',
     hooh:'Ho-Oh',lugia:'Lugia',suicune:'Suicune',
     groudon:'Groudon',kyogre:'Kyogre',rayquaza:'Rayquaza',
     shinyprimalgroudon:'Shiny Primal Groudon',shinyprimalkyogre:'Shiny Primal Kyogre',
@@ -315,15 +324,20 @@
   }
   function themeConfig(key){
     const colors=themes[key]||themes.winter;
-    const accent=displayAccents[key]||colors[2];
     const legendary=LEGENDARY_META[key]||null;
-    const material=legendary?'legendary':(GEM_KEYS.has(key)?'gem':'standard');
+    const handheld=HANDHELD_META[key]||null;
+    const accent=displayAccents[key]||legendary?.energy||colors[2];
+    const material=legendary?'legendary':(handheld?'handheld':(GEM_KEYS.has(key)?'gem':'standard'));
     const group=legendary?.group||(POKEMON_KEYS.has(key)?'Pokémon · Versions':(GEM_KEYS.has(key)?'Gems & Minerals':(HANDHELD_KEYS.has(key)?'DS & 3DS':(SEASON_KEYS.has(key)||HOLIDAY_KEYS.has(key)?'Calendar':'Signature'))));
     return {
       key,
       label:themeLabels[key]||String(key||'Theme').replace(/(^|[-_])\w/g,s=>s.replace(/[-_]/,'').toUpperCase()),
       material,
       group,
+      effect:legendary?.effect||handheld?.effect||'',
+      finish:handheld?.finish||'',
+      hardware:handheld?.hardware||'',
+      aura:legendary?.aura||handheld?.aura||'',
       bg:colors[0],
       surface:colors[1],
       secondary:colors[1],
@@ -345,96 +359,30 @@
     return[(n>>16)&255,(n>>8)&255,n&255].join(',');
   }
   function setVar(root,name,value){root.style.setProperty(name,value);}
-  function installMaterialStyles(){
-    if(document.getElementById('evertale-material-theme-style'))return;
-    const style=document.createElement('style');
-    style.id='evertale-material-theme-style';
-    style.textContent=`
-      @property --evertale-legendary-outline{
-        syntax:'<color>';
-        inherits:true;
-        initial-value:#ffffff;
-      }
-      @keyframes evertale-gem-sheen{
-        0%{background-position:180% 0,0 0,0 0,0 0;}
-        50%{background-position:45% 0,0 0,0 0,0 0;}
-        100%{background-position:-85% 0,0 0,0 0,0 0;}
-      }
-      @keyframes evertale-legendary-outline-pulse{
-        0%,100%{--evertale-legendary-outline:var(--legendary-energy);}
-        50%{--evertale-legendary-outline:color-mix(in srgb,var(--legendary-energy) 82%,#05070c);}
-      }
-      @keyframes evertale-legendary-aura{
-        0%,100%{background-position:0% 0%,100% 0%,0 0,0 0;}
-        50%{background-position:24% 10%,76% 16%,100% 0,0 0;}
-      }
-      html[data-theme-material="gem"] body,
-      html[data-theme-material="gem"] body.page-catalog-v2,
-      html[data-theme-material="gem"] body.page-roster-v2,
-      html[data-theme-material="gem"] body.page-optimizer,
-      html[data-theme-material="gem"] body.page-optimizer-v2{
-        background:
-          linear-gradient(112deg,transparent 0 38%,rgba(255,255,255,0) 43%,rgba(255,255,255,.13) 48%,rgba(var(--site-theme-rgb),.20) 52%,rgba(255,255,255,0) 59%,transparent 100%),
-          radial-gradient(circle at 7% 4%,rgba(var(--site-theme-rgb),.28),transparent 31%),
-          radial-gradient(circle at 92% 7%,color-mix(in srgb,var(--site-theme-secondary) 24%,transparent),transparent 29%),
-          linear-gradient(180deg,color-mix(in srgb,var(--site-theme-bg) 82%,#03050a) 0%,color-mix(in srgb,var(--site-theme-surface) 58%,#060812) 48%,#030309 100%)!important;
-        background-size:260% 100%,100% 100%,100% 100%,100% 100%!important;
-        background-attachment:fixed!important;
-        animation:evertale-gem-sheen 18s ease-in-out infinite!important;
-      }
-      html[data-theme-material="legendary"]{
-        animation:evertale-legendary-outline-pulse 6.4s ease-in-out infinite!important;
-      }
-      html[data-theme-material="legendary"] body,
-      html[data-theme-material="legendary"] body.page-catalog-v2,
-      html[data-theme-material="legendary"] body.page-roster-v2,
-      html[data-theme-material="legendary"] body.page-optimizer,
-      html[data-theme-material="legendary"] body.page-optimizer-v2{
-        background:
-          radial-gradient(circle at 10% 3%,rgba(var(--legendary-body-rgb),.32),transparent 32%),
-          radial-gradient(circle at 90% 6%,rgba(var(--legendary-energy-rgb),.27),transparent 30%),
-          linear-gradient(118deg,rgba(var(--legendary-body-rgb),.10),transparent 38%,rgba(var(--legendary-energy-rgb),.13) 62%,transparent 84%),
-          linear-gradient(180deg,color-mix(in srgb,var(--site-theme-bg) 84%,#020409) 0%,color-mix(in srgb,var(--site-theme-surface) 54%,#050711) 48%,#020308 100%)!important;
-        background-size:120% 120%,120% 120%,220% 100%,100% 100%!important;
-        background-attachment:fixed!important;
-        animation:evertale-legendary-aura 11s ease-in-out infinite!important;
-      }
-      html[data-theme-material="legendary"] :is(.v2-panel,.v2-grid-panel,.v2-detail-panel,.v2-card-skill-panel){
-        background:
-          linear-gradient(142deg,rgba(var(--legendary-body-rgb),.16),transparent 36%,rgba(var(--legendary-energy-rgb),.09) 72%),
-          linear-gradient(180deg,color-mix(in srgb,var(--site-theme-bg) 70%,#03050b),color-mix(in srgb,var(--site-theme-surface) 28%,#050712))!important;
-        border-color:var(--evertale-legendary-outline)!important;
-        box-shadow:0 14px 34px rgba(0,0,0,.38),0 0 18px color-mix(in srgb,var(--evertale-legendary-outline) 22%,transparent)!important;
-      }
-      html[data-theme-material="legendary"] body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-main .v2-hero .v2-filter-panel{
-        background:
-          linear-gradient(142deg,rgba(var(--legendary-body-rgb),.16),transparent 36%,rgba(var(--legendary-energy-rgb),.09) 72%),
-          linear-gradient(180deg,color-mix(in srgb,var(--site-theme-bg) 70%,#03050b),color-mix(in srgb,var(--site-theme-surface) 28%,#050712))!important;
-        border-color:var(--evertale-legendary-outline)!important;
-        box-shadow:0 14px 34px rgba(0,0,0,.38),0 0 18px color-mix(in srgb,var(--evertale-legendary-outline) 22%,transparent)!important;
-      }
-      html[data-theme-material="legendary"] :is(.v2-grid-head h2,.v2-filter-title,.v2-detail-title){
-        color:var(--legendary-detail)!important;
-        text-shadow:0 0 14px rgba(var(--legendary-detail-rgb),.32)!important;
-      }
-      html[data-theme-material="legendary"] body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-main .v2-hero .v2-filter-panel .v2-filter-title{
-        color:var(--legendary-detail)!important;
-        text-shadow:0 0 14px rgba(var(--legendary-detail-rgb),.32)!important;
-      }
-      html[data-theme-material="legendary"] .v2-filter-panel :is(input,select){
-        background:color-mix(in srgb,var(--site-theme-bg) 54%,#070a14)!important;
-        border-color:color-mix(in srgb,var(--evertale-legendary-outline) 48%,#374057)!important;
-      }
-      @media (prefers-reduced-motion:reduce){
-        html[data-theme-material="gem"] body{animation:none!important;background-position:45% 0,0 0,0 0,0 0!important;}
-        html[data-theme-material="legendary"]{animation:none!important;--evertale-legendary-outline:var(--legendary-energy)!important;}
-        html[data-theme-material="legendary"] body{animation:none!important;background-position:12% 4%,88% 6%,50% 0,0 0!important;}
-      }
-    `;
-    document.head.appendChild(style);
+  function ensureEffectLayer(){
+    if(!document.body)return null;
+    let layer=document.getElementById('siteThemeFx');
+    if(layer)return layer;
+    layer=document.createElement('div');
+    layer.id='siteThemeFx';
+    layer.className='siteThemeFx';
+    layer.setAttribute('aria-hidden','true');
+    const field=document.createElement('div');
+    const particles=document.createElement('div');
+    field.className='siteThemeFx__field';
+    particles.className='siteThemeFx__particles';
+    layer.append(field,particles);
+    document.body.insertBefore(layer,document.body.firstChild);
+    return layer;
+  }
+  function syncThemeMotion(){
+    const value=document.hidden?'paused':'running';
+    document.documentElement.setAttribute('data-theme-motion',value);
+    if(document.body)document.body.setAttribute('data-theme-motion',value);
   }
   function applyTheme(){
-    installMaterialStyles();
+    ensureEffectLayer();
+    syncThemeMotion();
     const active=resolvedTheme();
     const requested=active.requested;
     const key=active.key;
@@ -489,6 +437,10 @@
     root.setAttribute('data-theme-season',cfg.season);
     root.setAttribute('data-theme-holiday',cfg.holiday);
     root.setAttribute('data-theme-material',cfg.material);
+    root.setAttribute('data-theme-family',cfg.material);
+    root.setAttribute('data-theme-effect',cfg.effect||'');
+    root.setAttribute('data-theme-finish',cfg.finish||'');
+    root.setAttribute('data-theme-hardware',cfg.hardware||'');
     if(document.body){
       document.body.setAttribute('data-theme-key',key);
       document.body.setAttribute('data-theme-label',cfg.label);
@@ -497,6 +449,10 @@
       document.body.setAttribute('data-theme-season',cfg.season);
       document.body.setAttribute('data-theme-holiday',cfg.holiday);
       document.body.setAttribute('data-theme-material',cfg.material);
+      document.body.setAttribute('data-theme-family',cfg.material);
+      document.body.setAttribute('data-theme-effect',cfg.effect||'');
+      document.body.setAttribute('data-theme-finish',cfg.finish||'');
+      document.body.setAttribute('data-theme-hardware',cfg.hardware||'');
     }
     syncThemeLinks();
     observeThemeLinks();
@@ -532,6 +488,6 @@
     }
   };
   document.readyState==='loading'?document.addEventListener('DOMContentLoaded',applyTheme,{once:true}):applyTheme();
-  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&pref()===AUTO)applyTheme();});
+  document.addEventListener('visibilitychange',()=>{syncThemeMotion();if(!document.hidden&&pref()===AUTO)applyTheme();});
   setInterval(()=>{if(pref()===AUTO)applyTheme();},30*60*1000);
 })();

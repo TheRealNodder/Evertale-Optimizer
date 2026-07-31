@@ -24,6 +24,7 @@ const LS_LOCKS_KEY = "evertale_optimizer_slotLocks_v1";
 const LS_PRIMARY_ARCHETYPE_KEY = "evertale_optimizer_primaryArchetype_v1";
 const LS_SECONDARY_ARCHETYPE_KEY = "evertale_optimizer_secondaryArchetype_v1";
 const LS_META_WEIGHT_KEY = "evertale_optimizer_metaWeight_v1";
+const LS_SEARCH_INTELLIGENCE_KEY = "evertale_optimizer_searchIntelligence_v1";
 
 const ARCHETYPE_OPTIONS = new Set(["","none","burn","poison","sleep","stun","heal","turn","cleanse","defense","guardian","stealth","spirit","charge","blood","crisis","survivor"]);
 
@@ -86,6 +87,13 @@ function getMetaWeightPref() {
   return (v === "off" || v === "balanced" || v === "strong") ? v : "balanced";
 }
 function setMetaWeightPref(v) { localStorage.setItem(LS_META_WEIGHT_KEY, (v === "off" || v === "strong") ? v : "balanced"); }
+function getSearchIntelligencePref() {
+  const v = localStorage.getItem(LS_SEARCH_INTELLIGENCE_KEY) || "deep";
+  return (v === "standard" || v === "deep" || v === "ultra") ? v : "deep";
+}
+function setSearchIntelligencePref(v) {
+  localStorage.setItem(LS_SEARCH_INTELLIGENCE_KEY, (v === "standard" || v === "ultra") ? v : "deep");
+}
 
 function defaultLocks() {
   return {
@@ -137,11 +145,13 @@ function initSharedOptimizerFiltersUI() {
   const primarySel = el("primaryArchetypeSelect");
   const secondarySel = el("secondaryArchetypeSelect");
   const metaWeightSel = el("metaWeightSelect");
+  const intelligenceSel = el("searchIntelligenceSelect");
   if (teamSel) teamSel.value = getTeamTypePref();
   if (presetSel) presetSel.value = getPresetPref();
   if (primarySel) primarySel.value = getPrimaryArchetypePref();
   if (secondarySel) secondarySel.value = getSecondaryArchetypePref() || "none";
   if (metaWeightSel) metaWeightSel.value = getMetaWeightPref();
+  if (intelligenceSel) intelligenceSel.value = getSearchIntelligencePref();
   syncArchetypeDropdowns();
   teamSel?.addEventListener("change", (e) => setTeamTypePref(e.target.value || "auto"));
   presetSel?.addEventListener("change", (e) => setPresetPref(e.target.value || "auto"));
@@ -154,6 +164,7 @@ function initSharedOptimizerFiltersUI() {
     syncArchetypeDropdowns();
   });
   metaWeightSel?.addEventListener("change", (e) => setMetaWeightPref(e.target.value || "balanced"));
+  intelligenceSel?.addEventListener("change", (e) => setSearchIntelligencePref(e.target.value || "deep"));
 }
 
 function getOwnedIds() {
@@ -694,6 +705,7 @@ async function buildExampleTeam() {
   const unlockedLocks = defaultLocks();
 
   const poolSig = examplePool.map(u => normId(u?.id)).filter(Boolean).join("|");
+  const advisoryKey = window.OptimizerMetaAdvisory?.getEngineOptions?.() || { enabled: false };
   const cacheKey = [
     state.mode,
     style,
@@ -701,6 +713,14 @@ async function buildExampleTeam() {
     el("presetSelect")?.value || getPresetPref(),
     el("primaryArchetypeSelect")?.value || getPrimaryArchetypePref() || "",
     el("secondaryArchetypeSelect")?.value || getSecondaryArchetypePref() || "none",
+    el("metaWeightSelect")?.value || getMetaWeightPref(),
+    el("searchIntelligenceSelect")?.value || getSearchIntelligencePref(),
+    advisoryKey.enabled === true,
+    advisoryKey.dataVersion || "",
+    advisoryKey.source || "",
+    advisoryKey.cachedAt || 0,
+    window.OptimizerV6?.policy?.version || "",
+    window.EVERTALE_LIVE_CONFIG?.dataVersion || window.EVERTALE_LIVE_CONFIG?.version || "",
     poolSig
   ].join("::");
   const exampleCache = buildExampleTeam._cache || (buildExampleTeam._cache = new Map());
@@ -793,6 +813,43 @@ function resultUnitIds(values) {
   return Array.isArray(values) ? values.map(resultUnitId).filter(Boolean) : [];
 }
 
+function recordAdvisoryComparison(result) {
+  const options = window.__lastOptimizerOptions || {};
+  const debug = { ...(options.debugSelection || {}) };
+  delete debug.advisoryMetaEnabled;
+  const contextKey = JSON.stringify({
+    debug,
+    metaWeight: options.metaWeight || "",
+    searchIntelligence: options.searchIntelligence || "",
+    locks: lockSummary(options.slotLocks),
+    dataVersion: window.EVERTALE_LIVE_CONFIG?.dataVersion || window.EVERTALE_LIVE_CONFIG?.version || "",
+    policyVersion: window.OptimizerV6?.policy?.version || "",
+  });
+  const enabled = result?.diagnostics?.advisoryMeta?.enabled === true;
+  const story = [...resultUnitIds(result?.story?.main), ...resultUnitIds(result?.story?.back)];
+  const store = window.__optimizerAdvisoryComparisons || (window.__optimizerAdvisoryComparisons = new Map());
+  const pair = store.get(contextKey) || {};
+  const other = pair[String(!enabled)] || null;
+  const labels = ["Main 1", "Main 2", "Main 3", "Main 4", "Main 5", "Back 1", "Back 2", "Back 3"];
+  const changedSlots = other ? labels.flatMap((label, index) => {
+    const before = enabled ? other.story[index] : story[index];
+    const after = enabled ? story[index] : other.story[index];
+    return before !== after ? [{ slot: label, before: before || "(empty)", after: after || "(empty)" }] : [];
+  }) : [];
+  result.diagnostics = {
+    ...(result.diagnostics || {}),
+    advisoryComparison: {
+      available: !!other,
+      enabled,
+      changedCount: changedSlots.length,
+      changedSlots,
+      note: other ? "Compared with the same settings and opposite advisory state." : "Run the same settings once with the opposite advisory state to compare picks.",
+    },
+  };
+  pair[String(enabled)] = { story, score: Number(result?.score) || 0 };
+  store.set(contextKey, pair);
+}
+
 function layoutIds(layout = state.layout) {
   return {
     storyMain: Array.from({ length: STORY_MAIN }, (_, i) => normId(layout?.storyMain?.[i] || "")),
@@ -845,7 +902,11 @@ function renderOptimizerReasoning(result) {
   const forecast = reasoning.resourceForecast || {};
   if (summary) {
     const reserve = forecast.minimumReserve == null ? "not calculated" : `${forecast.minimumReserve} Spirit`;
-    summary.textContent = `${reasoning.summary} Opening reserve: ${reserve}. Evidence confidence: ${reasoning.confidence ?? 0}/100.`;
+    const comparison = result?.diagnostics?.advisoryComparison;
+    const comparisonNote = comparison?.available
+      ? ` Advisory comparison: ${comparison.changedCount ? `${comparison.changedCount} Story slot${comparison.changedCount === 1 ? "" : "s"} changed` : "no Story picks changed"}.`
+      : comparison?.enabled ? " Advisory comparison: run the same settings once with advisory off to compare picks." : "";
+    summary.textContent = `${reasoning.summary} Opening reserve: ${reserve}. Evidence confidence: ${reasoning.confidence ?? 0}/100.${comparisonNote}`;
   }
 
   const renderList = (targetId, title, values) => {
@@ -930,6 +991,12 @@ function applyEngineResult(result) {
   root.dataset.optimizerLockedStorySlots = String(locks.lockedStorySlots);
   root.dataset.optimizerLockedPlatoonSlots = String(locks.lockedPlatoonSlots);
   root.dataset.optimizerSkippedLockedCount = String(application.skippedLockedCount);
+  root.dataset.optimizerSearchIntelligence = String(result.diagnostics?.searchIntelligence?.level || window.__lastOptimizerOptions?.searchIntelligence || "");
+  root.dataset.optimizerSearchProbe = String(result.diagnostics?.searchStrategy?.probeLevel || "");
+  root.dataset.optimizerSearchRefined = String(result.diagnostics?.searchStrategy?.refinedCandidates || 0);
+  root.dataset.optimizerAdvisoryMeta = String(result.diagnostics?.advisoryMeta?.enabled === true);
+  root.dataset.optimizerDurationMs = String(Math.max(0, Number(result.diagnostics?.durationMs) || 0));
+  root.dataset.optimizerScore = String(Math.max(0, Number(result.score) || 0));
   root.dataset.optimizerStoryDiagnostics = JSON.stringify((result.diagnostics?.storyPicks || []).map(pick => ({
     id: pick.id,
     element: pick.element,
@@ -950,6 +1017,9 @@ function applyEngineResult(result) {
     status.dataset.optimizerPlan = application.plan;
   }
 
+  recordAdvisoryComparison(result);
+  root.dataset.optimizerAdvisoryChangedSlots = String(result.diagnostics?.advisoryComparison?.changedCount || 0);
+  root.dataset.optimizerAdvisoryComparisonAvailable = String(result.diagnostics?.advisoryComparison?.available === true);
   renderOptimizerReasoning(result);
   saveLayout();
   renderAll();
@@ -976,8 +1046,12 @@ function buildEngineOptions() {
   const secondaryArchetypeRaw = (el("secondaryArchetypeSelect")?.value || getSecondaryArchetypePref() || "none");
   const secondaryArchetype = secondaryArchetypeRaw === "none" ? "" : secondaryArchetypeRaw;
   const metaWeight = (el("metaWeightSelect")?.value || getMetaWeightPref());
+  const searchIntelligence = (el("searchIntelligenceSelect")?.value || getSearchIntelligencePref());
   setMetaWeightPref(metaWeight);
+  setSearchIntelligencePref(searchIntelligence);
   options.metaWeight = metaWeight;
+  options.searchIntelligence = searchIntelligence;
+  options.advisoryMeta = window.OptimizerMetaAdvisory?.getEngineOptions?.() || { enabled: false };
   options.archetypes = [primaryArchetype, secondaryArchetype].filter((v, i, arr) => v && arr.indexOf(v) === i);
 
   // Pass current layout + locks so engine can treat locked units as forced picks.
@@ -990,6 +1064,8 @@ function buildEngineOptions() {
     selectedPrimaryArchetype: primaryArchetype,
     selectedSecondaryArchetype: secondaryArchetype,
     selectedMetaWeight: metaWeight,
+    selectedSearchIntelligence: searchIntelligence,
+    advisoryMetaEnabled: options.advisoryMeta.enabled === true,
     buildScope: options.buildScope,
     ...lockSummary(options.slotLocks),
   };
@@ -1006,6 +1082,10 @@ function setOptimizerBusy(active) {
   if (example) example.disabled = !!active;
   if (cancel) cancel.hidden = !active;
   if (progress) progress.hidden = !active;
+  if (document.body) {
+    if (active) document.body.dataset.optimizerSearching = "true";
+    else delete document.body.dataset.optimizerSearching;
+  }
 }
 
 function updateOptimizerProgress(detail = {}) {

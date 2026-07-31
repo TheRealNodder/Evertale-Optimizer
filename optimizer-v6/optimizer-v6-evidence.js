@@ -32,7 +32,7 @@
     const value=P.key(source);
     if(P.evidence.rejectedSourceFragments.some(fragment=>value.includes(P.key(fragment))))return true;
     const kind=P.key(feature);
-    if(kind==='applies_burn'&&value.includes('frostburn'))return true;
+    if((kind==='applies_burn'||kind==='payoff_burn')&&value.includes('frostburn'))return true;
     if(kind==='role_healer'&&value.includes('healthy'))return true;
     return false;
   }

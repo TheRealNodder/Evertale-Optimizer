@@ -12,6 +12,11 @@ import unittest
 from pathlib import Path
 from typing import Any, Dict, Iterable, List
 
+try:
+    from .build_optimizer_runtime_model import description_features
+except ImportError:
+    from build_optimizer_runtime_model import description_features
+
 
 REPO = Path(__file__).resolve().parents[2]
 ENTRIES = REPO / "apkfiles" / "entries"
@@ -141,6 +146,14 @@ class OptimizerFoundationAuthorityTests(unittest.TestCase):
         def features(source: str) -> set[str]:
             return {str(row.get("feature") or "") for row in evidence.get(source, []) if isinstance(row, dict)}
 
+        def feature_sources(source: str, feature: str) -> set[str]:
+            return {
+                str(receipt)
+                for row in evidence.get(source, [])
+                if isinstance(row, dict) and row.get("feature") == feature
+                for receipt in row.get("sources") or []
+            }
+
         expected = {
             "AstridNew02": {"applies_burn", "payoff_burn"},
             "NobunagaRegular02": {"applies_burn", "payoff_burn"},
@@ -153,6 +166,26 @@ class OptimizerFoundationAuthorityTests(unittest.TestCase):
 
         self.assertNotIn("applies_burn", features("AnastasiaRegular02"), "Frostburn must not become normal Burn setup")
         self.assertNotIn("applies_burn", features("WashingtonRegular02"), "Frostburn must not become normal Burn setup")
+        washington_burn_sources = feature_sources("WashingtonRegular02", "payoff_burn")
+        self.assertFalse(
+            any("SingleAttackAWashingtonRegular" in source for source in washington_burn_sources),
+            "Frostburned-only Compounding Shot must not become a normal Burn payoff",
+        )
+        self.assertTrue(
+            any("LargeBuffAWashingtonRegular" in source for source in washington_burn_sources),
+            "Stars of Victory must retain its explicit support for burning allies",
+        )
+        frostburn_only = description_features("100% damage, plus 100% for each sleeping or frostburned enemy.")
+        self.assertIn("payoff_sleep", frostburn_only)
+        self.assertNotIn("payoff_burn", frostburn_only, "burned matched inside frostburned")
+        self.assertIn("payoff_burn", description_features("500% damage against targets that are burning."))
+        for description, feature in (
+            ("500% damage if the target is not burning.", "payoff_burn"),
+            ("500% damage if the target is non-poisoned.", "payoff_poison"),
+            ("500% damage if the target is not sleeping.", "payoff_sleep"),
+            ("500% damage if the target is not stunned.", "payoff_stun"),
+        ):
+            self.assertNotIn(feature, description_features(description), f"negated status invented {feature}")
         self.assertNotIn("payoff_stun", features("FireBird02"), "AI target hints must not invent Time Strike payoff")
         self.assertNotIn("applies_poison", features("HoodedFrog01"), "status immunity lists must not invent Poison setup")
 

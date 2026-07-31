@@ -2,7 +2,7 @@
   'use strict';
   const root=g.OptimizerV6=g.OptimizerV6||{},P=root.policy;
   if(!P)return;
-  const CACHE_KEY='evertale_optimizer_v6_cache_v1',memory=new Map();let active=null,sequence=0;
+  const CACHE_KEY='evertale_optimizer_v6_cache_v3',memory=new Map();let active=null,sequence=0;
 
   function cleanOptions(options){
     const clone={};for(const [key,value] of Object.entries(options||{}))if(!['onProgress','signal','cancelled'].includes(key)&&typeof value!=='function')clone[key]=value;return clone;
@@ -13,11 +13,21 @@
     return value;
   }
   function hash(text){let value=2166136261;for(let i=0;i<text.length;i++){value^=text.charCodeAt(i);value=Math.imul(value,16777619);}return(value>>>0).toString(16);}
+  function cacheOptions(options){
+    const clone=cleanOptions(options),layout=clone.currentLayout||{},locks=clone.slotLocks||{};
+    const keep=(values,flags,size)=>Array.from({length:size},(_,index)=>flags?.[index]?P.txt(values?.[index]):'');
+    clone.currentLayout={
+      storyMain:keep(layout.storyMain,locks.storyMain,P.story.main),
+      storyBack:keep(layout.storyBack,locks.storyBack,P.story.back),
+      platoons:Array.from({length:P.platoons.rows},(_,row)=>keep(layout.platoons?.[row],locks.platoons?.[row],P.platoons.size))
+    };
+    return clone;
+  }
   function cacheKey(units,options){
     const roster=(units||[]).map(unit=>({id:P.identity(unit),stats:unit?.__v6?.stats||unit?.__v5?.stats||unit?.stats,rarity:unit?.rarity,element:unit?.element}));
     const dataVersion=g.EVERTALE_LIVE_CONFIG?.dataVersion||g.EVERTALE_LIVE_CONFIG?.version||'live';
     let profile=null;try{profile=g.EvertaleRosterProfiles?.loadState?.()||null;}catch{}
-    return hash(JSON.stringify(stable({policy:P.version,dataVersion,roster,profile,options:cleanOptions(options)})));
+    return hash(JSON.stringify(stable({policy:P.version,dataVersion,roster,profile,options:cacheOptions(options)})));
   }
   function readCache(key){
     if(memory.has(key))return memory.get(key);
@@ -44,7 +54,7 @@
     if(typeof Worker!=='function'){
       const result=root.engine.run(prepared,{...options,preparedV6:true,onProgress:progress=>emit(progress,options)});if(result?.diagnostics?.v6Failed)throw new Error(result.diagnostics.v6Error);writeCache(key,result);return result;
     }
-    const jobId=`v6-${Date.now()}-${++sequence}`,worker=new Worker('./optimizer-v6/optimizer-v6-worker.js?v=3');
+    const jobId=`v6-${Date.now()}-${++sequence}`,worker=new Worker('./optimizer-v6/optimizer-v6-worker.js?v=6');
     return new Promise((resolve,reject)=>{
       active={jobId,worker,reject};
       worker.onmessage=event=>{
@@ -59,5 +69,5 @@
     });
   }
 
-  root.controller={run,cancel,cacheKey,readCache,writeCache,cleanOptions};
+  root.controller={run,cancel,cacheKey,readCache,writeCache,cleanOptions,cacheOptions};
 })(window);

@@ -2,8 +2,8 @@
   'use strict';
 
   const root=g.OptimizerV6=g.OptimizerV6||{};
-  const P=root.policy,F=root.featureModel,T=root.teamEvaluator,R=root.resourceReasoner,X=root.explanations;
-  if(!P||!F||!T||!R||!X)return;
+  const P=root.policy,M=root.localMeta,F=root.featureModel,T=root.teamEvaluator,R=root.resourceReasoner,X=root.explanations;
+  if(!P||!M||!F||!T||!R||!X)return;
 
   function assert(condition,message){if(!condition)throw new Error(message);}
   function unit(id,element='Fire',extra={}){
@@ -17,10 +17,10 @@
   }
   function skill(id,extra={}){return{id,name:id,description:'',tuCost:100,spiritGain:0,spiritCost:0,useLimit:null,targeting:'1Enemy',useCondition:'',flags:[],components:['Damage'],source:`resolved.activeSkills.${id}`,...extra};}
   function skillStore(units,skillsById={}){const out={};for(const row of units)out[row.sourceId]={sourceId:row.sourceId,family:row.family,skills:skillsById[row.sourceId]||[skill(`Attack${row.sourceId}`)]};return out;}
-  function withStore(store,units,profiles={}){
+  function withStore(store,units,profiles={},options={}){
     const previous=g.OptimizerRuntime;
     g.OptimizerRuntime={...(previous||{}),chunks:{...(previous?.chunks||{}),featureEvidence:store,skillProfiles:profiles}};
-    const attached=F.attach(units);
+    const attached=F.attach(units,options);
     g.OptimizerRuntime=previous;
     return attached;
   }
@@ -37,6 +37,71 @@
       return '5+3 Story, 20x5 platoons, leader all-eight best-only';
     });
 
+    test('search intelligence profiles increase monotonically',()=>{
+      const standard=P.intelligenceProfile('standard'),deep=P.intelligenceProfile('deep'),ultra=P.intelligenceProfile('ultra');
+      for(const field of ['storyBeamWidth','storyCandidateCap','storyPlacementFinalists','placementCombinations','platoonRowsPerPlan','allocatorPoolSize','allocationBudgetMs']){
+        assert(standard[field]<deep[field]&&deep[field]<ultra[field],`${field} is not monotonic across intelligence profiles`);
+      }
+      assert(P.intelligenceProfile({}).level==='deep','Deep is not the balanced default search intelligence');
+      return `beam ${standard.storyBeamWidth} -> ${deep.storyBeamWidth} -> ${ultra.storyBeamWidth}`;
+    });
+
+    test('auto tournament probes every complete plan before deep refinement',()=>{
+      const prepared=withStore({},makeTeam('Tournament'));
+      const contest=root.engine.tournament(prepared,{searchIntelligence:'deep',requirePlanComplete:false,buildScope:'story'});
+      assert(contest.diagnostics.useProbe&&contest.diagnostics.probeLevel==='probe','Deep auto tournament skipped the bounded probe pass');
+      assert(contest.diagnostics.refinedCandidates===2,'Deep auto tournament did not refine its top two finalists');
+      assert(contest.diagnostics.completeCandidates>=3,'Auto tournament did not preserve complete alternatives');
+      return `${contest.diagnostics.completeCandidates} complete probes, ${contest.diagnostics.refinedCandidates} refined`;
+    });
+
+    test('result cache ignores unlocked layout churn but tracks locked identity',()=>{
+      const units=makeTeam('Cache'),locks={
+        storyMain:[true,false,false,false,false],storyBack:[false,false,false],
+        platoons:Array.from({length:20},()=>Array(5).fill(false))
+      };
+      const options=id=>({
+        buildScope:'story',searchIntelligence:'deep',slotLocks:locks,
+        currentLayout:{storyMain:[id,'A','B','C','D'],storyBack:['E','F','G'],platoons:Array.from({length:20},()=>Array(5).fill(''))}
+      });
+      const first=root.controller.cacheKey(units,options('CacheA01'));
+      const unlockedChanged=options('CacheA01');unlockedChanged.currentLayout.storyMain[1]='ChangedUnlocked01';
+      const second=root.controller.cacheKey(units,unlockedChanged);
+      const lockedChanged=root.controller.cacheKey(units,options('CacheB01'));
+      assert(first===second,'Unlocked optimizer output invalidated the deterministic result cache');
+      assert(first!==lockedChanged,'Changing a locked identity failed to invalidate the result cache');
+      return 'unlocked layout stable; locked identity invalidates';
+    });
+
+    test('local latest-unit snapshot is schema and data-version bound',()=>{
+      const bundle={generatedAt:123,contentHash:'fixture',entries:[
+        {family:'NewestFamily',order:100,name:'Newest',title:'Drop',rarity:'SSR',states:[{sourceId:'NewestFamily01'},{sourceId:'NewestFamily02'}]},
+        {family:'RecentFamily',order:99,name:'Recent',title:'Drop',rarity:'SSR',states:[{sourceId:'RecentFamily01'}]},
+        {family:'OlderFamily',order:1,name:'Older',title:'Unit',rarity:'SSR',states:[{sourceId:'OlderFamily01'}]}
+      ]};
+      const snapshot=M.buildSnapshot(bundle,{dataVersion:'fixture-v1',cachedAt:456});
+      assert(M.validateSnapshot(snapshot,{dataVersion:'fixture-v1'}).valid,'Valid local snapshot was rejected');
+      assert(!M.validateSnapshot(snapshot,{dataVersion:'fixture-v2'}).valid,'Stale data-version snapshot remained valid');
+      assert(snapshot.maxOrder===100&&snapshot.scoresByIdentity.newestfamily01>0,'Snapshot lost global order or source identity');
+      assert(!M.engineOptions(snapshot,false,{dataVersion:'fixture-v1'}).enabled,'Advisory snapshot applied without explicit opt-in');
+      assert(M.engineOptions(snapshot,true,{dataVersion:'fixture-v1'}).enabled,'Valid opted-in snapshot did not produce engine options');
+      return `${snapshot.latest.length} records, max order ${snapshot.maxOrder}`;
+    });
+
+    test('advisory recency applies only after opt-in and stays bounded',()=>{
+      const raw=[unit('RecentMeta01','Fire',{__v5:{meta:{order:90,newer:.2}}})];
+      const disabled=withStore({},raw,{},{
+        advisoryMeta:{enabled:false,schemaVersion:1,maxOrder:100,scoresByIdentity:{recentmeta01:100}}
+      })[0].__v6;
+      const enabled=withStore({},raw,{},{
+        advisoryMeta:{enabled:true,schemaVersion:1,maxOrder:100,source:'generated-release-order',confidence:.76,scoresByIdentity:{recentmeta01:100}}
+      })[0].__v6;
+      assert(disabled.metaPrior===20,'Disabled advisory changed generated recency');
+      assert(enabled.metaPrior>disabled.metaPrior&&enabled.metaPrior<=100,'Enabled advisory was missing or unbounded');
+      assert(enabled.metaEvidence.applied&&enabled.metaEvidence.source==='generated-release-order','Advisory provenance is missing');
+      return `${disabled.metaPrior.toFixed(1)} disabled -> ${enabled.metaPrior.toFixed(1)} enabled`;
+    });
+
     test('element affinity cannot create a status engine',()=>{
       const fire=withStore({},[unit('AffinityOnly01','Fire')])[0];
       assert(F.mechanical(fire.__v6.evidence,'burn','setup')===0,'Fire affinity invented burn setup');
@@ -51,14 +116,16 @@
     });
 
     test('AI, Frostburn, and healthy substrings cannot invent features',()=>{
-      const raw=[unit('FrostOnly01','Water'),unit('AiHint01','Storm'),unit('HealthyOnly01','Light')],store={
+      const raw=[unit('FrostOnly01','Water'),unit('FrostPayoff01','Water'),unit('AiHint01','Storm'),unit('HealthyOnly01','Light')],store={
         FrostOnly01:[evidence('applies_burn',1.6,.98,'resolved.activeSkills.FrostburnAttack.localization.description')],
+        FrostPayoff01:[evidence('payoff_burn',1.5,.98,'resolved.activeSkills.FrostburnDrive.localization.description')],
         AiHint01:[evidence('payoff_stun',1.5,.98,'resolved.activeSkillsAI.0.ai.EnemyHasTimestrikerNoProtector')],
         HealthyOnly01:[evidence('role_healer',1.25,.98,'resolved.activeSkills.HighSpiritHealthyBlast#identifier')]
       },prepared=withStore(store,raw);
       assert(F.mechanical(prepared[0].__v6.evidence,'burn','setup')===0,'Frostburn became normal Burn setup');
-      assert(F.mechanical(prepared[1].__v6.evidence,'stun','payoff')===0,'AI target hint became Stun payoff');
-      assert(F.roleEvidence(prepared[2].__v6.evidence,'healer')===0,'healthy substring became healing');
+      assert(F.mechanical(prepared[1].__v6.evidence,'burn','payoff')===0,'Frostburn became normal Burn payoff');
+      assert(F.mechanical(prepared[2].__v6.evidence,'stun','payoff')===0,'AI target hint became Stun payoff');
+      assert(F.roleEvidence(prepared[3].__v6.evidence,'healer')===0,'healthy substring became healing');
       return 'context-invalid evidence rejected';
     });
 
@@ -67,6 +134,21 @@
       assert(F.mechanical(water.__v6.evidence,'burn','setup')>0,'Direct cross-element Burn evidence was discarded');
       assert(!water.__v6.evidence.affinities.burn,'Water received Fire-only affinity');
       return 'mechanics outrank element without inventing affinity';
+    });
+
+    test('V6 auto plan selection ignores legacy Frostburn keyword bias',()=>{
+      const raw=[unit('SleepSetup01','Water'),unit('SleepPayoff01','Water'),unit('SleepSupport01','Light')];
+      const prepared=withStore({
+        SleepSetup01:[evidence('applies_sleep')],
+        SleepPayoff01:[evidence('payoff_sleep')],
+        SleepSupport01:[evidence('applies_sleep'),evidence('payoff_sleep')]
+      },raw);
+      const previous=g.OptimizerV5Lab;
+      g.OptimizerV5Lab={candidatePool:{selectPlan:()=> 'burn'}};
+      const plan=root.engine.selectedPlan({presetTag:'auto'},prepared);
+      g.OptimizerV5Lab=previous;
+      assert(plan==='sleep',`expected sleep from V6 evidence, got ${plan}`);
+      return`${plan} selected from authoritative V6 evidence`;
     });
 
     test('all evaluator components and penalties are bounded',()=>{

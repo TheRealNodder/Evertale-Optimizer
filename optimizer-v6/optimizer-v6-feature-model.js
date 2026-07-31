@@ -55,15 +55,32 @@
     };
   }
 
-  function attach(units){
+  function advisoryMeta(unit,generatedMeta,options={}){
+    const advisory=options?.advisoryMeta;
+    if(!advisory?.enabled||Number(advisory?.schemaVersion)!==1){
+      return{score:P.clamp(generatedMeta),applied:false,source:'generated-roster-order',confidence:1};
+    }
+    const order=number(unit?.__v5?.meta?.order),maximum=number(advisory?.maxOrder);
+    const globalRelease=order>0&&maximum>1?P.clamp((order-1)/(maximum-1)*100):P.clamp(generatedMeta);
+    const identity=P.identity(unit),scores=advisory?.scoresByIdentity||{};
+    const observed=Math.max(...[identity.entry,identity.family,identity.sourceId,P.key(unit?.sourceId),P.key(unit?.internal?.sourceId)]
+      .map(key=>number(scores[key])).filter(value=>value>0),0);
+    const advised=observed>0?P.clamp(globalRelease*.9+observed*.1):globalRelease;
+    return{
+      score:P.clamp(Math.max(globalRelease,advised)),applied:true,source:String(advisory.source||'generated-release-order'),
+      confidence:P.clamp(number(advisory.confidence)*100)/100,globalRelease,observed
+    };
+  }
+
+  function attach(units,options={}){
     const source=rows(units),population=populationStats(source),store=E.runtimeStore(),skillStore=R.runtimeStore();
     return source.map(unit=>{
       const clone={...unit};
       const evidence=E.summarize(unit,store);
-      const meta=P.clamp(number(unit?.__v5?.meta?.newer)*100);
+      const generatedMeta=P.clamp(number(unit?.__v5?.meta?.newer)*100),meta=advisoryMeta(unit,generatedMeta,options);
       clone.__v6={
         identity:P.identity(unit),stats:stats(unit),baseValue:baseValue(unit,population),evidence,
-        roles:roleScores(evidence),skillProfile:R.unitProfile(unit,skillStore),metaPrior:meta,element:P.key(unit?.element)
+        roles:roleScores(evidence),skillProfile:R.unitProfile(unit,skillStore),metaPrior:meta.score,metaEvidence:meta,element:P.key(unit?.element)
       };
       return clone;
     });
@@ -78,5 +95,5 @@
     return P.clamp((Math.max(setup,payoff)/2)*70+role*30)/100;
   }
 
-  root.featureModel={stats,percentile,populationStats,baseValue,mechanical,roleEvidence,roleScores,attach,featureContribution};
+  root.featureModel={stats,percentile,populationStats,baseValue,mechanical,roleEvidence,roleScores,advisoryMeta,attach,featureContribution};
 })(window);

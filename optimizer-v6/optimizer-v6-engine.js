@@ -17,9 +17,30 @@
     const aliases={heal:'guardian',cleanse:'guardian',hp_buff:'guardian',hpbuff:'guardian',turn:'tempo',spirit:'tempo',atk_buff:'hybrid',atkbuff:'hybrid',offense:'hybrid'};
     const raw=P.key(options?.plan||options?.presetTag||''),explicit=aliases[raw]||raw;
     if(explicit&&explicit!=='auto'&&explicit!=='none')return explicit;
-    const v5=g.OptimizerV5Lab?.candidatePool;
-    if(v5&&typeof v5.selectPlan==='function')return P.key(v5.selectPlan(options||{},prepared))||'hybrid';
-    return'hybrid';
+    return evidencePrimaryPlan(prepared);
+  }
+
+  function evidencePrimaryPlan(prepared){
+    const units=rows(prepared),paired=new Set(['burn','poison','sleep','stun','blood']);
+    const topSum=values=>values.filter(value=>value>0).sort((a,b)=>b-a).slice(0,P.story.total).reduce((sum,value)=>sum+value,0);
+    let best='hybrid',bestScore=0;
+    for(const plan of ['burn','poison','sleep','stun','blood','crisis','survivor','guardian','tempo']){
+      let score=0;
+      if(paired.has(plan)){
+        const setup=topSum(units.map(unit=>F.mechanical(unit?.__v6?.evidence,plan,'setup')));
+        const payoff=topSum(units.map(unit=>F.mechanical(unit?.__v6?.evidence,plan,'payoff')));
+        const contributors=units.filter(unit=>F.mechanical(unit?.__v6?.evidence,plan,'setup')||F.mechanical(unit?.__v6?.evidence,plan,'payoff')).length;
+        score=Math.min(setup,payoff)*2+(setup+payoff)*.35+contributors*.08;
+      }else if(plan==='crisis'||plan==='survivor'){
+        score=topSum(units.map(unit=>F.mechanical(unit?.__v6?.evidence,plan,'payoff')))*1.4;
+      }else if(plan==='guardian'){
+        score=topSum(units.map(unit=>Number(unit?.__v6?.roles?.protection)||0))*1.15;
+      }else if(plan==='tempo'){
+        score=topSum(units.map(unit=>Number(unit?.__v6?.roles?.tempo)||0));
+      }
+      if(score>bestScore){best=plan;bestScore=score;}
+    }
+    return bestScore>0?best:'hybrid';
   }
 
   function prepare(units,options={}){
@@ -35,7 +56,7 @@
       const order=Number(shared?.metaOrder?.(unit))||0;
       return{...unit,__v5:{...(unit?.__v5||{}),identity:P.identity(unit),stats:{atk:Number(estimated?.atk)||0,hp:Number(estimated?.hp)||0,spd:Number(estimated?.spd)||0,cost:Math.max(1,Number(estimated?.cost)||1),power:Number(estimated?.power||estimated?.unitPower)||0},meta:{order,newer:order>0?(order-minimum)/span:0}}};
     });
-    return F.attach(prepared);
+    return F.attach(prepared,options);
   }
 
   function candidateRecord(kind,plan,result){
@@ -43,21 +64,55 @@
     return{kind,format:kind==='mono'?'mono':kind==='rainbow'?'rainbow':'hybrid',plan,element:best.element||best.evaluation?.element?.elements&&Object.keys(best.evaluation.element.elements)[0]||'',score:best.evaluation.score,best,result};
   }
 
+  function runCandidate(prepared,spec,options){
+    if(spec.kind==='mono')return S.bestMono(prepared,{...options,plan:spec.plan});
+    if(spec.kind==='rainbow')return S.rainbow(prepared,{...options,plan:spec.plan});
+    return S.search(prepared,{...options,plan:spec.plan,format:'auto',strictFormat:false});
+  }
+
   function tournament(prepared,options={}){
     const mode=selectedMode(options),hard=options?.presetMode==='hard',primary=selectedPlan(options,prepared),plans=hard?[primary]:['burn','poison','sleep','stun','blood','crisis','survivor','guardian','tempo','hybrid'];
-    const candidates=[];let completed=0;const total=mode==='force_mono'||mode==='force_rainbow'?plans.length:plans.length+2;
-    const add=(kind,plan,result)=>{const row=candidateRecord(kind,plan,result);if(row)candidates.push(row);completed++;if(typeof options.onProgress==='function')options.onProgress({type:'progress',stage:'format-tournament',completed,total,percent:Math.min(100,Math.round(completed/Math.max(1,total)*100)),message:`Evaluating ${kind} ${plan}`,firstValid:candidates.length===1,candidate:row?{format:row.format,plan:row.plan,element:row.element,score:row.score}:null});};
-    if(mode==='force_mono')for(const plan of plans)add('mono',plan,S.bestMono(prepared,{...options,plan}));
-    else if(mode==='force_rainbow')for(const plan of plans)add('rainbow',plan,S.rainbow(prepared,{...options,plan}));
+    const requested=P.intelligenceProfile(options),specs=[];
+    if(mode==='force_mono')plans.forEach(plan=>specs.push({kind:'mono',plan}));
+    else if(mode==='force_rainbow')plans.forEach(plan=>specs.push({kind:'rainbow',plan}));
     else{
-      add(primary==='hybrid'?'hybrid':'plan',primary,S.search(prepared,{...options,plan:primary,format:'auto',strictFormat:false}));
-      add('mono',primary,S.bestMono(prepared,{...options,plan:primary}));
-      add('rainbow',primary,S.rainbow(prepared,{...options,plan:primary}));
-      for(const plan of plans)if(plan!==primary)add(plan==='hybrid'?'hybrid':'plan',plan,S.search(prepared,{...options,plan,format:'auto',strictFormat:false}));
+      specs.push({kind:primary==='hybrid'?'hybrid':'plan',plan:primary},{kind:'mono',plan:primary},{kind:'rainbow',plan:primary});
+      for(const plan of plans)if(plan!==primary)specs.push({kind:plan==='hybrid'?'hybrid':'plan',plan});
+    }
+    const useProbe=!hard&&specs.length>3&&requested.level!=='probe';
+    const probeLevel=useProbe?'probe':requested.level,refineLimit=useProbe?(requested.level==='ultra'?3:requested.level==='deep'?2:1):0;
+    const candidates=[];let completed=0,total=specs.length+refineLimit;
+    const emit=(spec,row,stage='format-tournament')=>{
+      completed++;
+      if(typeof options.onProgress==='function')options.onProgress({
+        type:'progress',stage,completed,total,percent:Math.min(100,Math.round(completed/Math.max(1,total)*100)),
+        message:`${stage==='format-refinement'?'Refining':'Evaluating'} ${spec.kind} ${spec.plan}`,
+        firstValid:candidates.length===1,candidate:row?{format:row.format,plan:row.plan,element:row.element,score:row.score}:null
+      });
+    };
+    for(const spec of specs){
+      const result=runCandidate(prepared,spec,{...options,searchIntelligence:probeLevel});
+      const row=candidateRecord(spec.kind,spec.plan,result);if(row)candidates.push(row);emit(spec,row);
+    }
+    let refined=0;
+    if(useProbe&&candidates.length){
+      candidates.sort((a,b)=>b.score-a.score||a.format.localeCompare(b.format)||a.plan.localeCompare(b.plan)||a.element.localeCompare(b.element));
+      const finalists=candidates.slice(0,refineLimit),tokens=new Set(finalists.map(row=>`${row.kind}|${row.plan}`));
+      total=specs.length+finalists.length;
+      const replacements=[];
+      for(const candidate of finalists){
+        const spec={kind:candidate.kind,plan:candidate.plan},result=runCandidate(prepared,spec,options),row=candidateRecord(spec.kind,spec.plan,result);
+        replacements.push(row||candidate);refined++;emit(spec,row||candidate,'format-refinement');
+      }
+      const retained=candidates.filter(row=>!tokens.has(`${row.kind}|${row.plan}`));
+      candidates.splice(0,candidates.length,...retained,...replacements);
     }
     candidates.sort((a,b)=>b.score-a.score||a.format.localeCompare(b.format)||a.plan.localeCompare(b.plan)||a.element.localeCompare(b.element));
     const distinct=[];for(const candidate of candidates){const ids=new Set(candidate.best.ordered.map(uid));if(distinct.every(other=>other.best.ordered.filter(unit=>ids.has(uid(unit))).length<=6))distinct.push(candidate);if(distinct.length>=6)break;}
-    return{selected:candidates[0]||null,alternatives:distinct.filter(row=>row!==candidates[0]).slice(0,5),candidates};
+    return{
+      selected:candidates[0]||null,alternatives:distinct.filter(row=>row!==candidates[0]).slice(0,5),candidates,
+      diagnostics:{requestedLevel:requested.level,probeLevel,useProbe,refinedCandidates:refined,completeCandidates:candidates.length}
+    };
   }
 
   function emptyResult(error){return{story:{main:[],back:[]},platoons:[],totalScore:0,engineVersion:'optimizerEngineV6-error-no-fallback',diagnostics:{v6Failed:true,v6Error:P.txt(error?.message||error),usedFallback:false}};}
@@ -83,6 +138,12 @@
         scoreComponents:winner.best.evaluation.components,penalties:winner.best.evaluation.penalties,leader:winner.best.evaluation.leader,
         elementStrategy:winner.best.evaluation.element,unmetNeeds:winner.best.evaluation.unmetNeeds,
         storySearch:winner.result.diagnostics||winner.best.searchDiagnostics||{},preparedUnits:prepared.length,metaWeighting:winner.best.evaluation.metaWeighting,
+        advisoryMeta:options?.advisoryMeta?.enabled?{
+          enabled:true,source:options.advisoryMeta.source,dataVersion:options.advisoryMeta.dataVersion,
+          confidence:options.advisoryMeta.confidence,maxOrder:options.advisoryMeta.maxOrder
+        }:{enabled:false},
+        searchIntelligence:P.intelligenceProfile(options),
+        searchStrategy:contest.diagnostics,
         platoons:platoonDiagnostics,durationMs:Date.now()-started,usedFallback:false,policyVersion:P.version,selectedEngine:winner.plan
       };
       const explanation=X.explain(winner.best.ordered,winner.best.evaluation,{format:winner.format,plan:winner.plan});
@@ -92,6 +153,6 @@
     }catch(error){console.error('[Optimizer V6] failed without fallback.',error);return emptyResult(error);}
   }
 
-  root.engine={prepare,selectedMode,selectedPlan,tournament,run,emptyResult};
+  root.engine={prepare,selectedMode,selectedPlan,evidencePrimaryPlan,tournament,run,emptyResult};
   g.OptimizerEngineV6=root.engine;
 })(window);

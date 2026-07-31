@@ -1,0 +1,655 @@
+/*
+  Dynamic material and aura layer.
+  Legendary motion is a restrained visual interpretation of official power
+  descriptions; console themes reproduce finish and color relationships.
+*/
+
+@keyframes theme-field-drift{
+  0%{transform:translate3d(-1.5%,-1%,0) scale(1.035);opacity:.62;}
+  50%{transform:translate3d(1.2%,.8%,0) scale(1.065);opacity:.82;}
+  100%{transform:translate3d(-1.5%,-1%,0) scale(1.035);opacity:.62;}
+}
+
+@keyframes theme-field-rise{
+  0%{transform:translate3d(0,2.5%,0) scale(1.04);opacity:.58;}
+  50%{transform:translate3d(0,-1.5%,0) scale(1.075);opacity:.84;}
+  100%{transform:translate3d(0,2.5%,0) scale(1.04);opacity:.58;}
+}
+
+@keyframes theme-ring-breathe{
+  0%,100%{transform:scale(.96);opacity:.48;}
+  50%{transform:scale(1.08);opacity:.82;}
+}
+
+@keyframes theme-rift-shift{
+  0%,100%{transform:translate3d(-1%,0,0) skewX(-1deg);opacity:.52;}
+  48%{transform:translate3d(1.6%,-.6%,0) skewX(1.5deg);opacity:.82;}
+  52%{transform:translate3d(.2%,.4%,0) skewX(-.8deg);opacity:.68;}
+}
+
+@keyframes theme-reverse-fall{
+  0%{transform:translate3d(0,2%,0) rotate(-.35deg);opacity:.48;}
+  50%{transform:translate3d(0,-2%,0) rotate(.35deg);opacity:.78;}
+  100%{transform:translate3d(0,2%,0) rotate(-.35deg);opacity:.48;}
+}
+
+@keyframes theme-grid-scan{
+  0%,100%{transform:translate3d(-1.2%,1%,0) scale(1.025);opacity:.42;}
+  50%{transform:translate3d(1.2%,-1%,0) scale(1.045);opacity:.72;}
+}
+
+@keyframes theme-prism-shift{
+  0%,100%{transform:rotate(-.4deg) scale(1.02);opacity:.55;}
+  50%{transform:rotate(.45deg) scale(1.08);opacity:.82;}
+}
+
+@keyframes theme-blade-pass{
+  0%,42%,100%{transform:translate3d(-12%,0,0) rotate(-1deg);opacity:.30;}
+  50%{transform:translate3d(8%,-1%,0) rotate(.5deg);opacity:.78;}
+  58%{transform:translate3d(12%,0,0) rotate(1deg);opacity:.34;}
+}
+
+@keyframes theme-shield-wave{
+  0%,100%{transform:scale(.93);opacity:.46;}
+  48%{transform:scale(1.07);opacity:.80;}
+  60%{transform:scale(1.015);opacity:.62;}
+}
+
+@keyframes theme-shell-sheen{
+  0%,100%{transform:translate3d(-1.5%,0,0) scale(1.025);opacity:.58;}
+  50%{transform:translate3d(1.5%,0,0) scale(1.045);opacity:.82;}
+}
+
+@keyframes theme-galaxy-parallax{
+  0%,100%{transform:translate3d(-.6%,-.4%,0) scale(1.02);opacity:.55;}
+  50%{transform:translate3d(.8%,.6%,0) scale(1.045);opacity:.72;}
+}
+
+.siteThemeFx{
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  overflow:hidden;
+  pointer-events:none;
+  contain:strict;
+}
+
+body{
+  isolation:isolate;
+}
+
+.siteThemeFx__field,
+.siteThemeFx__particles{
+  display:none;
+  position:absolute;
+  inset:-4%;
+  pointer-events:none;
+  transform-origin:center;
+}
+
+html:is([data-theme-material="legendary"],[data-theme-material="handheld"],[data-theme-material="gem"]) :is(.siteThemeFx__field,.siteThemeFx__particles){
+  display:block;
+  will-change:transform,opacity;
+}
+
+html[data-theme-motion="paused"] .siteThemeFx__field,
+html[data-theme-motion="paused"] .siteThemeFx__particles{
+  animation-play-state:paused!important;
+}
+
+/* Gems keep their polished material treatment inside the same pauseable layer. */
+html[data-theme-material="gem"] body,
+html[data-theme-material="gem"] body.page-catalog-v2,
+html[data-theme-material="gem"] body.page-roster-v2,
+html[data-theme-material="gem"] body.page-optimizer,
+html[data-theme-material="gem"] body.page-optimizer-v2{
+  background:
+    radial-gradient(circle at 7% 4%,rgba(var(--site-theme-rgb),.24),transparent 31%),
+    radial-gradient(circle at 92% 7%,color-mix(in srgb,var(--site-theme-secondary) 22%,transparent),transparent 29%),
+    linear-gradient(180deg,color-mix(in srgb,var(--site-theme-bg) 82%,#03050a),color-mix(in srgb,var(--site-theme-surface) 58%,#060812) 48%,#030309)!important;
+}
+
+html[data-theme-material="gem"] .siteThemeFx__field{
+  background:
+    linear-gradient(112deg,transparent 0 38%,rgba(255,255,255,0) 43%,rgba(255,255,255,.15) 48%,rgba(var(--site-theme-rgb),.20) 52%,rgba(255,255,255,0) 59%,transparent 100%),
+    radial-gradient(circle at 20% 18%,rgba(var(--site-theme-rgb),.22),transparent 34%);
+  animation:theme-field-drift 24s ease-in-out infinite;
+}
+
+html[data-theme-material="gem"] .siteThemeFx__particles{
+  background:
+    radial-gradient(circle at 18% 24%,rgba(255,255,255,.34) 0 1px,transparent 1.8px),
+    radial-gradient(circle at 74% 32%,rgba(var(--site-theme-rgb),.30) 0 1px,transparent 1.7px),
+    radial-gradient(circle at 44% 78%,rgba(255,255,255,.20) 0 1px,transparent 1.5px);
+  background-size:92px 92px,126px 126px,168px 168px;
+  animation:theme-prism-shift 31s ease-in-out infinite;
+}
+
+html[data-theme-material="legendary"][data-theme-effect]{
+  --evertale-legendary-outline:var(--legendary-energy);
+  animation:none!important;
+}
+
+html[data-theme-material="legendary"][data-theme-effect] body,
+html[data-theme-material="legendary"][data-theme-effect] body.page-catalog-v2,
+html[data-theme-material="legendary"][data-theme-effect] body.page-roster-v2,
+html[data-theme-material="legendary"][data-theme-effect] body.page-optimizer,
+html[data-theme-material="legendary"][data-theme-effect] body.page-optimizer-v2{
+  background:
+    radial-gradient(circle at 13% 5%,rgba(var(--legendary-body-rgb),.27),transparent 33%),
+    radial-gradient(circle at 87% 7%,rgba(var(--legendary-energy-rgb),.22),transparent 31%),
+    linear-gradient(180deg,color-mix(in srgb,var(--site-theme-bg) 86%,#020409),color-mix(in srgb,var(--site-theme-surface) 54%,#050711) 52%,#020308)!important;
+  animation:none!important;
+}
+
+html[data-theme-material="legendary"][data-theme-effect] .siteThemeFx__field{
+  background:
+    radial-gradient(ellipse at 16% 12%,rgba(var(--legendary-body-rgb),.38),transparent 34%),
+    radial-gradient(ellipse at 84% 10%,rgba(var(--legendary-energy-rgb),.31),transparent 32%),
+    linear-gradient(125deg,rgba(var(--legendary-body-rgb),.12),transparent 38%,rgba(var(--legendary-energy-rgb),.13) 66%,transparent);
+  animation:theme-field-drift 26s ease-in-out infinite;
+}
+
+html[data-theme-material="legendary"][data-theme-effect] .siteThemeFx__particles{
+  opacity:.62;
+  background:
+    radial-gradient(circle at 18% 24%,rgba(var(--legendary-detail-rgb),.22) 0 1px,transparent 1.8px),
+    radial-gradient(circle at 74% 32%,rgba(var(--legendary-energy-rgb),.19) 0 1px,transparent 1.7px),
+    radial-gradient(circle at 44% 78%,rgba(255,255,255,.13) 0 1px,transparent 1.5px);
+  background-size:78px 78px,112px 112px,146px 146px;
+  animation:theme-field-drift 32s ease-in-out infinite reverse;
+}
+
+html[data-theme-material="legendary"][data-theme-effect] body :is(.panel,.v2-panel,.v2-grid-panel,.v2-detail-panel,.v2-card-skill-panel,.unitCard,.v2-filter-panel){
+  background:
+    linear-gradient(142deg,rgba(var(--legendary-body-rgb),.16),transparent 36%,rgba(var(--legendary-energy-rgb),.09) 72%),
+    linear-gradient(180deg,color-mix(in srgb,var(--site-theme-bg) 70%,#03050b),color-mix(in srgb,var(--site-theme-surface) 28%,#050712))!important;
+  border-color:color-mix(in srgb,var(--evertale-legendary-outline) 48%,rgba(255,255,255,.12))!important;
+  box-shadow:
+    0 16px 38px rgba(0,0,0,.38),
+    0 0 20px color-mix(in srgb,var(--evertale-legendary-outline) 17%,transparent)!important;
+  transition:border-color .42s ease,box-shadow .42s ease,transform .42s ease;
+}
+
+html[data-theme-material="legendary"][data-theme-effect] body :is(.unitCard,.btn,.tab,.stateBtn,button):hover{
+  border-color:color-mix(in srgb,var(--legendary-energy) 76%,white)!important;
+  box-shadow:
+    0 14px 34px rgba(0,0,0,.40),
+    0 0 24px rgba(var(--legendary-energy-rgb),.28)!important;
+}
+
+html[data-theme-material="legendary"][data-theme-effect] body :is(.unitCard,.btn,.tab,.stateBtn,button):focus-visible{
+  outline:3px solid color-mix(in srgb,var(--legendary-detail) 78%,white)!important;
+  outline-offset:2px!important;
+  border-color:color-mix(in srgb,var(--legendary-detail) 72%,white)!important;
+  box-shadow:0 0 0 2px rgba(0,0,0,.62),0 0 25px rgba(var(--legendary-detail-rgb),.32)!important;
+}
+
+html[data-theme-material="legendary"][data-theme-effect] body :is(.v2-grid-head h2,.v2-filter-title,.v2-detail-title,.panelTitle,.brandTitle){
+  color:var(--legendary-detail)!important;
+  text-shadow:0 0 15px rgba(var(--legendary-detail-rgb),.30)!important;
+}
+
+html[data-theme-material="legendary"][data-theme-effect] .v2-filter-panel :is(input,select){
+  background:color-mix(in srgb,var(--site-theme-bg) 54%,#070a14)!important;
+  border-color:color-mix(in srgb,var(--evertale-legendary-outline) 48%,#374057)!important;
+}
+
+html[data-theme-material="legendary"][data-theme-effect] body[data-optimizer-searching="true"] .siteThemeFx__field{
+  animation-duration:13s;
+}
+
+html[data-theme-material="legendary"][data-theme-effect] body[data-optimizer-searching="true"] .siteThemeFx__particles{
+  animation-duration:16s;
+}
+
+/* Ho-Oh: rising ember field crossed by restrained feather-like rainbow arcs. */
+html[data-theme-material="legendary"][data-theme-effect="rebirth"] .siteThemeFx__field{
+  background:
+    radial-gradient(ellipse at 18% 90%,rgba(246,201,78,.25),transparent 32%),
+    conic-gradient(from 198deg at 78% 18%,transparent 0 7%,rgba(50,169,118,.14) 8% 10%,rgba(98,214,233,.13) 11% 13%,rgba(124,90,200,.12) 14% 16%,transparent 17% 100%),
+    linear-gradient(145deg,rgba(216,74,50,.17),transparent 42%,rgba(246,201,78,.14));
+  animation:theme-field-rise 24s ease-in-out infinite;
+}
+
+html[data-theme-material="legendary"][data-theme-effect="rebirth"] .siteThemeFx__particles{
+  background:
+    radial-gradient(ellipse at 24% 72%,rgba(246,201,78,.36) 0 1px,transparent 2px),
+    radial-gradient(ellipse at 68% 44%,rgba(216,74,50,.27) 0 1px,transparent 2px),
+    radial-gradient(ellipse at 84% 82%,rgba(50,169,118,.23) 0 1px,transparent 2px);
+  background-size:82px 112px,118px 138px,154px 176px;
+  animation:theme-field-rise 20s ease-in-out infinite;
+}
+
+/* Lugia: sea depth below, broad atmospheric pressure above. */
+html[data-theme-material="legendary"][data-theme-effect="abyss-wind"] .siteThemeFx__field{
+  background:
+    repeating-radial-gradient(ellipse at 50% 115%,rgba(128,215,229,.15) 0 2px,transparent 3px 36px),
+    linear-gradient(172deg,rgba(238,244,245,.10),transparent 32%,rgba(23,43,88,.28) 82%),
+    radial-gradient(ellipse at 50% 100%,rgba(78,136,195,.28),transparent 54%);
+  animation:theme-ring-breathe 31s ease-in-out infinite;
+}
+
+html[data-theme-material="legendary"][data-theme-effect="abyss-wind"] .siteThemeFx__particles{
+  background:
+    repeating-linear-gradient(168deg,transparent 0 31px,rgba(238,244,245,.055) 32px 34px,transparent 35px 68px),
+    radial-gradient(ellipse at 50% 92%,rgba(128,215,229,.13),transparent 48%);
+  animation:theme-field-drift 28s ease-in-out infinite;
+}
+
+/* Suicune: calm aurora ribbons and clean-water rings. */
+html[data-theme-material="legendary"][data-theme-effect="aurora-water"] .siteThemeFx__field{
+  background:
+    repeating-radial-gradient(ellipse at 52% 94%,rgba(140,232,241,.12) 0 2px,transparent 3px 34px),
+    linear-gradient(118deg,transparent 8%,rgba(118,88,201,.14) 27%,rgba(140,232,241,.18) 46%,transparent 68%),
+    radial-gradient(ellipse at 18% 22%,rgba(49,95,184,.28),transparent 42%);
+  animation:theme-field-drift 29s ease-in-out infinite;
+}
+
+html[data-theme-material="legendary"][data-theme-effect="aurora-water"] .siteThemeFx__particles{
+  background:
+    linear-gradient(176deg,transparent 0 23%,rgba(140,232,241,.08) 29%,transparent 36%),
+    linear-gradient(184deg,transparent 0 48%,rgba(118,88,201,.10) 55%,transparent 62%);
+  animation:theme-field-drift 23s ease-in-out infinite reverse;
+}
+
+/* Groudon: fault geometry and heated land, not a full-screen flame field. */
+html[data-theme-material="legendary"][data-theme-effect="magma"] .siteThemeFx__field{
+  background:
+    repeating-linear-gradient(126deg,transparent 0 68px,rgba(var(--legendary-energy-rgb),.13) 69px 71px,transparent 72px 132px),
+    repeating-linear-gradient(38deg,transparent 0 94px,rgba(var(--legendary-detail-rgb),.09) 95px 97px,transparent 98px 176px),
+    radial-gradient(ellipse at 48% 106%,rgba(var(--legendary-energy-rgb),.24),transparent 54%);
+  animation:theme-ring-breathe 27s ease-in-out infinite;
+}
+
+html[data-theme-material="legendary"][data-theme-effect="magma"] .siteThemeFx__particles{
+  background:
+    radial-gradient(ellipse at 18% 82%,rgba(var(--legendary-energy-rgb),.21),transparent 34%),
+    linear-gradient(180deg,rgba(var(--legendary-detail-rgb),.045),transparent 38%);
+  animation:theme-field-rise 34s ease-in-out infinite;
+}
+
+/* Kyogre: rain bands and slow sonar-like ocean pressure rings. */
+html[data-theme-material="legendary"][data-theme-effect="ocean-pressure"] .siteThemeFx__field{
+  background:
+    repeating-radial-gradient(ellipse at 52% 114%,rgba(var(--legendary-energy-rgb),.13) 0 2px,transparent 3px 42px),
+    repeating-linear-gradient(104deg,transparent 0 46px,rgba(var(--legendary-detail-rgb),.065) 47px 49px,transparent 50px 92px),
+    radial-gradient(ellipse at 50% 100%,rgba(var(--legendary-body-rgb),.32),transparent 58%);
+  animation:theme-ring-breathe 25s ease-in-out infinite;
+}
+
+html[data-theme-material="legendary"][data-theme-effect="ocean-pressure"] .siteThemeFx__particles{
+  background:
+    repeating-linear-gradient(104deg,transparent 0 58px,rgba(233,247,251,.075) 59px 60px,transparent 61px 116px);
+  animation:theme-field-drift 19s linear infinite;
+}
+
+/* Rayquaza: high-altitude stream lines and sparse meteor streaks. */
+html[data-theme-material="legendary"][data-theme-effect="delta-stream"] .siteThemeFx__field{
+  background:
+    conic-gradient(from 218deg at 50% 52%,transparent 0 18%,rgba(var(--legendary-energy-rgb),.15) 22%,transparent 27% 54%,rgba(var(--legendary-body-rgb),.19) 58%,transparent 63%),
+    radial-gradient(ellipse at 72% 14%,rgba(var(--legendary-energy-rgb),.20),transparent 35%),
+    linear-gradient(145deg,rgba(var(--legendary-body-rgb),.15),transparent 62%);
+  animation:theme-field-drift 22s ease-in-out infinite;
+}
+
+html[data-theme-material="legendary"][data-theme-effect="delta-stream"] .siteThemeFx__particles{
+  background:
+    repeating-linear-gradient(136deg,transparent 0 88px,rgba(var(--legendary-energy-rgb),.10) 89px 90px,transparent 91px 176px),
+    radial-gradient(circle at 18% 20%,rgba(255,255,255,.22) 0 1px,transparent 1.6px);
+  background-size:auto,132px 132px;
+  animation:theme-blade-pass 34s ease-in-out infinite;
+}
+
+/* Dialga and Arceus: ordered ring systems, with different pacing. */
+html[data-theme-material="legendary"][data-theme-effect="time-rings"] .siteThemeFx__field,
+html[data-theme-material="legendary"][data-theme-effect="creation"] .siteThemeFx__field{
+  background:
+    repeating-radial-gradient(circle at 50% 46%,rgba(var(--legendary-energy-rgb),.13) 0 2px,transparent 3px 46px),
+    linear-gradient(90deg,transparent 49.8%,rgba(var(--legendary-detail-rgb),.10) 50%,transparent 50.2%),
+    radial-gradient(circle at 50% 46%,rgba(var(--legendary-body-rgb),.23),transparent 50%);
+  animation:theme-ring-breathe 30s ease-in-out infinite;
+}
+
+html[data-theme-material="legendary"][data-theme-effect="time-rings"] .siteThemeFx__particles{
+  background:repeating-linear-gradient(180deg,transparent 0 52px,rgba(var(--legendary-energy-rgb),.07) 53px 54px);
+  animation:theme-grid-scan 24s linear infinite;
+}
+
+html[data-theme-material="legendary"][data-theme-effect="creation"] .siteThemeFx__particles{
+  background:
+    conic-gradient(from 0deg at 50% 46%,transparent 0 11%,rgba(var(--legendary-energy-rgb),.08) 12% 13%,transparent 14% 24%,rgba(var(--legendary-detail-rgb),.07) 25% 26%,transparent 27% 100%),
+    radial-gradient(circle at 50% 46%,rgba(255,255,255,.12),transparent 28%);
+  animation:theme-prism-shift 36s ease-in-out infinite;
+}
+
+/* Palkia and Giratina: decorative planes shift while UI geometry stays fixed. */
+html[data-theme-material="legendary"][data-theme-effect="space-rift"] .siteThemeFx__field{
+  background:
+    linear-gradient(104deg,transparent 0 44%,rgba(var(--legendary-energy-rgb),.22) 46%,rgba(var(--legendary-detail-rgb),.13) 48%,transparent 51%),
+    linear-gradient(76deg,rgba(var(--legendary-body-rgb),.13),transparent 45%,rgba(var(--legendary-energy-rgb),.11));
+  animation:theme-rift-shift 27s ease-in-out infinite;
+}
+
+html[data-theme-material="legendary"][data-theme-effect="space-rift"] .siteThemeFx__particles{
+  background:
+    repeating-linear-gradient(104deg,transparent 0 76px,rgba(var(--legendary-detail-rgb),.075) 77px 79px,transparent 80px 150px);
+  animation:theme-rift-shift 31s ease-in-out infinite reverse;
+}
+
+html[data-theme-material="legendary"][data-theme-effect="distortion"] .siteThemeFx__field{
+  background:
+    repeating-conic-gradient(from 21deg at 50% 48%,rgba(var(--legendary-energy-rgb),.10) 0 2deg,transparent 3deg 22deg),
+    radial-gradient(ellipse at 50% 48%,rgba(var(--legendary-detail-rgb),.17),transparent 46%);
+  animation:theme-reverse-fall 30s ease-in-out infinite;
+}
+
+html[data-theme-material="legendary"][data-theme-effect="distortion"] .siteThemeFx__particles{
+  background:
+    radial-gradient(circle at 20% 78%,rgba(var(--legendary-detail-rgb),.22) 0 1px,transparent 2px),
+    radial-gradient(circle at 72% 60%,rgba(var(--legendary-energy-rgb),.20) 0 1px,transparent 2px);
+  background-size:92px 92px,134px 134px;
+  animation:theme-reverse-fall 22s linear infinite reverse;
+}
+
+/* Reshiram, Zekrom, and the two fused Kyurem themes keep their dual identities. */
+html[data-theme-material="legendary"][data-theme-effect="white-flame"] .siteThemeFx__field{
+  background:
+    conic-gradient(from 205deg at 50% 62%,transparent 0 18%,rgba(191,232,243,.16) 22%,rgba(241,123,69,.18) 27%,transparent 34%),
+    radial-gradient(ellipse at 50% 82%,rgba(var(--legendary-energy-rgb),.24),transparent 48%);
+  animation:theme-field-rise 23s ease-in-out infinite;
+}
+
+html[data-theme-material="legendary"][data-theme-effect="thunder-generator"] .siteThemeFx__field{
+  background:
+    repeating-conic-gradient(from 14deg at 76% 36%,transparent 0 18deg,rgba(var(--legendary-energy-rgb),.13) 19deg 20deg,transparent 21deg 42deg),
+    radial-gradient(ellipse at 76% 36%,rgba(var(--legendary-energy-rgb),.20),transparent 32%),
+    linear-gradient(150deg,rgba(var(--legendary-body-rgb),.20),transparent 58%);
+  animation:theme-ring-breathe 24s ease-in-out infinite;
+}
+
+html[data-theme-material="legendary"][data-theme-effect="freeze-shock"] .siteThemeFx__field,
+html[data-theme-material="legendary"][data-theme-effect="ice-burn"] .siteThemeFx__field{
+  background:
+    repeating-linear-gradient(132deg,transparent 0 70px,rgba(137,221,235,.10) 71px 73px,transparent 74px 138px),
+    repeating-linear-gradient(48deg,transparent 0 90px,rgba(var(--legendary-energy-rgb),.12) 91px 93px,transparent 94px 170px),
+    radial-gradient(ellipse at 52% 52%,rgba(var(--legendary-body-rgb),.20),transparent 46%);
+  animation:theme-prism-shift 27s ease-in-out infinite;
+}
+
+html[data-theme-material="legendary"][data-theme-effect="freeze-shock"] .siteThemeFx__particles{
+  background:linear-gradient(122deg,transparent 0 47%,rgba(57,141,222,.20) 48%,rgba(135,230,243,.25) 49%,transparent 51%);
+  animation:theme-blade-pass 18s ease-in-out infinite;
+}
+
+html[data-theme-material="legendary"][data-theme-effect="ice-burn"] .siteThemeFx__particles{
+  background:
+    radial-gradient(ellipse at 30% 72%,rgba(137,221,235,.18),transparent 36%),
+    radial-gradient(ellipse at 72% 28%,rgba(240,122,62,.18),transparent 34%);
+  animation:theme-field-drift 21s ease-in-out infinite;
+}
+
+/* Kalos: structured life light, inward drain, and cell correction. */
+html[data-theme-material="legendary"][data-theme-effect="life-antlers"] .siteThemeFx__field{
+  background:
+    repeating-linear-gradient(70deg,transparent 0 86px,rgba(115,227,209,.10) 87px 89px,transparent 90px 170px),
+    repeating-linear-gradient(110deg,transparent 0 108px,rgba(208,170,66,.09) 109px 111px,transparent 112px 204px),
+    radial-gradient(ellipse at 50% 100%,rgba(var(--legendary-energy-rgb),.25),transparent 54%);
+  animation:theme-field-rise 28s ease-in-out infinite;
+}
+
+html[data-theme-material="legendary"][data-theme-effect="cocoon-drain"] .siteThemeFx__field{
+  background:
+    conic-gradient(from 18deg at 50% 46%,transparent 0 9%,rgba(var(--legendary-body-rgb),.18) 10% 16%,transparent 17% 42%,rgba(var(--legendary-detail-rgb),.08) 43% 48%,transparent 49% 100%),
+    radial-gradient(ellipse at 50% 46%,rgba(var(--legendary-body-rgb),.24),transparent 46%);
+  animation:theme-ring-breathe 22s ease-in-out infinite reverse;
+}
+
+html[data-theme-material="legendary"][data-theme-effect="cell-grid"] .siteThemeFx__field{
+  background:
+    linear-gradient(30deg,rgba(var(--legendary-energy-rgb),.09) 12%,transparent 12.5%,transparent 87%,rgba(var(--legendary-energy-rgb),.09) 87.5%),
+    linear-gradient(150deg,rgba(var(--legendary-energy-rgb),.09) 12%,transparent 12.5%,transparent 87%,rgba(var(--legendary-energy-rgb),.09) 87.5%),
+    linear-gradient(30deg,rgba(var(--legendary-energy-rgb),.09) 12%,transparent 12.5%,transparent 87%,rgba(var(--legendary-energy-rgb),.09) 87.5%);
+  background-size:56px 98px,56px 98px,56px 98px;
+  background-position:0 0,0 0,28px 49px;
+  animation:theme-grid-scan 28s linear infinite;
+}
+
+html[data-theme-material="legendary"][data-theme-effect="cell-grid"] .siteThemeFx__particles{
+  background:
+    radial-gradient(circle at 18% 20%,rgba(var(--legendary-energy-rgb),.30) 0 2px,transparent 3px),
+    radial-gradient(circle at 70% 58%,rgba(var(--legendary-detail-rgb),.27) 0 2px,transparent 3px);
+  background-size:84px 84px,126px 126px;
+  animation:theme-field-drift 24s ease-in-out infinite;
+}
+
+/* Alola: solar, lunar, and hard-edged prism behavior. */
+html[data-theme-material="legendary"][data-theme-effect="solar-corona"] .siteThemeFx__field{
+  background:
+    repeating-conic-gradient(from 0deg at 50% 36%,rgba(var(--legendary-energy-rgb),.12) 0 2deg,transparent 3deg 16deg),
+    radial-gradient(circle at 50% 36%,rgba(var(--legendary-energy-rgb),.26),transparent 38%);
+  animation:theme-ring-breathe 25s ease-in-out infinite;
+}
+
+html[data-theme-material="legendary"][data-theme-effect="lunar-phase"] .siteThemeFx__field{
+  background:
+    radial-gradient(circle at 72% 25%,transparent 0 10%,rgba(var(--legendary-detail-rgb),.24) 10.5% 11.2%,transparent 12%),
+    conic-gradient(from 18deg at 72% 25%,transparent 0 23%,rgba(var(--legendary-energy-rgb),.14) 24% 27%,transparent 28% 100%),
+    radial-gradient(ellipse at 72% 25%,rgba(var(--legendary-body-rgb),.26),transparent 42%);
+  animation:theme-ring-breathe 31s ease-in-out infinite;
+}
+
+html[data-theme-material="legendary"][data-theme-effect="prism-rays"] .siteThemeFx__field{
+  background:
+    repeating-conic-gradient(from 10deg at 50% 42%,rgba(249,216,52,.12) 0 2deg,transparent 2.5deg 17deg,rgba(88,217,233,.11) 18deg 20deg,transparent 21deg 36deg),
+    radial-gradient(circle at 50% 42%,rgba(255,242,164,.25),transparent 38%);
+  animation:theme-prism-shift 26s ease-in-out infinite;
+}
+
+html[data-theme-material="legendary"][data-theme-effect="prism-rays"] .siteThemeFx__particles{
+  background:
+    linear-gradient(118deg,transparent 0 46%,rgba(88,217,233,.14) 48%,rgba(249,216,52,.15) 50%,transparent 53%),
+    linear-gradient(62deg,transparent 0 46%,rgba(255,255,255,.11) 49%,transparent 52%);
+  animation:theme-rift-shift 24s ease-in-out infinite;
+}
+
+/* Galar: one directional blade, stable shield, or a radial Dynamax core. */
+html[data-theme-material="legendary"][data-theme-effect="blade-trail"] .siteThemeFx__field{
+  background:
+    linear-gradient(126deg,transparent 0 44%,rgba(var(--legendary-energy-rgb),.23) 46%,rgba(var(--legendary-detail-rgb),.15) 48%,transparent 51%),
+    radial-gradient(ellipse at 22% 78%,rgba(var(--legendary-body-rgb),.22),transparent 40%);
+  animation:theme-blade-pass 24s ease-in-out infinite;
+}
+
+html[data-theme-material="legendary"][data-theme-effect="shield-wave"] .siteThemeFx__field{
+  background:
+    repeating-radial-gradient(circle at 50% 48%,rgba(var(--legendary-energy-rgb),.13) 0 2px,transparent 3px 40px),
+    conic-gradient(from 45deg at 50% 48%,rgba(var(--legendary-body-rgb),.15),transparent 18% 32%,rgba(var(--legendary-detail-rgb),.10),transparent 52% 100%);
+  animation:theme-shield-wave 26s ease-in-out infinite;
+}
+
+html[data-theme-material="legendary"][data-theme-effect="dynamax-core"] .siteThemeFx__field{
+  background:
+    repeating-conic-gradient(from 0deg at 50% 45%,rgba(var(--legendary-energy-rgb),.15) 0 3deg,transparent 4deg 27deg),
+    radial-gradient(circle at 50% 45%,rgba(var(--legendary-detail-rgb),.24) 0 2%,rgba(var(--legendary-energy-rgb),.22) 3%,transparent 35%);
+  animation:theme-prism-shift 23s ease-in-out infinite;
+}
+
+/* Paldea: grounded ancient pulse, precise future grid, and stellar facets. */
+html[data-theme-material="legendary"][data-theme-effect="ancient-pulse"] .siteThemeFx__field{
+  background:
+    repeating-radial-gradient(ellipse at 50% 105%,rgba(var(--legendary-energy-rgb),.13) 0 2px,transparent 3px 52px),
+    radial-gradient(ellipse at 50% 100%,rgba(var(--legendary-detail-rgb),.22),transparent 54%);
+  animation:theme-ring-breathe 25s ease-in-out infinite;
+}
+
+html[data-theme-material="legendary"][data-theme-effect="ancient-pulse"] .siteThemeFx__particles{
+  background:
+    radial-gradient(ellipse at 24% 88%,rgba(232,213,181,.23) 0 1px,transparent 2px),
+    radial-gradient(ellipse at 72% 82%,rgba(230,92,55,.20) 0 1px,transparent 2px);
+  background-size:96px 54px,138px 72px;
+  animation:theme-field-rise 29s ease-in-out infinite;
+}
+
+html[data-theme-material="legendary"][data-theme-effect="future-grid"] .siteThemeFx__field{
+  background:
+    linear-gradient(rgba(67,216,228,.09) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(67,216,228,.09) 1px,transparent 1px),
+    radial-gradient(ellipse at 50% 74%,rgba(107,74,203,.26),transparent 48%);
+  background-size:48px 48px,48px 48px,auto;
+  animation:theme-grid-scan 24s linear infinite;
+}
+
+html[data-theme-material="legendary"][data-theme-effect="future-grid"] .siteThemeFx__particles{
+  background:
+    repeating-radial-gradient(circle at 50% 52%,rgba(217,230,85,.10) 0 2px,transparent 3px 48px);
+  animation:theme-ring-breathe 20s ease-in-out infinite;
+}
+
+html[data-theme-material="legendary"][data-theme-effect="stellar-crystal"] .siteThemeFx__field{
+  background:
+    repeating-conic-gradient(from 15deg at 50% 48%,rgba(66,201,197,.10) 0 5deg,transparent 6deg 24deg,rgba(128,112,220,.10) 25deg 29deg,transparent 30deg 48deg),
+    radial-gradient(circle at 50% 48%,rgba(235,255,255,.18),transparent 42%);
+  animation:theme-prism-shift 29s ease-in-out infinite;
+}
+
+html[data-theme-material="legendary"][data-theme-effect="stellar-crystal"] .siteThemeFx__particles{
+  background:
+    linear-gradient(60deg,transparent 42%,rgba(66,201,197,.09) 43% 44%,transparent 45%),
+    linear-gradient(120deg,transparent 42%,rgba(128,112,220,.09) 43% 44%,transparent 45%);
+  background-size:82px 142px;
+  animation:theme-grid-scan 32s linear infinite;
+}
+
+/* Console material layer */
+html[data-theme-material="handheld"] body,
+html[data-theme-material="handheld"] body.page-catalog-v2,
+html[data-theme-material="handheld"] body.page-roster-v2,
+html[data-theme-material="handheld"] body.page-optimizer,
+html[data-theme-material="handheld"] body.page-optimizer-v2{
+  background:
+    linear-gradient(180deg,color-mix(in srgb,var(--site-theme-surface) 58%,#0b0c10) 0 17%,#08090d 17.4% 52%,color-mix(in srgb,var(--site-theme-bg) 80%,#050609) 100%)!important;
+}
+
+html[data-theme-material="handheld"] .siteThemeFx__field{
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.08),transparent 13%),
+    linear-gradient(90deg,transparent 0 7%,rgba(255,255,255,.035) 7.2%,transparent 7.5% 92.5%,rgba(0,0,0,.16) 92.8%,transparent 93%),
+    linear-gradient(180deg,var(--site-theme-surface) 0 16.8%,#111217 17.2% 100%);
+}
+
+html[data-theme-material="handheld"] .siteThemeFx__particles{
+  opacity:.34;
+  background:
+    linear-gradient(180deg,transparent 0 16.6%,rgba(210,218,228,.45) 16.8% 17%,rgba(0,0,0,.60) 17.2% 17.5%,transparent 17.7%),
+    radial-gradient(circle at 94% 16.1%,#5ea6d8 0 2px,transparent 3px),
+    radial-gradient(circle at 6% 16.1%,rgba(255,255,255,.50) 0 1px,transparent 2px);
+}
+
+html[data-theme-material="handheld"] body :is(.panel,.v2-panel,.v2-grid-panel,.v2-detail-panel,.v2-card-skill-panel,.unitCard,.v2-filter-panel){
+  border-color:color-mix(in srgb,var(--site-theme-accent) 34%,rgba(214,220,229,.22))!important;
+  box-shadow:
+    inset 0 1px rgba(255,255,255,.055),
+    inset 0 -1px rgba(0,0,0,.40),
+    0 15px 34px rgba(0,0,0,.38)!important;
+}
+
+html[data-theme-finish="gloss-crimson"] .siteThemeFx__field,
+html[data-theme-finish="gloss-cobalt"] .siteThemeFx__field{
+  background:
+    linear-gradient(112deg,transparent 0 34%,rgba(255,255,255,.18) 43%,rgba(255,255,255,.045) 52%,transparent 63%),
+    linear-gradient(180deg,rgba(255,255,255,.12),transparent 13%),
+    linear-gradient(180deg,var(--site-theme-surface) 0 16.8%,#101115 17.2% 100%);
+  background-size:250% 17%,100% 100%,100% 100%;
+  background-position:50% 0,0 0,0 0;
+  background-repeat:no-repeat;
+  animation:theme-shell-sheen 30s ease-in-out infinite;
+}
+
+html[data-theme-finish="metallic-rose"] .siteThemeFx__field,
+html[data-theme-finish="bronze"] .siteThemeFx__field{
+  background:
+    repeating-linear-gradient(94deg,rgba(255,255,255,.025) 0 1px,transparent 1px 5px),
+    linear-gradient(118deg,transparent 0 38%,rgba(255,255,255,.14) 46%,transparent 55%),
+    linear-gradient(180deg,var(--site-theme-surface) 0 16.8%,color-mix(in srgb,var(--site-theme-bg) 74%,#0d0d10) 17.2% 100%);
+  background-size:100% 17%,250% 17%,100% 100%;
+  background-position:0 0,50% 0,0 0;
+  background-repeat:no-repeat;
+  animation:theme-shell-sheen 36s ease-in-out infinite;
+}
+
+html[data-theme-finish="black-white"] .siteThemeFx__field{
+  background:
+    linear-gradient(112deg,#0f1013 0 48%,#e8e7e2 48.4% 51.5%,#f1f0ec 52% 100%) 0 0/100% 17% no-repeat,
+    linear-gradient(90deg,#111216 0 49.5%,#2c2e32 50% 100%);
+}
+
+html[data-theme-finish="black-white"] .siteThemeFx__particles{
+  opacity:.36;
+  background:
+    conic-gradient(from 214deg at 24% 10%,transparent 0 18%,rgba(79,202,225,.34) 19% 20%,transparent 21% 100%),
+    conic-gradient(from 34deg at 76% 10%,transparent 0 18%,rgba(245,197,104,.30) 19% 20%,transparent 21% 100%),
+    linear-gradient(180deg,transparent 0 16.6%,rgba(38,38,42,.78) 16.8% 17.3%,transparent 17.5%);
+}
+
+html[data-theme-finish="black-white"] body :is(.panel,.v2-panel,.v2-grid-panel,.v2-detail-panel,.v2-card-skill-panel,.unitCard,.v2-filter-panel){
+  border-color:rgba(174,179,184,.38)!important;
+}
+
+html[data-theme-finish="galaxy"] .siteThemeFx__field{
+  background:
+    radial-gradient(circle at 18% 8%,rgba(255,255,255,.70) 0 1px,transparent 1.8px),
+    radial-gradient(circle at 72% 12%,rgba(99,201,233,.62) 0 1px,transparent 1.7px),
+    radial-gradient(ellipse at 62% 9%,rgba(168,76,154,.38),transparent 31%),
+    linear-gradient(128deg,#080a25 0 22%,#161b57 42%,#55388f 65%,#101015 100%);
+  background-size:86px 86px,128px 128px,100% 18%,100% 18%;
+  background-repeat:repeat-x,repeat-x,no-repeat,no-repeat;
+  animation:theme-galaxy-parallax 38s ease-in-out infinite;
+}
+
+html[data-theme-finish="warm-plastic"] .siteThemeFx__field{
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.20),transparent 8%),
+    linear-gradient(90deg,#d8d3c7 0 100%) 0 0/100% 17% no-repeat,
+    linear-gradient(180deg,#4d4d52 17.2%,#202024 100%);
+}
+
+html[data-theme-finish="warm-plastic"] .siteThemeFx__particles{
+  opacity:.52;
+  background:
+    radial-gradient(circle at 79% 11.5%,#e64b43 0 5px,transparent 6px),
+    radial-gradient(circle at 82% 13.2%,#e1bd3c 0 5px,transparent 6px),
+    radial-gradient(circle at 85% 11.5%,#43a55e 0 5px,transparent 6px),
+    radial-gradient(circle at 88% 13.2%,#4177b5 0 5px,transparent 6px),
+    linear-gradient(180deg,transparent 0 16.6%,rgba(38,38,42,.78) 16.8% 17.3%,transparent 17.5%);
+}
+
+html[data-theme-finish="warm-plastic"] body :is(.btn,.tab,.stateBtn,button):focus-visible{
+  outline:3px solid #e1bd3c;
+  outline-offset:2px;
+}
+
+@media (max-width:700px){
+  html:is([data-theme-material="legendary"],[data-theme-material="handheld"],[data-theme-material="gem"]) .siteThemeFx__particles{display:none;}
+}
+
+@media (prefers-reduced-motion:reduce){
+  html[data-theme-material="legendary"][data-theme-effect],
+  html[data-theme-material="legendary"][data-theme-effect] .siteThemeFx__field,
+  html[data-theme-material="legendary"][data-theme-effect] .siteThemeFx__particles,
+  html[data-theme-material="legendary"][data-theme-effect] body[data-optimizer-searching="true"] .siteThemeFx__field,
+  html[data-theme-material="legendary"][data-theme-effect] body[data-optimizer-searching="true"] .siteThemeFx__particles,
+  html[data-theme-material="handheld"] .siteThemeFx__field,
+  html[data-theme-material="handheld"] .siteThemeFx__particles,
+  html[data-theme-material="gem"] .siteThemeFx__field,
+  html[data-theme-material="gem"] .siteThemeFx__particles{
+    animation:none!important;
+    transform:none!important;
+  }
+  html[data-theme-material="legendary"][data-theme-effect] body :is(.panel,.v2-panel,.v2-grid-panel,.v2-detail-panel,.v2-card-skill-panel,.unitCard,.v2-filter-panel){
+    transition:none!important;
+  }
+  html[data-theme-material="legendary"][data-theme-effect]{
+    --evertale-legendary-outline:var(--legendary-energy)!important;
+  }
+}

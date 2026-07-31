@@ -28,6 +28,8 @@ if (!dataVersionBase || !runtimeRevision) {
 }
 
 const themeSource = read('seasonal-theme.js');
+const themeEffectsSource = read('theme-effects.css');
+const watermarkSource = read('element-watermark.css');
 for (const gem of ['gold', 'silver', 'ruby', 'sapphire', 'emerald', 'amethyst', 'diamond', 'pearl', 'platinum', 'opal', 'topaz', 'jade', 'obsidian', 'quartz']) {
   if (!themeSource.includes(`${gem}:`)) errors.push(`Gem/mineral theme is missing: ${gem}`);
 }
@@ -46,23 +48,71 @@ for (const legendary of [
 ]) {
   if (!themeSource.includes(`${legendary}:`)) errors.push(`Legendary theme is missing: ${legendary}`);
 }
-if (!themeSource.includes('data-theme-material') || !themeSource.includes('prefers-reduced-motion')) {
-  errors.push('Gem themes must retain material scoping and reduced-motion handling');
+if (!themeSource.includes('data-theme-material') || !themeEffectsSource.includes('html[data-theme-material="gem"]')) {
+  errors.push('Gem themes must retain their centralized material scoping');
 }
-if (!themeSource.includes('evertale-legendary-outline-pulse') || !themeSource.includes('--legendary-body') || !themeSource.includes('--legendary-energy') || !themeSource.includes('--legendary-detail')) {
-  errors.push('Legendary themes must retain their fixed palette and subtle energy-outline pulse');
+if (!themeSource.includes('--legendary-body') || !themeSource.includes('--legendary-energy') || !themeSource.includes('--legendary-detail')) {
+  errors.push('Legendary themes must retain their fixed body, energy, and detail palette');
+}
+if (themeSource.includes('installMaterialStyles') || themeSource.includes('evertale-material-theme-style')) {
+  errors.push('Theme material CSS must have one external authority instead of runtime style injection');
+}
+for (const effect of [
+  'rebirth', 'abyss-wind', 'aurora-water', 'magma', 'ocean-pressure', 'delta-stream',
+  'time-rings', 'space-rift', 'distortion', 'creation', 'white-flame', 'thunder-generator',
+  'freeze-shock', 'ice-burn', 'life-antlers', 'cocoon-drain', 'cell-grid', 'solar-corona',
+  'lunar-phase', 'prism-rays', 'blade-trail', 'shield-wave', 'dynamax-core',
+  'ancient-pulse', 'future-grid', 'stellar-crystal',
+]) {
+  if (!themeSource.includes(`effect:'${effect}'`)) errors.push(`Legendary aura metadata is missing: ${effect}`);
+  if (!themeEffectsSource.includes(`data-theme-effect="${effect}"`)) errors.push(`Legendary aura CSS is missing: ${effect}`);
+}
+for (const finish of ['gloss-crimson', 'gloss-cobalt', 'metallic-rose', 'bronze', 'black-white', 'galaxy', 'warm-plastic']) {
+  if (!themeSource.includes(`finish:'${finish}'`)) errors.push(`Console material metadata is missing: ${finish}`);
+  if (!themeEffectsSource.includes(`data-theme-finish="${finish}"`)) errors.push(`Console material CSS is missing: ${finish}`);
+}
+for (const attribute of ['data-theme-family', 'data-theme-effect', 'data-theme-finish', 'data-theme-hardware']) {
+  if (!themeSource.includes(attribute)) errors.push(`Theme runtime does not expose ${attribute}`);
+}
+if (!themeSource.includes('ensureEffectLayer') || !themeSource.includes('siteThemeFx__field') || !themeSource.includes('siteThemeFx__particles')) {
+  errors.push('Theme runtime must install exactly one dedicated, pointer-inert effect layer');
+}
+if (/body::(?:before|after)/.test(themeEffectsSource)) {
+  errors.push('Dynamic theme effects must not replace the shared body pseudo-element decoration');
+}
+if (!themeEffectsSource.includes('@media (prefers-reduced-motion:reduce)')) {
+  errors.push('Dynamic theme effects must retain a reduced-motion fallback');
+}
+if (!themeEffectsSource.includes('z-index:-1') || !themeEffectsSource.includes('isolation:isolate') || /body\s*>\s*main[\s\S]{0,120}z-index/i.test(themeEffectsSource)) {
+  errors.push('Theme effect stacking must stay behind content without trapping page overlays in a main stacking context');
+}
+if (!themeEffectsSource.includes('display:none') || !themeEffectsSource.includes('will-change:transform,opacity')) {
+  errors.push('Inactive theme compositor layers must stay hidden and unpromoted');
+}
+if (/hue-rotate|animation:[^;]*(?:flash|shake)/i.test(themeEffectsSource)) {
+  errors.push('Dynamic themes contain an unsafe or visually unstable animation');
+}
+if (watermarkSource.includes('data-theme-key=') || watermarkSource.includes('data-theme-material=')) {
+  errors.push('Element watermark CSS must not own page-level theme material rules');
 }
 const siteMenuSource = read('site-menu.js');
 for (const group of ['Calendar', 'Pokémon · Versions', 'Pokémon · Hoenn Shiny', 'Pokémon · Paldea', 'Gems & Minerals', 'DS & 3DS', 'Signature']) {
   if (!themeSource.includes(`'${group}'`)) errors.push(`Theme menu group is missing: ${group}`);
 }
 if (!siteMenuSource.includes('siteThemeSwatchDivider') || !siteMenuSource.includes('groupOrder')) errors.push('Theme swatch category dividers are missing');
+if (!siteMenuSource.includes("existing.forEach(button=>") || !siteMenuSource.includes("aria-pressed")) errors.push('Theme swatches do not preserve focused DOM nodes while updating active state');
 
 for (const page of pages) {
   const html = read(page);
   const refs = [...html.matchAll(/(?:src|href)="\.\/([^"?#]+)/g)].map(match => match[1]);
   for (const ref of refs) {
     if (!exists(ref)) errors.push(`${page} references missing file: ${ref}`);
+  }
+  if (!html.includes('theme-effects.css?v=2')) {
+    errors.push(`${page} does not load the current dynamic theme effects layer`);
+  }
+  if (!html.includes('site-menu.js?v=15')) {
+    errors.push(`${page} does not load the focus-preserving theme menu revision`);
   }
   if (!html.includes(`live-data-config.js?v=${expectedDataVersion}`)) {
     errors.push(`${page} does not use the current full live-data config cache token`);
@@ -112,6 +162,37 @@ for (const file of catalogOrder) {
   if (current < 0) errors.push(`index.html is missing runtime authority: ${file}`);
   if (current >= 0 && current < previous) errors.push(`index.html load order is invalid near: ${file}`);
   previous = Math.max(previous, current);
+}
+
+const optimizerHtml = read('optimizer.html');
+const optimizerSource = read('optimizer.js');
+const researchSource = read('optimizer-strategy-research.js');
+const v6LoaderSource = read('optimizer-v6/optimizer-v6-loader.js');
+const v6PolicySource = read('optimizer-v6/optimizer-v6-policy.js');
+for (const control of ['searchIntelligenceSelect', 'metaWeightSelect', 'useAdvisoryMetaPrior', 'researchStrategies']) {
+  if (!optimizerHtml.includes(`id="${control}"`)) errors.push(`Optimizer control is missing: ${control}`);
+}
+if (!optimizerHtml.includes('optimizer-v6-loader.js?v=7') || !v6LoaderSource.includes('optimizer-v6-local-meta.js')) {
+  errors.push('Optimizer V6 local-meta module is not in the current public loader chain');
+}
+for (const level of ['standard', 'deep', 'ultra']) {
+  if (!v6PolicySource.includes(`${level}:`)) errors.push(`Optimizer search intelligence profile is missing: ${level}`);
+}
+if (!optimizerSource.includes('options.advisoryMeta') || !optimizerSource.includes('dataset.optimizerSearching')) {
+  errors.push('Optimizer does not pass advisory meta or expose real search activity to the theme layer');
+}
+if (!optimizerSource.includes('recordAdvisoryComparison') || !optimizerSource.includes('optimizerAdvisoryChangedSlots')) {
+  errors.push('Optimizer does not expose pick changes between matched advisory-on and advisory-off runs');
+}
+if (!v6PolicySource.includes("defaultLevel:'deep'") || !read('optimizer-v6/optimizer-v6-engine.js').includes("probeLevel=useProbe?'probe'")) {
+  errors.push('Optimizer must retain the balanced default and two-pass complete-team tournament');
+}
+for (const contract of ['evertale_optimizer_local_meta_snapshot_v1', 'generated-release-order', 'dataVersion', 'scoresByIdentity']) {
+  if (!researchSource.includes(contract)) errors.push(`Local meta cache contract is missing: ${contract}`);
+}
+if (!researchSource.includes('expiresAt')) errors.push('Public advisory cache does not enforce source expiry');
+if (/document\.cookie/i.test(researchSource)) {
+  errors.push('Local optimizer meta should use localStorage, not request-transmitted cookies');
 }
 
 const catalog = JSON.parse(read('apkfiles/entries/bundles/catalog.bundle.json'));

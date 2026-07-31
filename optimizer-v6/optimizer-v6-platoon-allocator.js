@@ -23,8 +23,8 @@
   }
 
   function compatibleSet(candidate,selected,skipIndexes=[]){const used=[];selected.forEach((row,index)=>{if(row&&!skipIndexes.includes(index))mark(row,used);});return !rowConflicts(candidate,used);}
-  function improve(selected,candidates,deadline){
-    let current=[...selected],iterations=0,changed=true;const pool=candidates.slice(0,180);
+  function improve(selected,candidates,deadline,poolSize=180){
+    let current=[...selected],iterations=0,changed=true;const pool=candidates.slice(0,Math.max(20,Number(poolSize)||180));
     while(changed&&Date.now()<deadline){changed=false;iterations++;
       for(let i=0;i<current.length&&!changed;i++){
         const base=current.filter((_,index)=>index!==i),available=pool.filter(row=>compatibleSet(row,current,[i]));let best=current;
@@ -55,17 +55,19 @@
   }
 
   function allocate(generated,units,options={}){
-    const started=Date.now(),format=generated?.diagnostics?.format||'auto',fixed=new Map(),used=[];
+    const started=Date.now(),intelligence=P.intelligenceProfile(options),format=generated?.diagnostics?.format||'auto',fixed=new Map(),used=[];
     for(const [indexText,candidates] of Object.entries(generated?.lockedRows||{})){
       const index=Number(indexText),candidate=rows(candidates).find(row=>!rowConflicts(row,used));if(!candidate)throw new Error(`No legal candidate for locked platoon ${index+1}`);fixed.set(index,candidate);mark(candidate,used);
     }
-    const remaining=rows(generated?.candidates).filter(row=>!rowConflicts(row,used)),limit=P.platoons.rows-fixed.size,seed=greedy(remaining,limit),improved=improve(seed,remaining,Date.now()+(Number(options?.allocationBudgetMs)||1200));
+    const allocationBudgetMs=Math.max(100,Number(options?.allocationBudgetMs)||intelligence.allocationBudgetMs);
+    const allocatorPoolSize=Math.max(20,Number(options?.allocatorPoolSize)||intelligence.allocatorPoolSize);
+    const remaining=rows(generated?.candidates).filter(row=>!rowConflicts(row,used)),limit=P.platoons.rows-fixed.size,seed=greedy(remaining,limit),improved=improve(seed,remaining,Date.now()+allocationBudgetMs,allocatorPoolSize);
     const selected=improved.selected.slice(0,limit),assigned=Array(P.platoons.rows).fill(null),open=[];for(let i=0;i<P.platoons.rows;i++)if(fixed.has(i))assigned[i]=fixed.get(i);else open.push(i);
     selected.forEach((row,index)=>{if(open[index]!==undefined)assigned[open[index]]=row;});
     const allUsed=[];assigned.filter(Boolean).forEach(row=>mark(row,allUsed));const available=rows(units).filter(unit=>!allUsed.some(other=>P.identityConflicts(unit,other)));
     for(let i=0;i<P.platoons.rows;i++)if(!assigned[i]){const partial=partialRow(available.filter(unit=>!allUsed.some(other=>P.identityConflicts(unit,other))),format);if(partial.length){const evaluation=G.rowEvaluation(partial,'hybrid');assigned[i]={units:partial,unitIds:partial.map(uid),plan:'hybrid',element:format.includes('mono')?P.key(partial[0]?.element):'',format,score:evaluation.score,viable:evaluation.complete,evaluation,token:G.token(partial),partial:true};mark(assigned[i],allUsed);}}
     const output=assigned.map((row,index)=>{if(!row)return{name:`Platoon ${index+1}`,units:Array(P.platoons.size).fill(''),score:0,plan:'',element:'',viable:false};const placed=placeLocked(row,index,options);return{name:`Platoon ${index+1}`,units:placed.map(unit=>unit?uid(unit):''),score:row.score,plan:row.plan,element:row.element,viable:row.viable!==false,partial:!!row.partial};});
-    return{platoons:output,selectedRows:assigned,diagnostics:{...generated.diagnostics,objective:objective(assigned),allocationIterations:improved.iterations,durationMs:Date.now()-started,lockedRows:fixed.size}};
+    return{platoons:output,selectedRows:assigned,diagnostics:{...generated.diagnostics,objective:objective(assigned),allocationIterations:improved.iterations,durationMs:Date.now()-started,lockedRows:fixed.size,allocatorPoolSize,allocationBudgetMs}};
   }
 
   root.platoonAllocator={rowConflicts,mark,objective,better,scarcity,adjusted,greedy,compatibleSet,improve,placeLocked,partialRow,allocate};

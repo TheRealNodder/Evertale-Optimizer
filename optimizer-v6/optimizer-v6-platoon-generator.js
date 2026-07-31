@@ -21,7 +21,10 @@
   function canAdd(selected,unit){return !selected.some(other=>P.identityConflicts(other,unit));}
 
   function generateRows(units,configuration={}){
-    const {plan='hybrid',element='',format='auto',locked=[],limit=P.search.platoonRowsPerPlan,beamWidth=60}=configuration;
+    const intelligence=P.intelligenceProfile(configuration);
+    const {plan='hybrid',element='',format='auto',locked=[]}=configuration;
+    const limit=Math.max(1,Number(configuration.limit)||intelligence.platoonRowsPerPlan);
+    const beamWidth=Math.max(12,Number(configuration.beamWidth)||intelligence.platoonBeamWidth);
     const map=mapUnits(units),seed=[];
     for(const slot of locked){const unit=map.get(slot.id);if(!unit)throw new Error(`Invalid locked platoon unit: ${slot.id}`);if(!seed.includes(unit))seed.push(unit);}
     if(!P.distinctIdentity(seed))throw new Error('Locked platoon row contains duplicate identity');
@@ -29,7 +32,8 @@
     if(strictMono&&seed.some(unit=>(unit?.__v6?.element||P.key(unit?.element))!==target))throw new Error('Locked mono platoon row contains multiple elements');
     const sorted=rows(units).filter(unit=>!strictMono||(unit?.__v6?.element||P.key(unit?.element))===target)
       .sort((a,b)=>S.unitPotential(b,plan,configuration)-S.unitPotential(a,plan,configuration)||P.identity(a).entry.localeCompare(P.identity(b).entry));
-    const chosen=new Map(),add=unit=>{if(unit&&!chosen.has(uid(unit))&&chosen.size<55)chosen.set(uid(unit),unit);};seed.forEach(add);sorted.slice(0,28).forEach(add);
+    const candidateCap=Math.max(P.platoons.size,Number(configuration.platoonCandidateCap)||intelligence.platoonCandidateCap);
+    const chosen=new Map(),add=unit=>{if(unit&&!chosen.has(uid(unit))&&chosen.size<candidateCap)chosen.set(uid(unit),unit);};seed.forEach(add);sorted.slice(0,Math.ceil(candidateCap*.55)).forEach(add);
     if(['burn','poison','sleep','stun','blood'].includes(plan)){
       [...sorted].sort((a,b)=>S.planSignals(b,plan).setup-S.planSignals(a,plan).setup).slice(0,8).forEach(add);
       [...sorted].sort((a,b)=>S.planSignals(b,plan).payoff-S.planSignals(a,plan).payoff).slice(0,8).forEach(add);
@@ -46,18 +50,33 @@
   }
 
   function generate(units,options={}){
+    const intelligence=P.intelligenceProfile(options);
     const planOptions=options?.presetMode==='hard'?[P.key(options?.presetTag||'hybrid')]:['burn','poison','sleep','stun','blood','crisis','survivor','guardian','tempo','hybrid'];
     const format=options?.format||options?.doctrineOverrides?.monoVsRainbow?.selectionMode||'auto',mono=format==='force_mono'||format==='mono',all=[],seen=new Set();
     const add=row=>{if(row&&!seen.has(row.token)){seen.add(row.token);all.push(row);}};
+    const useProbe=options?.presetMode!=='hard'&&planOptions.length>1&&['standard','deep','ultra'].includes(intelligence.level);
+    const generationOptions=useProbe?{...options,searchIntelligence:'probe'}:options;
     for(const plan of planOptions){
-      if(mono)for(const element of P.elements)generateRows(units,{...options,plan,element,format:'force_mono'}).forEach(add);
+      if(mono)for(const element of P.elements)generateRows(units,{...generationOptions,plan,element,format:'force_mono'}).forEach(add);
       else{
-        generateRows(units,{...options,plan,format:'auto'}).forEach(add);
-        for(const element of P.elements)generateRows(units,{...options,plan,element,format:'force_mono',limit:3,beamWidth:35}).forEach(add);
+        generateRows(units,{...generationOptions,plan,format:'auto'}).forEach(add);
+        const generationIntelligence=P.intelligenceProfile(generationOptions);
+        for(const element of P.elements)generateRows(units,{...generationOptions,plan,element,format:'force_mono',limit:Math.max(3,Math.ceil(generationIntelligence.platoonRowsPerPlan*.4)),beamWidth:Math.max(24,Math.ceil(generationIntelligence.platoonBeamWidth*.72))}).forEach(add);
+      }
+    }
+    let refinedGroups=0;
+    if(useProbe&&all.length){
+      const groups=[],groupSeen=new Set(),refineLimit=intelligence.level==='ultra'?5:intelligence.level==='deep'?3:1;
+      for(const row of [...all].sort((a,b)=>b.score-a.score||a.token.localeCompare(b.token))){
+        const key=`${row.plan}|${row.format}|${row.element||''}`;if(groupSeen.has(key))continue;
+        groupSeen.add(key);groups.push({plan:row.plan,format:row.format,element:row.element||''});if(groups.length>=refineLimit)break;
+      }
+      for(const group of groups){
+        generateRows(units,{...options,...group}).forEach(add);refinedGroups++;
       }
     }
     const lockedRows={};for(let rowIndex=0;rowIndex<P.platoons.rows;rowIndex++){const locked=lockedForRow(options,rowIndex);if(!locked.length)continue;const element=mono?P.key(mapUnits(units).get(locked[0].id)?.element):'';const candidates=[];for(const plan of planOptions)generateRows(units,{...options,plan,element,format:mono?'force_mono':'auto',locked,limit:5}).forEach(row=>candidates.push({...row,rowIndex}));lockedRows[rowIndex]=candidates.sort((a,b)=>b.score-a.score||a.token.localeCompare(b.token));}
-    return{candidates:all.sort((a,b)=>b.score-a.score||a.token.localeCompare(b.token)),lockedRows,diagnostics:{inputUnits:units.length,candidateRows:all.length,plans:planOptions,format,mono,metaWeighting:P.metaProfile(options)}};
+    return{candidates:all.sort((a,b)=>b.score-a.score||a.token.localeCompare(b.token)),lockedRows,diagnostics:{inputUnits:units.length,candidateRows:all.length,plans:planOptions,format,mono,metaWeighting:P.metaProfile(options),searchIntelligence:intelligence,probeLevel:useProbe?'probe':intelligence.level,refinedGroups}};
   }
 
   root.platoonGenerator={rowEvaluation,lockedForRow,mapUnits,token,canAdd,generateRows,generate};

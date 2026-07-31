@@ -7,13 +7,34 @@
   const key=value=>txt(value).toLowerCase().replace(/[\u2019']/g,'').replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');
 
   const policy={
-    version:'optimizer-v6-policy-5',
+    version:'optimizer-v6-policy-7',
     story:{main:5,back:3,total:8,leaderScope:8,leaderStacking:'best_only'},
     platoons:{rows:20,size:5,storyExcluded:true,allowBlankAfterExhaustion:true},
     elements:['fire','water','storm','earth','light','dark'],
     rainbow:{preferredDistinct:4,minimumContribution:0.18},
     mono:{strictWhenFeasible:true},
     search:{storyBeamWidth:32,storyCandidateCap:40,storyPlacementFinalists:6,placementCombinations:3,alternatives:5,platoonRowsPerPlan:8},
+    intelligence:{
+      defaultLevel:'deep',
+      levels:{
+        probe:{
+          storyBeamWidth:14,storyCandidateCap:28,storyPlacementFinalists:3,placementCombinations:2,
+          platoonRowsPerPlan:4,platoonBeamWidth:28,platoonCandidateCap:34,allocatorPoolSize:120,allocationBudgetMs:700
+        },
+        standard:{
+          storyBeamWidth:32,storyCandidateCap:40,storyPlacementFinalists:6,placementCombinations:3,
+          platoonRowsPerPlan:8,platoonBeamWidth:60,platoonCandidateCap:55,allocatorPoolSize:180,allocationBudgetMs:1200
+        },
+        deep:{
+          storyBeamWidth:48,storyCandidateCap:50,storyPlacementFinalists:10,placementCombinations:6,
+          platoonRowsPerPlan:14,platoonBeamWidth:76,platoonCandidateCap:68,allocatorPoolSize:260,allocationBudgetMs:2800
+        },
+        ultra:{
+          storyBeamWidth:80,storyCandidateCap:64,storyPlacementFinalists:18,placementCombinations:12,
+          platoonRowsPerPlan:20,platoonBeamWidth:92,platoonCandidateCap:78,allocatorPoolSize:340,allocationBudgetMs:5500
+        }
+      }
+    },
     timeBudgetMs:{storyFirst:500,storyFinal:2000,platoonsUseful:3000,platoonsFinal:9000},
     evidence:{
       minimumMechanicalConfidence:0.8,
@@ -97,5 +118,13 @@
     return{level,...policy.metaWeighting.levels[level]};
   }
 
-  root.policy={...policy,clamp,txt,key,identity,identityConflicts,distinctIdentity,boundedComponents,metaProfile};
+  function intelligenceProfile(options={}){
+    const aliases={normal:'standard',balanced:'deep',high:'ultra',maximum:'ultra',max:'ultra'};
+    const raw=typeof options==='string'?options:options?.searchIntelligence;
+    const requested=aliases[key(raw)]||key(raw);
+    const level=policy.intelligence.levels[requested]?requested:policy.intelligence.defaultLevel;
+    return{level,...policy.intelligence.levels[level]};
+  }
+
+  root.policy={...policy,clamp,txt,key,identity,identityConflicts,distinctIdentity,boundedComponents,metaProfile,intelligenceProfile};
 })(window);

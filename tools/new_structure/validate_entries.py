@@ -369,6 +369,7 @@ def validate_optimizer_semantics(repo: Path, base: Path, errors: List[str], warn
     tags = runtime.get("tags") if isinstance(runtime.get("tags"), dict) else {}
     evidence = runtime.get("featureEvidence") if isinstance(runtime.get("featureEvidence"), dict) else {}
     skill_profiles = runtime.get("skillProfiles") if isinstance(runtime.get("skillProfiles"), dict) else {}
+    entries_by_source = {semantic_source_id(row): row for row in entries if semantic_source_id(row)}
     evidence_count = sum(len(rows) for rows in evidence.values() if isinstance(rows, list))
     skill_count = 0
     skill_gain_count = 0
@@ -474,6 +475,22 @@ def validate_optimizer_semantics(repo: Path, base: Path, errors: List[str], warn
                 invalid_feature_sources.append(f"{source_id}:{feature}:negative-or-AI-context")
             if feature == "applies_burn" and "frostburn" in source_blob:
                 invalid_feature_sources.append(f"{source_id}:{feature}:frostburn-is-not-burn-setup")
+            if feature == "payoff_burn":
+                source_entry = entries_by_source.get(source_id, {})
+                resolved = source_entry.get("resolved") if isinstance(source_entry.get("resolved"), dict) else {}
+                for source in item.get("sources") or []:
+                    match = re.fullmatch(r"resolved\.(activeSkills|passives)\.([^.]+)\.localization\.description", str(source))
+                    if not match:
+                        continue
+                    collection = resolved.get(match.group(1)) if isinstance(resolved.get(match.group(1)), dict) else {}
+                    ability = collection.get(match.group(2)) if isinstance(collection.get(match.group(2)), dict) else {}
+                    localization = ability.get("localization") if isinstance(ability.get("localization"), dict) else {}
+                    description = str(localization.get("description") or "").lower()
+                    standalone_burn = re.search(r"(?<!frost)(?<!non-)(?<!not )\b(?:burning|burned)\b|\bburn status\b", description)
+                    if description and not standalone_burn:
+                        invalid_feature_sources.append(
+                            f"{source_id}:{feature}:description-has-no-standalone-burn:{match.group(2)}"
+                        )
             if feature == "role_healer" and "healthy" in source_blob:
                 invalid_feature_sources.append(f"{source_id}:{feature}:healthy-substring")
     if bool(tags) != bool(flags.get("usesTags")):
