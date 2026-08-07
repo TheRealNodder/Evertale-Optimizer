@@ -1,0 +1,1315 @@
+{
+  "schemaVersion": 3,
+  "order": 750,
+  "id": "mizuchi",
+  "sourceId": "WhiteSnakeGirlDark01",
+  "name": "Mizuchi",
+  "title": "Black-Hearted White Snake",
+  "secondName": "Black-Hearted White Snake",
+  "description": "Akame Mizuchi was ranked the second strongest among the Four Masters of the Onmyo Bureau. As a result, her shoulders were constantly weighed down with many responsibilities. She had to protect everyone from the oni, had to serve as a model for the onmyoji of her bureau, and had to obey the orders of the Inner Palace...",
+  "category": "character",
+  "rarity": "SSR",
+  "stars": 5,
+  "evolvedStars": 6,
+  "element": "Dark",
+  "weaponType": "Katana",
+  "stats": {
+    "atk": 1315,
+    "hp": 4635,
+    "spd": 556,
+    "cost": 28
+  },
+  "hp": 4635,
+  "atk": 1315,
+  "spd": 556,
+  "cost": 28,
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/WhiteSnakeGirlDark01.png",
+  "imageVariants": [
+    {
+      "state": "source",
+      "family": "WhiteSnakeGirlDark",
+      "form": 1,
+      "sourceId": "WhiteSnakeGirlDark01",
+      "image": "https://ik.imagekit.io/r8fsa98s9/characters/WhiteSnakeGirlDark01.png"
+    }
+  ],
+  "forms": [
+    {
+      "state": "source",
+      "family": "WhiteSnakeGirlDark",
+      "form": 1,
+      "sourceId": "WhiteSnakeGirlDark01",
+      "image": "https://ik.imagekit.io/r8fsa98s9/characters/WhiteSnakeGirlDark01.png"
+    }
+  ],
+  "activeSkills": [
+    "SingleAttackAWhiteSnakeGirlDark",
+    "AllyBuffAWhiteSnakeGirlDark",
+    "DoubleAttackAWhiteSnakeGirlDark"
+  ],
+  "passiveSkills": [
+    "HitTargetPassiveAWhiteSnakeGirlDark",
+    "BecomeDeathPassiveAWhiteSnakeGirlDark",
+    "PlusHPBoostLv3",
+    "PlusAttackBoostLv3",
+    "AttackUpTargetEquippedSwordLv3",
+    "AddWeaponPrefGreatAxe"
+  ],
+  "leaderSkills": [
+    "AttackUpDeathD"
+  ],
+  "refs": {
+    "activeSkills": [
+      "SingleAttackAWhiteSnakeGirlDark",
+      "AllyBuffAWhiteSnakeGirlDark",
+      "DoubleAttackAWhiteSnakeGirlDark"
+    ],
+    "passives": [
+      "HitTargetPassiveAWhiteSnakeGirlDark",
+      "BecomeDeathPassiveAWhiteSnakeGirlDark",
+      "PlusHPBoostLv3",
+      "PlusAttackBoostLv3",
+      "AttackUpTargetEquippedSwordLv3",
+      "AddWeaponPrefGreatAxe"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": "AttackUpDeathD",
+    "leaderBuffCondition": "IsDeath",
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "SingleAttackAWhiteSnakeGirlDark": {
+        "id": "SingleAttackAWhiteSnakeGirlDark",
+        "found": true,
+        "localization": {
+          "name": "Compounding Fury",
+          "description": "250% damage to 1 enemy, plus 250% for each time a non-conjured unit (ally or enemy) on the battlefield has been defeated or sacrificed by any source since the user entered the battlefield (max of 1500% total damage after 5 or more non-conjured units have been defeated or sacrificed). Steals up to 1 Spirit from enemies. This attack ignores the Counter Stance Status Effect, and the effects of Skin passive skills.\n\nThen the target hit has its burn removed (including Mega Healing Burn).\n\nThis skill locks after use, and unlocks each time the user uses Snake's Fangs.",
+          "selected": "250%+ damage, steals up to 1 Spirit"
+        },
+        "ability": {
+          "name": "SingleAttackAWhiteSnakeGirlDark",
+          "class": "Ability",
+          "abilityScalor": 1.5,
+          "conditionalAbilityScalors": [
+            4,
+            6.5,
+            9,
+            11.5,
+            14
+          ],
+          "config": "SingleAttackAWhiteSnakeGirlDark",
+          "tuCost": 75,
+          "useLimit": 0,
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "damageFlags": [
+                "IgnoreArmor",
+                "HardIgnoreBlockDeath",
+                "IgnoreSkin"
+              ],
+              "applyToTargetType": "Enemy",
+              "drainPercent": 1.0,
+              "drainEffect": "VampireDrain1"
+            },
+            {
+              "buffs": [
+                "RemoveBurn"
+              ],
+              "applyToTargetType": "Enemy",
+              "showMissConditions": "ShowNoMiss",
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "SpiritDrainDContra"
+              ],
+              "applyConditions": "AllySpirit1OrMore",
+              "buffBackMode": true,
+              "skipAbilityEffect": true,
+              "applyToTargetType": "Enemy",
+              "showMissConditions": "ShowNoMiss"
+            },
+            {
+              "buffs": [
+                "Active1LOCKWhiteSnakeGirlDark",
+                "RemoveActive3LOCKWhiteSnakeGirlDark"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "WhiteSnakeGirlDarkSnake",
+          "attackScalors": [
+            "GoodIfGain1GoodBuff",
+            "GoodIfGain2GoodBuff",
+            "GoodIfGain3GoodBuff",
+            "GoodIfGain4GoodBuff",
+            "GoodIfGain5GoodBuff"
+          ],
+          "conditionedAbilityEffects": [
+            "WhiteSnakeGirlDarkSnake",
+            "WhiteSnakeGirlDarkSnake",
+            "WhiteSnakeGirlDarkSnake",
+            "WhiteSnakeGirlDarkSnake",
+            "WhiteSnakeGirlDarkSnake"
+          ],
+          "recommendEffectWhenUsable": -2,
+          "useCondition": "IsNotActive1LOCKWhiteSnakeGirlDark"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0.5,
+            0.5,
+            0,
+            0,
+            0.2,
+            0,
+            0.7,
+            0,
+            0,
+            0.3,
+            0
+          ],
+          "prefabs": [
+            "batfx_SnowWhiteNew/batfx_BGtempPurple1",
+            "batfx_ofuda3/batfx_ofuda3",
+            "batsfx_prefab/batsfx_sacrifice1",
+            "batfx_WhiteSnakeGirlDark/batfx_whitesnakeslayer2",
+            "batsfx_prefab/batsfx_snakes1",
+            "batfx_ofuda3/batfx_ofuda3",
+            "batfx_WhiteSnakeGirlDark/batfx_whitesnakebeast2",
+            "batfx_WhiteSnakeGirlDark/batfx_whitesnakebeast1",
+            "batsfx_prefab/batsfx_gravityball",
+            "batfx_whitesnakeseal1/batfx_whitesnakeseal1",
+            "batfx_WhiteSnakeGirlDark/batfx_reiseal3",
+            "batfx_MusashiDark/batfx_RipplePurple1",
+            "batfx_WhiteSnakeGirlDark/batfx_SlashPurple1",
+            "batsfx_prefab/batsfx_slash1"
+          ],
+          "sortOrderOffset": [
+            -100,
+            -2,
+            -2,
+            -2,
+            -5,
+            -2,
+            5,
+            5,
+            0,
+            -2,
+            10,
+            -1,
+            10,
+            0
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "positionInBattlefieldCenter": [
+            true,
+            true,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "Active1LOCKWhiteSnakeGirlDark": {
+            "class": "Buff",
+            "stackName": "Active1LOCKWhiteSnakeGirlDark",
+            "duration": -1,
+            "isHiddenFromPlayers": true,
+            "showAsPermanent": false,
+            "showAsTimer": false
+          },
+          "RemoveActive3LOCKWhiteSnakeGirlDark": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "Active3LOCKWhiteSnakeGirlDark"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "RemoveBurn": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "RemoveMegaHealingBurnApplyHealingBurn"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "SpiritDrainDContra": {
+            "class": "Buff",
+            "behaviors": [
+              "AddSpirit",
+              "AddSpirit"
+            ],
+            "behaviorOverrides": [
+              {
+                "percentOfMax": -0.1,
+                "toEnemyTeam": true
+              },
+              {
+                "percentOfMax": 0.1
+              }
+            ],
+            "duration": 0,
+            "applyConditions": "EnemySpirit1OrMore",
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {
+          "GoodIfGain1GoodBuff": {
+            "class": "AttackScalor",
+            "sourceCondition": "Has1GoodGirlBuffExactly"
+          },
+          "GoodIfGain2GoodBuff": {
+            "class": "AttackScalor",
+            "sourceCondition": "Has2GoodGirlBuffExactly"
+          },
+          "GoodIfGain3GoodBuff": {
+            "class": "AttackScalor",
+            "sourceCondition": "Has3GoodGirlBuffExactly"
+          },
+          "GoodIfGain4GoodBuff": {
+            "class": "AttackScalor",
+            "sourceCondition": "Has4GoodGirlBuffExactly"
+          },
+          "GoodIfGain5GoodBuff": {
+            "class": "AttackScalor",
+            "sourceCondition": "Has5GoodGirlBuff"
+          }
+        },
+        "conditions": {
+          "AllySpirit1OrMore": {
+            "class": "MonsterConditions",
+            "teamSpiritGreaterThan": 0
+          },
+          "IsNotActive1LOCKWhiteSnakeGirlDark": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "Active1LOCKWhiteSnakeGirlDark"
+              ]
+            }
+          }
+        }
+      },
+      "AllyBuffAWhiteSnakeGirlDark": {
+        "id": "AllyBuffAWhiteSnakeGirlDark",
+        "found": true,
+        "localization": {
+          "name": "Incite Bloodlust",
+          "description": "Heals all allies on the battlefield for 500% of the user's attack, grants each of them an Instant Death Ward, and Super Stealth.\n\nThen immediately give all other allies that have defeated 1+ units with attacks while on the battlefield the next turns by reducing their current TU. Active skills that grant turns cannot be used by any affected units until after they have had the turn.\n\nUnlocked each time a non-conjured unit (ally or enemy) on the battlefield is defeated or sacrificed by any source. This skill is locked again after each use or if the user leaves the battlefield.\n\nAn Instant Death Ward prevents a unit from being immediately defeated without damage by a non-boss enemy once, then is removed. Instant Death Wards cannot be ignored and cannot stack. Super Stealth will overwrite other Status effects. Super Stealthed units ignore enemy attacks that would damage more than 1 target. Super Stealth will be removed after ignoring 3 enemy attacks since applying, and can be overwritten by other status effects, except normal Stealth. Damage will not remove Super Stealth.",
+          "selected": "Heal, Grant Wards, Super Stealth, maybe turns\n(Will overwrite other status effects)"
+        },
+        "ability": {
+          "name": "AllyBuffAWhiteSnakeGirlDark",
+          "class": "Ability",
+          "config": "AllyBuffAWhiteSnakeGirlDark",
+          "tuCost": 10,
+          "useLimit": 0,
+          "spiritGain": 0,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "AllAlly",
+          "components": [
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "Heal500Percent",
+                "InstantKillImmunityOnce",
+                "SuperStealth"
+              ],
+              "applyToTargetType": "Friendly"
+            },
+            {
+              "buffs": [
+                "GrantAllOtherKills1AlliesTurnEBB",
+                "Active2LOCKWhiteSnakeGirlDark"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "friendlyEventType": "Finish",
+          "sourceEventType": "Finish",
+          "flags": [
+            "NoDamage",
+            "Healer",
+            "GiveTurn"
+          ],
+          "abilityEffect": "WhiteSnakeGirlDarkArmor",
+          "useCondition": "IsNotActive2LOCKWhiteSnakeGirlDark"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "allFriends": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.3,
+            0,
+            1,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_castingpurple2/batfx_castingpurple2",
+            "batsfx_prefab/batsfx_heal1",
+            "batfx_WhiteSnakeGirlDark/batfx_ofuda2Purple1",
+            "batfx_WhiteSnakeGirlDark/batfx_healarmor2",
+            "batsfx_prefab/batsfx_protect1"
+          ],
+          "sortOrderOffset": [
+            2,
+            1,
+            -2,
+            4,
+            3,
+            2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            false,
+            true,
+            false,
+            false,
+            true
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "Active2LOCKWhiteSnakeGirlDark": {
+            "class": "Buff",
+            "stackName": "Active2LOCKWhiteSnakeGirlDark",
+            "duration": -1,
+            "isHiddenFromPlayers": true,
+            "showAsPermanent": false,
+            "showAsTimer": false
+          },
+          "GiveTurn": {
+            "class": "Buff",
+            "behaviors": [
+              "GiveTurn"
+            ],
+            "behaviorOverrides": [
+              {}
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "textKeyToShowWhenApplied": "TurnGivenKey",
+            "isHiddenFromPlayers": true
+          },
+          "GrantAllOtherKills1AlliesTurnEBB": {
+            "class": "Buff",
+            "behaviors": [
+              "EnterBattleBuff"
+            ],
+            "behaviorOverrides": [
+              {
+                "allAlliesButSelfBuffs": [
+                  "GiveTurn",
+                  "OnExtraTurn",
+                  "JustGivenTurn"
+                ],
+                "spreadCondition": "Kills1"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "isHiddenFromPlayers": true
+          },
+          "Heal500Percent": {
+            "class": "Buff",
+            "behaviors": [
+              "AdjustHp"
+            ],
+            "behaviorOverrides": [
+              {
+                "percentOfSourceAttack": 5.0,
+                "abilityEffect": "SmallHeal1",
+                "hpboosts": [
+                  "HealBoost"
+                ]
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "InstantKillImmunityOnce": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity"
+            ],
+            "stackName": "InstantKillImmunityOnce",
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "InstantKill"
+                ],
+                "useLimit": 1
+              }
+            ],
+            "duration": -1,
+            "showAsTimer": true,
+            "tags": [
+              "InstantKillImmuneTemp",
+              "ThisIsAWard"
+            ],
+            "iconSpriteName": "IconInstantDefeatInvalid01"
+          },
+          "SuperStealth": {
+            "class": "Buff",
+            "behaviors": [
+              "EnterBattleBuff"
+            ],
+            "behaviorOverrides": [
+              {
+                "selfBuffs": [
+                  "RemoveStealth",
+                  "SuperStealthPT3",
+                  "SuperStealthPT2",
+                  "SuperStealthPT1"
+                ]
+              }
+            ],
+            "showAsPermanent": false,
+            "showAsTimer": false,
+            "duration": 0,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "IsNotActive2LOCKWhiteSnakeGirlDark": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "Active2LOCKWhiteSnakeGirlDark"
+              ]
+            }
+          }
+        }
+      },
+      "DoubleAttackAWhiteSnakeGirlDark": {
+        "id": "DoubleAttackAWhiteSnakeGirlDark",
+        "found": true,
+        "localization": {
+          "name": "Snake's Fangs",
+          "description": "400% damage to 2 enemies. 800% damage instead every second time this skill is activated while on the battlefield.\n\nThen all targets hit have their Poison Wards removed, and are granted Mega Poison for 200TU. Mega Poison will overwrite other status effects on those units. Mega Poison deals 20 times the damage of normal Poison and cannot be overwritten by normal Poison or Super Poison.\n\nUnlocked each time the user uses Compounding Fury, and is locked again after each use or if the user leaves the battlefield.",
+          "selected": "400% damage, grants Mega Poison\n(Will overwrite other status effects)"
+        },
+        "ability": {
+          "name": "DoubleAttackAWhiteSnakeGirlDark",
+          "class": "Ability",
+          "abilityScalor": 3,
+          "conditionalAbilityScalors": [
+            7
+          ],
+          "config": "DoubleAttackAWhiteSnakeGirlDark",
+          "tuCost": 10,
+          "useLimit": 0,
+          "spiritGain": 0,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "applyToTargetType": "Enemy",
+              "damageFlags": [
+                "IgnoreArmor",
+                "HardIgnoreBlockDeath"
+              ],
+              "drainPercent": 1.0,
+              "drainEffect": "VampireDrain1"
+            },
+            {
+              "buffs": [
+                "RemovePoisonImmunityOnce",
+                "MegaPoison",
+                "BurnImmunityTempForRevenge"
+              ],
+              "applyToTargetType": "Enemy",
+              "showMissConditions": "ShowNoMiss",
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "Active3LOCKWhiteSnakeGirlDark",
+                "RemoveActive1LOCKWhiteSnakeGirlDark",
+                "LoseMomentum",
+                "GainMomentum"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Hit",
+          "abilityEffect": "WhiteSnakeGirlDarkAttack1",
+          "attackScalors": [
+            "GoodWithMomentum"
+          ],
+          "conditionedAbilityEffects": [
+            "WhiteSnakeGirlDarkAttack1",
+            "WhiteSnakeGirlDarkAttack1"
+          ],
+          "recommendEffectWhenUsable": -2,
+          "flags": [
+            "Poisoner"
+          ],
+          "useCondition": "IsNotActive3LOCKWhiteSnakeGirlDark"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0,
+            0.7,
+            0,
+            0,
+            0,
+            0,
+            0.2,
+            0,
+            0.5,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_slashsheen",
+            "batfx_RizetteBrave/batfx_blackout2Sec",
+            "batfx_tailwindpurple/batfx_tailwindpurple",
+            "batfx_Hijikata/batfx_biglight2",
+            "batfx_WhiteSnakeGirlDark/batfx_SlashPurple1",
+            "batsfx_prefab/batsfx_whoosh1",
+            "batfx_WhiteSnakeGirlDark/batfx_SnakeDash1",
+            "batfx_WhiteSnakeGirlDark/batfx_PurpleRipple1",
+            "batfx_roundtableknightDark/batfx_castingSmoke",
+            "batfx_WhiteSnakeGirlDark/batfx_chainslashPurple1",
+            "batsfx_prefab/batsfx_multislash1",
+            "batfx_deadlyvampire1/batfx_camerashake1",
+            "batsfx_prefab/batsfx_slash1"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -100,
+            -50,
+            3,
+            -3,
+            0,
+            2,
+            -2,
+            2,
+            1,
+            2,
+            2,
+            2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            true,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            false,
+            false
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            true,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "Active3LOCKWhiteSnakeGirlDark": {
+            "class": "Buff",
+            "stackName": "Active3LOCKWhiteSnakeGirlDark",
+            "duration": -1,
+            "isHiddenFromPlayers": true,
+            "showAsPermanent": false,
+            "showAsTimer": false
+          },
+          "BurnImmunityTempForRevenge": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Burn",
+                  "BurnAfterTurn",
+                  "BurnAtEndOfTurn"
+                ],
+                "dontShowText": true
+              },
+              {
+                "name": "BurnAfterTurn"
+              },
+              {
+                "name": "BurnSelfOnHit"
+              }
+            ],
+            "duration": 1,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "tags": [
+              "BurnImmune"
+            ],
+            "stackName": "BurnImmunityTempForRevenge",
+            "isHiddenFromPlayers": true
+          },
+          "GainMomentum": {
+            "class": "Buff",
+            "stackName": "MomentumReady",
+            "duration": -1,
+            "isHiddenFromPlayers": true,
+            "applyConditions": "NotLostMomentum"
+          },
+          "LoseMomentum": {
+            "class": "Buff",
+            "stackName": "LoseMomentum",
+            "duration": 0,
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "MomentumReady"
+              }
+            ],
+            "isHiddenFromPlayers": true,
+            "applyConditions": "HasDamagedWithAttack"
+          },
+          "MegaPoison": {
+            "class": "Buff",
+            "stackName": "Poison",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "DamageOverTime"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Sleep"
+              },
+              {
+                "name": "Armor"
+              },
+              {
+                "name": "Burn"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              },
+              {
+                "name": "Stance"
+              },
+              {
+                "name": "SpiritLeaking"
+              },
+              {
+                "name": "SpiritLeakReady"
+              },
+              {
+                "name": "Condemn"
+              },
+              {
+                "name": "Slowed"
+              },
+              {
+                "name": "StunSkinStatus"
+              },
+              {
+                "name": "Decay"
+              },
+              {
+                "percentOfAttack": 0.05,
+                "damageColor": "Green",
+                "abilityEffect": "MidDeath1MegaPoison",
+                "extraDamageFlag": "MegaPoison"
+              }
+            ],
+            "tags": [
+              "Poison",
+              "MegaPoison"
+            ],
+            "canBePurified": true,
+            "duration": 200,
+            "showAsTimer": true,
+            "statusEffect": "MegaPoisonStatus",
+            "statusEffectOffset": 0.1,
+            "damageType": "Poison",
+            "iconSpriteName": "IconPurplePoison01"
+          },
+          "RemoveActive1LOCKWhiteSnakeGirlDark": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "Active1LOCKWhiteSnakeGirlDark"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "RemovePoisonImmunityOnce": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "PoisonImmunityOnce"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {
+          "GoodWithMomentum": {
+            "class": "AttackScalor",
+            "sourceCondition": "HasDamagedWithAttack"
+          }
+        },
+        "conditions": {
+          "IsNotActive3LOCKWhiteSnakeGirlDark": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "Active3LOCKWhiteSnakeGirlDark"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "passives": {
+      "HitTargetPassiveAWhiteSnakeGirlDark": {
+        "id": "HitTargetPassiveAWhiteSnakeGirlDark",
+        "found": true,
+        "localization": {
+          "name": "Black-Hearted",
+          "description": "This unit cannot be defeated by damage from Poison status effects, and cannot be sent to the reinforcements from the battlefield.\n\nThis unit has 50% damage reduction from attacks, and reduces the amount of any stun effects against the unit by 50TU.\n\nThis unit's attacks heal this unit for 100% of total damage dealt, ignore damage reduction effects, and any effects of non-boss enemies that would prevent targets from being defeated.\n\nEach time this unit damages any number of non-conjured units with an attack, this unit will immediately get the next turn. If this triggers 3 times within 50TU, this effect cannot trigger again until 50TU advances. This effect can trigger again against the same unit. Effects that influence TU order may interrupt the extra turn (e.g. Stuns targeting the lowest TU target)."
+        }
+      },
+      "BecomeDeathPassiveAWhiteSnakeGirlDark": {
+        "id": "BecomeDeathPassiveAWhiteSnakeGirlDark",
+        "found": true,
+        "localization": {
+          "name": "Snake Formation",
+          "description": "This unit enters battle with Super Stealth, and an Instant Death Ward.\n\nIf this unit would be defeated by an enemy attack or a status effect while having more than 1 HP, it instead survives with 1 HP.\n\nWhenever this unit gets the turn, if this unit's Active Skills are not disabled, this unit can't have its Active Skills disabled until the end of its turn.\n\nEach time this unit takes damage from an attack and survives until after the end of the turn, this unit will be Purified, and heal for 50% of its max HP.\n\nThis unit has a 20% chance to grant a random enemy an Ambush Counter whenever this unit or another unit (ally or enemy) enters the battlefield from reinforcements. This chance is increased by 20% per Awakening, up to 100% chance if this unit has 4 Awakenings.\n\nWhen a unit with an Ambush Counter takes a turn, and survives until after the end of the turn, 2 random units on their opposing team will be given the next turns by reducing their current TU, then the Ambush Counter is removed. These TU reductions may trigger before or after other effects that adjust the turn order. Ambush counters are not a status effect. Ambush counters cannot stack, cannot apply to boss units, and cannot be purified. An ambush counter is removed from a unit that is defeated or leaves the battlefield."
+        }
+      },
+      "PlusHPBoostLv3": {
+        "id": "PlusHPBoostLv3",
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv3",
+          "description": "Adds 1200 to this unit's max HP."
+        }
+      },
+      "PlusAttackBoostLv3": {
+        "id": "PlusAttackBoostLv3",
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv3",
+          "description": "Adds 300 to this unit's Attack."
+        }
+      },
+      "AttackUpTargetEquippedSwordLv3": {
+        "id": "AttackUpTargetEquippedSwordLv3",
+        "found": true,
+        "localization": {
+          "name": "Sword Hunter Lv3",
+          "description": "10% bonus to attacks against units equipped with Swords."
+        }
+      },
+      "AddWeaponPrefGreatAxe": {
+        "id": "AddWeaponPrefGreatAxe",
+        "found": true,
+        "localization": {
+          "name": "Greataxe Mastery",
+          "description": "Can use weapon skills of Greataxes in addition to their original preferred weapon type."
+        }
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": {
+      "class": "MonsterConditions",
+      "elements": [
+        "Death"
+      ]
+    }
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "WhiteSnakeGirlDark01",
+    "family": "WhiteSnakeGirlDark",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "WhiteSnakeGirlDark01",
+    "family": "WhiteSnakeGirlDark",
+    "class": "Monster",
+    "leaderBuff": "AttackUpDeathD",
+    "leaderBuffCondition": "IsDeath",
+    "activeSkills": {
+      "0": "SingleAttackAWhiteSnakeGirlDark",
+      "1": "AllyBuffAWhiteSnakeGirlDark",
+      "2": "DoubleAttackAWhiteSnakeGirlDark"
+    },
+    "passives": {
+      "0": "HitTargetPassiveAWhiteSnakeGirlDark",
+      "1": "BecomeDeathPassiveAWhiteSnakeGirlDark",
+      "2": "PlusHPBoostLv3",
+      "3": "PlusAttackBoostLv3",
+      "4": "AttackUpTargetEquippedSwordLv3",
+      "5": "AddWeaponPrefGreatAxe"
+    },
+    "cost": 28,
+    "baseAttack": 1315,
+    "baseMaxHp": 4635,
+    "speed": 556,
+    "element": "Death",
+    "weaponPref": "Katana",
+    "weaponPivotIndex": 0,
+    "secure": 1,
+    "superEvolve1": "WhiteSnakeGirlDark02",
+    "aiTargetPickWeight": 1,
+    "stars": 5,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 0,
+    "battleOrbImageFlip": 0,
+    "attackType": "Bash",
+    "skillVoices": {
+      "0": [
+        13,
+        14
+      ],
+      "1": [
+        5,
+        6
+      ],
+      "2": [
+        1,
+        2
+      ],
+      "3": [
+        9,
+        10
+      ]
+    },
+    "damageVoices": [
+      17,
+      18
+    ],
+    "deathVoices": [
+      21,
+      22
+    ],
+    "victoryVoices": [
+      25
+    ],
+    "lineupVoices": [
+      27,
+      28,
+      29
+    ],
+    "evolutionVoices": [
+      38
+    ],
+    "trainVoices": [
+      33,
+      34,
+      35,
+      36,
+      37
+    ],
+    "titleVoices": [
+      44
+    ],
+    "gachaVoices": [
+      45
+    ],
+    "loginVoices": [
+      46
+    ],
+    "tapVoices": [
+      47,
+      48,
+      49
+    ],
+    "idleVoices": [
+      50
+    ]
+  },
+  "_build": {
+    "scriptVersion": "8-semantic-authorities",
+    "sourceHash": "35a0d93c4a1dc843ca2e0aeb6d7e725dc80325f909512ddc7d3a244a8d3ae3ef",
+    "dependencyHash": "78c5af39d02214563990646dc3b17ef8e78a3ef07171b3036ab3ddd4593840d5",
+    "generatedAt": 1786078802
+  }
+}

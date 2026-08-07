@@ -1,6 +1,6 @@
 {
 	"Version": 23,
-	"Time": 1785308486,
+	"Time": 1785390074,
 	"AbilityConfig": {
 		"StunSingle200A": {
 			"class": "AbilityConfig",
@@ -47751,6 +47751,132 @@
 			"attackScalors": ["GoodVsProtector"],
 			"conditionedAbilityEffects": ["LubuDarkSP","LubuDarkSP"],
 			"useCondition": "NotLockedAndEnemyHasNonBurningProtector"
+		},
+		"SingleAttackAWhiteSnakeGirlDark":{
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage","ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"damageFlags": ["IgnoreArmor","HardIgnoreBlockDeath","IgnoreSkin"],
+				"applyToTargetType": "Enemy",
+				"drainPercent": 1.0,
+				"drainEffect": "VampireDrain1"
+			},{
+				"buffs": ["RemoveBurn"],
+				"applyToTargetType": "Enemy",
+				"showMissConditions": "ShowNoMiss",
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["SpiritDrainDContra"],
+				"applyConditions": "AllySpirit1OrMore",
+				"buffBackMode": true,
+				"skipAbilityEffect": true,
+				"applyToTargetType": "Enemy",
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs":["Active1LOCKWhiteSnakeGirlDark","RemoveActive3LOCKWhiteSnakeGirlDark"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "WhiteSnakeGirlDarkSnake",
+			"attackScalors": ["GoodIfGain1GoodBuff","GoodIfGain2GoodBuff","GoodIfGain3GoodBuff","GoodIfGain4GoodBuff","GoodIfGain5GoodBuff"],
+			"conditionedAbilityEffects": ["WhiteSnakeGirlDarkSnake","WhiteSnakeGirlDarkSnake","WhiteSnakeGirlDarkSnake","WhiteSnakeGirlDarkSnake","WhiteSnakeGirlDarkSnake"],
+			"recommendEffectWhenUsable": -2,
+			"useCondition": "IsNotActive1LOCKWhiteSnakeGirlDark"
+		},
+		"AllyBuffAWhiteSnakeGirlDark":{
+			"class": "AbilityConfig",
+			"targetingData": "AllAlly",
+			"components": ["ApplyBuff","ApplyBuff"],
+			"componentOverrides":[{
+				"buffs": ["Heal500Percent","InstantKillImmunityOnce","SuperStealth"],
+				"applyToTargetType": "Friendly"
+			},{
+				"buffs": ["GrantAllOtherKills1AlliesTurnEBB","Active2LOCKWhiteSnakeGirlDark"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"friendlyEventType": "Finish",
+			"sourceEventType": "Finish",
+			"flags": ["NoDamage","Healer","GiveTurn"],
+			"abilityEffect": "WhiteSnakeGirlDarkArmor",
+			"useCondition": "IsNotActive2LOCKWhiteSnakeGirlDark"
+		},
+		"DoubleAttackAWhiteSnakeGirlDark":{
+			"class": "AbilityConfig",
+			"targetingData": "2Enemy",
+			"components": ["Damage","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"applyToTargetType": "Enemy",
+				"damageFlags": ["IgnoreArmor","HardIgnoreBlockDeath"],
+				"drainPercent": 1.0,
+				"drainEffect": "VampireDrain1"
+			},{
+				"buffs": ["RemovePoisonImmunityOnce","MegaPoison","BurnImmunityTempForRevenge"],
+				"applyToTargetType": "Enemy",
+				"showMissConditions": "ShowNoMiss",
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["Active3LOCKWhiteSnakeGirlDark","RemoveActive1LOCKWhiteSnakeGirlDark","LoseMomentum","GainMomentum"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Hit",
+			"abilityEffect": "WhiteSnakeGirlDarkAttack1",
+			"attackScalors": ["GoodWithMomentum"],
+			"conditionedAbilityEffects": ["WhiteSnakeGirlDarkAttack1","WhiteSnakeGirlDarkAttack1"],
+			"recommendEffectWhenUsable": -2,
+			"flags": ["Poisoner"],
+			"useCondition": "IsNotActive3LOCKWhiteSnakeGirlDark"
+		},
+		"RandomEnemyBuffAWhiteSnakeGirlDark":{
+			"class": "AbilityConfig",
+			"targetingData": "AllEnemy",
+			"components": ["ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides":[{
+				"buffs": ["EmptyPlaceholder"],
+				"applyToTargetType": "Enemy"
+			},{
+				"buffs": ["KillRandomEnemyEOTAndCreditKillWhiteSnakeGirlDark"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss",
+				"applyConditions": "IsWorldDeathCounter1"
+			},{
+				"buffs": ["KillRandomEnemyEOTAndCreditKillWhiteSnakeGirlDark"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss",
+				"applyConditions": "IsWorldDeathCounter2"
+			},{
+				"buffs": ["KillRandomEnemyEOTAndCreditKillWhiteSnakeGirlDark"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss",
+				"applyConditions": "IsWorldDeathCounter3"
+			},{
+				"buffs": ["KillRandomEnemyEOTAndCreditKillWhiteSnakeGirlDark"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss",
+				"applyConditions": "IsWorldDeathCounter4"
+			},{
+				"buffs": ["KillRandomEnemyEOTAndCreditKillWhiteSnakeGirlDark"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss",
+				"applyConditions": "IsWorldDeathCounter5"
+			}],
+			"enemyEventType": "Finish",
+			"sourceEventType": "Finish",
+			"flags": ["NoDamage"],
+			"abilityEffect": "WhiteSnakeGirlDarkAllAttack",
+			"useCondition": "TimeInCombat100NotActive4LOCKWhiteSnakeGirlDark"
 		}
 	}
 }

@@ -1,6 +1,6 @@
 {
 	"Version": 23,
-    "Time": 1785304010,
+    "Time": 1785390128,
 	"MonsterConditions": {
 	"IsFire": {
 		"class": "MonsterConditions",
@@ -31289,6 +31289,57 @@
 		"not": {
 			"class": "MonsterConditions",
 			"buffStackNames": ["XiaoLiRegularPassiveLock"]
+		}
+	},
+	"AtLeast1AllyHPBelow50Percent": {
+		"class": "MonsterConditions",
+		"myTeamMonsterConditionMatchesNeeded": {
+			"HPBelow50Percent": 1
+		}
+	},
+	"AtLeast1AllyNoInstantDeathWard": {
+		"class": "MonsterConditions",
+		"myTeamMonsterConditionMatchesNeeded": {
+			"NoInstantDeathWard": 1
+		}
+	},
+	"IsPoisonEaterOrSleeper": {
+		"class": "MonsterConditions",
+		"abilityConfigFlag": "PoisonEater",
+		"or":{
+			"class": "MonsterConditions",
+			"abilityConfigFlag": "Sleep",
+			"or":{
+				"class": "MonsterConditions",
+				"abilityConfigFlag": "SleepAlt",
+				"or":{
+					"class": "MonsterConditions",
+					"abilityConfigFlag": "SleepChance"
+				}
+			}
+		}
+	},
+	"IsAmbushCounter": {
+		"class": "MonsterConditions",
+		"buffStackNames": ["AmbushCounter"]
+	},
+	"NoAllyIsAmbushCounter": {
+		"class": "MonsterConditions",
+		"not": {
+			"class": "MonsterConditions",
+			"myTeamMonsterConditionMatchesNeeded": {
+				"IsAmbushCounter": 1
+			}
+		}
+	},
+	"NoEnemyIsAmbushCounter": {
+		"class": "MonsterConditions",
+		"not": {
+			"class": "MonsterConditions",
+			"checkEnemyTeamOfMonster": true,
+			"enemyTeamMonsterConditionMatchesNeeded": {
+				"IsAmbushCounter": 1
+			}
 		}
 	}
 }
