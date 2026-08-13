@@ -172,7 +172,7 @@ const v6PolicySource = read('optimizer-v6/optimizer-v6-policy.js');
 for (const control of ['searchIntelligenceSelect', 'metaWeightSelect', 'useAdvisoryMetaPrior', 'researchStrategies']) {
   if (!optimizerHtml.includes(`id="${control}"`)) errors.push(`Optimizer control is missing: ${control}`);
 }
-if (!optimizerHtml.includes('optimizer-v6-loader.js?v=7') || !v6LoaderSource.includes('optimizer-v6-local-meta.js')) {
+if (!optimizerHtml.includes('optimizer-v6-loader.js?v=9') || !v6LoaderSource.includes('optimizer-v6-local-meta.js')) {
   errors.push('Optimizer V6 local-meta module is not in the current public loader chain');
 }
 for (const level of ['standard', 'deep', 'ultra']) {
@@ -226,12 +226,14 @@ if (!exists(liveCharacterBundlePath)) {
   }
 }
 
-const workflows = ['.github/workflows/entry-safe-rebuild.yml', '.github/workflows/master-control.yml'];
+const dataWorkflows = ['.github/workflows/entry-safe-rebuild.yml', '.github/workflows/master-control.yml'];
+const nodeMaintenanceWorkflow = '.github/workflows/node-maintenance.yml';
+const workflows = [...dataWorkflows, nodeMaintenanceWorkflow];
 const activeWorkflowFiles = fs.readdirSync(path.join(root, '.github', 'workflows')).filter(file => /\.ya?ml$/i.test(file));
 if (activeWorkflowFiles.length !== workflows.length) {
   errors.push(`Expected exactly ${workflows.length} active workflows, found ${activeWorkflowFiles.length}: ${activeWorkflowFiles.join(', ')}`);
 }
-for (const workflow of workflows) {
+for (const workflow of dataWorkflows) {
   if (!exists(workflow)) {
     errors.push(`Missing active workflow: ${workflow}`);
     continue;
@@ -245,6 +247,25 @@ for (const workflow of workflows) {
   }
   if (/actions\/(?:checkout|setup-python|upload-artifact)@v[1-5]\b/.test(yaml)) {
     errors.push(`${workflow} still contains a pre-Node-24 action major`);
+  }
+}
+
+if (!exists(nodeMaintenanceWorkflow)) {
+  errors.push(`Missing active workflow: ${nodeMaintenanceWorkflow}`);
+} else {
+  const yaml = read(nodeMaintenanceWorkflow);
+  for (const expected of [
+    'actions/checkout@v6',
+    'actions/setup-node@v6',
+    'node-version-file: .node-version',
+    'check-latest: true',
+    'npm ci',
+    'npm test',
+  ]) {
+    if (!yaml.includes(expected)) errors.push(`${nodeMaintenanceWorkflow} is missing ${expected}`);
+  }
+  if (/actions\/(?:checkout|setup-node)@v[1-5]\b/.test(yaml)) {
+    errors.push(`${nodeMaintenanceWorkflow} still contains a pre-Node-24 action major`);
   }
 }
 

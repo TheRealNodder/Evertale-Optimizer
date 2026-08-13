@@ -2,8 +2,8 @@
   'use strict';
 
   const root=g.OptimizerV6=g.OptimizerV6||{};
-  const P=root.policy,M=root.localMeta,F=root.featureModel,T=root.teamEvaluator,R=root.resourceReasoner,X=root.explanations;
-  if(!P||!M||!F||!T||!R||!X)return;
+  const P=root.policy,M=root.localMeta,E=root.evidence,F=root.featureModel,T=root.teamEvaluator,R=root.resourceReasoner,X=root.explanations;
+  if(!P||!M||!E||!F||!T||!R||!X)return;
 
   function assert(condition,message){if(!condition)throw new Error(message);}
   function unit(id,element='Fire',extra={}){
@@ -17,9 +17,9 @@
   }
   function skill(id,extra={}){return{id,name:id,description:'',tuCost:100,spiritGain:0,spiritCost:0,useLimit:null,targeting:'1Enemy',useCondition:'',flags:[],components:['Damage'],source:`resolved.activeSkills.${id}`,...extra};}
   function skillStore(units,skillsById={}){const out={};for(const row of units)out[row.sourceId]={sourceId:row.sourceId,family:row.family,skills:skillsById[row.sourceId]||[skill(`Attack${row.sourceId}`)]};return out;}
-  function withStore(store,units,profiles={},options={}){
+  function withStore(store,units,profiles={},options={},leaders={}){
     const previous=g.OptimizerRuntime;
-    g.OptimizerRuntime={...(previous||{}),chunks:{...(previous?.chunks||{}),featureEvidence:store,skillProfiles:profiles}};
+    g.OptimizerRuntime={...(previous||{}),chunks:{...(previous?.chunks||{}),featureEvidence:store,skillProfiles:profiles,leaderProfiles:leaders}};
     const attached=F.attach(units,options);
     g.OptimizerRuntime=previous;
     return attached;
@@ -136,6 +136,123 @@
       return 'mechanics outrank element without inventing affinity';
     });
 
+    test('Frostburn, Stealth, Counter, and Charge remain distinct engines',()=>{
+      for(const plan of ['frostburn','stealth','counter','charge']){
+        const raw=makeTeam(`Typed${plan}`),store={
+          [raw[0].sourceId]:[evidence(`applies_${plan}`)],
+          [raw[1].sourceId]:[evidence(`payoff_${plan}`)]
+        },report=T.evaluate(withStore(store,raw),{plan,format:'auto'});
+        assert(report.valid&&report.engine.complete,`${plan} did not produce a complete distinct engine: ${report.errors.join('; ')}`);
+        assert(F.mechanical(report.engine&&withStore(store,[raw[0]])[0].__v6.evidence,plan,'setup')>0,`${plan} setup evidence was not mapped`);
+      }
+      return 'four typed setup/payoff engines remain separate';
+    });
+
+    test('Counter stance is a self-contained engine',()=>{
+      const raw=makeTeam('CounterPlan'),store={};raw.slice(0,4).forEach(row=>store[row.sourceId]=[evidence('applies_counter')]);
+      const team=withStore(store,raw),engine=T.engineState(team,'counter',{presetMode:'hard'});
+      assert(engine.complete&&engine.coherent&&engine.requiresSetup&&!engine.requiresPayoff,'Counter stance incorrectly requires a nonexistent payoff feature');
+      return `${engine.contributorCount} stance contributors, no invented payoff`;
+    });
+
+    test('generated support, defense, counter, and timing features are consumed',()=>{
+      const raw=[unit('TypedSupport01','Light'),unit('TypedDefense01','Earth')],prepared=withStore({
+        TypedSupport01:[evidence('role_ally_healer'),evidence('role_ally_cleanser'),evidence('timing_entry_self')],
+        TypedDefense01:[evidence('defense_armor'),evidence('defense_hold_ground'),evidence('removes_sleep')]
+      },raw),support=F.archetypeSignal(prepared[0],'heal'),cleanse=F.archetypeSignal(prepared[0],'cleanse'),defense=F.archetypeSignal(prepared[1],'defense'),counter=F.counterProfile(prepared[1]);
+      assert(support.contributes&&cleanse.contributes,'Generated ally/team support roles were ignored');
+      assert(defense.contributes&&counter.hold_ground>0&&counter.removes_sleep>0,'Generated defense/counter evidence was ignored');
+      assert(F.timingProfile(prepared[0]).entry>0,'Generated entry timing evidence was ignored');
+      return 'typed support, defense, removal counter, and entry timing mapped';
+    });
+
+    test('team support outranks ally support, which outranks self-only support',()=>{
+      const raw=[unit('TeamSupport01','Light'),unit('AllySupport01','Light'),unit('SelfSupport01','Light')],prepared=withStore({
+        TeamSupport01:[evidence('role_team_healer'),evidence('role_team_cleanser')],
+        AllySupport01:[evidence('role_ally_healer'),evidence('role_ally_cleanser')],
+        SelfSupport01:[evidence('role_self_sustain'),evidence('role_self_cleanser')]
+      },raw),heal=prepared.map(unit=>F.archetypeSignal(unit,'heal').score),cleanse=prepared.map(unit=>F.archetypeSignal(unit,'cleanse').score);
+      assert(heal[0]>heal[1]&&heal[1]>heal[2],`Heal scope order is wrong: ${heal.join(' > ')}`);
+      assert(cleanse[0]>cleanse[1]&&cleanse[1]>cleanse[2],`Cleanse scope order is wrong: ${cleanse.join(' > ')}`);
+      return 'team > ally > self for Heal and Cleanse';
+    });
+
+    test('typed relations separate production, payoff, and anti-synergy',()=>{
+      const blocked=E.normalizeItem({...evidence('applies_burn'),relations:['prevents'],receipts:[{source:'raw.activeSkills[0]',relation:'prevents'}]}),produces=E.normalizeItem({...evidence('applies_burn'),relations:['produces'],receipts:[{source:'raw.activeSkills[0]',relation:'produces'}]});
+      assert(!blocked.authoritative&&blocked.relationCompatible===false,'Preventive relation became positive Burn setup');
+      assert(produces.authoritative&&produces.relationCompatible===true,'Positive production relation was rejected');
+      const raw=makeTeam('Relation'),baseStore={};
+      for(let i=0;i<4;i++)baseStore[raw[i].sourceId]=[evidence(i%2?'payoff_burn':'applies_burn')];
+      const vulnerableStore={...baseStore,[raw[4].sourceId]:[{...evidence('penalized_by_burn',1.2,.99),relations:['penalized_by'],receipts:[{source:'raw.activeSkills[0]',relation:'penalized_by'}]}]};
+      const safe=T.evaluate(withStore(baseStore,raw),{plan:'burn',presetMode:'hard'}),vulnerable=T.evaluate(withStore(vulnerableStore,raw),{plan:'burn',presetMode:'hard'});
+      assert(vulnerable.penalties.planVulnerability>0&&vulnerable.score<safe.score,'Explicit Burn vulnerability did not reduce a Burn team');
+      assert(vulnerable.contributionLedger.plan.vulnerableUnits.includes(raw[4].id),'Anti-synergy unit was omitted from the contribution ledger');
+      return `Burn vulnerability penalty ${vulnerable.penalties.planVulnerability.toFixed(1)}/100`;
+    });
+
+    test('same-plan status removal is a bounded conflict, not a counter bonus',()=>{
+      const makeRemoval=(feature,targetTeam)=>({...evidence(feature,1,.99),relations:['removes'],receipts:[{source:'raw.activeSkills[0]',relation:'removes',targetTeam}]});
+      for(const plan of ['burn','poison','sleep']){
+        const row=withStore({[`Remove${plan}01`]:[makeRemoval(`removes_${plan}`,plan==='burn'?'allies':'enemies')]},[unit(`Remove${plan}01`)])[0];
+        assert(F.removalConflict(row,plan)>0&&F.antiSynergy(row,plan)>0,`${plan} removal did not register as plan conflict`);
+      }
+      const allyPoison=withStore({AllyPoisonCleanse01:[makeRemoval('removes_poison','allies')]},[unit('AllyPoisonCleanse01')])[0];
+      assert(F.removalConflict(allyPoison,'poison')===0,'Ally Poison cleanse was incorrectly treated as an enemy-engine conflict');
+      const pivot=withStore({SleepPivot01:[evidence('payoff_burn'),evidence('applies_sleep'),makeRemoval('removes_burn','enemies')]},[unit('SleepPivot01','Water')])[0];
+      assert(F.destructiveRemoval(pivot,'burn')>0&&F.hardPlanConflict(pivot,'burn'),'Enemy Burn-consuming Sleep pivot was not rejected from hard Burn');
+      return 'Burn removal and enemy Poison/Sleep removal conflict; allied cleanse remains support';
+    });
+
+    test('primary archetype is required while secondary remains bounded',()=>{
+      const raw=[...makeTeam('Archetype'),unit('ArchetypeReserve01','Dark')],store={};
+      store[raw[0].sourceId]=[evidence('applies_burn')];store[raw[1].sourceId]=[evidence('payoff_burn')];store[raw[2].sourceId]=[evidence('applies_burn')];store[raw[3].sourceId]=[evidence('team_healer')];
+      const prepared=withStore(store,raw),options={plan:'hybrid',format:'auto',requirePlanComplete:false,archetypes:['burn','heal']},contract=T.archetypeAvailability(prepared,options);
+      const aligned=T.evaluate(prepared.slice(0,8),{...options,archetypeContract:contract});
+      const missingPrimary=T.evaluate([prepared[0],prepared[1],...prepared.slice(3,9)],{...options,archetypeContract:contract});
+      const noSecondary=T.evaluate([prepared[0],prepared[1],prepared[2],...prepared.slice(4,9)],{...options,archetypeContract:contract});
+      assert(aligned.valid&&aligned.archetypes.primary.satisfied&&aligned.archetypes.secondary.satisfied,'Aligned primary/secondary contract failed');
+      assert(!missingPrimary.valid&&/Primary burn effect/.test(missingPrimary.errors.join(' ')),'Primary archetype was treated as an optional score hint');
+      assert(noSecondary.valid&&!noSecondary.archetypes.secondary.satisfied,'Secondary archetype incorrectly became a hard constraint');
+      assert(P.archetype.secondaryScoreShare<=.25,'Secondary archetype score is not bounded');
+      return `primary required; secondary capped at ${Math.round(P.archetype.secondaryScoreShare*100)}%`;
+    });
+
+    test('forced status plan rejects neutral-majority completion',()=>{
+      const raw=makeTeam('Coherence'),weakStore={
+        [raw[0].sourceId]:[evidence('applies_burn')],
+        [raw[1].sourceId]:[evidence('payoff_burn')]
+      },strongStore={...weakStore,[raw[2].sourceId]:[evidence('applies_burn')],[raw[3].sourceId]:[evidence('payoff_burn')]};
+      const weak=T.evaluate(withStore(weakStore,raw),{plan:'burn',presetMode:'hard',format:'auto'}),strong=T.evaluate(withStore(strongStore,raw),{plan:'burn',presetMode:'hard',format:'auto'});
+      assert(!weak.valid&&weak.engine.complete&&!weak.engine.coherent,'Two contributors passed a forced eight-unit Burn plan');
+      assert(strong.valid&&strong.engine.coherent&&strong.contributionLedger.plan.contributors===4,'Four-contributor forced Burn plan did not pass coherently');
+      return `${weak.engine.contributorCount}/8 rejected; ${strong.engine.contributorCount}/8 accepted`;
+    });
+
+    test('unavailable typed plan is explicitly relaxed',()=>{
+      const raw=makeTeam('Relaxed'),prepared=withStore({},raw),contract=T.planAvailability(prepared,'charge',{presetMode:'hard'}),report=T.evaluate(prepared,{plan:'charge',presetMode:'hard',format:'auto',planContract:contract});
+      assert(contract.relaxed&&!contract.feasible&&/authoritative charge evidence/.test(contract.reason),'Missing Charge authority was not diagnosed');
+      assert(report.valid&&report.relaxations.some(row=>row.type==='plan'&&row.plan==='charge'),'Unavailable plan relaxation was silent or still failed');
+      return contract.reason;
+    });
+
+    test('unavailable primary archetype is explicitly relaxed',()=>{
+      const raw=makeTeam('RelaxedPrimary'),prepared=withStore({},raw),options={plan:'hybrid',format:'auto',requirePlanComplete:false,archetypes:['charge']},contract=T.archetypeAvailability(prepared,options),report=T.evaluate(prepared,{...options,archetypeContract:contract});
+      assert(contract.primary?.relaxed&&/authoritative charge evidence/.test(contract.primary.reason),'Missing primary Charge authority was not diagnosed');
+      assert(report.valid&&report.relaxations.some(row=>row.type==='archetype'&&row.archetype==='charge'),'Primary effect relaxation was silent or still failed');
+      return contract.primary.reason;
+    });
+
+    test('support plans require direct scoped evidence when feasible',()=>{
+      const cases={heal:'role_team_healer',cleanse:'role_team_cleanser',defense:'role_defender',guardian:'role_guardian',spirit:'resource_spirit',tempo:'tempo_turn'};
+      for(const [plan,feature] of Object.entries(cases)){
+        const raw=makeTeam(`Support${plan}`),store={[raw[0].sourceId]:[evidence(feature)],[raw[1].sourceId]:[evidence(feature)]},prepared=withStore(store,raw),contract=T.planAvailability(prepared,plan,{presetMode:'hard'}),report=T.evaluate(prepared,{plan,presetMode:'hard',format:'auto',planContract:contract});
+        assert(contract.feasible&&!contract.relaxed&&report.valid&&report.engine.coherent,`${plan} did not enforce its direct support evidence: ${report.errors.join('; ')}`);
+      }
+      const neutral=withStore({},makeTeam('AttackRelaxed')),attack=T.planAvailability(neutral,'attack',{presetMode:'hard'});
+      assert(attack.relaxed&&/authoritative attack evidence/.test(attack.reason),'Unavailable Attack evidence was not explicitly relaxed');
+      return 'Heal, Cleanse, Defense, Guardian, Spirit, and Tempo distinct; Attack relaxed without evidence';
+    });
+
     test('V6 auto plan selection ignores legacy Frostburn keyword bias',()=>{
       const raw=[unit('SleepSetup01','Water'),unit('SleepPayoff01','Water'),unit('SleepSupport01','Light')];
       const prepared=withStore({
@@ -170,6 +287,14 @@
       assert(leader.selected&&leader.candidates.length===2,'Expected two candidates and one selected leader');
       assert(leader.selected.scope===8,'Selected leader did not evaluate all eight');
       return `${leader.selected.unitId} selected from ${leader.candidates.length}`;
+    });
+
+    test('structured leader profiles are consumed with provenance',()=>{
+      const raw=makeTeam('StructuredLeader'),leaders={StructuredLeaderA01:{id:'WaterAllies25',name:'Water allies',description:'Water allies gain 25% Attack',affected:'Water allies',condition:'',elements:['water'],percentages:[25],generic:false}};
+      const leader=T.leaderValue(withStore({},raw,{}, {},leaders));
+      assert(leader.selected?.source==='generated-leader-profile','Generated leader profile was ignored');
+      assert(leader.selected.element==='water'&&leader.selected.percent===25,'Structured leader element or percentage was reinterpreted incorrectly');
+      return `${leader.selected.leaderId} covers ${leader.selected.matches}/8 selected units`;
     });
 
     test('coherent rainbow requires four contributing elements',()=>{
@@ -298,6 +423,16 @@
       const raw=makeTeam('BadLock'),store={};raw.forEach((row,index)=>store[row.sourceId]=[evidence(index%2?'payoff_burn':'applies_burn')]);const prepared=withStore(store,raw),previous=g.OptimizerRuntime;
       g.OptimizerRuntime={contracts:{optimizerFoundationReady:true},chunks:{featureEvidence:store,skillProfiles:{}}};const report=expectedFailure(()=>root.engine.run(prepared,{preparedV6:true,buildScope:'story',presetMode:'hard',presetTag:'burn',currentLayout:{storyMain:['MissingUnit','','','',''],storyBack:['','','']},slotLocks:{storyMain:[true,false,false,false,false],storyBack:[false,false,false]}}));g.OptimizerRuntime=previous;
       assert(report.diagnostics.v6Failed&&report.diagnostics.usedFallback===false&&/Locked Story unit/.test(report.diagnostics.v6Error),'Invalid lock did not fail explicitly');return report.diagnostics.v6Error;
+    });
+
+    test('locked platoon identities are reserved before Story search',()=>{
+      const raw=Array.from({length:10},(_,index)=>unit(`Reserve${String.fromCharCode(65+index)}01`,'Fire',{stats:{atk:1000+index*10,hp:5000,spd:100,cost:20}})),store={};
+      raw.forEach((row,index)=>store[row.sourceId]=[evidence(index%2?'payoff_burn':'applies_burn')]);const prepared=withStore(store,raw),reserved=raw[9].sourceId;
+      const options={preparedV6:true,buildScope:'story',presetMode:'hard',presetTag:'burn',currentLayout:{platoons:[[reserved,'','','','']]},slotLocks:{platoons:[[true,false,false,false,false]]}};
+      const eligible=root.engine.storyEligible(prepared,options),report=root.engine.run(prepared,options),selected=[...report.story.main,...report.story.back];
+      assert(!eligible.some(row=>row.sourceId===reserved)&&!selected.includes(reserved),'Story consumed a unit locked to a platoon');
+      assert(report.diagnostics.reservedPlatoonUnits===1,'Reserved platoon diagnostics are missing');
+      return `${reserved} reserved from Story`;
     });
 
     const failed=results.filter(row=>!row.pass);

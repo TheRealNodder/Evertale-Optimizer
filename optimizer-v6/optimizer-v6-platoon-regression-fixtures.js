@@ -36,6 +36,13 @@
       const result=A.allocate({candidates:[low,high,neutral],lockedRows:{},diagnostics:{format:'auto'}},[],{allocationBudgetMs:100}),tokens=result.selectedRows.filter(Boolean).map(row=>row.token);
       assert(tokens.includes('high-guardian')&&tokens.includes('neutral')&&!tokens.includes('low-guardian'),`Scarce guardian misallocated: ${tokens}`);return tokens.join('+');
     });
+    test('hard-plan fallback rows report explicit relaxation',()=>{
+      const all=attach(Array.from({length:10},(_,index)=>unit(`Relax${index}01`)),{}),first=candidate('burn-row',all.slice(0,5),80);first.plan='burn';
+      const result=A.allocate({candidates:[first],lockedRows:{},diagnostics:{format:'auto',requestedPlan:'burn'}},all,{allocationBudgetMs:100}),relaxed=result.platoons[1];
+      assert(relaxed.units.every(Boolean)&&relaxed.plan==='hybrid'&&relaxed.relaxed,'Fallback row was not explicitly marked relaxed');
+      assert(result.diagnostics.relaxations.some(row=>row.row===2&&row.requestedPlan==='burn'),'Allocator diagnostics hid hard-plan relaxation');
+      return relaxed.relaxationReason;
+    });
     const failed=results.filter(row=>!row.pass);return{passed:results.length-failed.length,failed:failed.length,total:results.length,results};
   }
   root.platoonRegressionFixtures={run};g.runOptimizerV6PlatoonRegressionFixtures=run;

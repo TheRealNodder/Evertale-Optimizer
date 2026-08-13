@@ -7,6 +7,22 @@
 
   const rows=value=>Array.isArray(value)?value:[];
   const uid=unit=>P.txt(unit?.id||unit?.sourceId||unit?.family||unit?.name);
+  const unitIds=unit=>[unit?.id,unit?.sourceId,unit?.family,unit?.internal?.sourceId].map(P.txt).filter(Boolean);
+
+  function lockedPlatoonIds(options){
+    const layouts=rows(options?.currentLayout?.platoons),locks=rows(options?.slotLocks?.platoons),ids=[];
+    layouts.forEach((layout,rowIndex)=>rows(layout).forEach((id,slotIndex)=>{if(locks?.[rowIndex]?.[slotIndex]&&P.txt(id))ids.push(P.txt(id));}));
+    return ids;
+  }
+
+  function storyEligible(prepared,options={}){
+    const reservedIds=lockedPlatoonIds(options);if(!reservedIds.length)return rows(prepared);
+    const index=new Map();for(const unit of rows(prepared))for(const id of unitIds(unit))if(!index.has(id))index.set(id,unit);
+    const reserved=[];for(const id of reservedIds){const unit=index.get(id);if(!unit)throw new Error(`Locked platoon unit is invalid or unowned: ${id}`);if(!reserved.includes(unit))reserved.push(unit);}
+    const storyLocked=S.lockedSlots(options).map(slot=>index.get(slot.id)).filter(Boolean);
+    if(storyLocked.some(unit=>reserved.some(other=>P.identityConflicts(unit,other))))throw new Error('A unit cannot be locked in both Story and platoons');
+    return rows(prepared).filter(unit=>!reserved.some(other=>P.identityConflicts(unit,other)));
+  }
 
   function selectedMode(options){
     const value=options?.format||options?.doctrineOverrides?.monoVsRainbow?.selectionMode||'auto';
@@ -14,29 +30,29 @@
   }
 
   function selectedPlan(options,prepared){
-    const aliases={heal:'guardian',cleanse:'guardian',hp_buff:'guardian',hpbuff:'guardian',turn:'tempo',spirit:'tempo',atk_buff:'hybrid',atkbuff:'hybrid',offense:'hybrid'};
-    const raw=P.key(options?.plan||options?.presetTag||''),explicit=aliases[raw]||raw;
+    const raw=options?.plan||options?.presetTag||'',explicit=P.normalizeArchetype(raw);
     if(explicit&&explicit!=='auto'&&explicit!=='none')return explicit;
+    const primary=P.requestedArchetypes(options)[0];if(primary)return primary;
     return evidencePrimaryPlan(prepared);
   }
 
   function evidencePrimaryPlan(prepared){
-    const units=rows(prepared),paired=new Set(['burn','poison','sleep','stun','blood']);
+    const units=rows(prepared),paired=new Set(P.pairedPlans),selfContained=new Set(P.selfContainedPlans);
     const topSum=values=>values.filter(value=>value>0).sort((a,b)=>b-a).slice(0,P.story.total).reduce((sum,value)=>sum+value,0);
     let best='hybrid',bestScore=0;
-    for(const plan of ['burn','poison','sleep','stun','blood','crisis','survivor','guardian','tempo']){
+    for(const plan of P.plans.filter(plan=>plan!=='hybrid')){
       let score=0;
       if(paired.has(plan)){
         const setup=topSum(units.map(unit=>F.mechanical(unit?.__v6?.evidence,plan,'setup')));
         const payoff=topSum(units.map(unit=>F.mechanical(unit?.__v6?.evidence,plan,'payoff')));
         const contributors=units.filter(unit=>F.mechanical(unit?.__v6?.evidence,plan,'setup')||F.mechanical(unit?.__v6?.evidence,plan,'payoff')).length;
         score=Math.min(setup,payoff)*2+(setup+payoff)*.35+contributors*.08;
-      }else if(plan==='crisis'||plan==='survivor'){
+      }else if(P.payoffOnlyPlans.includes(plan)){
         score=topSum(units.map(unit=>F.mechanical(unit?.__v6?.evidence,plan,'payoff')))*1.4;
-      }else if(plan==='guardian'){
-        score=topSum(units.map(unit=>Number(unit?.__v6?.roles?.protection)||0))*1.15;
-      }else if(plan==='tempo'){
-        score=topSum(units.map(unit=>Number(unit?.__v6?.roles?.tempo)||0));
+      }else if(selfContained.has(plan)){
+        score=topSum(units.map(unit=>F.mechanical(unit?.__v6?.evidence,plan,'setup')))*1.4;
+      }else{
+        score=topSum(units.map(unit=>F.archetypeSignal(unit,plan).score))*1.25;
       }
       if(score>bestScore){best=plan;bestScore=score;}
     }
@@ -61,8 +77,11 @@
 
   function candidateRecord(kind,plan,result){
     const best=result?.best;if(!best)return null;
-    return{kind,format:kind==='mono'?'mono':kind==='rainbow'?'rainbow':'hybrid',plan,element:best.element||best.evaluation?.element?.elements&&Object.keys(best.evaluation.element.elements)[0]||'',score:best.evaluation.score,best,result};
+    const diagnostics=result?.diagnostics?.planContract||result?.diagnostics?.archetypeContract?result.diagnostics:best?.searchDiagnostics||result?.diagnostics||{},relaxationRank=Number(diagnostics?.planContract?.relaxed===true)+Number(diagnostics?.archetypeContract?.primary?.relaxed===true);
+    return{kind,format:kind==='mono'?'mono':kind==='rainbow'?'rainbow':'hybrid',plan,element:best.element||best.evaluation?.element?.elements&&Object.keys(best.evaluation.element.elements)[0]||'',score:best.evaluation.score,relaxationRank,best,result};
   }
+
+  function candidateOrder(a,b){return a.relaxationRank-b.relaxationRank||b.score-a.score||a.format.localeCompare(b.format)||a.plan.localeCompare(b.plan)||a.element.localeCompare(b.element);}
 
   function runCandidate(prepared,spec,options){
     if(spec.kind==='mono')return S.bestMono(prepared,{...options,plan:spec.plan});
@@ -71,7 +90,7 @@
   }
 
   function tournament(prepared,options={}){
-    const mode=selectedMode(options),hard=options?.presetMode==='hard',primary=selectedPlan(options,prepared),plans=hard?[primary]:['burn','poison','sleep','stun','blood','crisis','survivor','guardian','tempo','hybrid'];
+    const mode=selectedMode(options),hard=options?.presetMode==='hard',primary=selectedPlan(options,prepared),plans=hard?[primary]:P.plans;
     const requested=P.intelligenceProfile(options),specs=[];
     if(mode==='force_mono')plans.forEach(plan=>specs.push({kind:'mono',plan}));
     else if(mode==='force_rainbow')plans.forEach(plan=>specs.push({kind:'rainbow',plan}));
@@ -79,8 +98,8 @@
       specs.push({kind:primary==='hybrid'?'hybrid':'plan',plan:primary},{kind:'mono',plan:primary},{kind:'rainbow',plan:primary});
       for(const plan of plans)if(plan!==primary)specs.push({kind:plan==='hybrid'?'hybrid':'plan',plan});
     }
-    const useProbe=!hard&&specs.length>3&&requested.level!=='probe';
-    const probeLevel=useProbe?'probe':requested.level,refineLimit=useProbe?(requested.level==='ultra'?3:requested.level==='deep'?2:1):0;
+    const useProbe=specs.length>1&&requested.level!=='probe';
+    const probeLevel=useProbe?'probe':requested.level,refineLimit=useProbe?(hard?(requested.level==='ultra'?2:1):(requested.level==='ultra'?3:requested.level==='deep'?2:1)):0;
     const candidates=[];let completed=0,total=specs.length+refineLimit;
     const emit=(spec,row,stage='format-tournament')=>{
       completed++;
@@ -96,18 +115,19 @@
     }
     let refined=0;
     if(useProbe&&candidates.length){
-      candidates.sort((a,b)=>b.score-a.score||a.format.localeCompare(b.format)||a.plan.localeCompare(b.plan)||a.element.localeCompare(b.element));
+      candidates.sort(candidateOrder);
       const finalists=candidates.slice(0,refineLimit),tokens=new Set(finalists.map(row=>`${row.kind}|${row.plan}`));
       total=specs.length+finalists.length;
       const replacements=[];
       for(const candidate of finalists){
         const spec={kind:candidate.kind,plan:candidate.plan},result=runCandidate(prepared,spec,options),row=candidateRecord(spec.kind,spec.plan,result);
-        replacements.push(row||candidate);refined++;emit(spec,row||candidate,'format-refinement');
+        const improved=row&&candidateOrder(row,candidate)<=0?row:candidate;
+        replacements.push(improved);refined++;emit(spec,improved,'format-refinement');
       }
       const retained=candidates.filter(row=>!tokens.has(`${row.kind}|${row.plan}`));
       candidates.splice(0,candidates.length,...retained,...replacements);
     }
-    candidates.sort((a,b)=>b.score-a.score||a.format.localeCompare(b.format)||a.plan.localeCompare(b.plan)||a.element.localeCompare(b.element));
+    candidates.sort(candidateOrder);
     const distinct=[];for(const candidate of candidates){const ids=new Set(candidate.best.ordered.map(uid));if(distinct.every(other=>other.best.ordered.filter(unit=>ids.has(uid(unit))).length<=6))distinct.push(candidate);if(distinct.length>=6)break;}
     return{
       selected:candidates[0]||null,alternatives:distinct.filter(row=>row!==candidates[0]).slice(0,5),candidates,
@@ -121,7 +141,8 @@
     const started=Date.now();
     try{
       const prepared=prepare(units,options);if(prepared.length<P.story.total)throw new Error(`Insufficient owned roster: ${prepared.length}/${P.story.total}`);
-      const contest=tournament(prepared,options),winner=contest.selected;if(!winner)throw new Error('No legal V6 Story team was found');
+      const storyPool=storyEligible(prepared,options);if(storyPool.length<P.story.total)throw new Error(`Insufficient Story roster after platoon reservations: ${storyPool.length}/${P.story.total}`);
+      const contest=tournament(storyPool,options),winner=contest.selected;if(!winner)throw new Error('No legal V6 Story team was found');
       const story={main:winner.best.story.main.map(uid),back:winner.best.story.back.map(uid)};
       let platoons=[],platoonDiagnostics=null;
       if(options.buildScope!=='story'){
@@ -137,7 +158,9 @@
         alternatives:contest.alternatives.map(row=>({format:row.format,plan:row.plan,element:row.element,score:row.score})),
         scoreComponents:winner.best.evaluation.components,penalties:winner.best.evaluation.penalties,leader:winner.best.evaluation.leader,
         elementStrategy:winner.best.evaluation.element,unmetNeeds:winner.best.evaluation.unmetNeeds,
-        storySearch:winner.result.diagnostics||winner.best.searchDiagnostics||{},preparedUnits:prepared.length,metaWeighting:winner.best.evaluation.metaWeighting,
+        contributionLedger:winner.best.evaluation.contributionLedger,archetypeContract:winner.best.evaluation.archetypes,
+        relaxations:winner.best.evaluation.relaxations,planContract:winner.result.diagnostics?.planContract||winner.best.searchDiagnostics?.planContract||null,
+        storySearch:winner.result.diagnostics||winner.best.searchDiagnostics||{},preparedUnits:prepared.length,storyEligibleUnits:storyPool.length,reservedPlatoonUnits:prepared.length-storyPool.length,metaWeighting:winner.best.evaluation.metaWeighting,
         advisoryMeta:options?.advisoryMeta?.enabled?{
           enabled:true,source:options.advisoryMeta.source,dataVersion:options.advisoryMeta.dataVersion,
           confidence:options.advisoryMeta.confidence,maxOrder:options.advisoryMeta.maxOrder
@@ -153,6 +176,6 @@
     }catch(error){console.error('[Optimizer V6] failed without fallback.',error);return emptyResult(error);}
   }
 
-  root.engine={prepare,selectedMode,selectedPlan,evidencePrimaryPlan,tournament,run,emptyResult};
+  root.engine={prepare,selectedMode,selectedPlan,evidencePrimaryPlan,lockedPlatoonIds,storyEligible,tournament,run,emptyResult};
   g.OptimizerEngineV6=root.engine;
 })(window);

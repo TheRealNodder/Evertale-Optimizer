@@ -54,7 +54,7 @@
     if(typeof Worker!=='function'){
       const result=root.engine.run(prepared,{...options,preparedV6:true,onProgress:progress=>emit(progress,options)});if(result?.diagnostics?.v6Failed)throw new Error(result.diagnostics.v6Error);writeCache(key,result);return result;
     }
-    const jobId=`v6-${Date.now()}-${++sequence}`,worker=new Worker('./optimizer-v6/optimizer-v6-worker.js?v=6');
+    const jobId=`v6-${Date.now()}-${++sequence}`,worker=new Worker('./optimizer-v6/optimizer-v6-worker.js?v=9');
     return new Promise((resolve,reject)=>{
       active={jobId,worker,reject};
       worker.onmessage=event=>{
@@ -65,7 +65,7 @@
         if(message.type==='complete'){writeCache(key,message.result);emit({type:'progress',stage:'complete',completed:1,total:1,percent:100,message:'Complete'},options);resolve(message.result);}
       };
       worker.onerror=event=>{worker.terminate();if(active?.jobId===jobId)active=null;reject(new Error(event.message||'Optimizer V6 worker failed'));};
-      worker.postMessage({type:'run',jobId,units:prepared,options:cleanOptions(options),featureEvidence:g.OptimizerRuntime?.chunks?.featureEvidence||{},skillProfiles:g.OptimizerRuntime?.chunks?.skillProfiles||{}});
+      worker.postMessage({type:'run',jobId,units:prepared,options:cleanOptions(options),featureEvidence:g.OptimizerRuntime?.chunks?.featureEvidence||{},skillProfiles:g.OptimizerRuntime?.chunks?.skillProfiles||{},leaderProfiles:g.OptimizerRuntime?.chunks?.leaderProfiles||{}});
     });
   }
 

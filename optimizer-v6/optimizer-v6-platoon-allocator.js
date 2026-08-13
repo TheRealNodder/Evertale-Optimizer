@@ -13,7 +13,7 @@
   function better(a,b){for(const key of ['filled','complete','weakest','total','diversity'])if(num(a[key])!==num(b[key]))return num(a[key])>num(b[key]);return false;}
 
   function scarcity(candidates){const counts=new Map();for(const row of candidates)for(const unit of row.units){const key=P.identity(unit).entry;counts.set(key,(counts.get(key)||0)+1);}return counts;}
-  function adjusted(row,counts){const cost=row.units.reduce((sum,unit)=>sum+1/Math.max(1,counts.get(P.identity(unit).entry)||1),0);return num(row.score)-cost*2.5;}
+  function adjusted(row,counts){const cost=row.units.reduce((sum,unit)=>sum+1/Math.max(1,counts.get(P.identity(unit).entry)||1),0);return num(row.score)+(row.viable!==false?1000:0)-cost*2.5;}
 
   function greedy(candidates,rowLimit=P.platoons.rows,seed=[]){
     const selected=[...seed],used=[];selected.filter(Boolean).forEach(row=>mark(row,used));const counts=scarcity(candidates);
@@ -55,7 +55,7 @@
   }
 
   function allocate(generated,units,options={}){
-    const started=Date.now(),intelligence=P.intelligenceProfile(options),format=generated?.diagnostics?.format||'auto',fixed=new Map(),used=[];
+    const started=Date.now(),intelligence=P.intelligenceProfile(options),format=generated?.diagnostics?.format||'auto',requestedPlan=generated?.diagnostics?.requestedPlan||'',fixed=new Map(),used=[];
     for(const [indexText,candidates] of Object.entries(generated?.lockedRows||{})){
       const index=Number(indexText),candidate=rows(candidates).find(row=>!rowConflicts(row,used));if(!candidate)throw new Error(`No legal candidate for locked platoon ${index+1}`);fixed.set(index,candidate);mark(candidate,used);
     }
@@ -65,9 +65,10 @@
     const selected=improved.selected.slice(0,limit),assigned=Array(P.platoons.rows).fill(null),open=[];for(let i=0;i<P.platoons.rows;i++)if(fixed.has(i))assigned[i]=fixed.get(i);else open.push(i);
     selected.forEach((row,index)=>{if(open[index]!==undefined)assigned[open[index]]=row;});
     const allUsed=[];assigned.filter(Boolean).forEach(row=>mark(row,allUsed));const available=rows(units).filter(unit=>!allUsed.some(other=>P.identityConflicts(unit,other)));
-    for(let i=0;i<P.platoons.rows;i++)if(!assigned[i]){const partial=partialRow(available.filter(unit=>!allUsed.some(other=>P.identityConflicts(unit,other))),format);if(partial.length){const evaluation=G.rowEvaluation(partial,'hybrid');assigned[i]={units:partial,unitIds:partial.map(uid),plan:'hybrid',element:format.includes('mono')?P.key(partial[0]?.element):'',format,score:evaluation.score,viable:evaluation.complete,evaluation,token:G.token(partial),partial:true};mark(assigned[i],allUsed);}}
-    const output=assigned.map((row,index)=>{if(!row)return{name:`Platoon ${index+1}`,units:Array(P.platoons.size).fill(''),score:0,plan:'',element:'',viable:false};const placed=placeLocked(row,index,options);return{name:`Platoon ${index+1}`,units:placed.map(unit=>unit?uid(unit):''),score:row.score,plan:row.plan,element:row.element,viable:row.viable!==false,partial:!!row.partial};});
-    return{platoons:output,selectedRows:assigned,diagnostics:{...generated.diagnostics,objective:objective(assigned),allocationIterations:improved.iterations,durationMs:Date.now()-started,lockedRows:fixed.size,allocatorPoolSize,allocationBudgetMs}};
+    for(let i=0;i<P.platoons.rows;i++)if(!assigned[i]){const partial=partialRow(available.filter(unit=>!allUsed.some(other=>P.identityConflicts(unit,other))),format);if(partial.length){const evaluation=G.rowEvaluation(partial,'hybrid'),hardRelaxed=!!requestedPlan;assigned[i]={units:partial,unitIds:partial.map(uid),plan:'hybrid',requestedPlan,element:format.includes('mono')?P.key(partial[0]?.element):'',format,score:evaluation.score,viable:hardRelaxed?false:evaluation.complete,evaluation,token:G.token(partial),partial:true,relaxed:hardRelaxed,relaxationReason:hardRelaxed?`No unused legal ${requestedPlan} row remained; filled with a best-available hybrid row.`:''};mark(assigned[i],allUsed);}}
+    const output=assigned.map((row,index)=>{if(!row)return{name:`Platoon ${index+1}`,units:Array(P.platoons.size).fill(''),score:0,plan:'',element:'',viable:false};const placed=placeLocked(row,index,options),relaxed=!!row.relaxed||!!requestedPlan&&row.viable===false,relaxationReason=row.relaxationReason||(relaxed?`${requestedPlan} row coherence was infeasible with the remaining unique owned units.`:'');return{name:`Platoon ${index+1}`,units:placed.map(unit=>unit?uid(unit):''),score:row.score,plan:row.plan,requestedPlan,element:row.element,viable:row.viable!==false,partial:!!row.partial,relaxed,relaxationReason};});
+    const relaxations=output.map((row,index)=>row.relaxed?{row:index+1,requestedPlan:row.requestedPlan,actualPlan:row.plan,reason:row.relaxationReason}:null).filter(Boolean);
+    return{platoons:output,selectedRows:assigned,diagnostics:{...generated.diagnostics,objective:objective(assigned),relaxations,allocationIterations:improved.iterations,durationMs:Date.now()-started,lockedRows:fixed.size,allocatorPoolSize,allocationBudgetMs}};
   }
 
   root.platoonAllocator={rowConflicts,mark,objective,better,scarcity,adjusted,greedy,compatibleSet,improve,placeLocked,partialRow,allocate};

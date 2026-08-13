@@ -10,7 +10,7 @@
   const VERSION=LIVE_CONFIG.dataVersion||LIVE_CONFIG.version||'live';
   const BASE_PATH=LIVE_CONFIG.runtimeBase||'./apkfiles/entries/runtime';
   const HEAVY_CHUNKS=new Set(['abilityGraph','characterEntries']);
-  const OPTIMIZER_FOUNDATION_CHUNKS=new Set(['characters','featureEvidence','skillProfiles','optimizerKnowledge','tags']);
+  const OPTIMIZER_FOUNDATION_CHUNKS=new Set(['characters','featureEvidence','skillProfiles','leaderProfiles','optimizerKnowledge','tags']);
 
   let manifestPromise=null;
   let runtimeLoadPromise=null;

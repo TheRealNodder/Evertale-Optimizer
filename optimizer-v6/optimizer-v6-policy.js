@@ -7,12 +7,19 @@
   const key=value=>txt(value).toLowerCase().replace(/[\u2019']/g,'').replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');
 
   const policy={
-    version:'optimizer-v6-policy-7',
+    version:'optimizer-v6-policy-9',
     story:{main:5,back:3,total:8,leaderScope:8,leaderStacking:'best_only'},
     platoons:{rows:20,size:5,storyExcluded:true,allowBlankAfterExhaustion:true},
     elements:['fire','water','storm','earth','light','dark'],
     rainbow:{preferredDistinct:4,minimumContribution:0.18},
     mono:{strictWhenFeasible:true},
+    archetype:{
+      contributionThreshold:0.18,
+      primaryTeamShare:0.375,
+      forcedPlanTeamShare:0.50,
+      secondaryScoreShare:0.25,
+      selfOnlyMaximum:0.45
+    },
     search:{storyBeamWidth:32,storyCandidateCap:40,storyPlacementFinalists:6,placementCombinations:3,alternatives:5,platoonRowsPerPlan:8},
     intelligence:{
       defaultLevel:'deep',
@@ -51,15 +58,16 @@
       }
     },
     componentWeights:{
-      baseUnitValue:0.16,
-      engineCompletion:0.15,
-      roleCoverage:0.12,
+      baseUnitValue:0.15,
+      engineCompletion:0.14,
+      roleCoverage:0.10,
       resourceBalance:0.08,
-      pairSynergy:0.10,
-      groupSynergy:0.07,
+      pairSynergy:0.09,
+      groupSynergy:0.06,
+      archetypeAlignment:0.09,
       leaderValue:0.09,
       positionFlow:0.07,
-      elementStrategy:0.07,
+      elementStrategy:0.06,
       counterCoverage:0.05,
       boundedMetaPrior:0,
       evidenceConfidence:0.02
@@ -70,9 +78,21 @@
       resourceConflicts:0.04,
       unsupportedPayoffs:0.08,
       planDilution:0.07,
+      planVulnerability:0.07,
       evidenceUncertainty:0.04
     },
-    plans:['burn','poison','sleep','stun','blood','crisis','survivor','guardian','tempo','hybrid'],
+    pairedPlans:['burn','poison','sleep','stun','blood','frostburn','stealth','charge'],
+    selfContainedPlans:['counter'],
+    payoffOnlyPlans:['crisis','survivor'],
+    supportPlans:['heal','cleanse','defense','guardian','attack','spirit','tempo'],
+    plans:['burn','poison','sleep','stun','blood','frostburn','stealth','counter','charge','crisis','survivor','heal','cleanse','defense','guardian','attack','spirit','tempo','hybrid'],
+    archetypeAliases:{
+      healing:'heal',sustain:'heal',healer:'heal',
+      turn:'tempo',turn_tempo:'tempo',
+      tank:'defense',tank_defense:'defense',hp_buff:'defense',hpbuff:'defense',
+      atk_buff:'attack',atkbuff:'attack',offense:'attack',damage:'attack',
+      none:''
+    },
     policyChecks:{
       story5Main3Back:true,
       platoons20x5:true,
@@ -126,5 +146,15 @@
     return{level,...policy.intelligence.levels[level]};
   }
 
-  root.policy={...policy,clamp,txt,key,identity,identityConflicts,distinctIdentity,boundedComponents,metaProfile,intelligenceProfile};
+  function normalizeArchetype(value){
+    const normalized=key(value);
+    return policy.archetypeAliases[normalized]??normalized;
+  }
+
+  function requestedArchetypes(options={}){
+    const requested=(Array.isArray(options?.archetypes)?options.archetypes:[]).map(normalizeArchetype).filter(Boolean);
+    return [...new Set(requested)].slice(0,2);
+  }
+
+  root.policy={...policy,clamp,txt,key,identity,identityConflicts,distinctIdentity,boundedComponents,metaProfile,intelligenceProfile,normalizeArchetype,requestedArchetypes};
 })(window);

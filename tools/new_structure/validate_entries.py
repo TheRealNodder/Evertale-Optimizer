@@ -369,6 +369,7 @@ def validate_optimizer_semantics(repo: Path, base: Path, errors: List[str], warn
     tags = runtime.get("tags") if isinstance(runtime.get("tags"), dict) else {}
     evidence = runtime.get("featureEvidence") if isinstance(runtime.get("featureEvidence"), dict) else {}
     skill_profiles = runtime.get("skillProfiles") if isinstance(runtime.get("skillProfiles"), dict) else {}
+    leader_profiles = runtime.get("leaderProfiles") if isinstance(runtime.get("leaderProfiles"), dict) else {}
     entries_by_source = {semantic_source_id(row): row for row in entries if semantic_source_id(row)}
     evidence_count = sum(len(rows) for rows in evidence.values() if isinstance(rows, list))
     skill_count = 0
@@ -464,12 +465,50 @@ def validate_optimizer_semantics(repo: Path, base: Path, errors: List[str], warn
                     break
     feature_counts: Dict[str, int] = {}
     invalid_feature_sources: List[str] = []
+    invalid_feature_receipts: List[str] = []
+    evidence_features_by_source: Dict[str, set[str]] = {}
+    allowed_relations = {
+        "benefits_from", "converts", "penalized_by", "prevents", "produces",
+        "protects", "provides", "removes", "triggers",
+    }
     for source_id, evidence_rows in evidence.items():
         for item in evidence_rows if isinstance(evidence_rows, list) else []:
             if not isinstance(item, dict):
                 continue
             feature = str(item.get("feature") or "")
             feature_counts[feature] = feature_counts.get(feature, 0) + 1
+            evidence_features_by_source.setdefault(source_id, set()).add(feature)
+            sources = item.get("sources") if isinstance(item.get("sources"), list) else []
+            receipts = item.get("receipts") if isinstance(item.get("receipts"), list) else []
+            relations = {str(value) for value in item.get("relations") or [] if str(value)}
+            if not feature or not sources or not receipts:
+                invalid_feature_receipts.append(f"{source_id}:{feature or '<missing-feature>'}:missing-authority")
+            expected_relation = (
+                "produces" if feature.startswith("applies_") else
+                "benefits_from" if feature.startswith("payoff_") else
+                "penalized_by" if feature.startswith("penalized_by_") else
+                "converts" if feature.startswith("converts_") else
+                None
+            )
+            receipt_relations: set[str] = set()
+            for receipt in receipts:
+                if not isinstance(receipt, dict):
+                    invalid_feature_receipts.append(f"{source_id}:{feature}:non-object-receipt")
+                    continue
+                receipt_source = str(receipt.get("source") or "")
+                receipt_relation = str(receipt.get("relation") or "")
+                receipt_relations.add(receipt_relation)
+                confidence = receipt.get("confidence")
+                if not receipt_source or receipt_source not in sources:
+                    invalid_feature_receipts.append(f"{source_id}:{feature}:unlinked-receipt-source")
+                if receipt_relation not in allowed_relations:
+                    invalid_feature_receipts.append(f"{source_id}:{feature}:invalid-relation={receipt_relation}")
+                if not isinstance(confidence, (int, float)) or isinstance(confidence, bool) or not 0 <= confidence <= 1:
+                    invalid_feature_receipts.append(f"{source_id}:{feature}:invalid-confidence={confidence}")
+            if relations != receipt_relations:
+                invalid_feature_receipts.append(f"{source_id}:{feature}:relation-summary-mismatch")
+            if expected_relation and expected_relation not in receipt_relations:
+                invalid_feature_receipts.append(f"{source_id}:{feature}:missing-{expected_relation}-receipt")
             source_blob = " ".join(str(value) for value in item.get("sources") or []).lower()
             if any(token in source_blob for token in ("activeskillsai", "revengeeffectstoskip", "immunitylist")):
                 invalid_feature_sources.append(f"{source_id}:{feature}:negative-or-AI-context")
@@ -506,6 +545,7 @@ def validate_optimizer_semantics(repo: Path, base: Path, errors: List[str], warn
     append_semantic_failure(errors, "invalid structured skill profiles", invalid_skill_profiles)
     append_semantic_failure(errors, "structured skill profile/raw fact mismatch", skill_profile_fact_mismatches)
     append_semantic_failure(errors, "context-invalid feature evidence", invalid_feature_sources)
+    append_semantic_failure(errors, "invalid typed feature receipts", invalid_feature_receipts)
     required_features = {
         "applies_burn", "payoff_burn", "applies_poison", "payoff_poison",
         "applies_sleep", "payoff_sleep", "applies_stun", "payoff_stun",
@@ -522,13 +562,62 @@ def validate_optimizer_semantics(repo: Path, base: Path, errors: List[str], warn
         errors.append("[semantic] healer evidence is implausibly broad; check healthy substring matching")
     if not tags:
         warnings.append("[semantic] curated tags are empty; feature evidence is the active fallback authority")
+    missing_evidence_sources = sorted(expected_entry_keys - set(evidence))
+    if missing_evidence_sources:
+        warnings.append(
+            f"[semantic] entries without resolved feature evidence: {len(missing_evidence_sources)}; "
+            f"sample={missing_evidence_sources[:10]}"
+        )
     if tag_report.get("status") not in {"ok", "warning", "failed"}:
         errors.append("[semantic] tag sync report has no explicit status")
     if runtime_report.get("status") not in {"ok", "warning", "failed"}:
         errors.append("[semantic] runtime model report has no explicit status")
+    if runtime_report.get("status") == "failed" or runtime_report.get("errors"):
+        errors.append("[semantic] runtime model report contains unresolved errors")
+
+    if bool(leader_profiles) != bool(flags.get("usesLeaderProfiles")):
+        errors.append("[semantic] runtimeFlags.usesLeaderProfiles is not truthful")
+    unknown_leader_profiles = sorted(set(leader_profiles) - expected_entry_keys)
+    if unknown_leader_profiles:
+        errors.append(f"[semantic] leader profiles reference unknown entries: {unknown_leader_profiles[:10]}")
+    if leader_count and len(leader_profiles) != leader_count:
+        errors.append(f"[semantic] leader profile count mismatch: profiles={len(leader_profiles)} sources={leader_count}")
+
+    semantic_sentinels = {
+        "WhiteSnakeGirlDark02": {
+            "required": {"applies_poison"},
+            "forbidden": {"applies_stun"},
+        },
+        "KintaroRegular02": {
+            "required": {"applies_poison"},
+            "forbidden": {"payoff_burn", "payoff_poison", "payoff_sleep"},
+        },
+        "VenusRegular02": {
+            "required": {"role_team_healer", "role_team_cleanser"},
+            "forbidden": {"payoff_burn", "payoff_poison", "payoff_sleep"},
+        },
+        "WashingtonRegular02": {
+            "required": {"applies_frostburn"},
+            "forbidden": {"applies_burn"},
+        },
+        "AnastasiaRegular02": {
+            "required": {"applies_frostburn", "converts_frostburn_to_burn"},
+            "forbidden": {"applies_burn"},
+        },
+    }
+    sentinel_failures: List[str] = []
+    for source_id, contract in semantic_sentinels.items():
+        if source_id not in expected_entry_keys:
+            continue
+        actual = evidence_features_by_source.get(source_id, set())
+        missing = sorted(contract["required"] - actual)
+        forbidden = sorted(contract["forbidden"] & actual)
+        if missing or forbidden:
+            sentinel_failures.append(f"{source_id}:missing={missing},forbidden={forbidden}")
+    append_semantic_failure(errors, "optimizer evidence sentinel mismatch", sentinel_failures)
 
     manifest_chunks = manifest.get("chunks") if isinstance(manifest.get("chunks"), dict) else {}
-    for chunk in ("characters", "characterEntries", "featureEvidence", "skillProfiles", "tags", "optimizerKnowledge"):
+    for chunk in ("characters", "characterEntries", "featureEvidence", "skillProfiles", "leaderProfiles", "tags", "optimizerKnowledge"):
         if chunk not in manifest_chunks:
             errors.append(f"[semantic] runtime manifest missing {chunk} chunk")
     if manifest_chunks.get("characterEntries", {}).get("count") != len(expected_entry_keys):
@@ -537,6 +626,8 @@ def validate_optimizer_semantics(repo: Path, base: Path, errors: List[str], warn
         errors.append("[semantic] runtime manifest featureEvidence count is stale")
     if manifest_chunks.get("skillProfiles", {}).get("count") != len(skill_profiles):
         errors.append("[semantic] runtime manifest skillProfiles count is stale")
+    if manifest_chunks.get("leaderProfiles", {}).get("count") != len(leader_profiles):
+        errors.append("[semantic] runtime manifest leaderProfiles count is stale")
     if leader_count and not flags.get("usesLeaderSkills"):
         errors.append("[semantic] leader authority exists but runtimeFlags.usesLeaderSkills is false")
 
@@ -579,6 +670,8 @@ def validate_optimizer_semantics(repo: Path, base: Path, errors: List[str], warn
         "featureEvidenceEntries": len(evidence),
         "featureEvidenceItems": evidence_count,
         "featureEvidenceByFeature": dict(sorted(feature_counts.items())),
+        "featureEvidenceTypedReceiptErrors": len(invalid_feature_receipts),
+        "entriesWithoutFeatureEvidence": len(missing_evidence_sources),
         "skillProfileEntries": len(skill_profiles),
         "skillProfileSkills": skill_count,
         "skillProfilesWithSpiritGain": skill_gain_count,
@@ -589,6 +682,9 @@ def validate_optimizer_semantics(repo: Path, base: Path, errors: List[str], warn
         "skillProfileEntriesByElement": dict(sorted(skill_profile_entries_by_element.items())),
         "contextInvalidFeatureEvidence": len(invalid_feature_sources),
         "leaderEntries": leader_count,
+        "leaderProfiles": len(leader_profiles),
+        "leaderProfileUnknownEntries": len(unknown_leader_profiles),
+        "evidenceSentinelFailures": len(sentinel_failures),
         "familyRarityMismatches": len(family_rarity_errors),
         "entryRarityMismatches": len(entry_rarity_errors),
         "stateStarMismatches": len(state_star_errors),
@@ -612,7 +708,7 @@ def validate(include_optimizer_semantics: bool = True) -> int:
     duplicate_source_ids: Dict[str, List[str]] = {}
 
     print("=" * 60)
-    print("Evertale Optimizer Entry Validator v8")
+    print("Evertale Optimizer Entry Validator v9")
     print("=" * 60)
     print(f"Repo Root : {repo_root}")
     print(f"Entries   : {base}")
@@ -692,7 +788,7 @@ def validate(include_optimizer_semantics: bool = True) -> int:
 
     semantic_summary = validate_optimizer_semantics(repo_root, base, errors, warnings) if include_optimizer_semantics else {"status": "deferred_until_runtime_rebuild"}
     status = "failed" if errors else "warning" if warnings else "ok"
-    report = {"validatorVersion": 8, "generatedAt": int(time.time()), "status": status, "repoRoot": str(repo_root), "entriesRoot": str(base), "checked": checked, "categoryCounts": category_counts, "bundleCounts": bundle_counts, "markerStatus": marker_status, "duplicateSourceIds": duplicate_source_ids, "semanticSummary": semantic_summary, "errors": errors, "warnings": warnings}
+    report = {"validatorVersion": 9, "generatedAt": int(time.time()), "status": status, "repoRoot": str(repo_root), "entriesRoot": str(base), "checked": checked, "categoryCounts": category_counts, "bundleCounts": bundle_counts, "markerStatus": marker_status, "duplicateSourceIds": duplicate_source_ids, "semanticSummary": semantic_summary, "errors": errors, "warnings": warnings}
     reports_dir = base / "reports"
     write_json(reports_dir / "validation_report.json", report)
     write_json(base / "_markers" / "validate_entries.marker.json", {"schemaVersion": 2, "tool": "validate_entries", "category": "all", "status": status, "lastKey": "validation", "lastSourceId": "", "lastHandle": None, "lastFile": "apkfiles/entries/reports/validation_report.json", "processedCount": checked, "totalCount": checked, "updatedAt": int(time.time()), "extra": {"errors": len(errors), "warnings": len(warnings)}})

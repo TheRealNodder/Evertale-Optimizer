@@ -13,9 +13,9 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List
 
 try:
-    from .build_optimizer_runtime_model import description_features
+    from .build_optimizer_runtime_model import description_feature_records, description_features
 except ImportError:
-    from build_optimizer_runtime_model import description_features
+    from build_optimizer_runtime_model import description_feature_records, description_features
 
 
 REPO = Path(__file__).resolve().parents[2]
@@ -158,7 +158,7 @@ class OptimizerFoundationAuthorityTests(unittest.TestCase):
             "AstridNew02": {"applies_burn", "payoff_burn"},
             "NobunagaRegular02": {"applies_burn", "payoff_burn"},
             "UnicornRegular02": {"applies_stun", "payoff_survivor", "tempo_turn", "role_cleanser"},
-            "CallenBride02": {"applies_sleep", "payoff_sleep", "role_healer"},
+            "CallenBride02": {"applies_sleep", "payoff_sleep", "role_self_sustain"},
             "KingArthurRegular02": {"applies_poison", "payoff_poison", "summon"},
         }
         for source, required in expected.items():
@@ -188,6 +188,34 @@ class OptimizerFoundationAuthorityTests(unittest.TestCase):
             self.assertNotIn(feature, description_features(description), f"negated status invented {feature}")
         self.assertNotIn("payoff_stun", features("FireBird02"), "AI target hints must not invent Time Strike payoff")
         self.assertNotIn("applies_poison", features("HoodedFrog01"), "status immunity lists must not invent Poison setup")
+        self.assertNotIn("applies_stun", features("WhiteSnakeGirlDark02"), "stun reduction/caveats must not invent Stun setup")
+        for source in ("DeadlyNurse01", "DeadlyNurse02"):
+            self.assertNotIn("applies_stun", features(source), "Stun absorption granted to an ally is not enemy Stun setup")
+        self.assertIn("applies_poison", features("WhiteSnakeGirlDark02"), "ward removal must not hide the following Mega Poison application")
+        self.assertIn("role_team_healer", features("WhiteSnakeGirlDark02"), "team healing scope must be preserved")
+        for feature in ("payoff_burn", "payoff_poison", "payoff_sleep"):
+            self.assertNotIn(feature, features("VenusRegular02"), "status-removal availability is not a status payoff")
+            self.assertNotIn(feature, features("KintaroRegular02"), "a status damage penalty is not a status payoff")
+        self.assertIn("applies_frostburn", features("WashingtonRegular02"))
+        self.assertIn("payoff_frostburn", features("WashingtonRegular02"))
+        self.assertNotIn("applies_burn", features("WashingtonRegular02"), "Frostburn conversion is not immediate Burn setup")
+        self.assertIn("role_ally_healer", features("OnionBoy01"), "oneAllyNotMe is ally healing, not team-wide healing")
+        self.assertNotIn("role_team_healer", features("OnionBoy01"), "the substring 'all' inside 'ally' is not an all-allies target")
+        self.assertIn("role_ally_cleanser", features("MaleKnight01"), "1Ally Purify must retain external cleanse value")
+        self.assertNotIn("role_team_cleanser", features("MaleKnight01"), "1Ally Purify is not a team-wide cleanse")
+        for source in ("WhiteSnakeGirl01", "HijikataRegular01", "KaguyahimeSwimsuit01", "AnastasiaRegular02"):
+            self.assertNotIn("role_guardian", features(source), f"{source} only denies, targets, or bypasses Guardians")
+        for source in ("YamatoRegular01", "DonQuixoteRegular01", "ThorRegular01"):
+            self.assertIn("role_guardian", features(source), f"{source} has explicit interception authority")
+        self.assertIn("applies_poison", features("KaguyahimeDark02"), "Hypnosis has an explicit Mega Poison configuration")
+        self.assertNotIn("applies_sleep", features("KaguyahimeDark02"), "Hypnosis loses a turn but does not apply the Sleep status")
+        for source in ("ElmKouhaiRegular01", "ElmKouhaiRegular02"):
+            self.assertNotIn("payoff_burn", features(source), "unless burning is negative polarity, not Burn payoff")
+        christmas = {row["feature"]: row for row in evidence.get("ChristmasCatEar02", [])}
+        for status in ("burn", "poison", "sleep"):
+            receipts = christmas[f"removes_{status}"]["receipts"]
+            self.assertTrue(any(row.get("targetTeam") == "allies" for row in receipts), "allied cleanse target scope was lost")
+        self.assertIn("role_team_cleanser", christmas, "all-allies status removal must retain team cleanse value")
 
         forbidden_sources = ("activeskillsai", "revengeeffectstoskip", "immunitylist")
         problems = []
@@ -202,6 +230,48 @@ class OptimizerFoundationAuthorityTests(unittest.TestCase):
                     problems.append(f"{source_id}: healthy/heal substring leak")
         self.assertEqual(problems, [], "Context-invalid evidence:\n" + "\n".join(problems[:50]))
 
+    def test_description_parser_polarity_and_event_direction(self) -> None:
+        for text in (
+            "Effects may interrupt the turn (e.g. Stuns targeting the lowest TU target).",
+            "Reduces the amount of any stun effects this unit receives by 50TU.",
+            "Whenever an ally would be affected by stun, this unit takes the stun instead.",
+            "This unit has Stun Immunity and a Stun Ward.",
+        ):
+            self.assertNotIn("applies_stun", description_features(text), text)
+        self.assertIn("applies_stun", description_features("Stuns 2 random enemies for 50TU."))
+        self.assertNotIn("applies_poison", description_features("Poison cannot be applied to this unit."))
+        self.assertIn(
+            "applies_poison",
+            description_features("Targets have their Poison Wards removed, then are granted Mega Poison for 200TU."),
+        )
+        penalty = "700% damage. Minus 100% damage for each sleeping, burning or poisoned ally."
+        self.assertFalse({"payoff_burn", "payoff_poison", "payoff_sleep"} & set(description_features(penalty)))
+        counter = "Heals all allies. Usable if an ally is burning, sleeping or poisoned; those effects are removed."
+        self.assertFalse({"payoff_burn", "payoff_poison", "payoff_sleep"} & set(description_features(counter)))
+        typed = description_feature_records("When this unit enters the battlefield from allied reinforcements, all allies are healed.")
+        self.assertTrue(any(row.get("feature") == "timing_entry_self" and row.get("timing") == "entry" for row in typed))
+        for text in (
+            "This unit cannot become a Guardian.",
+            "500% damage if the target is a Guardian.",
+            "This attack cannot be redirected by Guardians.",
+        ):
+            self.assertNotIn("role_guardian", description_features(text), text)
+        self.assertIn(
+            "role_guardian",
+            description_features("This unit is a Guardian and redirects one enemy attack targeting another ally to itself."),
+        )
+        self.assertNotIn(
+            "payoff_burn",
+            description_features("For 200TU, unless burning, this unit cannot be defeated and has damage reduction."),
+        )
+        allied_cleanse = description_feature_records(
+            "Whenever this unit is defeated by an enemy, all allies are healed and sleep, burn or poison are removed from them."
+        )
+        for status in ("burn", "poison", "sleep"):
+            self.assertTrue(
+                any(row.get("feature") == f"removes_{status}" and row.get("targetTeam") == "allies" for row in allied_cleanse)
+            )
+
     def test_runtime_feature_coverage_is_bounded_and_complete(self) -> None:
         evidence = self.runtime.get("featureEvidence") or {}
         counts: Dict[str, int] = {}
@@ -215,17 +285,46 @@ class OptimizerFoundationAuthorityTests(unittest.TestCase):
             "summon", "payoff_blood", "payoff_crisis", "payoff_survivor",
             "role_guardian", "role_healer", "role_cleanser", "role_reviver",
             "resource_spirit", "tempo_turn", "leader",
+            "applies_frostburn", "payoff_frostburn", "applies_stealth", "payoff_stealth",
+            "applies_charge", "payoff_charge", "role_team_healer", "role_team_cleanser",
+            "role_ally_cleanser", "role_self_sustain", "defense_hold_ground", "timing_entry_self",
         }
         self.assertTrue(required <= set(counts), f"Missing feature authorities: {sorted(required - set(counts))}")
         entry_count = len(self.entries)
         self.assertLess(counts["payoff_stun"], entry_count * 0.25, "Time Strike evidence collapsed into generic AI metadata")
         self.assertLess(counts["role_healer"], entry_count * 0.60, "Heal evidence is too broad")
         self.assertLess(counts["applies_burn"], entry_count * 0.25, "Burn setup evidence is too broad")
+        self.assertLess(counts["applies_stun"], entry_count * 0.25, "Stun caveats/reductions collapsed into setup")
+
+    def test_typed_evidence_and_leader_profiles_are_source_indexed(self) -> None:
+        evidence = self.runtime.get("featureEvidence") or {}
+        problems = []
+        for evidence_source_id, items in evidence.items():
+            for item in items if isinstance(items, list) else []:
+                receipts = item.get("receipts") or []
+                if not receipts:
+                    problems.append(f"{evidence_source_id}:{item.get('feature')}: missing receipts")
+                    continue
+                for row in receipts:
+                    if not row.get("source") or not row.get("sourceScope") or not row.get("relation"):
+                        problems.append(f"{evidence_source_id}:{item.get('feature')}: incomplete typed receipt")
+        self.assertEqual([], problems[:50], "Typed evidence contract failures: " + "; ".join(problems[:50]))
+        leaders = self.runtime.get("leaderProfiles") or {}
+        expected = {
+            source_id(row)
+            for row in self.entries
+            if (row.get("raw") if isinstance(row.get("raw"), dict) else {}).get("leaderBuff") or row.get("leaderSkills")
+        }
+        self.assertEqual(expected, set(leaders))
+        self.assertTrue(all(row.get("authorityResolved") for row in leaders.values()))
+        chunks = self.manifest.get("chunks") or {}
+        self.assertIn("leaderProfiles", chunks)
+        self.assertEqual(len(leaders), chunks["leaderProfiles"].get("count"))
 
     def test_frontend_declares_and_checks_foundation_chunks(self) -> None:
         loader = (REPO / "optimizerRuntimeLoader.js").read_text(encoding="utf-8")
         bootstrap = (REPO / "optimizerRuntimeBootstrap.js").read_text(encoding="utf-8")
-        for chunk in ("characters", "featureEvidence", "optimizerKnowledge", "tags"):
+        for chunk in ("characters", "featureEvidence", "skillProfiles", "leaderProfiles", "optimizerKnowledge", "tags"):
             self.assertIn(chunk, loader)
         self.assertIn("OPTIMIZER_FOUNDATION_CHUNKS", loader)
         self.assertIn("optimizerFoundationReady", bootstrap)

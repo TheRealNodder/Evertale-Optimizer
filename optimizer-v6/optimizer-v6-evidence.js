@@ -4,6 +4,7 @@
   const root=g.OptimizerV6=g.OptimizerV6||{};
   const P=root.policy;
   if(!P)return;
+  const rows=value=>Array.isArray(value)?value:[];
 
   const FEATURE_MAP={
     applies_burn:['engines','burn','setup'],payoff_burn:['engines','burn','payoff'],
@@ -11,9 +12,27 @@
     applies_sleep:['engines','sleep','setup'],payoff_sleep:['engines','sleep','payoff'],
     applies_stun:['engines','stun','setup'],payoff_stun:['engines','stun','payoff'],
     summon:['engines','blood','setup'],payoff_blood:['engines','blood','payoff'],
+    applies_frostburn:['engines','frostburn','setup'],payoff_frostburn:['engines','frostburn','payoff'],
+    applies_stealth:['engines','stealth','setup'],payoff_stealth:['engines','stealth','payoff'],
+    applies_counter:['engines','counter','setup'],payoff_counter:['engines','counter','payoff'],
+    applies_charge:['engines','charge','setup'],payoff_charge:['engines','charge','payoff'],
     payoff_crisis:['engines','crisis','payoff'],payoff_survivor:['engines','survivor','payoff'],
     role_guardian:['roles','guardian'],role_healer:['roles','healer'],role_cleanser:['roles','cleanser'],
     role_reviver:['roles','reviver'],resource_spirit:['resources','spirit'],tempo_turn:['roles','tempo'],
+    ally_healer:['roles','ally_healer'],role_ally_healer:['roles','ally_healer'],team_healer:['roles','team_healer'],role_team_healer:['roles','team_healer'],
+    self_sustain:['roles','self_sustain'],role_self_sustain:['roles','self_sustain'],
+    ally_cleanser:['roles','ally_cleanser'],role_ally_cleanser:['roles','ally_cleanser'],team_cleanser:['roles','team_cleanser'],role_team_cleanser:['roles','team_cleanser'],
+    self_cleanser:['roles','self_cleanser'],role_self_cleanser:['roles','self_cleanser'],
+    guardian:['roles','guardian'],defender:['roles','defender'],role_defender:['roles','defender'],defense_armor:['roles','defender'],
+    role_attacker:['roles','attacker'],role_damage:['roles','attacker'],attack_pressure:['roles','attacker'],
+    timing_entry_self:['timing','entry'],timing_death_self:['timing','death'],
+    timing_revenge:['timing','revenge'],timing_reinforcement_add:['timing','reinforcement'],
+    ward_burn:['counters','ward_burn'],ward_poison:['counters','ward_poison'],
+    ward_sleep:['counters','ward_sleep'],ward_stun:['counters','ward_stun'],hold_ground:['counters','hold_ground'],defense_hold_ground:['counters','hold_ground'],
+    removes_burn:['counters','removes_burn'],removes_poison:['counters','removes_poison'],removes_sleep:['counters','removes_sleep'],removes_stun:['counters','removes_stun'],
+    converts_frostburn_to_burn:['transitions','frostburn_to_burn'],
+    penalized_by_burn:['antiSynergies','burn'],penalized_by_poison:['antiSynergies','poison'],
+    penalized_by_sleep:['antiSynergies','sleep'],penalized_by_stun:['antiSynergies','stun'],penalized_by_frostburn:['antiSynergies','frostburn'],
     leader:['leader']
   };
 
@@ -37,10 +56,22 @@
     return false;
   }
 
+  function relationCompatible(feature,relations){
+    const values=rows(relations).map(P.key).filter(Boolean);if(!values.length)return true;
+    if(feature.startsWith('applies_')||feature==='summon')return values.some(value=>['produces','provides','triggers'].includes(value));
+    if(feature.startsWith('payoff_'))return values.some(value=>['benefits_from','provides'].includes(value));
+    if(feature.startsWith('penalized_by_'))return values.includes('penalized_by');
+    if(feature.startsWith('ward_'))return values.some(value=>['prevents','provides'].includes(value));
+    if(feature.startsWith('removes_')||feature.includes('cleanser'))return values.some(value=>['removes','provides'].includes(value));
+    return true;
+  }
+
   function normalizeItem(item){
     const feature=P.key(item?.feature);
     const sources=(Array.isArray(item?.sources)?item.sources:[]).map(P.txt).filter(Boolean);
     const usable=sources.filter(source=>!rejectedSource(source,feature));
+    const receipts=rows(item?.receipts).filter(row=>row&&typeof row==='object'&&(!row.source||usable.includes(P.txt(row.source)))).map(row=>({...row}));
+    const relations=[...new Set([...rows(item?.relations),...receipts.map(row=>row.relation)].map(P.key).filter(Boolean))];
     const quality=usable.length?Math.max(...usable.map(sourceQuality)):0;
     const confidence=P.clamp(Math.min(Number(item?.confidence)||0,quality||0)/.01)/100;
     return{
@@ -48,8 +79,10 @@
       strength:Math.max(0,Number(item?.strength)||0),
       confidence,
       sources:usable,
-      rejectedSources:sources.filter(rejectedSource),
-      authoritative:quality>=P.evidence.minimumMechanicalConfidence
+      rejectedSources:sources.filter(source=>rejectedSource(source,feature)),
+      details:item?.details&&typeof item.details==='object'?{...item.details}:null,
+      relations,receipts,relationCompatible:relationCompatible(feature,relations),
+      authoritative:quality>=P.evidence.minimumMechanicalConfidence&&relationCompatible(feature,relations)
     };
   }
 
@@ -72,7 +105,7 @@
     }
     const unique=new Map();
     for(const row of out){
-      const token=[row.feature,row.sourceId,row.sources.join('|')].join('::');
+      const token=[row.feature,row.sourceId,row.relations.join('|'),row.sources.join('|')].join('::');
       if(!unique.has(token)||unique.get(token).confidence<row.confidence)unique.set(token,row);
     }
     return [...unique.values()];
@@ -87,7 +120,7 @@
   }
 
   function summarize(unit,store){
-    const model={engines:{},roles:{},resources:{},leader:[],records:[],affinities:{},confidence:0};
+    const model={engines:{},roles:{},resources:{},timing:{},counters:{},transitions:{},antiSynergies:{},leader:[],records:[],affinities:{},confidence:0};
     const records=recordsFor(unit,store);
     for(const record of records){
       const path=FEATURE_MAP[record.feature];
@@ -113,5 +146,15 @@
 
   function runtimeStore(){return g.OptimizerRuntime?.chunks?.featureEvidence||{};}
 
-  root.evidence={FEATURE_MAP,sourceQuality,rejectedSource,normalizeItem,unitSourceIds,recordsFor,summarize,best,strength,runtimeStore};
+  function runtimeLeaderStore(){return g.OptimizerRuntime?.chunks?.leaderProfiles||{};}
+
+  function leaderProfileFor(unit,store=runtimeLeaderStore()){
+    for(const sourceId of unitSourceIds(unit)){
+      const profile=store?.[sourceId]||store?.[P.key(sourceId)];
+      if(profile&&typeof profile==='object')return{...profile,sourceId:profile.sourceId||sourceId};
+    }
+    return null;
+  }
+
+  root.evidence={FEATURE_MAP,sourceQuality,rejectedSource,relationCompatible,normalizeItem,unitSourceIds,recordsFor,summarize,best,strength,runtimeStore,runtimeLeaderStore,leaderProfileFor};
 })(window);
