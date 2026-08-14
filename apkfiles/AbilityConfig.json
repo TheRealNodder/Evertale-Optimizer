@@ -1,6 +1,6 @@
 {
 	"Version": 23,
-	"Time": 1785390074,
+	"Time": 1786583153,
 	"AbilityConfig": {
 		"StunSingle200A": {
 			"class": "AbilityConfig",
@@ -47877,6 +47877,113 @@
 			"flags": ["NoDamage"],
 			"abilityEffect": "WhiteSnakeGirlDarkAllAttack",
 			"useCondition": "TimeInCombat100NotActive4LOCKWhiteSnakeGirlDark"
+		},
+		"SingleAttackAXiaoLiRegular": {
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage","ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"applyToTargetType": "Enemy",
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"damageFlags": ["RemoveXiaoLiDefeatBuff","IgnoreArmor","HardIgnoreBlockDeath","IgnoreSkin","DoNotWake"],
+				"drainPercent": 1.0,
+				"drainEffect": "VampireDrain1"
+			},{
+				"buffs": ["RemoveStealth"],
+				"applyToTargetType": "Enemy",
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs": ["StoreEnergy","UsedAbilityCounter"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["GiveTurn","OnExtraTurn","JustGivenTurn","XiaoLiExtraTurn50TUTrigger"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss",
+				"applyConditions": "IsNotXiaoLiExtraTurn50TUTrigger"
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Hit",
+			"abilityEffect": "XiaoLiAttack1",
+			"attackScalors": ["GoodIfUsedOnce","GoodIfUsedTwice","GoodIfUsedThrice"],
+			"conditionedAbilityEffects": ["XiaoLiAttack1","XiaoLiAttack1","XiaoLiAttack1"],
+			"recommendEffectWhenUsable": -2
+		},
+		"DoubleAttackAXiaoLiRegular": {
+			"class": "AbilityConfig",
+			"targetingData": "2Enemy",
+			"components": ["Damage", "ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides":[{
+				"applyToTargetType": "Enemy",
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"damageFlags": ["RemoveXiaoLiDefeatBuff","IgnoreArmor","HardIgnoreBlockDeath","IgnoreSkin","DoNotWake"],
+				"drainPercent": 1.0,
+				"drainEffect": "VampireDrain1"
+			},{
+				"buffs": ["RemoveBurn","RemoveSleepImmunityOnce","ColdSleepForced100TU"],
+				"applyToTargetType": "Enemy",
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs": ["StoreEnergy","GoodGirlBuffCounter"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["GiveTurn","OnExtraTurn","JustGivenTurn","XiaoLiExtraTurn50TUTrigger"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss",
+				"applyConditions": "IsNotXiaoLiExtraTurn50TUTrigger"
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "XiaoLiThrow",
+			"attackScalors": ["GoodIfGain1GoodBuff","GoodIfGain2GoodBuff","GoodIfGain3GoodBuff","GoodIfGain4GoodBuff","GoodIfGain5GoodBuff"],
+			"conditionedAbilityEffects": ["XiaoLiThrow","XiaoLiThrow","XiaoLiThrow","XiaoLiThrow","XiaoLiThrow"],
+			"flags": ["StealthWorthy","Sleep","SleepChance"],
+			"recommendEffectWhenUsable": -2,
+			"useCondition": "IsCharged1Exact"
+		},
+		"SelfBuffAXiaoLiRegular": {
+			"class": "AbilityConfig",
+			"targetingData": "SelfOnly",
+			"components": ["ApplyBuff"],
+			"componentOverrides":[{
+				"buffs": ["HealFull","StunImmunityOnce","InstantKillImmunityOnce","StoreEnergy","AttackPlus50Percent3TurnsOnly","SpiritGainG"],
+				"applyToTargetType": "Source"
+			}],
+			"sourceEventType": "Finish",
+			"abilityEffect": "XiaoLiOnmyou",
+			"useCondition": "IsCharged2Exact"
+		},
+		"SpecialAttackAXiaoLiRegular": {
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage","ApplyBuff","ApplyBuff"],
+			"componentOverrides":[{
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"damageFlags": ["IgnoreArmor","HardIgnoreBlockDeath","IgnoreSkin","DoNotWake"],
+				"applyToTargetType": "Enemy",
+				"drainPercent": 1.0,
+				"drainEffect": "VampireDrain1"
+			},{
+				"buffs": ["RemoveEnergy"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["GiveTurn","OnExtraTurn","JustGivenTurn","XiaoLiExtraTurn50TUTrigger"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss",
+				"applyConditions": "IsNotXiaoLiExtraTurn50TUTrigger"
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "XiaoLiSP",
+			"flags": ["SleepChance"],
+			"useCondition": "IsCharged3"
 		}
 	}
 }

@@ -1,6 +1,6 @@
 {
 	"Version": 23,
-	"Time": 1785890637,
+	"Time": 1785892940,
 	"Buff": {
 	"RelationshipFlatAttack50": {
 		"class": "Buff",
@@ -90448,6 +90448,199 @@
 			"duration": 0,
 			"showAsTimer": false,
 			"isHiddenFromPlayers": true
+		},
+		"HasteUpDamageReduc4AllyKills1": {
+			"class": "Buff",
+			"behaviors": ["ModifyDamage", "StatOnly"],
+			"behaviorOverrides": [{
+				"conditions": "2AlliesIsKills1",
+				"percent": 0.94,
+				"cancelFromDamageTypes": ["BuffDamage", "Poison", "Burn"],
+				"cancelFromDamageFlags": ["Sneak", "IgnoreArmor"]
+			}, {
+				"conditions": "2AlliesIsKills1",
+				"flatStatBonuses": {
+					"Haste": -64
+				}
+			}],
+			"iconSpriteName": "IconYellowDefUpShieldClock01",
+			"noIconShownOnBattleStatus": true,
+			"duration": -1,
+			"showAsTimer": false,
+			"isWeaponBuff": true,
+			"hideActivatedIcon": true
+		},
+		"HasteUpDamageReduc5AllyKills1": {
+			"class": "Buff",
+			"behaviors": ["ModifyDamage", "StatOnly"],
+			"behaviorOverrides": [{
+				"conditions": "2AlliesIsKills1",
+				"percent": 0.92,
+				"cancelFromDamageTypes": ["BuffDamage", "Poison", "Burn"],
+				"cancelFromDamageFlags": ["Sneak", "IgnoreArmor"]
+			}, {
+				"conditions": "2AlliesIsKills1",
+				"flatStatBonuses": {
+					"Haste": -87
+				}
+			}],
+			"iconSpriteName": "IconYellowDefUpShieldClock01",
+			"noIconShownOnBattleStatus": true,
+			"duration": -1,
+			"showAsTimer": false,
+			"isWeaponBuff": true,
+			"hideActivatedIcon": true
+		},
+		"HasteUpDamageReduc6AllyKills1": {
+			"class": "Buff",
+			"behaviors": ["ModifyDamage", "StatOnly"],
+			"behaviorOverrides": [{
+				"conditions": "2AlliesIsKills1",
+				"percent": 0.9,
+				"cancelFromDamageTypes": ["BuffDamage", "Poison", "Burn"],
+				"cancelFromDamageFlags": ["Sneak", "IgnoreArmor"]
+			}, {
+				"conditions": "2AlliesIsKills1",
+				"flatStatBonuses": {
+					"Haste": -111
+				}
+			}],
+			"iconSpriteName": "IconYellowDefUpShieldClock01",
+			"noIconShownOnBattleStatus": true,
+			"duration": -1,
+			"showAsTimer": false,
+			"isWeaponBuff": true,
+			"hideActivatedIcon": true
+		},
+        "ComboTimePassiveAXiaoLiRegular":{
+			"class": "Buff",
+			"stackName": "ComboTimePassiveAXiaoLiRegular",
+			"behaviors": ["EnterBattleBuff","BuffOnMonsterTurn","BuffOnMonsterTurn","FrostBiteCounterImmunityFallback","SleepImmunityFallback"],
+			"behaviorOverrides": [{
+					"sourceBuffs": ["80PercentDamageReductionFor100TU","FrostBiteCounterImmunityFor100TU","SleepImmunityFor100TU","KnockbackImmunity","BlockDeathByBuffDamage","DisableFallBackImmunity","Charged1Icon","Charged2Icon","Charged3Icon"]
+				},{
+					"enemyBuffs": ["RemoveXiaoLiKillBuff"],
+					"selfBuffs": ["XiaoLiRegularKillsMoreThanSkillsUsed"]
+				},{
+					"selfBuffs": ["BlockGiveTurnImmunityOneTurn"],
+					"spreadCondition": "IsNotBlockTurn"	
+			},{},{}],
+			"duration": -1,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true,
+			"noIconShownOnBattleStatus": true
+		},
+		"RemoveXiaoLiKillBuff":{
+			"class": "Buff",
+			"behaviors": ["BuffWhenMonsterHurt"],
+			"behaviorOverrides":[{
+				"allyBuffs": ["RemoveXiaoLiRegularKillsMoreThanSkillsUsed"],
+				"onlyFromDamageFlags": ["RemoveXiaoLiDefeatBuff"]
+			}],
+			"duration": 0,
+			"isHiddenFromPlayers": true,
+			"allowBuffOnDeadTarget": true
+		},
+		"XiaoLiRegularKillsMoreThanSkillsUsed": {
+			"class": "Buff",
+			"stackName": "XiaoLiRegularKillsMoreThanSkillsUsed",
+			"behaviors": ["BuffWhenMonstersDie", "BuffWhenMonstersDie"],
+			"behaviorOverrides": [{
+				"sourceBuffs": ["WeakenAndColdSleepAllEnemiesEBB"],
+				"sameTeam": false,
+				"spreadCondition": "KillsMoreThanSkillUsedAltAlt",
+				"deadMonsterConditions": "NotTransformingOrMirage"
+			},{
+				"sourceBuffs": ["FudgeUsedAltAlt"],
+				"sameTeam": false,
+				"spreadCondition": "KillsMoreThanSkillUsedAltAlt"
+			}],
+			"isHiddenFromPlayers": true,
+			"duration": 0
+		},
+		"RemoveXiaoLiRegularKillsMoreThanSkillsUsed":{
+			"class": "Buff",
+			"behaviors": ["RemoveBuffs"],
+			"behaviorOverrides": [{
+				"name": "XiaoLiRegularKillsMoreThanSkillsUsed"
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
+		"FrostBiteCounterImmunityFor100TU": {
+			"class": "Buff",
+			"stackName": "TempFrostBurnImmunity",
+			"behaviors": ["Immunity"],
+			"behaviorOverrides": [{
+				"stackNamesToBlock": ["FrostBurn"]
+			}],
+			"duration": 100,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["FrostbittenImmune"],
+			"iconSpriteName": "IconFrostBurnInvalid01"
+		},
+		"HoldStrongPassiveAXiaoLiRegular":{
+			"class": "Buff",
+			"stackName": "HoldStrongPassiveAXiaoLiRegular",
+			"behaviors": ["EnterBattleBuff","BuffWhenMonsterHurt","BuffOnMonsterTurnEnd","BuffOnMonsterTurnEnd"],
+			"behaviorOverrides": [{
+				"sourceBuffs": ["HoldGround","DodgeDoubleTargetAttack","StunImmunityOnce","InstantKillImmunityOnce"]
+			},{
+				"selfBuffs": ["BrideHealOK"],
+				"cancelFromDamageTypes": ["BuffDamage"]
+			},{
+				"selfBuffs": ["BrideHeal50PercentXiaoLiRegular"],
+				"activeMonsterConditions": "NotAlwaysMyTurn",
+				"spreadCondition": "BrideHealReady"
+			},{
+				"sourceBuffs": ["HealFull","TUMinus50","LargeHijikataCounter","LargeHijikataCounterFuseAfterTime","XiaoLiRegularPassiveLock"],
+				"sameTeam": false,
+				"activeMonsterConditions": "IsSleeping",
+				"spreadCondition": "IsNotXiaoLiRegularPassiveLock"
+			}],
+			"duration": -1,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true,
+			"noIconShownOnBattleStatus": true
+		},
+		"XiaoLiRegularPassiveLock": {
+			"class": "Buff",
+			"stackName": "XiaoLiRegularPassiveLock",
+			"duration": 50,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"iconSpriteName": "IconRedCountdownPassiveClock3",
+			"applyConditions": "IsLargeHijikataCharged5"
+		},
+		"BrideHeal50PercentXiaoLiRegular": {
+			"class": "Buff",
+			"behaviors": ["AdjustHp","RemoveBuffs"],
+			"behaviorOverrides": [{
+				"percent": 0.50,
+				"abilityEffect": "Blank",
+				"hpboosts": [
+					"HealBoost"
+				]
+			},{
+				"name": "BrideHealOK"
+			}],
+			"duration": 0,
+			"effectToShowWhenApplied": "LargeHeal1",
+			"textKeyToShowWhenApplied": "HealDoubleANameKey",
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
+		"XiaoLiExtraTurn50TUTrigger":{
+			"class": "Buff",
+			"duration": 50,
+			"stackName": "XiaoLiExtraTurnTrigger",
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"iconSpriteName": "IconRedCountdownPassiveClock3"
 		}
     }
 }
