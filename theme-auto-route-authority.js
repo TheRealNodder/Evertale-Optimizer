@@ -65,11 +65,22 @@
     document.head.appendChild(script);
   }
 
-  function ensureFrostbiteTheme(){
-    if(document.querySelector('script[src*="frostbite-theme.js"]'))return;
+  function ensureFrostbiteTheme(done){
+    const ready=typeof done==='function'?done:()=>{};
+    if(window.EvertaleTheme?.themes?.frostbite){ready();return;}
+
+    const existing=document.querySelector('script[src*="frostbite-theme.js"]');
+    if(existing){
+      existing.addEventListener('load',ready,{once:true});
+      existing.addEventListener('error',ready,{once:true});
+      return;
+    }
+
     const script=document.createElement('script');
     script.src='./frostbite-theme.js?v=1';
     script.defer=true;
+    script.addEventListener('load',ready,{once:true});
+    script.addEventListener('error',ready,{once:true});
     document.head.appendChild(script);
   }
 
@@ -88,9 +99,10 @@
 
   function install(){
     ensureImageCacheLoader();
-    ensureFrostbiteTheme();
-    syncCurrentUrl();
-    syncLinks(document);
+    ensureFrostbiteTheme(()=>{
+      syncCurrentUrl();
+      syncLinks(document);
+    });
     document.addEventListener('evertale:theme-applied',()=>schedule(document),true);
     document.addEventListener('click',()=>schedule(document),true);
     window.addEventListener('popstate',()=>schedule(document));
