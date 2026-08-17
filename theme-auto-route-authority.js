@@ -1,6 +1,7 @@
 /* theme-auto-route-authority.js
    Keeps Auto theme explicit across Catalog, Roster, and Optimizer links.
-   Scope: theme routing only plus loading the shared ImageKit cache helper when a page has not loaded it yet.
+   Scope: theme routing plus loading shared theme/cache helpers when a page
+   has not loaded them yet.
    No layout, data, sidebar, catalog, roster, optimizer, or stat logic ownership.
 */
 (function(){
@@ -64,6 +65,14 @@
     document.head.appendChild(script);
   }
 
+  function ensureFrostbiteTheme(){
+    if(document.querySelector('script[src*="frostbite-theme.js"]'))return;
+    const script=document.createElement('script');
+    script.src='./frostbite-theme.js?v=1';
+    script.defer=true;
+    document.head.appendChild(script);
+  }
+
   let scheduled=false;
   function schedule(root=document){
     if(scheduled)return;
@@ -79,6 +88,7 @@
 
   function install(){
     ensureImageCacheLoader();
+    ensureFrostbiteTheme();
     syncCurrentUrl();
     syncLinks(document);
     document.addEventListener('evertale:theme-applied',()=>schedule(document),true);
