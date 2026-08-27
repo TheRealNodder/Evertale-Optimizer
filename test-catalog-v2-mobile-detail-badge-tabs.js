@@ -152,6 +152,9 @@
       if(!isMobile())return;
       const detailBtn=event.target.closest('#catalogGrid .unitCard .v2-detail-btn');
       if(detailBtn){
+        // Landscape owns an in-card two-state detail view; do not open the
+        // portrait popover or stop the landscape authority's capture handler.
+        if(document.body.classList.contains('catalog-mobile-landscape'))return;
         const card=detailBtn.closest('.unitCard');
         const target=detailBtn.getAttribute('popovertarget');
         const pop=target?document.getElementById(target):card?.querySelector('.v2-detail-backdrop');

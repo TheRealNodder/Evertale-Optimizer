@@ -302,6 +302,7 @@
       }
       const detailBtn=e.target.closest('#catalogGrid .unitCard .v2-detail-btn');
       if(detailBtn){
+        if(document.body.classList.contains('catalog-mobile-landscape'))return;
         const card=detailBtn.closest('.unitCard');
         if(card){
           e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();
@@ -312,6 +313,7 @@
       }
       const card=e.target.closest('#catalogGrid .unitCard');
       if(card&&!e.target.closest('.stateRow .stateBtn,.duoFormBtn,button,input,select,a')){
+        if(document.body.classList.contains('catalog-mobile-landscape'))return;
         e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();
         card.classList.add('v2-selected');
         openDetail(card);

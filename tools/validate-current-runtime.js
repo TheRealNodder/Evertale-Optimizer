@@ -137,7 +137,7 @@ const mobileCatalogDockStyles = read('catalog-mobile-command-dock.css');
 if (!catalogHtml.includes('test-catalog-v2-desktop-structure.js?v=13')) {
   errors.push('index.html does not use the current desktop catalog state-sync cache token');
 }
-if (!catalogHtml.includes('catalog-mobile-command-dock.css?v=1') || !catalogHtml.includes('catalog-mobile-command-dock.js?v=1')) {
+if (!catalogHtml.includes('catalog-mobile-command-dock.css?v=9') || !catalogHtml.includes('catalog-mobile-command-dock.js?v=7')) {
   errors.push('index.html does not load the mobile catalog command dock authority');
 }
 for (const label of ['Return to Top', 'All', 'Characters', 'Weapons', 'Bosses', 'Accessories']) {
@@ -149,14 +149,29 @@ if (!mobileCatalogDockSource.includes("searchHost.appendChild(sourceSearch)")) {
 if (!mobileCatalogDockSource.includes("sourceType.dispatchEvent(new Event('change'")) {
   errors.push('Mobile catalog entry menu does not synchronize with the canonical type control');
 }
-if (!mobileCatalogDockStyles.includes('position:fixed') || !mobileCatalogDockStyles.includes('.catalog-mobile-landscape') || !mobileCatalogDockStyles.includes('grid-template-columns:clamp(165px,30vw,260px) minmax(0,1fr)')) {
+if (!mobileCatalogDockStyles.includes('position:fixed') || !mobileCatalogDockStyles.includes('.catalog-mobile-landscape') || !mobileCatalogDockStyles.includes('grid-template-columns:clamp(145px,21vw,185px) minmax(0,1fr)')) {
   errors.push('Mobile catalog dock or horizontal landscape card layout is incomplete');
+}
+for (const contract of ['v2-landscape-back', 'data-landscape-detail-tab="leader"', 'showLandscapeDetails', 'hideLandscapeDetails']) {
+  if (!mobileCatalogDockSource.includes(contract)) errors.push(`Landscape in-card detail contract is missing: ${contract}`);
+}
+if (!mobileCatalogDockStyles.includes('.v2-landscape-detail-open') || !mobileCatalogDockStyles.includes('.metaMain::after') || !mobileCatalogDockStyles.includes('.unitThumb::after')) {
+  errors.push('Landscape card/detail styling does not relocate and toggle the element emblem');
+}
+if (!mobileCatalogDockStyles.includes('.unitDetails > .leaderBlock') || !mobileCatalogDockStyles.includes("content:'LEADER'")) {
+  errors.push('Landscape summary does not fill the center band with the leader skill.');
 }
 if (!read('catalog-v2-lite.js').includes("if(state.type==='all')hydrateAll(true)")) {
   errors.push('Catalog All filter does not hydrate every entry category');
 }
 if (!read('catalog-v2-lite.js').includes('openDetail,getSelectedId') || !read('test-catalog-v2-mobile-detail-badge-tabs.js').includes('EvertaleCatalogV2.openDetail(card)')) {
   errors.push('Mobile detail buttons do not use the populated catalog detail authority');
+}
+if (!read('test-catalog-v2-mobile-detail-badge-tabs.js').includes("classList.contains('catalog-mobile-landscape')")) {
+  errors.push('Portrait detail authority does not yield to the landscape two-state card.');
+}
+if (!read('test-catalog-v2-detail-fix.js').includes("classList.contains('catalog-mobile-landscape')")) {
+  errors.push('Legacy detail authority does not yield to the landscape two-state card.');
 }
 if (!desktopCatalogSource.includes('awakenIndexFromCard(card)')) {
   errors.push('Desktop catalog selection does not derive the awakened index from the selected card');
