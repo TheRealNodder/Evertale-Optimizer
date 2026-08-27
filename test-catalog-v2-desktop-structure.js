@@ -24,7 +24,7 @@
 
   function qs(sel, root=document){ return root.querySelector(sel); }
   function qsa(sel, root=document){ return Array.from(root.querySelectorAll(sel)); }
-  function isDesktop(){ return window.innerWidth >= BREAKPOINT; }
+  function isDesktop(){ return window.innerWidth >= BREAKPOINT && !window.matchMedia('(orientation: landscape) and (max-width: 1180px) and (max-height: 600px)').matches; }
   function safeText(value){ return String(value ?? '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
   function decodeAttrJson(value){ try { return JSON.parse(decodeURIComponent(value || '')); } catch { return []; } }
   function normalizeElement(value){ return String(value || '').trim().toLowerCase().replace(/[^a-z]/g,''); }

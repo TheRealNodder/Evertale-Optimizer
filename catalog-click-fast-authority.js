@@ -5,7 +5,8 @@
    Mobile exits immediately so the mobile popup/detail flow remains untouched.
 */
 (function(){
-  if(!window.matchMedia('(min-width: 821px)').matches){
+  const compactLandscape=window.matchMedia('(orientation: landscape) and (max-width: 1180px) and (max-height: 600px)').matches;
+  if(!window.matchMedia('(min-width: 821px)').matches||compactLandscape){
     window.__EVERTALE_DESKTOP_SIDEBAR_AUTHORITY_SKIPPED_ON_MOBILE = true;
     return;
   }

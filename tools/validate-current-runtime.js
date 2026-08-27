@@ -132,8 +132,31 @@ for (const page of pages) {
 
 const catalogHtml = read('index.html');
 const desktopCatalogSource = read('test-catalog-v2-desktop-structure.js');
-if (!catalogHtml.includes('test-catalog-v2-desktop-structure.js?v=12')) {
+const mobileCatalogDockSource = read('catalog-mobile-command-dock.js');
+const mobileCatalogDockStyles = read('catalog-mobile-command-dock.css');
+if (!catalogHtml.includes('test-catalog-v2-desktop-structure.js?v=13')) {
   errors.push('index.html does not use the current desktop catalog state-sync cache token');
+}
+if (!catalogHtml.includes('catalog-mobile-command-dock.css?v=1') || !catalogHtml.includes('catalog-mobile-command-dock.js?v=1')) {
+  errors.push('index.html does not load the mobile catalog command dock authority');
+}
+for (const label of ['Return to Top', 'All', 'Characters', 'Weapons', 'Bosses', 'Accessories']) {
+  if (!mobileCatalogDockSource.includes(label)) errors.push(`Mobile catalog command dock is missing control: ${label}`);
+}
+if (!mobileCatalogDockSource.includes("searchHost.appendChild(sourceSearch)")) {
+  errors.push('Mobile catalog dock does not reuse the canonical search control');
+}
+if (!mobileCatalogDockSource.includes("sourceType.dispatchEvent(new Event('change'")) {
+  errors.push('Mobile catalog entry menu does not synchronize with the canonical type control');
+}
+if (!mobileCatalogDockStyles.includes('position:fixed') || !mobileCatalogDockStyles.includes('.catalog-mobile-landscape') || !mobileCatalogDockStyles.includes('grid-template-columns:clamp(165px,30vw,260px) minmax(0,1fr)')) {
+  errors.push('Mobile catalog dock or horizontal landscape card layout is incomplete');
+}
+if (!read('catalog-v2-lite.js').includes("if(state.type==='all')hydrateAll(true)")) {
+  errors.push('Catalog All filter does not hydrate every entry category');
+}
+if (!read('catalog-v2-lite.js').includes('openDetail,getSelectedId') || !read('test-catalog-v2-mobile-detail-badge-tabs.js').includes('EvertaleCatalogV2.openDetail(card)')) {
+  errors.push('Mobile detail buttons do not use the populated catalog detail authority');
 }
 if (!desktopCatalogSource.includes('awakenIndexFromCard(card)')) {
   errors.push('Desktop catalog selection does not derive the awakened index from the selected card');

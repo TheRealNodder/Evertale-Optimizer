@@ -258,19 +258,18 @@
     const status=$('statusText');
     if(status)status.textContent='Loading Characters...';
     const search=$('catalogSearch'),type=$('catalogType'),sort=$('catalogSort');
-    if(type&&type.value==='all')type.value='characters';
     state.type=type?.value||'characters';
     if(sort){
       state.sort=sort.value||'newest';
       sort.addEventListener('change',()=>{state.sort=sort.value||'newest';render();});
     }
     search?.addEventListener('input',()=>{clearTimeout(search._t);search._t=setTimeout(()=>{state.q=search.value||'';render();},160);});
-    type?.addEventListener('change',()=>{state.type=type.value||'characters';hydrateCategory(state.type,true);});
+    type?.addEventListener('change',()=>{state.type=type.value||'characters';if(state.type==='all')hydrateAll(true);else hydrateCategory(state.type,true);});
     attach();
-    await hydrateCategory('characters',false);
+    await hydrateCategory(state.type,false);
     render();
     warmColdCategories();
   }
-  window.EvertaleCatalogV2={applyState,readStateRows,selectCard,selectedCard,getSelectedId:()=>state.selectedId};
+  window.EvertaleCatalogV2={applyState,readStateRows,selectCard,selectedCard,openDetail,getSelectedId:()=>state.selectedId};
   document.addEventListener('DOMContentLoaded',()=>init().catch(err=>{console.error(err);const s=$('statusText');if(s)s.textContent=`Error: ${err.message||err}`;}));
 })();

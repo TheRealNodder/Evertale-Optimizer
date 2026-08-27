@@ -4,8 +4,8 @@
    Logic only: no style or layout changes.
 */
 (function(){
-  const BREAKPOINT=820;
-  function isMobile(){return window.innerWidth<=BREAKPOINT;}
+  const LANDSCAPE_QUERY='(orientation: landscape) and (max-width: 1180px) and (max-height: 600px)';
+  function isMobile(){return window.innerWidth<=820||window.matchMedia(LANDSCAPE_QUERY).matches;}
   function toggleSection(summary){
     const section=summary&&summary.closest('.v2-detail-section');
     if(!section)return;

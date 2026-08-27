@@ -3,8 +3,8 @@
    Desktop is untouched. No MutationObserver. No data fetch. No global layout ownership.
 */
 (function(){
-  const BREAKPOINT=820;
-  const isMobile=()=>window.innerWidth<=BREAKPOINT;
+  const LANDSCAPE_QUERY='(orientation: landscape) and (max-width: 1180px) and (max-height: 600px)';
+  const isMobile=()=>window.innerWidth<=820||window.matchMedia(LANDSCAPE_QUERY).matches;
   const q=(s,r=document)=>r.querySelector(s);
   const qa=(s,r=document)=>Array.from(r.querySelectorAll(s));
 
@@ -159,8 +159,9 @@
           event.preventDefault();
           event.stopPropagation();
           event.stopImmediatePropagation();
-          card.classList.add('v2-selected');
-          try{pop.showPopover();}catch{}
+          window.EvertaleCatalogV2?.selectCard?.(card);
+          if(typeof window.EvertaleCatalogV2?.openDetail==='function')window.EvertaleCatalogV2.openDetail(card);
+          else try{pop.showPopover();}catch{}
         }
         return;
       }
