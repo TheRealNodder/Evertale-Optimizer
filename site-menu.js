@@ -91,7 +91,7 @@
       const activeKey=select.value==='auto'?resolvedKey:select.value;
       const existing=Array.from(swatches.querySelectorAll('[data-theme-key]'));
       if(existing.length!==items.length){
-        swatches.innerHTML=grouped.map(row=>`<section class="siteThemeSwatchGroup" data-theme-group="${row.group}"><div class="siteThemeSwatchDivider">${row.group}</div><div class="siteThemeSwatchGrid">${row.items.map(item=>`<button type="button" class="siteThemeSwatch${item.material==='gem'?' gem':item.material==='legendary'?' legendary':item.material==='handheld'?' handheld':''}${item.key===activeKey?' active':''}" data-theme-key="${item.key}" aria-label="${item.label}" aria-pressed="${item.key===activeKey}" title="${item.label}" style="--swatch-a:${item.bg};--swatch-b:${item.surface};--swatch-c:${item.accent};"></button>`).join('')}</div></section>`).join('');
+        swatches.innerHTML=grouped.map(row=>`<section class="siteThemeSwatchGroup" data-theme-group="${row.group}"><div class="siteThemeSwatchDivider">${row.group}</div><div class="siteThemeSwatchGrid">${row.items.map(item=>`<button type="button" class="siteThemeSwatch${item.material==='gem'?' gem':item.material==='legendary'?' legendary':item.material==='handheld'?' handheld':item.material==='elemental'?' elemental':''}${item.key===activeKey?' active':''}" data-theme-key="${item.key}" aria-label="${item.label}" aria-pressed="${item.key===activeKey}" title="${item.label}" style="--swatch-a:${item.bg};--swatch-b:${item.surface};--swatch-c:${item.accent};"></button>`).join('')}</div></section>`).join('');
       }else{
         existing.forEach(button=>{
           const selected=button.dataset.themeKey===activeKey;
@@ -145,6 +145,7 @@
       .siteThemeSwatchGrid{display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:7px!important;}
       .siteThemeSwatch{aspect-ratio:1!important;min-width:0!important;border-radius:10px!important;border:1px solid rgba(255,255,255,.20)!important;background:linear-gradient(135deg,var(--swatch-a),var(--swatch-b) 52%,var(--swatch-c))!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 8px 18px rgba(0,0,0,.24)!important;cursor:pointer!important;}
       .siteThemeSwatch.legendary{border-color:color-mix(in srgb,var(--swatch-c) 72%,white)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 0 12px color-mix(in srgb,var(--swatch-c) 22%,transparent)!important;}
+      .siteThemeSwatch.elemental{border-color:color-mix(in srgb,var(--swatch-c) 82%,white 18%)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.34),0 0 15px color-mix(in srgb,var(--swatch-c) 30%,transparent)!important;}
       .siteThemeSwatch.active{outline:2px solid var(--v2-theme-trim,var(--site-theme-accent,#f6ca5e))!important;outline-offset:2px!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 0 20px var(--v2-theme-soft,rgba(255,255,255,.18))!important;}
     `;
     document.head.appendChild(style);

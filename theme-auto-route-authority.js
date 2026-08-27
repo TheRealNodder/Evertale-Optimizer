@@ -65,11 +65,11 @@
     document.head.appendChild(script);
   }
 
-  function ensureFrostbiteTheme(done){
+  function ensureElementalThemes(done){
     const ready=typeof done==='function'?done:()=>{};
-    if(window.EvertaleTheme?.themes?.frostbite){ready();return;}
+    if(window.EvertaleElementalThemes){ready();return;}
 
-    const existing=document.querySelector('script[src*="frostbite-theme.js"]');
+    const existing=document.querySelector('script[src*="elemental-themes.js"]');
     if(existing){
       existing.addEventListener('load',ready,{once:true});
       existing.addEventListener('error',ready,{once:true});
@@ -77,7 +77,7 @@
     }
 
     const script=document.createElement('script');
-    script.src='./frostbite-theme.js?v=1';
+    script.src='./elemental-themes.js?v=1';
     script.defer=true;
     script.addEventListener('load',ready,{once:true});
     script.addEventListener('error',ready,{once:true});
@@ -99,7 +99,7 @@
 
   function install(){
     ensureImageCacheLoader();
-    ensureFrostbiteTheme(()=>{
+    ensureElementalThemes(()=>{
       syncCurrentUrl();
       syncLinks(document);
     });

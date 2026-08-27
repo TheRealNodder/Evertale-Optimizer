@@ -6,6 +6,16 @@
   const HOLIDAY_KEYS=new Set(['newyear','valentine','stpatrick','easter','independence','halloween','thanksgiving','christmas']);
   const GEM_KEYS=new Set(['gold','silver','ruby','sapphire','emerald','amethyst','diamond','pearl','platinum','opal','topaz','jade','obsidian','quartz']);
   const POKEMON_KEYS=new Set(['gold','silver','ruby','sapphire','emerald','diamond','pearl','platinum']);
+  const ELEMENTAL_META={
+    cinderfall:{label:'Fire · Cinderfall',element:'fire',accent:'#ff4a32',secondary:'#ffb13b',effect:'element-fire',aura:'Molten fissures, rising embers, and circling flame currents'},
+    undertow:{label:'Water · Undertow',element:'water',accent:'#2d9cff',secondary:'#55f0ff',effect:'element-water',aura:'Abyssal currents, caustic light, and ascending bubbles'},
+    frostbite:{label:'Water / Ice · Frostbite',element:'water-ice',accent:'#8eeeff',secondary:'#effcff',effect:'element-ice',aura:'Glacial wind, seamless snowfall, and crystalline arctic light'},
+    thunderwake:{label:'Storm · Thunderwake',element:'storm',accent:'#ffd328',secondary:'#7bdcff',effect:'element-storm',aura:'Charged cloud bands, diagonal rain, and restrained lightning'},
+    worldroot:{label:'Earth · Worldroot',element:'earth',accent:'#35d76a',secondary:'#d6a34f',effect:'element-earth',aura:'Ancient roots, floating pollen, and deep stone resonance'},
+    dawnspire:{label:'Light · Dawnspire',element:'light',accent:'#fff1a8',secondary:'#ffffff',effect:'element-light',aura:'Prismatic rays, halo rings, and celestial motes'},
+    voidcrown:{label:'Dark · Voidcrown',element:'dark',accent:'#9b5cff',secondary:'#ff5fc8',effect:'element-dark',aura:'Eclipse rings, drifting shadow shards, and violet corona light'}
+  };
+  const ELEMENTAL_KEYS=new Set(Object.keys(ELEMENTAL_META));
   const HANDHELD_META={
     crimsonblack:{effect:'ds-lite',finish:'gloss-crimson',hardware:'ds-lite',aura:'Gloss crimson lid over a matte black body'},
     cobaltblack:{effect:'ds-lite',finish:'gloss-cobalt',hardware:'ds-lite',aura:'Gloss cobalt lid over a matte black body'},
@@ -49,12 +59,19 @@
   };
   const LEGENDARY_KEYS=new Set(Object.keys(LEGENDARY_META));
   const THEME_GROUP_ORDER=[
-    'Calendar','Pokémon · Versions','Pokémon · Johto','Pokémon · Hoenn',
+    'Calendar','Evertale · Elements','Pokémon · Versions','Pokémon · Johto','Pokémon · Hoenn',
     'Pokémon · Hoenn Shiny','Pokémon · Sinnoh','Pokémon · Unova',
     'Pokémon · Kalos / Z-A','Pokémon · Alola','Pokémon · Galar',
     'Pokémon · Paldea','Gems & Minerals','DS & 3DS','Signature'
   ];
   const themes={
+    cinderfall:['#120503','#52150e','#ff4a32','#fff1e8'],
+    undertow:['#020b1d','#083d82','#2d9cff','#effcff'],
+    frostbite:['#03101d','#0a2238','#8eeeff','#effcff'],
+    thunderwake:['#050a14','#24344a','#ffd328','#f5fbff'],
+    worldroot:['#04150b','#153f25','#35d76a','#f4ffe9'],
+    dawnspire:['#17140d','#5d5236','#fff1a8','#ffffff'],
+    voidcrown:['#070311','#2b1158','#9b5cff','#fff0fb'],
     spring:['#153b2b','#3f7d57','#91d18b','#f1ffe8'],
     summer:['#0b2e4f','#145da0','#f7b733','#fff3b0'],
     autumn:['#2d1b12','#7b3f00','#c97a40','#f2c572'],
@@ -324,23 +341,26 @@
   }
   function themeConfig(key){
     const colors=themes[key]||themes.winter;
+    const elemental=ELEMENTAL_META[key]||null;
     const legendary=LEGENDARY_META[key]||null;
     const handheld=HANDHELD_META[key]||null;
-    const accent=displayAccents[key]||legendary?.energy||colors[2];
-    const material=legendary?'legendary':(handheld?'handheld':(GEM_KEYS.has(key)?'gem':'standard'));
-    const group=legendary?.group||(POKEMON_KEYS.has(key)?'Pokémon · Versions':(GEM_KEYS.has(key)?'Gems & Minerals':(HANDHELD_KEYS.has(key)?'DS & 3DS':(SEASON_KEYS.has(key)||HOLIDAY_KEYS.has(key)?'Calendar':'Signature'))));
+    const accent=elemental?.accent||displayAccents[key]||legendary?.energy||colors[2];
+    const secondary=elemental?.secondary||colors[1];
+    const material=elemental?'elemental':(legendary?'legendary':(handheld?'handheld':(GEM_KEYS.has(key)?'gem':'standard')));
+    const group=elemental?'Evertale · Elements':(legendary?.group||(POKEMON_KEYS.has(key)?'Pokémon · Versions':(GEM_KEYS.has(key)?'Gems & Minerals':(HANDHELD_KEYS.has(key)?'DS & 3DS':(SEASON_KEYS.has(key)||HOLIDAY_KEYS.has(key)?'Calendar':'Signature')))));
     return {
       key,
-      label:themeLabels[key]||String(key||'Theme').replace(/(^|[-_])\w/g,s=>s.replace(/[-_]/,'').toUpperCase()),
+      label:elemental?.label||themeLabels[key]||String(key||'Theme').replace(/(^|[-_])\w/g,s=>s.replace(/[-_]/,'').toUpperCase()),
       material,
       group,
-      effect:legendary?.effect||handheld?.effect||'',
+      element:elemental?.element||'',
+      effect:elemental?.effect||legendary?.effect||handheld?.effect||'',
       finish:handheld?.finish||'',
       hardware:handheld?.hardware||'',
-      aura:legendary?.aura||handheld?.aura||'',
+      aura:elemental?.aura||legendary?.aura||handheld?.aura||'',
       bg:colors[0],
       surface:colors[1],
-      secondary:colors[1],
+      secondary,
       accent,
       ink:colors[3],
       legendaryBody:legendary?.body||colors[1],
@@ -348,7 +368,7 @@
       legendaryDetail:legendary?.detail||colors[3],
       gradientA:colors[0],
       gradientB:colors[1],
-      gradientC:accent
+      gradientC:secondary
     };
   }
   function hexToRgb(hex){
@@ -405,7 +425,7 @@
     setVar(root,'--site-theme-surface',colors[1]);
     setVar(root,'--site-theme-accent',accent);
     setVar(root,'--site-theme-ink',ink);
-    setVar(root,'--site-theme-secondary',colors[1]);
+    setVar(root,'--site-theme-secondary',cfg.secondary);
     setVar(root,'--site-theme-rgb',rgb);
     setVar(root,'--site-theme-surface-rgb',surfaceRgb);
     setVar(root,'--legendary-body',legendaryBody);
@@ -421,7 +441,7 @@
     setVar(root,'--site-theme-glow',`rgba(${rgb},.18)`);
     setVar(root,'--v2-theme-rgb',rgb);
     setVar(root,'--v2-theme-trim',accent);
-    setVar(root,'--v2-theme-secondary',colors[1]);
+    setVar(root,'--v2-theme-secondary',cfg.secondary);
     setVar(root,'--v2-theme-soft',`rgba(${rgb},.16)`);
     setVar(root,'--v2-theme-mid',`rgba(${rgb},.28)`);
     setVar(root,'--v2-theme-strong',`rgba(${rgb},.48)`);
@@ -462,6 +482,7 @@
   }
   window.EvertaleTheme={
     themes,
+    elementalKeys:Object.freeze([...ELEMENTAL_KEYS]),
     groupOrder:[...THEME_GROUP_ORDER],
     listThemes(){return Object.keys(themes).map(key=>themeConfig(key));},
     listThemeOptions(){

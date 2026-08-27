@@ -5,6 +5,9 @@ import {fileURLToPath} from 'node:url';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const source=fs.readFileSync(path.join(root,'seasonal-theme.js'),'utf8');
+const elementalSource=fs.readFileSync(path.join(root,'elemental-themes.js'),'utf8');
+const elementalCss=fs.readFileSync(path.join(root,'elemental-themes.css'),'utf8');
+const routeSource=fs.readFileSync(path.join(root,'theme-auto-route-authority.js'),'utf8');
 
 function element(tagName='div'){
   const attributes=new Map();
@@ -63,12 +66,20 @@ if(!api)throw new Error('Theme API was not created');
 const themes=api.listThemes();
 const legendary=themes.filter(theme=>theme.material==='legendary');
 const handheld=themes.filter(theme=>theme.material==='handheld');
+const elemental=themes.filter(theme=>theme.material==='elemental');
+const expectedElemental=['cinderfall','undertow','frostbite','thunderwake','worldroot','dawnspire','voidcrown'];
 const failures=[];
 const check=(condition,message)=>{if(!condition)failures.push(message);};
 
 check(new Set(themes.map(theme=>theme.key)).size===themes.length,'Theme keys are not unique');
 check(legendary.length===29,`Expected 29 legendary profiles, found ${legendary.length}`);
 check(handheld.length===7,`Expected 7 handheld profiles, found ${handheld.length}`);
+check(elemental.length===7,`Expected 7 elemental profiles, found ${elemental.length}`);
+check(JSON.stringify(elemental.map(theme=>theme.key))===JSON.stringify(expectedElemental),'Elemental profiles are missing or out of canonical display order');
+check(JSON.stringify(api.elementalKeys)===JSON.stringify(expectedElemental),'Theme API elemental key registry is incomplete');
+check(elemental.every(theme=>theme.group==='Evertale · Elements'),'An elemental profile is outside the Evertale element group');
+check(elemental.every(theme=>theme.element&&theme.effect&&theme.aura),'An elemental profile is missing element/effect/aura metadata');
+check(api.groupOrder[1]==='Evertale · Elements','Evertale element group is not prioritized after Calendar');
 check(legendary.every(theme=>theme.effect&&theme.aura),'A legendary profile is missing effect/aura metadata');
 check(handheld.every(theme=>theme.effect&&theme.finish&&theme.hardware&&theme.aura),'A handheld profile is missing hardware metadata');
 const expectedHardware={
@@ -80,9 +91,22 @@ check(themes.every(theme=>api.groupOrder.includes(theme.group)),'A theme group i
 check(body.children.filter(child=>child.id==='siteThemeFx').length===1,'Dedicated theme effect layer was not created exactly once');
 check(body.children.find(child=>child.id==='siteThemeFx')?.children?.length===2,'Theme effect layer does not contain exactly two compositor layers');
 check(!document.getElementById('evertale-material-theme-style'),'Theme runtime still injected a second material CSS authority');
+check(!/\balternate\b/i.test(elementalCss),'Elemental CSS contains a rubberbanding alternate animation');
+check(/elementalArtOrbit/.test(elementalCss)&&/elementalSpin/.test(elementalCss),'Elemental CSS is missing its closed-loop motion authorities');
+check(/elementalRise/.test(elementalCss)&&/elementalRain/.test(elementalCss)&&/elementalSnow/.test(elementalCss),'Elemental CSS is missing an off-screen particle loop');
+check(/requestAnimationFrame/.test(elementalSource),'Elemental depth response is not frame-scheduled');
+check(/elemental-themes\.js\?v=1/.test(routeSource),'Theme route authority does not load the elemental compositor');
+for(const key of expectedElemental){
+  const asset=path.join(root,'assets','themes','elemental',`${key}.png`);
+  check(fs.existsSync(asset),`Missing elemental background: ${key}.png`);
+  if(fs.existsSync(asset))check(fs.statSync(asset).size>500000,`Elemental background is unexpectedly small: ${key}.png`);
+}
 
 api.applyTheme();
 check(body.children.filter(child=>child.id==='siteThemeFx').length===1,'Repeated apply duplicated the effect layer');
+api.setPreference('cinderfall');
+check(html.getAttribute('data-theme-material')==='elemental','Elemental theme material did not apply');
+check(html.getAttribute('data-theme-effect')==='element-fire','Elemental theme effect metadata did not apply');
 api.setPreference('zygarde');
 check(html.getAttribute('data-theme-key')==='zygarde','Manual theme preference did not apply');
 check(html.getAttribute('data-theme-effect')==='cell-grid','Legendary effect attribute did not apply');

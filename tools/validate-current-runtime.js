@@ -111,7 +111,7 @@ for (const page of pages) {
   if (!html.includes('theme-effects.css?v=2')) {
     errors.push(`${page} does not load the current dynamic theme effects layer`);
   }
-  if (!html.includes('site-menu.js?v=15')) {
+  if (!html.includes('site-menu.js?v=16')) {
     errors.push(`${page} does not load the focus-preserving theme menu revision`);
   }
   if (!html.includes(`live-data-config.js?v=${expectedDataVersion}`)) {
