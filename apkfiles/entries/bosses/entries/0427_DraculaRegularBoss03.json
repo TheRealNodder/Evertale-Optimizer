@@ -1,0 +1,1462 @@
+{
+  "schemaVersion": 3,
+  "order": 427,
+  "id": "mega-dracula",
+  "sourceId": "DraculaRegularBoss03",
+  "name": "Mega Dracula",
+  "title": "",
+  "secondName": "",
+  "description": "",
+  "category": "bosse",
+  "rarity": null,
+  "stars": 6,
+  "evolvedStars": 6,
+  "element": "Dark",
+  "weaponType": "Sword",
+  "stats": {
+    "atk": 2900,
+    "hp": 232000,
+    "spd": 487,
+    "cost": 999
+  },
+  "hp": 232000,
+  "atk": 2900,
+  "spd": 487,
+  "cost": 999,
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/DraculaRegular03.png",
+  "imageVariants": [],
+  "forms": [],
+  "activeSkills": [
+    "SingleAttackADraculaRegularBoss",
+    "EnemyBuffADraculaRegularBoss",
+    "MultiAttackADraculaRegularBoss",
+    "AllBuffADraculaRegularBoss"
+  ],
+  "passiveSkills": [
+    "BloodSuckerPassiveADraculaRegularBoss",
+    "TransylvaniaPassiveADraculaRegularBoss"
+  ],
+  "leaderSkills": [],
+  "refs": {
+    "activeSkills": [
+      "SingleAttackADraculaRegularBoss",
+      "EnemyBuffADraculaRegularBoss",
+      "MultiAttackADraculaRegularBoss",
+      "AllBuffADraculaRegularBoss"
+    ],
+    "passives": [
+      "BloodSuckerPassiveADraculaRegularBoss",
+      "TransylvaniaPassiveADraculaRegularBoss"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": null,
+    "leaderBuffCondition": null,
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "SingleAttackADraculaRegularBoss": {
+        "id": "SingleAttackADraculaRegularBoss",
+        "found": true,
+        "localization": {
+          "name": "Blade of Night",
+          "description": "1000% damage to 1 enemy.\n\nWhen this attack hits a target and that target has 1HP remaining after damage, that target has their Active Skills disabled for 30TU. When a unit's Active Skills are disabled and they get the turn, they will lose the turn as if they were sleeping. This effect cannot affect boss units, cannot be purified, and will end if the user is defeated.",
+          "selected": "1000% damage, may disable skills"
+        },
+        "ability": {
+          "name": "SingleAttackADraculaRegularBoss",
+          "class": "Ability",
+          "abilityScalor": 9,
+          "config": "SingleAttackADraculaRegularBoss",
+          "tuCost": 50,
+          "useLimit": 0,
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "damageFlags": [
+                "IgnoreArmor",
+                "IgnoreSkin"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "NoTurnsFor30TU"
+              ],
+              "applyConditions": "On1HPIsNotBoss",
+              "applyToTargetType": "Enemy",
+              "showMissConditions": "ShowNoMiss",
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "GoodGirlBuffCounter",
+                "RemoveActive1LOCKForActive4DraculaRegularBoss"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "DraculaSingleAtatck1",
+          "recommendEffectWhenUsable": -2
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.8,
+            0,
+            0.7,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0.8,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batfx_tailwindred2/batfx_tailwindred2",
+            "batsfx_prefab/batsfx_timestrike1",
+            "batfx_YandereDark/batfx_redcharge3",
+            "batsfx_prefab/batsfx_charge1",
+            "batfx_Dracula/batfx_SlashRedHorizontal1",
+            "batsfx_prefab/batsfx_timestrike1",
+            "batfx_Dracula/batfx_chainSpark1",
+            "batfx_YandereDark/batfx_impactpetals5",
+            "batfx_Dracula/batfx_BloodSplash1",
+            "batsfx_prefab/batsfx_multislash2",
+            "batfx_deadlyvampire1/batfx_camerashake1",
+            "batfx_Dracula/batfx_SlashRedHorizontal1",
+            "batsfx_prefab/batsfx_water2"
+          ],
+          "sortOrderOffset": [
+            100,
+            2,
+            10,
+            2,
+            10,
+            2,
+            10,
+            10,
+            10,
+            2,
+            2,
+            10,
+            2
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle3",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "GoodGirlBuffCounter": {
+            "class": "Buff",
+            "stackName": "GoodGirlBuffCounter",
+            "stackLimit": 5,
+            "duration": -1,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "noIconShownOnBattleStatus": true,
+            "isHiddenFromPlayers": true
+          },
+          "NoTurnsFor30TU": {
+            "class": "Buff",
+            "stackName": "BlockGiveTurnFor30TU",
+            "behaviors": [
+              "LoseTurn",
+              "RemoveOnSourceDeath"
+            ],
+            "behaviorOverrides": [
+              {},
+              {},
+              {},
+              {}
+            ],
+            "duration": 30,
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "tags": [
+              "BlockTurnTag"
+            ],
+            "iconSpriteName": "IconRedDisabled01",
+            "statusEffect": "TurnGiftStunStatus",
+            "applyConditions": "IsNotBoss"
+          },
+          "RemoveActive1LOCKForActive4DraculaRegularBoss": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "Active1LOCKForActive4DraculaRegular"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "On1HPIsNotBoss": {
+            "class": "MonsterConditions",
+            "hpLessThanValue": 1,
+            "not": {
+              "class": "MonsterConditions",
+              "families": [
+                "Mibone",
+                "RedMinotaur",
+                "Eternal",
+                "Norza",
+                "Gyurelle",
+                "Druke",
+                "Luther",
+                "Cetus",
+                "GyurelleInDisguise",
+                "FloatingMageBoss",
+                "MetalDragonBoss",
+                "MaskViola",
+                "DrukeSmall",
+                "FireDragonBoss",
+                "FireLizardLancer",
+                "Gyurelle0",
+                "GyurelleInDisguise0",
+                "AstridBoss",
+                "DeathKnightBoss",
+                "TaotieBoss",
+                "AirCloakKnight",
+                "UndeadMinotaur",
+                "Darna",
+                "NorzaRegularBoss",
+                "GolemBoss",
+                "MechanicalTitan",
+                "DarkRizetteBoss",
+                "FireLich",
+                "NovaBlastDragonBoss",
+                "EarthKaijuBoss",
+                "WindDragonBoss",
+                "BabyDarkDragonBoss",
+                "MetalDragonDemon",
+                "MaskElfWarrior",
+                "DarkLudmillaBoss",
+                "LifeEyeballEX",
+                "GoldAngelEX",
+                "DarkAstridBoss",
+                "LudmillaRegularBoss",
+                "YandereMaidBoss",
+                "BunnySamuraiBoss",
+                "SchoolGirlWarriorBoss",
+                "OniSchoolGirlBoss",
+                "Orcanix",
+                "DarkFinnBoss",
+                "CyrusBoss",
+                "BahamutBoss",
+                "RoundTableKnightBoss",
+                "CrossSwordKnightBoss",
+                "MerlinRegularBoss",
+                "GyurelleRegularBoss",
+                "OssiaDarkBoss",
+                "AstridNewBoss",
+                "IbarahimeRegularBoss",
+                "CinderellaRegularBoss",
+                "SnowWhiteBoss",
+                "DarkRizetteSwimsuitBoss",
+                "LudmillaSchoolGirlBoss",
+                "RolotiaNewBoss",
+                "SnowWhiteBrideBoss",
+                "SnowBlackBrideBoss",
+                "NobunagaRegularBoss",
+                "BurnedGirlRegularBoss",
+                "DeerGirlBoss",
+                "KingArthurRegularBoss",
+                "YandereMaidRaceQueenBoss",
+                "LudmillaRacequeenBoss",
+                "LifeMinionBoss",
+                "JeanneDarkSwimsuitBoss",
+                "JeanneDarkBoss",
+                "JeanneDarkAngelBoss",
+                "HimikoRegularBoss",
+                "KaguyahimeRegularBoss",
+                "OdinRegularBoss",
+                "OdinRavenBoss",
+                "LokiRegularBoss",
+                "FreyaRegularBoss",
+                "AstridBrideBoss",
+                "MechaSisterBrideBoss",
+                "HorseIdolGirlBoss",
+                "AntaresModernBoss",
+                "CatIdolGirlBoss",
+                "MyshaIdolGirlBoss",
+                "CleopatraRegularBoss",
+                "GilgameshRegularBoss",
+                "GokuDarkBoss",
+                "GokuDarkBossClone",
+                "OtohimeRegularBoss",
+                "CinderellaDarkBoss",
+                "CerberusRegularBoss",
+                "LudmillaYukataBoss",
+                "PercivalRegularBoss",
+                "MordredRegularBoss",
+                "IbarahimeSwimsuitBoss",
+                "RapunzelRegularBoss",
+                "LuBuRegularBoss",
+                "MusashiRegularBoss",
+                "KingArthurSwimsuitBoss",
+                "FrankensteinRegularBoss",
+                "FrankensteinRegularDollBoss",
+                "GenieRegularBoss",
+                "CinderellaSwimsuitBoss",
+                "CthulhuGirlRegularBoss",
+                "NapoleonRegularBoss",
+                "CleopatraDarkBoss",
+                "HijikataRegularBoss",
+                "OkitaRegularBoss",
+                "KaguyahimeSwimsuitBoss",
+                "ExcaliburRegularBoss",
+                "TristanRegularBoss",
+                "RoundTableKnightDarkBoss",
+                "LuciferRegularBoss",
+                "CrossSwordKnightDarkBoss",
+                "SnowWhiteMaidBoss",
+                "MurasakiRegularBoss",
+                "MermaidRegularBoss",
+                "GokuBrideBoss",
+                "GoemonRegularBoss",
+                "KojiroRegularBoss",
+                "DaVinciRegularBoss",
+                "SatanRegularBoss",
+                "DragonGirlRegularBoss",
+                "HokusaiRegularBoss",
+                "MechaSisterNewBoss",
+                "YamatoRegularBoss",
+                "ZoroRegularBoss",
+                "KaguyahimeDarkBoss",
+                "KirinGirlRegularBoss",
+                "LudmillaDarkNewBoss",
+                "ElizabethRegularBoss",
+                "YandereMaidDarkBoss",
+                "NikeRegularBoss",
+                "ChronosRegularBoss",
+                "RolotiaDarkBoss",
+                "RizKouhaiRegularBoss",
+                "KongmingRegularBoss",
+                "PinocchioRegularBoss",
+                "MasamuneRegularBoss",
+                "RyomaRegularBoss",
+                "PerryRegularBoss",
+                "OniSchoolDarkBoss",
+                "ElminaModernBoss",
+                "PeachGirlRegularBoss",
+                "KingArthurEvilBoss",
+                "DonQuixoteRegularBoss",
+                "AnastasiaRegularBoss",
+                "BahamutGirlRegularBoss",
+                "ElmKouhaiRegularBoss",
+                "SiegfriedRegularBoss",
+                "ZeusRegularBoss",
+                "RizetteBraveBoss",
+                "VenusRegularBoss",
+                "MusashiDarkBoss",
+                "KenshinRegularBoss",
+                "MyshaKnightBoss",
+                "ThorRegularBoss",
+                "CalKouhaiRegularBoss",
+                "FreyaNewBoss",
+                "MechaSisterBandBoss",
+                "ChopinRegularBoss",
+                "WashingtonRegularBoss",
+                "SnowWhiteNewBoss",
+                "BeautyBeastRegularBoss",
+                "BeautyRegularBoss",
+                "BeastRegularBoss",
+                "KintaroRegularBoss",
+                "LudmillaBalletBoss",
+                "YandereMaidBalletBoss",
+                "VictoriaRegularBoss",
+                "LupinRegularBoss",
+                "JeanneFusionBoss",
+                "BasiliskRegularBoss",
+                "ManchesterRegularBoss",
+                "LuBuDarkBoss",
+                "WhiteSnakeGirlDarkBoss",
+                "XiaoLiRegularBoss",
+                "DraculaRegularBoss",
+                "VanHelsingRegularBoss",
+                "SherlockRegularBoss"
+              ]
+            }
+          }
+        }
+      },
+      "EnemyBuffADraculaRegularBoss": {
+        "id": "EnemyBuffADraculaRegularBoss",
+        "found": true,
+        "localization": {
+          "name": "Bloodthirsty Swarm",
+          "description": "Each enemy on the battlefield has a 50% chance to have their Instant Death Wards and Stealth status effects (including Super Stealth) removed.\n\nThen if any enemy on the battlefield still has an Instant Death Ward or Stealth, a random non-boss, non-Ephemeral enemy on the battlefield will be immediately defeated (the user is considered to have defeated that enemy with an attack). This secondary effect ignores Revenge passive skills, Revival passive skills, and any passive skills or effects of active skills that would prevent the random enemy from being defeated.\n\nLocked for 50TU after the user has entered the battlefield, and locks again for 50TU after each use. Usable 5 times per battle.",
+          "selected": "May Remove Instant Death Wards & Stealth"
+        },
+        "ability": {
+          "name": "EnemyBuffADraculaRegularBoss",
+          "class": "Ability",
+          "config": "EnemyBuffADraculaRegularBoss",
+          "tuCost": 1,
+          "useLimit": 5,
+          "spiritGain": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "AllEnemy",
+          "components": [
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "EmptyPlaceholder"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "50PercentChanceToRemoveStealthAndInstantDeathWardsFromAllEnemies",
+                "MaybeInstantDefeatDraculaRegularBossEBB",
+                "RemoveActive2LOCKForActive4DraculaRegularBoss",
+                "DraculaRegularBossActive2Cooldown50"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "enemyEventType": "Finish",
+          "sourceEventType": "Finish",
+          "flags": [
+            "NoDamage"
+          ],
+          "abilityEffect": "DraculaPoison1",
+          "useCondition": "TimeInCombat50NotInstantCooldown"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "allEnemies": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.7,
+            0,
+            0.2,
+            0.8,
+            0
+          ],
+          "prefabs": [
+            "batfx_ChristmasDarkPrep1/batfx_ChristmasDarkPrep1",
+            "batsfx_prefab/batsfx_gravityball",
+            "batfx_Dracula/batfx_BatWingflow1",
+            "batsfx_prefab/batsfx_sacrifice1",
+            "batfx_YandereDark/batfx_Bloodflow1",
+            "batfx_cleopatraDark/batfx_poisonmidPurple",
+            "batsfx_prefab/batsfx_buff1"
+          ],
+          "sortOrderOffset": [
+            -1,
+            0,
+            100,
+            -2,
+            10,
+            10,
+            -2
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle2",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "50PercentChanceToRemoveStealthAndInstantDeathWardsFromAllEnemies": {
+            "class": "Buff",
+            "behaviors": [
+              "EnterBattleBuff"
+            ],
+            "behaviorOverrides": [
+              {
+                "randomEnemyBuffs": [
+                  "RemoveInstantKillImmunityOnceAndStealth50PercentChance"
+                ],
+                "numRandomToBuff": 4
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "isHiddenFromPlayers": true
+          },
+          "DraculaRegularBossActive2Cooldown50": {
+            "class": "Buff",
+            "stackName": "InstantCooldown",
+            "duration": 50,
+            "isHiddenFromPlayers": false,
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "iconSpriteName": "IconBlueCountdownClock3Numbered02"
+          },
+          "EmptyPlaceholder": {
+            "class": "Buff",
+            "isHiddenFromPlayers": true,
+            "duration": 0,
+            "showAsTimer": false,
+            "showAsPermanent": false
+          },
+          "MaybeInstantDefeatDraculaRegularBossEBB": {
+            "class": "Buff",
+            "behaviors": [
+              "EnterBattleBuff"
+            ],
+            "behaviorOverrides": [
+              {
+                "sourceBuffs": [
+                  "KillRandomEnemyEOTAndCreditKillDraculaRegularBoss"
+                ],
+                "spreadCondition": "1EnemyIsStealthOrInstantDeathImmunityOnce"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false
+          },
+          "RemoveActive2LOCKForActive4DraculaRegularBoss": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "Active2LOCKForActive4DraculaRegular"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "TimeInCombat50NotInstantCooldown": {
+            "class": "MonsterConditions",
+            "timeInCombat": 50,
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "InstantCooldown"
+              ]
+            }
+          }
+        }
+      },
+      "MultiAttackADraculaRegularBoss": {
+        "id": "MultiAttackADraculaRegularBoss",
+        "found": true,
+        "localization": {
+          "name": "Wrapped in Death",
+          "description": "400% damage to all enemies, plus 150% for each time the user has already used this skill or Blade of Night while on the battlefield (max of 1000% total damage after the user has used this skill or Blade of Night 4 or more times).\n\nThen for each enemy that was hit by this attack, 1 random ally to be given next turn by reducing their current TU. Multiple triggers may target the same ally. Active skills that grant turns cannot be used by any affected allies until after they have had the turn, this skill can be used on such turns.\n\nThis skill becomes locked for 50TU after use.",
+          "selected": "400%+ damage, may grant turn"
+        },
+        "ability": {
+          "name": "MultiAttackADraculaRegularBoss",
+          "class": "Ability",
+          "abilityScalor": 3,
+          "conditionalAbilityScalors": [
+            4.5,
+            6,
+            7.5,
+            9,
+            9
+          ],
+          "config": "MultiAttackADraculaRegularBoss",
+          "tuCost": 100,
+          "useLimit": 0,
+          "spiritCost": 3,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "AllEnemy",
+          "components": [
+            "Damage",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "applyToTargetType": "Enemy",
+              "damageFlags": [
+                "IgnoreArmor",
+                "IgnoreSkin"
+              ]
+            },
+            {
+              "buffs": [
+                "GrantTurnRemoveDisableDraculaRegularBoss"
+              ],
+              "buffBackMode": true,
+              "applyToTargetOnly": true,
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss"
+            },
+            {
+              "buffs": [
+                "GoodGirlBuffCounter",
+                "DraculaRegularBossActive3Cooldown50",
+                "RemoveActive3LOCKForActive4DraculaRegularBoss"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Hit",
+          "abilityEffect": "DraculaSP",
+          "attackScalors": [
+            "GoodIfGain1GoodBuff",
+            "GoodIfGain2GoodBuff",
+            "GoodIfGain3GoodBuff",
+            "GoodIfGain4GoodBuff",
+            "GoodIfGain5GoodBuff"
+          ],
+          "conditionedAbilityEffects": [
+            "DraculaSP",
+            "DraculaSP",
+            "DraculaSP",
+            "DraculaSP",
+            "DraculaSP"
+          ],
+          "recommendEffectWhenUsable": -2,
+          "useCondition": "NotInstantCooldown2"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "allEnemies": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0,
+            0.8,
+            0,
+            0,
+            1.1,
+            0,
+            0,
+            0.2,
+            0,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_cherryprep1",
+            "batfx_Dracula/batfx_cskprepRed1",
+            "batfx_Dracula/batfx_BgRedDracula1",
+            "batfx_cinderelladark1/batfx_tailwindcindark1",
+            "batfx_Dracula/batfx_clothchainX1",
+            "batsfx_prefab/batsfx_cherryprep1",
+            "batfx_Dracula/batfx_clothchainX2",
+            "batfx_Dracula/batfx_SlashRedHorizontal1",
+            "batfx_Dracula/batfx_RedImpact1",
+            "batsfx_prefab/batsfx_slash1",
+            "batfx_YandereDark/batfx_finish3",
+            "batfx_YandereDark/batfx_BGBlood",
+            "batfx_deadlyvampire1/batfx_camerashake1",
+            "batsfx_prefab/batsfx_water2"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -2,
+            -80,
+            -5,
+            -5,
+            -2,
+            1,
+            10,
+            10,
+            -2,
+            50,
+            -10,
+            2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle2",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            false,
+            false,
+            false,
+            true,
+            true,
+            true,
+            false,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            false,
+            true,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            true,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "DraculaRegularBossActive3Cooldown50": {
+            "class": "Buff",
+            "stackName": "InstantCooldown2",
+            "duration": 50,
+            "isHiddenFromPlayers": false,
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "iconSpriteName": "IconBlueCountdownClock3Numbered03"
+          },
+          "GoodGirlBuffCounter": {
+            "class": "Buff",
+            "stackName": "GoodGirlBuffCounter",
+            "stackLimit": 5,
+            "duration": -1,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "noIconShownOnBattleStatus": true,
+            "isHiddenFromPlayers": true
+          },
+          "GrantTurnRemoveDisableDraculaRegularBoss": {
+            "class": "Buff",
+            "behaviors": [
+              "EnterBattleBuff"
+            ],
+            "behaviorOverrides": [
+              {
+                "randomEnemyBuffs": [
+                  "GiveTurn",
+                  "OnExtraTurn",
+                  "JustGivenTurn",
+                  "RemoveBlockGiveTurn"
+                ],
+                "numRandomToBuff": 1
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "isHiddenFromPlayers": true
+          },
+          "RemoveActive3LOCKForActive4DraculaRegularBoss": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "Active3LOCKForActive4DraculaRegular"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {
+          "GoodIfGain1GoodBuff": {
+            "class": "AttackScalor",
+            "sourceCondition": "Has1GoodGirlBuffExactly"
+          },
+          "GoodIfGain2GoodBuff": {
+            "class": "AttackScalor",
+            "sourceCondition": "Has2GoodGirlBuffExactly"
+          },
+          "GoodIfGain3GoodBuff": {
+            "class": "AttackScalor",
+            "sourceCondition": "Has3GoodGirlBuffExactly"
+          },
+          "GoodIfGain4GoodBuff": {
+            "class": "AttackScalor",
+            "sourceCondition": "Has4GoodGirlBuffExactly"
+          },
+          "GoodIfGain5GoodBuff": {
+            "class": "AttackScalor",
+            "sourceCondition": "Has5GoodGirlBuff"
+          }
+        },
+        "conditions": {
+          "NotInstantCooldown2": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "InstantCooldown2"
+              ]
+            }
+          }
+        }
+      },
+      "AllBuffADraculaRegularBoss": {
+        "id": "AllBuffADraculaRegularBoss",
+        "found": true,
+        "localization": {
+          "name": "Vampiric Rage",
+          "description": "Enrages all allies, then grants each of them a Stun Ward. This will overwrite the effects of other Enrage skills on those units.\n\nThe user's next attack to hit while on the battlefield ignores effects of non-boss enemies that would prevent the target(s) from being defeated.\n\nUnlocked each time the user uses all 3 of their other active skills. This skill is locked again after each use or if the user leaves the battlefield.\n\nEnraged units have their Attack increased to 1.5x until the end of their next turn. A Stun Ward prevents Stun from being applied once, then is removed. Stun Wards cannot stack. ",
+          "selected": "Enrages & Grants Wards"
+        },
+        "ability": {
+          "name": "AllBuffADraculaRegularBoss",
+          "class": "Ability",
+          "config": "AllBuffADraculaRegularBoss",
+          "tuCost": 1,
+          "useLimit": 0,
+          "spiritGain": 0,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "All",
+          "components": [
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "AttackPlus50Percent1TurnOnly",
+                "StunImmunityOnce"
+              ],
+              "applyToTargetType": "Friendly"
+            },
+            {
+              "buffs": [
+                "HardIgnoreBlockDeathNextAttack",
+                "Active1LOCKForActive4DraculaRegularBoss",
+                "Active2LOCKForActive4DraculaRegularBoss",
+                "Active3LOCKForActive4DraculaRegularBoss"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "friendlyEventType": "Finish",
+          "sourceEventType": "Finish",
+          "flags": [
+            "NoDamage"
+          ],
+          "abilityEffect": "DraculaAllyHeal1",
+          "useCondition": "IsNotActive4LOCKEDDraculaRegular"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "all": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.7,
+            0.1,
+            0
+          ],
+          "prefabs": [
+            "batfx_YandereDark/batfx_redcharge2",
+            "batsfx_prefab/batsfx_charge1",
+            "batfx_Dracula/batfx_redcharge1_1",
+            "batsfx_prefab/batsfx_heal1",
+            "batfx_healtop1/batfx_healtop1"
+          ],
+          "sortOrderOffset": [
+            -2,
+            0,
+            2,
+            2,
+            0
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            true,
+            false,
+            true,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "Active1LOCKForActive4DraculaRegularBoss": {
+            "class": "Buff",
+            "stackName": "Active1LOCKForActive4DraculaRegular",
+            "duration": -1,
+            "isHiddenFromPlayers": true,
+            "showAsPermanent": false,
+            "showAsTimer": false
+          },
+          "Active2LOCKForActive4DraculaRegularBoss": {
+            "class": "Buff",
+            "stackName": "Active2LOCKForActive4DraculaRegular",
+            "duration": -1,
+            "isHiddenFromPlayers": true,
+            "showAsPermanent": false,
+            "showAsTimer": false
+          },
+          "Active3LOCKForActive4DraculaRegularBoss": {
+            "class": "Buff",
+            "stackName": "Active3LOCKForActive4DraculaRegular",
+            "duration": -1,
+            "isHiddenFromPlayers": true,
+            "showAsPermanent": false,
+            "showAsTimer": false
+          },
+          "AttackPlus50Percent1TurnOnly": {
+            "class": "Buff",
+            "stackName": "AttackPlus50Percent",
+            "behaviors": [
+              "RemoveAfterTurnsBehavior",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "turnCount": 1,
+                "scalorStatBonuses": {
+                  "Attack": 0.5
+                }
+              },
+              {
+                "name": "AttackMinus25Percent"
+              }
+            ],
+            "iconSpriteName": "IconRedRage01",
+            "showAsTimer": true,
+            "duration": -1
+          },
+          "HardIgnoreBlockDeathNextAttack": {
+            "class": "Buff",
+            "stackName": "NextAttackKiller",
+            "behaviors": [
+              "BuffOnMonsterTurn",
+              "BuffChanceOnHit"
+            ],
+            "behaviorOverrides": [
+              {
+                "selfBuffs": [
+                  "HardIgnoreBlockDeathWhenAttacking"
+                ]
+              },
+              {
+                "selfBuffs": [
+                  "RemoveHardIgnoreBlockDeathWhenAttacking",
+                  "RemoveNextAttackKiller"
+                ],
+                "chance": 1.0
+              }
+            ],
+            "duration": -1,
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "iconSpriteName": "IconRedHoldIgnore01"
+          },
+          "StunImmunityOnce": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity"
+            ],
+            "stackName": "StunImmunityOnce",
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Stun",
+                  "StunNoAbsorb"
+                ],
+                "useLimit": 1
+              }
+            ],
+            "duration": -1,
+            "showAsTimer": true,
+            "tags": [
+              "StunImmuneTemp",
+              "ThisIsAWard"
+            ],
+            "iconSpriteName": "IconRedStunInvalidLightning01"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "IsNotActive4LOCKEDDraculaRegular": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "Active1LOCKForActive4DraculaRegular"
+              ],
+              "or": {
+                "class": "MonsterConditions",
+                "buffStackNames": [
+                  "Active2LOCKForActive4DraculaRegular"
+                ],
+                "or": {
+                  "class": "MonsterConditions",
+                  "buffStackNames": [
+                    "Active3LOCKForActive4DraculaRegular"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "passives": {
+      "BloodSuckerPassiveADraculaRegularBoss": {
+        "id": "BloodSuckerPassiveADraculaRegularBoss",
+        "found": true,
+        "localization": {
+          "name": "Ruler of Vampires",
+          "description": "This unit has 50% damage reduction from attacks.\n\nThis unit cannot be sent to the reinforcements from the battlefield.\n\nThis unit cannot be defeated by damage from Poison status effects.\n\nThis unit's attacks ignore damage reduction effects, Counter Stance Status Effects, and the effects of Skin passive skills.\n\nWhenever another unit (ally or enemy) on the battlefield damages any unit(s) with an attack, this unit's current TU is reduced by 30TU per unit hit. When this unit gets the turn, unless this unit is sleeping, this effect cannot trigger until 30TU advances."
+        }
+      },
+      "TransylvaniaPassiveADraculaRegularBoss": {
+        "id": "TransylvaniaPassiveADraculaRegularBoss",
+        "found": true,
+        "localization": {
+          "name": "Timeless Blood",
+          "description": "If this unit would be defeated by an enemy attack or a status effect while having more than 1 HP, it instead survives with 1 HP.\n\nThis unit enters battle with a Stun Ward.\n\nWhile this unit is on the battlefield, the first time another non-conjured unit on the battlefield is defeated or sacrificed by any source:\n- this unit will be Purified (any negative status effects like sleep, burn or poison are removed).\n- this unit will have its TU reduced to 0."
+        }
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": null
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "DraculaRegularBoss03",
+    "family": "DraculaRegularBoss",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "DraculaRegularBoss03",
+    "class": "Monster",
+    "family": "DraculaRegularBoss",
+    "activeSkills": {
+      "0": "SingleAttackADraculaRegularBoss",
+      "1": "EnemyBuffADraculaRegularBoss",
+      "2": "MultiAttackADraculaRegularBoss",
+      "3": "AllBuffADraculaRegularBoss"
+    },
+    "passives": {
+      "0": "BloodSuckerPassiveADraculaRegularBoss",
+      "1": "TransylvaniaPassiveADraculaRegularBoss"
+    },
+    "cost": 999,
+    "baseAttack": 2900,
+    "baseMaxHp": 232000,
+    "speed": 487,
+    "element": "Death",
+    "weaponPref": "Sword",
+    "weaponPivotIndex": 0,
+    "walkSound": "TestSound",
+    "secure": 1,
+    "aiTargetPickWeight": 1,
+    "stars": 6,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 1,
+    "battleOrbImageFlip": 0,
+    "skillVoices": {
+      "0": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "1": [
+        9,
+        10,
+        11,
+        12
+      ],
+      "2": [
+        13,
+        14,
+        15,
+        16
+      ],
+      "3": [
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "damageVoices": [
+      17,
+      18,
+      19,
+      20
+    ],
+    "deathVoices": [
+      21,
+      22,
+      23,
+      24
+    ]
+  },
+  "_build": {
+    "scriptVersion": "7-base-form-rarity",
+    "sourceHash": "19ff5f9135803306e5c0916f01006d8b5339a808afc87cccaa987b9bd2ed8cd3",
+    "dependencyHash": "15bde945dcac7741a26ab9b0f416a6fe7b538d9634ab459929a88b0dc5a82b68",
+    "generatedAt": 1787841479
+  }
+}

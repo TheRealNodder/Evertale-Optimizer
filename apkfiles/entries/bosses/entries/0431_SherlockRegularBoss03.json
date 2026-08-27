@@ -1,0 +1,1163 @@
+{
+  "schemaVersion": 3,
+  "order": 431,
+  "id": "mega-holmes",
+  "sourceId": "SherlockRegularBoss03",
+  "name": "Mega Holmes",
+  "title": "",
+  "secondName": "",
+  "description": "",
+  "category": "bosse",
+  "rarity": null,
+  "stars": 6,
+  "evolvedStars": 6,
+  "element": "Storm",
+  "weaponType": "Staff",
+  "stats": {
+    "atk": 3000,
+    "hp": 178000,
+    "spd": 523,
+    "cost": 999
+  },
+  "hp": 178000,
+  "atk": 3000,
+  "spd": 523,
+  "cost": 999,
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/SherlockRegular03.png",
+  "imageVariants": [],
+  "forms": [],
+  "activeSkills": [
+    "SingleAttackASherlockRegularBoss",
+    "AllyBuffASherlockRegularBoss",
+    "EnemyBuffASherlockRegularBoss",
+    "MultiAttackASherlockRegularBoss"
+  ],
+  "passiveSkills": [
+    "GameIsAFootPassiveASherlockRegularBoss",
+    "TrueDetectivePassiveASherlockRegularBoss"
+  ],
+  "leaderSkills": [],
+  "refs": {
+    "activeSkills": [
+      "SingleAttackASherlockRegularBoss",
+      "AllyBuffASherlockRegularBoss",
+      "EnemyBuffASherlockRegularBoss",
+      "MultiAttackASherlockRegularBoss"
+    ],
+    "passives": [
+      "GameIsAFootPassiveASherlockRegularBoss",
+      "TrueDetectivePassiveASherlockRegularBoss"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": null,
+    "leaderBuffCondition": null,
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "SingleAttackASherlockRegularBoss": {
+        "id": "SingleAttackASherlockRegularBoss",
+        "found": true,
+        "localization": {
+          "name": "Shot in the Dark",
+          "description": "300% damage to 1 enemy. 600% damage instead if any enemy on the battlefield has a current TU of 100TU or more. 900% damage instead if any enemy on the battlefield has a current TU of 200TU or more. This attack ignores skin passive skills and the Counter Stance status effect. This attack is considered a Time Strike type Active Skill.\n\nWhen this attack hits a target and that target has a current TU of 100TU or less, the user is granted a Charge. Certain skills are affected by and may consume charges. A unit can store a maximum of 3 charges.",
+          "selected": "300%+ damage, may grant Charge"
+        },
+        "ability": {
+          "name": "SingleAttackASherlockRegularBoss",
+          "class": "Ability",
+          "abilityScalor": 2,
+          "conditionalAbilityScalors": [
+            5,
+            8
+          ],
+          "config": "SingleAttackASherlockRegularBoss",
+          "tuCost": 50,
+          "useLimit": 0,
+          "spiritGain": 3,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "TimestrikeDamageBoost"
+              ],
+              "damageFlags": [
+                "IgnoreSkin",
+                "IgnoreArmor",
+                "HardIgnoreBlockDeath"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "Grant1EnemyDisableIfNotCharged3SherlockRegularBossPT1",
+                "StoreEnergy"
+              ],
+              "buffBackMode": true,
+              "applyConditions": "CurrentTULessThan100",
+              "applyToTargetOnly": true,
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss"
+            },
+            {
+              "buffs": [
+                "RemoveActive2LOCKSherlockRegularBoss"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "SherlockShot1",
+          "flags": [
+            "Timestrike"
+          ],
+          "attackScalors": [
+            "GoodIfEnemyCurrentTUGreaterThan100",
+            "GoodIf2EnemiesCurrentTUGreaterThan100"
+          ],
+          "conditionedAbilityEffects": [
+            "SherlockShot1",
+            "SherlockShot1"
+          ],
+          "recommendEffectWhenUsable": -2
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            1,
+            0.1,
+            0,
+            0,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batfx_MyshaKnight/batfx_quickchargeGreen1",
+            "batsfx_prefab/batsfx_ring2",
+            "batfx_Lupin/batfx_LupinMuzzleshot1",
+            "batsfx_prefab/batsfx_GunShot",
+            "batsfx_prefab/batsfx_fire4",
+            "batfx_Sherlock/batfx_impactmagicGreen1",
+            "batfx_spotred/batfx_spotred",
+            "batfx_Sherlock/batfx_impactpetals5-1"
+          ],
+          "sortOrderOffset": [
+            3,
+            0,
+            3,
+            -2,
+            0,
+            1,
+            -2,
+            1
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle3"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            1
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            true
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            false
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "Grant1EnemyDisableIfNotCharged3SherlockRegularBossPT1": {
+            "class": "Buff",
+            "behaviors": [
+              "EnterBattleBuff"
+            ],
+            "behaviorOverrides": [
+              {
+                "selfBuffs": [
+                  "Grant1EnemyDisableSherlockRegularBoss"
+                ]
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "isHiddenFromPlayers": true,
+            "noIconShownOnBattleStatus": true,
+            "applyConditions": "NotCharged3"
+          },
+          "RemoveActive2LOCKSherlockRegularBoss": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "Active2LOCKSherlockRegular"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "StoreEnergy": {
+            "class": "Buff",
+            "stackLimit": 3,
+            "duration": -1,
+            "showAsTimer": false,
+            "stackName": "StoreEnergy",
+            "noIconShownOnBattleStatus": true,
+            "usesStackCountDescription": true,
+            "iconSpriteName": "IconPinkCharge01"
+          }
+        },
+        "attackScalors": {
+          "GoodIf2EnemiesCurrentTUGreaterThan100": {
+            "class": "AttackScalor",
+            "sourceCondition": "2EnemiesCurrentTUGreaterThan100"
+          },
+          "GoodIfEnemyCurrentTUGreaterThan100": {
+            "class": "AttackScalor",
+            "sourceCondition": "EnemyTeamHasCurrentTUGreaterThan100"
+          }
+        },
+        "conditions": {
+          "CurrentTULessThan100": {
+            "class": "MonsterConditions",
+            "currentTULessThan": 100
+          }
+        }
+      },
+      "AllyBuffASherlockRegularBoss": {
+        "id": "AllyBuffASherlockRegularBoss",
+        "found": true,
+        "localization": {
+          "name": "Charged Clues",
+          "description": "The user is granted a Charge. Heals all allies on the battlefield for 1% of the user's attack.\n\nThen if any allies on the battlefield are burning, sleeping or poisoned, all allies are Purified (any negative status effects like sleep, burn or poison are removed), and the user is granted another Charge.\n\nUnlocked each time the user uses Shot in the Dark, and is locked again after each use or if the user leaves the battlefield.",
+          "selected": "Heals allies, grants Charge(s), may Purify"
+        },
+        "ability": {
+          "name": "AllyBuffASherlockRegularBoss",
+          "class": "Ability",
+          "config": "AllyBuffASherlockRegularBoss",
+          "tuCost": 1,
+          "useLimit": 0,
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "AllAlly",
+          "components": [
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "1PercentHealMaxHPBoss"
+              ],
+              "applyToTargetType": "Friendly"
+            },
+            {
+              "buffs": [
+                "Grant1EnemyDisableIfNotCharged3SherlockRegularBossPT1",
+                "StoreEnergy",
+                "Active2LOCKSherlockRegularBoss"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "Grant1EnemyDisableIfNotCharged3SherlockRegularBossPT1",
+                "StoreEnergy"
+              ],
+              "applyToSourceOnly": true,
+              "applyConditions": "1AllyIsSleepingPoisonedOrBurning",
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss"
+            },
+            {
+              "buffs": [
+                "RemoveBuffs"
+              ],
+              "applyToTargetType": "Friendly",
+              "applyConditions": "1AllyIsSleepingPoisonedOrBurning",
+              "showMissConditions": "ShowNoMiss",
+              "skipAbilityEffect": true
+            }
+          ],
+          "friendlyEventType": "Finish",
+          "sourceEventType": "Finish",
+          "flags": [
+            "Healer"
+          ],
+          "abilityEffect": "SherlockGlass1",
+          "useCondition": "IsNotActive2LOCKSherlockRegular"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "allFriends": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.1,
+            0,
+            1,
+            0
+          ],
+          "prefabs": [
+            "batfx_Sherlock/batfx_glass1",
+            "batsfx_prefab/batsfx_summon1",
+            "batfx_Sherlock/batfx_SherlockCasting1",
+            "batsfx_prefab/batsfx_casting1"
+          ],
+          "sortOrderOffset": [
+            2,
+            0,
+            2,
+            0
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            false,
+            true,
+            false,
+            true
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "1PercentHealMaxHPBoss": {
+            "class": "Buff",
+            "behaviors": [
+              "AdjustHp"
+            ],
+            "behaviorOverrides": [
+              {
+                "percent": 0.01,
+                "abilityEffect": "Blank",
+                "hpboosts": [
+                  "HealBoost"
+                ]
+              }
+            ],
+            "duration": 0,
+            "effectToShowWhenApplied": "SmallHeal1",
+            "showAsPermanent": false,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "Active2LOCKSherlockRegularBoss": {
+            "class": "Buff",
+            "stackName": "Active2LOCKSherlockRegular",
+            "duration": -1,
+            "isHiddenFromPlayers": true,
+            "showAsPermanent": false,
+            "showAsTimer": false
+          },
+          "Grant1EnemyDisableIfNotCharged3SherlockRegularBossPT1": {
+            "class": "Buff",
+            "behaviors": [
+              "EnterBattleBuff"
+            ],
+            "behaviorOverrides": [
+              {
+                "selfBuffs": [
+                  "Grant1EnemyDisableSherlockRegularBoss"
+                ]
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "isHiddenFromPlayers": true,
+            "noIconShownOnBattleStatus": true,
+            "applyConditions": "NotCharged3"
+          },
+          "RemoveBuffs": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "StoreEnergy": {
+            "class": "Buff",
+            "stackLimit": 3,
+            "duration": -1,
+            "showAsTimer": false,
+            "stackName": "StoreEnergy",
+            "noIconShownOnBattleStatus": true,
+            "usesStackCountDescription": true,
+            "iconSpriteName": "IconPinkCharge01"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "1AllyIsSleepingPoisonedOrBurning": {
+            "class": "MonsterConditions",
+            "myTeamMonsterConditionMatchesNeeded": {
+              "IsSleepingPoisonedOrBurning": 1
+            }
+          },
+          "IsNotActive2LOCKSherlockRegular": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "Active2LOCKSherlockRegular"
+              ]
+            }
+          }
+        }
+      },
+      "EnemyBuffASherlockRegularBoss": {
+        "id": "EnemyBuffASherlockRegularBoss",
+        "found": true,
+        "localization": {
+          "name": "Shocking Evidence",
+          "description": "1 random enemy has their Active Skills disabled for 50TU, then all other enemies on the battlefield are stunned for 50TU. This effect triggers again for each Charge stored on the user (max of 4 times total if the user has stored 3 Charges.)\n\nUsable only if there are at least 2 enemies on the battlefield and less than 2 enemies on the battlefield have their Active Skills disabled. Usable 5 times per battle.\n\nWhen a unit's Active Skills are disabled and they get the turn, they will lose the turn as if they were sleeping. This effect cannot affect boss units, cannot be purified, and will end if the user is defeated.",
+          "selected": "Disables and Stuns Enemies"
+        },
+        "ability": {
+          "name": "EnemyBuffASherlockRegularBoss",
+          "class": "Ability",
+          "config": "EnemyBuffASherlockRegularBoss",
+          "tuCost": 1,
+          "useLimit": 5,
+          "spiritCost": 3,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "AllEnemy",
+          "components": [
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "EmptyPlaceholder"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "Disable1EnemyThenStunAllOtherEnemiesSherlockRegularBossEBB"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss"
+            },
+            {
+              "buffs": [
+                "Disable1EnemyThenStunAllOtherEnemiesSherlockRegularBossEBB"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss",
+              "applyConditions": "IsCharged1"
+            },
+            {
+              "buffs": [
+                "Disable1EnemyThenStunAllOtherEnemiesSherlockRegularBossEBB"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss",
+              "applyConditions": "IsCharged2"
+            },
+            {
+              "buffs": [
+                "Disable1EnemyThenStunAllOtherEnemiesSherlockRegularBossEBB"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss",
+              "applyConditions": "IsCharged3"
+            }
+          ],
+          "sourceEventType": "Finish",
+          "enemyEventType": "Finish",
+          "abilityEffect": "SherlockStun1",
+          "flags": [
+            "StunChance",
+            "NoDamage"
+          ],
+          "useCondition": "2EnemiesAnd2EnemiesNotDisabled"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "allEnemies": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0.2,
+            0.5,
+            0.1,
+            0,
+            0.3,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_timestrike1",
+            "batfx_castinggreen1/batfx_castinggreen1",
+            "batfx_Sherlock/batfx_missilesGreen1",
+            "batfx_Sherlock/batfx_weaponthunderGreen1",
+            "batsfx_prefab/batsfx_electric1",
+            "batfx_Sherlock/batfx_merlinstunGreen1",
+            "batfx_stun2/batfx_stun2"
+          ],
+          "sortOrderOffset": [
+            0,
+            2,
+            2,
+            -2,
+            2,
+            2,
+            2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "Disable1EnemyThenStunAllOtherEnemiesSherlockRegularBossEBB": {
+            "class": "Buff",
+            "behaviors": [
+              "EnterBattleBuff",
+              "EnterBattleBuff",
+              "EnterBattleBuff"
+            ],
+            "behaviorOverrides": [
+              {
+                "randomEnemyBuffs": [
+                  "NoTurnsFor50TU",
+                  "MarkedBySherlockRegularBoss"
+                ],
+                "numRandomToBuff": 1
+              },
+              {
+                "randomEnemyBuffs": [
+                  "Stun50"
+                ],
+                "numRandomToBuff": 4,
+                "spreadCondition": "IsNotMarkedBySherlockRegular"
+              },
+              {
+                "randomEnemyBuffs": [
+                  "RemoveMarkedBySherlockRegularBoss"
+                ],
+                "numRandomToBuff": 4
+              }
+            ],
+            "duration": 0,
+            "isHiddenFromPlayers": true,
+            "showAsPermanent": false,
+            "showAsTimer": false
+          },
+          "EmptyPlaceholder": {
+            "class": "Buff",
+            "isHiddenFromPlayers": true,
+            "duration": 0,
+            "showAsTimer": false,
+            "showAsPermanent": false
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "2EnemiesAnd2EnemiesNotDisabled": {
+            "class": "MonsterConditions",
+            "enemyTeamSize": 2,
+            "not": {
+              "class": "MonsterConditions",
+              "checkEnemyTeamOfMonster": true,
+              "enemyTeamMonsterConditionMatchesNeeded": {
+                "IsBlockTurn": 2
+              }
+            }
+          },
+          "IsCharged1": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "StoreEnergy"
+            ],
+            "buffStackCounts": [
+              1
+            ]
+          },
+          "IsCharged2": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "StoreEnergy"
+            ],
+            "buffStackCounts": [
+              2
+            ]
+          },
+          "IsCharged3": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "StoreEnergy"
+            ],
+            "buffStackCounts": [
+              3
+            ]
+          }
+        }
+      },
+      "MultiAttackASherlockRegularBoss": {
+        "id": "MultiAttackASherlockRegularBoss",
+        "found": true,
+        "localization": {
+          "name": "Final Deduction",
+          "description": "700% damage to 2 enemies. 850% damage instead if the user has survived 100TU or more on the battlefield. 1000% damage instead if the user has survived 200TU or more on the battlefield.\n\nUsable only if the user has stored 3 Charges. Consumes all Charges on the user. This skill becomes locked for 50TU after use.",
+          "selected": "700%+ damage, consumes Charges"
+        },
+        "ability": {
+          "name": "MultiAttackASherlockRegularBoss",
+          "class": "Ability",
+          "abilityScalor": 6,
+          "conditionalAbilityScalors": [
+            7.5,
+            9
+          ],
+          "config": "MultiAttackASherlockRegularBoss",
+          "tuCost": 100,
+          "useLimit": 0,
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "damageFlags": [
+                "IgnoreArmor",
+                "HardIgnoreBlockDeath"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "RemoveEnergy",
+                "SherlockRegularBossCooldown50"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "SherlockSP",
+          "attackScalors": [
+            "TimeInCombat100",
+            "TimeInCombat200"
+          ],
+          "conditionedAbilityEffects": [
+            "SherlockSP",
+            "SherlockSP"
+          ],
+          "recommendEffectWhenUsable": -2,
+          "flags": [
+            "Duration"
+          ],
+          "useCondition": "IsCharged3AndNotInstantCooldown"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0.6,
+            0.4,
+            1,
+            0,
+            0,
+            0,
+            1
+          ],
+          "prefabs": [
+            "batfx_Sherlock/batfx_tailwindMurasaki1",
+            "batfx_Sherlock/batfx_FadeoutEnemy1",
+            "batsfx_prefab/batsfx_dreamhunt1",
+            "batfx_Sherlock/batfx_glass2",
+            "batsfx_prefab/batsfx_ring2",
+            "batfx_Sherlock/batfx_SherlockCasting2",
+            "batfx_Sherlock/batfx_CanonBeam2",
+            "batfx_Sherlock/batfx_bombmultiSilence2",
+            "batsfx_prefab/batsfx_blaster1",
+            "batfx_deadlyvampire1/batfx_camerashake1"
+          ],
+          "sortOrderOffset": [
+            100,
+            30,
+            0,
+            100,
+            0,
+            100,
+            10,
+            50,
+            0,
+            2
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle2"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            false,
+            true,
+            false,
+            true,
+            false,
+            true,
+            false
+          ],
+          "positionInBattlefieldCenter": [
+            true,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "RemoveEnergy": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "StoreEnergy"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "SherlockRegularBossCooldown50": {
+            "class": "Buff",
+            "duration": 50,
+            "stackName": "InstantCooldown",
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "iconSpriteName": "IconBlueCountdownClock3"
+          }
+        },
+        "attackScalors": {
+          "TimeInCombat100": {
+            "class": "AttackScalor",
+            "sourceCondition": "TimeInCombat100"
+          },
+          "TimeInCombat200": {
+            "class": "AttackScalor",
+            "sourceCondition": "TimeInCombat200"
+          }
+        },
+        "conditions": {
+          "IsCharged3AndNotInstantCooldown": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "StoreEnergy"
+            ],
+            "buffStackCounts": [
+              3
+            ],
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "InstantCooldown"
+              ]
+            }
+          },
+          "TimeInCombat100": {
+            "class": "MonsterConditions",
+            "timeInCombat": 100
+          },
+          "TimeInCombat200": {
+            "class": "MonsterConditions",
+            "timeInCombat": 200
+          }
+        }
+      }
+    },
+    "passives": {
+      "GameIsAFootPassiveASherlockRegularBoss": {
+        "id": "GameIsAFootPassiveASherlockRegularBoss",
+        "found": true,
+        "localization": {
+          "name": "Grand Detective",
+          "description": "This unit cannot fall asleep or be sent to the reinforcements from the battlefield.\n\nThis unit's attacks ignore damage reduction effects, and any effects of non-boss enemies that would prevent targets from being defeated.\n\nThis unit has 20% damage reduction from attacks for each Charge stored on this unit (max of 60% while 3 Charges are stored on this unit).\n\nWhenever this unit gains a Charge from one of its own active skills, 1 random enemy's Active Skills are disabled for 50TU. This effect cannot trigger from a Charge gained while this unit already has 3 Charges stored."
+        }
+      },
+      "TrueDetectivePassiveASherlockRegularBoss": {
+        "id": "TrueDetectivePassiveASherlockRegularBoss",
+        "found": true,
+        "localization": {
+          "name": "Londinium's Finest",
+          "description": "This unit cannot be poisoned for 100TU.\n\nIf this unit would be defeated by an enemy attack or a status effect while having more than 1 HP, it instead survives with 1 HP.\n\nEach time this unit takes damage from an attack and survives until after the end of the turn, this unit will be Purified.\n\nAfter the end of each other ally's turn, this unit will have its TU reduced to 0. This TU reduction may trigger before or after other effects that adjust the turn order. Then this effect cannot trigger again until 50TU advances.\n\nWhen this unit takes damage from an attack, they will immediately get the next turn, this cannot trigger again until TU advances. This is a skin effect. This unit cannot become a Guardian or Stun Absorber."
+        }
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": null
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "SherlockRegularBoss03",
+    "family": "SherlockRegularBoss",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "SherlockRegularBoss03",
+    "class": "Monster",
+    "family": "SherlockRegularBoss",
+    "activeSkills": {
+      "0": "SingleAttackASherlockRegularBoss",
+      "1": "AllyBuffASherlockRegularBoss",
+      "2": "EnemyBuffASherlockRegularBoss",
+      "3": "MultiAttackASherlockRegularBoss"
+    },
+    "passives": {
+      "0": "GameIsAFootPassiveASherlockRegularBoss",
+      "1": "TrueDetectivePassiveASherlockRegularBoss"
+    },
+    "cost": 999,
+    "baseAttack": 3000,
+    "baseMaxHp": 178000,
+    "speed": 523,
+    "element": "Air",
+    "weaponPref": "Staff",
+    "weaponPivotIndex": 0,
+    "walkSound": "TestSound",
+    "secure": 1,
+    "aiTargetPickWeight": 1,
+    "stars": 6,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 1,
+    "battleOrbImageFlip": 0,
+    "skillVoices": {
+      "0": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "1": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "2": [
+        9,
+        10,
+        11,
+        12
+      ],
+      "3": [
+        13,
+        14,
+        15,
+        16
+      ]
+    },
+    "damageVoices": [
+      17,
+      18,
+      19,
+      20
+    ],
+    "deathVoices": [
+      21,
+      22,
+      23,
+      24
+    ]
+  },
+  "_build": {
+    "scriptVersion": "7-base-form-rarity",
+    "sourceHash": "1acc74d83254601c309067e57eb749a664cfa20c6005a7e566b240ba7717d83a",
+    "dependencyHash": "5242546710a0ce1a9bb64e19f5ac54bfd93fc2a7a7f676fd6e5a98e6f1794579",
+    "generatedAt": 1787841479
+  }
+}
