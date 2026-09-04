@@ -1,0 +1,1209 @@
+{
+  "schemaVersion": 3,
+  "order": 756,
+  "id": "helsing",
+  "sourceId": "VanHelsingRegular01",
+  "name": "Helsing",
+  "title": "Twilight Avenger",
+  "secondName": "Twilight Avenger",
+  "description": "As a dreamy young girl, Helsing loved the meat pies her mother made. Whenever she would cry, her mother would bake one for her and make the tears stop. The two of them had always lived together in poverty, just mother and daughter. Even so, looking back, those were the happiest years of her life.",
+  "category": "character",
+  "rarity": "SSR",
+  "stars": 5,
+  "evolvedStars": 6,
+  "element": "Light",
+  "weaponType": "Hammer",
+  "stats": {
+    "atk": 1103,
+    "hp": 5695,
+    "spd": 550,
+    "cost": 28
+  },
+  "hp": 5695,
+  "atk": 1103,
+  "spd": 550,
+  "cost": 28,
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/VanHelsingRegular01.png",
+  "imageVariants": [
+    {
+      "state": "source",
+      "family": "VanHelsingRegular",
+      "form": 1,
+      "sourceId": "VanHelsingRegular01",
+      "image": "https://ik.imagekit.io/r8fsa98s9/characters/VanHelsingRegular01.png"
+    }
+  ],
+  "forms": [
+    {
+      "state": "source",
+      "family": "VanHelsingRegular",
+      "form": 1,
+      "sourceId": "VanHelsingRegular01",
+      "image": "https://ik.imagekit.io/r8fsa98s9/characters/VanHelsingRegular01.png"
+    }
+  ],
+  "activeSkills": [
+    "SingleAttackAVanHelsingRegular",
+    "EnemyBuffAVanHelsingRegular",
+    "MultiAttackAVanHelsingRegular"
+  ],
+  "passiveSkills": [
+    "StakeInHandPassiveVanHelsingRegular",
+    "PreparedPassiveVanHelsingRegular",
+    "PlusAttackBoostLv3",
+    "PlusHPBoostLv3",
+    "DeathMinusDamageLv3",
+    "AddWeaponPrefGreatSword"
+  ],
+  "leaderSkills": [
+    "AttackAndHPUp6Life"
+  ],
+  "refs": {
+    "activeSkills": [
+      "SingleAttackAVanHelsingRegular",
+      "EnemyBuffAVanHelsingRegular",
+      "MultiAttackAVanHelsingRegular"
+    ],
+    "passives": [
+      "StakeInHandPassiveVanHelsingRegular",
+      "PreparedPassiveVanHelsingRegular",
+      "PlusAttackBoostLv3",
+      "PlusHPBoostLv3",
+      "DeathMinusDamageLv3",
+      "AddWeaponPrefGreatSword"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": "AttackAndHPUp6Life",
+    "leaderBuffCondition": "IsLife",
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "SingleAttackAVanHelsingRegular": {
+        "id": "SingleAttackAVanHelsingRegular",
+        "found": true,
+        "localization": {
+          "name": "Silver Bullet",
+          "description": "400% damage to 1 enemy, plus 200% for each charge stored by the user (max of 1000% total damage while 3 charges are stored by the user). This attack does not wake up sleeping enemies, and ignores skin passive skills and the Counter Stance status effect.\n\nThen the target hit will become Weakened, and be granted a Rage Ward. This will overwrite any existing Weak or Enrage effects on that unit.\n\nRage Wards will prevent a unit from becoming Enraged once, then be removed. Rage Wards cannot stack. Weakened units have their Attack reduced to 0.75x until the end of their next turn. The effect of Weakening may be diminished if the affected unit's Attack is increased by other effects and it can be overwritten by Enrage effects.",
+          "selected": "400%+ damage, weaken and grant rage ward"
+        },
+        "ability": {
+          "name": "SingleAttackAVanHelsingRegular",
+          "class": "Ability",
+          "abilityScalor": 3,
+          "conditionalAbilityScalors": [
+            5,
+            7,
+            9
+          ],
+          "config": "SingleAttackAVanHelsingRegular",
+          "tuCost": 50,
+          "useLimit": 0,
+          "spiritGain": 3,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "damageFlags": [
+                "DoNotWake",
+                "IgnoreSkin",
+                "IgnoreArmor",
+                "HardIgnoreBlockDeath"
+              ],
+              "applyToTargetType": "Enemy",
+              "drainPercent": 1.0,
+              "drainEffect": "VampireDrain1"
+            },
+            {
+              "buffs": [
+                "AttackMinus25Percent1TurnOnly",
+                "EnrageImmunityOnce"
+              ],
+              "applyToTargetType": "Enemy",
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "GiveTurn",
+                "OnExtraTurn",
+                "JustGivenTurn",
+                "AttackPlus50Percent1TurnOnly"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss",
+              "applyConditions": "IsGodModeActiveVanHelsingRegular"
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "VanHelsingAttack1",
+          "recommendEffectWhenUsable": -1,
+          "attackScalors": [
+            "GoodIfCharged1",
+            "GoodIfCharged2",
+            "GoodIfCharged3"
+          ],
+          "conditionedAbilityEffects": [
+            "VanHelsingAttack1",
+            "VanHelsingAttack1",
+            "VanHelsingAttack1"
+          ]
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0.4,
+            0.9,
+            0.1,
+            0,
+            0.2
+          ],
+          "prefabs": [
+            "batfx_tailwindpetal/batfx_tailwindpetal",
+            "batsfx_prefab/batsfx_timestrike1",
+            "batfx_VanHelsing/batfx_crosshairVH1",
+            "batfx_tailwindpetal/batfx_tailwindpetal",
+            "batfx_Lupin/batfx_LupinMuzzleshot1",
+            "batsfx_prefab/batsfx_GunShot",
+            "batfx_VanHelsing/batfx_SilverBullet1",
+            "batfx_VanHelsing/batfx_WhiteImpact1"
+          ],
+          "sortOrderOffset": [
+            -60,
+            2,
+            3,
+            -50,
+            3,
+            -2,
+            50,
+            5
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            false,
+            true,
+            true,
+            true,
+            false,
+            false
+          ],
+          "positionInBattlefieldCenter": [
+            true,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "AttackMinus25Percent1TurnOnly": {
+            "class": "Buff",
+            "stackName": "AttackMinus25Percent",
+            "behaviors": [
+              "RemoveAfterTurnsBehavior",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "turnCount": 1,
+                "scalorStatBonuses": {
+                  "Attack": -0.3333333
+                }
+              },
+              {
+                "name": "AttackPlus50Percent"
+              },
+              {
+                "name": "RageCount1Icon"
+              },
+              {
+                "name": "RageCount2Icon"
+              },
+              {
+                "name": "RageCount3Icon"
+              }
+            ],
+            "iconSpriteName": "IconRedWeak01",
+            "showAsTimer": true,
+            "duration": -1
+          },
+          "AttackPlus50Percent1TurnOnly": {
+            "class": "Buff",
+            "stackName": "AttackPlus50Percent",
+            "behaviors": [
+              "RemoveAfterTurnsBehavior",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "turnCount": 1,
+                "scalorStatBonuses": {
+                  "Attack": 0.5
+                }
+              },
+              {
+                "name": "AttackMinus25Percent"
+              }
+            ],
+            "iconSpriteName": "IconRedRage01",
+            "showAsTimer": true,
+            "duration": -1
+          },
+          "EnrageImmunityOnce": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity"
+            ],
+            "stackName": "EnrageImmunityOnce",
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "AttackPlus50Percent"
+                ],
+                "useLimit": 1
+              }
+            ],
+            "duration": -1,
+            "showAsTimer": true,
+            "tags": [
+              "EnrageImmuneTemp",
+              "ThisIsAWard"
+            ],
+            "iconSpriteName": "IconRedRageWard01"
+          },
+          "GiveTurn": {
+            "class": "Buff",
+            "behaviors": [
+              "GiveTurn"
+            ],
+            "behaviorOverrides": [
+              {}
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "textKeyToShowWhenApplied": "TurnGivenKey",
+            "isHiddenFromPlayers": true
+          },
+          "JustGivenTurn": {
+            "class": "Buff",
+            "duration": 1,
+            "stackName": "JustGivenTurnBuff",
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "isHiddenFromPlayers": true,
+            "noIconShownOnBattleStatus": true
+          },
+          "OnExtraTurn": {
+            "class": "Buff",
+            "stackName": "OnExtraTurn",
+            "duration": 1,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {
+          "GoodIfCharged1": {
+            "class": "AttackScalor",
+            "sourceCondition": "IsCharged1"
+          },
+          "GoodIfCharged2": {
+            "class": "AttackScalor",
+            "sourceCondition": "IsCharged2"
+          },
+          "GoodIfCharged3": {
+            "class": "AttackScalor",
+            "sourceCondition": "IsCharged3"
+          }
+        },
+        "conditions": {
+          "IsGodModeActiveVanHelsingRegular": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "GodModeActiveVanHelsingRegular"
+            ]
+          },
+          "OnExtraTurn": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "OnExtraTurn"
+            ]
+          }
+        }
+      },
+      "EnemyBuffAVanHelsingRegular": {
+        "id": "EnemyBuffAVanHelsingRegular",
+        "found": true,
+        "localization": {
+          "name": "Targets Acquired",
+          "description": "Grants all non-Guardian enemies on the battlefield a Hunter's Mark.\n\nUsable only if no enemies on the battlefield have a Hunter's Mark, and a valid target exists.\n\nA unit with a Hunter's Mark has the next attack damage dealt to them increased to 1.25 times the normal amount, then the Hunter's Mark is removed. A Hunter's Mark is not a status effect. Hunter's Marks cannot stack, cannot apply to boss units, and cannot be purified. A Hunter's Mark is removed from a unit that is defeated or leaves the battlefield.",
+          "selected": "Grants all non-Guardians a Hunter's Mark"
+        },
+        "ability": {
+          "name": "EnemyBuffAVanHelsingRegular",
+          "class": "Ability",
+          "config": "EnemyBuffAVanHelsingRegular",
+          "tuCost": 1,
+          "useLimit": 0,
+          "spiritGain": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "AllEnemy",
+          "components": [
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "EmptyPlaceholder"
+              ],
+              "applyToTargetType": "Enemy"
+            },
+            {
+              "buffs": [
+                "BullseyeMarkedForAttack"
+              ],
+              "applyToTargetType": "Enemy",
+              "showMissConditions": "ShowNoMiss",
+              "skipAbilityEffect": true,
+              "applyConditions": "IsMarkedEnemyVanHelsingRegular"
+            },
+            {
+              "buffs": [
+                "GiveTurn",
+                "OnExtraTurn",
+                "JustGivenTurn",
+                "AttackPlus50Percent1TurnOnly"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss",
+              "applyConditions": "IsGodModeActiveVanHelsingRegular"
+            }
+          ],
+          "enemyEventType": "Finish",
+          "sourceEventType": "Finish",
+          "flags": [
+            "NoDamage"
+          ],
+          "abilityEffect": "VanHelsingRedMoon1",
+          "useCondition": "1EnemyIsMarkedEnemyNoBullseyeMarkedEnemies"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "allEnemies": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0.1,
+            0,
+            0.5,
+            0,
+            0,
+            0.5,
+            0.3,
+            0
+          ],
+          "prefabs": [
+            "batfx_LudmillaDark/batfx_quickchargeRed",
+            "batsfx_prefab/batsfx_gravityball",
+            "batfx_VanHelsing/batfx_bloodmoon3",
+            "batfx_VanHelsing/batfx_bloodmoon4",
+            "batfx_VanHelsing/batfx_MoonFoot1",
+            "batsfx_prefab/batsfx_buff1",
+            "batsfx_prefab/batsfx_specialattacksfx1",
+            "batfx_VanHelsing/batfx_crosshairVH2"
+          ],
+          "sortOrderOffset": [
+            2,
+            0,
+            -2,
+            2,
+            -2,
+            10,
+            10,
+            3
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "audiobundle1",
+            "BattleEffectsBundle3"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "AttackPlus50Percent1TurnOnly": {
+            "class": "Buff",
+            "stackName": "AttackPlus50Percent",
+            "behaviors": [
+              "RemoveAfterTurnsBehavior",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "turnCount": 1,
+                "scalorStatBonuses": {
+                  "Attack": 0.5
+                }
+              },
+              {
+                "name": "AttackMinus25Percent"
+              }
+            ],
+            "iconSpriteName": "IconRedRage01",
+            "showAsTimer": true,
+            "duration": -1
+          },
+          "BullseyeMarkedForAttack": {
+            "class": "Buff",
+            "stackName": "BullseyeMarkedForAttack",
+            "behaviors": [
+              "ModifyDamage",
+              "BuffWhenMonsterHurt",
+              "RemoveOnHurt"
+            ],
+            "behaviorOverrides": [
+              {
+                "percent": 1.25,
+                "cancelFromDamageTypes": [
+                  "BuffDamage",
+                  "Poison",
+                  "Burn",
+                  "Reflect"
+                ]
+              },
+              {
+                "allyBuffs": [
+                  "RemoveActive3LOCKVanHelsingRegularBoss"
+                ],
+                "spreadCondition": "IsVanHelsingRegular",
+                "cancelFromDamageTypes": [
+                  "BuffDamage",
+                  "Reflect"
+                ],
+                "cancelFromDamageFlags": [
+                  "DoNotUnlockVanHelsing"
+                ]
+              },
+              {
+                "cancelFromDamageTypes": [
+                  "BuffDamage",
+                  "Reflect"
+                ],
+                "cancelFromDamageFlags": [
+                  "Poison",
+                  "SuperPoison",
+                  "MegaPoison",
+                  "LethalPoison",
+                  "Burn"
+                ]
+              }
+            ],
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "duration": -1,
+            "iconSpriteName": "IconRedHuntersMark01"
+          },
+          "EmptyPlaceholder": {
+            "class": "Buff",
+            "isHiddenFromPlayers": true,
+            "duration": 0,
+            "showAsTimer": false,
+            "showAsPermanent": false
+          },
+          "GiveTurn": {
+            "class": "Buff",
+            "behaviors": [
+              "GiveTurn"
+            ],
+            "behaviorOverrides": [
+              {}
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "textKeyToShowWhenApplied": "TurnGivenKey",
+            "isHiddenFromPlayers": true
+          },
+          "JustGivenTurn": {
+            "class": "Buff",
+            "duration": 1,
+            "stackName": "JustGivenTurnBuff",
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "isHiddenFromPlayers": true,
+            "noIconShownOnBattleStatus": true
+          },
+          "OnExtraTurn": {
+            "class": "Buff",
+            "stackName": "OnExtraTurn",
+            "duration": 1,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "1EnemyIsMarkedEnemyNoBullseyeMarkedEnemies": {
+            "class": "MonsterConditions",
+            "checkEnemyTeamOfMonster": true,
+            "enemyTeamMonsterConditionMatchesNeeded": {
+              "NotProtecting": 1
+            },
+            "not": {
+              "class": "MonsterConditions",
+              "checkEnemyTeamOfMonster": true,
+              "enemyTeamMonsterConditionMatchesNeeded": {
+                "IsBullseyeMarkedForAttack": 1
+              }
+            }
+          },
+          "IsGodModeActiveVanHelsingRegular": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "GodModeActiveVanHelsingRegular"
+            ]
+          },
+          "IsMarkedEnemyVanHelsingRegular": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "MarkedEnemyVanHelsingRegular"
+            ]
+          },
+          "OnExtraTurn": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "OnExtraTurn"
+            ]
+          }
+        }
+      },
+      "MultiAttackAVanHelsingRegular": {
+        "id": "MultiAttackAVanHelsingRegular",
+        "found": true,
+        "localization": {
+          "name": "Silver Onslaught",
+          "description": "800% damage to 2 enemies. This attack ignores the Stealth status effect.\n\nUnlocked each time an enemy unit with a Hunter's Mark is damaged by an attack other than Silver Onslaught. This skill is locked again after each use or if the user leaves the battlefield.",
+          "selected": "800% damage to 2 enemies, ignores Stealth"
+        },
+        "ability": {
+          "name": "MultiAttackAVanHelsingRegular",
+          "class": "Ability",
+          "abilityScalor": 7,
+          "config": "MultiAttackAVanHelsingRegular",
+          "tuCost": 75,
+          "useLimit": 0,
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "2Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "damageFlags": [
+                "IgnoreArmor",
+                "HardIgnoreBlockDeath",
+                "DoNotUnlockVanHelsing"
+              ],
+              "applyToTargetType": "Enemy",
+              "drainPercent": 1.0,
+              "drainEffect": "VampireDrain1"
+            },
+            {
+              "buffs": [
+                "Active3LOCKVanHelsingRegular"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "GiveTurn",
+                "OnExtraTurn",
+                "JustGivenTurn",
+                "AttackPlus50Percent1TurnOnly"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss",
+              "applyConditions": "IsGodModeActiveVanHelsingRegular"
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "VanHelsingSp1",
+          "recommendEffectWhenUsable": -1,
+          "flags": [
+            "IgnoreStealth"
+          ],
+          "useCondition": "IsNotActive3LOCKVanHelsingRegular"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 2
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0.5,
+            0.4,
+            0.4,
+            0.1,
+            0.1,
+            0.2,
+            0,
+            1,
+            0
+          ],
+          "prefabs": [
+            "batfx_inugamiregular1/batfx_tailwindred3",
+            "batsfx_prefab/batsfx_timestrike1",
+            "batfx_VanHelsing/batfx_crosshair2",
+            "batfx_inugamiregular1/batfx_tailwindred3",
+            "batsfx_prefab/batsfx_multislash1",
+            "batfx_Lupin/batfx_LupinMuzzleshot1",
+            "batsfx_prefab/batsfx_GunShotMulti",
+            "batfx_VanHelsing/batfx_SilverBullet2",
+            "batfx_VanHelsing/batfx_SparklemultiBig3",
+            "batfx_deadlyvampire1/batfx_camerashake1",
+            "batfx_deadlyvampire1/batfx_camerashake1",
+            "batsfx_prefab/batsfx_bomb1"
+          ],
+          "sortOrderOffset": [
+            -60,
+            2,
+            50,
+            -60,
+            2,
+            3,
+            -2,
+            50,
+            40,
+            2,
+            2,
+            2
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            true,
+            false,
+            true,
+            true,
+            false,
+            false,
+            false,
+            true,
+            true,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "Active3LOCKVanHelsingRegular": {
+            "class": "Buff",
+            "stackName": "Active3LOCKVanHelsingRegular",
+            "duration": -1,
+            "isHiddenFromPlayers": true,
+            "showAsPermanent": false,
+            "showAsTimer": false
+          },
+          "AttackPlus50Percent1TurnOnly": {
+            "class": "Buff",
+            "stackName": "AttackPlus50Percent",
+            "behaviors": [
+              "RemoveAfterTurnsBehavior",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "turnCount": 1,
+                "scalorStatBonuses": {
+                  "Attack": 0.5
+                }
+              },
+              {
+                "name": "AttackMinus25Percent"
+              }
+            ],
+            "iconSpriteName": "IconRedRage01",
+            "showAsTimer": true,
+            "duration": -1
+          },
+          "GiveTurn": {
+            "class": "Buff",
+            "behaviors": [
+              "GiveTurn"
+            ],
+            "behaviorOverrides": [
+              {}
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "textKeyToShowWhenApplied": "TurnGivenKey",
+            "isHiddenFromPlayers": true
+          },
+          "JustGivenTurn": {
+            "class": "Buff",
+            "duration": 1,
+            "stackName": "JustGivenTurnBuff",
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "isHiddenFromPlayers": true,
+            "noIconShownOnBattleStatus": true
+          },
+          "OnExtraTurn": {
+            "class": "Buff",
+            "stackName": "OnExtraTurn",
+            "duration": 1,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "IsGodModeActiveVanHelsingRegular": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "GodModeActiveVanHelsingRegular"
+            ]
+          },
+          "IsNotActive3LOCKVanHelsingRegular": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "Active3LOCKVanHelsingRegular"
+              ]
+            }
+          },
+          "OnExtraTurn": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "OnExtraTurn"
+            ]
+          }
+        }
+      }
+    },
+    "passives": {
+      "StakeInHandPassiveVanHelsingRegular": {
+        "id": "StakeInHandPassiveVanHelsingRegular",
+        "found": true,
+        "localization": {
+          "name": "Twilight Avenger",
+          "description": "This unit cannot be sent to the reinforcements from the battlefield.\n\nThis unit's attacks heal this unit for 100% of total damage dealt, ignore damage reduction effects, and any effects of non-boss enemies that would prevent targets from being defeated.\n\nThis unit will gain a Charge and be healed for 100% of its max HP each time another ally gets the turn. Certain skills are affected by and may consume charges. A unit can store a maximum of 3 charges, and all charges are removed from a unit that leaves the battlefield.\n\nWhen this unit enters battle, this unit grants all allies Sleep Immunity, Poison Immunity, and Stun Immunity until the end of their next turn while on the battlefield.\n\nWhen this unit defeats an enemy with an attack, if they are:\n- Dark or Storm, after the end of the turn, all allies on the battlefield, will be given the next turns by reducing their current TU, and become Enraged. These TU reductions may trigger before or after other effects that adjust the turn order.\n- Light or Earth, all allies on the battlefield will be healed for 100% of max HP, and will have the TU costs for all of their skills reduced by 20%. This will overwrite the effects of other Quicken skills.\n- Water or Fire, all allies on the battlefield will be Purified (any negative status effects like sleep, burn or poison are removed), and granted Sleep Wards. Sleep Ward prevents Sleep from being applied once, then is removed. Sleep Wards cannot stack.\nAll of these defeat effects may trigger before or after other effects."
+        }
+      },
+      "PreparedPassiveVanHelsingRegular": {
+        "id": "PreparedPassiveVanHelsingRegular",
+        "found": true,
+        "localization": {
+          "name": "Hunter's Stake",
+          "description": "If this unit would be defeated by an enemy attack or a status effect while having more than 1 HP, it instead survives with 1 HP.\n\nThis unit has 35% damage reduction from attacks for 100TU. Afterwards this unit has 70% damage reduction instead.\n\nWhenever this unit gets the turn, if this unit's Active Skills are not disabled, this unit can't have its Active Skills disabled until the end of its turn.\n\nThis unit enters battle with an Instant Death Ward. Then after entering battle, for 100TU, each time this unit takes damage from an attack and survives until after the end of the turn, this unit will be Purified, heal for 100% of its max HP, and have its TU reduced to 0. This TU reduction may trigger before or after other effects that adjust the turn order.\n\nAt the end of the first turn this unit gets on the battlefield, this unit is granted Sleep Immunity for 50TU, Stun Immunity for 50TU, and Poison Immunity for 50TU."
+        }
+      },
+      "PlusAttackBoostLv3": {
+        "id": "PlusAttackBoostLv3",
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv3",
+          "description": "Adds 300 to this unit's Attack."
+        }
+      },
+      "PlusHPBoostLv3": {
+        "id": "PlusHPBoostLv3",
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv3",
+          "description": "Adds 1200 to this unit's max HP."
+        }
+      },
+      "DeathMinusDamageLv3": {
+        "id": "DeathMinusDamageLv3",
+        "found": true,
+        "localization": {
+          "name": "Dark Resist Lv3",
+          "description": "10% less damage from attacks by Dark units."
+        }
+      },
+      "AddWeaponPrefGreatSword": {
+        "id": "AddWeaponPrefGreatSword",
+        "found": true,
+        "localization": {
+          "name": "Greatsword Mastery",
+          "description": "Can use weapon skills of Greatswords in addition to their original preferred weapon type."
+        }
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": {
+      "class": "MonsterConditions",
+      "elements": [
+        "Life"
+      ]
+    }
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "VanHelsingRegular01",
+    "family": "VanHelsingRegular",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "VanHelsingRegular01",
+    "family": "VanHelsingRegular",
+    "class": "Monster",
+    "leaderBuff": "AttackAndHPUp6Life",
+    "leaderBuffCondition": "IsLife",
+    "activeSkills": {
+      "0": "SingleAttackAVanHelsingRegular",
+      "1": "EnemyBuffAVanHelsingRegular",
+      "2": "MultiAttackAVanHelsingRegular"
+    },
+    "passives": {
+      "0": "StakeInHandPassiveVanHelsingRegular",
+      "1": "PreparedPassiveVanHelsingRegular",
+      "2": "PlusAttackBoostLv3",
+      "3": "PlusHPBoostLv3",
+      "4": "DeathMinusDamageLv3",
+      "5": "AddWeaponPrefGreatSword"
+    },
+    "cost": 28,
+    "baseAttack": 1103,
+    "baseMaxHp": 5695,
+    "speed": 550,
+    "element": "Life",
+    "weaponPref": "Hammer",
+    "weaponPivotIndex": 0,
+    "secure": 1,
+    "superEvolve1": "VanHelsingRegular02",
+    "aiTargetPickWeight": 1,
+    "stars": 5,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 0,
+    "battleOrbImageFlip": 0,
+    "attackType": "Bash",
+    "skillVoices": {
+      "0": [
+        1,
+        2
+      ],
+      "1": [
+        5,
+        7
+      ],
+      "2": [
+        9,
+        10
+      ],
+      "3": [
+        13,
+        14
+      ]
+    },
+    "damageVoices": [
+      17,
+      18
+    ],
+    "deathVoices": [
+      21,
+      22
+    ],
+    "victoryVoices": [
+      25
+    ],
+    "lineupVoices": [
+      27,
+      28,
+      29
+    ],
+    "evolutionVoices": [
+      38
+    ],
+    "trainVoices": [
+      33,
+      34,
+      35,
+      36,
+      37
+    ],
+    "titleVoices": [
+      44
+    ],
+    "gachaVoices": [
+      45
+    ],
+    "loginVoices": [
+      46
+    ],
+    "tapVoices": [
+      47,
+      48,
+      49
+    ],
+    "idleVoices": [
+      50
+    ]
+  },
+  "_build": {
+    "scriptVersion": "8-semantic-authorities",
+    "sourceHash": "6e91ad1c6a7c50202b59cfd868679d56ecbc7b0df3a26fc421cae090dd4287fa",
+    "dependencyHash": "b3e755179797d8b5d2b60fbe62642bccef8ad6afc49388c6e16dde145b18799e",
+    "generatedAt": 1788484507
+  }
+}

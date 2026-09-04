@@ -1,6 +1,6 @@
 {
 	"Version": 23,
-	"Time": 1787714015,
+	"Time": 1787809259,
 	"Buff": {
 	"RelationshipFlatAttack50": {
 		"class": "Buff",
@@ -91573,6 +91573,277 @@
 			"showAsTimer": true,
 			"showAsPermanent": false,
 			"iconSpriteName": "IconBlueCountdownClock3Numbered03"
+		},
+		"DamageReduc4UserIsDisabled": {
+			"class": "Buff",
+			"behaviors": ["ModifyDamage"],
+			"behaviorOverrides": [{
+				"conditions": "IsBlockTurn",
+				"percent": 0.93,
+					"cancelFromDamageTypes": ["BuffDamage", "Poison", "Burn"],
+					"cancelFromDamageFlags": ["Sneak", "IgnoreArmor"]
+			}],
+			"iconSpriteName": "IconBrownDefenseShield01",
+			"noIconShownOnBattleStatus": true,
+			"duration": -1,
+			"showAsTimer": false,
+			"isWeaponBuff": true,
+			"hideActivatedIcon": true
+		},
+		"DamageReduc5UserIsDisabled": {
+			"class": "Buff",
+			"behaviors": ["ModifyDamage"],
+			"behaviorOverrides": [{
+				"conditions": "IsBlockTurn",
+				"percent": 0.9,
+					"cancelFromDamageTypes": ["BuffDamage", "Poison", "Burn"],
+					"cancelFromDamageFlags": ["Sneak", "IgnoreArmor"]
+			}],
+			"iconSpriteName": "IconBrownDefenseShield01",
+			"noIconShownOnBattleStatus": true,
+			"duration": -1,
+			"showAsTimer": false,
+			"isWeaponBuff": true,
+			"hideActivatedIcon": true
+		},
+		"DamageReduc6UserIsDisabled": {
+			"class": "Buff",
+			"behaviors": ["ModifyDamage"],
+			"behaviorOverrides": [{
+				"conditions": "IsBlockTurn",
+				"percent": 0.85,
+					"cancelFromDamageTypes": ["BuffDamage", "Poison", "Burn"],
+					"cancelFromDamageFlags": ["Sneak", "IgnoreArmor"]
+			}],
+			"iconSpriteName": "IconBrownDefenseShield01",
+			"noIconShownOnBattleStatus": true,
+			"duration": -1,
+			"showAsTimer": false,
+			"isWeaponBuff": true,
+			"hideActivatedIcon": true
+		},
+		"StakeInHandPassiveVanHelsingRegular": {
+			"class": "Buff",
+			"stackName": "StakeInHandPassiveVanHelsingRegular",
+			"behaviors": ["EnterBattleBuff","EnterBattleBuff","BuffOnMonsterTurn","BuffOnMonsterTurn","BuffWhenMonstersDie","BuffWhenMonstersDie","BuffWhenMonstersDie","BuffWhenMonstersDie"],
+			"behaviorOverrides": [{
+				"selfBuffs": ["KnockbackImmunity","Active3LOCKVanHelsingRegular","Active4LOCKVanHelsingRegular"]
+			},{
+				"randomAllyBuffs": ["ImmunityFromSleepUntilNextTurn","ImmunityFromPoisonUntilFirstTurn","StunImmunityUntilNextTurnGenericTitle"],
+				"numRandomToBuff": 4
+			},{
+				"randomEnemyBuffs": ["MarkedEnemyVanHelsingRegular"],
+				"numRandomToBuff": 4,
+				"spreadCondition": "NotProtecting"
+			},{
+				"sourceBuffs": ["StoreEnergy","HealFull","HealFX"],
+				"sameTeam": true,
+				"activeMonsterConditions": "AlwaysTrue",
+				"spreadCondition": "IsNotActing"
+			},{
+				"sourceBuffs": ["TriggerKillDeathAndAirEnemiesVanHelsingRegular"],
+				"sameTeam": false,
+				"spreadCondition": "KillsMoreThanSkillUsed",
+				"deadMonsterConditions": "IsDeathOrAir"
+			},{
+				"sourceBuffs": ["TriggerKillLifeAndEarthEnemiesVanHelsingRegular"],
+				"sameTeam": false,
+				"spreadCondition": "KillsMoreThanSkillUsed",
+				"deadMonsterConditions": "IsLifeOrEarth"
+			},{
+				"sourceBuffs": ["TriggerKillWaterAndFireEnemiesVanHelsingRegular"],
+				"sameTeam": false,
+				"spreadCondition": "KillsMoreThanSkillUsed",
+				"deadMonsterConditions": "IsFireOrWater"
+			},{
+				"sameTeam": true,
+				"sourceBuffs": ["RemoveActive4LOCKVanHelsingRegular"],
+				"deadMonsterConditions": "IsNotSummonedOrTransformingOrMirage"
+			}],
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true,
+			"duration": -1
+		},
+		"MarkedEnemyVanHelsingRegular":{
+			"class": "Buff",
+			"stackName": "MarkedEnemyVanHelsingRegular",
+			"duration": 0,
+			"isHiddenFromPlayers": true,
+			"showAsPermanent": false,
+			"showAsTimer": false
+		},
+		"TriggerKillDeathAndAirEnemiesVanHelsingRegular": {
+			"class": "Buff",
+			"isHiddenFromPlayers": true,
+			"behaviors": ["BuffOnMonsterTurnEnd", "BuffOnMonsterTurnEnd"],
+			"behaviorOverrides": [{
+				"randomAllyBuffs": ["PseudoGetTurn","OnExtraTurn","JustGivenTurn","AttackPlus50Percent1TurnOnly"],
+				"numRandomToBuff": 4
+			},{
+				"sourceBuffs": ["FudgeUsed","RemoveActive4LOCKVanHelsingRegular"]
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"showAsPermanent": false
+		},
+		"TriggerKillLifeAndEarthEnemiesVanHelsingRegular": {
+			"class": "Buff",
+			"isHiddenFromPlayers": true,
+			"behaviors": ["BuffOnMonsterTurnEnd", "BuffOnMonsterTurnEnd"],
+			"behaviorOverrides": [{
+				"randomAllyBuffs": ["HealFull","HasteUp20Percent","HealFX"],
+				"numRandomToBuff": 4
+			},{
+				"sourceBuffs": ["FudgeUsed","RemoveActive4LOCKVanHelsingRegular"]
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"showAsPermanent": false
+		},
+		"TriggerKillWaterAndFireEnemiesVanHelsingRegular": {
+			"class": "Buff",
+			"isHiddenFromPlayers": true,
+			"behaviors": ["BuffOnMonsterTurnEnd", "BuffOnMonsterTurnEnd"],
+			"behaviorOverrides": [{
+				"randomAllyBuffs": ["RemoveBuffs","SleepImmunityOnce"],
+				"numRandomToBuff": 4
+			},{
+				"sourceBuffs": ["FudgeUsed","RemoveActive4LOCKVanHelsingRegular"]
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"showAsPermanent": false
+		},
+		"PreparedPassiveVanHelsingRegular":{
+			"class": "Buff",
+			"stackName": "PreparedPassiveVanHelsingRegular",
+			"behaviors": ["EnterBattleBuff","BuffOnMonsterTurnEnd","ModifyDamage","ModifyDamage","BuffOnMonsterTurn"],
+			"behaviorOverrides": [{
+				"selfBuffs": ["HoldGround","InstantKillImmunityOnce","BrideHealFor100TUVanHelsingRegular","Charged1Icon","Charged2Icon","Charged3Icon"]
+			},{
+				"selfBuffs": ["PoisonImmunityFor50TU","SleepImmunityFor50TU","StunImmunityFor50TU","VanHelsingRegularFirstTurnLock"],
+				"spreadCondition": "IsNotVanHelsingRegularFirstTurnLock"
+			},{
+				"percent": 0.65,
+				"cancelFromDamageTypes": ["BuffDamage", "Poison", "Burn"],
+				"cancelFromDamageFlags": ["Sneak", "IgnoreArmor"],
+				"conditions": "TimeInCombatNot100"
+			},{
+				"percent": 0.30,
+				"cancelFromDamageTypes": ["BuffDamage", "Poison", "Burn"],
+				"cancelFromDamageFlags": ["Sneak", "IgnoreArmor"],
+				"conditions": "TimeInCombat100"
+			},{
+				"selfBuffs": ["BlockGiveTurnImmunityOneTurn"],
+				"spreadCondition": "IsNotBlockTurn"	
+			}],
+			"duration": -1,
+			"showAsPermanent": false,
+			"showAsTimer": true,
+			"isHiddenFromPlayers": true,
+			"tags": ["BigDamageMinus"],
+			"iconSpriteName": "IconPurpleDamageMinus01"
+		},
+		"VanHelsingRegularFirstTurnLock":{
+			"class": "Buff",
+			"duration": -1,
+			"stackName": "VanHelsingRegularFirstTurnLock",
+			"showAsPermanent": false,
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
+		"BrideHealFor100TUVanHelsingRegular":{
+			"class": "Buff",
+			"stackName": "BrideHealFor100TUVanHelsingRegular",
+			"behaviors": ["BuffWhenMonsterHurt","BuffOnMonsterTurnEnd"],
+			"behaviorOverrides": [{
+				"selfBuffs": ["BrideHealOK"],
+				"cancelFromDamageTypes": ["BuffDamage"]
+			},{
+				"selfBuffs": ["PseudoGetTurn","OnExtraTurn","JustGivenTurn","BrideHeal100PercentPurifyVanHelsingRegular"],
+				"activeMonsterConditions": "NotAlwaysMyTurn",
+				"spreadCondition": "BrideHealReady"
+			}],
+			"duration": 100,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true,
+			"noIconShownOnBattleStatus": true
+		},
+		"BrideHeal100PercentPurifyVanHelsingRegular": {
+			"class": "Buff",
+			"behaviors": ["AdjustHp","RemoveBuffs","RemoveBuffs"],
+			"behaviorOverrides": [{
+				"percent": 1.0,
+				"abilityEffect": "Blank",
+				"hpboosts": [
+					"HealBoost"
+				]
+			},{
+				"name": "BrideHealOK"
+			},{}],
+			"duration": 0,
+			"effectToShowWhenApplied": "LargeHeal1",
+			"textKeyToShowWhenApplied": "HealDoubleANameKey",
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
+		"GodModeActiveVanHelsingRegular": {
+			"class": "Buff",
+			"stackName": "GodModeActiveVanHelsingRegular",
+			"behaviors": ["RemoveAfterTurnsBehavior"],
+			"behaviorOverrides": [{
+				"turnCount": 3
+			}],
+			"duration": -1,
+			"isHiddenFromPlayers": true,
+			"showAsPermanent": false,
+			"showAsTimer": false
+		},
+		"Active3LOCKVanHelsingRegular":{
+			"class": "Buff",
+			"stackName": "Active3LOCKVanHelsingRegular",
+			"duration": -1,
+			"isHiddenFromPlayers": true,
+			"showAsPermanent": false,
+			"showAsTimer": false
+		},
+		"RemoveActive3LOCKVanHelsingRegular": {
+			"class": "Buff",
+			"behaviors": ["RemoveBuffs"],
+			"behaviorOverrides": [{
+				"name": "Active3LOCKVanHelsingRegular"
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
+		"Active4LOCKVanHelsingRegular":{
+			"class": "Buff",
+			"stackName": "Active4LOCKVanHelsingRegular",
+			"duration": -1,
+			"isHiddenFromPlayers": true,
+			"showAsPermanent": false,
+			"showAsTimer": false
+		},
+		"RemoveActive4LOCKVanHelsingRegular": {
+			"class": "Buff",
+			"behaviors": ["RemoveBuffs"],
+			"behaviorOverrides": [{
+				"name": "Active4LOCKVanHelsingRegular"
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
+		"VanHelsingRegularActive4Cooldown50": {
+			"class": "Buff",
+			"stackName": "InstantCooldown",
+			"duration": 50,
+			"isHiddenFromPlayers": false,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"iconSpriteName": "IconBlueCountdownClock3"
 		}
     }
 }
