@@ -1,6 +1,6 @@
 {
 	"Version": 23,
-	"Time": 1787809259,
+	"Time": 1788832909,
 	"Buff": {
 	"RelationshipFlatAttack50": {
 		"class": "Buff",
@@ -81818,20 +81818,61 @@
 		"GrantBlockTurnTo2EnemiesWithHighestAndLowestTUEBB":{
 			"class": "Buff",
 			"stackName": "GrantBlockTurnTo2EnemiesWithHighestAndLowestTUEBB",
-			"behaviors": ["EnterBattleBuff","EnterBattleBuff"],
+			"behaviors": ["EnterBattleBuff","EnterBattleBuff","EnterBattleBuff"],
 			"behaviorOverrides": [{
-				"randomEnemyBuffs": ["NoTurnsFor50TU"],
+				"randomEnemyBuffs": ["MarkedEnemyForThorRegular"],
 				"numRandomToBuff": 1,
 				"randomTargetingMonsterRanker": "ActingLatest"
 			},{
-				"randomEnemyBuffs": ["NoTurnsFor50TU"],
+				"randomEnemyBuffs": ["MarkedEnemyForThorRegular"],
 				"numRandomToBuff": 1,
 				"randomTargetingMonsterRanker": "ActingSoonest"
+			},{
+				"randomEnemyBuffs": ["NoTurnsFor50TUThorRegularV2","NoTurnsFor50TUThorRegularV1"],
+				"numRandomToBuff": 2,
+				"spreadCondition": "IsMarkedEnemyForThorRegular"
 			}],
 			"duration": 0,
 			"isHiddenFromPlayers": true,
 			"showAsPermanent": false,
 			"showAsTimer": false
+		},
+		"MarkedEnemyForThorRegular":{
+			"class": "Buff",
+			"stackName": "MarkedEnemyForThorRegular",
+			"duration": 0,
+			"isHiddenFromPlayers": true,
+			"showAsPermanent": false,
+			"showAsTimer": false,
+			"applyConditions": "IsNotBoss"
+		},
+		"NoTurnsFor50TUThorRegularV1": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnThorRegularV1",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 50,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsNotBlockGiveTurnThorRegularV1"
+		},
+		"NoTurnsFor50TUThorRegularV2": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnThorRegularV2",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 50,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV1ThorRegularV2Ready"
 		},
 		"ThorRegularBossCooldown50":{
 			"class": "Buff",
@@ -82902,7 +82943,11 @@
 			"behaviors": ["Immunity"],
 			"behaviorOverrides": [{
 				"stackNamesToBlock": ["BlockGiveTurnFor10TU","BlockGiveTurnFor20TU","BlockGiveTurnFor30TU","BlockGiveTurnFor40TU","BlockGiveTurnFor50TU","BlockGiveTurnFor60TU","BlockGiveTurnFor80TU","BlockGiveTurnFor100TU","BlockGiveTurnFor50TUZeusReady","BlockGiveTurnChronos",
-					"BlockGiveTurnFor10TUPassive","BlockGiveTurnFor20TUPassive","BlockGiveTurnFor30TUPassive","BlockGiveTurnFor40TUPassive","BlockGiveTurnFor50TUPassive","BlockGiveTurnFor60TUPassive","BlockGiveTurnFor80TUPassive","BlockGiveTurnFor100TUPassive"]
+					"BlockGiveTurnFor10TUPassive","BlockGiveTurnFor20TUPassive","BlockGiveTurnFor30TUPassive","BlockGiveTurnFor40TUPassive","BlockGiveTurnFor50TUPassive","BlockGiveTurnFor60TUPassive","BlockGiveTurnFor80TUPassive","BlockGiveTurnFor100TUPassive",
+					"BlockGiveTurnThorRegularV1","BlockGiveTurnThorRegularV2","BlockGiveTurnMechaSisterBandV1","BlockGiveTurnMechaSisterBandV2","BlockGiveTurnPassiveBasiliskRegularV1","BlockGiveTurnPassiveBasiliskRegularV2",
+					"BlockGiveTurnPassiveJeanneFusionV1","BlockGiveTurnPassiveJeanneFusionV2","BlockGiveTurnPassiveJeanneFusionV3","BlockGiveTurnPassiveJeanneFusionV4","BlockGiveTurnPassiveJeanneFusionV5","BlockGiveTurnPassiveJeanneFusionV6","BlockGiveTurnPassiveJeanneFusionV7","BlockGiveTurnPassiveJeanneFusionV8","BlockGiveTurnPassiveJeanneFusionV9","BlockGiveTurnPassiveJeanneFusionV10",
+					"BlockGiveTurnDraculaRegularV1","BlockGiveTurnDraculaRegularV2","BlockGiveTurnDraculaRegularV3","BlockGiveTurnDraculaRegularV4","BlockGiveTurnDraculaRegularV5","BlockGiveTurnDraculaRegularV6","BlockGiveTurnDraculaRegularV7","BlockGiveTurnDraculaRegularV8","BlockGiveTurnDraculaRegularV9","BlockGiveTurnDraculaRegularV10",
+					"BlockGiveTurnPassiveSherlockRegularV1","BlockGiveTurnSherlockRegularV1"]
 			}],
 			"duration": 0,
 			"noIconShownOnBattleStatus": true,
@@ -83899,6 +83944,34 @@
 			"iconSpriteName": "IconPurpleDamageMinus01",
 			"tags": ["BigDamageMinus"],
 			"duration": -1
+		},
+		"NoTurnsFor10TUMechaSisterBandV1": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnMechaSisterBandV1",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 10,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsNotBlockGiveTurnMechaSisterBandV1"
+		},
+		"NoTurnsFor10TUMechaSisterBandV2": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnMechaSisterBandV2",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 10,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV1MechaSisterBandV2Ready"
 		},
 		"BrideHeal50PercentMechaSisterBand": {
 			"class": "Buff",
@@ -87939,7 +88012,7 @@
 				"spreadCondition": "BattleTimeOver1OrAnyDeadMonster"
 			},{
 				"selfAbilityEffect": "Blank",
-				"randomEnemyBuffs": ["NoTurnsFor30TUPassive"],
+				"randomEnemyBuffs": ["NoTurnsFor30TUPassiveJeanneFusionBossV5","NoTurnsFor30TUPassiveJeanneFusionBossV4","NoTurnsFor30TUPassiveJeanneFusionBossV3","NoTurnsFor30TUPassiveJeanneFusionBossV2","NoTurnsFor30TUPassiveJeanneFusionBossV1"],
 				"numRandomToBuff": 2,
 				"spreadCondition": "BattleTimeOver1OrAnyDeadMonster"
 			},{
@@ -87950,6 +88023,76 @@
 			"showAsTimer": false,
 			"showAsPermanent": false,
 			"duration": -1
+		},
+		"NoTurnsFor30TUPassiveJeanneFusionBossV1": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveJeanneFusionV1",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 30,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsNotBlockGiveTurnJeanneFusionV1"
+		},
+		"NoTurnsFor30TUPassiveJeanneFusionBossV2": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveJeanneFusionV2",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 30,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV1NotBlockGiveTurnJeanneFusionV2"
+		},
+		"NoTurnsFor30TUPassiveJeanneFusionBossV3": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveJeanneFusionV3",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 30,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV2NotBlockGiveTurnJeanneFusionV3"
+		},
+		"NoTurnsFor30TUPassiveJeanneFusionBossV4": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveJeanneFusionV4",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 30,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV3NotBlockGiveTurnJeanneFusionV4"
+		},
+		"NoTurnsFor30TUPassiveJeanneFusionBossV5": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveJeanneFusionV5",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 30,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV4NotBlockGiveTurnJeanneFusionV5"
 		},
 		"MirageMonsterLiteBoss": {
 			"class": "Buff",
@@ -88482,13 +88625,40 @@
 			"showAsTimer": false,
 			"isHiddenFromPlayers": true
 		},
+		"MarkedEnemyForJeanneFusion":{
+			"class": "Buff",
+			"stackName": "MarkedEnemyForJeanneFusion",
+			"duration": 0,
+			"isHiddenFromPlayers": true,
+			"showAsPermanent": false,
+			"showAsTimer": false,
+			"applyConditions": "IsNotBoss"
+		},
+		"RemoveMarkedEnemyForJeanneFusion": {
+			"class": "Buff",
+			"behaviors": ["RemoveBuffs"],
+			"behaviorOverrides": [{
+				"name": "MarkedEnemyForJeanneFusion"
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
 		"PassiveEntryJeanneFusionLV1": {
 			"class": "Buff",
-			"behaviors": ["EnterBattleBuff"],
+			"behaviors": ["EnterBattleBuff","EnterBattleBuff","EnterBattleBuff"],
 			"behaviorOverrides": [{
-				"randomEnemyBuffs": ["NoTurnsFor10TUPassive"],
+				"randomEnemyBuffs": ["MarkedEnemyForJeanneFusion"],
 				"numRandomToBuff": 2,
 				"spreadCondition": "BattleTimeOver1OrAnyDeadMonster"
+			},{
+				"randomEnemyBuffs": ["NoTurnsFor10TUPassiveJeanneFusionV10","NoTurnsFor10TUPassiveJeanneFusionV9","NoTurnsFor10TUPassiveJeanneFusionV8","NoTurnsFor10TUPassiveJeanneFusionV7","NoTurnsFor10TUPassiveJeanneFusionV6","NoTurnsFor10TUPassiveJeanneFusionV5","NoTurnsFor10TUPassiveJeanneFusionV4","NoTurnsFor10TUPassiveJeanneFusionV3","NoTurnsFor10TUPassiveJeanneFusionV2","NoTurnsFor10TUPassiveJeanneFusionV1"],
+				"numRandomToBuff": 2,
+				"spreadCondition": "IsMarkedEnemyForJeanneFusion"
+			},{
+				"randomEnemyBuffs": ["RemoveMarkedEnemyForJeanneFusion"],
+				"numRandomToBuff": 2,
+				"spreadCondition": "IsMarkedEnemyForJeanneFusion"
 			}],
 			"duration": 0,
 			"showAsTimer": false,
@@ -88497,13 +88667,161 @@
 			"noIconShownOnBattleStatus": true,
 			"applyConditions": "HasNoAwakening"
 		},
+		"NoTurnsFor10TUPassiveJeanneFusionV1": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveJeanneFusionV1",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 10,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsNotBlockGiveTurnJeanneFusionV1"
+		},
+		"NoTurnsFor10TUPassiveJeanneFusionV2": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveJeanneFusionV2",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 10,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV1NotBlockGiveTurnJeanneFusionV2"
+		},
+		"NoTurnsFor10TUPassiveJeanneFusionV3": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveJeanneFusionV3",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 10,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV2NotBlockGiveTurnJeanneFusionV3"
+		},
+		"NoTurnsFor10TUPassiveJeanneFusionV4": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveJeanneFusionV4",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 10,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV3NotBlockGiveTurnJeanneFusionV4"
+		},
+		"NoTurnsFor10TUPassiveJeanneFusionV5": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveJeanneFusionV5",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 10,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV4NotBlockGiveTurnJeanneFusionV5"
+		},
+		"NoTurnsFor10TUPassiveJeanneFusionV6": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveJeanneFusionV6",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 10,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV5NotBlockGiveTurnJeanneFusionV6"
+		},
+		"NoTurnsFor10TUPassiveJeanneFusionV7": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveJeanneFusionV7",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 10,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV6NotBlockGiveTurnJeanneFusionV7"
+		},
+		"NoTurnsFor10TUPassiveJeanneFusionV8": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveJeanneFusionV8",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 10,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV7NotBlockGiveTurnJeanneFusionV8"
+		},
+		"NoTurnsFor10TUPassiveJeanneFusionV9": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveJeanneFusionV9",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 10,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV8NotBlockGiveTurnJeanneFusionV9"
+		},
+		"NoTurnsFor10TUPassiveJeanneFusionV10": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveJeanneFusionV10",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 10,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV9JeanneFusionV10Ready"
+		},
 		"PassiveEntryJeanneFusionLV2": {
 			"class": "Buff",
-			"behaviors": ["EnterBattleBuff"],
+			"behaviors": ["EnterBattleBuff","EnterBattleBuff","EnterBattleBuff"],
 			"behaviorOverrides": [{
-				"randomEnemyBuffs": ["NoTurnsFor20TUPassive"],
+				"randomEnemyBuffs": ["MarkedEnemyForJeanneFusion"],
 				"numRandomToBuff": 2,
 				"spreadCondition": "BattleTimeOver1OrAnyDeadMonster"
+			},{
+				"randomEnemyBuffs": ["NoTurnsFor20TUPassiveJeanneFusionV10","NoTurnsFor20TUPassiveJeanneFusionV9","NoTurnsFor20TUPassiveJeanneFusionV8","NoTurnsFor20TUPassiveJeanneFusionV7","NoTurnsFor20TUPassiveJeanneFusionV6","NoTurnsFor20TUPassiveJeanneFusionV5","NoTurnsFor20TUPassiveJeanneFusionV4","NoTurnsFor20TUPassiveJeanneFusionV3","NoTurnsFor20TUPassiveJeanneFusionV2","NoTurnsFor20TUPassiveJeanneFusionV1"],
+				"numRandomToBuff": 2,
+				"spreadCondition": "IsMarkedEnemyForJeanneFusion"
+			},{
+				"randomEnemyBuffs": ["RemoveMarkedEnemyForJeanneFusion"],
+				"numRandomToBuff": 2,
+				"spreadCondition": "IsMarkedEnemyForJeanneFusion"
 			}],
 			"duration": 0,
 			"showAsTimer": false,
@@ -88512,13 +88830,161 @@
 			"noIconShownOnBattleStatus": true,
 			"applyConditions": "Has1AwakeningExact"
 		},
+		"NoTurnsFor20TUPassiveJeanneFusionV1": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveJeanneFusionV1",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 20,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsNotBlockGiveTurnJeanneFusionV1"
+		},
+		"NoTurnsFor20TUPassiveJeanneFusionV2": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveJeanneFusionV2",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 20,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV1NotBlockGiveTurnJeanneFusionV2"
+		},
+		"NoTurnsFor20TUPassiveJeanneFusionV3": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveJeanneFusionV3",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 20,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV2NotBlockGiveTurnJeanneFusionV3"
+		},
+		"NoTurnsFor20TUPassiveJeanneFusionV4": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveJeanneFusionV4",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 20,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV3NotBlockGiveTurnJeanneFusionV4"
+		},
+		"NoTurnsFor20TUPassiveJeanneFusionV5": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveJeanneFusionV5",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 20,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV4NotBlockGiveTurnJeanneFusionV5"
+		},
+		"NoTurnsFor20TUPassiveJeanneFusionV6": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveJeanneFusionV6",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 20,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV5NotBlockGiveTurnJeanneFusionV6"
+		},
+		"NoTurnsFor20TUPassiveJeanneFusionV7": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveJeanneFusionV7",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 20,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV6NotBlockGiveTurnJeanneFusionV7"
+		},
+		"NoTurnsFor20TUPassiveJeanneFusionV8": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveJeanneFusionV8",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 20,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV7NotBlockGiveTurnJeanneFusionV8"
+		},
+		"NoTurnsFor20TUPassiveJeanneFusionV9": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveJeanneFusionV9",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 20,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV8NotBlockGiveTurnJeanneFusionV9"
+		},
+		"NoTurnsFor20TUPassiveJeanneFusionV10": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveJeanneFusionV10",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 20,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV9JeanneFusionV10Ready"
+		},
 		"PassiveEntryJeanneFusionLV3": {
 			"class": "Buff",
-			"behaviors": ["EnterBattleBuff"],
+			"behaviors": ["EnterBattleBuff","EnterBattleBuff","EnterBattleBuff"],
 			"behaviorOverrides": [{
-				"randomEnemyBuffs": ["NoTurnsFor30TUPassive"],
+				"randomEnemyBuffs": ["MarkedEnemyForJeanneFusion"],
 				"numRandomToBuff": 2,
 				"spreadCondition": "BattleTimeOver1OrAnyDeadMonster"
+			},{
+				"randomEnemyBuffs": ["NoTurnsFor30TUPassiveJeanneFusionV10","NoTurnsFor30TUPassiveJeanneFusionV9","NoTurnsFor30TUPassiveJeanneFusionV8","NoTurnsFor30TUPassiveJeanneFusionV7","NoTurnsFor30TUPassiveJeanneFusionV6","NoTurnsFor30TUPassiveJeanneFusionV5","NoTurnsFor30TUPassiveJeanneFusionV4","NoTurnsFor30TUPassiveJeanneFusionV3","NoTurnsFor30TUPassiveJeanneFusionV2","NoTurnsFor30TUPassiveJeanneFusionV1"],
+				"numRandomToBuff": 2,
+				"spreadCondition": "IsMarkedEnemyForJeanneFusion"
+			},{
+				"randomEnemyBuffs": ["RemoveMarkedEnemyForJeanneFusion"],
+				"numRandomToBuff": 2,
+				"spreadCondition": "IsMarkedEnemyForJeanneFusion"
 			}],
 			"duration": 0,
 			"showAsTimer": false,
@@ -88527,13 +88993,161 @@
 			"noIconShownOnBattleStatus": true,
 			"applyConditions": "Has2AwakeningsExact"
 		},
+		"NoTurnsFor30TUPassiveJeanneFusionV1": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveJeanneFusionV1",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 30,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsNotBlockGiveTurnJeanneFusionV1"
+		},
+		"NoTurnsFor30TUPassiveJeanneFusionV2": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveJeanneFusionV2",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 30,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV1NotBlockGiveTurnJeanneFusionV2"
+		},
+		"NoTurnsFor30TUPassiveJeanneFusionV3": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveJeanneFusionV3",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 30,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV2NotBlockGiveTurnJeanneFusionV3"
+		},
+		"NoTurnsFor30TUPassiveJeanneFusionV4": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveJeanneFusionV4",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 30,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV3NotBlockGiveTurnJeanneFusionV4"
+		},
+		"NoTurnsFor30TUPassiveJeanneFusionV5": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveJeanneFusionV5",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 30,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV4NotBlockGiveTurnJeanneFusionV5"
+		},
+		"NoTurnsFor30TUPassiveJeanneFusionV6": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveJeanneFusionV6",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 30,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV5NotBlockGiveTurnJeanneFusionV6"
+		},
+		"NoTurnsFor30TUPassiveJeanneFusionV7": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveJeanneFusionV7",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 30,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV6NotBlockGiveTurnJeanneFusionV7"
+		},
+		"NoTurnsFor30TUPassiveJeanneFusionV8": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveJeanneFusionV8",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 30,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV7NotBlockGiveTurnJeanneFusionV8"
+		},
+		"NoTurnsFor30TUPassiveJeanneFusionV9": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveJeanneFusionV9",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 30,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV8NotBlockGiveTurnJeanneFusionV9"
+		},
+		"NoTurnsFor30TUPassiveJeanneFusionV10": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveJeanneFusionV10",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 30,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV9JeanneFusionV10Ready"
+		},
 		"PassiveEntryJeanneFusionLV4": {
 			"class": "Buff",
-			"behaviors": ["EnterBattleBuff"],
+			"behaviors": ["EnterBattleBuff","EnterBattleBuff","EnterBattleBuff"],
 			"behaviorOverrides": [{
-				"randomEnemyBuffs": ["NoTurnsFor40TUPassive"],
+				"randomEnemyBuffs": ["MarkedEnemyForJeanneFusion"],
 				"numRandomToBuff": 2,
 				"spreadCondition": "BattleTimeOver1OrAnyDeadMonster"
+			},{
+				"randomEnemyBuffs": ["NoTurnsFor40TUPassiveJeanneFusionV10","NoTurnsFor40TUPassiveJeanneFusionV9","NoTurnsFor40TUPassiveJeanneFusionV8","NoTurnsFor40TUPassiveJeanneFusionV7","NoTurnsFor40TUPassiveJeanneFusionV6","NoTurnsFor40TUPassiveJeanneFusionV5","NoTurnsFor40TUPassiveJeanneFusionV4","NoTurnsFor40TUPassiveJeanneFusionV3","NoTurnsFor40TUPassiveJeanneFusionV2","NoTurnsFor40TUPassiveJeanneFusionV1"],
+				"numRandomToBuff": 2,
+				"spreadCondition": "IsMarkedEnemyForJeanneFusion"
+			},{
+				"randomEnemyBuffs": ["RemoveMarkedEnemyForJeanneFusion"],
+				"numRandomToBuff": 2,
+				"spreadCondition": "IsMarkedEnemyForJeanneFusion"
 			}],
 			"duration": 0,
 			"showAsTimer": false,
@@ -88542,13 +89156,161 @@
 			"noIconShownOnBattleStatus": true,
 			"applyConditions": "Has3AwakeningsExact"
 		},
+		"NoTurnsFor40TUPassiveJeanneFusionV1": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveJeanneFusionV1",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 40,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsNotBlockGiveTurnJeanneFusionV1"
+		},
+		"NoTurnsFor40TUPassiveJeanneFusionV2": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveJeanneFusionV2",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 40,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV1NotBlockGiveTurnJeanneFusionV2"
+		},
+		"NoTurnsFor40TUPassiveJeanneFusionV3": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveJeanneFusionV3",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 40,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV2NotBlockGiveTurnJeanneFusionV3"
+		},
+		"NoTurnsFor40TUPassiveJeanneFusionV4": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveJeanneFusionV4",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 40,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV3NotBlockGiveTurnJeanneFusionV4"
+		},
+		"NoTurnsFor40TUPassiveJeanneFusionV5": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveJeanneFusionV5",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 40,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV4NotBlockGiveTurnJeanneFusionV5"
+		},
+		"NoTurnsFor40TUPassiveJeanneFusionV6": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveJeanneFusionV6",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 40,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV5NotBlockGiveTurnJeanneFusionV6"
+		},
+		"NoTurnsFor40TUPassiveJeanneFusionV7": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveJeanneFusionV7",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 40,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV6NotBlockGiveTurnJeanneFusionV7"
+		},
+		"NoTurnsFor40TUPassiveJeanneFusionV8": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveJeanneFusionV8",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 40,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV7NotBlockGiveTurnJeanneFusionV8"
+		},
+		"NoTurnsFor40TUPassiveJeanneFusionV9": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveJeanneFusionV9",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 40,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV8NotBlockGiveTurnJeanneFusionV9"
+		},
+		"NoTurnsFor40TUPassiveJeanneFusionV10": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveJeanneFusionV10",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 40,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV9JeanneFusionV10Ready"
+		},
 		"PassiveEntryJeanneFusionLV5": {
 			"class": "Buff",
-			"behaviors": ["EnterBattleBuff"],
+			"behaviors": ["EnterBattleBuff","EnterBattleBuff","EnterBattleBuff"],
 			"behaviorOverrides": [{
-				"randomEnemyBuffs": ["NoTurnsFor50TUPassive"],
+				"randomEnemyBuffs": ["MarkedEnemyForJeanneFusion"],
 				"numRandomToBuff": 2,
 				"spreadCondition": "BattleTimeOver1OrAnyDeadMonster"
+			},{
+				"randomEnemyBuffs": ["NoTurnsFor50TUPassiveJeanneFusionV10","NoTurnsFor50TUPassiveJeanneFusionV9","NoTurnsFor50TUPassiveJeanneFusionV8","NoTurnsFor50TUPassiveJeanneFusionV7","NoTurnsFor50TUPassiveJeanneFusionV6","NoTurnsFor50TUPassiveJeanneFusionV5","NoTurnsFor50TUPassiveJeanneFusionV4","NoTurnsFor50TUPassiveJeanneFusionV3","NoTurnsFor50TUPassiveJeanneFusionV2","NoTurnsFor50TUPassiveJeanneFusionV1"],
+				"numRandomToBuff": 2,
+				"spreadCondition": "IsMarkedEnemyForJeanneFusion"
+			},{
+				"randomEnemyBuffs": ["RemoveMarkedEnemyForJeanneFusion"],
+				"numRandomToBuff": 2,
+				"spreadCondition": "IsMarkedEnemyForJeanneFusion"
 			}],
 			"duration": 0,
 			"showAsTimer": false,
@@ -88556,6 +89318,146 @@
 			"isHiddenFromPlayers": true,
 			"noIconShownOnBattleStatus": true,
 			"applyConditions": "Has4Awakenings"
+		},
+		"NoTurnsFor50TUPassiveJeanneFusionV1": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveJeanneFusionV1",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 50,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsNotBlockGiveTurnJeanneFusionV1"
+		},
+		"NoTurnsFor50TUPassiveJeanneFusionV2": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveJeanneFusionV2",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 50,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV1NotBlockGiveTurnJeanneFusionV2"
+		},
+		"NoTurnsFor50TUPassiveJeanneFusionV3": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveJeanneFusionV3",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 50,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV2NotBlockGiveTurnJeanneFusionV3"
+		},
+		"NoTurnsFor50TUPassiveJeanneFusionV4": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveJeanneFusionV4",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 50,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV3NotBlockGiveTurnJeanneFusionV4"
+		},
+		"NoTurnsFor50TUPassiveJeanneFusionV5": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveJeanneFusionV5",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 50,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV4NotBlockGiveTurnJeanneFusionV5"
+		},
+		"NoTurnsFor50TUPassiveJeanneFusionV6": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveJeanneFusionV6",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 50,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV5NotBlockGiveTurnJeanneFusionV6"
+		},
+		"NoTurnsFor50TUPassiveJeanneFusionV7": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveJeanneFusionV7",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 50,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV6NotBlockGiveTurnJeanneFusionV7"
+		},
+		"NoTurnsFor50TUPassiveJeanneFusionV8": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveJeanneFusionV8",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 50,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV7NotBlockGiveTurnJeanneFusionV8"
+		},
+		"NoTurnsFor50TUPassiveJeanneFusionV9": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveJeanneFusionV9",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 50,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV8NotBlockGiveTurnJeanneFusionV9"
+		},
+		"NoTurnsFor50TUPassiveJeanneFusionV10": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveJeanneFusionV10",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 50,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV9JeanneFusionV10Ready"
 		},
 		"MirageMonsterLite": {
 			"class": "Buff",
@@ -88978,12 +89880,41 @@
 			"class": "Buff",
 			"behaviors": ["EnterBattleBuff"],
 			"behaviorOverrides": [{
-				"enemyBuffs": ["NoTurnsFor10TUPassive"]
+				"enemyBuffs": ["NoTurnsFor10TUPassiveBasiliskRegularV2","NoTurnsFor10TUPassiveBasiliskRegularV1"],
+				"spreadCondition": "IsNotBoss"
 			}],
 			"duration": 0,
 			"showAsTimer": false,
 			"showAsPermanent": false,
 			"noIconShownOnBattleStatus": true
+		},
+		"NoTurnsFor10TUPassiveBasiliskRegularV1": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveBasiliskRegularV1",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 10,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsNotBlockGiveTurnPassiveBasiliskRegularV1"
+		},
+		"NoTurnsFor10TUPassiveBasiliskRegularV2": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveBasiliskRegularV2",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 10,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV1PassiveBasiliskRegularV2Ready"
 		},
 		"MarkedBasiliskRegular":{
 			"class": "Buff",
@@ -88998,12 +89929,40 @@
 			"stackName": "DisableAllBurningEnemiesFor10TUEBB",
 			"behaviors": ["EnterBattleBuff"],
 			"behaviorOverrides": [{
-				"randomEnemyBuffs": ["NoTurnsFor10TU"],
+				"randomEnemyBuffs": ["NoTurnsFor10TUBasiliskRegularV2","NoTurnsFor10TUBasiliskRegularV1"],
 				"numRandomToBuff": 4,
-				"spreadCondition": "IsBurning"
+				"spreadCondition": "IsBurningNotBoss"
 			}],
 			"duration": 0,
 			"showAsTimer": false
+		},
+		"NoTurnsFor10TUBasiliskRegularV1": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnBasiliskRegularV1",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 10,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsNotBlockGiveTurnBasiliskRegularV1"
+		},
+		"NoTurnsFor10TUBasiliskRegularV2": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnBasiliskRegularV2",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 10,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV1BasiliskRegularV2Ready"
 		},
 		"KillRandomDisabledEnemyEOTAndCreditKillBasiliskRegular":{
 			"class": "Buff",
@@ -89147,7 +90106,9 @@
 			"stackName": "PassiveBlockGiveTurnImmunity",
 			"behaviors": ["Immunity"],
 			"behaviorOverrides": [{
-				"stackNamesToBlock": ["BlockGiveTurnFor10TUPassive","BlockGiveTurnFor20TUPassive","BlockGiveTurnFor30TUPassive","BlockGiveTurnFor40TUPassive","BlockGiveTurnFor50TUPassive","BlockGiveTurnFor60TUPassive","BlockGiveTurnFor80TUPassive","BlockGiveTurnFor100TUPassive"]
+				"stackNamesToBlock": ["BlockGiveTurnFor10TUPassive","BlockGiveTurnFor20TUPassive","BlockGiveTurnFor30TUPassive","BlockGiveTurnFor40TUPassive","BlockGiveTurnFor50TUPassive","BlockGiveTurnFor60TUPassive","BlockGiveTurnFor80TUPassive","BlockGiveTurnFor100TUPassive",
+					"BlockGiveTurnPassiveBasiliskRegularV1","BlockGiveTurnPassiveBasiliskRegularV2","BlockGiveTurnPassiveJeanneFusionV1","BlockGiveTurnPassiveJeanneFusionV2","BlockGiveTurnPassiveJeanneFusionV3","BlockGiveTurnPassiveJeanneFusionV4","BlockGiveTurnPassiveJeanneFusionV5","BlockGiveTurnPassiveJeanneFusionV6","BlockGiveTurnPassiveJeanneFusionV7","BlockGiveTurnPassiveJeanneFusionV8","BlockGiveTurnPassiveJeanneFusionV9","BlockGiveTurnPassiveJeanneFusionV10",
+					"BlockGiveTurnPassiveSherlockRegularV1"]
 			}],
 			"duration": -1,
 			"showAsTimer": false,
@@ -89225,7 +90186,7 @@
 		},
 		"RemoveBlockGiveTurn": {
 			"class": "Buff",
-			"behaviors": ["RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs"],
+			"behaviors": ["RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs"],
 			"behaviorOverrides": [{
 					"name": "BlockGiveTurnFor10TU"
 				},{
@@ -89262,6 +90223,62 @@
 					"name": "BlockGiveTurnFor80TUPassive"
 				},{
 					"name": "BlockGiveTurnFor100TUPassive"
+			},{
+					"name": "BlockGiveTurnThorRegularV1"
+				},{
+					"name": "BlockGiveTurnThorRegularV2"
+				},{
+					"name": "BlockGiveTurnMechaSisterBandV1"
+				},{
+					"name": "BlockGiveTurnMechaSisterBandV2"
+				},{
+					"name": "BlockGiveTurnPassiveBasiliskRegularV1"
+				},{
+					"name": "BlockGiveTurnPassiveBasiliskRegularV2"
+			},{
+					"name": "BlockGiveTurnPassiveJeanneFusionV1"
+				},{
+					"name": "BlockGiveTurnPassiveJeanneFusionV2"
+				},{
+					"name": "BlockGiveTurnPassiveJeanneFusionV3"
+				},{
+					"name": "BlockGiveTurnPassiveJeanneFusionV4"
+				},{
+					"name": "BlockGiveTurnPassiveJeanneFusionV5"
+				},{
+					"name": "BlockGiveTurnPassiveJeanneFusionV6"
+				},{
+					"name": "BlockGiveTurnPassiveJeanneFusionV7"
+				},{
+					"name": "BlockGiveTurnPassiveJeanneFusionV8"
+				},{
+					"name": "BlockGiveTurnPassiveJeanneFusionV9"
+				},{
+					"name": "BlockGiveTurnPassiveJeanneFusionV10"
+			},{
+					"name": "BlockGiveTurnDraculaRegularV1"
+				},{
+					"name": "BlockGiveTurnDraculaRegularV2"
+				},{
+					"name": "BlockGiveTurnDraculaRegularV3"
+				},{
+					"name": "BlockGiveTurnDraculaRegularV4"
+				},{
+					"name": "BlockGiveTurnDraculaRegularV5"
+				},{
+					"name": "BlockGiveTurnDraculaRegularV6"
+				},{
+					"name": "BlockGiveTurnDraculaRegularV7"
+				},{
+					"name": "BlockGiveTurnDraculaRegularV8"
+				},{
+					"name": "BlockGiveTurnDraculaRegularV9"
+				},{
+					"name": "BlockGiveTurnDraculaRegularV10"
+			},{
+					"name": "BlockGiveTurnPassiveSherlockRegularV1"
+				},{
+					"name": "BlockGiveTurnSherlockRegularV1"
 			}],
 			"duration": 0,
 			"showAsTimer": false,
@@ -91502,6 +92519,146 @@
 			"showAsTimer": false,
 			"isHiddenFromPlayers": true
 		},
+		"NoTurnsFor30TUDraculaRegularV1": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnDraculaRegularV1",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 30,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsNotBlockGiveTurnDraculaRegularV1"
+		},
+		"NoTurnsFor30TUDraculaRegularV2": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnDraculaRegularV2",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 30,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV1NotBlockGiveTurnDraculaRegularV2"
+		},
+		"NoTurnsFor30TUDraculaRegularV3": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnDraculaRegularV3",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 30,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV2NotBlockGiveTurnDraculaRegularV3"
+		},
+		"NoTurnsFor30TUDraculaRegularV4": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnDraculaRegularV4",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 30,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV3NotBlockGiveTurnDraculaRegularV4"
+		},
+		"NoTurnsFor30TUDraculaRegularV5": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnDraculaRegularV5",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 30,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV4NotBlockGiveTurnDraculaRegularV5"
+		},
+		"NoTurnsFor30TUDraculaRegularV6": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnDraculaRegularV6",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 30,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV5NotBlockGiveTurnDraculaRegularV6"
+		},
+		"NoTurnsFor30TUDraculaRegularV7": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnDraculaRegularV7",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 30,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV6NotBlockGiveTurnDraculaRegularV7"
+		},
+		"NoTurnsFor30TUDraculaRegularV8": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnDraculaRegularV8",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 30,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV7NotBlockGiveTurnDraculaRegularV8"
+		},
+		"NoTurnsFor30TUDraculaRegularV9": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnDraculaRegularV9",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 30,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV8NotBlockGiveTurnDraculaRegularV9"
+		},
+		"NoTurnsFor30TUDraculaRegularV10": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnDraculaRegularV10",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 30,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsV9DraculaRegularV10Ready"
+		},
 		"Active1LOCKForActive4DraculaRegular":{
 			"class": "Buff",
 			"stackName": "Active1LOCKForActive4DraculaRegular",
@@ -91841,6 +92998,315 @@
 			"stackName": "InstantCooldown",
 			"duration": 50,
 			"isHiddenFromPlayers": false,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"iconSpriteName": "IconBlueCountdownClock3"
+		},
+		"HasteUpDamageReduc4DisabledEnemy":{
+			"class": "Buff",
+			"behaviors": ["ModifyDamage", "StatOnly"],
+			"behaviorOverrides": [{
+				"conditions": "1EnemyDisabled",
+				"percent": 0.94,
+					"cancelFromDamageTypes": ["BuffDamage", "Poison", "Burn"],
+					"cancelFromDamageFlags": ["Sneak", "IgnoreArmor"]
+				}, {
+				"conditions": "1EnemyDisabled",
+				"flatStatBonuses": {
+					"Haste": -64
+				}
+			}],
+			"iconSpriteName": "IconYellowDefUpShieldClock01",
+			"noIconShownOnBattleStatus": true,
+			"duration": -1,
+			"showAsTimer": false,
+			"isWeaponBuff": true,
+			"hideActivatedIcon": true
+		},
+		"HasteUpDamageReduc5DisabledEnemy":{
+			"class": "Buff",
+			"behaviors": ["ModifyDamage", "StatOnly"],
+			"behaviorOverrides": [{
+				"conditions": "1EnemyDisabled",
+				"percent": 0.92,
+					"cancelFromDamageTypes": ["BuffDamage", "Poison", "Burn"],
+					"cancelFromDamageFlags": ["Sneak", "IgnoreArmor"]
+				}, {
+				"conditions": "1EnemyDisabled",
+				"flatStatBonuses": {
+					"Haste": -87
+				}
+			}],
+			"iconSpriteName": "IconYellowDefUpShieldClock01",
+			"noIconShownOnBattleStatus": true,
+			"duration": -1,
+			"showAsTimer": false,
+			"isWeaponBuff": true,
+			"hideActivatedIcon": true
+		},
+		"HasteUpDamageReduc6DisabledEnemy":{
+			"class": "Buff",
+			"behaviors": ["ModifyDamage", "StatOnly"],
+			"behaviorOverrides": [{
+				"conditions": "1EnemyDisabled",
+				"percent": 0.9,
+					"cancelFromDamageTypes": ["BuffDamage", "Poison", "Burn"],
+					"cancelFromDamageFlags": ["Sneak", "IgnoreArmor"]
+				}, {
+				"conditions": "1EnemyDisabled",
+				"flatStatBonuses": {
+					"Haste": -111
+				}
+			}],
+			"iconSpriteName": "IconYellowDefUpShieldClock01",
+			"noIconShownOnBattleStatus": true,
+			"duration": -1,
+			"showAsTimer": false,
+			"isWeaponBuff": true,
+			"hideActivatedIcon": true
+		},
+		"GameIsAFootPassiveASherlockRegular": {
+			"class": "Buff",
+			"stackName": "GameIsAFootPassiveASherlockRegular",
+			"behaviors": ["EnterBattleBuff","SleepImmunityFallback"],
+			"behaviorOverrides": [{
+				"sourceBuffs": ["SleepImmunity","KnockbackImmunity","3LevelsOfDamageReductionBasedOnCharges","Active2LOCKSherlockRegular","Charged1Icon","Charged2Icon","Charged3Icon"]
+			},{}],
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"duration": -1
+		},
+		"TrueDetectivePassiveASherlockRegular": {
+			"class": "Buff",
+			"stackName": "TrueDetectivePassiveASherlockRegular",
+			"behaviors": ["EnterBattleBuff","BuffWhenMonsterHurt","BuffOnMonsterTurnEnd","BuffOnMonsterTurn","PoisonImmunityFallback"],
+			"behaviorOverrides": [{
+				"sourceBuffs": ["HoldGround","PoisonImmunityFor100TU","GetTurnSkinA","DisableFallBackImmunity"]
+			},{
+				"selfBuffs": ["BrideHealOK"],
+				"cancelFromDamageTypes": ["BuffDamage"]
+			},{
+				"selfBuffs": ["BrideHeal50PercentSherlockRegular"],
+				"activeMonsterConditions": "NotAlwaysMyTurn",
+				"spreadCondition": "BrideHealReady"
+			},{
+				"sourceBuffs": ["PassiveExtraTurnSherlockRegular"],
+				"sameTeam": true,
+				"activeMonsterConditions": "AlwaysTrue",
+				"spreadCondition": "IsNotActingOrSherlockPassiveLock"
+			},{}],
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"duration": -1
+		},
+		"PassiveExtraTurnSherlockRegular": {
+			"class": "Buff",
+			"isHiddenFromPlayers": true,
+			"behaviors": ["BuffOnMonsterTurnEnd"],
+			"behaviorOverrides": [{
+				"sourceBuffs": ["PseudoGetTurn","OnExtraTurn","JustGivenTurn","SherlockRegularExtraTurn30TUTrigger"],
+				"activeMonsterConditions": "AlwaysTrue"
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"showAsPermanent": false
+		},
+		"SherlockRegularExtraTurn30TUTrigger":{
+			"class": "Buff",
+			"duration": 30,
+			"stackName": "SherlockRegularExtraTurn50TUTrigger",
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"iconSpriteName": "IconRedCountdownPassiveClock3"
+		},
+		"BrideHeal50PercentSherlockRegular": {
+			"class": "Buff",
+			"behaviors": ["AdjustHp", "RemoveBuffs","RemoveBuffs"],
+			"behaviorOverrides": [{
+				"percent": 0.50,
+				"abilityEffect": "Blank",
+				"hpboosts": [
+					"HealBoost"
+				]
+			},{
+				"name": "BrideHealOK"
+			},{}],
+			"duration": 0,
+			"effectToShowWhenApplied": "LargeHeal1",
+			"textKeyToShowWhenApplied": "HealDoubleANameKey",
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
+		"Grant1EnemyDisableIfNotCharged3SherlockRegularPT1": {
+			"class": "Buff",
+			"behaviors": ["EnterBattleBuff"],
+			"behaviorOverrides": [{
+				"selfBuffs": ["Grant1EnemyDisableSherlockRegularLV1","Grant1EnemyDisableSherlockRegularLV2","Grant1EnemyDisableSherlockRegularLV3","Grant1EnemyDisableSherlockRegularLV4","Grant1EnemyDisableSherlockRegularLV5"]
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true,
+			"noIconShownOnBattleStatus": true,
+			"applyConditions": "NotCharged3"
+		},
+		"NoTurnsFor50TUPassiveSherlockRegularV1": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveSherlockRegularV1",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 50,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsNotBoss"
+		},
+		"Grant1EnemyDisableSherlockRegularLV1": {
+			"class": "Buff",
+			"behaviors": ["EnterBattleBuff"],
+			"behaviorOverrides": [{
+				"randomEnemyBuffs": ["NoTurnsFor50TUPassiveSherlockRegularV1"],
+				"numRandomToBuff": 1
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true,
+			"noIconShownOnBattleStatus": true,
+			"applyConditions": "NoAwakening20Percent"
+		},
+		"Grant1EnemyDisableSherlockRegularLV2": {
+			"class": "Buff",
+			"behaviors": ["EnterBattleBuff"],
+			"behaviorOverrides": [{
+				"randomEnemyBuffs": ["NoTurnsFor50TUPassiveSherlockRegularV1"],
+				"numRandomToBuff": 1
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true,
+			"noIconShownOnBattleStatus": true,
+			"applyConditions": "1Awakening40Percent"
+		},
+		"Grant1EnemyDisableSherlockRegularLV3": {
+			"class": "Buff",
+			"behaviors": ["EnterBattleBuff"],
+			"behaviorOverrides": [{
+				"randomEnemyBuffs": ["NoTurnsFor50TUPassiveSherlockRegularV1"],
+				"numRandomToBuff": 1
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true,
+			"noIconShownOnBattleStatus": true,
+			"applyConditions": "2Awakening60Percent"
+		},
+		"Grant1EnemyDisableSherlockRegularLV4": {
+			"class": "Buff",
+			"behaviors": ["EnterBattleBuff"],
+			"behaviorOverrides": [{
+				"randomEnemyBuffs": ["NoTurnsFor50TUPassiveSherlockRegularV1"],
+				"numRandomToBuff": 1
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true,
+			"noIconShownOnBattleStatus": true,
+			"applyConditions": "3Awakening80Percent"
+		},
+		"Grant1EnemyDisableSherlockRegularLV5": {
+			"class": "Buff",
+			"behaviors": ["EnterBattleBuff"],
+			"behaviorOverrides": [{
+				"randomEnemyBuffs": ["NoTurnsFor50TUPassiveSherlockRegularV1"],
+				"numRandomToBuff": 1
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true,
+			"noIconShownOnBattleStatus": true,
+			"applyConditions": "Has4Awakenings"
+		},
+		"Disable1EnemyThenStunAllOtherEnemiesSherlockRegularEBB":{
+			"class": "Buff",
+			"behaviors": ["EnterBattleBuff","EnterBattleBuff","EnterBattleBuff"],
+			"behaviorOverrides": [{
+				"randomEnemyBuffs": ["NoTurnsFor50TUSherlockRegularV1","MarkedBySherlockRegular"],
+				"numRandomToBuff": 1
+			},{
+				"randomEnemyBuffs": ["Stun50"],
+				"numRandomToBuff": 4,
+				"spreadCondition": "IsNotMarkedBySherlockRegular"
+			},{
+				"randomEnemyBuffs": ["RemoveMarkedBySherlockRegular"],
+				"numRandomToBuff": 4
+			}],
+			"duration": 0,
+			"isHiddenFromPlayers": true,
+			"showAsPermanent": false,
+			"showAsTimer": false
+		},
+		"NoTurnsFor50TUSherlockRegularV1": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnSherlockRegularV1",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 50,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsNotBoss"
+		},
+		"MarkedBySherlockRegular":{
+			"class": "Buff",
+			"stackName": "MarkedBySherlockRegular",
+			"duration": 0,
+			"isHiddenFromPlayers": true,
+			"showAsPermanent": false,
+			"showAsTimer": false
+		},
+		"RemoveMarkedBySherlockRegular": {
+			"class": "Buff",
+			"behaviors": ["RemoveBuffs"],
+			"behaviorOverrides": [{
+				"name": "MarkedBySherlockRegular"
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
+		"Active2LOCKSherlockRegular":{
+			"class": "Buff",
+			"stackName": "Active2LOCKSherlockRegular",
+			"duration": -1,
+			"isHiddenFromPlayers": true,
+			"showAsPermanent": false,
+			"showAsTimer": false
+		},
+		"RemoveActive2LOCKSherlockRegular": {
+			"class": "Buff",
+			"behaviors": ["RemoveBuffs"],
+			"behaviorOverrides": [{
+				"name": "Active2LOCKSherlockRegular"
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
+		"SherlockRegularCooldown50":{
+			"class": "Buff",
+			"duration": 50,
+			"stackName": "InstantCooldown",
 			"showAsTimer": true,
 			"showAsPermanent": false,
 			"iconSpriteName": "IconBlueCountdownClock3"

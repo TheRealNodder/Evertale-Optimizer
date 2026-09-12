@@ -1,6 +1,6 @@
 {
 	"Version": 23,
-	"Time": 1787708167,
+	"Time": 1789086872,
 	"AbilityConfig": {
 		"StunSingle200A": {
 			"class": "AbilityConfig",
@@ -44409,10 +44409,11 @@
 				"applyToSourceOnly": true,
 				"skipAbilityEffect": true
 			},{
-				"buffs": ["NoTurnsFor10TU"],
+				"buffs": ["NoTurnsFor10TUMechaSisterBandV2","NoTurnsFor10TUMechaSisterBandV1"],
 				"applyToTargetType": "Enemy",
 				"showMissConditions": "ShowNoMiss",
-				"skipAbilityEffect": true	
+				"skipAbilityEffect": true,
+				"applyConditions": "IsNotBoss"
 			}],
 			"enemyEventType": "Finish",
 			"sourceEventType": "Finish",
@@ -48186,7 +48187,7 @@
 			"sourceEventType": "Finish",
 			"abilityEffect": "SherlockShot1",
 			"flags": ["Timestrike"],
-			"attackScalors": ["GoodIfEnemyCurrentTUGreaterThan100","GoodIf2EnemiesCurrentTUGreaterThan100"],
+			"attackScalors": ["GoodIfEnemyCurrentTUGreaterThan100","GoodIfEnemyCurrentTUGreaterThan200"],
 			"conditionedAbilityEffects": ["SherlockShot1","SherlockShot1"],
 			"recommendEffectWhenUsable": -2
 		},
@@ -48290,7 +48291,7 @@
 				"drainPercent": 1.0,
 				"drainEffect": "VampireDrain1"
 			},{
-				"buffs": ["NoTurnsFor30TU"],
+				"buffs": ["NoTurnsFor30TUDraculaRegularV10","NoTurnsFor30TUDraculaRegularV9","NoTurnsFor30TUDraculaRegularV8","NoTurnsFor30TUDraculaRegularV7","NoTurnsFor30TUDraculaRegularV6","NoTurnsFor30TUDraculaRegularV5","NoTurnsFor30TUDraculaRegularV4","NoTurnsFor30TUDraculaRegularV3","NoTurnsFor30TUDraculaRegularV2","NoTurnsFor30TUDraculaRegularV1"],
 				"applyConditions": "On1HPIsNotBoss",
 				"applyToTargetType": "Enemy",
 				"showMissConditions": "ShowNoMiss",
@@ -48463,6 +48464,127 @@
 			"sourceEventType": "Finish",
 			"abilityEffect": "VanHelsingStainedGlass1",
 			"useCondition": "IsNotInstantCooldownOrActive4LOCKVanHelsingRegular"
+		},
+		"SingleAttackASherlockRegular": {
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"damageBoosts": ["TimestrikeDamageBoost"],
+				"damageFlags": ["IgnoreSkin","IgnoreArmor","HardIgnoreBlockDeath"],
+				"applyToTargetType": "Enemy",
+				"drainPercent": 1.0,
+				"drainEffect": "MerlinSelfHeal1"
+			},{
+				"buffs": ["Grant1EnemyDisableIfNotCharged3SherlockRegularPT1","StoreEnergy"],
+				"buffBackMode": true,
+				"applyConditions": "CurrentTULessThan100",
+				"applyToTargetOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs":["RemoveActive2LOCKSherlockRegular"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "SherlockShot1",
+			"flags": ["Timestrike"],
+			"attackScalors": ["GoodIfEnemyCurrentTUGreaterThan100","GoodIfEnemyCurrentTUGreaterThan200"],
+			"conditionedAbilityEffects": ["SherlockShot1","SherlockShot1"],
+			"recommendEffectWhenUsable": -2
+		},
+		"AllyBuffASherlockRegular": {
+			"class": "AbilityConfig",
+			"targetingData": "AllAlly",
+			"components": ["ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"buffs": ["Heal500Percent"],
+				"applyToTargetType": "Friendly"
+			},{
+				"buffs":["Grant1EnemyDisableIfNotCharged3SherlockRegularPT1","StoreEnergy","Active2LOCKSherlockRegular"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["Grant1EnemyDisableIfNotCharged3SherlockRegularPT1","StoreEnergy"],
+				"applyToSourceOnly": true,
+				"applyConditions": "1AllyIsSleepingPoisonedOrBurning",
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs": ["RemoveBuffs"],
+				"applyToTargetType": "Friendly",
+				"applyConditions": "1AllyIsSleepingPoisonedOrBurning",
+				"showMissConditions": "ShowNoMiss",
+				"skipAbilityEffect": true
+			}],
+			"friendlyEventType": "Finish",
+			"sourceEventType": "Finish",
+			"flags": ["Healer"],
+			"abilityEffect": "SherlockGlass1",
+			"useCondition": "IsNotActive2LOCKSherlockRegular"
+		},
+		"EnemyBuffASherlockRegular": {
+			"class": "AbilityConfig",
+			"targetingData": "AllEnemy",
+			"components": ["ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"buffs": ["EmptyPlaceholder"],
+				"applyToTargetType": "Enemy"
+			},{
+				"buffs": ["Disable1EnemyThenStunAllOtherEnemiesSherlockRegularEBB"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs": ["Disable1EnemyThenStunAllOtherEnemiesSherlockRegularEBB"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss",
+				"applyConditions": "IsCharged1"
+			},{
+				"buffs": ["Disable1EnemyThenStunAllOtherEnemiesSherlockRegularEBB"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss",
+				"applyConditions": "IsCharged2"
+			},{
+				"buffs": ["Disable1EnemyThenStunAllOtherEnemiesSherlockRegularEBB"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss",
+				"applyConditions": "IsCharged3"
+			}],
+			"sourceEventType": "Finish",
+			"enemyEventType": "Finish",
+			"abilityEffect": "SherlockStun1",
+			"flags": ["StunChance","NoDamage"],
+			"useCondition": "2EnemiesAnd2EnemiesNotDisabled"
+		},
+		"MultiAttackASherlockRegular":{
+			"class": "AbilityConfig",
+			"targetingData": "2Enemy",
+			"components": ["Damage","ApplyBuff"],
+			"componentOverrides": [{
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"damageFlags": ["IgnoreArmor","HardIgnoreBlockDeath"],
+				"applyToTargetType": "Enemy",
+				"drainPercent": 1.0,
+				"drainEffect": "MerlinSelfHeal1"
+			},{
+				"buffs":["RemoveEnergy","SherlockRegularCooldown50"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "SherlockSP",
+			"attackScalors": ["TimeInCombat100","TimeInCombat200"],
+			"conditionedAbilityEffects": ["SherlockSP","SherlockSP"],
+			"recommendEffectWhenUsable": -2,
+			"flags": ["Duration"],
+			"useCondition": "IsCharged3AndNotInstantCooldown"
 		}
 	}
 }
