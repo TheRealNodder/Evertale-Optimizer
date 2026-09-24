@@ -1,6 +1,6 @@
 {
 	"Version": 23,
-	"Time": 1789086872,
+	"Time": 1789614188,
 	"AbilityConfig": {
 		"StunSingle200A": {
 			"class": "AbilityConfig",
@@ -48585,6 +48585,303 @@
 			"recommendEffectWhenUsable": -2,
 			"flags": ["Duration"],
 			"useCondition": "IsCharged3AndNotInstantCooldown"
+		},
+		"SingleAttackAAliceNewBoss":{
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"damageFlags": ["IgnoreArmor","HardIgnoreBlockDeath","DoNotWake"],
+				"applyToTargetType": "Enemy"
+			},{
+				"buffs":["RemoveSleepFromAllAlliesEBB","StoreEnergy"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["GiveTurn","OnExtraTurn","JustGivenTurn","RemoveNextMoveIsGodModeAliceNewBoss"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss",
+				"applyConditions": "IsNextMoveIsGodModeAliceNew"
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "AliceNewAttack",
+			"attackScalors": ["GoodIf2EnemiesIsBurningSleepingOrFrostburned","GoodIfAllEnemiesIsBurningSleepingOrFrostburned"],
+			"conditionedAbilityEffects": ["AliceNewAttack","AliceNewAttack"],
+			"recommendEffectWhenUsable": -2
+		},
+		"AllyBuffAAliceNewBoss": {
+			"class": "AbilityConfig",
+			"targetingData": "AllAlly",
+			"components": ["ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"buffs": ["RemoveBuffs","SleepImmunityOnce","PoisonImmunityOnce"],
+				"applyToTargetType": "Friendly"
+			},{
+				"buffs":["NextMoveIsGodModeAliceNewBoss","StoreEnergy"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["AliceNewBossActive2Cooldown50"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			}],
+			"friendlyEventType": "Finish",
+			"sourceEventType": "Finish",
+			"abilityEffect": "AliceNewHeal",
+			"flags": ["Purify"],
+			"useCondition": "AtLeast1UnitIsIsSleepingPoisonedOrBurningNotInstantCooldown"
+		},
+		"EnemyBuffAAliceNewBoss": {
+			"class": "AbilityConfig",
+			"targetingData": "AllEnemy",
+			"components": ["ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"buffs": ["RemoveSleepImmunityOnce","RemoveBurn","RemoveStealthShieldOnce"],
+				"applyToTargetType": "Enemy"
+			},{
+				"buffs": ["GiantActive3BuffAliceNewEBB","AliceNewBossActive3Cooldown50","StoreEnergy"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "AliceNewSleep",
+			"flags": ["NoDamage","SleepChance","Sleep"],
+			"useCondition": "LessThan2EnemiesSleepingAndNotInstantCooldown2"
+		},
+		"MultiAttackAAliceNewBoss":{
+			"class": "AbilityConfig",
+			"targetingData": "2Enemy",
+			"components": ["Damage","ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"damageFlags": ["IgnoreArmor","HardIgnoreBlockDeath","DoNotWake"],
+				"applyToTargetType": "Enemy"
+			},{
+				"buffs": ["SendToFrontOfReinforcements", "RemoveBuffs"],
+				"applyConditions": "AllyHasReinforcements",
+				"applyToTargetType": "Source",
+				"showMissConditions": "ShowNoMiss",
+				"skipAbilityEffect": true,
+				"buffAppliedEffects": ["YamatoStepback"]
+			},{
+				"buffs": ["Add4SuperWaterMinionBossNextNotKnockbackImmune"],
+				"applyConditions": "IsAlone",
+				"applyToTargetType": "Source",
+				"showMissConditions": "ShowNoMiss",
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["Add3SuperWaterMinionBossNextNotKnockbackImmune"],
+				"applyConditions": "2AlliesLeftNot3",
+				"applyToTargetType": "Source",
+				"showMissConditions": "ShowNoMiss",
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["Add2SuperWaterMinionBossNextNotKnockbackImmune"],
+				"applyConditions": "3AlliesLeftNot4",
+				"applyToTargetType": "Source",
+				"showMissConditions": "ShowNoMiss",
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["Add1SuperWaterMinionBossNextNotKnockbackImmune"],
+				"applyConditions": "4AlliesLeftNoReinforcements",
+				"applyToTargetType": "Source",
+				"showMissConditions": "ShowNoMiss",
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["SendToBackOfReinforcements", "RemoveBuffs"],
+				"applyToTargetType": "Source",
+				"showMissConditions": "ShowNoMiss",
+				"skipAbilityEffect": true,
+				"buffAppliedEffects": ["YamatoStepback"]
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "AliceNewSp",
+			"flags": ["Summon"],
+			"recommendEffectWhenUsable": -2,
+			"useCondition": "IsCharged3"
+		},
+		"SingleAttackAQueenHeartsRegularBoss":{
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage","ApplyBuff"],
+			"componentOverrides": [{
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"damageFlags": ["HardIgnoreBlockDeath"],
+				"applyToTargetType": "Enemy"
+			},{
+				"buffs":["GrantAllAlliesBurnEBB","RemoveActive3LOCKQueenHeartsRegularBoss"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true	
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "QueenHeartsAttack1",
+			"attackScalors": ["GoodVs1NotBurningOrSleepingEnemy","GoodVs2NotBurningOrSleepingEnemies","GoodVs3NotBurningOrSleepingEnemies","GoodVs4NotBurningOrSleepingEnemies"],
+			"conditionedAbilityEffects": ["QueenHeartsAttack1","QueenHeartsAttack1","QueenHeartsAttack1","QueenHeartsAttack1"],
+			"flags": ["Burn","ApplyStatusToSelf"],
+			"recommendEffectWhenUsable": -2
+		},
+		"AllUnitsBuffAQueenHeartsRegularBoss": {
+			"class": "AbilityConfig",
+			"targetingData": "All",
+			"components": ["ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"buffs": ["EmptyPlaceholder"],
+				"applyToTargetType": "Enemy"
+			},{
+				"buffs": ["EmptyPlaceholder"],
+				"applyToTargetType": "Friendly"
+			},{
+				"buffs": ["MarkedQueenHeartsRegularBoss","BigBuffQueenHeartsRegularBossEBB","QueenHeartsRegularBossActive2Cooldown50"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "QueenHeartsCardThrow",
+			"flags": ["NoDamage"],
+			"useCondition": "AtLeast4BurningInBattleNotInstantCooldown2"
+		},
+		"AllyBuffAQueenHeartsRegularBoss": {
+			"class": "AbilityConfig",
+			"targetingData": "AllAlly",
+			"components": ["ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"buffs": ["RemovePoison","StunImmunityOnce","PoisonImmunityOnce","IgnoreDamageReduction1TurnOnly"],
+				"applyToTargetType": "Friendly"
+			},{
+				"buffs": ["GainSpiritForCurrentBurningOrSleepingUnitsOnBattlefieldEBB","Active3LOCKQueenHeartsRegularBoss"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"friendlyEventType": "Finish",
+			"sourceEventType": "Finish",
+			"abilityEffect": "QueenHeartsCardBG",
+			"useCondition": "IsNotActive3LOCKQueenHeartsRegular"
+		},
+		"MultiAttackAQueenHeartsRegularBoss":{
+			"class": "AbilityConfig",
+			"targetingData": "2Enemy",
+			"components": ["Damage","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"damageFlags": ["HardIgnoreBlockDeath","IgnoreSkin","DoNotWake"],
+				"applyToTargetType": "Enemy",
+				"drainPercent": 1.0,
+				"drainEffect": "MerlinSelfHeal1"
+			},{
+				"buffs":["RemoveActive3LOCKQueenHeartsRegularBoss","HijikataCounter","HijikataCounterFuseAfterTime"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["QueenHeartsRegularBossActive4Cooldown50"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"applyConditions": "IsHijikataCharged2",
+				"showMissConditions": "ShowNoMiss"
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "QueenHeartsSP",
+			"attackScalors": ["GoodVs1NotBurningOrSleepingEnemy","GoodVs2NotBurningOrSleepingEnemies","GoodVs3NotBurningOrSleepingEnemies","GoodVs4NotBurningOrSleepingEnemies"],
+			"conditionedAbilityEffects": ["QueenHeartsSP","QueenHeartsSP","QueenHeartsSP","QueenHeartsSP"],
+			"flags": ["BurnBlast"],
+			"useCondition": "IsBurningNotInstantCooldown",
+			"recommendEffectWhenUsable": -2
+		},
+		"SingleAttackACupidRegularBoss": {
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage","ApplyBuff"],
+			"componentOverrides":[{
+				"damageFlags": ["DoNotWake","IgnoreSkin","IgnoreArmor","HardIgnoreBlockDeath"],
+				"applyToTargetType": "Enemy"
+			},{
+				"buffs": ["PoisonImmunityOnce","SleepImmunityOnce","RemoveActive3LOCKCupidRegularBoss","GoodGirlBuffCounter"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true	
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "CupidAttack",
+			"attackScalors":["GoodVsICantBelieveYouHitMeBuff"],
+			"conditionedAbilityEffects": ["CupidAttack","CupidAttack"],
+			"recommendEffectWhenUsable": -1
+		},
+		"AllyBuffACupidRegularBoss": {
+			"class": "AbilityConfig",
+			"targetingData": "AllAlly",
+			"components": ["ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"buffs": ["EmptyPlaceholder"],
+				"applyToTargetType": "Friendly",
+				"applyConditions": "IsReadyForBondingCupidRegularActive2",
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs": ["CupidBossBondwith1RandomValidAllyPlusExtrasEBB","RemoveBuffs","FortifyFor3Attacks"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			}],
+			"sourceEventType": "Finish",
+			"friendlyEventType": "Finish",
+			"hideTargetingInfo": true,
+			"abilityEffect": "CupidGiveLink",
+			"flags": ["NoDamage"],
+			"useCondition": "1AllyIsReadyForBondingAnd2AlliesNotCupidBonding"
+		},
+		"MultiBuffACupidRegularBoss": {
+			"class": "AbilityConfig",
+			"targetingData": "AllAlly",
+			"components": ["ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"buffs": ["EmptyPlaceholder"],
+				"applyToTargetType": "Friendly"
+			},{
+				"buffs": ["Give2AlliesExtraTurnCupidRegularBoss","Active3LOCKCupidRegularBoss"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"	
+			}],
+			"friendlyEventType": "Finish",
+			"sourceEventType": "Finish",
+			"abilityEffect": "CupidCopy",
+			"flags": ["GiveTurn","NoDamage"],
+			"useCondition": "IsNotActive3LOCKCupidRegular"
+		},
+		"SpecialAttackACupidRegularBoss": {
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"applyToTargetType": "Enemy",
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"damageFlags": ["DoNotWake","IgnoreArmor","HardIgnoreBlockDeath"]
+			},{
+				"buffs": ["KillRandomEnemyEOTAndCreditKillCupidRegularBoss","LoseMomentum"],
+				"applyConditions": "HasDamagedWithAttack",
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs": ["GoodGirlBuffCounter","GainMomentum","RemoveActive3LOCKCupidRegularBoss"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "CupidSP",
+			"attackScalors":["GoodIfGain1GoodBuff","GoodIfGain2GoodBuff","GoodIfGain3GoodBuff","GoodIfGain4GoodBuff","GoodIfGain5GoodBuff"],
+			"conditionedAbilityEffects": ["CupidSP","CupidSP","CupidSP","CupidSP","CupidSP"],
+			"recommendEffectWhenUsable": -1
 		}
 	}
 }
