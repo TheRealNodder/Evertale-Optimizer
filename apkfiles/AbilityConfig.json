@@ -1,6 +1,6 @@
 {
 	"Version": 23,
-	"Time": 1789614188,
+	"Time": 1790226418,
 	"AbilityConfig": {
 		"StunSingle200A": {
 			"class": "AbilityConfig",
@@ -48660,7 +48660,7 @@
 			"components": ["Damage","ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff"],
 			"componentOverrides": [{
 				"damageBoosts": ["RegularAttackDamageBoost"],
-				"damageFlags": ["IgnoreArmor","HardIgnoreBlockDeath","DoNotWake"],
+				"damageFlags": ["IgnoreArmor","HardIgnoreBlockDeath","DoNotWake","IgnoreSkin"],
 				"applyToTargetType": "Enemy"
 			},{
 				"buffs": ["SendToFrontOfReinforcements", "RemoveBuffs"],
@@ -48882,6 +48882,131 @@
 			"attackScalors":["GoodIfGain1GoodBuff","GoodIfGain2GoodBuff","GoodIfGain3GoodBuff","GoodIfGain4GoodBuff","GoodIfGain5GoodBuff"],
 			"conditionedAbilityEffects": ["CupidSP","CupidSP","CupidSP","CupidSP","CupidSP"],
 			"recommendEffectWhenUsable": -1
+		},
+		"SingleAttackAAliceNew":{
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"damageFlags": ["IgnoreArmor","HardIgnoreBlockDeath","DoNotWake"],
+				"applyToTargetType": "Enemy",
+				"drainPercent": 1.0,
+				"drainEffect": "MerlinSelfHeal1"
+			},{
+				"buffs":["RemoveSleepFromAllAlliesEBB","StoreEnergy"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["GiveTurn","OnExtraTurn","JustGivenTurn","RemoveNextMoveIsGodModeAliceNew"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss",
+				"applyConditions": "IsNextMoveIsGodModeAliceNew"
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "AliceNewAttack",
+			"attackScalors": ["GoodIf2EnemiesIsBurningSleepingOrFrostburned","GoodIfAllEnemiesIsBurningSleepingOrFrostburned"],
+			"conditionedAbilityEffects": ["AliceNewAttack","AliceNewAttack"],
+			"recommendEffectWhenUsable": -2
+		},
+		"AllyBuffAAliceNew": {
+			"class": "AbilityConfig",
+			"targetingData": "AllAlly",
+			"components": ["ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"buffs": ["RemoveBuffs","SleepImmunityOnce","PoisonImmunityOnce"],
+				"applyToTargetType": "Friendly"
+			},{
+				"buffs":["NextMoveIsGodModeAliceNew","StoreEnergy"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["AliceNewActive2Cooldown50"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			}],
+			"friendlyEventType": "Finish",
+			"sourceEventType": "Finish",
+			"abilityEffect": "AliceNewHeal",
+			"flags": ["Purify"],
+			"useCondition": "AtLeast1UnitIsIsSleepingPoisonedOrBurningNotInstantCooldown"
+		},
+		"EnemyBuffAAliceNew": {
+			"class": "AbilityConfig",
+			"targetingData": "AllEnemy",
+			"components": ["ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"buffs": ["RemoveSleepImmunityOnce","RemoveBurn","RemoveStealthShieldOnce"],
+				"applyToTargetType": "Enemy"
+			},{
+				"buffs": ["GiantActive3BuffAliceNewEBB","AliceNewActive3Cooldown50","StoreEnergy"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "AliceNewSleep",
+			"flags": ["NoDamage","SleepChance","Sleep"],
+			"useCondition": "LessThan2EnemiesSleepingAndNotInstantCooldown2"
+		},
+		"MultiAttackAAliceNew":{
+			"class": "AbilityConfig",
+			"targetingData": "2Enemy",
+			"components": ["Damage","ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"damageFlags": ["IgnoreArmor","HardIgnoreBlockDeath","DoNotWake","IgnoreSkin"],
+				"applyToTargetType": "Enemy",
+				"drainPercent": 1.0,
+				"drainEffect": "MerlinSelfHeal1"
+			},{
+				"buffs": ["SendToFrontOfReinforcements", "RemoveBuffs"],
+				"applyConditions": "AllyHasReinforcements",
+				"applyToTargetType": "Source",
+				"showMissConditions": "ShowNoMiss",
+				"skipAbilityEffect": true,
+				"buffAppliedEffects": ["YamatoStepback"]
+			},{
+				"buffs": ["Add4SuperWaterMinionNextNotKnockbackImmune"],
+				"applyConditions": "IsAlone",
+				"applyToTargetType": "Source",
+				"showMissConditions": "ShowNoMiss",
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["Add3SuperWaterMinionNextNotKnockbackImmune"],
+				"applyConditions": "2AlliesLeftNot3",
+				"applyToTargetType": "Source",
+				"showMissConditions": "ShowNoMiss",
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["Add2SuperWaterMinionNextNotKnockbackImmune"],
+				"applyConditions": "3AlliesLeftNot4",
+				"applyToTargetType": "Source",
+				"showMissConditions": "ShowNoMiss",
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["Add1SuperWaterMinionNextNotKnockbackImmune"],
+				"applyConditions": "4AlliesLeftNoReinforcements",
+				"applyToTargetType": "Source",
+				"showMissConditions": "ShowNoMiss",
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["SendToBackOfReinforcements", "RemoveBuffs"],
+				"applyToTargetType": "Source",
+				"showMissConditions": "ShowNoMiss",
+				"skipAbilityEffect": true,
+				"buffAppliedEffects": ["YamatoStepback"]
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "AliceNewSp",
+			"flags": ["Summon"],
+			"recommendEffectWhenUsable": -2,
+			"useCondition": "IsCharged3"
 		}
 	}
 }

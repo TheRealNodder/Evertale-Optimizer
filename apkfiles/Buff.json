@@ -1,6 +1,6 @@
 {
 	"Version": 23,
-	"Time": 1789614001,
+	"Time": 1789621903,
 	"Buff": {
 	"RelationshipFlatAttack50": {
 		"class": "Buff",
@@ -93941,31 +93941,287 @@
 			"showAsTimer": false,
 			"isHiddenFromPlayers": true
 		},
-		"CupidRegularInstantDeathFXBuff": {
+	    "CupidRegularInstantDeathFXBuff": {
+            "class": "Buff",
+            "isHiddenFromPlayers": true,
+            "duration": 0,
+            "effectToShowWhenApplied": "CupidInstantdeath1",
+            "showAsTimer": false,
+            "showAsPermanent": false
+        },
+        "Active3LOCKCupidRegularBoss":{
+            "class": "Buff",
+            "stackName": "Active3LOCKCupidRegular",
+            "duration": -1,
+            "isHiddenFromPlayers": true,
+            "showAsPermanent": false,
+            "showAsTimer": false
+        },
+        "RemoveActive3LOCKCupidRegularBoss": {
+            "class": "Buff",
+            "behaviors": ["RemoveBuffs"],
+            "behaviorOverrides": [{
+                "name": "Active3LOCKCupidRegular"
+            }],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+        },    
+		"HasteUp4AtLeast2BurningOrSleepingInBattle": {
+			"class": "Buff",
+			"behaviors": ["StatOnly"],
+			"behaviorOverrides": [{
+				"conditions": "AtLeast4BurningOrSleepingInBattle",
+				"flatStatBonuses": {
+					"Haste": -64
+				}
+			}],
+			"duration": -1,
+			"showAsTimer": false,
+			"noIconShownOnBattleStatus": true,
+			"iconSpriteName": "IconBrownSpeedUpClock01",
+			"isWeaponBuff": true
+		},
+		"HasteUp5AtLeast2BurningOrSleepingInBattle": {
+			"class": "Buff",
+			"behaviors": ["StatOnly"],
+			"behaviorOverrides": [{
+				"conditions": "AtLeast4BurningOrSleepingInBattle",
+				"flatStatBonuses": {
+					"Haste": -87
+				}
+			}],
+			"duration": -1,
+			"showAsTimer": false,
+			"noIconShownOnBattleStatus": true,
+			"iconSpriteName": "IconBrownSpeedUpClock01",
+			"isWeaponBuff": true
+		},
+		"HasteUp6AtLeast2BurningOrSleepingInBattle": {
+			"class": "Buff",
+			"behaviors": ["StatOnly"],
+			"behaviorOverrides": [{
+				"conditions": "AtLeast4BurningOrSleepingInBattle",
+				"flatStatBonuses": {
+					"Haste": -111
+				}
+			}],
+			"duration": -1,
+			"showAsTimer": false,
+			"noIconShownOnBattleStatus": true,
+			"iconSpriteName": "IconBrownSpeedUpClock01",
+			"isWeaponBuff": true
+		},
+		"WhiteRabbitPassiveAAliceNew":{
+			"class": "Buff",
+			"stackName": "WhiteRabbitPassiveAAliceNew",
+			"behaviors": ["EnterBattleBuff","BlockDeath","BuffOnMonsterTurn","StunImmunityIfAnyUnitIsFireOrBurnBlastOrBurnForceFallback"],
+			"behaviorOverrides": [{
+				"sourceBuffs": ["BrideHeal100PercentWhenHurtAliceNewFor50TU","Charged1Icon","Charged2Icon","Charged3Icon","StunImmunityIfAnyUnitIsFireOrBurnBlastOrBurnForce","DisableFallBackImmunity"]
+			},{
+				"blockDeathFromDamageFlags": ["Burn"]
+			},{
+				"selfBuffs": ["KnockbackImmunityOneTurn"],
+				"sameTeam": false,
+				"activeMonsterConditions": "AlwaysTrue"
+			},{}],
+			"duration": -1,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true,
+			"noIconShownOnBattleStatus": true,
+			"tags": ["DontTargetMePeachGirl"],
+			"iconSpriteName": "IconRedHoldGroundBurn01"
+		},
+		"BrideHeal100PercentWhenHurtAliceNewFor50TU":{
+			"class": "Buff",
+			"stackName": "BrideHeal100PercentWhenHurtAliceNewFor50TU",
+			"behaviors": ["BuffWhenMonsterHurt","BuffOnMonsterTurnEnd"],
+			"behaviorOverrides": [{
+				"selfBuffs": ["BrideHealOK"],
+				"cancelFromDamageTypes": ["BuffDamage"]
+			},{
+				"selfBuffs": ["BrideHeal100PercentAliceNew"],
+				"activeMonsterConditions": "NotAlwaysMyTurn",
+				"spreadCondition": "BrideHealReady"
+			}],
+			"duration": 50,
+			"isHiddenFromPlayers": true,
+			"showAsPermanent": false,
+			"showAsTimer": false
+		},
+		"BrideHeal100PercentAliceNew": {
+			"class": "Buff",
+			"behaviors": ["AdjustHp", "RemoveBuffs"],
+			"behaviorOverrides": [{
+				"percent": 1.0,
+				"abilityEffect": "Blank",
+				"hpboosts": [
+					"HealBoost"
+				]
+			}, {
+				"name": "BrideHealOK"
+			}],
+			"duration": 0,
+			"effectToShowWhenApplied": "LargeHeal1",
+			"textKeyToShowWhenApplied": "HealDoubleANameKey",
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
+		"SleepyPassiveAAliceNew": {
+			"class": "Buff",
+			"stackName": "SleepyPassiveAAliceNew",
+			"behaviors": ["EnterBattleBuff","EnterBattleBuff","EnterBattleBuff","EnterBattleBuff","BuffOnMonsterTurn"],
+			"behaviorOverrides": [{
+				"sourceBuffs": ["HoldGround","SleepImmunityOnce","PoisonImmunityOnce","InstantKillImmunityOnce","FortifyFor3Attacks","AliceNewEnchantmentLv1","AliceNewEnchantmentLv2","AliceNewEnchantmentLv3","AliceNewEnchantmentLv4","AliceNewEnchantmentLv5"]
+			},{
+				"enemyBuffs": ["RemoveSleepImmunityOnce","RemoveStealthShieldOnce","RemoveBurn"],
+				"spreadCondition": "BattleTimeOver1OrAnyDeadMonster"
+			},{
+				"selfAbilityEffect": "Blank",
+				"randomEnemyBuffs": ["ColdSleepForced100TU"],
+				"numRandomToBuff": 1,
+				"spreadCondition": "BattleTimeOver1OrAnyDeadMonsterNotSleeping",
+				"randomTargetingMonsterRanker": "ActingLatest"
+			},{
+				"selfAbilityEffect": "Blank",
+				"randomEnemyBuffs": ["ColdSleepForced100TU"],
+				"numRandomToBuff": 1,
+				"spreadCondition": "BattleTimeOver1OrAnyDeadMonsterNotSleeping",
+				"randomTargetingMonsterRanker": "ActingSoonest"
+			},{
+				"selfBuffs": ["QuarterHeal"],
+				"activeMonsterConditions": "IsBurningOrSleeping"
+			}],
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"duration": -1
+		},
+		"AliceNewEnchantmentLv1":{
+				"class": "Buff",
+				"stackName": "AliceNewEnchantment",
+				"behaviors": ["BuffOnMonsterTurnEnd"],
+				"behaviorOverrides": [{
+					"randomEnemyBuffs": ["ColdSleepForced100TU","AliceNewTriggerEnchantmentFXBuff"],
+					"numRandomToBuff": 1,
+					"activeMonsterConditions": "NoSleepingAllies20PercentChance",
+					"sameTeam": false
+				}],
+			"duration": -1,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true,
+			"applyConditions": "HasNoAwakening"
+		},
+		"AliceNewEnchantmentLv2":{
+				"class": "Buff",
+				"stackName": "AliceNewEnchantment",
+				"behaviors": ["BuffOnMonsterTurnEnd"],
+				"behaviorOverrides": [{
+					"randomEnemyBuffs": ["ColdSleepForced100TU","AliceNewTriggerEnchantmentFXBuff"],
+					"numRandomToBuff": 1,
+					"activeMonsterConditions": "NoSleepingAllies40PercentChance",
+					"sameTeam": false
+				}],
+			"duration": -1,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true,
+			"applyConditions": "Has1AwakeningExact"
+		},
+		"AliceNewEnchantmentLv3":{
+				"class": "Buff",
+				"stackName": "AliceNewEnchantment",
+				"behaviors": ["BuffOnMonsterTurnEnd"],
+				"behaviorOverrides": [{
+					"randomEnemyBuffs": ["ColdSleepForced100TU","AliceNewTriggerEnchantmentFXBuff"],
+					"numRandomToBuff": 1,
+					"activeMonsterConditions": "NoSleepingAllies60PercentChance",
+					"sameTeam": false
+				}],
+			"duration": -1,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true,
+			"applyConditions": "Has2AwakeningsExact"
+		},
+		"AliceNewEnchantmentLv4":{
+				"class": "Buff",
+				"stackName": "AliceNewEnchantment",
+				"behaviors": ["BuffOnMonsterTurnEnd"],
+				"behaviorOverrides": [{
+					"randomEnemyBuffs": ["ColdSleepForced100TU","AliceNewTriggerEnchantmentFXBuff"],
+					"numRandomToBuff": 1,
+					"activeMonsterConditions": "NoSleepingAllies80PercentChance",
+					"sameTeam": false
+				}],
+			"duration": -1,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true,
+			"applyConditions": "Has3AwakeningsExact"
+		},
+		"AliceNewEnchantmentLv5":{
+				"class": "Buff",
+				"stackName": "AliceNewEnchantment",
+				"behaviors": ["BuffOnMonsterTurnEnd"],
+				"behaviorOverrides": [{
+					"randomEnemyBuffs": ["ColdSleepForced100TU","AliceNewTriggerEnchantmentFXBuff"],
+					"numRandomToBuff": 1,
+					"activeMonsterConditions": "NoSleepingAllies",
+					"sameTeam": false
+				}],
+			"duration": -1,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true,
+			"applyConditions": "Has4Awakenings"
+		},
+		"AliceNewTriggerEnchantmentFXBuff": {
 			"class": "Buff",
 			"isHiddenFromPlayers": true,
+			"stackName": "AliceNewTriggerEnchantmentFXBuff",
 			"duration": 0,
-			"effectToShowWhenApplied": "CupidInstantdeath1",
+			"effectToShowWhenApplied": "SleepBuffInstant",
+			"textKeyToShowWhenApplied": "SleepyPassiveAAliceNewNameKey",
 			"showAsTimer": false,
 			"showAsPermanent": false
 		},
-		"Active3LOCKCupidRegularBoss":{
+		"NextMoveIsGodModeAliceNew": {
 			"class": "Buff",
-			"stackName": "Active3LOCKCupidRegular",
+			"stackName": "NextMoveIsGodModeAliceNew",
 			"duration": -1,
 			"isHiddenFromPlayers": true,
 			"showAsPermanent": false,
 			"showAsTimer": false
 		},
-		"RemoveActive3LOCKCupidRegularBoss": {
+		"RemoveNextMoveIsGodModeAliceNew": {
 			"class": "Buff",
 			"behaviors": ["RemoveBuffs"],
 			"behaviorOverrides": [{
-				"name": "Active3LOCKCupidRegular"
+				"name": "NextMoveIsGodModeAliceNew"
 			}],
 			"duration": 0,
 			"showAsTimer": false,
 			"isHiddenFromPlayers": true
+		},
+		"AliceNewActive2Cooldown50": {
+			"class": "Buff",
+			"stackName": "InstantCooldown",
+			"duration": 50,
+			"isHiddenFromPlayers": false,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"iconSpriteName": "IconBlueCountdownClock3Numbered02"
+		},
+		"AliceNewActive3Cooldown50": {
+			"class": "Buff",
+			"stackName": "InstantCooldown2",
+			"duration": 50,
+			"isHiddenFromPlayers": false,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"iconSpriteName": "IconBlueCountdownClock3Numbered03"
 		}
     }
 }
