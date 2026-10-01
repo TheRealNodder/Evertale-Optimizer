@@ -1,6 +1,6 @@
 {
 	"Version": 23,
-	"Time": 1789621903,
+	"Time": 1790820625,
 	"Buff": {
 	"RelationshipFlatAttack50": {
 		"class": "Buff",
@@ -91939,10 +91939,9 @@
 			"stackName": "StakeInHandPassiveVanHelsingRegular",
 			"behaviors": ["EnterBattleBuff","EnterBattleBuff","BuffOnMonsterTurn","BuffOnMonsterTurn","BuffWhenMonstersDie","BuffWhenMonstersDie","BuffWhenMonstersDie","BuffWhenMonstersDie"],
 			"behaviorOverrides": [{
-				"selfBuffs": ["KnockbackImmunity","Active3LOCKVanHelsingRegularBoss","Active4LOCKVanHelsingRegularBoss"]
+				"selfBuffs": ["KnockbackImmunity","Active3LOCKVanHelsingRegularBoss","Active4LOCKVanHelsingRegularBoss","ImmunityFromSleepVanHelsingRegular","ImmunityFromPoisonVanHelsingRegular","StunImmunityVanHelsingRegular"]
 			},{
-				"randomAllyBuffs": ["ImmunityFromSleepUntilNextTurn","ImmunityFromPoisonUntilFirstTurn","StunImmunityUntilNextTurnGenericTitle"],
-				"numRandomToBuff": 4
+				"allAlliesButSelfBuffs": ["ImmunityFromSleepUntilNextTurn","ImmunityFromPoisonUntilFirstTurn","StunImmunityUntilNextTurnGenericTitle"]
 			},{
 				"randomEnemyBuffs": ["MarkedEnemyVanHelsingRegularBoss"],
 				"numRandomToBuff": 4,
@@ -92033,7 +92032,7 @@
 			"behaviorOverrides": [{
 				"selfBuffs": ["HoldGroundBoss","BrideHealFor100TUVanHelsingRegularBoss","Charged1Icon","Charged2Icon","Charged3Icon"]
 			},{
-				"selfBuffs": ["PoisonImmunityFor50TU","SleepImmunityFor50TU","StunImmunityFor50TU","VanHelsingRegularBossFirstTurnLock"],
+				"selfBuffs": ["RemoveImmunitiesFromVanHelsingRegular","PoisonImmunityFor50TU","SleepImmunityFor50TU","StunImmunityFor50TU","VanHelsingRegularBossFirstTurnLock"],
 				"spreadCondition": "IsNotVanHelsingRegularFirstTurnLock"
 			},{
 				"percent": 0.65,
@@ -92797,10 +92796,9 @@
 			"stackName": "StakeInHandPassiveVanHelsingRegular",
 			"behaviors": ["EnterBattleBuff","EnterBattleBuff","BuffOnMonsterTurn","BuffOnMonsterTurn","BuffWhenMonstersDie","BuffWhenMonstersDie","BuffWhenMonstersDie","BuffWhenMonstersDie"],
 			"behaviorOverrides": [{
-				"selfBuffs": ["KnockbackImmunity","Active3LOCKVanHelsingRegular","Active4LOCKVanHelsingRegular"]
+				"selfBuffs": ["KnockbackImmunity","Active3LOCKVanHelsingRegular","Active4LOCKVanHelsingRegular","ImmunityFromSleepVanHelsingRegular","ImmunityFromPoisonVanHelsingRegular","StunImmunityVanHelsingRegular"]
 			},{
-				"randomAllyBuffs": ["ImmunityFromSleepUntilNextTurn","ImmunityFromPoisonUntilFirstTurn","StunImmunityUntilNextTurnGenericTitle"],
-				"numRandomToBuff": 4
+				"allAlliesButSelfBuffs": ["ImmunityFromSleepUntilNextTurn","ImmunityFromPoisonUntilFirstTurn","StunImmunityUntilNextTurnGenericTitle"]
 			},{
 				"randomEnemyBuffs": ["MarkedEnemyVanHelsingRegular"],
 				"numRandomToBuff": 4,
@@ -92833,6 +92831,59 @@
 			"showAsPermanent": false,
 			"isHiddenFromPlayers": true,
 			"duration": -1
+		},
+		"ImmunityFromSleepVanHelsingRegular":{
+			"class": "Buff",
+			"stackName": "ImmunityFromSleepVanHelsingRegular",
+			"behaviors": ["Immunity"],
+			"behaviorOverrides": [{
+				"stackNamesToBlock": ["Sleep"]
+			}],
+			"showAsPermanent": false,
+			"showAsTimer": true,
+			"duration": -1,
+			"tags": ["SleepImmune"],
+			"iconSpriteName": "IconRedSleepInvalidZs01"
+		},
+		"ImmunityFromPoisonVanHelsingRegular":{
+			"class": "Buff",
+			"stackName": "ImmunityFromPoisonVanHelsingRegular",
+			"behaviors": ["Immunity"],
+			"behaviorOverrides": [{
+				"stackNamesToBlock": ["Poison"]
+			}],
+			"showAsPermanent": false,
+			"showAsTimer": true,
+			"duration": -1,
+			"tags": ["PoisonImmune"],
+			"iconSpriteName": "IconRedPoisonInvalid01"
+		},
+		"StunImmunityVanHelsingRegular": {
+			"class": "Buff",
+			"stackName": "StunImmunityVanHelsingRegular",
+			"behaviors": ["Immunity"],
+			"behaviorOverrides": [{
+				"stackNamesToBlock": ["Stun","StunNoAbsorb"]
+			}],
+			"iconSpriteName": "IconRedStunInvalidLightning01",
+			"tags": ["StunImmuneTemp"],
+			"duration": -1,
+			"showAsTimer": true,
+			"showAsPermanent": false
+		},
+		"RemoveImmunitiesFromVanHelsingRegular": {
+			"class": "Buff",
+			"behaviors": ["RemoveBuffs","RemoveBuffs","RemoveBuffs"],
+			"behaviorOverrides": [{
+				"name": "ImmunityFromSleepVanHelsingRegular"
+			},{
+				"name": "ImmunityFromPoisonVanHelsingRegular"
+			},{
+				"name": "StunImmunityVanHelsingRegular"
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
 		},
 		"MarkedEnemyVanHelsingRegular":{
 			"class": "Buff",
@@ -92891,7 +92942,7 @@
 			"behaviorOverrides": [{
 				"selfBuffs": ["HoldGround","InstantKillImmunityOnce","BrideHealFor100TUVanHelsingRegular","Charged1Icon","Charged2Icon","Charged3Icon"]
 			},{
-				"selfBuffs": ["PoisonImmunityFor50TU","SleepImmunityFor50TU","StunImmunityFor50TU","VanHelsingRegularFirstTurnLock"],
+				"selfBuffs": ["RemoveImmunitiesFromVanHelsingRegular","PoisonImmunityFor50TU","SleepImmunityFor50TU","StunImmunityFor50TU","VanHelsingRegularFirstTurnLock"],
 				"spreadCondition": "IsNotVanHelsingRegularFirstTurnLock"
 			},{
 				"percent": 0.65,
@@ -93941,7 +93992,7 @@
 			"showAsTimer": false,
 			"isHiddenFromPlayers": true
 		},
-	    "CupidRegularInstantDeathFXBuff": {
+        "CupidRegularInstantDeathFXBuff": {
             "class": "Buff",
             "isHiddenFromPlayers": true,
             "duration": 0,
@@ -93966,8 +94017,8 @@
             "duration": 0,
             "showAsTimer": false,
             "isHiddenFromPlayers": true
-        },    
-		"HasteUp4AtLeast2BurningOrSleepingInBattle": {
+        },
+		"HasteUp4AtLeast4BurningOrSleepingInBattle": {
 			"class": "Buff",
 			"behaviors": ["StatOnly"],
 			"behaviorOverrides": [{
@@ -93982,7 +94033,7 @@
 			"iconSpriteName": "IconBrownSpeedUpClock01",
 			"isWeaponBuff": true
 		},
-		"HasteUp5AtLeast2BurningOrSleepingInBattle": {
+		"HasteUp5AtLeast4BurningOrSleepingInBattle": {
 			"class": "Buff",
 			"behaviors": ["StatOnly"],
 			"behaviorOverrides": [{
@@ -93997,7 +94048,7 @@
 			"iconSpriteName": "IconBrownSpeedUpClock01",
 			"isWeaponBuff": true
 		},
-		"HasteUp6AtLeast2BurningOrSleepingInBattle": {
+		"HasteUp6AtLeast4BurningOrSleepingInBattle": {
 			"class": "Buff",
 			"behaviors": ["StatOnly"],
 			"behaviorOverrides": [{
@@ -94222,6 +94273,320 @@
 			"showAsTimer": true,
 			"showAsPermanent": false,
 			"iconSpriteName": "IconBlueCountdownClock3Numbered03"
+		},
+		"AttackUp4TargetIsBurning": {
+			"class": "Buff",
+			"behaviors": ["ExtraAttackScalor"],
+			"behaviorOverrides": [{
+				"targetCondition": "IsBurning",
+				"scalor": 0.07
+			}],
+			"iconSpriteName": "IconYellowAttackUpSword01",
+			"noIconShownOnBattleStatus": true,
+			"duration": -1,
+			"showAsTimer": false,
+			"isWeaponBuff": true
+		},
+		"AttackUp5TargetIsBurning": {
+			"class": "Buff",
+			"behaviors": ["ExtraAttackScalor"],
+			"behaviorOverrides": [{
+				"targetCondition": "IsBurning",
+				"scalor": 0.1
+			}],
+			"iconSpriteName": "IconYellowAttackUpSword01",
+			"noIconShownOnBattleStatus": true,
+			"duration": -1,
+			"showAsTimer": false,
+			"isWeaponBuff": true
+		},
+		"AttackUp6TargetIsBurning": {
+			"class": "Buff",
+			"behaviors": ["ExtraAttackScalor"],
+			"behaviorOverrides": [{
+				"targetCondition": "IsBurning",
+				"scalor": 0.15
+			}],
+			"iconSpriteName": "IconYellowAttackUpSword01",
+			"noIconShownOnBattleStatus": true,
+			"duration": -1,
+			"showAsTimer": false,
+			"isWeaponBuff": true
+		},
+		"RoyalDecreePassiveAQueenHeartsRegular":{
+			"class": "Buff",
+			"stackName": "RoyalDecreePassiveAQueenHeartsRegular",
+			"behaviors": ["EnterBattleBuff","EnterBattleBuff","BuffWhenMonsterHurt","ModifyDamage"],
+			"behaviorOverrides": [{
+				"selfBuffs": ["KnockbackImmunity","HoldGround","FortifyFor3Attacks","Active3LOCKQueenHeartsRegular"]
+			},{
+				"allAlliesButSelfBuffs": ["FortifyFor3Attacks"],
+				"spreadCondition": "IsFireOrWater"
+			},{
+				"selfBuffs": ["PsuedoTurnQueenHeartsRegular"],
+				"cancelFromDamageTypes": ["BuffDamage"],
+				"spreadCondition": "IsPoisonedOrBurning"
+			},{
+				"percent": 0.20,
+				"cancelFromDamageTypes": ["BuffDamage", "Poison", "Burn"],
+				"cancelFromDamageFlags": ["Sneak", "IgnoreArmor"],
+				"conditions": "AllEnemiesIsBurningOrSleeping"
+			}],
+			"duration": -1,
+			"showAsPermanent": false,
+			"showAsTimer": true,
+			"isHiddenFromPlayers": true,
+			"tags": ["GoodToBurn","BigDamageMinus"],
+			"iconSpriteName": "IconPurpleDamageMinus01"
+		},
+		"PsuedoTurnQueenHeartsRegular": {
+			"class": "Buff",
+			"behaviors": ["BuffOnMonsterTurnEnd"],
+			"behaviorOverrides": [{
+				"selfBuffs": ["PseudoGetTurn","OnExtraTurn","JustGivenTurn","Burn"],
+				"activeMonsterConditions": "AlwaysTrue",
+				"spreadCondition": "MoreThan1HP"
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"noIconShownOnBattleStatus": true
+		},
+		"OffWithTheirHeadsPassiveAQueenHeartsRegular": {
+			"class": "Buff",
+			"stackName": "OffWithTheirHeadsPassiveAQueenHeartsRegular",
+			"behaviors": ["BlockDeath","BuffOnMonsterTurn","EnterBattleBuff","BuffOnMonsterTurn","BuffWhenMonstersDie","BuffWhenMonstersDie","BuffWhenMonstersDie"],
+			"behaviorOverrides": [{
+				"blockDeathFromDamageFlags": ["Burn"]
+			},{
+				"selfBuffs": ["BlockGiveTurnImmunityOneTurn"],
+				"spreadCondition": "IsNotBlockTurn"
+			},{
+				"selfBuffs": ["InstantKillImmunityOnce","MegaHealingBurn","RemoveMegaHealingBurnApplyHealingBurn","StunImmunityOnce","PoisonImmunityOnce"],
+				"allyBuffs": ["StunImmunityOnce","PoisonImmunityOnce"]
+			},{
+				"contextBuffs": ["20PercentHealWithSpiritGainDEndOfTurnQueenHearts"],
+				"sameTeam": true,
+				"activeMonsterConditions": "IsBurning"
+			},{
+				"randomAllyBuffs": ["RemoveBuffs","Burn"],
+				"numRandomToBuff": 4,
+				"deadMonsterConditions": "IsFireOrWaterNotTransformingOrMirage"
+			},{
+				"sourceBuffs": ["GrantAllOtherAlliesPseudoTurnEBB","FudgeUsed"],
+				"sameTeam": false,
+				"spreadCondition": "KillsMoreThanSkillUsed",
+				"deadMonsterConditions": "IsNotSummonedOrTransformingOrMirage"
+			},{
+				"sourceBuffs": ["FudgeUsedAtEndOfTurn"],
+				"sameTeam": false,
+				"spreadCondition": "KillsMoreThanSkillUsed"
+			}],
+			"duration": -1,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true,
+			"noIconShownOnBattleStatus": true,
+			"tags": ["MegaHealingBurnPassiveTag"],
+			"iconSpriteName": "IconRedHoldGroundBurn01"
+		},
+		"20PercentHealWithSpiritGainDEndOfTurnQueenHearts": {
+			"class": "Buff",
+			"behaviors": ["AdjustHp", "BuffOnMonsterTurnEnd"],
+			"behaviorOverrides": [{
+				"percent": 0.2,
+				"abilityEffect": "Blank",
+				"hpboosts": [
+					"HealBoost"
+				]
+			},{
+				"sourceBuffs": ["SpiritGainDIdolFX"]
+			}],
+			"duration": 0,
+			"effectToShowWhenApplied": "BurnHealQueenHearts1",
+			"textKeyToShowWhenApplied": "OffWithTheirHeadsPassiveAQueenHeartsRegularNameKey",
+			"showAsPermanent": false,
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
+		"MarkedQueenHeartsRegular":{
+			"class": "Buff",
+			"stackName": "MarkedQueenHeartsRegular",
+			"duration": 0,
+			"isHiddenFromPlayers": true,
+			"showAsPermanent": false,
+			"showAsTimer": false
+		},
+		"ReduceTUEndDisableQueenHeartsRegularEBB":{
+			"class": "Buff",
+			"behaviors": ["EnterBattleBuff"],
+			"behaviorOverrides": [{
+				"randomAllyBuffs": ["TUMinus50","RemoveBlockGiveTurn"],
+				"numRandomToBuff": 4,
+				"spreadCondition": "IsBurningNotMarkedQueenHeartsRegular"
+			}],
+			"duration": 0,
+			"isHiddenFromPlayers": true,
+			"showAsPermanent": false,
+			"showAsTimer": false
+		},
+		"AwakeningLevel1QueenHeartsRegularEBB":{
+			"class": "Buff",
+			"behaviors": ["EnterBattleBuff","EnterBattleBuff"],
+			"behaviorOverrides": [{
+				"randomEnemyBuffs": ["ENEMYMarkedQueenHeartsRegularLV1"],
+				"numRandomToBuff": 4,
+				"spreadCondition": "IsBurning"
+			},{
+				"randomEnemyBuffs": ["NoTurnsFor30TUQueenHeartsRegularV1"],
+				"numRandomToBuff": 4,
+				"spreadCondition": "IsENEMYMarkedQueenHeartsRegular"
+			}],
+			"duration": 0,
+			"isHiddenFromPlayers": true,
+			"showAsPermanent": false,
+			"showAsTimer": false,
+			"applyConditions": "HasNoAwakening"
+		},
+		"ENEMYMarkedQueenHeartsRegularLV1":{
+			"class": "Buff",
+			"stackName": "ENEMYMarkedQueenHeartsRegular",
+			"duration": 0,
+			"isHiddenFromPlayers": true,
+			"showAsPermanent": false,
+			"showAsTimer": false,
+			"applyConditions": "20PercentChance"
+		},
+		"AwakeningLevel2QueenHeartsRegularEBB":{
+			"class": "Buff",
+			"behaviors": ["EnterBattleBuff","EnterBattleBuff"],
+			"behaviorOverrides": [{
+				"randomEnemyBuffs": ["ENEMYMarkedQueenHeartsRegularLV2"],
+				"numRandomToBuff": 4,
+				"spreadCondition": "IsBurning"
+			},{
+				"randomEnemyBuffs": ["NoTurnsFor30TUQueenHeartsRegularV1"],
+				"numRandomToBuff": 4,
+				"spreadCondition": "IsENEMYMarkedQueenHeartsRegular"
+			}],
+			"duration": 0,
+			"isHiddenFromPlayers": true,
+			"showAsPermanent": false,
+			"showAsTimer": false,
+			"applyConditions": "Has1AwakeningExact"
+		},
+		"ENEMYMarkedQueenHeartsRegularLV2":{
+			"class": "Buff",
+			"stackName": "ENEMYMarkedQueenHeartsRegular",
+			"duration": 0,
+			"isHiddenFromPlayers": true,
+			"showAsPermanent": false,
+			"showAsTimer": false,
+			"applyConditions": "40PercentChance"
+		},
+		"AwakeningLevel3QueenHeartsRegularEBB":{
+			"class": "Buff",
+			"behaviors": ["EnterBattleBuff","EnterBattleBuff"],
+			"behaviorOverrides": [{
+				"randomEnemyBuffs": ["ENEMYMarkedQueenHeartsRegularLV3"],
+				"numRandomToBuff": 4,
+				"spreadCondition": "IsBurning"
+			},{
+				"randomEnemyBuffs": ["NoTurnsFor30TUQueenHeartsRegularV1"],
+				"numRandomToBuff": 4,
+				"spreadCondition": "IsENEMYMarkedQueenHeartsRegular"
+			}],
+			"duration": 0,
+			"isHiddenFromPlayers": true,
+			"showAsPermanent": false,
+			"showAsTimer": false,
+			"applyConditions": "Has2AwakeningsExact"
+		},
+		"ENEMYMarkedQueenHeartsRegularLV3":{
+			"class": "Buff",
+			"stackName": "ENEMYMarkedQueenHeartsRegular",
+			"duration": 0,
+			"isHiddenFromPlayers": true,
+			"showAsPermanent": false,
+			"showAsTimer": false,
+			"applyConditions": "60PercentChance"
+		},
+		"AwakeningLevel4QueenHeartsRegularEBB":{
+			"class": "Buff",
+			"behaviors": ["EnterBattleBuff","EnterBattleBuff"],
+			"behaviorOverrides": [{
+				"randomEnemyBuffs": ["ENEMYMarkedQueenHeartsRegularLV4"],
+				"numRandomToBuff": 4,
+				"spreadCondition": "IsBurning"
+			},{
+				"randomEnemyBuffs": ["NoTurnsFor30TUQueenHeartsRegularV1"],
+				"numRandomToBuff": 4,
+				"spreadCondition": "IsENEMYMarkedQueenHeartsRegular"
+			}],
+			"duration": 0,
+			"isHiddenFromPlayers": true,
+			"showAsPermanent": false,
+			"showAsTimer": false,
+			"applyConditions": "Has3AwakeningsExact"
+		},
+		"ENEMYMarkedQueenHeartsRegularLV4":{
+			"class": "Buff",
+			"stackName": "ENEMYMarkedQueenHeartsRegular",
+			"duration": 0,
+			"isHiddenFromPlayers": true,
+			"showAsPermanent": false,
+			"showAsTimer": false,
+			"applyConditions": "80PercentChance"
+		},
+		"AwakeningLevel5QueenHeartsRegularEBB":{
+			"class": "Buff",
+			"behaviors": ["EnterBattleBuff"],
+			"behaviorOverrides": [{
+				"randomEnemyBuffs": ["NoTurnsFor30TUQueenHeartsRegularV1"],
+				"numRandomToBuff": 4,
+				"spreadCondition": "IsBurning"
+			}],
+			"duration": 0,
+			"isHiddenFromPlayers": true,
+			"showAsPermanent": false,
+			"showAsTimer": false,
+			"applyConditions": "Has4Awakenings"
+		},
+		"Active3LOCKQueenHeartsRegular":{
+			"class": "Buff",
+			"stackName": "Active3LOCKQueenHeartsRegular",
+			"duration": -1,
+			"isHiddenFromPlayers": true,
+			"showAsPermanent": false,
+			"showAsTimer": false
+		},
+		"RemoveActive3LOCKQueenHeartsRegular": {
+			"class": "Buff",
+			"behaviors": ["RemoveBuffs"],
+			"behaviorOverrides": [{
+				"name": "Active3LOCKQueenHeartsRegular"
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
+		"QueenHeartsRegularActive2Cooldown50": {
+			"class": "Buff",
+			"stackName": "InstantCooldown2",
+			"duration": 50,
+			"isHiddenFromPlayers": false,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"iconSpriteName": "IconBlueCountdownClock3Numbered02"
+		},
+		"QueenHeartsRegularActive4Cooldown50": {
+			"class": "Buff",
+			"stackName": "InstantCooldown",
+			"duration": 50,
+			"isHiddenFromPlayers": false,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"iconSpriteName": "IconBlueCountdownClock3Numbered04"
 		}
     }
 }
