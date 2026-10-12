@@ -1,0 +1,1223 @@
+{
+  "schemaVersion": 3,
+  "order": 764,
+  "id": "cupid",
+  "sourceId": "CupidRegular01",
+  "name": "Cupid",
+  "title": "Sorceress of True Love",
+  "secondName": "Sorceress of True Love",
+  "description": "Whenever she senses love in the air, Cupid comes flying, forgetting all about time and place. Declarations of love, gushing about a lover, and lovers' quarrels—they all carry the sweetest scent of romance. Even now, whenever she hears someone's heart begin to race, Cupid will appear with the soft flutter of her wings.",
+  "category": "character",
+  "rarity": "SSR",
+  "stars": 5,
+  "evolvedStars": 6,
+  "element": "Light",
+  "weaponType": "Mace",
+  "stats": {
+    "atk": 1069,
+    "hp": 5865,
+    "spd": 526,
+    "cost": 28
+  },
+  "hp": 5865,
+  "atk": 1069,
+  "spd": 526,
+  "cost": 28,
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/CupidRegular01.png",
+  "imageVariants": [
+    {
+      "state": "source",
+      "family": "CupidRegular",
+      "form": 1,
+      "sourceId": "CupidRegular01",
+      "image": "https://ik.imagekit.io/r8fsa98s9/characters/CupidRegular01.png"
+    }
+  ],
+  "forms": [
+    {
+      "state": "source",
+      "family": "CupidRegular",
+      "form": 1,
+      "sourceId": "CupidRegular01",
+      "image": "https://ik.imagekit.io/r8fsa98s9/characters/CupidRegular01.png"
+    }
+  ],
+  "activeSkills": [
+    "SingleAttackACupidRegular",
+    "AllyBuffACupidRegular",
+    "MultiBuffACupidRegular"
+  ],
+  "passiveSkills": [
+    "MatchMakerPassiveACupidRegular",
+    "AngelOfLovePassiveACupidRegular",
+    "PlusAttackBoostLv3",
+    "PlusHPBoostLv3",
+    "SwordMinusDamageLv3",
+    "AddWeaponPrefAxe"
+  ],
+  "leaderSkills": [
+    "HPUpLifeD"
+  ],
+  "refs": {
+    "activeSkills": [
+      "SingleAttackACupidRegular",
+      "AllyBuffACupidRegular",
+      "MultiBuffACupidRegular"
+    ],
+    "passives": [
+      "MatchMakerPassiveACupidRegular",
+      "AngelOfLovePassiveACupidRegular",
+      "PlusAttackBoostLv3",
+      "PlusHPBoostLv3",
+      "SwordMinusDamageLv3",
+      "AddWeaponPrefAxe"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": "HPUpLifeD",
+    "leaderBuffCondition": "IsLife",
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "SingleAttackACupidRegular": {
+        "id": "SingleAttackACupidRegular",
+        "found": true,
+        "localization": {
+          "name": "Hurt Feelings",
+          "description": "400% damage to 1 enemy. 800% damage instead if the target has not left the battlefield since damaging an ally with an attack while an ally \"Cupid, Sorceress of True Love\" was on the battlefield. This attack ignores skin passive skills and the Counter Stance status effect.\n\nThe user is granted a Sleep Ward, and Poison Ward. Each Ward prevents their named effect from being applied once, then is removed. Identical Wards cannot stack.",
+          "selected": "400%+ damage, grants user wards"
+        },
+        "ability": {
+          "name": "SingleAttackACupidRegular",
+          "class": "Ability",
+          "abilityScalor": 3,
+          "conditionalAbilityScalors": [
+            7
+          ],
+          "config": "SingleAttackACupidRegular",
+          "tuCost": 50,
+          "useLimit": 0,
+          "spiritGain": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageFlags": [
+                "DoNotWake",
+                "IgnoreSkin",
+                "IgnoreArmor",
+                "HardIgnoreBlockDeath"
+              ],
+              "applyToTargetType": "Enemy",
+              "drainPercent": 1.0,
+              "drainEffect": "MerlinSelfHeal1"
+            },
+            {
+              "buffs": [
+                "PoisonImmunityOnce",
+                "SleepImmunityOnce",
+                "RemoveActive3LOCKCupidRegular",
+                "GoodGirlBuffCounter"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "CupidAttack",
+          "attackScalors": [
+            "GoodVsICantBelieveYouHitMeBuff"
+          ],
+          "conditionedAbilityEffects": [
+            "CupidAttack",
+            "CupidAttack"
+          ],
+          "recommendEffectWhenUsable": -1
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.4,
+            0,
+            0.3,
+            0.35,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_timestrike1",
+            "batfx_YandereBallet/batfx_tailwindPink",
+            "batfx_YandereBallet/batfx_quickchargePink1",
+            "batsfx_prefab/batsfx_ring1",
+            "batfx_Cupid/batfx_throwparticlePink1",
+            "batfx_impact1/batfx_impact1",
+            "batsfx_prefab/batsfx_spiritgain1",
+            "batfx_Cupid/batfx_CupidLoveWave1",
+            "batfx_KirinGirl/batfx_spearcombo1",
+            "batfx_Cupid/batfx_CupidArrow2",
+            "batfx_Cupid/batfx_CupidArrow1",
+            "batfx_jeannevalentine1/batfx_jv_heartsimpact2"
+          ],
+          "sortOrderOffset": [
+            -2,
+            -100,
+            3,
+            3,
+            3,
+            2,
+            -2,
+            2,
+            2,
+            2,
+            -2,
+            -2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle2"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            false,
+            true,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "isProjectileFX": [
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "projectileFlightDuration": [
+            0,
+            0,
+            0,
+            0,
+            0.35,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "projectileStartOffsetX": [
+            0,
+            0,
+            0,
+            0,
+            100,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "projectileStartOffsetY": [
+            0,
+            0,
+            0,
+            0,
+            155,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "projectileShouldTargetTeamEffectPosition": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "GoodGirlBuffCounter": {
+            "class": "Buff",
+            "stackName": "GoodGirlBuffCounter",
+            "stackLimit": 5,
+            "duration": -1,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "noIconShownOnBattleStatus": true,
+            "isHiddenFromPlayers": true
+          },
+          "PoisonImmunityOnce": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity"
+            ],
+            "stackName": "PoisonImmunityOnce",
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Poison"
+                ],
+                "useLimit": 1
+              }
+            ],
+            "duration": -1,
+            "showAsTimer": true,
+            "tags": [
+              "PoisonImmuneTemp",
+              "ThisIsAWard"
+            ],
+            "iconSpriteName": "IconRedPoisonInvalid01"
+          },
+          "RemoveActive3LOCKCupidRegular": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "Active3LOCKCupidRegular"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "SleepImmunityOnce": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity"
+            ],
+            "stackName": "SleepImmunityOnce",
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Sleep"
+                ],
+                "useLimit": 1
+              }
+            ],
+            "duration": -1,
+            "showAsTimer": true,
+            "tags": [
+              "SleepImmuneTemp",
+              "ThisIsAWard"
+            ],
+            "iconSpriteName": "IconRedSleepInvalidZs01"
+          }
+        },
+        "attackScalors": {
+          "GoodVsICantBelieveYouHitMeBuff": {
+            "class": "AttackScalor",
+            "targetCondition": "IsICantBelieveYouHitMeBuff"
+          }
+        },
+        "conditions": {}
+      },
+      "AllyBuffACupidRegular": {
+        "id": "AllyBuffACupidRegular",
+        "found": true,
+        "localization": {
+          "name": "Restore Cupid's Link",
+          "description": "Grants Cupid's Link for 50TU to another random non-conjured ally that does not already have a Link.\n\nThen that ally and the user are:\n- healed for 100% max HP.\n- Purified (removes negative status effects like sleep, burn or poison).\n- Fortified, and granted an Instant Death Ward.\n\nUsable only if no other ally on the battlefield has Cupid's Link already, and there is a valid target. Usable 5 times per battle.\n\nAn Instant Death Ward prevents a unit from being immediately defeated without damage by a non-boss enemy once, then is removed. Instant Death Wards cannot be ignored and cannot stack. A Fortified unit has 50% damage reduction from attacks. This reduction cannot be ignored by attacks that do not specifically ignore Fortify. Fortify will be removed after reducing damage 3 times since applying, and will be reset if reapplied. This is not a status effect.",
+          "selected": "Give another ally Cupid's Link"
+        },
+        "ability": {
+          "name": "AllyBuffACupidRegular",
+          "class": "Ability",
+          "config": "AllyBuffACupidRegular",
+          "tuCost": 1,
+          "useLimit": 5,
+          "spiritGain": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "AllAlly",
+          "components": [
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "EmptyPlaceholder"
+              ],
+              "applyToTargetType": "Friendly",
+              "applyConditions": "IsReadyForBondingCupidRegularActive2",
+              "showMissConditions": "ShowNoMiss"
+            },
+            {
+              "buffs": [
+                "CupidBondwith1RandomValidAllyPlusExtrasEBB",
+                "RemoveBuffs",
+                "HealFull",
+                "InstantKillImmunityOnce",
+                "FortifyFor3Attacks",
+                "RemoveFirstHitLOCKCupidRegular"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss"
+            }
+          ],
+          "sourceEventType": "Finish",
+          "friendlyEventType": "Finish",
+          "hideTargetingInfo": true,
+          "abilityEffect": "CupidGiveLink",
+          "flags": [
+            "Healer",
+            "NoDamage",
+            "Purify"
+          ],
+          "useCondition": "1AllyIsReadyForBondingAnd2AlliesNotCupidBonding"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "allFriends": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0.5,
+            1,
+            1,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_magic1",
+            "batfx_rizettebride1/batfx_castspark1",
+            "batfx_rizettebride1/batfx_castspark1",
+            "batfx_Cupid/batfx_Heartcast2",
+            "batfx_Cupid/batfx_Heartcast2",
+            "batfx_Cupid/batfx_FootGlitter1",
+            "batfx_Cupid/batfx_FootGlitter1",
+            "batsfx_prefab/batsfx_stealth1",
+            "batfx_Cupid/batfx_powderCupid1",
+            "batfx_Cupid/batfx_LoveCast1",
+            "batsfx_prefab/batsfx_ludmillaballad1"
+          ],
+          "sortOrderOffset": [
+            -2,
+            2,
+            -2,
+            -2,
+            -2,
+            2,
+            2,
+            2,
+            5,
+            -2,
+            2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            false,
+            true,
+            false,
+            false,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "CupidBondwith1RandomValidAllyPlusExtrasEBB": {
+            "class": "Buff",
+            "stackName": "CupidBondwith1RandomValidAllyPlusExtrasEBB",
+            "behaviors": [
+              "EnterBattleBuff"
+            ],
+            "behaviorOverrides": [
+              {
+                "randomAllyBuffs": [
+                  "RemoveBuffs",
+                  "HealFull",
+                  "InstantKillImmunityOnce",
+                  "FortifyFor3Attacks",
+                  "BondingModeBuffCupidRegular"
+                ],
+                "numRandomToBuff": 1,
+                "spreadCondition": "IsReadyForBondingCupidRegularActive2"
+              }
+            ],
+            "duration": 0,
+            "isHiddenFromPlayers": true,
+            "showAsPermanent": false,
+            "showAsTimer": false
+          },
+          "EmptyPlaceholder": {
+            "class": "Buff",
+            "isHiddenFromPlayers": true,
+            "duration": 0,
+            "showAsTimer": false,
+            "showAsPermanent": false
+          },
+          "FortifyFor3Attacks": {
+            "class": "Buff",
+            "behaviors": [
+              "EnterBattleBuff"
+            ],
+            "behaviorOverrides": [
+              {
+                "selfBuffs": [
+                  "FortifyFor3AttacksPart3",
+                  "FortifyFor3AttacksPart2",
+                  "FortifyFor3AttacksPart1"
+                ]
+              }
+            ],
+            "showAsPermanent": false,
+            "showAsTimer": false,
+            "duration": 0,
+            "isHiddenFromPlayers": true
+          },
+          "HealFull": {
+            "class": "Buff",
+            "behaviors": [
+              "AdjustHp"
+            ],
+            "behaviorOverrides": [
+              {
+                "percent": 1.0,
+                "abilityEffect": "LargeHeal1"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "InstantKillImmunityOnce": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity"
+            ],
+            "stackName": "InstantKillImmunityOnce",
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "InstantKill"
+                ],
+                "useLimit": 1
+              }
+            ],
+            "duration": -1,
+            "showAsTimer": true,
+            "tags": [
+              "InstantKillImmuneTemp",
+              "ThisIsAWard"
+            ],
+            "iconSpriteName": "IconInstantDefeatInvalid01"
+          },
+          "RemoveBuffs": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "RemoveFirstHitLOCKCupidRegular": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "FirstHitLOCKCupidRegular"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "1AllyIsReadyForBondingAnd2AlliesNotCupidBonding": {
+            "class": "MonsterConditions",
+            "myTeamMonsterConditionMatchesNeeded": {
+              "IsNotSummonedOrBonding": 1
+            },
+            "not": {
+              "class": "MonsterConditions",
+              "myTeamMonsterConditionMatchesNeeded": {
+                "IsCupidBonding": 2
+              }
+            }
+          },
+          "IsReadyForBondingCupidRegularActive2": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "ReadyForBondingCupidRegular"
+            ]
+          }
+        }
+      },
+      "MultiBuffACupidRegular": {
+        "id": "MultiBuffACupidRegular",
+        "found": true,
+        "localization": {
+          "name": "Matchmaker",
+          "description": "Another random ally that has Cupid's Link and a random ally that doesn't have Cupid's Link are given the next turns by having their TU reduced. The ally without Cupid's Link will be first in the turn order. Both units are Purified and become Enraged. Active skills that grant turns cannot be used by any affected units until after they have had the turn.\n\nUnlocked each time the user uses Hurt Feelings or Cupid's Shot, and is locked again after each use or if the user leaves the battlefield.\n\nThis will overwrite the effects of other Enrage skills on those units. Enraged units have their Attack increased to 1.5x until the end of their next turn.",
+          "selected": "Reduces 2 allies TU, Purifies & Enrages"
+        },
+        "ability": {
+          "name": "MultiBuffACupidRegular",
+          "class": "Ability",
+          "config": "MultiBuffACupidRegular",
+          "tuCost": 10,
+          "useLimit": 0,
+          "spiritCost": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "AllAlly",
+          "components": [
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "EmptyPlaceholder"
+              ],
+              "applyToTargetType": "Friendly"
+            },
+            {
+              "buffs": [
+                "Give2AlliesExtraTurnCupidRegular",
+                "Active3LOCKCupidRegular"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss"
+            }
+          ],
+          "friendlyEventType": "Finish",
+          "sourceEventType": "Finish",
+          "abilityEffect": "CupidCopy",
+          "flags": [
+            "GiveTurn",
+            "NoDamage"
+          ],
+          "useCondition": "IsNotActive3LOCKCupidRegular"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "allFriends": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batfx_RizetteBrave/batfx_blackout2Sec",
+            "batfx_Cupid/batfx_tailwindlove5_1",
+            "batsfx_prefab/batsfx_summon1",
+            "batfx_Cupid/batfx_CupidSpotlight1",
+            "batfx_Cupid/batfx_LensflareBase1",
+            "batfx_Cupid/batfx_LensflareBase1",
+            "batfx_Cupid/batfx_CupidSwap1",
+            "batfx_Cupid/batfx_CupidSwap1",
+            "batfx_RizetteBrave/batfx_blackout2Sec",
+            "batsfx_prefab/batsfx_charge1"
+          ],
+          "sortOrderOffset": [
+            -100,
+            -70,
+            2,
+            -2,
+            -2,
+            -2,
+            2,
+            2,
+            -100,
+            -50
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            true,
+            true,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            true,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            true
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "Active3LOCKCupidRegular": {
+            "class": "Buff",
+            "stackName": "Active3LOCKCupidRegular",
+            "duration": -1,
+            "isHiddenFromPlayers": true,
+            "showAsPermanent": false,
+            "showAsTimer": false
+          },
+          "EmptyPlaceholder": {
+            "class": "Buff",
+            "isHiddenFromPlayers": true,
+            "duration": 0,
+            "showAsTimer": false,
+            "showAsPermanent": false
+          },
+          "Give2AlliesExtraTurnCupidRegular": {
+            "class": "Buff",
+            "behaviors": [
+              "EnterBattleBuff",
+              "EnterBattleBuff",
+              "EnterBattleBuff"
+            ],
+            "behaviorOverrides": [
+              {
+                "selfBuffs": [
+                  "MarkedCupidRegular"
+                ]
+              },
+              {
+                "randomAllyBuffs": [
+                  "GiveTurn",
+                  "OnExtraTurn",
+                  "JustGivenTurn",
+                  "RemoveBuffs",
+                  "AttackPlus50Percent1TurnOnly"
+                ],
+                "numRandomToBuff": 1,
+                "spreadCondition": "IsCupidBondingNotMarkedCupidRegular"
+              },
+              {
+                "randomAllyBuffs": [
+                  "GiveTurn",
+                  "OnExtraTurn",
+                  "JustGivenTurn",
+                  "RemoveBuffs",
+                  "AttackPlus50Percent1TurnOnly"
+                ],
+                "numRandomToBuff": 1,
+                "spreadCondition": "IsNotCupidBonding"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "isHiddenFromPlayers": true
+          },
+          "GiveTurn": {
+            "class": "Buff",
+            "behaviors": [
+              "GiveTurn"
+            ],
+            "behaviorOverrides": [
+              {}
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "textKeyToShowWhenApplied": "TurnGivenKey",
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "IsNotActive3LOCKCupidRegular": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "Active3LOCKCupidRegular"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "passives": {
+      "MatchMakerPassiveACupidRegular": {
+        "id": "MatchMakerPassiveACupidRegular",
+        "found": true,
+        "localization": {
+          "name": "Sorceress of True Love",
+          "description": "This unit starts with Cupid's Link. When this unit enters battle it grants Cupid's Link for 50TU to another random non-conjured ally that does not have a Link already. Then that ally and this unit are Fortified, and granted an Instant Death Ward.\n\nA unit with Cupid's Link has these effects:\n\nThis unit cannot become Charmed.\n\nEach time an ally with Cupid's Link gets the turn, this unit will be healed for 50% of its max HP.\n\nThis unit has 0.25x of their original Attack added to their Attack while they are not Enraged. This increase will stack with other Attack increases (e.g. 1.5x + 0.25x => 1.75x total).\n\nWhen this unit defeats an enemy with an attack, after the end of the turn, all other allies with Cupid's Link will be given the next turns by reducing their current TU, and become Purified. Effects that influence TU order may interrupt the extra turn (e.g. Stuns targeting the lowest TU target). These TU reductions may trigger before or after other effects that adjust the turn order.\n\nThis Link is removed if this unit or the unit that granted it leaves the battlefield. This unit cannot gain other Links."
+        }
+      },
+      "AngelOfLovePassiveACupidRegular": {
+        "id": "AngelOfLovePassiveACupidRegular",
+        "found": true,
+        "localization": {
+          "name": "Winged Sweetheart",
+          "description": "This unit enters battle with a Sleep Ward, and Poison Ward.\n\nThis unit cannot be stunned or be sent to the reinforcements from the battlefield.\n\nIf this unit would be defeated by an enemy attack or a status effect while having more than 1 HP, it instead survives with 1 HP.\n\nThis unit has 25% damage reduction from attacks. While there are 2 Linked allies on the battlefield, this unit has 50% damage reduction from attacks instead.\n\nThis unit's attacks heal this unit for 100% of total damage dealt, will not wake sleeping enemies, ignore damage reduction effects, and any effects of non-boss enemies that would prevent targets from being defeated.\n\nThe first time this unit is damaged by an enemy attack and survives until after the end of the turn, there is a 20% chance, plus 20% chance per Awakening (up to 100% chance if this unit has 4 Awakenings) for this unit to Charm all enemies on the battlefield for 50TU. Whenever this unit uses Restore Cupid's Link, this effect is reset so it can trigger again.\n\nEach time this unit takes damage from an attack and survives until after the end of the turn, this unit will be Purified, and heal for 25% of its max HP.\n\nA Charmed unit has their attack greatly reduced (e.g. to 0.5x of their original Attack for a unit with no other Attack modifiers. The effect of Charmed may be diminished if the affected unit's Attack is increased by other effects). Charmed overwrites Enrage and Weaken effects, and units that are Charmed cannot be Enraged or Weakened. Charmed units are less likely to target the unit that Charmed them with most active skills. Charmed is not a status effect and cannot be removed by Purify skills, but will end if the Charmed unit leaves the battlefield."
+        }
+      },
+      "PlusAttackBoostLv3": {
+        "id": "PlusAttackBoostLv3",
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv3",
+          "description": "Adds 300 to this unit's Attack."
+        }
+      },
+      "PlusHPBoostLv3": {
+        "id": "PlusHPBoostLv3",
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv3",
+          "description": "Adds 1200 to this unit's max HP."
+        }
+      },
+      "SwordMinusDamageLv3": {
+        "id": "SwordMinusDamageLv3",
+        "found": true,
+        "localization": {
+          "name": "Sword Resist Lv3",
+          "description": "10% less damage from attacks by units equipped with Swords."
+        }
+      },
+      "AddWeaponPrefAxe": {
+        "id": "AddWeaponPrefAxe",
+        "found": true,
+        "localization": {
+          "name": "Axe Mastery",
+          "description": "Can use weapon skills of Axes in addition to their original preferred weapon type."
+        }
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": {
+      "class": "MonsterConditions",
+      "elements": [
+        "Life"
+      ]
+    }
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "CupidRegular01",
+    "family": "CupidRegular",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "CupidRegular01",
+    "family": "CupidRegular",
+    "class": "Monster",
+    "leaderBuff": "HPUpLifeD",
+    "leaderBuffCondition": "IsLife",
+    "activeSkills": {
+      "0": "SingleAttackACupidRegular",
+      "1": "AllyBuffACupidRegular",
+      "2": "MultiBuffACupidRegular"
+    },
+    "passives": {
+      "0": "MatchMakerPassiveACupidRegular",
+      "1": "AngelOfLovePassiveACupidRegular",
+      "2": "PlusAttackBoostLv3",
+      "3": "PlusHPBoostLv3",
+      "4": "SwordMinusDamageLv3",
+      "5": "AddWeaponPrefAxe"
+    },
+    "cost": 28,
+    "baseAttack": 1069,
+    "baseMaxHp": 5865,
+    "speed": 526,
+    "element": "Life",
+    "weaponPref": "Mace",
+    "weaponPivotIndex": 0,
+    "secure": 1,
+    "superEvolve1": "CupidRegular02",
+    "aiTargetPickWeight": 1,
+    "stars": 5,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 0,
+    "battleOrbImageFlip": 0,
+    "attackType": "Bash",
+    "skillVoices": {
+      "0": [
+        1,
+        2
+      ],
+      "1": [
+        5,
+        6
+      ],
+      "2": [
+        9,
+        10
+      ],
+      "3": [
+        13,
+        14
+      ]
+    },
+    "damageVoices": [
+      17,
+      18
+    ],
+    "deathVoices": [
+      21,
+      22
+    ],
+    "victoryVoices": [
+      25
+    ],
+    "lineupVoices": [
+      27,
+      28,
+      29
+    ],
+    "evolutionVoices": [
+      38
+    ],
+    "trainVoices": [
+      33,
+      34,
+      35,
+      36,
+      37
+    ],
+    "titleVoices": [
+      44
+    ],
+    "gachaVoices": [
+      45
+    ],
+    "loginVoices": [
+      46
+    ],
+    "tapVoices": [
+      47,
+      48,
+      49
+    ],
+    "idleVoices": [
+      50
+    ]
+  },
+  "_build": {
+    "scriptVersion": "8-semantic-authorities",
+    "sourceHash": "72ff52117e040af0525ac97df170c8d5f89ac6ce037c5a605970231da935dd04",
+    "dependencyHash": "186c87d9ef39349a40ab1418db980c59b0671d4e7353c4f6e9a7c1ad240e9376",
+    "generatedAt": 1791827446
+  }
+}

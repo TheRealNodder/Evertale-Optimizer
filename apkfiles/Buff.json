@@ -1,6 +1,6 @@
 {
 	"Version": 23,
-	"Time": 1790820625,
+	"Time": 1790832868,
 	"Buff": {
 	"RelationshipFlatAttack50": {
 		"class": "Buff",
@@ -94587,6 +94587,434 @@
 			"showAsTimer": true,
 			"showAsPermanent": false,
 			"iconSpriteName": "IconBlueCountdownClock3Numbered04"
+		},
+		"AttackUpDamageReduc4NoSleepingPoisonedOrBurningAllies": {
+			"class": "Buff",
+			"behaviors": ["ModifyDamage","ExtraAttackScalor"],
+			"behaviorOverrides": [{
+				"conditions": "NoSleepingPoisonedOrBurningAllies",
+				"percent": 0.94,
+				"cancelFromDamageTypes": ["BuffDamage", "Poison", "Burn"],
+				"cancelFromDamageFlags": ["Sneak", "IgnoreArmor"]
+			},{
+				"attackerCondition": "NoSleepingPoisonedOrBurningAllies",
+				"scalor": 0.07
+			}],
+			"iconSpriteName": "IconBrownDefenseShield01",
+			"noIconShownOnBattleStatus": true,
+			"duration": -1,
+			"showAsTimer": false,
+			"isWeaponBuff": true,
+			"hideActivatedIcon": true
+		},
+		"AttackUpDamageReduc5NoSleepingPoisonedOrBurningAllies": {
+			"class": "Buff",
+			"behaviors": ["ModifyDamage","ExtraAttackScalor"],
+			"behaviorOverrides": [{
+				"conditions": "NoSleepingPoisonedOrBurningAllies",
+				"percent": 0.92,
+				"cancelFromDamageTypes": ["BuffDamage", "Poison", "Burn"],
+				"cancelFromDamageFlags": ["Sneak", "IgnoreArmor"]
+			},{
+				"attackerCondition": "NoSleepingPoisonedOrBurningAllies",
+				"scalor": 0.10
+			}],
+			"iconSpriteName": "IconBrownDefenseShield01",
+			"noIconShownOnBattleStatus": true,
+			"duration": -1,
+			"showAsTimer": false,
+			"isWeaponBuff": true,
+			"hideActivatedIcon": true
+		},
+		"AttackUpDamageReduc6NoSleepingPoisonedOrBurningAllies": {
+			"class": "Buff",
+			"behaviors": ["ModifyDamage","ExtraAttackScalor"],
+			"behaviorOverrides": [{
+				"conditions": "NoSleepingPoisonedOrBurningAllies",
+				"percent": 0.9,
+				"cancelFromDamageTypes": ["BuffDamage", "Poison", "Burn"],
+				"cancelFromDamageFlags": ["Sneak", "IgnoreArmor"]
+			},{
+				"attackerCondition": "NoSleepingPoisonedOrBurningAllies",
+				"scalor": 0.15
+			}],
+			"iconSpriteName": "IconBrownDefenseShield01",
+			"noIconShownOnBattleStatus": true,
+			"duration": -1,
+			"showAsTimer": false,
+			"isWeaponBuff": true,
+			"hideActivatedIcon": true
+		},
+		"MatchMakerPassiveACupidRegular": {
+			"class": "Buff",
+			"stackName": "MatchMakerPassiveACupidRegular",
+			"behaviors": ["EnterBattleBuff","BuffOnMonsterTurn","EnterBattleBuff","EnterBattleBuff","BuffWhenMonstersDie","BuffOnMonsterTurn","Immunity","BuffOnMonsterTurn"],
+			"behaviorOverrides": [{
+				"selfBuffs": ["FortifyFor3Attacks","InstantKillImmunityOnce","NotEnragedBuffCupidRegular","Active3LOCKCupidRegular"]
+			},{
+				"randomAllyBuffs": ["YouAreHurtingMe"],
+				"numRandomToBuff": 4,
+				"activeMonsterConditions": "AlwaysTrue"
+			},{
+				"allAlliesButSelfBuffs": ["RandomAllyOfCupidRegular"],
+				"spreadCondition": "IsNotSummonedOrBonding"	
+			},{
+				"randomAllyBuffs": ["FortifyFor3Attacks","InstantKillImmunityOnce","BondingModeBuffCupidRegular"],
+				"numRandomToBuff": 1,
+				"spreadCondition": "IsRandomAllyOfCupidRegularNotBonding"
+			},{
+				"selfBuffs": ["TriggerKillCupidRegular"],
+				"sameTeam": false,
+				"spreadCondition": "KillsMoreThanSkillUsedCupidRegular"
+			},{
+				"selfBuffs": ["HealHalf"],
+				"sameTeam": true,
+				"activeMonsterConditions": "IsCupidBonding"
+			},{
+				"stackNamesToBlock": ["IsCurrentlyCharmed"]
+			},{
+				"randomAllyBuffs": ["ReadyForBondingCupidRegularActive2"],
+				"numRandomToBuff": 1,
+				"spreadCondition": "IsNotSummonedOrBonding"	
+			}],
+			"showAsPermanent": false,
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true,
+			"noIconShownOnBattleStatus": true,
+			"tags": ["ActiveBonding","CupidBond"],
+			"duration": -1,
+			"iconSpriteName": "IconPinkCharmInvalid01"
+		},
+		"TriggerKillCupidRegular": {
+			"class": "Buff",
+			"isHiddenFromPlayers": true,
+			"behaviors": ["BuffOnMonsterTurnEnd", "BuffOnMonsterTurnEnd"],
+			"behaviorOverrides": [{
+				"allAlliesButSelfBuffs": ["PseudoGetTurn","OnExtraTurn","JustGivenTurn","RemoveBuffs"],
+				"spreadCondition": "IsCupidBonding"
+			},{
+				"selfBuffs": ["FudgeUsedCupidRegular"]
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"showAsPermanent": false
+		},
+		"FudgeUsedCupidRegular": {
+			"class": "Buff",
+			"duration": 0,
+			"behaviors": ["AddBattleProperty"],
+			"behaviorOverrides": [{
+				"properties": {
+					"fudgeSkillUsesCupidRegular": 1
+				},
+				"replace": true,
+				"setToKills": true
+			}],
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
+		"RandomAllyOfCupidRegular":{
+			"class": "Buff",
+			"stackName": "RandomAllyOfCupidRegular",
+			"duration": 0,
+			"isHiddenFromPlayers": true,
+			"showAsPermanent": false,
+			"showAsTimer": false
+		},
+		"NotEnragedBuffCupidRegular":{
+			"class": "Buff",
+			"behaviors": ["StatOnly"],	
+			"behaviorOverrides":[{
+				"conditions": "NotEnraged",
+				"scalorStatBonuses": {
+					"Attack": 0.25
+				}
+			}],
+			"duration": -1,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true
+		},
+		"AngelOfLovePassiveACupidRegular":{
+			"class": "Buff",
+			"stackName": "AngelOfLovePassiveACupidRegular",
+			"behaviors": ["EnterBattleBuff","ModifyDamage","ModifyDamage","BuffWhenMonsterHurt","BuffOnMonsterTurnEnd","StunImmunityFallback"],
+			"behaviorOverrides": [{
+				"selfBuffs": ["HoldGround","KnockbackImmunity","PoisonImmunityOnce","SleepImmunityOnce","StunImmunitywithStackName","DisableFallBackImmunity"]
+			},{
+				"percent": 0.5,
+				"cancelFromDamageTypes": ["BuffDamage", "Poison", "Burn"],
+				"cancelFromDamageFlags": ["Sneak", "IgnoreArmor"],
+				"conditions": "2AlliesIsBonding"
+			},{
+				"percent": 0.75,
+				"cancelFromDamageTypes": ["BuffDamage", "Poison", "Burn"],
+				"cancelFromDamageFlags": ["Sneak", "IgnoreArmor"],
+				"conditions": "2AlliesIsNotBonding"
+			},{
+				"selfBuffs": ["BrideHealOK"],
+				"cancelFromDamageTypes": ["BuffDamage"]
+			},{
+				"selfBuffs": ["OKToCharmCupidRegularLV1","OKToCharmCupidRegularLV2","OKToCharmCupidRegularLV3","OKToCharmCupidRegularLV4","OKToCharmCupidRegularLV5",
+					"CharmAllEnemiesIfOKCupidRegular","FirstHitLOCKCupidRegular","BrideHeal25PercentCupidRegular"],
+				"activeMonsterConditions": "NotAlwaysMyTurn",
+				"spreadCondition": "BrideHealReady"
+			},{}],
+			"duration": -1,
+			"tags": ["BigDamageMinus"],
+			"showAsPermanent": false,
+			"showAsTimer": true,
+			"isHiddenFromPlayers": true,
+			"iconSpriteName": "IconPurpleDamageMinus01"
+		},
+		"OKToCharmCupidRegularLV1":{
+			"class": "Buff",
+			"stackName": "OKToCharmCupidRegular",
+			"duration": 0,
+			"isHiddenFromPlayers": true,
+			"showAsPermanent": false,
+			"showAsTimer": false,
+			"applyConditions": "NoAwakening20Percent"
+		},
+		"OKToCharmCupidRegularLV2":{
+			"class": "Buff",
+			"stackName": "OKToCharmCupidRegular",
+			"duration": 0,
+			"isHiddenFromPlayers": true,
+			"showAsPermanent": false,
+			"showAsTimer": false,
+			"applyConditions": "1Awakening40Percent"
+		},
+		"OKToCharmCupidRegularLV3":{
+			"class": "Buff",
+			"stackName": "OKToCharmCupidRegular",
+			"duration": 0,
+			"isHiddenFromPlayers": true,
+			"showAsPermanent": false,
+			"showAsTimer": false,
+			"applyConditions": "2Awakening60Percent"
+		},
+		"OKToCharmCupidRegularLV4":{
+			"class": "Buff",
+			"stackName": "OKToCharmCupidRegular",
+			"duration": 0,
+			"isHiddenFromPlayers": true,
+			"showAsPermanent": false,
+			"showAsTimer": false,
+			"applyConditions": "3Awakening80Percent"
+		},
+		"OKToCharmCupidRegularLV5":{
+			"class": "Buff",
+			"stackName": "OKToCharmCupidRegular",
+			"duration": 0,
+			"isHiddenFromPlayers": true,
+			"showAsPermanent": false,
+			"showAsTimer": false,
+			"applyConditions": "Has4Awakenings"
+		},
+		"CharmAllEnemiesIfOKCupidRegular": {
+			"class": "Buff",
+			"behaviors": ["EnterBattleBuff"],
+			"behaviorOverrides": [{
+				"enemyBuffs": ["Charmed50TUBuffCupidRegular"]
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true,
+			"applyConditions": "OKtoCharmIsNotFirstHitLOCKCupidRegular"
+		},
+		"FirstHitLOCKCupidRegular":{
+			"class": "Buff",
+			"stackName": "FirstHitLOCKCupidRegular",
+			"duration": -1,
+			"isHiddenFromPlayers": true,
+			"showAsPermanent": false,
+			"showAsTimer": false,
+			"applyConditions": "IsNotFirstHitLOCKCupidRegular"
+		},
+		"RemoveFirstHitLOCKCupidRegular": {
+			"class": "Buff",
+			"behaviors": ["RemoveBuffs"],
+			"behaviorOverrides": [{
+				"name": "FirstHitLOCKCupidRegular"
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
+		"BrideHeal25PercentCupidRegular": {
+			"class": "Buff",
+			"behaviors": ["AdjustHp", "RemoveBuffs","RemoveBuffs"],
+			"behaviorOverrides": [{
+				"percent": 0.25,
+				"abilityEffect": "Blank",
+				"hpboosts": [
+					"HealBoost"
+				]
+			},{
+				"name": "BrideHealOK"
+			},{}],
+			"duration": 0,
+			"effectToShowWhenApplied": "LargeHeal1",
+			"textKeyToShowWhenApplied": "HealDoubleANameKey",
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
+		"Charmed50TUBuffCupidRegular": {
+			"class": "Buff",
+			"behaviors": ["StatOnly","Immunity","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","BuffOnMonsterTurn"],
+			"behaviorOverrides": [{
+				"scalorStatBonuses": {
+				"Attack": -0.9999999
+				}
+			},{	
+				"stackNamesToBlock": ["AttackPlus50Percent","AttackMinus25Percent"]
+			},{
+				"name": "AttackMinus25Percent"
+			},{
+				"name": "AttackPlus50Percent"
+			},{
+				"name": "RageCount1Icon"
+			},{
+				"name": "RageCount2Icon"
+			},{
+				"name": "RageCount3Icon"
+			},{
+				"sourceBuffs": ["PleaseDONTDefeatMeBuffCupidRegular"]
+			}],
+			"stackName": "IsCurrentlyCharmed",
+			"iconSpriteName": "IconPinkCharmHeart01",
+			"showAsTimer": true,
+			"duration": 50,
+			"statusEffect": "CharmStatus"
+		},
+		"PleaseDONTDefeatMeBuffCupidRegular":{
+			"class": "Buff",
+			"stackName": "PleaseDONTDefeatMeBuffCupidRegular",
+			"duration": 0,
+			"isHiddenFromPlayers": true
+		},
+		"ReadyForBondingCupidRegularActive2":{
+			"class": "Buff",
+			"stackName": "ReadyForBondingCupidRegular",
+			"duration": 0,
+			"isHiddenFromPlayers": true,
+			"showAsPermanent": false,
+			"showAsTimer": false
+		},
+		"CupidBondwith1RandomValidAllyPlusExtrasEBB":{
+			"class": "Buff",
+			"stackName": "CupidBondwith1RandomValidAllyPlusExtrasEBB",
+			"behaviors": ["EnterBattleBuff"],
+			"behaviorOverrides": [{
+				"randomAllyBuffs": ["RemoveBuffs","HealFull","InstantKillImmunityOnce","FortifyFor3Attacks","BondingModeBuffCupidRegular"],
+				"numRandomToBuff": 1,
+				"spreadCondition": "IsReadyForBondingCupidRegularActive2"
+			}],
+			"duration": 0,
+			"isHiddenFromPlayers": true,
+			"showAsPermanent": false,
+			"showAsTimer": false
+		},
+		"BondingModeBuffCupidRegular": {
+			"class": "Buff",
+			"stackName": "FriendshipBond",
+			"behaviors": ["Immunity","BuffWhenMonstersDie","BuffOnMonsterTurn","StatOnly","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+				"stackNamesToBlock": ["IsCurrentlyCharmed"]
+			},{
+				"selfBuffs": ["TriggerKillCupidRegular"],
+				"sameTeam": false,
+				"spreadCondition": "KillsMoreThanSkillUsedCupidRegular"
+			},{
+				"selfBuffs": ["HealHalf"],
+				"sameTeam": true,
+				"activeMonsterConditions": "IsCupidBonding"
+			},{
+				"conditions": "NotEnraged",
+				"scalorStatBonuses": {
+					"Attack": 0.25
+				}
+			},{}],
+			"duration": 50,
+			"showAsPermanent": false,
+			"showAsTimer": false,
+			"tags": ["ActiveBonding","CupidBond"],
+			"statusEffect": "CupidLink",
+			"iconSpriteName": "IconWhiteLinked01",
+			"applyConditions": "IsNotFriendshipBond"
+		},
+		"Give2AlliesExtraTurnCupidRegular": {
+			"class": "Buff",
+			"behaviors": ["EnterBattleBuff","EnterBattleBuff","EnterBattleBuff"],
+			"behaviorOverrides": [{
+				"selfBuffs": ["MarkedCupidRegular"]
+			},{
+				"randomAllyBuffs": ["GiveTurn","OnExtraTurn","JustGivenTurn","RemoveBuffs","AttackPlus50Percent1TurnOnly"],
+				"numRandomToBuff": 1,
+				"spreadCondition": "IsCupidBondingNotMarkedCupidRegular"
+			},{
+				"randomAllyBuffs": ["GiveTurn","OnExtraTurn","JustGivenTurn","RemoveBuffs","AttackPlus50Percent1TurnOnly"],
+				"numRandomToBuff": 1,
+				"spreadCondition": "IsNotCupidBonding"
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true
+		},
+		"MarkedCupidRegular":{
+			"class": "Buff",
+			"stackName": "MarkedCupidRegular",
+			"duration": 0,
+			"isHiddenFromPlayers": true,
+			"showAsPermanent": false,
+			"showAsTimer": false
+		},
+		"KillRandomEnemyEOTAndCreditKillCupidRegular":{
+			"class": "Buff",
+			"behaviors": ["EnterBattleBuff"],
+			"behaviorOverrides": [{
+				"randomEnemyBuffs": ["PT2InstantKillAndCreditKillCupidRegular"],
+				"numRandomToBuff": 1,
+				"spreadCondition": "IsNotBossAndNotMirage"
+			}],
+			"showAsPermanent": false,
+			"showAsTimer": false,
+			"duration": 0,
+			"isHiddenFromPlayers": true
+		},
+		"PT2InstantKillAndCreditKillCupidRegular": {
+			"class": "Buff",
+			"stackName": "InstantKill",
+			"behaviors": ["EnterBattleBuff","EnterBattleBuff","InstantDeath"],
+			"behaviorOverrides": [{
+				"selfBuffs": ["CupidRegularInstantDeathFXBuff"]
+			},{	
+				"sourceBuffs": ["Add1Kill"]
+			},{}],
+			"duration": 0,
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
+		"Active3LOCKCupidRegular":{
+			"class": "Buff",
+			"stackName": "Active3LOCKCupidRegular",
+			"duration": -1,
+			"isHiddenFromPlayers": true,
+			"showAsPermanent": false,
+			"showAsTimer": false
+		},
+		"RemoveActive3LOCKCupidRegular": {
+			"class": "Buff",
+			"behaviors": ["RemoveBuffs"],
+			"behaviorOverrides": [{
+				"name": "Active3LOCKCupidRegular"
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
 		}
     }
 }

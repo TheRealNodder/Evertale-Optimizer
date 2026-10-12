@@ -1,6 +1,6 @@
 {
 	"Version": 23,
-	"Time": 1790819630,
+	"Time": 1791422093,
 	"AbilityConfig": {
 		"StunSingle200A": {
 			"class": "AbilityConfig",
@@ -48835,7 +48835,7 @@
 			"friendlyEventType": "Finish",
 			"hideTargetingInfo": true,
 			"abilityEffect": "CupidGiveLink",
-			"flags": ["NoDamage"],
+			"flags": ["NoDamage", "Purify"],
 			"useCondition": "1AllyIsReadyForBondingAnd2AlliesNotCupidBonding"
 		},
 		"MultiBuffACupidRegularBoss": {
@@ -49101,6 +49101,96 @@
 			"conditionedAbilityEffects": ["QueenHeartsSP","QueenHeartsSP","QueenHeartsSP","QueenHeartsSP"],
 			"flags": ["BurnBlast"],
 			"useCondition": "IsBurningNotInstantCooldown",
+			"recommendEffectWhenUsable": -1
+		},
+		"SingleAttackACupidRegular": {
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage","ApplyBuff"],
+			"componentOverrides":[{
+				"damageFlags": ["DoNotWake","IgnoreSkin","IgnoreArmor","HardIgnoreBlockDeath"],
+				"applyToTargetType": "Enemy",
+				"drainPercent": 1.0,
+				"drainEffect": "MerlinSelfHeal1"
+			},{
+				"buffs": ["PoisonImmunityOnce","SleepImmunityOnce","RemoveActive3LOCKCupidRegular","GoodGirlBuffCounter"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true	
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "CupidAttack",
+			"attackScalors":["GoodVsICantBelieveYouHitMeBuff"],
+			"conditionedAbilityEffects": ["CupidAttack","CupidAttack"],
+			"recommendEffectWhenUsable": -1
+		},
+		"AllyBuffACupidRegular": {
+			"class": "AbilityConfig",
+			"targetingData": "AllAlly",
+			"components": ["ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"buffs": ["EmptyPlaceholder"],
+				"applyToTargetType": "Friendly",
+				"applyConditions": "IsReadyForBondingCupidRegularActive2",
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs": ["CupidBondwith1RandomValidAllyPlusExtrasEBB","RemoveBuffs","HealFull","InstantKillImmunityOnce","FortifyFor3Attacks","RemoveFirstHitLOCKCupidRegular"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			}],
+			"sourceEventType": "Finish",
+			"friendlyEventType": "Finish",
+			"hideTargetingInfo": true,
+			"abilityEffect": "CupidGiveLink",
+			"flags": ["Healer","NoDamage","Purify"],
+			"useCondition": "1AllyIsReadyForBondingAnd2AlliesNotCupidBonding"
+		},
+		"MultiBuffACupidRegular": {
+			"class": "AbilityConfig",
+			"targetingData": "AllAlly",
+			"components": ["ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"buffs": ["EmptyPlaceholder"],
+				"applyToTargetType": "Friendly"
+			},{
+				"buffs": ["Give2AlliesExtraTurnCupidRegular","Active3LOCKCupidRegular"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"	
+			}],
+			"friendlyEventType": "Finish",
+			"sourceEventType": "Finish",
+			"abilityEffect": "CupidCopy",
+			"flags": ["GiveTurn","NoDamage"],
+			"useCondition": "IsNotActive3LOCKCupidRegular"
+		},
+		"SpecialAttackACupidRegular": {
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"applyToTargetType": "Enemy",
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"damageFlags": ["DoNotWake","IgnoreArmor","HardIgnoreBlockDeath"],
+				"drainPercent": 1.0,
+				"drainEffect": "MerlinSelfHeal1"
+			},{
+				"buffs": ["KillRandomEnemyEOTAndCreditKillCupidRegular","LoseMomentum"],
+				"applyConditions": "HasDamagedWithAttack",
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs": ["GoodGirlBuffCounter","GainMomentum","RemoveActive3LOCKCupidRegular"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "CupidSP",
+			"attackScalors":["GoodIfGain1GoodBuff","GoodIfGain2GoodBuff","GoodIfGain3GoodBuff","GoodIfGain4GoodBuff","GoodIfGain5GoodBuff"],
+			"conditionedAbilityEffects": ["CupidSP","CupidSP","CupidSP","CupidSP","CupidSP"],
 			"recommendEffectWhenUsable": -1
 		}
 	}
