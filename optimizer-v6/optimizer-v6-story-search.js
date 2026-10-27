@@ -2,8 +2,8 @@
   'use strict';
 
   const root=g.OptimizerV6=g.OptimizerV6||{};
-  const P=root.policy,F=root.featureModel,T=root.teamEvaluator;
-  if(!P||!F||!T)return;
+  const P=root.policy,F=root.featureModel,T=root.teamEvaluator,S=root.skillModel;
+  if(!P||!F||!T||!S)return;
 
   const rows=value=>Array.isArray(value)?value:[];
   const num=value=>Number.isFinite(Number(value))?Number(value):0;
@@ -58,8 +58,8 @@
     const roles=unit?.__v6?.roles||{},signals=planSignals(unit,plan);
     const role=Math.max(num(roles.damage),num(roles.protection),num(roles.sustain),num(roles.control),num(roles.tempo),num(roles.setup));
     const direct=Math.min(100,(signals.setup+signals.payoff)*36);
-    const planSignal=F.archetypeSignal(unit,plan).score*100,primary=requested[0]?F.archetypeSignal(unit,requested[0]).score*100:0,secondary=requested[1]?F.archetypeSignal(unit,requested[1]).score*100:0;
-    const mechanicalCore=mechanicalPlan(plan)?num(unit?.__v6?.baseValue)*.25+Math.max(direct,planSignal)*.43+role*.17:num(unit?.__v6?.baseValue)*.45+planSignal*.22+role*.18;
+    const planSignal=F.archetypeSignal(unit,plan).score*100,primary=requested[0]?F.archetypeSignal(unit,requested[0]).score*100:0,secondary=requested[1]?F.archetypeSignal(unit,requested[1]).score*100:0,ability=S.portfolio(unit,plan).score;
+    const mechanicalCore=mechanicalPlan(plan)?num(unit?.__v6?.baseValue)*.19+Math.max(direct,planSignal)*.37+role*.15+ability*.18:num(unit?.__v6?.baseValue)*.34+planSignal*.18+role*.16+ability*.20;
     const vulnerability=Math.max(F.antiSynergy(unit,plan),requested[0]?F.antiSynergy(unit,requested[0]):0)*18;
     const core=P.clamp(mechanicalCore+primary*(requested.length ? .10 : 0)+secondary*(requested.length>1 ? .05 : 0)-vulnerability);
     const value=P.clamp(core*(1-profile.searchWeight)+num(unit?.__v6?.metaPrior)*profile.searchWeight);
@@ -74,33 +74,33 @@
       const locked=new Set(lockedSeed(units,options).selected),compatible=source.filter(unit=>locked.has(unit)||!F.hardPlanConflict(unit,plan));
       if(compatible.length>=P.story.total)source=compatible;
     }
-    const intelligence=P.intelligenceProfile(options),cap=Math.max(P.story.total,Number(options?.candidateCap)||intelligence.storyCandidateCap),chosen=new Map();
-    const add=unit=>{if(unit&&!chosen.has(uid(unit))&&chosen.size<cap)chosen.set(uid(unit),unit);};
+    const intelligence=P.intelligenceProfile(options),cap=Math.max(P.story.total,Number(options?.candidateCap)||intelligence.storyCandidateCap),candidates=new Map();
+    const nominate=(unit,priority)=>{if(!unit)return;const key=uid(unit),current=candidates.get(key);if(!current)candidates.set(key,{unit,priority,hits:1});else{current.priority=Math.min(current.priority,priority);current.hits++;}};
     const profile=P.metaProfile(options),sorted=[...source].sort((a,b)=>unitPotential(b,plan,options)-unitPotential(a,plan,options)||P.identity(a).entry.localeCompare(P.identity(b).entry));
-    lockedSeed(units,options).selected.forEach(add);
-    sorted.slice(0,Math.ceil(cap*.45)).forEach(add);
-    if(profile.candidateReserve>0)[...source].sort((a,b)=>num(b?.__v6?.metaPrior)-num(a?.__v6?.metaPrior)||P.identity(a).entry.localeCompare(P.identity(b).entry)).slice(0,Math.ceil(cap*profile.candidateReserve)).forEach(add);
+    lockedSeed(units,options).selected.forEach(unit=>nominate(unit,-100));
     if(mechanicalPlan(plan)){
-      if(pairedPlan(plan))[...sorted].sort((a,b)=>planSignals(b,plan).setup-planSignals(a,plan).setup).slice(0,12).forEach(add);
-      [...sorted].sort((a,b)=>planSignals(b,plan).payoff-planSignals(a,plan).payoff).slice(0,12).forEach(add);
+      if(pairedPlan(plan))[...sorted].sort((a,b)=>planSignals(b,plan).setup-planSignals(a,plan).setup).slice(0,12).forEach(unit=>nominate(unit,0));
+      [...sorted].sort((a,b)=>planSignals(b,plan).payoff-planSignals(a,plan).payoff).slice(0,12).forEach(unit=>nominate(unit,0));
     }
     for(const archetype of P.requestedArchetypes(options)){
-      [...sorted].sort((a,b)=>F.archetypeSignal(b,archetype).score-F.archetypeSignal(a,archetype).score||unitPotential(b,plan,options)-unitPotential(a,plan,options)).slice(0,12).forEach(add);
+      [...sorted].sort((a,b)=>F.archetypeSignal(b,archetype).score-F.archetypeSignal(a,archetype).score||unitPotential(b,plan,options)-unitPotential(a,plan,options)).slice(0,10).forEach(unit=>nominate(unit,1));
     }
     for(const role of ['damage','protection','sustain','control','tempo','setup']){
-      [...sorted].sort((a,b)=>num(b?.__v6?.roles?.[role])-num(a?.__v6?.roles?.[role])||unitPotential(b,plan,options)-unitPotential(a,plan,options)).slice(0,6).forEach(add);
+      [...sorted].sort((a,b)=>num(b?.__v6?.roles?.[role])-num(a?.__v6?.roles?.[role])||unitPotential(b,plan,options)-unitPotential(a,plan,options)).slice(0,5).forEach(unit=>nominate(unit,2));
     }
-    if(format==='rainbow'||format==='force_rainbow')for(const element of P.elements)sorted.filter(unit=>(unit?.__v6?.element||P.key(unit?.element))===element).slice(0,8).forEach(add);
-    sorted.forEach(add);
-    return [...chosen.values()].sort((a,b)=>unitPotential(b,plan,options)-unitPotential(a,plan,options)||P.identity(a).entry.localeCompare(P.identity(b).entry));
+    if(format==='rainbow'||format==='force_rainbow')for(const element of P.elements)sorted.filter(unit=>(unit?.__v6?.element||P.key(unit?.element))===element).slice(0,5).forEach(unit=>nominate(unit,1));
+    if(profile.candidateReserve>0)[...source].sort((a,b)=>num(b?.__v6?.metaPrior)-num(a?.__v6?.metaPrior)||P.identity(a).entry.localeCompare(P.identity(b).entry)).slice(0,Math.ceil(cap*profile.candidateReserve)).forEach(unit=>nominate(unit,3));
+    sorted.forEach(unit=>nominate(unit,4));
+    return [...candidates.values()].sort((a,b)=>a.priority-b.priority||b.hits-a.hits||unitPotential(b.unit,plan,options)-unitPotential(a.unit,plan,options)||P.identity(a.unit).entry.localeCompare(P.identity(b.unit).entry)).slice(0,cap).map(row=>row.unit).sort((a,b)=>unitPotential(b,plan,options)-unitPotential(a,plan,options)||P.identity(a).entry.localeCompare(P.identity(b).entry));
   }
 
   function stateSummary(selected,plan,options={}){
     const elements=new Set(),roles={damage:0,protection:0,sustain:0,control:0,tempo:0,setup:0};
     const requested=P.requestedArchetypes(options),archetypeContributors=requested.map(()=>0),archetypeSetup=requested.map(()=>0),archetypePayoff=requested.map(()=>0);
-    let base=0,setup=0,payoff=0,contributors=0,confidence=0,meta=0,vulnerability=0;
+    let base=0,setup=0,payoff=0,contributors=0,confidence=0,meta=0,vulnerability=0,ability=0;
     for(const unit of selected){
       elements.add(unit?.__v6?.element||P.key(unit?.element));base+=num(unit?.__v6?.baseValue);confidence+=num(unit?.__v6?.evidence?.confidence)*100;meta+=num(unit?.__v6?.metaPrior);
+      ability+=S.portfolio(unit,plan).score;
       const signals=planSignals(unit,plan),directSignal=F.archetypeSignal(unit,plan);setup+=signals.setup;payoff+=signals.payoff;if(directSignal.contributes)contributors++;
       requested.forEach((archetype,index)=>{const signal=F.archetypeSignal(unit,archetype);if(signal.contributes)archetypeContributors[index]++;if(signal.setup)archetypeSetup[index]++;if(signal.payoff)archetypePayoff[index]++;});
       vulnerability+=Math.max(F.antiSynergy(unit,plan),requested[0]?F.antiSynergy(unit,requested[0]):0)*50;
@@ -112,9 +112,9 @@
     else if(payoffOnlyPlan(plan))engine=(payoff>0?30:0)+Math.min(30,contributors*7.5);
     else if(selfContainedPlan(plan))engine=(setup>0?30:0)+Math.min(30,contributors*7.5);
     else engine=Math.max(setup,payoff)*24;
-    const core=(selected.length?base/selected.length:0)*.32+roleCoverage*.23+engine*.40+(selected.length?confidence/selected.length:0)*.05-(selected.length?vulnerability/selected.length:0)*.14,profile=P.metaProfile(options),metaPrior=selected.length?meta/selected.length:0;
+    const core=(selected.length?base/selected.length:0)*.27+roleCoverage*.20+engine*.34+(selected.length?ability/selected.length:0)*.14+(selected.length?confidence/selected.length:0)*.05-(selected.length?vulnerability/selected.length:0)*.14,profile=P.metaProfile(options),metaPrior=selected.length?meta/selected.length:0;
     const heuristic=P.clamp(core*(1-profile.searchWeight)+metaPrior*profile.searchWeight);
-    return{elements,roles,base,setup,payoff,contributors,archetypeContributors,archetypeSetup,archetypePayoff,vulnerability,confidence,meta,metaPrior,heuristic};
+    return{elements,roles,base,setup,payoff,contributors,archetypeContributors,archetypeSetup,archetypePayoff,vulnerability,confidence,ability,meta,metaPrior,heuristic};
   }
 
   function canAdd(selected,unit){return !selected.some(other=>P.identityConflicts(other,unit));}
@@ -243,10 +243,21 @@
   }
 
   function bestMono(units,options={}){
-    const candidates=[];for(const element of P.elements){const result=search(units,{...options,format:'force_mono',targetElement:element,strictFormat:true});if(result.best)candidates.push({...result.best,element,searchDiagnostics:result.diagnostics});}
+    const seeded=options?.__monoProbeResult,candidates=seeded?[seeded.best,...rows(seeded.alternatives)].filter(Boolean).map(row=>({...row})):[],requested=P.intelligenceProfile(options),explicit=Number(options?.beamWidth)>0||Number(options?.candidateCap)>0||Number(options?.placementFinalists)>0||Number(options?.placementCombinations)>0,useProbe=!explicit&&requested.level!=='probe';
+    const run=(element,searchIntelligence)=>{const result=search(units,{...options,searchIntelligence,format:'force_mono',targetElement:element,strictFormat:true});return result.best?{...result.best,element,searchDiagnostics:result.diagnostics}:null;};
+    if(!seeded)for(const element of P.elements){const candidate=run(element,useProbe?'probe':requested.level);if(candidate)candidates.push(candidate);}
     const relaxationRank=row=>Number(row?.searchDiagnostics?.planContract?.relaxed===true)+Number(row?.searchDiagnostics?.archetypeContract?.primary?.relaxed===true);
     candidates.sort((a,b)=>relaxationRank(a)-relaxationRank(b)||b.evaluation.score-a.evaluation.score||a.element.localeCompare(b.element));
-    return{best:candidates[0]||null,alternatives:candidates.slice(1,4),diagnostics:{evaluatedElements:P.elements,candidateElements:candidates.map(row=>row.element)}};
+    const refinedElements=[];
+    if(useProbe){
+      const refineCount=requested.level==='ultra'?2:1;
+      for(const probe of candidates.slice(0,refineCount)){
+        const refined=run(probe.element,requested.level);refinedElements.push(probe.element);
+        if(refined&&relaxationRank(refined)<=relaxationRank(probe)&&refined.evaluation.score>=probe.evaluation.score){const index=candidates.indexOf(probe);candidates[index]=refined;}
+      }
+      candidates.sort((a,b)=>relaxationRank(a)-relaxationRank(b)||b.evaluation.score-a.evaluation.score||a.element.localeCompare(b.element));
+    }
+    return{best:candidates[0]||null,alternatives:candidates.slice(1,4),diagnostics:{evaluatedElements:P.elements,candidateElements:candidates.map(row=>row.element),probeLevel:useProbe?'probe':requested.level,requestedLevel:requested.level,refinedElements}};
   }
 
   function rainbow(units,options={}){

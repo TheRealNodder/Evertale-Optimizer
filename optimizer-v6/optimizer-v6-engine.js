@@ -120,7 +120,7 @@
       total=specs.length+finalists.length;
       const replacements=[];
       for(const candidate of finalists){
-        const spec={kind:candidate.kind,plan:candidate.plan},result=runCandidate(prepared,spec,options),row=candidateRecord(spec.kind,spec.plan,result);
+        const spec={kind:candidate.kind,plan:candidate.plan},refineOptions=candidate.kind==='mono'?{...options,__monoProbeResult:candidate.result}:options,result=runCandidate(prepared,spec,refineOptions),row=candidateRecord(spec.kind,spec.plan,result);
         const improved=row&&candidateOrder(row,candidate)<=0?row:candidate;
         replacements.push(improved);refined++;emit(spec,improved,'format-refinement');
       }

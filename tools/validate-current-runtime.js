@@ -207,10 +207,33 @@ const optimizerSource = read('optimizer.js');
 const researchSource = read('optimizer-strategy-research.js');
 const v6LoaderSource = read('optimizer-v6/optimizer-v6-loader.js');
 const v6PolicySource = read('optimizer-v6/optimizer-v6-policy.js');
-for (const control of ['searchIntelligenceSelect', 'metaWeightSelect', 'useAdvisoryMetaPrior', 'researchStrategies']) {
-  if (!optimizerHtml.includes(`id="${control}"`)) errors.push(`Optimizer control is missing: ${control}`);
+const optimizerControlIds = [
+  'modeStory', 'modePlatoons', 'ownedCount', 'optimizerRuntimeStatus',
+  'teamTypeSelect', 'presetSelect', 'buildBest', 'cancelOptimizer',
+  'optimizerRosterGuidance', 'optimizerProgress', 'optimizerProgressBar', 'optimizerProgressText',
+  'optimizerAdvancedControls', 'optimizerAdvancedSummary', 'primaryArchetypeSelect',
+  'secondaryArchetypeSelect', 'searchIntelligenceSelect', 'metaWeightSelect',
+  'optimizerMetaTools', 'refreshLatestUnitCache', 'useAdvisoryMetaPrior', 'localMetaStatus',
+  'researchStrategies', 'useInternetResearchPrior', 'researchStatus', 'researchFindings',
+  'optimizerMoreActions', 'buildExample', 'clearTeams', 'lockFilledStory', 'unlockAllLocks',
+];
+for (const control of optimizerControlIds) {
+  const occurrences = optimizerHtml.match(new RegExp(`id=["']${control}["']`, 'g'))?.length || 0;
+  if (occurrences !== 1) errors.push(`Optimizer control must appear exactly once (${occurrences} found): ${control}`);
 }
-if (!optimizerHtml.includes('optimizer-v6-loader.js?v=9') || !v6LoaderSource.includes('optimizer-v6-local-meta.js')) {
+for (const disclosure of ['optimizerAdvancedControls', 'optimizerMetaTools', 'optimizerMoreActions']) {
+  if (!optimizerHtml.includes(`<details id="${disclosure}"`)) errors.push(`Optimizer disclosure is missing or is not native details: ${disclosure}`);
+}
+if (optimizerHtml.indexOf('id="buildBest"') > optimizerHtml.indexOf('id="optimizerAdvancedControls"')) {
+  errors.push('Optimizer primary build action must remain visible before optional disclosures');
+}
+for (const accessibilityContract of ['aria-pressed', 'aria-live="polite"', 'aria-labelledby="optimizerProgressText"']) {
+  if (!optimizerHtml.includes(accessibilityContract)) errors.push(`Optimizer accessibility contract is missing: ${accessibilityContract}`);
+}
+for (const behaviorContract of ['updateAdvancedControlsSummary', 'updateOwnedBuildAvailability', 'syncModeButtons']) {
+  if (!optimizerSource.includes(behaviorContract)) errors.push(`Optimizer sidebar behavior is missing: ${behaviorContract}`);
+}
+if (!optimizerHtml.includes('optimizer-v6-loader.js?v=10') || !v6LoaderSource.includes('optimizer-v6-local-meta.js') || !v6LoaderSource.includes('optimizer-v6-skill-model.js')) {
   errors.push('Optimizer V6 local-meta module is not in the current public loader chain');
 }
 for (const level of ['standard', 'deep', 'ultra']) {

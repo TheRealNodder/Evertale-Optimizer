@@ -13,9 +13,17 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List
 
 try:
-    from .build_optimizer_runtime_model import description_feature_records, description_features
+    from .build_optimizer_runtime_model import (
+        description_feature_records,
+        description_features,
+        structured_scaler_polarity_records,
+    )
 except ImportError:
-    from build_optimizer_runtime_model import description_feature_records, description_features
+    from build_optimizer_runtime_model import (
+        description_feature_records,
+        description_features,
+        structured_scaler_polarity_records,
+    )
 
 
 REPO = Path(__file__).resolve().parents[2]
@@ -211,6 +219,20 @@ class OptimizerFoundationAuthorityTests(unittest.TestCase):
         self.assertNotIn("applies_sleep", features("KaguyahimeDark02"), "Hypnosis loses a turn but does not apply the Sleep status")
         for source in ("ElmKouhaiRegular01", "ElmKouhaiRegular02"):
             self.assertNotIn("payoff_burn", features(source), "unless burning is negative polarity, not Burn payoff")
+        self.assertIn("payoff_burn", features("QueenHeartsRegular02"), "lower non-Burn scaler must resolve as Burn payoff")
+        self.assertIn("payoff_sleep", features("QueenHeartsRegular02"), "lower non-Sleep scaler must resolve as Sleep payoff")
+        self.assertNotIn("penalized_by_burn", features("QueenHeartsRegular02"), "inverted scaler polarity made Queen anti-Burn")
+        self.assertIn("penalized_by_burn", features("KintaroRegular02"), "higher non-Burn scaler must retain anti-Burn polarity")
+        for source, status in (
+            ("NapoleonRegular02", "stun"),
+            ("NobunagaRegular02", "stun"),
+            ("SatanRegular02", "stun"),
+        ):
+            self.assertNotIn(
+                f"removes_{status}",
+                features(source),
+                f"{source} mentions {status} setup/ward/immunity but does not remove it",
+            )
         christmas = {row["feature"]: row for row in evidence.get("ChristmasCatEar02", [])}
         for status in ("burn", "poison", "sleep"):
             receipts = christmas[f"removes_{status}"]["receipts"]
@@ -271,6 +293,54 @@ class OptimizerFoundationAuthorityTests(unittest.TestCase):
             self.assertTrue(
                 any(row.get("feature") == f"removes_{status}" and row.get("targetTeam") == "allies" for row in allied_cleanse)
             )
+        false_cross_clause = description_features(
+            "This unit gains Stun Immunity and a Stun Ward. The Ward is removed after it blocks one effect."
+        )
+        self.assertNotIn("removes_stun", false_cross_clause, "cross-clause removal invented a Stun cleanse")
+        false_setup = description_features(
+            "Burns one ally. Grants that ally a Poison Ward. Wards are removed after one use."
+        )
+        self.assertNotIn("removes_burn", false_setup, "setup plus unrelated removal invented a Burn cleanse")
+        self.assertNotIn("removes_poison", false_setup, "ward expiration invented a Poison cleanse")
+
+    def test_structured_scaler_polarity_uses_numeric_direction(self) -> None:
+        payoff = structured_scaler_polarity_records({
+            "ability": {"abilityScalor": 9, "conditionalAbilityScalors": [7, 5]},
+            "config": {"attackScalors": ["GoodVs1NotBurningEnemy", "GoodVs2NotSleepingEnemies"]},
+            "attackScalors": {
+                "GoodVs1NotBurningEnemy": {"sourceCondition": "1EnemyNotBurning"},
+                "GoodVs2NotSleepingEnemies": {"sourceCondition": "2EnemiesNotSleeping"},
+            },
+        })
+        self.assertEqual({row["feature"] for row in payoff}, {"payoff_burn", "payoff_sleep"})
+        conflict = structured_scaler_polarity_records({
+            "ability": {"abilityScalor": 1, "conditionalAbilityScalors": [4]},
+            "config": {"attackScalors": ["GoodVsNotBurning"]},
+            "attackScalors": {"GoodVsNotBurning": {"targetCondition": "IsNotBurning"}},
+        })
+        self.assertEqual([row["feature"] for row in conflict], ["penalized_by_burn"])
+        availability_only = structured_scaler_polarity_records({
+            "ability": {"abilityScalor": 1},
+            "config": {"useCondition": "IsNotBurning"},
+        })
+        self.assertEqual(availability_only, [], "availability condition became scaler polarity")
+
+    def test_skill_profiles_preserve_contextual_action_authority(self) -> None:
+        profiles = self.runtime.get("skillProfiles") or {}
+        self.assertTrue(profiles)
+        self.assertTrue(all(row.get("profileVersion") == 2 for row in profiles.values()))
+        cupid = profiles.get("CupidRegular02") or {}
+        skills = {row.get("id"): row for row in cupid.get("skills") or []}
+        shot = skills.get("SpecialAttackACupidRegular") or {}
+        self.assertEqual(shot.get("target", {}).get("side"), "enemies")
+        self.assertEqual(shot.get("target", {}).get("count"), 1)
+        self.assertEqual(shot.get("baseMultiplier"), 1.5)
+        self.assertEqual(shot.get("conditionalMultipliers"), [3, 4.5, 6, 7.5, 9])
+        self.assertTrue(shot.get("attackScalers"), "resolved conditional scaler authority was dropped")
+        matchmaker = skills.get("MultiBuffACupidRegular") or {}
+        self.assertEqual(matchmaker.get("target", {}).get("side"), "allies")
+        self.assertTrue(matchmaker.get("target", {}).get("all"))
+        self.assertIn("IsNotActive3LOCKCupidRegular", matchmaker.get("conditionIds") or [])
 
     def test_runtime_feature_coverage_is_bounded_and_complete(self) -> None:
         evidence = self.runtime.get("featureEvidence") or {}

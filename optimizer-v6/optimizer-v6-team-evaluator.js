@@ -2,8 +2,8 @@
   'use strict';
 
   const root=g.OptimizerV6=g.OptimizerV6||{};
-  const P=root.policy,F=root.featureModel,E=root.evidence,R=root.resourceReasoner;
-  if(!P||!F||!E||!R)return;
+  const P=root.policy,F=root.featureModel,E=root.evidence,R=root.resourceReasoner,S=root.skillModel;
+  if(!P||!F||!E||!R||!S)return;
 
   const rows=value=>Array.isArray(value)?value:[];
   const num=value=>Number.isFinite(Number(value))?Number(value):0;
@@ -232,10 +232,10 @@
 
   function evaluate(team,options={}){
     const units=rows(team),plan=P.normalizeArchetype(options.plan||'hybrid')||'hybrid',format=selectionMode(options);
-    const validation=validateStory(units,options),engine=engineState(units,plan,options),archetypes=archetypeState(units,options),roles=roleCoverage(units),resource=resourceBalance(units,plan),pairs=pairSynergy(units,plan),leader=leaderValue(units,plan),position=positionFlow(units),element=elementStrategy(units,plan,format),counters=counterCoverage(units,roles);
+    const validation=validateStory(units,options),engine=engineState(units,plan,options),archetypes=archetypeState(units,options),roles=roleCoverage(units),resource=resourceBalance(units,plan),ability=S.teamFit(units,plan),pairs=pairSynergy(units,plan),leader=leaderValue(units,plan),position=positionFlow(units),element=elementStrategy(units,plan,format),counters=counterCoverage(units,roles);
     const components=P.boundedComponents({
       baseUnitValue:mean(units.map(unit=>num(unit?.__v6?.baseValue))),engineCompletion:engine.score,roleCoverage:roles.score,
-      resourceBalance:resource.score,pairSynergy:pairs.score,groupSynergy:P.clamp(engine.score*.45+roles.score*.35+archetypes.score*.20),archetypeAlignment:archetypes.score,leaderValue:leader.score,
+      resourceBalance:resource.score,abilityFit:ability.score,pairSynergy:pairs.score,groupSynergy:P.clamp(engine.score*.38+roles.score*.27+archetypes.score*.18+ability.score*.17),archetypeAlignment:archetypes.score,leaderValue:leader.score,
       positionFlow:position.score,elementStrategy:element.score,counterCoverage:counters,
       boundedMetaPrior:mean(units.map(unit=>num(unit?.__v6?.metaPrior))),evidenceConfidence:mean(units.map(unit=>num(unit?.__v6?.evidence?.confidence)*100))
     });
@@ -251,7 +251,7 @@
     const relaxations=[...(planRelaxed?[{type:'plan',plan,reason:options.planContract.reason}]:[]),...archetypes.relaxations.map(row=>({type:'archetype',...row}))];
     return{
       valid:errors.length===0,errors,score:errors.length?0:weightedScore(components,penaltyValues,options),components,componentWeights,metaWeighting,penalties:penaltyValues,
-      plan,format,engine,archetypes,contributionLedger:{plan:{plan,contributors:engine.contributorCount,minimumContributors:engine.minimumContributors,setup:engine.setupCount,payoff:engine.payoffCount,complete:engine.complete,coherent:engine.coherent,vulnerableUnits:units.filter(unit=>F.antiSynergy(unit,plan)>0).map(unitId)},archetypes:archetypes.entries},roles,resource,pairs,leader,position,element,counters,relaxations,
+      plan,format,engine,archetypes,contributionLedger:{plan:{plan,contributors:engine.contributorCount,minimumContributors:engine.minimumContributors,setup:engine.setupCount,payoff:engine.payoffCount,complete:engine.complete,coherent:engine.coherent,vulnerableUnits:units.filter(unit=>F.antiSynergy(unit,plan)>0).map(unitId)},archetypes:archetypes.entries},roles,resource,ability,pairs,leader,position,element,counters,relaxations,
       unmetNeeds:[engine.requiresSetup&&!engine.setupCount?'setup':'',engine.requiresPayoff&&!engine.payoffCount?'payoff':'',roles.damage<25?'damage':'',roles.safety<25?'protection/sustain':'',roles.tempo<20?'control/tempo':''].filter(Boolean)
     };
   }

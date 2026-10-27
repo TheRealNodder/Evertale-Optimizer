@@ -7,7 +7,7 @@
   const key=value=>txt(value).toLowerCase().replace(/[\u2019']/g,'').replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');
 
   const policy={
-    version:'optimizer-v6-policy-9',
+    version:'optimizer-v6-policy-10',
     story:{main:5,back:3,total:8,leaderScope:8,leaderStacking:'best_only'},
     platoons:{rows:20,size:5,storyExcluded:true,allowBlankAfterExhaustion:true},
     elements:['fire','water','storm','earth','light','dark'],
@@ -62,6 +62,7 @@
       engineCompletion:0.14,
       roleCoverage:0.10,
       resourceBalance:0.08,
+      abilityFit:0.10,
       pairSynergy:0.09,
       groupSynergy:0.06,
       archetypeAlignment:0.09,

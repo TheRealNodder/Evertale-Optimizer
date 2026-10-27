@@ -394,6 +394,8 @@ def validate_optimizer_semantics(repo: Path, base: Path, errors: List[str], warn
     for source_id, profile in skill_profiles.items():
         if source_id not in expected_entry_keys:
             invalid_skill_profiles.append(f"{source_id}:unknown-entry")
+        if not isinstance(profile, dict) or profile.get("profileVersion") != 2:
+            invalid_skill_profiles.append(f"{source_id}:profile-version={profile.get('profileVersion') if isinstance(profile, dict) else None}")
         skills = profile.get("skills") if isinstance(profile, dict) and isinstance(profile.get("skills"), list) else []
         for skill in skills:
             if not isinstance(skill, dict):
@@ -410,6 +412,24 @@ def validate_optimizer_semantics(repo: Path, base: Path, errors: List[str], warn
             tu = skill.get("tuCost")
             if tu is not None and (not isinstance(tu, (int, float)) or isinstance(tu, bool) or tu < 0 or tu > 10000):
                 invalid_skill_profiles.append(f"{source_id}:{skill.get('id')}:tuCost={tu}")
+            target = skill.get("target") if isinstance(skill.get("target"), dict) else {}
+            if target.get("side") not in {"self", "allies", "enemies", "mixed", "unknown"}:
+                invalid_skill_profiles.append(f"{source_id}:{skill.get('id')}:target-side={target.get('side')}")
+            target_count = target.get("count")
+            if target_count is not None and (not isinstance(target_count, int) or isinstance(target_count, bool) or target_count < 1 or target_count > 20):
+                invalid_skill_profiles.append(f"{source_id}:{skill.get('id')}:target-count={target_count}")
+            for field in ("all", "random"):
+                if not isinstance(target.get(field), bool):
+                    invalid_skill_profiles.append(f"{source_id}:{skill.get('id')}:target-{field}={target.get(field)}")
+            if not isinstance(skill.get("conditionIds"), list):
+                invalid_skill_profiles.append(f"{source_id}:{skill.get('id')}:conditionIds")
+            if not isinstance(skill.get("attackScalers"), list):
+                invalid_skill_profiles.append(f"{source_id}:{skill.get('id')}:attackScalers")
+            if not isinstance(skill.get("conditionalMultipliers"), list):
+                invalid_skill_profiles.append(f"{source_id}:{skill.get('id')}:conditionalMultipliers")
+            for chance in skill.get("effectChances") or []:
+                if not isinstance(chance, (int, float)) or isinstance(chance, bool) or not 0 <= chance <= 1:
+                    invalid_skill_profiles.append(f"{source_id}:{skill.get('id')}:effectChance={chance}")
             skill_gain_count += int((skill.get("spiritGain") or 0) > 0)
             skill_cost_count += int((skill.get("spiritCost") or 0) > 0)
             skill_tu_count += int(tu is not None)
@@ -538,6 +558,12 @@ def validate_optimizer_semantics(repo: Path, base: Path, errors: List[str], warn
         errors.append("[semantic] runtimeFlags.usesFeatureEvidence is not truthful")
     if bool(skill_profiles) != bool(flags.get("usesSkillProfiles")):
         errors.append("[semantic] runtimeFlags.usesSkillProfiles is not truthful")
+    contextual_profiles = bool(skill_profiles) and all(
+        isinstance(profile, dict) and profile.get("profileVersion") == 2
+        for profile in skill_profiles.values()
+    )
+    if contextual_profiles != bool(flags.get("usesContextualSkillProfiles")):
+        errors.append("[semantic] runtimeFlags.usesContextualSkillProfiles is not truthful")
     if not evidence:
         errors.append("[semantic] resolved character data produced no feature evidence")
     if not skill_profiles:
@@ -603,6 +629,22 @@ def validate_optimizer_semantics(repo: Path, base: Path, errors: List[str], warn
         "AnastasiaRegular02": {
             "required": {"applies_frostburn", "converts_frostburn_to_burn"},
             "forbidden": {"applies_burn"},
+        },
+        "QueenHeartsRegular02": {
+            "required": {"applies_burn", "payoff_burn", "payoff_sleep"},
+            "forbidden": {"penalized_by_burn", "penalized_by_sleep"},
+        },
+        "NapoleonRegular02": {
+            "required": {"applies_stun", "payoff_stun"},
+            "forbidden": {"removes_stun"},
+        },
+        "NobunagaRegular02": {
+            "required": {"applies_burn", "payoff_burn"},
+            "forbidden": {"removes_stun", "removes_sleep", "removes_poison"},
+        },
+        "VanHelsingRegular02": {
+            "required": {"applies_charge", "payoff_charge", "role_team_cleanser"},
+            "forbidden": {"removes_stun"},
         },
     }
     sentinel_failures: List[str] = []

@@ -1,14 +1,14 @@
 (function(g){
   'use strict';
-  const root=g.OptimizerV6=g.OptimizerV6||{},P=root.policy,F=root.featureModel,T=root.teamEvaluator,S=root.storySearch;
-  if(!P||!F||!T||!S)return;
+  const root=g.OptimizerV6=g.OptimizerV6||{},P=root.policy,F=root.featureModel,T=root.teamEvaluator,SS=root.storySearch,K=root.skillModel;
+  if(!P||!F||!T||!SS||!K)return;
   const rows=value=>Array.isArray(value)?value:[],num=value=>Number.isFinite(Number(value))?Number(value):0,uid=unit=>P.txt(unit?.id||unit?.sourceId||unit?.family||unit?.name);
 
   function rowEvaluation(units,plan,options={}){
-    const engine=T.engineState(units,plan,options),roles=T.roleCoverage(units),pairs=T.pairSynergy(units,plan),archetypes=T.archetypeState(units,options),base=units.length?units.reduce((sum,unit)=>sum+num(unit?.__v6?.baseValue),0)/units.length:0,vulnerability=units.length?units.reduce((sum,unit)=>sum+F.antiSynergy(unit,plan)*50,0)/units.length:0;
-    const core=P.clamp(base*.27+engine.score*.29+roles.score*.22+pairs.score*.14+archetypes.score*.08-(engine.required&&!engine.coherent?35:0)-vulnerability*.08),metaPrior=units.length?units.reduce((sum,unit)=>sum+num(unit?.__v6?.metaPrior),0)/units.length:0,metaWeighting=P.metaProfile(options);
+    const engine=T.engineState(units,plan,options),roles=T.roleCoverage(units),ability=K.teamFit(units,plan),pairs=T.pairSynergy(units,plan),archetypes=T.archetypeState(units,options),base=units.length?units.reduce((sum,unit)=>sum+num(unit?.__v6?.baseValue),0)/units.length:0,vulnerability=units.length?units.reduce((sum,unit)=>sum+F.antiSynergy(unit,plan)*50,0)/units.length:0;
+    const core=P.clamp(base*.23+engine.score*.25+roles.score*.19+ability.score*.14+pairs.score*.12+archetypes.score*.07-(engine.required&&!engine.coherent?35:0)-vulnerability*.08),metaPrior=units.length?units.reduce((sum,unit)=>sum+num(unit?.__v6?.metaPrior),0)/units.length:0,metaWeighting=P.metaProfile(options);
     const score=P.clamp(core*(1-metaWeighting.scoreWeight)+metaPrior*metaWeighting.scoreWeight);
-    return{score,engine,roles,pairs,archetypes,vulnerability,metaPrior,metaWeighting,complete:units.length===P.platoons.size&&(!engine.required||engine.coherent)&&archetypes.valid};
+    return{score,engine,roles,ability,pairs,archetypes,vulnerability,metaPrior,metaWeighting,complete:units.length===P.platoons.size&&(!engine.required||engine.coherent)&&archetypes.valid};
   }
 
   function lockedForRow(options,rowIndex){
@@ -33,12 +33,12 @@
     let eligible=rows(units).filter(unit=>!strictMono||(unit?.__v6?.element||P.key(unit?.element))===target);
     if(configuration?.presetMode==='hard'&&P.pairedPlans.includes(P.normalizeArchetype(plan))){const compatible=eligible.filter(unit=>seed.includes(unit)||!F.hardPlanConflict(unit,plan));if(compatible.length>=P.platoons.size)eligible=compatible;}
     const sorted=eligible
-      .sort((a,b)=>S.unitPotential(b,plan,configuration)-S.unitPotential(a,plan,configuration)||P.identity(a).entry.localeCompare(P.identity(b).entry));
+      .sort((a,b)=>SS.unitPotential(b,plan,configuration)-SS.unitPotential(a,plan,configuration)||P.identity(a).entry.localeCompare(P.identity(b).entry));
     const candidateCap=Math.max(P.platoons.size,Number(configuration.platoonCandidateCap)||intelligence.platoonCandidateCap);
     const chosen=new Map(),add=unit=>{if(unit&&!chosen.has(uid(unit))&&chosen.size<candidateCap)chosen.set(uid(unit),unit);};seed.forEach(add);sorted.slice(0,Math.ceil(candidateCap*.55)).forEach(add);
     if(P.pairedPlans.includes(P.normalizeArchetype(plan))){
-      [...sorted].sort((a,b)=>S.planSignals(b,plan).setup-S.planSignals(a,plan).setup).slice(0,8).forEach(add);
-      [...sorted].sort((a,b)=>S.planSignals(b,plan).payoff-S.planSignals(a,plan).payoff).slice(0,8).forEach(add);
+      [...sorted].sort((a,b)=>SS.planSignals(b,plan).setup-SS.planSignals(a,plan).setup).slice(0,8).forEach(add);
+      [...sorted].sort((a,b)=>SS.planSignals(b,plan).payoff-SS.planSignals(a,plan).payoff).slice(0,8).forEach(add);
     }
     for(const archetype of P.requestedArchetypes(configuration))[...sorted].sort((a,b)=>F.archetypeSignal(b,archetype).score-F.archetypeSignal(a,archetype).score).slice(0,8).forEach(add);
     for(const role of ['damage','protection','sustain','control','tempo'])[...sorted].sort((a,b)=>num(b?.__v6?.roles?.[role])-num(a?.__v6?.roles?.[role])).slice(0,4).forEach(add);

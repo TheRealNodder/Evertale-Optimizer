@@ -20,6 +20,7 @@
     if(num(evaluation?.roles?.safety)>=50)strengths.push('Protection and sustain coverage is above the team-safety threshold.');
     if(num(evaluation?.roles?.tempo)>=50)strengths.push('The selected team has meaningful control or turn-tempo coverage.');
     if(evaluation?.leader?.selected)strengths.push(`${evaluation.leader.selected.unitId} supplies the best leader effect among the selected eight.`);
+    if(evaluation?.ability?.source==='contextual-skill-profiles')strengths.push(`Skill timing, targets, conditions, Spirit, and damage scaling were compared in ${evaluation.plan} context.`);
     if(evaluation?.metaWeighting?.level!=='off')strengths.push(`Newer-unit weighting is ${evaluation.metaWeighting.level} (${Math.round(num(evaluation.metaWeighting.scoreWeight)*100)}% bounded prior).`);
     strengths.push(...rows(resource.strengths));
 
@@ -52,6 +53,14 @@
         unitId:action.unitId,skillId:action.skillId,skillName:action.skillName,tuCost:action.tuCost,
         spiritGain:action.spiritGain,spiritCost:action.spiritCost,conditional:!!action.conditional,
         useCondition:action.useCondition,reason:action.reason,source:action.source
+      })),
+      skillChoices:rows(evaluation?.ability?.units).map(unit=>({
+        unitId:unit.unitId,portfolioScore:rounded(unit.score),
+        actions:rows(unit.topActions).map(action=>({
+          skillId:action.skillId,skillName:action.skillName,score:rounded(action.score),features:rows(action.features),
+          scoreComponents:Object.fromEntries(Object.entries(action.parts||{}).map(([name,value])=>[name,rounded(value)])),
+          target:action.target,conflict:rounded(action.conflict),reason:action.reason,source:action.source
+        }))
       })),
       resourceForecast:{
         source:resource.source,score:rounded(resource.score),reliableGeneration:rounded(resource.reliableGeneration),

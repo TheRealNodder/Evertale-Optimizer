@@ -2,8 +2,8 @@
   'use strict';
 
   const root=g.OptimizerV6=g.OptimizerV6||{};
-  const P=root.policy,E=root.evidence;
-  if(!P||!E)return;
+  const P=root.policy,E=root.evidence,S=root.skillModel;
+  if(!P||!E||!S)return;
 
   const rows=value=>Array.isArray(value)?value:[];
   const num=(value,fallback=0)=>Number.isFinite(Number(value))?Number(value):fallback;
@@ -27,6 +27,12 @@
       useLimit:Number.isFinite(Number(skill?.useLimit))&&Number(skill.useLimit)>0?Number(skill.useLimit):null,
       targeting:P.txt(skill?.targeting),useCondition:P.txt(skill?.useCondition),
       flags:rows(skill?.flags).map(P.txt).filter(Boolean),components:rows(skill?.components).map(P.txt).filter(Boolean),
+      target:skill?.target&&typeof skill.target==='object'?{...skill.target}:null,
+      conditionIds:rows(skill?.conditionIds).map(P.txt).filter(Boolean),
+      baseMultiplier:Number.isFinite(Number(skill?.baseMultiplier))?Number(skill.baseMultiplier):null,
+      conditionalMultipliers:rows(skill?.conditionalMultipliers).map(Number).filter(Number.isFinite),
+      attackScalers:rows(skill?.attackScalers).filter(row=>row&&typeof row==='object').map(row=>({...row})),
+      effectChances:rows(skill?.effectChances).map(Number).filter(Number.isFinite),
       source:P.txt(skill?.source)
     };
   }
@@ -44,36 +50,24 @@
   }
 
   function relevantFeatures(unit,skill,plan){
-    const allowed=PLAN_FEATURES[plan]||new Set();
-    if(plan==='hybrid')for(const values of Object.values(PLAN_FEATURES))for(const value of values)allowed.add(value);
-    const prefix=P.key(`resolved.activeSkills.${skill.id}`);
-    return rows(unit?.__v6?.evidence?.records).filter(record=>{
-      if(!allowed.has(record.feature))return false;
-      return rows(record.sources).some(source=>P.key(source).startsWith(prefix));
-    }).map(record=>record.feature);
+    return [...new Set(S.recordsFor(unit,skill,plan).map(record=>record.feature))];
   }
 
   function actionRank(unit,skill,plan){
-    const features=relevantFeatures(unit,skill,plan),conditionPenalty=skill.useCondition?12:0;
-    return features.length*100+skill.spiritGain*22-skill.spiritCost*3-(skill.tuCost??160)*.05-conditionPenalty;
+    return S.evaluateAction(unit,skill,plan).score;
   }
 
   function chooseAction(unit,plan){
-    const skills=rows(unit?.__v6?.skillProfile?.skills),withEvidence=skills.map(skill=>({skill,features:relevantFeatures(unit,skill,plan)}));
-    const relevant=withEvidence.filter(row=>row.features.length).sort((a,b)=>actionRank(unit,b.skill,plan)-actionRank(unit,a.skill,plan)||a.skill.id.localeCompare(b.skill.id));
-    let selected=relevant[0];
-    if(!selected){
-      const reliable=withEvidence.filter(row=>row.skill.spiritGain>0&&!row.skill.useCondition).sort((a,b)=>b.skill.spiritGain-a.skill.spiritGain||(a.skill.tuCost??9999)-(b.skill.tuCost??9999)||a.skill.id.localeCompare(b.skill.id));
-      selected=reliable[0]||withEvidence.sort((a,b)=>(a.skill.tuCost??9999)-(b.skill.tuCost??9999)||a.skill.spiritCost-b.skill.spiritCost||a.skill.id.localeCompare(b.skill.id))[0];
-    }
+    const selected=S.portfolio(unit,plan).topAction;
     if(!selected)return null;
-    const skill=selected.skill;
+    const skill=selected.skill,features=selected.features;
     return{
       unitId:uid(unit),skillId:skill.id,skillName:skill.name,tuCost:skill.tuCost,
       spiritGain:skill.spiritGain,spiritCost:skill.spiritCost,conditional:!!skill.useCondition,
-      useCondition:skill.useCondition,evidenceFeatures:selected.features,
+      useCondition:skill.useCondition,evidenceFeatures:features,contextScore:selected.score,
+      scoreComponents:selected.parts,target:selected.target,conflict:selected.conflict,
       source:skill.source,description:skill.description,
-      reason:selected.features.length?`Direct ${plan} evidence`:(skill.spiritGain>0?'Reliable Spirit generation':'Lowest-TU available action')
+      reason:selected.reason
     };
   }
 

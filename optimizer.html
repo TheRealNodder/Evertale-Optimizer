@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="./theme-effects.css?v=2" />
   <link rel="stylesheet" href="./v2-site-ui-pass.css?v=4" />
   <link rel="stylesheet" href="./optimizer-layout.css?v=4" />
-  <link rel="stylesheet" href="./v2-optimizer-mainstyle.css?v=5" />
+  <link rel="stylesheet" href="./v2-optimizer-mainstyle.css?v=6" />
 </head>
 <body class="page-optimizer page-optimizer-v2">
   <header class="topbar">
@@ -42,19 +42,17 @@
       </div>
 
       <div class="optimizerControls" style="margin-top:10px;">
-        <div class="optimizerControlCard">
-          <div class="panelTitle" style="margin:0;">Team Mode</div>
-          <div class="optMode">
-            <button id="modeStory" class="pill active" type="button">Story (5 + 3)</button>
-            <button id="modePlatoons" class="pill" type="button">Platoons (20 × 5)</button>
+        <div class="optimizerControlCard optimizerQuickBuildCard">
+          <div class="panelTitle" style="margin:0;">Quick Build</div>
+          <div class="optimizerControlLabel">Team Mode</div>
+          <div class="optMode" role="group" aria-label="Team mode">
+            <button id="modeStory" class="pill active" type="button" aria-pressed="true">Story (5 + 3)</button>
+            <button id="modePlatoons" class="pill" type="button" aria-pressed="false">Platoons (20 × 5)</button>
           </div>
-          <div id="ownedCount" class="muted">0 selected</div>
-          <div id="optimizerRuntimeStatus" class="muted">Runtime: loading...</div>
-        </div>
-
-        <div class="optimizerControlCard optimizerFiltersCard">
-          <div class="panelTitle" style="margin:0;">Passive Effect Focus</div>
-          <div class="optimizerFilterGrid">
+          <div id="ownedCount" class="muted" role="status" aria-live="polite">0 selected</div>
+          <div id="optimizerRuntimeStatus" class="muted" role="status" aria-live="polite">Runtime: loading...</div>
+          <div class="panelTitle optimizerStrategyTitle">Team Strategy</div>
+          <div class="optimizerFilterGrid optimizerQuickSettings">
             <label class="optimizerField">
               <span>Team Pattern</span>
               <select id="teamTypeSelect" class="input">
@@ -87,8 +85,28 @@
                 <option value="survivor">Survivor</option>
               </select>
             </label>
+          </div>
+          <div class="optimizerActionGrid optimizerPrimaryActions">
+            <button id="buildBest" class="btn" type="button" aria-describedby="optimizerRosterGuidance">Build Best Team</button>
+            <button id="cancelOptimizer" class="btn" type="button" hidden>Cancel</button>
+          </div>
+          <div id="optimizerRosterGuidance" class="muted optimizerRosterGuidance" role="status" aria-live="polite" hidden>
+            Select owned units in Roster before building a team.
+          </div>
+          <div id="optimizerProgress" class="muted" role="status" aria-live="polite" hidden>
+            <progress id="optimizerProgressBar" max="100" value="0" aria-labelledby="optimizerProgressText"></progress>
+            <span id="optimizerProgressText">Preparing data</span>
+          </div>
+        </div>
+
+        <details id="optimizerAdvancedControls" class="optimizerControlCard optimizerDisclosure optimizerFiltersCard">
+          <summary>
+            <span class="panelTitle">Advanced tuning</span>
+            <span id="optimizerAdvancedSummary" class="muted optimizerDisclosureStatus">Recommended defaults</span>
+          </summary>
+          <div class="optimizerDisclosureBody optimizerFilterGrid">
             <label class="optimizerField">
-              <span>Primary Effect Type</span>
+              <span>Primary Synergy</span>
               <select id="primaryArchetypeSelect" class="input">
                 <option value="">Any passive effect type</option>
                 <option value="burn">Burn</option>
@@ -112,7 +130,7 @@
               </select>
             </label>
             <label class="optimizerField">
-              <span>Extra Effect Type</span>
+              <span>Secondary Synergy</span>
               <select id="secondaryArchetypeSelect" class="input">
                 <option value="none">No extra added effects</option>
                 <option value="burn">Burn</option>
@@ -152,41 +170,40 @@
               </select>
             </label>
           </div>
-        </div>
+        </details>
 
-        <div class="optimizerControlCard optimizerActionsCard">
-          <div class="panelTitle" style="margin:0;">Build Tools</div>
-          <div class="optimizerActionGrid optimizerActionGridSimple">
-            <button id="buildBest" class="btn" type="button">Build Best Team</button>
-            <button id="cancelOptimizer" class="btn" type="button" hidden>Cancel</button>
-            <button id="buildExample" class="btn" type="button">Build Example Team</button>
-            <button id="clearTeams" class="btn" type="button">Clear</button>
-          </div>
-          <div id="optimizerProgress" class="muted" style="margin-top:8px;" hidden>
-            <progress id="optimizerProgressBar" max="100" value="0" style="width:100%;"></progress>
-            <span id="optimizerProgressText">Preparing data</span>
-          </div>
-          <div style="margin-top:8px;">
+        <details id="optimizerMetaTools" class="optimizerControlCard optimizerDisclosure optimizerActionsCard">
+          <summary>
+            <span class="panelTitle">Meta &amp; data</span>
+            <span class="muted optimizerDisclosureStatus">Optional</span>
+          </summary>
+          <div class="optimizerDisclosureBody">
             <button id="refreshLatestUnitCache" class="btn" type="button">Refresh Latest Unit Cache</button>
             <label class="muted" style="display:block;margin-top:6px;"><input id="useAdvisoryMetaPrior" type="checkbox" disabled> Use local newer-unit prior</label>
-            <div id="localMetaStatus" class="muted">Preparing the local generated release-order cache…</div>
+            <div id="localMetaStatus" class="muted" role="status" aria-live="polite">Preparing the local generated release-order cache…</div>
             <button id="researchStrategies" class="btn" type="button" style="margin-top:8px;" disabled>Research Public Strategies</button>
             <label class="muted" style="display:block;margin-top:6px;"><input id="useInternetResearchPrior" type="checkbox" disabled> Add internet evidence to meta prior</label>
-            <div id="researchStatus" class="muted">Checking optional research backend configuration…</div>
+            <div id="researchStatus" class="muted" role="status" aria-live="polite">Checking optional research backend configuration…</div>
             <details id="researchFindings" class="muted" style="margin-top:6px;" hidden>
               <summary id="researchFindingsSummary">Internet research source report</summary>
               <div id="researchFindingsList"></div>
             </details>
           </div>
-        </div>
-      </div>
+        </details>
 
-      <div class="panelRow" style="margin-top:10px;">
-        <button id="lockFilledStory" class="btn" type="button">Lock Filled Story Slots</button>
-        <button id="unlockAllLocks" class="btn" type="button">Unlock All</button>
-        <div class="muted" style="align-self:center;">
-          Locks prevent optimizer from replacing units in those slots.
-        </div>
+        <details id="optimizerMoreActions" class="optimizerControlCard optimizerDisclosure optimizerActionsCard">
+          <summary>
+            <span class="panelTitle">More actions</span>
+            <span class="muted optimizerDisclosureStatus">Demo, clear &amp; locks</span>
+          </summary>
+          <div class="optimizerDisclosureBody optimizerActionGrid optimizerActionGridSimple">
+            <button id="buildExample" class="btn" type="button">Try Demo Team</button>
+            <button id="clearTeams" class="btn" type="button">Clear Team Layout</button>
+            <button id="lockFilledStory" class="btn" type="button">Lock Filled Story Slots</button>
+            <button id="unlockAllLocks" class="btn" type="button">Unlock All</button>
+            <div class="muted">Locks prevent optimizer from replacing units in those slots.</div>
+          </div>
+        </details>
       </div>
         </section>
       </aside>
@@ -233,7 +250,7 @@
   <script src="./seasonal-theme.js?v=16"></script>
   <script src="./site-menu.js?v=16"></script>
   <script src="./theme-auto-route-authority.js?v=2"></script>
-  <script src="./live-data-config.js?v=entries-1791827475-00f34d5fba2c-optimizer-v6-synergy-v1"></script>
+  <script src="./live-data-config.js?v=entries-1791827475-00f34d5fba2c-optimizer-v6-synergy-v2"></script>
   <script src="./image-cache-reset.js?v=5"></script>
   <script src="./data-loader.js?v=7"></script>
   <script src="./duo-source-collapse.js?v=2"></script>
@@ -248,7 +265,7 @@
   <script src="./optimizerEngineV3.js?v=2"></script>
   <script src="./optimizer-legacy/optimizer-v4-fallback-loader.js?v=12"></script>
   <script src="./optimizer-v5-lab/optimizer-v5-loader.js?v=12"></script>
-  <script src="./optimizer-v6/optimizer-v6-loader.js?v=9"></script>
+  <script src="./optimizer-v6/optimizer-v6-loader.js?v=10"></script>
   <script src="./optimizer-strategy-research.js?v=4"></script>
   <script src="./optimizer-hook.js?v=1770082379"></script>
   <script src="./optimizerRuntimeBootstrap.js?v=1"></script>

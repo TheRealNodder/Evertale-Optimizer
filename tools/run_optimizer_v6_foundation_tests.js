@@ -9,6 +9,7 @@ for(const file of [
   'optimizer-v6-policy.js',
   'optimizer-v6-local-meta.js',
   'optimizer-v6-evidence.js',
+  'optimizer-v6-skill-model.js',
   'optimizer-v6-resource-reasoner.js',
   'optimizer-v6-feature-model.js',
   'optimizer-v6-team-evaluator.js',

@@ -2,7 +2,7 @@
   'use strict';
   const root=g.OptimizerV6=g.OptimizerV6||{},P=root.policy;
   if(!P)return;
-  const CACHE_KEY='evertale_optimizer_v6_cache_v3',memory=new Map();let active=null,sequence=0;
+  const CACHE_KEY='evertale_optimizer_v6_cache_v4',memory=new Map();let active=null,sequence=0;
 
   function cleanOptions(options){
     const clone={};for(const [key,value] of Object.entries(options||{}))if(!['onProgress','signal','cancelled'].includes(key)&&typeof value!=='function')clone[key]=value;return clone;
@@ -54,7 +54,7 @@
     if(typeof Worker!=='function'){
       const result=root.engine.run(prepared,{...options,preparedV6:true,onProgress:progress=>emit(progress,options)});if(result?.diagnostics?.v6Failed)throw new Error(result.diagnostics.v6Error);writeCache(key,result);return result;
     }
-    const jobId=`v6-${Date.now()}-${++sequence}`,worker=new Worker('./optimizer-v6/optimizer-v6-worker.js?v=9');
+    const jobId=`v6-${Date.now()}-${++sequence}`,worker=new Worker('./optimizer-v6/optimizer-v6-worker.js?v=10');
     return new Promise((resolve,reject)=>{
       active={jobId,worker,reject};
       worker.onmessage=event=>{

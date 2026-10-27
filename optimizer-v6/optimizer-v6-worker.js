@@ -2,16 +2,17 @@
 self.window=self;
 
 importScripts(
-  './optimizer-v6-policy.js?v=9',
-  './optimizer-v6-evidence.js?v=9',
-  './optimizer-v6-resource-reasoner.js?v=9',
-  './optimizer-v6-feature-model.js?v=9',
-  './optimizer-v6-team-evaluator.js?v=9',
-  './optimizer-v6-explanations.js?v=9',
-  './optimizer-v6-story-search.js?v=9',
-  './optimizer-v6-platoon-generator.js?v=9',
-  './optimizer-v6-platoon-allocator.js?v=9',
-  './optimizer-v6-engine.js?v=9'
+  './optimizer-v6-policy.js?v=10',
+  './optimizer-v6-evidence.js?v=10',
+  './optimizer-v6-skill-model.js?v=10',
+  './optimizer-v6-resource-reasoner.js?v=10',
+  './optimizer-v6-feature-model.js?v=10',
+  './optimizer-v6-team-evaluator.js?v=10',
+  './optimizer-v6-explanations.js?v=10',
+  './optimizer-v6-story-search.js?v=10',
+  './optimizer-v6-platoon-generator.js?v=10',
+  './optimizer-v6-platoon-allocator.js?v=10',
+  './optimizer-v6-engine.js?v=10'
 );
 
 self.onmessage=function(event){

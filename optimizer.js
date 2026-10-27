@@ -25,6 +25,12 @@ const LS_PRIMARY_ARCHETYPE_KEY = "evertale_optimizer_primaryArchetype_v1";
 const LS_SECONDARY_ARCHETYPE_KEY = "evertale_optimizer_secondaryArchetype_v1";
 const LS_META_WEIGHT_KEY = "evertale_optimizer_metaWeight_v1";
 const LS_SEARCH_INTELLIGENCE_KEY = "evertale_optimizer_searchIntelligence_v1";
+const ADVANCED_CONTROL_DEFAULTS = Object.freeze({
+  primaryArchetypeSelect: "",
+  secondaryArchetypeSelect: "none",
+  searchIntelligenceSelect: "deep",
+  metaWeightSelect: "balanced",
+});
 
 const ARCHETYPE_OPTIONS = new Set(["","none","burn","poison","sleep","stun","heal","turn","cleanse","defense","guardian","stealth","spirit","charge","blood","crisis","survivor"]);
 
@@ -139,6 +145,26 @@ function syncArchetypeDropdowns() {
   }
 }
 
+function updateAdvancedControlsSummary({ revealCustom = false } = {}) {
+  const details = el("optimizerAdvancedControls");
+  const summary = el("optimizerAdvancedSummary");
+  const customCount = Object.entries(ADVANCED_CONTROL_DEFAULTS).reduce((count, [id, defaultValue]) => {
+    const control = el(id);
+    return count + (control && control.value !== defaultValue ? 1 : 0);
+  }, 0);
+
+  if (summary) {
+    summary.textContent = customCount
+      ? `${customCount} custom setting${customCount === 1 ? "" : "s"}`
+      : "Recommended defaults";
+    summary.dataset.customCount = String(customCount);
+  }
+  if (details) {
+    details.dataset.customCount = String(customCount);
+    if (revealCustom && customCount > 0) details.open = true;
+  }
+}
+
 function initSharedOptimizerFiltersUI() {
   const teamSel = el("teamTypeSelect");
   const presetSel = el("presetSelect");
@@ -153,18 +179,27 @@ function initSharedOptimizerFiltersUI() {
   if (metaWeightSel) metaWeightSel.value = getMetaWeightPref();
   if (intelligenceSel) intelligenceSel.value = getSearchIntelligencePref();
   syncArchetypeDropdowns();
+  updateAdvancedControlsSummary({ revealCustom: true });
   teamSel?.addEventListener("change", (e) => setTeamTypePref(e.target.value || "auto"));
   presetSel?.addEventListener("change", (e) => setPresetPref(e.target.value || "auto"));
   primarySel?.addEventListener("change", (e) => {
     setPrimaryArchetypePref(e.target.value || "");
     syncArchetypeDropdowns();
+    updateAdvancedControlsSummary();
   });
   secondarySel?.addEventListener("change", (e) => {
     setSecondaryArchetypePref(e.target.value || "none");
     syncArchetypeDropdowns();
+    updateAdvancedControlsSummary();
   });
-  metaWeightSel?.addEventListener("change", (e) => setMetaWeightPref(e.target.value || "balanced"));
-  intelligenceSel?.addEventListener("change", (e) => setSearchIntelligencePref(e.target.value || "deep"));
+  metaWeightSel?.addEventListener("change", (e) => {
+    setMetaWeightPref(e.target.value || "balanced");
+    updateAdvancedControlsSummary();
+  });
+  intelligenceSel?.addEventListener("change", (e) => {
+    setSearchIntelligencePref(e.target.value || "deep");
+    updateAdvancedControlsSummary();
+  });
 }
 
 function getOwnedIds() {
@@ -604,10 +639,23 @@ function renderStorage() {
   }).join("");
 }
 
+function updateOwnedBuildAvailability() {
+  const hasOwnedUnits = state.ownedUnits.length > 0;
+  const isSearching = document.body?.dataset.optimizerSearching === "true";
+  const build = el("buildBest");
+  const guidance = el("optimizerRosterGuidance");
+  if (build) {
+    build.disabled = !hasOwnedUnits || isSearching;
+    build.setAttribute("aria-disabled", String(!hasOwnedUnits || isSearching));
+  }
+  if (guidance) guidance.hidden = hasOwnedUnits;
+}
+
 function renderAll() {
   el("ownedCount") && (el("ownedCount").textContent = `${state.ownedUnits.length} selected`);
   el("ownedPoolText") && (el("ownedPoolText").textContent = `${state.ownedUnits.length} owned units available`);
   updateOptimizerRuntimeStatus();
+  updateOwnedBuildAvailability();
 
   const storySection = el("storySection");
   const platoonsSection = el("platoonsSection");
@@ -1078,7 +1126,6 @@ function setOptimizerBusy(active) {
   const example = el("buildExample");
   const cancel = el("cancelOptimizer");
   const progress = el("optimizerProgress");
-  if (build) build.disabled = !!active;
   if (example) example.disabled = !!active;
   if (cancel) cancel.hidden = !active;
   if (progress) progress.hidden = !active;
@@ -1086,6 +1133,7 @@ function setOptimizerBusy(active) {
     if (active) document.body.dataset.optimizerSearching = "true";
     else delete document.body.dataset.optimizerSearching;
   }
+  if (build) updateOwnedBuildAvailability();
 }
 
 function updateOptimizerProgress(detail = {}) {
@@ -1099,7 +1147,12 @@ async function runEngine() {
   // normal optimizer = owned-only
   state.exampleMode = false;
   const owned = state.ownedUnits || [];
-  if (!owned.length || !window.OptimizerEngine || typeof window.OptimizerEngine.run !== "function") return;
+  if (!owned.length) {
+    showOptimizerNotice("Select owned units in Roster before building a team.");
+    updateOwnedBuildAvailability();
+    return;
+  }
+  if (!window.OptimizerEngine || typeof window.OptimizerEngine.run !== "function") return;
   const options = buildEngineOptions();
   options.onProgress = updateOptimizerProgress;
   setOptimizerBusy(true);
@@ -1121,22 +1174,33 @@ function structuredCloneSafe(obj) {
   try { return structuredClone(obj); } catch { return JSON.parse(JSON.stringify(obj || {})); }
 }
 
+function syncModeButtons() {
+  const storyBtn = el("modeStory");
+  const platoonsBtn = el("modePlatoons");
+  if (!storyBtn || !platoonsBtn) return;
+  const storyActive = state.mode === "story";
+  storyBtn.classList.toggle("active", storyActive);
+  platoonsBtn.classList.toggle("active", !storyActive);
+  storyBtn.setAttribute("aria-pressed", String(storyActive));
+  platoonsBtn.setAttribute("aria-pressed", String(!storyActive));
+}
+
 function installModeButtons() {
   const storyBtn = el("modeStory");
   const platoonsBtn = el("modePlatoons");
   if (!storyBtn || !platoonsBtn) return;
 
+  syncModeButtons();
+
   storyBtn.addEventListener("click", () => {
     state.mode = "story";
-    storyBtn.classList.add("active");
-    platoonsBtn.classList.remove("active");
+    syncModeButtons();
     renderAll();
   });
 
   platoonsBtn.addEventListener("click", () => {
     state.mode = "platoons";
-    platoonsBtn.classList.add("active");
-    storyBtn.classList.remove("active");
+    syncModeButtons();
     renderAll();
   });
 }

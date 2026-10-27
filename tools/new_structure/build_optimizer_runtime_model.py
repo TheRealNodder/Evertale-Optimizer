@@ -500,18 +500,57 @@ def configuration_feature_records(config: Any) -> List[Dict[str, Any]]:
     return list(found.values())
 
 
-def configuration_negative_payoffs(config: Any) -> set[str]:
-    if not isinstance(config, dict):
-        return set()
-    result = set()
-    for path, value in iter_named_scalars(config):
-        if not any(field in path.lower() for field in ("attackscalors", "damageboosts", "usecondition")):
+def structured_scaler_polarity_records(payload: Any) -> List[Dict[str, Any]]:
+    """Resolve status polarity from exact damage-scaler values.
+
+    A condition named ``GoodVsNotBurning`` is not enough to decide polarity.
+    If its conditional multiplier is greater than the base multiplier, Burn
+    removes a bonus and is a genuine conflict.  If the multiplier is lower,
+    burning the enemy avoids a damage penalty and is a Burn payoff.  Availability
+    conditions such as ``IsNotBurning`` are deliberately excluded: those often
+    guard the skill that applies Burn and must never become anti-Burn evidence.
+    """
+    if not isinstance(payload, dict):
+        return []
+    ability = payload.get("ability") if isinstance(payload.get("ability"), dict) else {}
+    config = payload.get("config") if isinstance(payload.get("config"), dict) else {}
+    resolved_scalers = payload.get("attackScalors") if isinstance(payload.get("attackScalors"), dict) else {}
+    scaler_ids = config.get("attackScalors") if isinstance(config.get("attackScalors"), list) else list(resolved_scalers)
+    conditional = ability.get("conditionalAbilityScalors")
+    conditional_values = conditional if isinstance(conditional, list) else []
+    base = finite_number(ability.get("abilityScalor"))
+    if base is None:
+        return []
+    found: Dict[Tuple[str, str], Dict[str, Any]] = {}
+    for index, scaler_id in enumerate(scaler_ids):
+        if index >= len(conditional_values):
             continue
-        token = normalized(value)
+        multiplier = finite_number(conditional_values[index])
+        if multiplier is None or multiplier == base:
+            continue
+        scaler = resolved_scalers.get(str(scaler_id)) if isinstance(resolved_scalers.get(str(scaler_id)), dict) else {}
+        condition_blob = normalized(" ".join((
+            str(scaler_id),
+            str(scaler.get("sourceCondition") or ""),
+            str(scaler.get("targetCondition") or ""),
+        )))
         for status in ("burn", "poison", "sleep", "stun"):
-            if any(fragment in token for fragment in (f"not{status}", f"non{status}", f"without{status}")):
-                result.add(status)
-    return result
+            if not any(fragment in condition_blob for fragment in (f"not{status}", f"non{status}", f"without{status}")):
+                continue
+            if multiplier > base:
+                feature, relation = f"penalized_by_{status}", "penalized_by"
+            else:
+                feature, relation = f"payoff_{status}", "benefits_from"
+            found.setdefault(
+                (feature, str(scaler_id)),
+                receipt(
+                    feature,
+                    relation=relation,
+                    target_team="enemies",
+                    trigger=f"damage_scaler:{scaler_id}:{base}->{multiplier}",
+                ),
+            )
+    return list(found.values())
 
 
 def description_feature_records(description: Any) -> List[Dict[str, Any]]:
@@ -719,9 +758,12 @@ def description_feature_records(description: Any) -> List[Dict[str, Any]]:
             add(f"ward_{status}", "prevents", "self")
         for clause in scoped_clauses:
             removal_pattern = rf"\b(?:remove|removes|removed|purif(?:y|ies|ied)).{{0,90}}\b{status}\b|\b{status}\b.{{0,70}}\bremoved\b"
+            # Removal must be proven inside the same clause.  The previous
+            # document-wide fallback joined an unrelated Purify sentence with
+            # later Ward, immunity, setup, and payoff mentions.  That produced
+            # hundreds of false cleanses and poisoned every status plan.
             if not re.search(removal_pattern, clause):
-                if not (re.search(r"\b(?:remove|removes|removed|purif(?:y|ies|ied))\b", text) and re.search(rf"\b{status}\b", clause)):
-                    continue
+                continue
             target = target_of(clause)
             removal_from_allies = re.search(r"\b(?:from them|from all allies|from allied units)\b", text)
             if removal_from_allies:
@@ -800,17 +842,24 @@ def feature_evidence_for_entry(row: Dict[str, Any]) -> List[Dict[str, Any]]:
             if not isinstance(ability, dict):
                 continue
             config = ability.get("config") if isinstance(ability.get("config"), dict) else {}
-            negative_payoffs = configuration_negative_payoffs(config)
             for record in configuration_feature_records(config):
                 add(record["feature"], f"{source_base}.config", 0.99, record)
-            for status in negative_payoffs:
-                feature = f"penalized_by_{status}"
-                add(feature, f"{source_base}.config", 0.99, receipt(feature, relation="penalized_by", target_team="allies", trigger="ability_scaler"))
+            scaler_polarity = structured_scaler_polarity_records(ability)
+            scaler_conflicts = {
+                record["feature"].removeprefix("penalized_by_")
+                for record in scaler_polarity
+                if str(record.get("feature") or "").startswith("penalized_by_")
+            }
+            for record in scaler_polarity:
+                add(record["feature"], f"{source_base}.attackScalors", 0.99, record)
             localization = ability.get("localization") if isinstance(ability.get("localization"), dict) else {}
             description = localization.get("description")
             if description:
                 for record in description_feature_records(description):
-                    if record["feature"].startswith("payoff_") and record["feature"].removeprefix("payoff_") in negative_payoffs:
+                    if (
+                        record["feature"].startswith("payoff_")
+                        and record["feature"].removeprefix("payoff_") in scaler_conflicts
+                    ):
                         continue
                     add(record["feature"], f"{source_base}.localization.description", 0.84, record)
 
@@ -852,6 +901,77 @@ def finite_number(value: Any, fallback: Any = None) -> Any:
     return int(number) if number.is_integer() else number
 
 
+def active_skill_target(payload: Dict[str, Any], config: Dict[str, Any]) -> Dict[str, Any]:
+    """Return a compact, exact target contract for browser-side reasoning."""
+    targeting = payload.get("targetingData") if isinstance(payload.get("targetingData"), dict) else {}
+    key = normalized(config.get("targetingData"))
+    side, count, targets_all, random_target = "unknown", None, False, False
+    if targeting.get("selfOnly") or key in {"selfonly", "sourceonly", "self", "user"}:
+        side, count = "self", 1
+    elif targeting.get("allEnemies") or key == "allenemy":
+        side, targets_all = "enemies", True
+    elif targeting.get("allFriends") or key in {"allally", "allfriends", "allfriendly"}:
+        side, targets_all = "allies", True
+    elif targeting.get("all") or key in {"all", "allfriendsandenemies"}:
+        side, targets_all = "mixed", True
+    elif finite_number(targeting.get("enemyTargets")):
+        side, count = "enemies", max(1, int(finite_number(targeting.get("enemyTargets"), 1)))
+    elif finite_number(targeting.get("friendlyTargets")):
+        side, count = "allies", max(1, int(finite_number(targeting.get("friendlyTargets"), 1)))
+    elif targeting.get("twoRandomEnemy") or key == "2randomenemy":
+        side, count, random_target = "enemies", 2, True
+    elif targeting.get("randomEnemy") or key == "randomenemy":
+        side, count, random_target = "enemies", 1, True
+    elif targeting.get("randomFriend"):
+        side, count, random_target = "allies", 1, True
+    elif key:
+        if "enemy" in key:
+            side = "enemies"
+        elif "ally" in key or "friend" in key:
+            side = "allies"
+        if key.startswith("2"):
+            count = 2
+        elif key.startswith("1") or "oneally" in key:
+            count = 1
+        random_target = "random" in key
+    return {
+        "side": side,
+        "count": count,
+        "all": targets_all,
+        "random": random_target,
+        "authority": "resolved.targetingData" if targeting else "config.targetingData",
+    }
+
+
+def active_skill_scalers(payload: Dict[str, Any], config: Dict[str, Any], ability: Dict[str, Any]) -> List[Dict[str, Any]]:
+    resolved = payload.get("attackScalors") if isinstance(payload.get("attackScalors"), dict) else {}
+    requested = config.get("attackScalors") if isinstance(config.get("attackScalors"), list) else list(resolved)
+    conditional = ability.get("conditionalAbilityScalors") if isinstance(ability.get("conditionalAbilityScalors"), list) else []
+    rows: List[Dict[str, Any]] = []
+    for index, scaler_id in enumerate(requested):
+        exact = resolved.get(str(scaler_id)) if isinstance(resolved.get(str(scaler_id)), dict) else {}
+        row = {
+            "id": str(scaler_id),
+            "multiplier": finite_number(conditional[index]) if index < len(conditional) else None,
+            "sourceCondition": str(exact.get("sourceCondition") or ""),
+            "targetCondition": str(exact.get("targetCondition") or ""),
+        }
+        rows.append(row)
+    return rows
+
+
+def active_skill_effect_chances(payload: Dict[str, Any]) -> List[float | int]:
+    values: set[float | int] = set()
+    buffs = payload.get("buffs") if isinstance(payload.get("buffs"), dict) else {}
+    for path, raw in iter_named_scalars(buffs, "buffs"):
+        if not path.lower().endswith(".chance"):
+            continue
+        chance = finite_number(raw)
+        if chance is not None and 0 <= chance <= 1:
+            values.add(chance)
+    return sorted(values)
+
+
 def skill_profile_for_entry(row: Dict[str, Any]) -> Dict[str, Any]:
     resolved = row.get("resolved") if isinstance(row.get("resolved"), dict) else {}
     active = resolved.get("activeSkills") if isinstance(resolved.get("activeSkills"), dict) else {}
@@ -869,6 +989,9 @@ def skill_profile_for_entry(row: Dict[str, Any]) -> Dict[str, Any]:
         flags = config.get("flags") if isinstance(config.get("flags"), list) else []
         components = config.get("components") if isinstance(config.get("components"), list) else []
         use_limit = finite_number(ability.get("useLimit"), 0)
+        resolved_conditions = payload.get("conditions") if isinstance(payload.get("conditions"), dict) else {}
+        base_multiplier = finite_number(ability.get("abilityScalor"))
+        conditional_multipliers = ability.get("conditionalAbilityScalors") if isinstance(ability.get("conditionalAbilityScalors"), list) else []
         skills.append({
             "id": str(payload.get("id") or skill_id),
             "name": str(localization.get("name") or payload.get("id") or skill_id),
@@ -878,12 +1001,19 @@ def skill_profile_for_entry(row: Dict[str, Any]) -> Dict[str, Any]:
             "spiritCost": max(0, finite_number(ability.get("spiritCost"), 0)),
             "useLimit": use_limit if use_limit and use_limit > 0 else None,
             "targeting": str(config.get("targetingData") or ""),
+            "target": active_skill_target(payload, config),
             "useCondition": str(config.get("useCondition") or ""),
+            "conditionIds": [str(value) for value in resolved_conditions if str(value).strip()],
             "flags": [str(value) for value in flags if str(value).strip()],
             "components": [str(value) for value in components if str(value).strip()],
+            "baseMultiplier": base_multiplier,
+            "conditionalMultipliers": [finite_number(value) for value in conditional_multipliers if finite_number(value) is not None],
+            "attackScalers": active_skill_scalers(payload, config, ability),
+            "effectChances": active_skill_effect_chances(payload),
             "source": f"resolved.activeSkills.{skill_id}",
         })
     return {
+        "profileVersion": 2,
         "sourceId": entry_key(row),
         "family": family_key(row),
         "skills": skills,
@@ -1024,6 +1154,14 @@ def main() -> int:
         1 for row in skill_profiles.values() for skill in row.get("skills") or []
         if finite_number(skill.get("tuCost")) is not None
     )
+    skill_profiles_with_targets = sum(
+        1 for row in skill_profiles.values() for skill in row.get("skills") or []
+        if isinstance(skill.get("target"), dict) and skill.get("target", {}).get("side") != "unknown"
+    )
+    skill_profiles_with_damage_scalers = sum(
+        1 for row in skill_profiles.values() for skill in row.get("skills") or []
+        if finite_number(skill.get("baseMultiplier")) is not None or skill.get("attackScalers")
+    )
     skill_profile_entries_by_element: Dict[str, int] = {}
     skill_profile_gain_by_element: Dict[str, int] = {}
     skill_profile_cost_by_element: Dict[str, int] = {}
@@ -1089,7 +1227,7 @@ def main() -> int:
         errors.append(f"Context-invalid feature evidence detected: {len(suspicious_evidence)}")
 
     report = {
-        "schemaVersion": 3,
+        "schemaVersion": 4,
         "generatedAt": int(time.time()),
         "status": "failed" if errors else "warning" if warnings else "ok",
         "errors": errors,
@@ -1116,6 +1254,9 @@ def main() -> int:
             "skillProfilesWithSpiritGain": skill_profiles_with_spirit_gain,
             "skillProfilesWithSpiritCost": skill_profiles_with_spirit_cost,
             "skillProfilesWithTU": skill_profiles_with_tu,
+            "skillProfilesWithTargetContracts": skill_profiles_with_targets,
+            "skillProfilesWithDamageScalers": skill_profiles_with_damage_scalers,
+            "skillProfileVersion": 2,
             "leaderProfileEntries": len(leader_profiles),
             "leaderProfilesResolved": len(leader_profiles) - len(unresolved_leader_profiles),
             "leaderProfilesUnresolved": len(unresolved_leader_profiles),
@@ -1135,7 +1276,7 @@ def main() -> int:
         return 1
 
     runtime = {
-        "schemaVersion": 5,
+        "schemaVersion": 6,
         "generatedAt": int(time.time()),
         "characters": families_index,
         "characterEntries": entry_index,
@@ -1165,12 +1306,15 @@ def main() -> int:
             "usesTags": bool(tags),
             "usesFeatureEvidence": bool(feature_evidence),
             "usesSkillProfiles": bool(skill_profiles),
+            "usesContextualSkillProfiles": bool(skill_profiles) and all(
+                profile.get("profileVersion") == 2 for profile in skill_profiles.values()
+            ),
             "usesLeaderProfiles": bool(leader_profiles),
         },
         "sources": {
             "tags": tag_sources,
             "featureEvidence": "characters.bundle.json resolved refs/configuration/localization",
-            "skillProfiles": "characters.bundle.json resolved.activeSkills structured ability/config/localization fields",
+            "skillProfiles": "characters.bundle.json resolved.activeSkills target/condition/scaler/effect authorities",
             "leaderProfiles": "leader_skill_localization.json joined to source-indexed character leaderBuff records",
             "knowledge": "apkfiles/entries/runtime/optimizer_knowledge.json",
         },

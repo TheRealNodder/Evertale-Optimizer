@@ -2,8 +2,8 @@
   'use strict';
 
   const root=g.OptimizerV6=g.OptimizerV6||{};
-  const P=root.policy,M=root.localMeta,E=root.evidence,F=root.featureModel,T=root.teamEvaluator,R=root.resourceReasoner,X=root.explanations;
-  if(!P||!M||!E||!F||!T||!R||!X)return;
+  const P=root.policy,M=root.localMeta,E=root.evidence,F=root.featureModel,T=root.teamEvaluator,R=root.resourceReasoner,K=root.skillModel,X=root.explanations;
+  if(!P||!M||!E||!F||!T||!R||!K||!X)return;
 
   function assert(condition,message){if(!condition)throw new Error(message);}
   function unit(id,element='Fire',extra={}){
@@ -370,6 +370,32 @@
       return `reserve ${forecast.minimumReserve}, opening ${forecast.openingSequence.map(row=>row.skillId).join(' -> ')}`;
     });
 
+    test('skill choice changes with team plan instead of using a universal rank',()=>{
+      const raw=[unit('ContextSkill01')],store={ContextSkill01:[evidence('applies_burn',1.6,.98,'resolved.activeSkills.Ignite#identifier')]};
+      const profiles=skillStore(raw,{ContextSkill01:[
+        skill('Ignite',{tuCost:100,spiritCost:2,components:['ApplyBuff'],target:{side:'enemies',count:1,all:false,random:false}}),
+        skill('HeavyHit',{tuCost:50,baseMultiplier:9,components:['Damage'],target:{side:'enemies',count:1,all:false,random:false}})
+      ]}),prepared=withStore(store,raw,profiles),burn=K.portfolio(prepared[0],'burn'),attack=K.portfolio(prepared[0],'attack');
+      assert(burn.topAction.skill.id==='Ignite',`Burn context chose ${burn.topAction.skill.id}`);
+      assert(attack.topAction.skill.id==='HeavyHit',`Attack context chose ${attack.topAction.skill.id}`);
+      return `Burn: ${burn.topAction.skill.id}; Attack: ${attack.topAction.skill.id}`;
+    });
+
+    test('same-mechanic skills compare exact TU targets and availability',()=>{
+      const raw=[unit('EfficiencySkill01')],store={EfficiencySkill01:[
+        evidence('applies_stun',1.6,.98,'resolved.activeSkills.SlowSingle#identifier'),
+        evidence('applies_stun',1.6,.98,'resolved.activeSkills.FastDouble#identifier')
+      ]},profiles=skillStore(raw,{EfficiencySkill01:[
+        skill('SlowSingle',{tuCost:160,useCondition:'AfterSetup',useLimit:1,target:{side:'enemies',count:1,all:false,random:false}}),
+        skill('FastDouble',{tuCost:50,target:{side:'enemies',count:2,all:false,random:false}})
+      ]}),prepared=withStore(store,raw,profiles),portfolio=K.portfolio(prepared[0],'stun');
+      assert(portfolio.topAction.skill.id==='FastDouble',`Exact action comparison chose ${portfolio.topAction.skill.id}`);
+      assert(portfolio.actions[0].parts.tempo>portfolio.actions[1].parts.tempo,'TU efficiency was not reflected');
+      assert(portfolio.actions[0].parts.targeting>portfolio.actions[1].parts.targeting,'target coverage was not reflected');
+      assert(portfolio.actions[0].parts.availability>portfolio.actions[1].parts.availability,'availability was not reflected');
+      return `${portfolio.actions[0].score.toFixed(1)} fast-double vs ${portfolio.actions[1].score.toFixed(1)} conditional-single`;
+    });
+
     test('Spirit sequencing rewards generator before spender',()=>{
       const build=(generatorSpeed,spenderSpeed)=>{
         const raw=makeTeam('Order');raw[0].stats.spd=generatorSpeed;raw[1].stats.spd=spenderSpeed;
@@ -402,8 +428,9 @@
       const allowed=new Set(Object.values(profiles).flatMap(row=>row.skills.map(value=>value.id)));
       assert(report.openingSequence.every(action=>allowed.has(action.skillId)),'Explanation invented a skill');
       assert(report.receipts.length===Object.keys(evaluation.components).length,'Score receipts are incomplete');
+      assert(evaluation.components.abilityFit>=0&&report.skillChoices.length===8,'Contextual skill receipts are incomplete');
       assert(report.method==='deterministic-evidence-reasoning','Explanation method is not explicit');
-      return `${report.openingSequence.length} sourced actions, ${report.receipts.length} receipts`;
+      return `${report.openingSequence.length} sourced actions, ${report.skillChoices.length} skill portfolios, ${report.receipts.length} receipts`;
     });
 
     test('missing runtime authority fails without fallback',()=>{
