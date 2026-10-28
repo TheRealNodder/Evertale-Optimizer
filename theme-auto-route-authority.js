@@ -84,6 +84,16 @@
     document.head.appendChild(script);
   }
 
+  function ensureLegendaryScenes(){
+    if(window.EvertaleLegendaryScenes){window.EvertaleLegendaryScenes.sync();return;}
+    if(document.querySelector('script[src*="legendary-scenes.js"]'))return;
+    const script=document.createElement('script');
+    script.src='./legendary-scenes.js?v=1';
+    script.defer=true;
+    script.addEventListener('error',()=>console.warn('Legendary illustration layer failed to load; base theme remains available.'),{once:true});
+    document.head.appendChild(script);
+  }
+
   let scheduled=false;
   function schedule(root=document){
     if(scheduled)return;
@@ -99,6 +109,7 @@
 
   function install(){
     ensureImageCacheLoader();
+    ensureLegendaryScenes();
     ensureElementalThemes(()=>{
       syncCurrentUrl();
       syncLinks(document);

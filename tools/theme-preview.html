@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <base href="../">
+  <title>Theme material preview</title>
+  <link rel="stylesheet" href="style.css?v=1770741091">
+  <link rel="stylesheet" href="theme-effects.css?v=3">
+  <style>
+    html,body{min-height:100%;overflow:hidden}body{padding:24px;font-size:15px}
+    .preview-heading{font-size:13px;letter-spacing:.15em;font-weight:800;margin-bottom:18px;color:var(--site-theme-ink);background:rgba(3,7,15,.9);border-radius:6px;padding:8px;width:fit-content}
+    .panel{position:relative;padding:22px;border-radius:18px;background:rgba(3,7,15,.87);border:1px solid rgba(var(--site-theme-rgb),.4);max-width:430px}
+    h1{font-size:23px;margin:0 0 8px;color:var(--site-theme-ink)}p{line-height:1.5;color:var(--site-theme-ink);opacity:.8;max-width:280px;margin-bottom:22px}
+    .preview-controls{display:flex;gap:10px}button{padding:11px 18px;border:1px solid var(--site-theme-accent);background:var(--site-theme-surface);color:var(--site-theme-ink);border-radius:9px;font:inherit;font-weight:700}
+    button[aria-pressed=true]{background:var(--site-theme-accent);color:var(--site-theme-on-accent)}
+    /* Static contact-sheet preview only. Production motion uses the OS setting. */
+    html *,html *::before,html *::after{animation-play-state:paused!important}
+  </style>
+  <script defer src="seasonal-theme.js?v=17"></script>
+  <script defer src="legendary-scenes.js?v=1"></script>
+  <script defer src="elemental-themes.js?v=1"></script>
+</head>
+<body>
+  <header class="preview-heading brandTitle">EVERTALE OPTIMIZER</header>
+  <section class="panel"><h1 id="preview-name">Theme preview</h1><p id="preview-cue">A material and identity reference for the live interface.</p><div class="preview-controls"><button aria-pressed="true">Selected</button><button>Secondary</button></div></section>
+  <script>
+    document.addEventListener('DOMContentLoaded',()=>{
+      const cfg=window.EvertaleTheme.getActiveTheme();
+      document.title=cfg.label+' — Theme preview';
+      document.getElementById('preview-name').textContent=cfg.label;
+      document.getElementById('preview-cue').textContent=cfg.aura||'Palette, surface, border, text, and selected-state reference.';
+    });
+  </script>
+</body>
+</html>

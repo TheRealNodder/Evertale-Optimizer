@@ -29,6 +29,7 @@ if (!dataVersionBase || !runtimeRevision) {
 
 const themeSource = read('seasonal-theme.js');
 const themeEffectsSource = read('theme-effects.css');
+const legendarySceneSource = read('legendary-scenes.js');
 const watermarkSource = read('element-watermark.css');
 for (const gem of ['gold', 'silver', 'ruby', 'sapphire', 'emerald', 'amethyst', 'diamond', 'pearl', 'platinum', 'opal', 'topaz', 'jade', 'obsidian', 'quartz']) {
   if (!themeSource.includes(`${gem}:`)) errors.push(`Gem/mineral theme is missing: ${gem}`);
@@ -47,6 +48,7 @@ for (const legendary of [
   'koraidon', 'miraidon', 'terapagos',
 ]) {
   if (!themeSource.includes(`${legendary}:`)) errors.push(`Legendary theme is missing: ${legendary}`);
+  if (!legendarySceneSource.includes(`${legendary}:`)) errors.push(`Subject-authored legendary scene is missing: ${legendary}`);
 }
 if (!themeSource.includes('data-theme-material') || !themeEffectsSource.includes('html[data-theme-material="gem"]')) {
   errors.push('Gem themes must retain their centralized material scoping');
@@ -65,7 +67,6 @@ for (const effect of [
   'ancient-pulse', 'future-grid', 'stellar-crystal',
 ]) {
   if (!themeSource.includes(`effect:'${effect}'`)) errors.push(`Legendary aura metadata is missing: ${effect}`);
-  if (!themeEffectsSource.includes(`data-theme-effect="${effect}"`)) errors.push(`Legendary aura CSS is missing: ${effect}`);
 }
 for (const finish of ['gloss-crimson', 'gloss-cobalt', 'metallic-rose', 'bronze', 'black-white', 'galaxy', 'warm-plastic']) {
   if (!themeSource.includes(`finish:'${finish}'`)) errors.push(`Console material metadata is missing: ${finish}`);
@@ -108,7 +109,7 @@ for (const page of pages) {
   for (const ref of refs) {
     if (!exists(ref)) errors.push(`${page} references missing file: ${ref}`);
   }
-  if (!html.includes('theme-effects.css?v=2')) {
+  if (!html.includes('theme-effects.css?v=3') || !html.includes('theme-auto-route-authority.js?v=3') || !html.includes('seasonal-theme.js?v=17')) {
     errors.push(`${page} does not load the current dynamic theme effects layer`);
   }
   if (!html.includes('site-menu.js?v=16')) {

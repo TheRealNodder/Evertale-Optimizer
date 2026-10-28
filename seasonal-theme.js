@@ -27,20 +27,20 @@
   };
   const HANDHELD_KEYS=new Set(Object.keys(HANDHELD_META));
   const LEGENDARY_META={
-    hooh:{group:'Pokémon · Johto',body:'#d84a32',energy:'#f6c94e',detail:'#32a976',effect:'rebirth',aura:'Prismatic feather arcs and a warm rekindling pulse'},
-    lugia:{group:'Pokémon · Johto',body:'#eef4f5',energy:'#4e88c3',detail:'#80d7e5',effect:'abyss-wind',aura:'Deep-water caustics and broad atmospheric pressure waves'},
-    suicune:{group:'Pokémon · Johto',body:'#315fb8',energy:'#8ce8f1',detail:'#7658c9',effect:'aurora-water',aura:'North-wind ribbons and clear purification ripples'},
+    hooh:{group:'Pokémon · Johto',body:'#d84a32',energy:'#f6c94e',detail:'#32a976',effect:'rebirth',aura:'Radiant feather crest, warm sunrise, and rising golden motes'},
+    lugia:{group:'Pokémon · Johto',body:'#eef4f5',energy:'#4e88c3',detail:'#80d7e5',effect:'abyss-wind',aura:'Broad wing crest, deep-ocean swells, and moving air currents'},
+    suicune:{group:'Pokémon · Johto',body:'#315fb8',energy:'#8ce8f1',detail:'#7658c9',effect:'aurora-water',aura:'Diamond crest, aurora ribbons, and quiet purification swells'},
     groudon:{group:'Pokémon · Hoenn',body:'#a62d29',energy:'#e0b34b',detail:'#c99736',effect:'magma',aura:'Fault lines, ground heat, and drought pressure'},
-    kyogre:{group:'Pokémon · Hoenn',body:'#125aa2',energy:'#8ddff0',detail:'#e9f7fb',effect:'ocean-pressure',aura:'Rain bands, ocean pressure rings, and underwater caustics'},
-    rayquaza:{group:'Pokémon · Hoenn',body:'#168657',energy:'#e6c14b',detail:'#b42e35',effect:'delta-stream',aura:'High-altitude streams, ozone currents, and sparse meteors'},
+    kyogre:{group:'Pokémon · Hoenn',body:'#125aa2',energy:'#8ddff0',detail:'#e9f7fb',effect:'ocean-pressure',aura:'Fin markings, deep ocean swells, and continuous falling rain'},
+    rayquaza:{group:'Pokémon · Hoenn',body:'#168657',energy:'#e6c14b',detail:'#b42e35',effect:'delta-stream',aura:'Serpentine crest and broad upper-atmosphere cloud currents'},
     shinyprimalgroudon:{group:'Pokémon · Hoenn Shiny',body:'#241313',energy:'#ffd45a',detail:'#f05a24',effect:'magma',aura:'Molten fissures, convection, and harsh solar pressure'},
     shinyprimalkyogre:{group:'Pokémon · Hoenn Shiny',body:'#531442',energy:'#32e3ee',detail:'#f4faff',effect:'ocean-pressure',aura:'Magenta primal body light, cyan lines, heavy rain, and broad ocean swells'},
     shinymegarayquaza:{group:'Pokémon · Hoenn Shiny',body:'#080a09',energy:'#ffd84b',detail:'#e33d37',effect:'delta-stream',aura:'Black form, gold tendrils, red trim, and a controlled high-altitude vortex'},
     dialga:{group:'Pokémon · Sinnoh',body:'#476f9a',energy:'#78d8e8',detail:'#c8d6df',effect:'time-rings',aura:'Concentric temporal rings and stepped time scans'},
-    palkia:{group:'Pokémon · Sinnoh',body:'#f0ecec',energy:'#d17ba7',detail:'#9175c5',effect:'space-rift',aura:'Parallax planes and a subtle spatial seam'},
+    palkia:{group:'Pokémon · Sinnoh',body:'#f0ecec',energy:'#d17ba7',detail:'#9175c5',effect:'space-rift',aura:'Pearl forms and a luminous curved spatial seam'},
     giratina:{group:'Pokémon · Sinnoh',body:'#17151b',energy:'#c79a38',detail:'#a82837',effect:'distortion',aura:'Reverse-falling particles and folded broken planes'},
     arceus:{group:'Pokémon · Sinnoh',body:'#f2f0e4',energy:'#d6b64a',detail:'#ffffff',effect:'creation',aura:'Ordered cosmic rings and a calm creation halo'},
-    reshiram:{group:'Pokémon · Unova',body:'#f2f0e8',energy:'#f17b45',detail:'#bfe8f3',effect:'white-flame',aura:'Atmospheric convection and a white-hot turbine spiral'},
+    reshiram:{group:'Pokémon · Unova',body:'#f2f0e8',energy:'#f17b45',detail:'#bfe8f3',effect:'white-flame',aura:'Feathered crest, warm convection, and a white-hot turbine seal'},
     zekrom:{group:'Pokémon · Unova',body:'#11151b',energy:'#41d2e5',detail:'#2879c8',effect:'thunder-generator',aura:'Cloud pressure and a restrained electric generator pulse'},
     blackkyurem:{group:'Pokémon · Unova',body:'#1d242c',energy:'#87e6f3',detail:'#398dde',effect:'freeze-shock',aura:'Electric bridges through angular frozen structures'},
     whitekyurem:{group:'Pokémon · Unova',body:'#e9f4f3',energy:'#f07a3e',detail:'#89ddeb',effect:'ice-burn',aura:'Warm light moving beneath cold crystalline layers'},
@@ -48,7 +48,7 @@
     yveltal:{group:'Pokémon · Kalos / Z-A',body:'#a92232',energy:'#101014',detail:'#d2cbd0',effect:'cocoon-drain',aura:'Particles drawn inward toward a wing-shaped shadow'},
     zygarde:{group:'Pokémon · Kalos / Z-A',body:'#101414',energy:'#74d84d',detail:'#d33b42',effect:'cell-grid',aura:'Cells assembling on a corrective hex grid'},
     solgaleo:{group:'Pokémon · Alola',body:'#f5f3e9',energy:'#f3c445',detail:'#67bfd7',effect:'solar-corona',aura:'A breathing solar corona and clean radiant flare'},
-    lunala:{group:'Pokémon · Alola',body:'#111637',energy:'#b847a4',detail:'#4cc7d7',effect:'lunar-phase',aura:'Moon halo, constellation edges, and slow phase breathing'},
+    lunala:{group:'Pokémon · Alola',body:'#111637',energy:'#b847a4',detail:'#4cc7d7',effect:'lunar-phase',aura:'Crescent wings, eclipsed moon halo, and drifting star motes'},
     ultranecrozma:{group:'Pokémon · Alola',body:'#fff2a4',energy:'#58d9e9',detail:'#f9d834',effect:'prism-rays',aura:'Hard-edged refraction from brilliant crystalline facets'},
     zacian:{group:'Pokémon · Galar',body:'#4ebccb',energy:'#e8be4d',detail:'#b44985',effect:'blade-trail',aura:'Poised directional streaks and a single clean blade trail'},
     zamazenta:{group:'Pokémon · Galar',body:'#b12e3d',energy:'#ddb94e',detail:'#5db9c9',effect:'shield-wave',aura:'Stable shield geometry and a rebounding pressure wave'},
@@ -79,7 +79,7 @@
     newyear:['#0b1020','#1e2a78','#7c4dff','#d7c8ff'],
     valentine:['#3b0a23','#8b1e4f','#d94f70','#ffd1dc'],
     stpatrick:['#062b16','#0f6b3a','#5dbb63','#daf7dc'],
-    easter:['#2e245c','#7c70d8','#f7c6e0','#fff7c2'],
+    easter:['#2e245c','#51428f','#f7c6e0','#fff7c2'],
     independence:['#081f5c','#b22234','#ffffff','#6ea8fe'],
     halloween:['#140b1f','#4a235a','#d35400','#f39c12'],
     thanksgiving:['#2b1a10','#8c4a1f','#d4a373','#f6e7cb'],
@@ -362,7 +362,8 @@
       surface:colors[1],
       secondary,
       accent,
-      ink:colors[3],
+      ink:readableInk(colors[3],[colors[0],colors[1]]),
+      onAccent:readableInk('#070a12',[accent]),
       legendaryBody:legendary?.body||colors[1],
       legendaryEnergy:legendary?.energy||accent,
       legendaryDetail:legendary?.detail||colors[3],
@@ -377,6 +378,16 @@
     const n=Number.parseInt(full,16);
     if(!Number.isFinite(n))return'246,202,94';
     return[(n>>16)&255,(n>>8)&255,n&255].join(',');
+  }
+  function contrast(a,b){
+    const light=color=>hexToRgb(color).split(',').map(Number).map(n=>{const c=n/255;return c<=.04045?c/12.92:((c+.055)/1.055)**2.4;}).reduce((sum,c,i)=>sum+c*[.2126,.7152,.0722][i],0);
+    const x=light(a),y=light(b);
+    return(Math.max(x,y)+.05)/(Math.min(x,y)+.05);
+  }
+  function readableInk(preferred,backgrounds){
+    const minimum=ink=>Math.min(...backgrounds.map(bg=>contrast(ink,bg)));
+    if(minimum(preferred)>=4.5)return preferred;
+    return minimum('#ffffff')>=minimum('#000000')?'#ffffff':'#000000';
   }
   function setVar(root,name,value){root.style.setProperty(name,value);}
   function ensureEffectLayer(){
@@ -396,7 +407,7 @@
     return layer;
   }
   function syncThemeMotion(){
-    const value=document.hidden?'paused':'running';
+    const value=document.hidden||window.matchMedia?.('(prefers-reduced-motion: reduce)').matches?'paused':'running';
     document.documentElement.setAttribute('data-theme-motion',value);
     if(document.body)document.body.setAttribute('data-theme-motion',value);
   }
@@ -425,6 +436,7 @@
     setVar(root,'--site-theme-surface',colors[1]);
     setVar(root,'--site-theme-accent',accent);
     setVar(root,'--site-theme-ink',ink);
+    setVar(root,'--site-theme-on-accent',cfg.onAccent);
     setVar(root,'--site-theme-secondary',cfg.secondary);
     setVar(root,'--site-theme-rgb',rgb);
     setVar(root,'--site-theme-surface-rgb',surfaceRgb);
@@ -510,5 +522,6 @@
   };
   document.readyState==='loading'?document.addEventListener('DOMContentLoaded',applyTheme,{once:true}):applyTheme();
   document.addEventListener('visibilitychange',()=>{syncThemeMotion();if(!document.hidden&&pref()===AUTO)applyTheme();});
+  window.matchMedia?.('(prefers-reduced-motion: reduce)').addEventListener?.('change',syncThemeMotion);
   setInterval(()=>{if(pref()===AUTO)applyTheme();},30*60*1000);
 })();
