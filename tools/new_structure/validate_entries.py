@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 from path_utils import configure_utf8_stdio
+from sync_category_order_canonical import CATEGORY_CONFIG
 
 ROOT_MARKERS = ["apkfiles", "tools"]
 CATEGORIES = ["characters", "weapons", "accessories", "bosses"]
@@ -108,6 +109,30 @@ def published_source_ids(entries: List[Dict[str, Any]], category: str) -> set[st
 def file_handle_order(file_value: Any) -> int | None:
     match = re.match(r"^(\d+)_", str(file_value or "").split("/")[-1])
     return int(match.group(1)) if match else None
+
+
+def validate_index_order(category: str, entries: List[Dict[str, Any]], errors: List[str], warnings: List[str]) -> None:
+    """Chronological handles and canonical display positions are different axes."""
+    config = CATEGORY_CONFIG[category]
+    handles = bool(config.get("order_by_file_handle"))
+    descending = bool(config.get("newest_first")) if handles else False
+    previous = None
+    seen: set[int] = set()
+    for row in entries:
+        rel = row.get("file")
+        order = int((row.get("fileHandleOrder") or file_handle_order(rel) or 0) if handles else (row.get("sourceOrder") or row.get("order") or 0))
+        actual_handle = file_handle_order(rel)
+        if row.get("fileHandleOrder") and actual_handle != int(row["fileHandleOrder"]):
+            errors.append(f"[{category}] File handle metadata mismatch: {rel}")
+        if row.get("sourceOrder") and row.get("order") and int(row["sourceOrder"]) != int(row["order"]):
+            errors.append(f"[{category}] Canonical order metadata mismatch: {rel}")
+        if not order or order in seen:
+            errors.append(f"[{category}] Missing or duplicate order {order}: {rel}")
+        elif previous is not None and ((descending and order > previous) or (not descending and order < previous)):
+            direction = "descending file-handle" if descending else "ascending canonical"
+            warnings.append(f"[{category}] Non-monotonic {direction} order near {rel}: {order} after {previous}")
+        seen.add(order)
+        previous = order
 
 
 def weapon_overlay_enabled(bundle: Dict[str, Any]) -> bool:
@@ -750,7 +775,7 @@ def validate(include_optimizer_semantics: bool = True) -> int:
     duplicate_source_ids: Dict[str, List[str]] = {}
 
     print("=" * 60)
-    print("Evertale Optimizer Entry Validator v9")
+    print("Evertale Optimizer Entry Validator v10")
     print("=" * 60)
     print(f"Repo Root : {repo_root}")
     print(f"Entries   : {base}")
@@ -779,7 +804,7 @@ def validate(include_optimizer_semantics: bool = True) -> int:
         category_counts[category] = len(entries)
         index_ids = [row_identity(entry) for entry in entries if row_identity(entry)]
         seen_ids: Dict[str, str] = {}
-        last_order = 0
+        validate_index_order(category, entries, errors, warnings)
         for entry in entries:
             checked += 1
             rel_file = entry.get("file")
@@ -791,10 +816,6 @@ def validate(include_optimizer_semantics: bool = True) -> int:
             if is_excluded_path(entry_path):
                 errors.append(f"[{category}] Index points to excluded path: {rel_file}")
                 continue
-            order = int(entry.get("fileHandleOrder") or entry.get("sourceOrder") or entry.get("order") or file_handle_order(rel_file) or 0)
-            if order and order < last_order:
-                warnings.append(f"[{category}] Non-monotonic order near {rel_file}: {order} after {last_order}")
-            last_order = max(last_order, order)
             if source_id in seen_ids:
                 duplicate_source_ids.setdefault(category, []).append(source_id)
             else:
@@ -830,7 +851,7 @@ def validate(include_optimizer_semantics: bool = True) -> int:
 
     semantic_summary = validate_optimizer_semantics(repo_root, base, errors, warnings) if include_optimizer_semantics else {"status": "deferred_until_runtime_rebuild"}
     status = "failed" if errors else "warning" if warnings else "ok"
-    report = {"validatorVersion": 9, "generatedAt": int(time.time()), "status": status, "repoRoot": str(repo_root), "entriesRoot": str(base), "checked": checked, "categoryCounts": category_counts, "bundleCounts": bundle_counts, "markerStatus": marker_status, "duplicateSourceIds": duplicate_source_ids, "semanticSummary": semantic_summary, "errors": errors, "warnings": warnings}
+    report = {"validatorVersion": 10, "generatedAt": int(time.time()), "status": status, "repoRoot": str(repo_root), "entriesRoot": str(base), "checked": checked, "categoryCounts": category_counts, "bundleCounts": bundle_counts, "markerStatus": marker_status, "duplicateSourceIds": duplicate_source_ids, "semanticSummary": semantic_summary, "errors": errors, "warnings": warnings}
     reports_dir = base / "reports"
     write_json(reports_dir / "validation_report.json", report)
     write_json(base / "_markers" / "validate_entries.marker.json", {"schemaVersion": 2, "tool": "validate_entries", "category": "all", "status": status, "lastKey": "validation", "lastSourceId": "", "lastHandle": None, "lastFile": "apkfiles/entries/reports/validation_report.json", "processedCount": checked, "totalCount": checked, "updatedAt": int(time.time()), "extra": {"errors": len(errors), "warnings": len(warnings)}})

@@ -2,9 +2,13 @@
 from __future__ import annotations
 
 import json
+import re
 import time
+from collections import Counter
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Tuple
+
+from build_apk_entry_folders import parse_localizable, stars_to_rarity
 
 ROOT_MARKERS = ["apkfiles", "tools"]
 ENTRIES_REL = "apkfiles/entries"
@@ -235,29 +239,81 @@ def audit_runtime(repo: Path) -> Tuple[Dict[str, Any], List[str], List[str]]:
     }, errors, warnings
 
 
+def audit_display_sources(repo: Path) -> Tuple[List[Dict[str, Any]], List[str]]:
+    """Keep every unresolved source gap, and fail on recoverable generation gaps."""
+    localizable = parse_localizable(repo / "apkfiles/Localizable_English.txt")
+    gaps: List[Dict[str, Any]] = []
+    errors: List[str] = []
+    for category in CATEGORIES:
+        root = repo / ENTRIES_REL / category
+        index = read_json(root / "index.json", {})
+        rows = [read_json(path, {}) for path in entry_paths(repo / ENTRIES_REL, category, index)]
+        by_source = {key_for(row, Path("")): row for row in rows}
+        for row in rows:
+            source_id = key_for(row, Path(""))
+            raw = row.get("raw") if isinstance(row.get("raw"), dict) else {}
+            if category != "characters" and (raw.get("stars") is not None or raw.get("accessoryStars") is not None):
+                stars = raw.get("stars") if raw.get("stars") is not None else raw.get("accessoryStars")
+                expected = raw.get("rarity") or stars_to_rarity(int(stars))
+                if row.get("rarity") != expected:
+                    errors.append(f"[{category}] {source_id}: generated rarity differs from existing frontend raw-star display contract")
+            for field in VISIBLE_FIELDS[category]:
+                if not is_missing(row.get(field)):
+                    continue
+                candidates = {f"raw.{field}": raw.get(field)}
+                suffixes = ["SecondNameKey", "TitleKey", "ProfileKey"] if field == "title" else [f"{field.title()}Key"]
+                families = [source_id]
+                if category == "characters":
+                    families.append(str(raw.get("family") or re.sub(r"\d+$", "", source_id)))
+                for family in families:
+                    for suffix in suffixes:
+                        candidates[f"Localizable_English:{family}{suffix}"] = localizable.get(f"{family}{suffix}")
+                if category == "weapons" and field == "description" and raw.get("family"):
+                    base = f"{raw['family']}01"
+                    candidates[f"explicit_raw_family:{base}.description"] = by_source.get(base, {}).get("description")
+                recoverable = any(not is_missing(value) for value in candidates.values())
+                gaps.append({"category": category, "sourceId": source_id, "field": field, "reason": "generation_gap" if recoverable else "source_unavailable", "sourcesChecked": list(candidates)})
+                if recoverable:
+                    errors.append(f"[{category}] {source_id}: {field} is missing despite available source authority")
+    return gaps, errors
+
+
+def warning_summary(warnings: List[str]) -> Dict[str, int]:
+    groups: Counter[str] = Counter()
+    for warning in warnings:
+        match = re.match(r"\[([^]]+)\].*: visible field (\w+) is missing$", warning)
+        groups[f"{match[1]}.missing_{match[2]}" if match else warning.split(":", 1)[0]] += 1
+    return dict(sorted(groups.items()))
+
+
 def main() -> int:
     repo = find_repo_root(Path(__file__).resolve())
     entry_summary, entry_errors, entry_warnings = audit_entries(repo)
     bundle_summary, bundle_errors, bundle_warnings = audit_bundles(repo)
     runtime_summary, runtime_errors, runtime_warnings = audit_runtime(repo)
+    source_gaps, source_errors = audit_display_sources(repo)
 
-    errors = entry_errors + bundle_errors + runtime_errors
+    errors = entry_errors + bundle_errors + runtime_errors + source_errors
     warnings = entry_warnings + bundle_warnings + runtime_warnings
     report = {
-        "schemaVersion": 1,
+        "schemaVersion": 2,
         "generatedAt": int(time.time()),
         "status": "failed" if errors else "warning" if warnings else "ok",
         "purpose": "Master Control field contract audit for Catalog, Roster, and Optimizer readiness.",
         "entrySummary": entry_summary,
         "bundleSummary": bundle_summary,
         "runtimeSummary": runtime_summary,
-        "errors": errors[:500],
-        "warnings": warnings[:500],
+        "errors": errors,
+        "warnings": warnings,
+        "warningSummary": warning_summary(warnings),
+        "sourceGaps": source_gaps,
+        "sourceGapCount": len(source_gaps),
         "warningCount": len(warnings),
         "errorCount": len(errors),
         "rules": [
             "Critical fields must exist before data is considered safe for site runtime.",
             "Visible-field warnings identify missing display or optimizer context but do not fail the run.",
+            "Every warning is retained. Missing optional source text is never fabricated; available but unpromoted source text fails validation.",
             "Raw source payload must be preserved so future extractors can promote newly discovered fields without data loss.",
         ],
     }

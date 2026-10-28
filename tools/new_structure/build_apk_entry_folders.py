@@ -26,7 +26,7 @@ from entry_checkpoint import write_marker as write_entry_marker
 from path_utils import find_repo_root, resolve_repo_path
 
 SCRIPT_VERSION = "8-semantic-authorities"
-LEGACY_CATEGORY_SCRIPT_VERSION = "7-base-form-rarity"
+LEGACY_CATEGORY_SCRIPT_VERSION = "8-generated-display-authority"
 TOOL_NAME = "build_apk_entry_folders"
 IMAGEKIT_BASE = "https://ik.imagekit.io/r8fsa98s9"
 ROOT_MARKERS = ("apkfiles", "tools")
@@ -315,8 +315,21 @@ def localize_character(localizable: Dict[str, str], internal_id: str, fallback_n
     return {"name": name, "title": title, "description": description}
 
 
-def localize_ability_like(localizable: Dict[str, str], ability_id: str) -> Dict[str, Any]:
+def ability_localization(localizable: Dict[str, str], ability_id: str, ability: Any = None) -> Dict[str, Any]:
+    """Follow explicit raw aliases per field; never infer aliases from names."""
     loc = localized(localizable, ability_id)
+    if isinstance(ability, dict):
+        for field in ("name", "description", "selected"):
+            alias = ability.get(f"{field}Key")
+            if not loc.get(field) and isinstance(alias, str) and alias:
+                key = alias if alias.endswith("Key") else f"{alias}{field.title()}Key"
+                if localizable.get(key):
+                    loc[field] = localizable[key]
+    return loc
+
+
+def localize_ability_like(localizable: Dict[str, str], ability_id: str, ability: Any = None) -> Dict[str, Any]:
+    loc = ability_localization(localizable, ability_id, ability)
     return {
         "id": ability_id,
         "found": bool(loc),
@@ -343,7 +356,7 @@ def strings_in(value: Any) -> Set[str]:
 
 def dependency_fingerprint_for_ability(ability_id: str, resolvers: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
     ability = resolvers["Ability"].get(ability_id)
-    fp: Dict[str, Any] = {"abilityId": ability_id, "ability": ability, "localization": localized(resolvers["Localizable"], ability_id)}
+    fp: Dict[str, Any] = {"abilityId": ability_id, "ability": ability, "localization": ability_localization(resolvers["Localizable"], ability_id, ability)}
     if not isinstance(ability, dict):
         return fp
     config_id = ability.get("config")
@@ -372,6 +385,8 @@ def build_source_marker(item: Optional[Dict[str, Any]], category: str, internal_
         "characterLocalization": localize_character(resolvers["Localizable"], internal_id, str(item.get("name") or internal_id)) if category == "characters" else None,
         "leaderCondition": resolvers["MonsterConditions"].get(item.get("leaderBuffCondition")) if isinstance(item.get("leaderBuffCondition"), str) else None,
     }
+    if category != "characters":
+        dependency_material["displayAuthority"] = display_authority(item, category, resolvers)
     source_material = {"category": category, "internalId": internal_id, "order": order_index, "displayName": display_name, "raw": item, "scriptVersion": script_version}
     return {"scriptVersion": script_version, "sourceHash": sha256_data(source_material), "dependencyHash": sha256_data(dependency_material)}
 
@@ -390,7 +405,7 @@ def existing_marker_matches(path: Path, marker: Dict[str, Any], force: bool) -> 
 
 def resolve_ability(ability_id: str, resolvers: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
     ability = resolvers["Ability"].get(ability_id)
-    result: Dict[str, Any] = localize_ability_like(resolvers["Localizable"], ability_id)
+    result: Dict[str, Any] = localize_ability_like(resolvers["Localizable"], ability_id, ability)
     if not isinstance(ability, dict):
         return result
     result["found"] = True
@@ -469,13 +484,55 @@ def image_variants_for_entry(category: str, internal_id: str) -> List[Dict[str, 
     }]
 
 
+def weapon_family_descriptions(items: List[Dict[str, Any]], localizable: Dict[str, str]) -> Dict[str, Any]:
+    """Only the explicit raw family and its real 01 form can supply shared prose."""
+    result: Dict[str, Any] = {}
+    for item in items:
+        source_id = get_internal_id(item)
+        family = str(item.get("family") or "")
+        if not family or source_id != f"{family}01":
+            continue
+        key = f"{source_id}DescriptionKey"
+        text = localizable.get(key) or item.get("description")
+        if text:
+            result[family] = {"value": text, "source": f"Localizable_English:{key}" if localizable.get(key) else f"Weapon:{source_id}.description", "sourceId": source_id}
+    return result
+
+
+def display_authority(item: Dict[str, Any], category: str, resolvers: Dict[str, Any]) -> Dict[str, Any]:
+    source_id = get_internal_id(item)
+    key = f"{source_id}DescriptionKey"
+    localized_text = resolvers["Localizable"].get(key)
+    description = localized_text or item.get("description") or ""
+    sources: Dict[str, Any] = {}
+    if description:
+        sources["description"] = {"source": f"Localizable_English:{key}" if localized_text else "raw.description", "sourceId": source_id}
+    elif category == "weapons":
+        shared = resolvers.get("WeaponFamilyDescriptions", {}).get(item.get("family"))
+        if shared:
+            description = shared["value"]
+            sources["description"] = {"source": shared["source"], "sourceId": shared["sourceId"], "scope": "explicit_raw_weapon_family"}
+    rarity = item.get("rarity")
+    if rarity:
+        sources["rarity"] = {"source": "raw.rarity"}
+    elif category != "characters":
+        # Preserve exactly the existing frontend display mapping, not evolvedStars
+        # and not the separate character-family rarity rule.
+        field = "stars" if item.get("stars") is not None else "accessoryStars"
+        if item.get(field) is not None:
+            rarity = stars_to_rarity(safe_int(item[field]))
+            sources["rarity"] = {"source": f"raw.{field}", "transform": "frontend_base_star_display_mapping"}
+    return {"description": description, "rarity": rarity, "fieldSources": sources}
+
+
 def normalize_entry(item: Dict[str, Any], category: str, order_index: int, display_name_override: Optional[str], resolvers: Dict[str, Dict[str, Any]], marker: Dict[str, Any], resolved_rarity: Optional[str] = None) -> Dict[str, Any]:
     internal_id = get_internal_id(item)
     localizable = resolvers["Localizable"]
     char_loc = localize_character(localizable, internal_id, str(item.get("displayName") or item.get("name") or internal_id)) if category == "characters" else {}
     display_name = display_name_override or char_loc.get("name") or localizable.get(f"{internal_id}NameKey") or item.get("displayName") or item.get("title") or item.get("name") or internal_id
     title = char_loc.get("title") or localizable.get(f"{internal_id}SecondNameKey") or localizable.get(f"{internal_id}TitleKey") or localizable.get(f"{internal_id}ProfileKey") or item.get("title") or ""
-    description = char_loc.get("description") or localizable.get(f"{internal_id}DescriptionKey") or item.get("description") or ""
+    display = display_authority(item, category, resolvers)
+    description = char_loc.get("description") or display["description"]
     active_ids = [x for x in ordered_values(item.get("activeSkills", [])) if isinstance(x, str)]
     passive_ids = [x for x in ordered_values(item.get("passives", item.get("passiveSkills", []))) if isinstance(x, str)]
     active_ai = item.get("activeSkillsAI", {}) if isinstance(item.get("activeSkillsAI"), dict) else {}
@@ -495,7 +552,8 @@ def normalize_entry(item: Dict[str, Any], category: str, order_index: int, displ
         "secondName": title,
         "description": description,
         "category": category[:-1] if category.endswith("s") else category,
-        "rarity": resolved_rarity if category == "characters" else item.get("rarity"),
+        "rarity": resolved_rarity if category == "characters" else display["rarity"],
+        **({"fieldSources": display["fieldSources"]} if category != "characters" else {}),
         "stars": item.get("stars"),
         "evolvedStars": item.get("evolvedStars"),
         "element": normalize_element(item.get("element")),
@@ -747,6 +805,8 @@ def build_category(
         return {"category": category, "status": "missing_raw_file", "entriesWritten": 0, "entriesSkipped": 0, "placeholdersWritten": 0}
     raw = load_json(raw_path)
     items = extract_list(raw, category)
+    if category == "weapons":
+        resolvers["WeaponFamilyDescriptions"] = weapon_family_descriptions(items, resolvers["Localizable"])
     by_id = {get_internal_id(item): item for item in items}
     family_rarities = character_family_rarities(items) if category == "characters" else {}
     ordered: List[Tuple[str, Optional[str]]] = []

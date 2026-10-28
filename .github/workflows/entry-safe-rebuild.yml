@@ -137,6 +137,11 @@ jobs:
             echo "Audit tool not found; skipping."
           fi
 
+      - name: Validate semantic authorities and warning repairs
+        run: |
+          python tools/new_structure/test_optimizer_foundation_authorities.py
+          python tools/new_structure/test_entry_warning_repairs.py
+
       - name: Show bundle report summary
         run: |
           python - <<'PY'
