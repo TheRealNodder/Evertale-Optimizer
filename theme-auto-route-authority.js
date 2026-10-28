@@ -85,12 +85,21 @@
   }
 
   function ensureLegendaryScenes(){
-    if(window.EvertaleLegendaryScenes){window.EvertaleLegendaryScenes.sync();return;}
+    if(window.EvertaleLegendaryScenes){window.EvertaleLegendaryScenes.sync();ensurePokemonPresence();return;}
     if(document.querySelector('script[src*="legendary-scenes.js"]'))return;
     const script=document.createElement('script');
     script.src='./legendary-scenes.js?v=1';
     script.defer=true;
+    script.addEventListener('load',ensurePokemonPresence,{once:true});
     script.addEventListener('error',()=>console.warn('Legendary illustration layer failed to load; base theme remains available.'),{once:true});
+    document.head.appendChild(script);
+  }
+
+  function ensurePokemonPresence(){
+    if(window.EvertalePokemonPresence){window.EvertalePokemonPresence.sync();return;}
+    if(document.querySelector('script[src*="pokemon-theme-presence.js"]'))return;
+    const script=document.createElement('script');script.src='./pokemon-theme-presence.js?v=1';script.defer=true;
+    script.addEventListener('error',()=>console.warn('Pokémon identity layer failed to load; base theme remains available.'),{once:true});
     document.head.appendChild(script);
   }
 

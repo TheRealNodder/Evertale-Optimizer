@@ -5,7 +5,7 @@
   <base href="../">
   <title>Theme material preview</title>
   <link rel="stylesheet" href="style.css?v=1770741091">
-  <link rel="stylesheet" href="theme-effects.css?v=3">
+  <link rel="stylesheet" href="theme-effects.css?v=4">
   <style>
     html,body{min-height:100%;overflow:hidden}body{padding:24px;font-size:15px}
     .preview-heading{font-size:13px;letter-spacing:.15em;font-weight:800;margin-bottom:18px;color:var(--site-theme-ink);background:rgba(3,7,15,.9);border-radius:6px;padding:8px;width:fit-content}
@@ -14,10 +14,12 @@
     .preview-controls{display:flex;gap:10px}button{padding:11px 18px;border:1px solid var(--site-theme-accent);background:var(--site-theme-surface);color:var(--site-theme-ink);border-radius:9px;font:inherit;font-weight:700}
     button[aria-pressed=true]{background:var(--site-theme-accent);color:var(--site-theme-on-accent)}
     /* Static contact-sheet preview only. Production motion uses the OS setting. */
-    html *,html *::before,html *::after{animation-play-state:paused!important}
+    html[data-preview-still] *,html[data-preview-still] *::before,html[data-preview-still] *::after{animation-play-state:paused!important}
   </style>
-  <script defer src="seasonal-theme.js?v=17"></script>
+  <script>if(new URLSearchParams(location.search).get('still')==='1')document.documentElement.setAttribute('data-preview-still','');</script>
+  <script defer src="seasonal-theme.js?v=18"></script>
   <script defer src="legendary-scenes.js?v=1"></script>
+  <script defer src="pokemon-theme-presence.js?v=1"></script>
   <script defer src="elemental-themes.js?v=1"></script>
 </head>
 <body>
@@ -27,8 +29,8 @@
     document.addEventListener('DOMContentLoaded',()=>{
       const cfg=window.EvertaleTheme.getActiveTheme();
       document.title=cfg.label+' — Theme preview';
-      document.getElementById('preview-name').textContent=cfg.label;
-      document.getElementById('preview-cue').textContent=cfg.aura||'Palette, surface, border, text, and selected-state reference.';
+      document.getElementById('preview-name').textContent='Team configuration';
+      document.getElementById('preview-cue').textContent=cfg.material==='legendary'?'Character-linked frames and a coordinated battle atmosphere.':(cfg.aura||'Palette, surface, border, text, and selected-state reference.');
     });
   </script>
 </body>

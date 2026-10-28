@@ -109,7 +109,7 @@ for (const page of pages) {
   for (const ref of refs) {
     if (!exists(ref)) errors.push(`${page} references missing file: ${ref}`);
   }
-  if (!html.includes('theme-effects.css?v=3') || !html.includes('theme-auto-route-authority.js?v=3') || !html.includes('seasonal-theme.js?v=17')) {
+  if (!html.includes('theme-effects.css?v=4') || !html.includes('theme-auto-route-authority.js?v=4') || !html.includes('seasonal-theme.js?v=18')) {
     errors.push(`${page} does not load the current dynamic theme effects layer`);
   }
   if (!html.includes('site-menu.js?v=16')) {

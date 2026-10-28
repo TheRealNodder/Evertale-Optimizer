@@ -316,6 +316,97 @@ html[data-theme-motion="paused"] .legendaryScene *{animation-play-state:paused!i
   .legendaryScene *{animation:none!important;transition:none!important;}
 }
 
+/* Pokémon identity pass: real local artwork and coordinated luminous frames. */
+html[data-pokemon-presence] .legendaryScene__crest{display:none;}
+html[data-pokemon-presence] .brandTitle::before{width:1.65em;height:1.45em;vertical-align:-.30em;}
+html[data-pokemon-presence] [data-pokemon-frame]{border-color:color-mix(in srgb,var(--pokemon-frame-a) 38%,transparent)!important;}
+html[data-pokemon-presence] [data-pokemon-frame]:not(.v2-sidebar){position:relative;}
+.legendaryFrame{display:none;}
+html[data-pokemon-presence] body [data-pokemon-frame] > span.legendaryFrame{
+  display:block!important;position:absolute!important;inset:0!important;border-radius:inherit;
+  margin:0!important;padding:0!important;width:auto!important;height:auto!important;min-height:0!important;min-width:0!important;
+  pointer-events:none!important;z-index:5!important;opacity:.65;
+  animation:pokemon-frame-breathe 4.8s ease-in-out infinite;
+  animation-play-state:paused;
+}
+html[data-pokemon-presence] body [data-pokemon-frame] > span.legendaryFrame[data-frame-visible="true"]{animation-play-state:running;}
+html[data-pokemon-presence] body [data-pokemon-frame] > span.legendaryFrame[hidden]{display:none!important;}
+html[data-pokemon-presence] [data-pokemon-outline]{
+  outline:2px solid var(--pokemon-frame-a);outline-offset:-2px;
+  animation:pokemon-panel-outline 4.8s ease-in-out infinite paused;
+}
+html[data-pokemon-presence] [data-pokemon-outline][data-pokemon-visible="true"]{animation-play-state:running;}
+@keyframes pokemon-panel-outline{
+  0%,100%{outline-color:color-mix(in srgb,var(--pokemon-frame-a) 45%,transparent);}
+  50%{outline-color:var(--pokemon-frame-b);}
+}
+.legendaryFrame::before,.legendaryFrame::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;}
+.legendaryFrame::before{
+  padding:2px;
+  background:linear-gradient(120deg,var(--pokemon-frame-a),var(--pokemon-frame-b) 49%,var(--pokemon-frame-c) 76%,var(--pokemon-frame-a));
+  -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+  -webkit-mask-composite:xor;
+  mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+  mask-composite:exclude;
+}
+.legendaryFrame::after{
+  border:1px solid color-mix(in srgb,var(--pokemon-frame-a) 70%,transparent);
+  box-shadow:inset 0 0 13px color-mix(in srgb,var(--pokemon-frame-a) 17%,transparent),0 0 14px color-mix(in srgb,var(--pokemon-frame-b) 23%,transparent);
+}
+@keyframes pokemon-frame-breathe{0%,100%{opacity:.42;}50%{opacity:1;}}
+.pokemonEncounter{
+  position:relative;grid-column:1/-1;min-width:0;height:210px;
+  margin:0 0 20px;border:1px solid rgba(255,255,255,.1);border-radius:24px;overflow:hidden;
+  background:
+    radial-gradient(ellipse at 84% 50%,color-mix(in srgb,var(--pokemon-frame-a) 24%,transparent),transparent 48%),
+    linear-gradient(110deg,#060b13 0%,color-mix(in srgb,var(--site-theme-bg) 90%,#000) 48%,color-mix(in srgb,var(--legendary-body) 19%,#030711));
+  box-shadow:0 20px 44px rgba(0,0,0,.25);
+}
+.pokemonEncounter[hidden]{display:none!important;}
+.pokemonEncounter__ambient{position:absolute;inset:0;pointer-events:none;opacity:.34;
+  background:radial-gradient(ellipse at 75% 70%,color-mix(in srgb,var(--pokemon-frame-b) 35%,transparent),transparent 45%);
+}
+.pokemonEncounter__ambient::after{
+  content:"";position:absolute;width:260px;height:260px;right:10%;top:-24px;border-radius:50%;
+  border:1px solid color-mix(in srgb,var(--pokemon-frame-a) 45%,transparent);
+  box-shadow:0 0 60px color-mix(in srgb,var(--pokemon-frame-a) 18%,transparent),inset 0 0 40px color-mix(in srgb,var(--pokemon-frame-b) 12%,transparent);
+}
+.pokemonEncounter__copy{position:relative;z-index:2;padding:26px 32px;max-width:65%;}
+.pokemonEncounter__group{font-size:10px;letter-spacing:.2em;text-transform:uppercase;font-weight:800;color:color-mix(in srgb,var(--pokemon-frame-c) 60%,#fff);margin-bottom:8px;}
+.pokemonEncounter__name{font:900 clamp(27px,3vw,45px)/1.08 system-ui;margin:0;letter-spacing:.015em;color:#fff;text-shadow:0 3px 18px #000;}
+.pokemonEncounter__line{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:#dce6ee;line-height:1.5;margin-top:9px;}
+.pokemonEncounter__credits{display:inline-block;color:#aebdca;font-size:10px;margin-top:16px;text-decoration:underline;text-underline-offset:3px;}
+.pokemonEncounter__art{position:absolute;right:7%;top:50%;width:325px;height:325px;object-fit:contain;z-index:1;pointer-events:none;
+  filter:drop-shadow(0 0 26px color-mix(in srgb,var(--pokemon-frame-a) 35%,transparent));
+  animation:pokemon-character-float 7s ease-in-out infinite;
+}
+.pokemonEncounter[data-pokemon="groudon"] .pokemonEncounter__art,
+.pokemonEncounter[data-pokemon="shinyprimalgroudon"] .pokemonEncounter__art,
+.pokemonEncounter[data-pokemon="koraidon"] .pokemonEncounter__art{animation-name:pokemon-character-power;}
+.pokemonEncounter:is([data-pokemon="zekrom"],[data-pokemon="shinyprimalgroudon"],[data-pokemon="shinyprimalkyogre"],[data-pokemon="shinymegarayquaza"],[data-pokemon="eternatus"]) .pokemonEncounter__art{
+  filter:drop-shadow(0 0 1px var(--pokemon-frame-c)) drop-shadow(0 0 26px color-mix(in srgb,var(--pokemon-frame-a) 45%,transparent));
+}
+.pokemonEncounter[data-art-state="failed"] .pokemonEncounter__art{display:none;}
+@keyframes pokemon-character-float{0%,100%{transform:translateY(-50%) rotate(-1deg);}50%{transform:translateY(calc(-50% - 7px)) rotate(1deg);}}
+@keyframes pokemon-character-power{0%,100%{transform:translateY(-50%) scale(1);}50%{transform:translateY(-50%) scale(1.025);}}
+html[data-theme-motion="paused"] :is(.legendaryFrame,.pokemonEncounter__art,[data-pokemon-outline]){animation-play-state:paused!important;}
+@media(max-width:700px){
+  .pokemonEncounter{height:210px;border-radius:19px;margin-bottom:14px;}
+  .pokemonEncounter__copy{padding:22px 18px;max-width:62%;}
+  .pokemonEncounter__name{font-size:28px;}
+  .pokemonEncounter__group{font-size:8px;letter-spacing:.11em;}
+  .pokemonEncounter__line{font-size:10px;letter-spacing:.08em;}
+  .pokemonEncounter__credits{font-size:9px;margin-top:14px;}
+  .pokemonEncounter__art{width:205px;height:205px;right:0;top:58%;}
+  .pokemonEncounter__ambient::after{right:-38px;}
+  .legendaryFrame::before{padding:1.5px;}
+}
+@media(prefers-reduced-motion:reduce){
+  html[data-pokemon-presence] .legendaryFrame{animation:none!important;opacity:.85!important;}
+  html[data-pokemon-presence] [data-pokemon-outline]{animation:none!important;}
+  .pokemonEncounter__art{animation:none!important;transform:translateY(-50%);}
+}
+
 /* Console material layer */
 html[data-theme-material="handheld"]{
   --site-backdrop-opacity:0;

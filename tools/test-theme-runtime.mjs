@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import vm from 'node:vm';
+import crypto from 'node:crypto';
 import {fileURLToPath} from 'node:url';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
@@ -9,6 +10,7 @@ const elementalSource=fs.readFileSync(path.join(root,'elemental-themes.js'),'utf
 const elementalCss=fs.readFileSync(path.join(root,'elemental-themes.css'),'utf8');
 const routeSource=fs.readFileSync(path.join(root,'theme-auto-route-authority.js'),'utf8');
 const sceneSource=fs.readFileSync(path.join(root,'legendary-scenes.js'),'utf8');
+const presenceSource=fs.readFileSync(path.join(root,'pokemon-theme-presence.js'),'utf8');
 const effectCss=fs.readFileSync(path.join(root,'theme-effects.css'),'utf8');
 
 function element(tagName='div'){
@@ -23,8 +25,10 @@ function element(tagName='div'){
     append(...nodes){children.push(...nodes);this.firstChild=children[0]||null;},
     appendChild(node){children.push(node);this.firstChild=children[0]||null;return node;},
     insertBefore(node,before){const index=children.indexOf(before);if(index<0)children.unshift(node);else children.splice(index,0,node);this.firstChild=children[0]||null;return node;},
-    querySelectorAll(){return[];},
-    matches(){return false;}
+    addEventListener(){},
+    contains(node){return children.includes(node)||children.some(child=>child.contains?.(node));},
+    querySelectorAll(selector){const found=[];const walk=node=>{for(const child of node.children||[]){if(child.matches?.(selector))found.push(child);walk(child);}};walk(this);return found;},
+    matches(selector){return selector.split(',').some(part=>part.startsWith('.')&&String(this.className).split(' ').includes(part.slice(1)));}
   };
 }
 
@@ -44,7 +48,7 @@ const document={
     };
     return walk(head)||walk(body);
   },
-  querySelectorAll(){return[];},
+  querySelectorAll(selector){return body.querySelectorAll(selector);},
   querySelector(selector){
     const walk=node=>node?.className===selector.slice(1)?node:(node?.children||[]).map(walk).find(Boolean);
     return selector.startsWith('.')?walk(body):null;
@@ -53,6 +57,7 @@ const document={
   dispatchEvent(event){for(const handler of listeners.get(event.type)||[])handler(event);return true;}
 };
 
+let frameMutations;
 const context={
   window:null,document,location:{href:'https://example.test/optimizer.html',search:''},
   localStorage:{
@@ -61,7 +66,8 @@ const context={
   },
   URL,URLSearchParams,Intl,Date,Math,Number,String,Object,Array,Set,Map,RegExp,JSON,
   CustomEvent:class CustomEvent{constructor(type,init={}){this.type=type;this.detail=init.detail;}},
-  setInterval:()=>0,clearInterval:()=>{},console
+  setInterval:()=>0,clearInterval:()=>{},console,
+  MutationObserver:class{constructor(callback){frameMutations=callback;}observe(){}}
 };
 const reducedMotion={matches:false,addEventListener(type,handler){this.onchange=handler;}};
 context.matchMedia=()=>reducedMotion;
@@ -69,6 +75,8 @@ context.window=context;
 vm.createContext(context);
 vm.runInContext(source,context,{filename:'seasonal-theme.js'});
 vm.runInContext(sceneSource,context,{filename:'legendary-scenes.js'});
+const testCard=element('article');testCard.className='unitCard';body.appendChild(testCard);
+vm.runInContext(presenceSource,context,{filename:'pokemon-theme-presence.js'});
 
 const api=context.EvertaleTheme;
 if(!api)throw new Error('Theme API was not created');
@@ -99,6 +107,10 @@ check(elemental.every(theme=>theme.element&&theme.effect&&theme.aura),'An elemen
 check(api.groupOrder[1]==='Evertale · Elements','Evertale element group is not prioritized after Calendar');
 check(legendary.every(theme=>theme.effect&&theme.aura),'A legendary profile is missing effect/aura metadata');
 const scenes=context.EvertaleLegendaryScenes;
+const presence=context.EvertalePokemonPresence;
+const artwork=JSON.parse(fs.readFileSync(path.join(root,'assets/themes/pokemon/artwork-sources.json'),'utf8'));
+check(JSON.stringify([...presence.keys].sort())===JSON.stringify(legendary.map(theme=>theme.key).sort()),'Pokémon artwork/frame registry differs from themes');
+check(presence.art('unknown')==='','Unknown Pokémon key invents an artwork path');
 check(JSON.stringify([...scenes.keys].sort())===JSON.stringify(legendary.map(theme=>theme.key).sort()),'Legendary illustration registry differs from theme authority');
 for(const theme of legendary){
   const svg=scenes.markup(theme.key);
@@ -107,13 +119,43 @@ for(const theme of legendary){
   check(svg.length<14000,`Scene exceeds geometry budget: ${theme.key}`);
   api.setPreference(theme.key);
   check(document.getElementById('siteThemeFx').getAttribute('data-scene-key')===theme.key,`Scene did not follow theme selection: ${theme.key}`);
+  check(html.getAttribute('data-pokemon-presence')===theme.key,`Character identity did not follow theme selection: ${theme.key}`);
+  check(document.getElementById('pokemonEncounter').getAttribute('data-pokemon')===theme.key,`Encounter banner retained the wrong character: ${theme.key}`);
+  const receipt=artwork.profiles[theme.key];
+  check(Boolean(receipt),`Missing artwork provenance: ${theme.key}`);
+  if(receipt){
+    const file=path.join(root,'assets/themes/pokemon',receipt.file);
+    check(fs.existsSync(file),`Missing character artwork: ${theme.key}`);
+    if(fs.existsSync(file)){const bytes=fs.readFileSync(file);check(bytes.subarray(0,8).toString('hex')==='89504e470d0a1a0a',`Invalid character PNG: ${theme.key}`);check(crypto.createHash('sha256').update(bytes).digest('hex')===receipt.sha256,`Artwork checksum mismatch: ${theme.key}`);check(receipt.width>=400&&receipt.height>=400,`Artwork too small: ${theme.key}`);}
+    check(receipt.shiny===theme.key.startsWith('shiny'),`Shiny character art does not match theme: ${theme.key}`);
+  }
+  check(presence.describe(theme.key).slice(0,3).every(c=>/^#[0-9a-f]{6}$/i.test(c)),`Invalid three-color frame palette: ${theme.key}`);
 }
+presence.scan();presence.scan();
+check(testCard.children.filter(node=>node.className==='legendaryFrame').length===1,'Repeated scanning duplicated a card frame');
+testCard.children.length=0;
+frameMutations([{target:testCard,addedNodes:[]}]);
+check(testCard.children.filter(node=>node.className==='legendaryFrame').length===1,'Re-rendering a card permanently removed its frame');
+const storyCard=element('div');storyCard.className='slotCard storySlotCard';body.appendChild(storyCard);presence.scan();
+check(storyCard.children.some(node=>node.className==='legendaryFrame'),'Story slots are not covered by Pokémon frames');
+const scrollPane=element('section');scrollPane.className='v2-grid-panel';body.appendChild(scrollPane);presence.scan();
+check(scrollPane.getAttribute('data-pokemon-outline')!==null&&scrollPane.children[0]?.hidden,'Scroll-pane frames would scroll across their content');
+check(body.children.filter(node=>node.id==='pokemonEncounter').length===1,'Theme changes duplicated the character banner');
+check(artwork.profiles.shinyprimalgroudon.form==='groudon-primal'&&artwork.profiles.shinyprimalkyogre.form==='kyogre-primal'&&artwork.profiles.shinymegarayquaza.form==='rayquaza-mega','Shiny themes use an incorrect base form');
+check(artwork.profiles.zacian.form==='zacian-crowned'&&artwork.profiles.zamazenta.form==='zamazenta-crowned','Sword/shield themes lack their crowned forms');
+check(presence.describe('groudon')[0]==='#ff5136'&&presence.describe('kyogre')[1]==='#ed415d','Groudon/Kyogre frame signatures were lost');
+check(presence.describe('shinyprimalkyogre')[0]==='#ffdf63','Shiny Primal Kyogre lost its black/gold form identity');
+check(/IntersectionObserver/.test(presenceSource)&&/data-frame-visible/.test(effectCss),'Frame motion lacks viewport gating');
+check(!/fetch\(|requestAnimationFrame|setInterval/.test(presenceSource),'Character presentation introduces an unbounded render loop or network API dependency');
+check(/pokemon-frame-breathe/.test(effectCss)&&/mask-composite:exclude/.test(effectCss),'Colored frame treatment is missing');
+check(/pokemon-panel-outline/.test(effectCss)&&/\[data-pokemon-outline\]\{animation:none!important/.test(effectCss),'Scrollable panel outlines lack motion or reduced-motion support');
 check(scenes.markup('unknown')==='','Unknown theme fabricated a scene');
 check(scenes.describe('kyogre')[1]==='sea'&&scenes.describe('groudon')[1]==='volcano'&&scenes.describe('rayquaza')[1]==='stratosphere','Hoenn weather identities collapsed into generic motion');
 check(scenes.describe('koraidon')[1]!==scenes.describe('miraidon')[1],'Ancient sunlight and Electric Terrain share an environment');
 check(/legendaryScene \*\{animation-play-state:paused/.test(effectCss),'Hidden document does not pause SVG descendant animations');
 check(!/repeating-(?:linear|radial|conic)-gradient/.test(effectCss.slice(effectCss.indexOf('/* Subject-authored'),effectCss.indexOf('/* Console material'))),'Legendary scenes still use tiled gradient stripes');
 check(/legendary-scenes\.js\?v=1/.test(routeSource),'Scene loader is missing');
+check(/pokemon-theme-presence\.js\?v=1/.test(routeSource),'Recognizable Pokémon art/frame loader is missing');
 check(handheld.every(theme=>theme.effect&&theme.finish&&theme.hardware&&theme.aura),'A handheld profile is missing hardware metadata');
 const expectedHardware={
   crimsonblack:'ds-lite',cobaltblack:'ds-lite',metallicrose:'dsi-xl',bronzexl:'dsi-xl',
@@ -144,6 +186,7 @@ api.setPreference('zygarde');
 check(html.getAttribute('data-theme-key')==='zygarde','Manual theme preference did not apply');
 check(html.getAttribute('data-theme-effect')==='cell-grid','Legendary effect attribute did not apply');
 api.setPreference('galaxystyle');
+check(!html.getAttribute('data-pokemon-presence')&&document.getElementById('pokemonEncounter').hidden,'Leaving Pokémon themes retained the encounter banner');
 check(!document.getElementById('siteThemeFx').getAttribute('data-scene-key'),'Leaving a legendary theme retained stale scene metadata');
 check(document.querySelector('.siteThemeFx__field').innerHTML==='','Leaving a legendary theme retained its illustration');
 check(html.getAttribute('data-theme-material')==='handheld','Handheld material attribute did not apply');
