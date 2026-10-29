@@ -515,78 +515,88 @@
                   "or": {
                     "class": "MonsterConditions",
                     "monsterTags": [
-                      "StunImmuneFromThorns"
+                      "StunImmuneVs1AirEnemy"
                     ],
-                    "myTeamMonsterConditionMatchesNeeded": {
-                      "IsThorned": 1
+                    "checkEnemyTeamOfMonster": true,
+                    "enemyTeamMonsterConditionMatchesNeeded": {
+                      "IsAir": 1
                     },
                     "or": {
                       "class": "MonsterConditions",
                       "monsterTags": [
-                        "StunImmuneIfBeastAlly"
+                        "StunImmuneFromThorns"
                       ],
-                      "checkReinforcementsForTeamConditionMatches": true,
                       "myTeamMonsterConditionMatchesNeeded": {
-                        "IsBeastRegular": 1
+                        "IsThorned": 1
                       },
                       "or": {
                         "class": "MonsterConditions",
                         "monsterTags": [
-                          "StunImmuneIfAnyBurningAllies"
+                          "StunImmuneIfBeastAlly"
                         ],
+                        "checkReinforcementsForTeamConditionMatches": true,
                         "myTeamMonsterConditionMatchesNeeded": {
-                          "IsBurning": 1
+                          "IsBeastRegular": 1
                         },
                         "or": {
                           "class": "MonsterConditions",
                           "monsterTags": [
-                            "StunImmuneIfEnemyIsFireBurnBlastOrForce"
+                            "StunImmuneIfAnyBurningAllies"
                           ],
-                          "checkEnemyTeamOfMonster": true,
-                          "enemyTeamMonsterConditionMatchesNeeded": {
-                            "IsBurnBlastOrForceOrFire": 1
+                          "myTeamMonsterConditionMatchesNeeded": {
+                            "IsBurning": 1
                           },
                           "or": {
                             "class": "MonsterConditions",
                             "monsterTags": [
-                              "StunImmuneIfAllyIsFireBurnBlastOrForce"
+                              "StunImmuneIfEnemyIsFireBurnBlastOrForce"
                             ],
-                            "myTeamMonsterConditionMatchesNeeded": {
+                            "checkEnemyTeamOfMonster": true,
+                            "enemyTeamMonsterConditionMatchesNeeded": {
                               "IsBurnBlastOrForceOrFire": 1
                             },
                             "or": {
                               "class": "MonsterConditions",
                               "monsterTags": [
-                                "StunImmuneIfPoisonedEnemy"
+                                "StunImmuneIfAllyIsFireBurnBlastOrForce"
                               ],
-                              "checkEnemyTeamOfMonster": true,
-                              "enemyTeamMonsterConditionMatchesNeeded": {
-                                "IsPoisoned": 1
+                              "myTeamMonsterConditionMatchesNeeded": {
+                                "IsBurnBlastOrForceOrFire": 1
                               },
                               "or": {
                                 "class": "MonsterConditions",
                                 "monsterTags": [
-                                  "StunImmunityIfNotBurning"
+                                  "StunImmuneIfPoisonedEnemy"
                                 ],
-                                "not": {
-                                  "class": "MonsterConditions",
-                                  "buffStackNames": [
-                                    "Burn"
-                                  ]
+                                "checkEnemyTeamOfMonster": true,
+                                "enemyTeamMonsterConditionMatchesNeeded": {
+                                  "IsPoisoned": 1
                                 },
                                 "or": {
                                   "class": "MonsterConditions",
                                   "monsterTags": [
-                                    "StunImmuneIfHoldGroundPlusTriggered"
-                                  ],
-                                  "buffStackNames": [
-                                    "BlockDeathUntilNextTurn"
+                                    "StunImmunityIfNotBurning"
                                   ],
                                   "not": {
                                     "class": "MonsterConditions",
                                     "buffStackNames": [
-                                      "HoldGroundOnceForHoldGroundPlus"
+                                      "Burn"
                                     ]
+                                  },
+                                  "or": {
+                                    "class": "MonsterConditions",
+                                    "monsterTags": [
+                                      "StunImmuneIfHoldGroundPlusTriggered"
+                                    ],
+                                    "buffStackNames": [
+                                      "BlockDeathUntilNextTurn"
+                                    ],
+                                    "not": {
+                                      "class": "MonsterConditions",
+                                      "buffStackNames": [
+                                        "HoldGroundOnceForHoldGroundPlus"
+                                      ]
+                                    }
                                   }
                                 }
                               }
@@ -994,17 +1004,26 @@
                   "or": {
                     "class": "MonsterConditions",
                     "monsterTags": [
-                      "SleepImmuneVs2Enemies"
+                      "SleepImmuneWithWater"
                     ],
-                    "enemyTeamSize": 2,
+                    "myTeamMonsterConditionMatchesNeeded": {
+                      "IsWater": 1
+                    },
                     "or": {
                       "class": "MonsterConditions",
                       "monsterTags": [
-                        "NegativeStatusImmunityFromThorns"
+                        "SleepImmuneVs2Enemies"
                       ],
-                      "buffStackNames": [
-                        "SleepThorns"
-                      ]
+                      "enemyTeamSize": 2,
+                      "or": {
+                        "class": "MonsterConditions",
+                        "monsterTags": [
+                          "NegativeStatusImmunityFromThorns"
+                        ],
+                        "buffStackNames": [
+                          "SleepThorns"
+                        ]
+                      }
                     }
                   }
                 }
@@ -1366,7 +1385,7 @@
   "_build": {
     "scriptVersion": "8-generated-display-authority",
     "sourceHash": "0cb89e528a2e0b75987a30a82cf9372c9f8e35ff079ec560623e996be8661abe",
-    "dependencyHash": "d7fce5f29c4caab3eb9de313d046492336a37d98c7d893eba98df42654d04737",
-    "generatedAt": 1793155211
+    "dependencyHash": "783e803052a79a9e01679f601d908cf5ef8c02c51eb146784e51db257827ed57",
+    "generatedAt": 1793246974
   }
 }

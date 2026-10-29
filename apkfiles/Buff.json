@@ -1,6 +1,6 @@
 {
 	"Version": 23,
-	"Time": 1790832868,
+	"Time": 1793154406,
 	"Buff": {
 	"RelationshipFlatAttack50": {
 		"class": "Buff",
@@ -82947,7 +82947,7 @@
 					"BlockGiveTurnThorRegularV1","BlockGiveTurnThorRegularV2","BlockGiveTurnMechaSisterBandV1","BlockGiveTurnMechaSisterBandV2","BlockGiveTurnPassiveBasiliskRegularV1","BlockGiveTurnPassiveBasiliskRegularV2",
 					"BlockGiveTurnPassiveJeanneFusionV1","BlockGiveTurnPassiveJeanneFusionV2","BlockGiveTurnPassiveJeanneFusionV3","BlockGiveTurnPassiveJeanneFusionV4","BlockGiveTurnPassiveJeanneFusionV5","BlockGiveTurnPassiveJeanneFusionV6","BlockGiveTurnPassiveJeanneFusionV7","BlockGiveTurnPassiveJeanneFusionV8","BlockGiveTurnPassiveJeanneFusionV9","BlockGiveTurnPassiveJeanneFusionV10",
 					"BlockGiveTurnDraculaRegularV1","BlockGiveTurnDraculaRegularV2","BlockGiveTurnDraculaRegularV3","BlockGiveTurnDraculaRegularV4","BlockGiveTurnDraculaRegularV5","BlockGiveTurnDraculaRegularV6","BlockGiveTurnDraculaRegularV7","BlockGiveTurnDraculaRegularV8","BlockGiveTurnDraculaRegularV9","BlockGiveTurnDraculaRegularV10",
-					"BlockGiveTurnPassiveSherlockRegularV1","BlockGiveTurnSherlockRegularV1","BlockGiveTurnQueenHeartsRegularV1"]
+					"BlockGiveTurnPassiveSherlockRegularV1","BlockGiveTurnSherlockRegularV1","BlockGiveTurnQueenHeartsRegularV1","BlockGiveTurnArsenalRegularV1","BlockGiveTurnPassiveArsenalRegularV1"]
 			}],
 			"duration": 0,
 			"noIconShownOnBattleStatus": true,
@@ -83227,6 +83227,17 @@
 				"allyBuffs": ["RemoveBuffs","PurifyFXOnly"],
 				"selfBuffs": ["RemoveBuffs","PurifyFXOnly"],
 				"activeMonsterConditions": "AlwaysTrue"
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
+		"PurifyAllAlliesEBB": {
+			"class": "Buff",
+			"behaviors": ["EnterBattleBuff"],
+			"behaviorOverrides": [{
+				"allyBuffs": ["RemoveBuffs","PurifyFXOnly"],
+				"selfBuffs": ["RemoveBuffs","PurifyFXOnly"]
 			}],
 			"duration": 0,
 			"showAsTimer": false,
@@ -90197,7 +90208,7 @@
 		},
 		"RemoveBlockGiveTurn": {
 			"class": "Buff",
-			"behaviors": ["RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs"],
+			"behaviors": ["RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs","RemoveBuffs"],
 			"behaviorOverrides": [{
 					"name": "BlockGiveTurnFor10TU"
 				},{
@@ -90292,6 +90303,10 @@
 					"name": "BlockGiveTurnSherlockRegularV1"
 				},{
 					"name": "BlockGiveTurnQueenHeartsRegularV1"
+				},{
+					"name": "BlockGiveTurnArsenalRegularV1"
+				},{
+					"name": "BlockGiveTurnPassiveArsenalRegularV1"
 			}],
 			"duration": 0,
 			"showAsTimer": false,
@@ -95015,6 +95030,458 @@
 			"duration": 0,
 			"showAsTimer": false,
 			"isHiddenFromPlayers": true
+		},
+		"CakePassiveAMarieAntoinetteBoss": {
+			"class": "Buff",
+			"stackName": "CakePassiveAMarieAntoinette",
+			"behaviors": ["EnterBattleBuff","BuffOnMonsterTurn","BuffWhenMonstersDie","BuffWhenMonstersDie","StunImmunityIfNotBurningFallback"],
+			"behaviorOverrides": [{
+				"sourceBuffs": ["PoisonImmunityFor50TU","SleepImmunityFor50TU","StunImmunityIfNotBurning"]
+			},{
+				"selfBuffs": ["StoreEnergyHidden"],
+				"sameTeam": true,
+				"activeMonsterConditions": "IsNotBurning",
+				"spreadCondition": "IsNotActing"
+			},{
+				"sourceBuffs": ["FortifyAllAlliesMarieAntoinetteEBB","MarieAntoinetteFirstKillLock"],
+				"sameTeam": false,
+				"spreadCondition": "KillsMoreThanSkillUsed",
+				"deadMonsterConditions": "NotTransformingOrMirage"
+			},{
+				"sourceBuffs": ["FudgeUsedAtEndOfTurn"],
+				"sameTeam": false,
+				"spreadCondition": "KillsMoreThanSkillUsed"
+			},{}],
+			"duration": -1,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true
+		},
+		"FortifyAllAlliesMarieAntoinetteEBB":{
+			"class": "Buff",
+			"stackName": "FortifyAllAlliesEBB",
+			"behaviors": ["EnterBattleBuff"],
+			"behaviorOverrides": [{
+				"randomAllyBuffs": ["FortifyFor3Attacks"],
+				"numRandomToBuff": 4
+			}],
+			"duration": 0,
+			"isHiddenFromPlayers": true,
+			"showAsPermanent": false,
+			"showAsTimer": false,
+			"applyConditions": "IsNotMarieAntoinetteFirstKillLock"
+		},
+		"MarieAntoinetteFirstKillLock":{
+			"class": "Buff",
+			"duration": -1,
+			"stackName": "MarieAntoinetteFirstKillLock",
+			"showAsPermanent": false,
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true,
+			"applyConditions": "IsNotMarieAntoinetteFirstKillLock"
+		},
+		"QueenyPassiveAMarieAntoinetteBoss": {
+			"class": "Buff",
+			"stackName": "QueenyPassiveAMarieAntoinette",
+			"behaviors": ["EnterBattleBuff","BuffOnMonsterTurn"],
+			"behaviorOverrides": [{
+				"sourceBuffs": ["KnockbackImmunity","HoldGroundBoss","Hit50TUMinusMarieAntoinetteBossFor100TU"]
+			},{
+				"selfBuffs": ["HijikataCounterFuseAfterTime","HijikataCounter","MarieAntoinetteBossPassiveHitLock"]
+			}],
+			"duration": -1,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true
+		},
+		"MarieAntoinetteBossPassiveHitLock":{
+			"class": "Buff",
+			"duration": 20,
+			"stackName": "MarieAntoinettePassiveHitLock",
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"iconSpriteName": "IconRedCountdownPassiveClock3",
+			"applyConditions": "IsHijikataCharged3"
+		},
+		"Hit50TUMinusMarieAntoinetteBossFor100TU": {
+			"class": "Buff",
+			"behaviors": ["BuffOnMonsterTurn"],
+			"behaviorOverrides": [{
+				"enemyBuffs": ["GrantSource50TUMinusMarieAntoinetteBoss"],
+				"sameTeam": false,
+				"activeMonsterConditions": "AlwaysTrue"
+			}],
+			"duration": 100,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"iconSpriteName": "IconBrownCountdownClock01"
+		},
+		"GrantSource50TUMinusMarieAntoinetteBoss": {
+			"class": "Buff",
+			"behaviors": ["BuffChanceOnHit","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+				"sourceBuffs": ["TUMinus50"],
+				"spreadCondition": "IsNotMarieAntoinettePassiveHitLock",
+				"targetCondition": "IsNotBurning"
+			},{}],
+			"duration": 0,
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
+		"MarkedMarieAntoinette":{
+			"class": "Buff",
+			"stackName": "SourceMarieAntoinette",
+			"duration": 0,
+			"isHiddenFromPlayers": true,
+			"showAsPermanent": false,
+			"showAsTimer": false
+		},
+		"RandomOtherAllyExtraTurnMarieAntoinetteBoss": {
+			"class": "Buff",
+			"behaviors": ["EnterBattleBuff"],
+			"behaviorOverrides": [{
+				"randomAllyBuffs": ["GiveTurn","OnExtraTurn","JustGivenTurn"],
+				"numRandomToBuff": 1,
+				"spreadCondition": "IsNotMarkedTargetMarieAntoinette"
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true
+		},
+		"MarieAntoinetteBossActive3Cooldown50": {
+			"class": "Buff",
+			"stackName": "InstantCooldown",
+			"duration": 50,
+			"isHiddenFromPlayers": false,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"iconSpriteName": "IconBlueCountdownClock3"
+		},
+		"GreatestKnightPassiveAGalahadRegularBoss": {
+			"class": "Buff",
+			"stackName": "GreatestKnightPassiveAGalahadRegular",
+			"behaviors": ["EnterBattleBuff"],
+			"behaviorOverrides": [{
+				"selfBuffs": ["GetTurnSkinA","SuperPoisonSkinA","StunSkinBoss1","KnockbackImmunity","PoisonImmunityFor50TU","SleepImmunityFor50TU","StunImmunityFor50TU"]
+			}],
+			"showAsPermanent": true,
+			"isHiddenFromPlayers": false,
+			"duration": -1
+		},
+		"RoundTablePassiveAGalahadRegularBoss":{
+			"class": "Buff",
+			"stackName": "RoundTablePassiveAGalahadRegular",
+			"behaviors": ["EnterBattleBuff","BuffOnMonsterTurnEnd","BuffWhenMonsterHurt","BuffOnMonsterTurnEnd"],
+				"behaviorOverrides": [{
+				"selfBuffs": ["BlockDeathOnceBoss","FortifyFor3Attacks"],
+				"allyBuffs": ["FortifyFor3Attacks"],
+				"enemyBuffs": ["EnrageImmunityOnce"]
+			},{
+				"selfBuffs": ["EndOfFirstTurnGalahadRegularBossEBB"],
+				"spreadCondition": "IsNotGalahadRegularEndOfFirstTurnLock"
+			},{
+				"selfBuffs": ["BrideHealOK"],
+				"cancelFromDamageTypes": ["BuffDamage"]
+			},{
+				"selfBuffs": ["BrideHeal1PercentGalahadRegularBoss"],
+				"activeMonsterConditions": "NotAlwaysMyTurn",
+				"spreadCondition": "BrideHealReady"
+			}],
+			"showAsPermanent": true,
+			"isHiddenFromPlayers": false,
+			"duration": -1
+		},
+		"InstantKillAndCreditKillGalahadRegularBoss": {
+			"class": "Buff",
+			"stackName": "InstantKill",
+			"behaviors": ["EnterBattleBuff","EnterBattleBuff","InstantDeath"],
+			"behaviorOverrides": [{
+				"selfBuffs": ["GalahadRegularInstantDeathFXBuff"]
+			},{	
+				"sourceBuffs": ["Add1Kill"]
+			},{}],
+			"duration": 0,
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true,
+			"applyConditions": "IsNotBossAndNotMirage"
+		},
+		"GalahadRegularInstantDeathFXBuff": {
+            "class": "Buff",
+            "isHiddenFromPlayers": true,
+            "duration": 0,
+            "effectToShowWhenApplied": "ManchesterInstantdeath1",
+            "showAsTimer": false,
+            "showAsPermanent": false
+        },
+		"EndOfFirstTurnGalahadRegularBossEBB": {
+			"class": "Buff",
+			"behaviors": ["EnterBattleBuff","EnterBattleBuff"],
+			"behaviorOverrides": [{
+				"randomAllyBuffs": ["FortifyFor3Attacks","QuarterHealFX"],
+				"numRandomToBuff": 4
+			},{
+				"selfBuffs": ["GalahadRegularEndOfFirstTurnLock"]
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true,
+			"applyConditions": "IsNotGalahadRegularEndOfFirstTurnLock"
+		},
+		"GalahadRegularEndOfFirstTurnLock":{
+			"class": "Buff",
+			"duration": -1,
+			"stackName": "GalahadRegularEndOfFirstTurnLock",
+			"showAsPermanent": false,
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
+		"BrideHeal1PercentGalahadRegularBoss": {
+			"class": "Buff",
+			"behaviors": ["AdjustHp", "RemoveBuffs"],
+			"behaviorOverrides": [{
+				"percent": 0.01,
+				"abilityEffect": "Blank",
+				"hpboosts": [
+					"HealBoost"
+				]
+				}, {
+				"name": "BrideHealOK"
+			}],
+			"duration": 0,
+			"effectToShowWhenApplied": "LargeHeal1",
+			"textKeyToShowWhenApplied": "HealDoubleANameKey",
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
+		"100TUGalahadRegularCountdown": {
+			"class": "Buff",
+			"stackName": "100TUGalahadRegularCountdown",
+			"iconSpriteName": "IconBrownCountdownClock01",
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": false,
+			"duration": 100
+		},
+		"PassPassiveAArsenalRegularBoss": {
+			"class": "Buff",
+			"stackName": "PassPassiveAArsenalRegular",
+			"behaviors": ["EnterBattleBuff","SleepImmunityIf1WaterEnemyFallback","SleepImmunityIf1WaterAllyFallback","StunImmunityIf2AirAlliesFallback","StunImmunityIf1AirEnemyFallback"],
+			"behaviorOverrides": [{
+				"sourceBuffs": ["StunImmunityIf2AirAlliesOr1AirEnemyUnitOnBattlefield","SleepImmunityIfWaterUnitOnBattlefield","KnockbackImmunity","BlockDeathByBuffDamage","Active2LOCKArsenalRegular","Charged1Icon","Charged2Icon","Charged3Icon","DisableFallBackImmunity"]
+			},{},{},{},{}],
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"duration": -1
+		},
+		"PassiveTUMinusLOCKEDArsenalRegularBoss":{
+			"class": "Buff",
+			"stackName": "TUMinusLOCKEDArsenalRegular",
+			"duration": 50,
+			"isHiddenFromPlayers": false,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"iconSpriteName": "IconRedCountdownPassiveClock3",
+			"applyConditions": "IsHijikataCharged3"
+		},
+		"StunImmunityIf2AirAlliesOr1AirEnemyUnitOnBattlefield": {
+			"class": "Buff",
+			"behaviors": ["Immunity", "RemoveOnSourceDeath"],
+			"stackName": "StunImmunityIf2AirAlliesOr1AirEnemyUnitOnBattlefield",
+			"behaviorOverrides": [{
+				"stackNamesToBlock": ["Stun","StunNoAbsorb"],
+				"activateCondition": "AtLeast2AirAllyOr1AirEnemyInBattle"
+			},{}],
+			"duration": -1,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"iconSpriteName": "IconRedStunInvalidLightning01",
+			"hideFromPlayerCondition": "Not2AirAllyOr1AirEnemyInBattle",
+			"tags": ["StunImmuneWith2AirAllies","StunImmuneVs1AirEnemy"]
+		},
+		"SleepImmunityIfWaterUnitOnBattlefield": {
+			"class": "Buff",
+			"behaviors": ["Immunity", "RemoveOnSourceDeath"],
+			"stackName": "SleepImmunityIfWaterUnitOnBattlefield",
+			"behaviorOverrides": [{
+				"stackNamesToBlock": ["Sleep"],
+				"activateCondition": "AtLeast1WaterUnitInBattle"
+			},{}],
+			"duration": -1,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"iconSpriteName": "IconRedSleepInvalidZs01",
+			"hideFromPlayerCondition": "NoUnitsInBattleIsWater",
+			"tags": ["SleepImmuneVsWater","SleepImmuneWithWater"]
+		},
+		"Active2LOCKArsenalRegular":{
+			"class": "Buff",
+			"stackName": "Active2LOCKArsenalRegular",
+			"duration": -1,
+			"isHiddenFromPlayers": true,
+			"showAsPermanent": false,
+			"showAsTimer": false
+		},
+		"RemoveActive2LOCKArsenalRegular": {
+			"class": "Buff",
+			"behaviors": ["RemoveBuffs"],
+			"behaviorOverrides": [{
+				"name": "Active2LOCKArsenalRegular"
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
+		"KickToTheHeadPassiveAArsenalRegularBoss": {
+			"class": "Buff",
+			"stackName": "KickToTheHeadPassiveAArsenalRegular",
+			"behaviors": ["EnterBattleBuff","BuffWhenMonsterHurt","BuffOnMonsterTurnEnd","BuffOnMonsterTurnEnd","BuffOnMonsterTurnEnd"],
+			"behaviorOverrides": [{
+				"sourceBuffs": ["HoldGroundBoss"]
+			},{
+				"selfBuffs": ["BrideHealOK"],
+				"cancelFromDamageTypes": ["BuffDamage"]
+			},{
+				"selfBuffs": ["IWasHurtArsenalRegularBoss"],
+				"activeMonsterConditions": "NotAlwaysMyTurn",
+				"spreadCondition": "BrideHealReady"
+			},{
+				"sourceBuffs": ["EnchantmentREADYArsenalRegular"],
+				"spreadCondition": "2EnemiesNotDisabled"
+			},{
+				"sourceBuffs": ["ArsenalRegularBossEnchantment","RemoveEnchantmentREADYArsenalRegular"],
+				"spreadCondition": "IsEnchantmentREADYArsenalRegularBossNOTLocked"
+			}],
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"duration": -1
+		},
+		"IWasHurtArsenalRegularBoss": {
+			"class": "Buff",
+			"behaviors": ["EnterBattleBuff","EnterBattleBuff","RemoveBuffs"],
+			"behaviorOverrides": [{
+				"selfBuffs": ["PseudoGetTurn","OnExtraTurn","JustGivenTurn","DoNotGiveChargeArsenalRegular","RemoveEnergyCount2"],
+				"spreadCondition": "IsCharged3"
+			},{
+				"sourceBuffs": ["StoreEnergy"],
+				"spreadCondition": "IsNotDoNotGiveChargeArsenalRegular"
+			},{
+				"name": "BrideHealOK"
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"noIconShownOnBattleStatus": true
+		},
+		"DoNotGiveChargeArsenalRegular":{
+			"class": "Buff",
+			"stackName": "DoNotGiveChargeArsenalRegular",
+			"duration": 0,
+			"isHiddenFromPlayers": true,
+			"showAsPermanent": false,
+			"showAsTimer": false
+		},
+		"RemoveEnergyCount2": {
+			"class": "Buff",
+			"behaviors": ["RemoveBuffs"],
+			"behaviorOverrides": [{
+				"name": "StoreEnergy",
+				"decreaseCount": 2
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
+		"EnchantmentREADYArsenalRegular":{
+			"class": "Buff",
+			"stackName": "EnchantmentREADYArsenalRegular",
+			"duration": 0,
+			"isHiddenFromPlayers": true,
+			"showAsPermanent": false,
+			"showAsTimer": false,
+			"applyConditions": "IsNotAlone"
+		},
+		"RemoveEnchantmentREADYArsenalRegular": {
+			"class": "Buff",
+			"behaviors": ["RemoveBuffs"],
+			"behaviorOverrides": [{
+				"name": "EnchantmentREADYArsenalRegular"
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
+		"ArsenalRegularBossEnchantment":{
+				"class": "Buff",
+				"stackName": "ArsenalRegularEnchantment",
+				"behaviors": ["EnterBattleBuff","EnterBattleBuff"],
+				"behaviorOverrides": [{
+					"sourceBuffs": ["ArsenalBossDisablePassiveTrigger"]
+				},{
+					"randomEnemyBuffs": ["NoTurnsFor50TUPassiveArsenalRegularV1","ArsenalBossTriggerEnchantmentFXBuff"],
+					"numRandomToBuff": 1
+				}],
+			"duration": -1,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true
+		},
+		"ArsenalBossDisablePassiveTrigger": {
+			"class": "Buff",
+			"stackName": "ArsenalBossDisablePassiveTrigger",
+			"stackLimit": 5,
+			"duration": -1,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"noIconShownOnBattleStatus": true,
+			"isHiddenFromPlayers": true
+		},
+		"ArsenalBossTriggerEnchantmentFXBuff": {
+			"class": "Buff",
+			"isHiddenFromPlayers": true,
+			"stackName": "ArsenalBossTriggerEnchantmentFXBuff",
+			"duration": 0,
+			"effectToShowWhenApplied": "ArsenalPassive",
+			"textKeyToShowWhenApplied": "KickToTheHeadPassiveAArsenalRegularBossNameKey",
+			"showAsTimer": false,
+			"showAsPermanent": false
+		},
+		"NoTurnsFor50TUArsenalRegularV1": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnArsenalRegularV1",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 50,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsNotBoss"
+		},
+		"NoTurnsFor50TUPassiveArsenalRegularV1": {
+			"class": "Buff",
+			"stackName": "BlockGiveTurnPassiveArsenalRegularV1",
+			"behaviors": ["LoseTurn","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+			},{},{}],
+			"duration": 50,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["BlockTurnTag"],
+			"iconSpriteName": "IconRedDisabled01",
+			"statusEffect": "TurnGiftStunStatus",
+			"applyConditions": "IsNotBoss"
+		},
+		"ArsenalRegularBossCooldown50":{
+			"class": "Buff",
+			"duration": 50,
+			"stackName": "InstantCooldown",
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"iconSpriteName": "IconBlueCountdownClock3"
 		}
     }
 }

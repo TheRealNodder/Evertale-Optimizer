@@ -1,0 +1,1257 @@
+{
+  "schemaVersion": 3,
+  "order": 442,
+  "id": "berserk-arsenal",
+  "sourceId": "ArsenalRegularBoss01",
+  "name": "Berserk Arsenal",
+  "title": "",
+  "secondName": "",
+  "description": "",
+  "category": "bosse",
+  "rarity": "SSR",
+  "fieldSources": {
+    "rarity": {
+      "source": "raw.stars",
+      "transform": "frontend_base_star_display_mapping"
+    }
+  },
+  "stars": 6,
+  "evolvedStars": 6,
+  "element": "Storm",
+  "weaponType": "Sword",
+  "stats": {
+    "atk": 1400,
+    "hp": 20100,
+    "spd": 555,
+    "cost": 999
+  },
+  "hp": 20100,
+  "atk": 1400,
+  "spd": 555,
+  "cost": 999,
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/ArsenalRegular01.png",
+  "imageVariants": [],
+  "forms": [],
+  "activeSkills": [
+    "SingleAttackAArsenalRegularBoss",
+    "AllyBuffAArsenalRegularBoss",
+    "SpecialAttackAArsenalRegularBoss"
+  ],
+  "passiveSkills": [
+    "PassPassiveAArsenalRegularBoss",
+    "KickToTheHeadPassiveAArsenalRegularBoss"
+  ],
+  "leaderSkills": [],
+  "refs": {
+    "activeSkills": [
+      "SingleAttackAArsenalRegularBoss",
+      "AllyBuffAArsenalRegularBoss",
+      "SpecialAttackAArsenalRegularBoss"
+    ],
+    "passives": [
+      "PassPassiveAArsenalRegularBoss",
+      "KickToTheHeadPassiveAArsenalRegularBoss"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": null,
+    "leaderBuffCondition": null,
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "SingleAttackAArsenalRegularBoss": {
+        "id": "SingleAttackAArsenalRegularBoss",
+        "found": true,
+        "localization": {
+          "name": "Bolt Blast",
+          "description": "500% damage to 1 enemy. 1000% damage instead every second time this skill is activated while on the battlefield. This attack ignores enemy damage reduction effects, skin passive skills and the Counter Stance status effect.\n\nIf this damage does not defeat the target, allies gain 3 Spirit.",
+          "selected": "500%+ damage, may gain Spirit"
+        },
+        "ability": {
+          "name": "SingleAttackAArsenalRegularBoss",
+          "class": "Ability",
+          "abilityScalor": 4,
+          "conditionalAbilityScalors": [
+            9
+          ],
+          "config": "SingleAttackAArsenalRegularBoss",
+          "tuCost": 60,
+          "useLimit": 0,
+          "spiritGain": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageFlags": [
+                "IgnoreArmor",
+                "HardIgnoreBlockDeath",
+                "IgnoreSkin"
+              ],
+              "applyToTargetType": "Enemy",
+              "drainPercent": 0.01,
+              "drainEffect": "MerlinSelfHeal1"
+            },
+            {
+              "buffs": [
+                "SpiritGainA"
+              ],
+              "applyConditions": "MoreThan0HP",
+              "applyToTargetOnly": true,
+              "buffBackMode": true,
+              "skipAbilityEffect": true,
+              "showMissConditions": "ShowNoMiss"
+            },
+            {
+              "buffs": [
+                "RemoveEnergyCount1",
+                "TUMinus30",
+                "HijikataCounter",
+                "HijikataCounterFuseAfterTime",
+                "PassiveTUMinusLOCKEDArsenalRegularBoss"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true,
+              "applyConditions": "IsChargedAtAllNotTUMinusLOCKEDArsenalRegular",
+              "showMissConditions": "ShowNoMiss"
+            },
+            {
+              "buffs": [
+                "RemoveActive2LOCKArsenalRegular",
+                "LoseMomentum",
+                "GainMomentum"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "ArsenalTwinAttack",
+          "attackScalors": [
+            "GoodWithMomentum"
+          ],
+          "conditionedAbilityEffects": [
+            "ArsenalTwinAttack",
+            "ArsenalTwinAttack"
+          ],
+          "recommendEffectWhenUsable": -2
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.4,
+            0,
+            0,
+            0.4,
+            0.4,
+            0,
+            0.8,
+            0,
+            0.2,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batfx_KirinGirl/batfx_tailwindyellow",
+            "batsfx_prefab/batsfx_stun2",
+            "batfx_KirinGirl/batfx_chargepetal4",
+            "batsfx_prefab/batsfx_dreamhunt1",
+            "batfx_Zeus/batfx_ZeusThunder1",
+            "batsfx_prefab/batsfx_electric1",
+            "batfx_Zeus/batfx_ZeusThunder2",
+            "batsfx_prefab/batsfx_swordslash",
+            "batfx_Zeus/batfx_SlashYellow2",
+            "batsfx_prefab/batsfx_bomb1",
+            "batfx_Arsenal/batfx_firepillar5",
+            "batfx_Zeus/batfx_groundimpactYellow1",
+            "batsfx_prefab/batsfx_electric2"
+          ],
+          "sortOrderOffset": [
+            -80,
+            1,
+            -2,
+            1,
+            -1,
+            1,
+            15,
+            1,
+            2,
+            1,
+            4,
+            -2,
+            1
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            false,
+            false,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "GainMomentum": {
+            "class": "Buff",
+            "stackName": "MomentumReady",
+            "duration": -1,
+            "isHiddenFromPlayers": true,
+            "applyConditions": "NotLostMomentum"
+          },
+          "HijikataCounter": {
+            "class": "Buff",
+            "stackName": "StealthOverdriveCounter",
+            "stackLimit": 3,
+            "duration": -1,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "noIconShownOnBattleStatus": true,
+            "isHiddenFromPlayers": true
+          },
+          "HijikataCounterFuseAfterTime": {
+            "class": "Buff",
+            "duration": 10,
+            "behaviors": [
+              "BuffAfterTime"
+            ],
+            "behaviorOverrides": [
+              {
+                "selfBuffs": [
+                  "HijikataCounterDecrease"
+                ],
+                "fuse": 10
+              }
+            ],
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "noIconShownOnBattleStatus": true,
+            "isHiddenFromPlayers": true
+          },
+          "LoseMomentum": {
+            "class": "Buff",
+            "stackName": "LoseMomentum",
+            "duration": 0,
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "MomentumReady"
+              }
+            ],
+            "isHiddenFromPlayers": true,
+            "applyConditions": "HasDamagedWithAttack"
+          },
+          "PassiveTUMinusLOCKEDArsenalRegularBoss": {
+            "class": "Buff",
+            "stackName": "TUMinusLOCKEDArsenalRegular",
+            "duration": 50,
+            "isHiddenFromPlayers": false,
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "iconSpriteName": "IconRedCountdownPassiveClock3",
+            "applyConditions": "IsHijikataCharged3"
+          },
+          "RemoveActive2LOCKArsenalRegular": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "Active2LOCKArsenalRegular"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "RemoveEnergyCount1": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "StoreEnergy",
+                "decreaseCount": 1
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "SpiritGainA": {
+            "class": "Buff",
+            "behaviors": [
+              "AddSpirit"
+            ],
+            "behaviorOverrides": [
+              {
+                "percentOfMax": 0.3
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "TUMinus30": {
+            "class": "Buff",
+            "stackName": "TUMinus",
+            "behaviors": [
+              "Stun"
+            ],
+            "behaviorOverrides": [
+              {
+                "stunTU": -30
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true,
+            "textKeyToShowWhenApplied": "TUMinusKey"
+          }
+        },
+        "attackScalors": {
+          "GoodWithMomentum": {
+            "class": "AttackScalor",
+            "sourceCondition": "HasDamagedWithAttack"
+          }
+        },
+        "conditions": {
+          "IsChargedAtAllNotTUMinusLOCKEDArsenalRegular": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "StoreEnergy"
+            ],
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "TUMinusLOCKEDArsenalRegular"
+              ]
+            }
+          },
+          "MoreThan0HP": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "hpLessThanValue": 0
+            }
+          }
+        }
+      },
+      "AllyBuffAArsenalRegularBoss": {
+        "id": "AllyBuffAArsenalRegularBoss",
+        "found": true,
+        "localization": {
+          "name": "Twin Charge",
+          "description": "The user is granted 2 Charges.\n\nAll allies on the battlefield are granted a Sleep Ward. A Sleep Ward prevents Sleep from being applied once, then is removed. Sleep Wards cannot stack.All non-sleeping allies on the battlefield will become Enraged. This will overwrite the effects of other Enrage skills on those units. Enraged units have their Attack increased to 1.5x until the end of their next turn.\n\nUnlocked each time the user uses another active skill. This skill is locked again after each use or if the user leaves the battlefield.",
+          "selected": "Grants 2 Charges, Sleep Wards & may Enrage"
+        },
+        "ability": {
+          "name": "AllyBuffAArsenalRegularBoss",
+          "class": "Ability",
+          "config": "AllyBuffAArsenalRegularBoss",
+          "tuCost": 1,
+          "useLimit": 0,
+          "spiritGain": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "AllAlly",
+          "components": [
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "SleepImmunityOnce"
+              ],
+              "applyToTargetType": "Friendly"
+            },
+            {
+              "buffs": [
+                "AttackPlus50Percent1TurnOnly"
+              ],
+              "applyToTargetType": "Friendly",
+              "applyConditions": "IsNotSleeping",
+              "skipAbilityEffect": true,
+              "showMissConditions": "IsSleeping"
+            },
+            {
+              "buffs": [
+                "Active2LOCKArsenalRegular",
+                "StoreEnergy",
+                "StoreEnergy"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "friendlyEventType": "Finish",
+          "sourceEventType": "Finish",
+          "abilityEffect": "ArsenalCharge",
+          "useCondition": "IsNotActive2LOCKArsenalRegular"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "allFriends": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0.5,
+            0,
+            0,
+            0,
+            0.75,
+            0,
+            0.3,
+            0,
+            0,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_purify1",
+            "batfx_castingyellow2/batfx_castingyellow2",
+            "batsfx_prefab/batsfx_electric2",
+            "batfx_KirinGirl/batfx_KirinCloudThunder1",
+            "batfx_KirinGirl/batfx_KirinCloudThunder2",
+            "batfx_common/batfx_yellowbase1",
+            "batsfx_prefab/batsfx_buff1",
+            "batsfx_prefab/batsfx_electric1",
+            "batfx_Thor/batfx_ElectricUp1",
+            "batfx_Thor/batfx_groundimpactThor1",
+            "batfx_Thor/batfx_groundimpactThor2",
+            "batfx_Thor/batfx_ElectricUp1",
+            "batfx_LudmillaNew/batfx_magicnukeYellow"
+          ],
+          "sortOrderOffset": [
+            2,
+            4,
+            -2,
+            4,
+            -1,
+            -1,
+            0,
+            0,
+            3,
+            -10,
+            10,
+            3,
+            -1
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle2"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            true,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "Active2LOCKArsenalRegular": {
+            "class": "Buff",
+            "stackName": "Active2LOCKArsenalRegular",
+            "duration": -1,
+            "isHiddenFromPlayers": true,
+            "showAsPermanent": false,
+            "showAsTimer": false
+          },
+          "AttackPlus50Percent1TurnOnly": {
+            "class": "Buff",
+            "stackName": "AttackPlus50Percent",
+            "behaviors": [
+              "RemoveAfterTurnsBehavior",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "turnCount": 1,
+                "scalorStatBonuses": {
+                  "Attack": 0.5
+                }
+              },
+              {
+                "name": "AttackMinus25Percent"
+              }
+            ],
+            "iconSpriteName": "IconRedRage01",
+            "showAsTimer": true,
+            "duration": -1
+          },
+          "SleepImmunityOnce": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity"
+            ],
+            "stackName": "SleepImmunityOnce",
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Sleep"
+                ],
+                "useLimit": 1
+              }
+            ],
+            "duration": -1,
+            "showAsTimer": true,
+            "tags": [
+              "SleepImmuneTemp",
+              "ThisIsAWard"
+            ],
+            "iconSpriteName": "IconRedSleepInvalidZs01"
+          },
+          "StoreEnergy": {
+            "class": "Buff",
+            "stackLimit": 3,
+            "duration": -1,
+            "showAsTimer": false,
+            "stackName": "StoreEnergy",
+            "noIconShownOnBattleStatus": true,
+            "usesStackCountDescription": true,
+            "iconSpriteName": "IconPinkCharge01"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "IsNotActive2LOCKArsenalRegular": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "Active2LOCKArsenalRegular"
+              ]
+            }
+          },
+          "IsNotSleeping": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "Sleep"
+              ]
+            }
+          },
+          "IsSleeping": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "Sleep"
+            ]
+          }
+        }
+      },
+      "SpecialAttackAArsenalRegularBoss": {
+        "id": "SpecialAttackAArsenalRegularBoss",
+        "found": true,
+        "localization": {
+          "name": "Charged Blade",
+          "description": "1000% damage to 1 enemy. This attack ignores Guardians.\n\nThen the target hit has all Stealth status effects removed (including Super Stealth).\n\nUsable only if the user has stored 1+ Charges. This skill becomes locked for 50TU after use. Usable 10 times per battle.",
+          "selected": "1000% damage, removes Stealth"
+        },
+        "ability": {
+          "name": "SpecialAttackAArsenalRegularBoss",
+          "class": "Ability",
+          "abilityScalor": 9,
+          "config": "SpecialAttackAArsenalRegularBoss",
+          "tuCost": 60,
+          "useLimit": 10,
+          "spiritCost": 2,
+          "blockTargetManipulation": 1,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff",
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "damageFlags": [
+                "HardIgnoreBlockDeath"
+              ],
+              "applyToTargetType": "Enemy",
+              "drainPercent": 0.01,
+              "drainEffect": "MerlinSelfHeal1"
+            },
+            {
+              "buffs": [
+                "RemoveStealth"
+              ],
+              "applyToTargetType": "Enemy",
+              "showMissConditions": "ShowNoMiss",
+              "skipAbilityEffect": true
+            },
+            {
+              "buffs": [
+                "RemoveEnergyCount1",
+                "TUMinus30",
+                "HijikataCounter",
+                "HijikataCounterFuseAfterTime",
+                "PassiveTUMinusLOCKEDArsenalRegularBoss"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true,
+              "applyConditions": "IsChargedAtAllNotTUMinusLOCKEDArsenalRegular",
+              "showMissConditions": "ShowNoMiss"
+            },
+            {
+              "buffs": [
+                "ArsenalRegularBossCooldown50",
+                "RemoveActive2LOCKArsenalRegular"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "ArsenalSlash",
+          "recommendEffectWhenUsable": -2,
+          "useCondition": "IsChargedAtAllAndNotInstantCooldown"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0.6,
+            0.5,
+            0,
+            0.2,
+            0,
+            0,
+            0,
+            0.9,
+            0,
+            0.5,
+            0
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_accelerate1",
+            "batfx_KirinGirl/batfx_tailwindyellow",
+            "batfx_Arsenal/batfx_teleport1_2",
+            "batfx_Arsenal/batfx_teleport1_2",
+            "batfx_KirinGirl/batfx_tailwindyellow",
+            "batfx_Arsenal/batfx_spikeflurryArsenal1",
+            "batsfx_prefab/batsfx_multislash1",
+            "batfx_Arsenal/batfx_multiplestabYellow1",
+            "batfx_deadlyvampire1/batfx_camerashake1",
+            "batfx_Nike/batfx_quickchargeYellow1",
+            "batsfx_prefab/batsfx_ring2",
+            "batfx_Arsenal/batfx_SlashYellow2",
+            "batsfx_prefab/batsfx_slash1"
+          ],
+          "sortOrderOffset": [
+            0,
+            -80,
+            5,
+            5,
+            -80,
+            2,
+            0,
+            3,
+            2,
+            20,
+            0,
+            5,
+            0
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            true,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            true,
+            true,
+            false,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            false,
+            true,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "ArsenalRegularBossCooldown50": {
+            "class": "Buff",
+            "duration": 50,
+            "stackName": "InstantCooldown",
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "iconSpriteName": "IconBlueCountdownClock3"
+          },
+          "HijikataCounter": {
+            "class": "Buff",
+            "stackName": "StealthOverdriveCounter",
+            "stackLimit": 3,
+            "duration": -1,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "noIconShownOnBattleStatus": true,
+            "isHiddenFromPlayers": true
+          },
+          "HijikataCounterFuseAfterTime": {
+            "class": "Buff",
+            "duration": 10,
+            "behaviors": [
+              "BuffAfterTime"
+            ],
+            "behaviorOverrides": [
+              {
+                "selfBuffs": [
+                  "HijikataCounterDecrease"
+                ],
+                "fuse": 10
+              }
+            ],
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "noIconShownOnBattleStatus": true,
+            "isHiddenFromPlayers": true
+          },
+          "PassiveTUMinusLOCKEDArsenalRegularBoss": {
+            "class": "Buff",
+            "stackName": "TUMinusLOCKEDArsenalRegular",
+            "duration": 50,
+            "isHiddenFromPlayers": false,
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "iconSpriteName": "IconRedCountdownPassiveClock3",
+            "applyConditions": "IsHijikataCharged3"
+          },
+          "RemoveActive2LOCKArsenalRegular": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "Active2LOCKArsenalRegular"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "RemoveEnergyCount1": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "StoreEnergy",
+                "decreaseCount": 1
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "RemoveStealth": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "ActiveStealthJustGained"
+              },
+              {
+                "name": "Stealth"
+              },
+              {
+                "name": "SuperStealthPT2"
+              },
+              {
+                "name": "SuperStealthPT3"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "TUMinus30": {
+            "class": "Buff",
+            "stackName": "TUMinus",
+            "behaviors": [
+              "Stun"
+            ],
+            "behaviorOverrides": [
+              {
+                "stunTU": -30
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true,
+            "textKeyToShowWhenApplied": "TUMinusKey"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "IsChargedAtAllAndNotInstantCooldown": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "StoreEnergy"
+            ],
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "InstantCooldown"
+              ]
+            }
+          },
+          "IsChargedAtAllNotTUMinusLOCKEDArsenalRegular": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "StoreEnergy"
+            ],
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "TUMinusLOCKEDArsenalRegular"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "passives": {
+      "PassPassiveAArsenalRegularBoss": {
+        "id": "PassPassiveAArsenalRegularBoss",
+        "found": true,
+        "localization": {
+          "name": "Ultimate Scion",
+          "description": "This unit cannot be sent to the reinforcements from the battlefield, and cannot be defeated by damage from Poison or Burn status effects.\n\nThis unit cannot be stunned if there is another Storm unit (ally or enemy) on the battlefield. This unit cannot fall asleep if there are any Water units (ally or enemy) on the battlefield.\n\nThis unit's attacks heal this unit for 1% of total damage dealt, and ignore any effects of non-boss enemies that would prevent targets from being defeated.\n\nIf this unit has a Charge, when this unit uses Bolt Blast or Charged Blade, this unit will consume 1 Charge to have its current TU reduced by 30TU. If this triggers 3 times within 10TU, this effect cannot trigger again until 50TU advances."
+        }
+      },
+      "KickToTheHeadPassiveAArsenalRegularBoss": {
+        "id": "KickToTheHeadPassiveAArsenalRegularBoss",
+        "found": true,
+        "localization": {
+          "name": "Bring the Thunder",
+          "description": "If this unit would be defeated by an enemy attack or a status effect while having more than 1 HP, it instead survives with 1 HP.\n\nEach time this unit takes damage from an attack and survives until after the end of the turn, this unit will gain a Charge. If this unit already had 3 Charges stored, this unit then consumes 2 Charges to have its current TU reduced to 0. This TU reduction may trigger before or after other effects that adjust the turn order. Certain skills are affected by and may consume charges. A unit can store a maximum of 3 charges.\n\nAfter the end of each of this unit's turns, if less than 2 enemies on the battlefield have their Active Skills disabled, this unit will disable 1 random enemy's Active Skills for 50TU. This unit can only successfully trigger this effect 5 times since entering the battlefield. This effect cannot trigger if Arsenal has no other allies on the battlefield."
+        }
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": null
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "ArsenalRegularBoss01",
+    "family": "ArsenalRegularBoss",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "ArsenalRegularBoss01",
+    "class": "Monster",
+    "family": "ArsenalRegularBoss",
+    "activeSkills": {
+      "0": "SingleAttackAArsenalRegularBoss",
+      "1": "AllyBuffAArsenalRegularBoss",
+      "2": "SpecialAttackAArsenalRegularBoss"
+    },
+    "passives": {
+      "0": "PassPassiveAArsenalRegularBoss",
+      "1": "KickToTheHeadPassiveAArsenalRegularBoss"
+    },
+    "cost": 999,
+    "baseAttack": 1400,
+    "baseMaxHp": 20100,
+    "speed": 555,
+    "element": "Air",
+    "weaponPref": "Sword",
+    "weaponPivotIndex": 0,
+    "walkSound": "TestSound",
+    "secure": 1,
+    "aiTargetPickWeight": 1,
+    "stars": 6,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 1,
+    "battleOrbImageFlip": 0,
+    "skillVoices": {
+      "0": [
+        1,
+        2
+      ],
+      "1": [
+        5,
+        6
+      ],
+      "2": [
+        9,
+        10
+      ],
+      "3": [
+        13,
+        15
+      ]
+    },
+    "damageVoices": [
+      17,
+      18
+    ],
+    "deathVoices": [
+      21,
+      22
+    ]
+  },
+  "_build": {
+    "scriptVersion": "8-generated-display-authority",
+    "sourceHash": "2be9ab544652e445c52e7765fef3ae3fb398aabcb48584f66765712cdb4552bf",
+    "dependencyHash": "8fdc7ddc2a61f7b9ae0829795c55c2f66ef7be669791027cc9c6550da741aa29",
+    "generatedAt": 1793246976
+  }
+}

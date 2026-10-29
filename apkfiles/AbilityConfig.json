@@ -1,6 +1,6 @@
 {
 	"Version": 23,
-	"Time": 1791422093,
+	"Time": 1792737697,
 	"AbilityConfig": {
 		"StunSingle200A": {
 			"class": "AbilityConfig",
@@ -48876,12 +48876,12 @@
 				"applyToSourceOnly": true,
 				"skipAbilityEffect": true
 			}],
-			"enemyEventType": "Hit",
-			"sourceEventType": "Finish",
-			"abilityEffect": "CupidSP",
-			"attackScalors":["GoodIfGain1GoodBuff","GoodIfGain2GoodBuff","GoodIfGain3GoodBuff","GoodIfGain4GoodBuff","GoodIfGain5GoodBuff"],
-			"conditionedAbilityEffects": ["CupidSP","CupidSP","CupidSP","CupidSP","CupidSP"],
-			"recommendEffectWhenUsable": -1
+            "enemyEventType": "Hit",
+            "sourceEventType": "Finish",
+            "abilityEffect": "CupidSP",
+            "attackScalors":["GoodIfGain1GoodBuff","GoodIfGain2GoodBuff","GoodIfGain3GoodBuff","GoodIfGain4GoodBuff","GoodIfGain5GoodBuff"],
+            "conditionedAbilityEffects": ["CupidSP","CupidSP","CupidSP","CupidSP","CupidSP"],
+            "recommendEffectWhenUsable": -1
 		},
 		"SingleAttackAAliceNew":{
 			"class": "AbilityConfig",
@@ -49192,6 +49192,272 @@
 			"attackScalors":["GoodIfGain1GoodBuff","GoodIfGain2GoodBuff","GoodIfGain3GoodBuff","GoodIfGain4GoodBuff","GoodIfGain5GoodBuff"],
 			"conditionedAbilityEffects": ["CupidSP","CupidSP","CupidSP","CupidSP","CupidSP"],
 			"recommendEffectWhenUsable": -1
+		},
+		"SingleAttackAMarieAntoinetteBoss":{
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage","ApplyBuff"],
+			"componentOverrides": [{
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"damageFlags": ["IgnoreArmor","HardIgnoreBlockDeath","IgnoreSkin","DoNotWake"],
+				"applyToTargetType": "Enemy"
+			},{
+				"buffs": ["MarkedMarieAntoinette","RandomOtherAllyExtraTurnMarieAntoinetteBoss"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"applyConditions": "IsNotJustGrantedTurn"
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "MarieAntoinetteAttack1",
+			"attackScalors": ["GoodIfCharged1","GoodIfCharged2","GoodIfCharged3"],
+			"conditionedAbilityEffects": ["MarieAntoinetteAttack1","MarieAntoinetteAttack1","MarieAntoinetteAttack1"],
+			"recommendEffectWhenUsable": -1
+		},
+		"AllyBuffAMarieAntoinetteBoss":{
+			"class": "AbilityConfig",
+			"targetingData": "AllAlly",
+			"components": ["ApplyBuff","ApplyBuff"],
+			"componentOverrides":[{
+				"buffs": ["RemoveSleep","RemovePoison"],
+				"applyToTargetType": "Friendly"
+			},{
+				"buffs": ["SleepThorns","AttackPlus50Percent1TurnOnly"],
+				"applyToTargetType": "Friendly",
+				"applyConditions": "IsNotBurning",
+				"skipAbilityEffect": true,
+				"showMissConditions": "IsBurning"
+			}],
+			"friendlyEventType": "Finish",
+			"flags": ["NoDamage"],
+			"abilityEffect": "MarieAntoinetteFlowreBuff",
+			"useCondition": "NoThornsOnAlliesNotBurning"
+		},
+		"MultiBuffAMarieAntoinetteBoss":{
+			"class": "AbilityConfig",
+			"targetingData": "SelfOnly",
+			"components": ["ApplyBuff"],
+			"componentOverrides":[{
+				"buffs": ["FortifyFor3Attacks","SleepImmunityFor50TU","PoisonImmunityFor50TU","MarieAntoinetteBossActive3Cooldown50"],
+				"applyToSourceOnly": true
+			}],
+			"sourceEventType": "Finish",
+			"abilityEffect": "MarieAntoinetteBreadSleep",
+			"useCondition": "TimeInCombat50NotInstantCooldown"
+		},
+		"SpecialAttackAMarieAntoinetteBoss":{
+			"class": "AbilityConfig",
+			"targetingData": "AllEnemy",
+			"components": ["Damage","ApplyBuff"],
+			"componentOverrides": [{
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"applyToTargetType": "Enemy",
+				"damageFlags": ["IgnoreArmor","HardIgnoreBlockDeath","DoNotWake"]
+			},{
+				"buffs": ["RemoveSleepImmunityOnce","RemovePoisonImmunityOnce"],
+				"applyToTargetOnly": true,
+				"showMissConditions": "ShowNoMiss",
+				"skipAbilityEffect": true
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Hit",
+			"abilityEffect": "MarieAntoinetteSpecial",
+			"attackScalors": ["GoodVsSummonedEnemy"],
+			"conditionedAbilityEffects": ["MarieAntoinetteSpecial","MarieAntoinetteSpecial"],
+			"useCondition": "EnemyTeamHas2ConjuredAllies"
+		},
+		"SingleAttackAGalahadRegularBoss":{
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage", "ApplyBuff"],
+			"componentOverrides": [{
+				"damageFlags": ["DoNotWake","HardIgnoreBlockDeath","IgnoreArmor"],
+				"applyToTargetType": "Enemy"
+			},{
+				"buffs":["SpiritDrainDContra"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Hit",
+			"abilityEffect": "GalahadAttack",
+			"attackScalors": ["TimeInCombat100"],
+			"conditionedAbilityEffects": ["GalahadAttack","GalahadAttack"],
+			"recommendEffectWhenUsable": -1
+		},
+		"AllyBuffAGalahadRegularBoss": {
+			"class": "AbilityConfig",
+			"targetingData": "AllAllyButMe",
+			"components": ["ApplyBuff","ApplyBuff"],
+			"componentOverrides":[{
+				"buffs": ["GiveTurn","OnExtraTurn","JustGivenTurn","RemoveSleep"],
+				"applyToTargetType": "Friendly",
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["EmptyPlaceholder"],
+				"applyToTargetType": "Friendly"
+			}],
+			"friendlyEventType": "Finish",
+			"flags": ["GiveTurn"],
+			"abilityEffect": "GalahadAllyBuff",
+			"useCondition": "TimeInCombat50"
+		},
+		"MultiBuffAGalahadRegularBoss":{
+			"class": "AbilityConfig",
+			"targetingData": "AllEnemy",
+			"components": ["ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides":[{
+				"buffs": ["RemoveSleepImmunityOnce","RemovePoisonImmunityOnce","RemoveInstantKillImmunityOnce"],
+				"applyToTargetType": "Enemy"
+			},{
+				"randomBuffFromList": ["MegaPoison","SleepForcedThorns","InstantKillAndCreditKillGalahadRegularBoss"],
+				"randomBuffListEffects": ["blank1","blank1","blank1"],
+				"applyToTargetType": "Enemy",
+				"showMissConditions": "ShowNoMiss",
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["EmptyPlaceholder"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"enemyEventType": "Finish",
+			"sourceEventType": "Finish",
+			"flags": ["NoDamage","SleepChance","PoisonChance"],
+			"abilityEffect": "GalahadSP",
+			"useCondition": "TimeInCombat100"
+		},
+		"SpecialBuffAGalahadRegularBoss": {
+			"class": "AbilityConfig",
+			"targetingData": "AllAlly",
+			"components": ["ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides":[{
+				"buffs": ["RemoveBurn","RemovePoison"],
+				"buffAppliedEffects": ["SmallHeal1"],
+				"applyToTargetType": "Friendly"
+			},{
+				"applyConditions": "IsNotFortified",
+				"buffs": ["FortifyFor3Attacks"],
+				"applyToTargetOnly": true,
+				"skipAbilityEffect": true,
+				"applyToTargetType": "Friendly"
+			},{
+				"applyConditions": "IsNotFortified",
+				"buffs": ["FortifyFor3Attacks"],
+				"skipAbilityEffect": true,
+				"applyToSourceOnly": true
+			}],
+			"friendlyEventType": "Finish",
+			"sourceEventType": "Finish",
+			"abilityEffect": "GalahadEtemyBuff",
+			"useCondition": "NotAloneAndIsNotFortified"
+		},
+		"SingleAttackAArsenalRegularBoss": {
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage","ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"damageFlags": ["IgnoreArmor","HardIgnoreBlockDeath","IgnoreSkin"],
+				"applyToTargetType": "Enemy",
+				"drainPercent": 0.01,
+				"drainEffect": "MerlinSelfHeal1"
+			},{
+				"buffs": ["SpiritGainA"],
+				"applyConditions": "MoreThan0HP",
+				"applyToTargetOnly": true,
+				"buffBackMode": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs":["RemoveEnergyCount1","TUMinus30","HijikataCounter","HijikataCounterFuseAfterTime","PassiveTUMinusLOCKEDArsenalRegularBoss"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"applyConditions": "IsChargedAtAllNotTUMinusLOCKEDArsenalRegular",
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs":["RemoveActive2LOCKArsenalRegular","LoseMomentum","GainMomentum"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "ArsenalTwinAttack",
+			"attackScalors": ["GoodWithMomentum"],
+			"conditionedAbilityEffects": ["ArsenalTwinAttack","ArsenalTwinAttack"],
+			"recommendEffectWhenUsable": -2
+		},
+		"AllyBuffAArsenalRegularBoss": {
+			"class": "AbilityConfig",
+			"targetingData": "AllAlly",
+			"components": ["ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"buffs": ["SleepImmunityOnce"],
+				"applyToTargetType": "Friendly"
+			},{
+				"buffs": ["AttackPlus50Percent1TurnOnly"],
+				"applyToTargetType": "Friendly",
+				"applyConditions": "IsNotSleeping",
+				"skipAbilityEffect": true,
+				"showMissConditions": "IsSleeping"
+			},{
+				"buffs":["Active2LOCKArsenalRegular","StoreEnergy","StoreEnergy"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"friendlyEventType": "Finish",
+			"sourceEventType": "Finish",
+			"abilityEffect": "ArsenalCharge",
+			"useCondition": "IsNotActive2LOCKArsenalRegular"
+		},
+		"SpecialAttackAArsenalRegularBoss":{
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage","ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"damageFlags": ["HardIgnoreBlockDeath"],
+				"applyToTargetType": "Enemy",
+				"drainPercent": 0.01,
+				"drainEffect": "MerlinSelfHeal1"
+			},{
+				"buffs": ["RemoveStealth"],
+				"applyToTargetType": "Enemy",
+				"showMissConditions": "ShowNoMiss",
+				"skipAbilityEffect": true
+			},{
+				"buffs":["RemoveEnergyCount1","TUMinus30","HijikataCounter","HijikataCounterFuseAfterTime","PassiveTUMinusLOCKEDArsenalRegularBoss"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"applyConditions": "IsChargedAtAllNotTUMinusLOCKEDArsenalRegular",
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs":["ArsenalRegularBossCooldown50","RemoveActive2LOCKArsenalRegular"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "ArsenalSlash",
+			"recommendEffectWhenUsable": -2,
+			"useCondition": "IsChargedAtAllAndNotInstantCooldown"
+		},
+		"EnemyBuffAArsenalRegularBoss": {
+			"class": "AbilityConfig",
+			"targetingData": "AllEnemy",
+			"components": ["ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"buffs": ["NoTurnsFor50TUArsenalRegularV1"],
+				"applyToTargetType": "Enemy"
+			},{
+				"buffs": ["GrantAllOtherAlliesTurnEBB","PurifyAllAlliesEBB","RemoveActive2LOCKArsenalRegular","RemoveEnergy"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			}],
+			"sourceEventType": "Finish",
+			"enemyEventType": "Finish",
+			"abilityEffect": "ArsenalAllStun",
+			"flags": ["NoDamage","GiveTurn"],
+			"useCondition": "IsCharged3"
 		}
 	}
 }

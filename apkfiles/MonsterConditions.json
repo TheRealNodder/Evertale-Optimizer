@@ -1,6 +1,6 @@
 {
 	"Version": 23,
-    "Time": 1790233634,
+    "Time": 1792737847,
 	"MonsterConditions": {
 	"IsFire": {
 		"class": "MonsterConditions",
@@ -1683,12 +1683,19 @@
 					},
 					"or":{
 						"class": "MonsterConditions",
-						"monsterTags": ["SleepImmuneVs2Enemies"],
-						"enemyTeamSize": 2,
+						"monsterTags": ["SleepImmuneWithWater"],
+						"myTeamMonsterConditionMatchesNeeded":{
+							"IsWater": 1
+						},
 						"or":{
 							"class": "MonsterConditions",
-							"monsterTags": ["NegativeStatusImmunityFromThorns"],
-							"buffStackNames": ["SleepThorns"]
+							"monsterTags": ["SleepImmuneVs2Enemies"],
+							"enemyTeamSize": 2,
+							"or":{
+								"class": "MonsterConditions",
+								"monsterTags": ["NegativeStatusImmunityFromThorns"],
+								"buffStackNames": ["SleepThorns"]
+							}	
 						}	
 					}
 				}
@@ -6930,57 +6937,65 @@
 					},
 					"or":{
 						"class": "MonsterConditions",
-						"monsterTags": ["StunImmuneFromThorns"],
-						"myTeamMonsterConditionMatchesNeeded":{
-							"IsThorned": 1
+						"monsterTags": ["StunImmuneVs1AirEnemy"],
+						"checkEnemyTeamOfMonster": true,
+						"enemyTeamMonsterConditionMatchesNeeded": {
+								"IsAir": 1
 						},
 						"or":{
 							"class": "MonsterConditions",
-							"monsterTags": ["StunImmuneIfBeastAlly"],
-							"checkReinforcementsForTeamConditionMatches": true,
+							"monsterTags": ["StunImmuneFromThorns"],
 							"myTeamMonsterConditionMatchesNeeded":{
-								"IsBeastRegular": 1
+								"IsThorned": 1
 							},
 							"or":{
 								"class": "MonsterConditions",
-								"monsterTags": ["StunImmuneIfAnyBurningAllies"],
+								"monsterTags": ["StunImmuneIfBeastAlly"],
+								"checkReinforcementsForTeamConditionMatches": true,
 								"myTeamMonsterConditionMatchesNeeded":{
-									"IsBurning": 1
+									"IsBeastRegular": 1
 								},
 								"or":{
 									"class": "MonsterConditions",
-									"monsterTags": ["StunImmuneIfEnemyIsFireBurnBlastOrForce"],
-									"checkEnemyTeamOfMonster": true,
-									"enemyTeamMonsterConditionMatchesNeeded": {
-											"IsBurnBlastOrForceOrFire": 1
+									"monsterTags": ["StunImmuneIfAnyBurningAllies"],
+									"myTeamMonsterConditionMatchesNeeded":{
+										"IsBurning": 1
 									},
 									"or":{
 										"class": "MonsterConditions",
-										"monsterTags": ["StunImmuneIfAllyIsFireBurnBlastOrForce"],
-										"myTeamMonsterConditionMatchesNeeded": {
+										"monsterTags": ["StunImmuneIfEnemyIsFireBurnBlastOrForce"],
+										"checkEnemyTeamOfMonster": true,
+										"enemyTeamMonsterConditionMatchesNeeded": {
 												"IsBurnBlastOrForceOrFire": 1
 										},
 										"or":{
 											"class": "MonsterConditions",
-											"monsterTags": ["StunImmuneIfPoisonedEnemy"],
-											"checkEnemyTeamOfMonster": true,
-											"enemyTeamMonsterConditionMatchesNeeded": {
-													"IsPoisoned": 1
+											"monsterTags": ["StunImmuneIfAllyIsFireBurnBlastOrForce"],
+											"myTeamMonsterConditionMatchesNeeded": {
+													"IsBurnBlastOrForceOrFire": 1
 											},
 											"or":{
 												"class": "MonsterConditions",
-												"monsterTags": ["StunImmunityIfNotBurning"],
-												"not":{
-													"class": "MonsterConditions",
-													"buffStackNames": ["Burn"]
+												"monsterTags": ["StunImmuneIfPoisonedEnemy"],
+												"checkEnemyTeamOfMonster": true,
+												"enemyTeamMonsterConditionMatchesNeeded": {
+														"IsPoisoned": 1
 												},
 												"or":{
 													"class": "MonsterConditions",
-													"monsterTags": ["StunImmuneIfHoldGroundPlusTriggered"],
-													"buffStackNames": ["BlockDeathUntilNextTurn"],
-													"not": {
+													"monsterTags": ["StunImmunityIfNotBurning"],
+													"not":{
 														"class": "MonsterConditions",
-														"buffStackNames": ["HoldGroundOnceForHoldGroundPlus"]
+														"buffStackNames": ["Burn"]
+													},
+													"or":{
+														"class": "MonsterConditions",
+														"monsterTags": ["StunImmuneIfHoldGroundPlusTriggered"],
+														"buffStackNames": ["BlockDeathUntilNextTurn"],
+														"not": {
+															"class": "MonsterConditions",
+															"buffStackNames": ["HoldGroundOnceForHoldGroundPlus"]
+														}	
 													}	
 												}	
 											}
@@ -16288,7 +16303,7 @@
         	"SnowWhiteNewBoss","BeautyBeastRegularBoss","BeautyRegularBoss","BeastRegularBoss","KintaroRegularBoss",
         	"LudmillaBalletBoss","YandereMaidBalletBoss","VictoriaRegularBoss","LupinRegularBoss","JeanneFusionBoss","BasiliskRegularBoss","ManchesterRegularBoss",
         	"LuBuDarkBoss","WhiteSnakeGirlDarkBoss","XiaoLiRegularBoss","DraculaRegularBoss","VanHelsingRegularBoss","SherlockRegularBoss",
-        	"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss"]
+        	"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss","MarieAntoinetteBoss","GalahadRegularBoss","ArsenalRegularBoss"]
 	},
 	"IsBossOrInstantKillImmune": {
 		"class": "MonsterConditions",
@@ -16324,7 +16339,7 @@
         		"SnowWhiteNewBoss","BeautyBeastRegularBoss","BeautyRegularBoss","BeastRegularBoss","KintaroRegularBoss",
         		"LudmillaBalletBoss","YandereMaidBalletBoss","VictoriaRegularBoss","LupinRegularBoss","JeanneFusionBoss","BasiliskRegularBoss","ManchesterRegularBoss",
         		"LuBuDarkBoss","WhiteSnakeGirlDarkBoss","XiaoLiRegularBoss","DraculaRegularBoss","VanHelsingRegularBoss","SherlockRegularBoss",
-        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss"]
+        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss","MarieAntoinetteBoss","GalahadRegularBoss","ArsenalRegularBoss"]
 		}
 	},
 	"IsNotBoss": {
@@ -16360,7 +16375,7 @@
         		"SnowWhiteNewBoss","BeautyBeastRegularBoss","BeautyRegularBoss","BeastRegularBoss","KintaroRegularBoss",
         		"LudmillaBalletBoss","YandereMaidBalletBoss","VictoriaRegularBoss","LupinRegularBoss","JeanneFusionBoss","BasiliskRegularBoss","ManchesterRegularBoss",
         		"LuBuDarkBoss","WhiteSnakeGirlDarkBoss","XiaoLiRegularBoss","DraculaRegularBoss","VanHelsingRegularBoss","SherlockRegularBoss",
-        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss"]
+        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss","MarieAntoinetteBoss","GalahadRegularBoss","ArsenalRegularBoss"]
 		}
 	},
 	"IsNotBossNotAloneAndNoAllyIsPloyed": {
@@ -16397,7 +16412,7 @@
         		"SnowWhiteNewBoss","BeautyBeastRegularBoss","BeautyRegularBoss","BeastRegularBoss","KintaroRegularBoss",
         		"LudmillaBalletBoss","YandereMaidBalletBoss","VictoriaRegularBoss","LupinRegularBoss","JeanneFusionBoss","BasiliskRegularBoss","ManchesterRegularBoss",
         		"LuBuDarkBoss","WhiteSnakeGirlDarkBoss","XiaoLiRegularBoss","DraculaRegularBoss","VanHelsingRegularBoss","SherlockRegularBoss",
-        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss"],
+        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss","MarieAntoinetteBoss","GalahadRegularBoss","ArsenalRegularBoss"],
 			"or":{
 				"class": "MonsterConditions",
 				"myTeamMonsterConditionMatchesNeeded":{
@@ -16442,7 +16457,7 @@
         			"SnowWhiteNewBoss","BeautyBeastRegularBoss","BeautyRegularBoss","BeastRegularBoss","KintaroRegularBoss",
         			"LudmillaBalletBoss","YandereMaidBalletBoss","VictoriaRegularBoss","LupinRegularBoss","JeanneFusionBoss","BasiliskRegularBoss","ManchesterRegularBoss",
         			"LuBuDarkBoss","WhiteSnakeGirlDarkBoss","XiaoLiRegularBoss","DraculaRegularBoss","VanHelsingRegularBoss","SherlockRegularBoss",
-        			"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss"]
+        			"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss","MarieAntoinetteBoss","GalahadRegularBoss","ArsenalRegularBoss"]
 			}
 		}
 	},
@@ -16483,7 +16498,7 @@
         			"SnowWhiteNewBoss","BeautyBeastRegularBoss","BeautyRegularBoss","BeastRegularBoss","KintaroRegularBoss",
         			"LudmillaBalletBoss","YandereMaidBalletBoss","VictoriaRegularBoss","LupinRegularBoss","JeanneFusionBoss","BasiliskRegularBoss","ManchesterRegularBoss",
         			"LuBuDarkBoss","WhiteSnakeGirlDarkBoss","XiaoLiRegularBoss","DraculaRegularBoss","VanHelsingRegularBoss","SherlockRegularBoss",
-        			"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss"]
+        			"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss","MarieAntoinetteBoss","GalahadRegularBoss","ArsenalRegularBoss"]
 			}
 		}
 	},
@@ -16532,7 +16547,7 @@
         						"SnowWhiteNewBoss","BeautyBeastRegularBoss","BeautyRegularBoss","BeastRegularBoss","KintaroRegularBoss",
         						"LudmillaBalletBoss","YandereMaidBalletBoss","VictoriaRegularBoss","LupinRegularBoss","JeanneFusionBoss","BasiliskRegularBoss","ManchesterRegularBoss",
         						"LuBuDarkBoss","WhiteSnakeGirlDarkBoss","XiaoLiRegularBoss","DraculaRegularBoss","VanHelsingRegularBoss","SherlockRegularBoss",
-        						"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss"]
+        						"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss","MarieAntoinetteBoss","GalahadRegularBoss","ArsenalRegularBoss"]
 						}
 					}
 				}
@@ -16573,7 +16588,7 @@
         		"SnowWhiteNewBoss","BeautyBeastRegularBoss","BeautyRegularBoss","BeastRegularBoss","KintaroRegularBoss",
         		"LudmillaBalletBoss","YandereMaidBalletBoss","VictoriaRegularBoss","LupinRegularBoss","JeanneFusionBoss","BasiliskRegularBoss","ManchesterRegularBoss",
         		"LuBuDarkBoss","WhiteSnakeGirlDarkBoss","XiaoLiRegularBoss","DraculaRegularBoss","VanHelsingRegularBoss","SherlockRegularBoss",
-        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss"]
+        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss","MarieAntoinetteBoss","GalahadRegularBoss","ArsenalRegularBoss"]
 		}
 	},
 	"IsBurningNotBoss": {
@@ -16610,7 +16625,7 @@
         		"SnowWhiteNewBoss","BeautyBeastRegularBoss","BeautyRegularBoss","BeastRegularBoss","KintaroRegularBoss",
         		"LudmillaBalletBoss","YandereMaidBalletBoss","VictoriaRegularBoss","LupinRegularBoss","JeanneFusionBoss","BasiliskRegularBoss","ManchesterRegularBoss",
         		"LuBuDarkBoss","WhiteSnakeGirlDarkBoss","XiaoLiRegularBoss","DraculaRegularBoss","VanHelsingRegularBoss","SherlockRegularBoss",
-        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss"]
+        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss","MarieAntoinetteBoss","GalahadRegularBoss","ArsenalRegularBoss"]
 		}
 	},
 	"IsBurningNotBossAndNotMirage": {
@@ -16647,7 +16662,7 @@
         		"SnowWhiteNewBoss","BeautyBeastRegularBoss","BeautyRegularBoss","BeastRegularBoss","KintaroRegularBoss",
         		"LudmillaBalletBoss","YandereMaidBalletBoss","VictoriaRegularBoss","LupinRegularBoss","JeanneFusionBoss","BasiliskRegularBoss","ManchesterRegularBoss",
         		"LuBuDarkBoss","WhiteSnakeGirlDarkBoss","XiaoLiRegularBoss","DraculaRegularBoss","VanHelsingRegularBoss","SherlockRegularBoss",
-        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss"],
+        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss","MarieAntoinetteBoss","GalahadRegularBoss","ArsenalRegularBoss"],
 			"or":{
 				"class": "MonsterConditions",
 				"buffStackNames": ["MirageMonster"]
@@ -19306,6 +19321,12 @@
 			"IsSleeping": 2
 		}
 	},
+	"2AllySleepingAlt": {
+		"class": "MonsterConditions",
+		"myTeamMonsterConditionMatchesNeeded": {
+			"IsSleeping": 2
+		}
+	},
 	"IsMiddleHealAtAllBrideHealOK": {
 		"class": "MonsterConditions",
 		"buffStackNames": ["MiddleHealStack"],
@@ -20109,7 +20130,7 @@
         		"SnowWhiteNewBoss","BeautyBeastRegularBoss","BeautyRegularBoss","BeastRegularBoss","KintaroRegularBoss",
         		"LudmillaBalletBoss","YandereMaidBalletBoss","VictoriaRegularBoss","LupinRegularBoss","JeanneFusionBoss","BasiliskRegularBoss","ManchesterRegularBoss",
         		"LuBuDarkBoss","WhiteSnakeGirlDarkBoss","XiaoLiRegularBoss","DraculaRegularBoss","VanHelsingRegularBoss","SherlockRegularBoss",
-        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss"]
+        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss","MarieAntoinetteBoss","GalahadRegularBoss","ArsenalRegularBoss"]
 			}
 	},
 	"On10PercentHPNotBossNotInstantKillImmune": {
@@ -20146,7 +20167,7 @@
         		"SnowWhiteNewBoss","BeautyBeastRegularBoss","BeautyRegularBoss","BeastRegularBoss","KintaroRegularBoss",
         		"LudmillaBalletBoss","YandereMaidBalletBoss","VictoriaRegularBoss","LupinRegularBoss","JeanneFusionBoss","BasiliskRegularBoss","ManchesterRegularBoss",
         		"LuBuDarkBoss","WhiteSnakeGirlDarkBoss","XiaoLiRegularBoss","DraculaRegularBoss","VanHelsingRegularBoss","SherlockRegularBoss",
-        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss"],
+        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss","MarieAntoinetteBoss","GalahadRegularBoss","ArsenalRegularBoss"],
 			"or":{
 				"class": "MonsterConditions",
 				"monsterTags": ["InstantKillImmune"],
@@ -21133,6 +21154,14 @@
 			}
 		}
 	},
+	"IsChargedAtAllAndNotInstantCooldown": {
+		"class": "MonsterConditions",
+		"buffStackNames": ["StoreEnergy"],
+		"not":{
+			"class": "MonsterConditions",
+			"buffStackNames": ["InstantCooldown"]
+		}
+	},
 	"IsCharged3AndNotInstantCooldown": {
 		"class": "MonsterConditions",
 		"buffStackNames": ["StoreEnergy"],
@@ -21415,7 +21444,7 @@
         			"SnowWhiteNewBoss","BeautyBeastRegularBoss","BeautyRegularBoss","BeastRegularBoss","KintaroRegularBoss",
         			"LudmillaBalletBoss","YandereMaidBalletBoss","VictoriaRegularBoss","LupinRegularBoss","JeanneFusionBoss","BasiliskRegularBoss","ManchesterRegularBoss",
         			"LuBuDarkBoss","WhiteSnakeGirlDarkBoss","XiaoLiRegularBoss","DraculaRegularBoss","VanHelsingRegularBoss","SherlockRegularBoss",
-        			"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss"]
+        			"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss","MarieAntoinetteBoss","GalahadRegularBoss","ArsenalRegularBoss"]
 			}
 		}
 	},
@@ -21580,6 +21609,17 @@
 			}
 		}
 	},
+	"HasDamagedWithAttackAndEnemyNOTProtected": {
+		"class": "MonsterConditions",
+		"buffStackNames": ["MomentumReady"],
+		"not":{
+			"class": "MonsterConditions",
+			"checkEnemyTeamOfMonster": true,
+			"enemyTeamMonsterConditionMatchesNeeded": {
+				"IsProtecting": 1
+			}
+		}
+	},
 	"IsNotBurningOrSleeping": {
 		"class": "MonsterConditions",
 		"not": {
@@ -21611,6 +21651,11 @@
 		"class": "MonsterConditions",
 		"buffStackNames": ["StealthOverdriveCounter"],
 		"buffStackCounts": [2]
+	},
+	"IsHijikataCharged3": {
+		"class": "MonsterConditions",
+		"buffStackNames": ["StealthOverdriveCounter"],
+		"buffStackCounts": [3]
 	},
 	"NotProtectedExceptTokenAndNotEnraged": {
 		"class": "MonsterConditions",
@@ -23481,7 +23526,7 @@
         		"SnowWhiteNewBoss","BeautyBeastRegularBoss","BeautyRegularBoss","BeastRegularBoss","KintaroRegularBoss",
         		"LudmillaBalletBoss","YandereMaidBalletBoss","VictoriaRegularBoss","LupinRegularBoss","JeanneFusionBoss","BasiliskRegularBoss","ManchesterRegularBoss",
         		"LuBuDarkBoss","WhiteSnakeGirlDarkBoss","XiaoLiRegularBoss","DraculaRegularBoss","VanHelsingRegularBoss","SherlockRegularBoss",
-        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss"]
+        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss","MarieAntoinetteBoss","GalahadRegularBoss","ArsenalRegularBoss"]
 		}
 	},
 	"HPBelow1Percent": {
@@ -23529,7 +23574,7 @@
         		"SnowWhiteNewBoss","BeautyBeastRegularBoss","BeautyRegularBoss","BeastRegularBoss","KintaroRegularBoss",
         		"LudmillaBalletBoss","YandereMaidBalletBoss","VictoriaRegularBoss","LupinRegularBoss","JeanneFusionBoss","BasiliskRegularBoss","ManchesterRegularBoss",
         		"LuBuDarkBoss","WhiteSnakeGirlDarkBoss","XiaoLiRegularBoss","DraculaRegularBoss","VanHelsingRegularBoss","SherlockRegularBoss",
-        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss"],
+        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss","MarieAntoinetteBoss","GalahadRegularBoss","ArsenalRegularBoss"],
 			"or":{
 				"class": "MonsterConditions",
 				"monsterTags": ["InstantKillImmune"],
@@ -23740,7 +23785,7 @@
         		"SnowWhiteNewBoss","BeautyBeastRegularBoss","BeautyRegularBoss","BeastRegularBoss","KintaroRegularBoss",
         		"LudmillaBalletBoss","YandereMaidBalletBoss","VictoriaRegularBoss","LupinRegularBoss","JeanneFusionBoss","BasiliskRegularBoss","ManchesterRegularBoss",
         		"LuBuDarkBoss","WhiteSnakeGirlDarkBoss","XiaoLiRegularBoss","DraculaRegularBoss","VanHelsingRegularBoss","SherlockRegularBoss",
-        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss"],
+        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss","MarieAntoinetteBoss","GalahadRegularBoss","ArsenalRegularBoss"],
 			"or":{
 				"class": "MonsterConditions",
 				"buffStackNames": ["MirageMonster"]
@@ -23781,7 +23826,7 @@
         		"SnowWhiteNewBoss","BeautyBeastRegularBoss","BeautyRegularBoss","BeastRegularBoss","KintaroRegularBoss",
         		"LudmillaBalletBoss","YandereMaidBalletBoss","VictoriaRegularBoss","LupinRegularBoss","JeanneFusionBoss","BasiliskRegularBoss","ManchesterRegularBoss",
         		"LuBuDarkBoss","WhiteSnakeGirlDarkBoss","XiaoLiRegularBoss","DraculaRegularBoss","VanHelsingRegularBoss","SherlockRegularBoss",
-        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss"],
+        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss","MarieAntoinetteBoss","GalahadRegularBoss","ArsenalRegularBoss"],
 			"or":{
 				"class": "MonsterConditions",
 				"buffStackNames": ["MirageMonster"]
@@ -23822,7 +23867,7 @@
         		"SnowWhiteNewBoss","BeautyBeastRegularBoss","BeautyRegularBoss","BeastRegularBoss","KintaroRegularBoss",
         		"LudmillaBalletBoss","YandereMaidBalletBoss","VictoriaRegularBoss","LupinRegularBoss","JeanneFusionBoss","BasiliskRegularBoss","ManchesterRegularBoss",
         		"LuBuDarkBoss","WhiteSnakeGirlDarkBoss","XiaoLiRegularBoss","DraculaRegularBoss","VanHelsingRegularBoss","SherlockRegularBoss",
-        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss"]
+        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss","MarieAntoinetteBoss","GalahadRegularBoss","ArsenalRegularBoss"]
 		}
 	},
 	"IsDisabledNotBossAndNotMirage": {
@@ -23859,7 +23904,7 @@
         		"SnowWhiteNewBoss","BeautyBeastRegularBoss","BeautyRegularBoss","BeastRegularBoss","KintaroRegularBoss",
         		"LudmillaBalletBoss","YandereMaidBalletBoss","VictoriaRegularBoss","LupinRegularBoss","JeanneFusionBoss","BasiliskRegularBoss","ManchesterRegularBoss",
         		"LuBuDarkBoss","WhiteSnakeGirlDarkBoss","XiaoLiRegularBoss","DraculaRegularBoss","VanHelsingRegularBoss","SherlockRegularBoss",
-        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss"],
+        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss","MarieAntoinetteBoss","GalahadRegularBoss","ArsenalRegularBoss"],
 			"or":{
 				"class": "MonsterConditions",
 				"buffStackNames": ["MirageMonster"]
@@ -24014,7 +24059,7 @@
         		"SnowWhiteNewBoss","BeautyBeastRegularBoss","BeautyRegularBoss","BeastRegularBoss","KintaroRegularBoss",
         		"LudmillaBalletBoss","YandereMaidBalletBoss","VictoriaRegularBoss","LupinRegularBoss","JeanneFusionBoss","BasiliskRegularBoss","ManchesterRegularBoss",
         		"LuBuDarkBoss","WhiteSnakeGirlDarkBoss","XiaoLiRegularBoss","DraculaRegularBoss","VanHelsingRegularBoss","SherlockRegularBoss",
-        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss"]
+        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss","MarieAntoinetteBoss","GalahadRegularBoss","ArsenalRegularBoss"]
 			}
 	},
 	"IsSummonedNotBossOrInstantKillImmune": {
@@ -24051,7 +24096,7 @@
         		"SnowWhiteNewBoss","BeautyBeastRegularBoss","BeautyRegularBoss","BeastRegularBoss","KintaroRegularBoss",
         		"LudmillaBalletBoss","YandereMaidBalletBoss","VictoriaRegularBoss","LupinRegularBoss","JeanneFusionBoss","BasiliskRegularBoss","ManchesterRegularBoss",
         		"LuBuDarkBoss","WhiteSnakeGirlDarkBoss","XiaoLiRegularBoss","DraculaRegularBoss","VanHelsingRegularBoss","SherlockRegularBoss",
-        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss"],
+        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss","MarieAntoinetteBoss","GalahadRegularBoss","ArsenalRegularBoss"],
 			"or":{
 				"class": "MonsterConditions",
 				"monsterTags": ["InstantKillImmune"],
@@ -24576,7 +24621,7 @@
         		"SnowWhiteNewBoss","BeautyBeastRegularBoss","BeautyRegularBoss","BeastRegularBoss","KintaroRegularBoss",
         		"LudmillaBalletBoss","YandereMaidBalletBoss","VictoriaRegularBoss","LupinRegularBoss","JeanneFusionBoss","BasiliskRegularBoss","ManchesterRegularBoss",
         		"LuBuDarkBoss","WhiteSnakeGirlDarkBoss","XiaoLiRegularBoss","DraculaRegularBoss","VanHelsingRegularBoss","SherlockRegularBoss",
-        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss"],
+        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss","MarieAntoinetteBoss","GalahadRegularBoss","ArsenalRegularBoss"],
 			"or":{
 				"class": "MonsterConditions",
 				"not":{
@@ -24945,7 +24990,7 @@
         		"SnowWhiteNewBoss","BeautyBeastRegularBoss","BeautyRegularBoss","BeastRegularBoss","KintaroRegularBoss",
         		"LudmillaBalletBoss","YandereMaidBalletBoss","VictoriaRegularBoss","LupinRegularBoss","JeanneFusionBoss","BasiliskRegularBoss","ManchesterRegularBoss",
         		"LuBuDarkBoss","WhiteSnakeGirlDarkBoss","XiaoLiRegularBoss","DraculaRegularBoss","VanHelsingRegularBoss","SherlockRegularBoss",
-        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss"],
+        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss","MarieAntoinetteBoss","GalahadRegularBoss","ArsenalRegularBoss"],
 			"or":{
 				"class": "MonsterConditions",
 				"monsterTags": ["InstantKillImmune"],
@@ -25699,7 +25744,7 @@
         		"SnowWhiteNewBoss","BeautyBeastRegularBoss","BeautyRegularBoss","BeastRegularBoss","KintaroRegularBoss",
         		"LudmillaBalletBoss","YandereMaidBalletBoss","VictoriaRegularBoss","LupinRegularBoss","JeanneFusionBoss","BasiliskRegularBoss","ManchesterRegularBoss",
         		"LuBuDarkBoss","WhiteSnakeGirlDarkBoss","XiaoLiRegularBoss","DraculaRegularBoss","VanHelsingRegularBoss","SherlockRegularBoss",
-        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss"]
+        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss","MarieAntoinetteBoss","GalahadRegularBoss","ArsenalRegularBoss"]
 			}
 	},
 	"On50PercentHPNotBossNotInstantKillImmune": {
@@ -25736,7 +25781,7 @@
         		"SnowWhiteNewBoss","BeautyBeastRegularBoss","BeautyRegularBoss","BeastRegularBoss","KintaroRegularBoss",
         		"LudmillaBalletBoss","YandereMaidBalletBoss","VictoriaRegularBoss","LupinRegularBoss","JeanneFusionBoss","BasiliskRegularBoss","ManchesterRegularBoss",
         		"LuBuDarkBoss","WhiteSnakeGirlDarkBoss","XiaoLiRegularBoss","DraculaRegularBoss","VanHelsingRegularBoss","SherlockRegularBoss",
-        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss"],
+        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss","MarieAntoinetteBoss","GalahadRegularBoss","ArsenalRegularBoss"],
 			"or":{
 				"class": "MonsterConditions",
 				"monsterTags": ["InstantKillImmune"],
@@ -25781,7 +25826,7 @@
         		"SnowWhiteNewBoss","BeautyBeastRegularBoss","BeautyRegularBoss","BeastRegularBoss","KintaroRegularBoss",
         		"LudmillaBalletBoss","YandereMaidBalletBoss","VictoriaRegularBoss","LupinRegularBoss","JeanneFusionBoss","BasiliskRegularBoss","ManchesterRegularBoss",
         		"LuBuDarkBoss","WhiteSnakeGirlDarkBoss","XiaoLiRegularBoss","DraculaRegularBoss","VanHelsingRegularBoss","SherlockRegularBoss",
-        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss"],
+        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss","MarieAntoinetteBoss","GalahadRegularBoss","ArsenalRegularBoss"],
 			"or":{
 				"class": "MonsterConditions",
 				"hpMoreThanPercent": 0.4999999
@@ -26174,7 +26219,7 @@
         		"SnowWhiteNewBoss","BeautyBeastRegularBoss","BeautyRegularBoss","BeastRegularBoss","KintaroRegularBoss",
         		"LudmillaBalletBoss","YandereMaidBalletBoss","VictoriaRegularBoss","LupinRegularBoss","JeanneFusionBoss","BasiliskRegularBoss","ManchesterRegularBoss",
         		"LuBuDarkBoss","WhiteSnakeGirlDarkBoss","XiaoLiRegularBoss","DraculaRegularBoss","VanHelsingRegularBoss","SherlockRegularBoss",
-        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss"]
+        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss","MarieAntoinetteBoss","GalahadRegularBoss","ArsenalRegularBoss"]
 		}
 	},
 	"CurrentTUGreaterThan300NotBossOrMirageAndNotInstantKillImmune": {
@@ -26211,7 +26256,7 @@
         		"SnowWhiteNewBoss","BeautyBeastRegularBoss","BeautyRegularBoss","BeastRegularBoss","KintaroRegularBoss",
         		"LudmillaBalletBoss","YandereMaidBalletBoss","VictoriaRegularBoss","LupinRegularBoss","JeanneFusionBoss","BasiliskRegularBoss","ManchesterRegularBoss",
         		"LuBuDarkBoss","WhiteSnakeGirlDarkBoss","XiaoLiRegularBoss","DraculaRegularBoss","VanHelsingRegularBoss","SherlockRegularBoss",
-        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss"],
+        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss","MarieAntoinetteBoss","GalahadRegularBoss","ArsenalRegularBoss"],
 			"or":{
 				"class": "MonsterConditions",
 				"monsterTags": ["InstantKillImmune"],
@@ -26513,6 +26558,13 @@
 		}
 	},
 	"EnemyHas3Imposters":{
+		"class": "MonsterConditions",
+		"checkEnemyTeamOfMonster": true,
+		"enemyTeamMonsterConditionMatchesNeeded":{
+			"IsImposter": 3
+		}
+	},
+	"EnemyHas3ImpostersAlt":{
 		"class": "MonsterConditions",
 		"checkEnemyTeamOfMonster": true,
 		"enemyTeamMonsterConditionMatchesNeeded":{
@@ -26911,7 +26963,7 @@
         		"SnowWhiteNewBoss","BeautyBeastRegularBoss","BeautyRegularBoss","BeastRegularBoss","KintaroRegularBoss",
         		"LudmillaBalletBoss","YandereMaidBalletBoss","VictoriaRegularBoss","LupinRegularBoss","JeanneFusionBoss","BasiliskRegularBoss","ManchesterRegularBoss",
         		"LuBuDarkBoss","WhiteSnakeGirlDarkBoss","XiaoLiRegularBoss","DraculaRegularBoss","VanHelsingRegularBoss","SherlockRegularBoss",
-        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss"],
+        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss","MarieAntoinetteBoss","GalahadRegularBoss","ArsenalRegularBoss"],
 			"or":{
 				"class": "MonsterConditions",
 				"monsterTags": ["InstantKillImmune"],
@@ -27206,7 +27258,7 @@
         		"SnowWhiteNewBoss","BeautyBeastRegularBoss","BeautyRegularBoss","BeastRegularBoss","KintaroRegularBoss",
         		"LudmillaBalletBoss","YandereMaidBalletBoss","VictoriaRegularBoss","LupinRegularBoss","JeanneFusionBoss","BasiliskRegularBoss","ManchesterRegularBoss",
         		"LuBuDarkBoss","WhiteSnakeGirlDarkBoss","XiaoLiRegularBoss","DraculaRegularBoss","VanHelsingRegularBoss","SherlockRegularBoss",
-        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss"],
+        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss","MarieAntoinetteBoss","GalahadRegularBoss","ArsenalRegularBoss"],
 			"or":{
 				"class": "MonsterConditions",
 				"buffStackNames": ["MirageMonster"]
@@ -27325,7 +27377,7 @@
         		"SnowWhiteNewBoss","BeautyBeastRegularBoss","BeautyRegularBoss","BeastRegularBoss","KintaroRegularBoss",
         		"LudmillaBalletBoss","YandereMaidBalletBoss","VictoriaRegularBoss","LupinRegularBoss","JeanneFusionBoss","BasiliskRegularBoss","ManchesterRegularBoss",
         		"LuBuDarkBoss","WhiteSnakeGirlDarkBoss","XiaoLiRegularBoss","DraculaRegularBoss","VanHelsingRegularBoss","SherlockRegularBoss",
-        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss"],
+        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss","MarieAntoinetteBoss","GalahadRegularBoss","ArsenalRegularBoss"],
 			"or":{
 				"class": "MonsterConditions",
 				"buffStackNames": ["MirageMonster"]
@@ -28036,7 +28088,7 @@
         			"SnowWhiteNewBoss","BeautyBeastRegularBoss","BeautyRegularBoss","BeastRegularBoss","KintaroRegularBoss",
         			"LudmillaBalletBoss","YandereMaidBalletBoss","VictoriaRegularBoss","LupinRegularBoss","JeanneFusionBoss","BasiliskRegularBoss","ManchesterRegularBoss",
         			"LuBuDarkBoss","WhiteSnakeGirlDarkBoss","XiaoLiRegularBoss","DraculaRegularBoss","VanHelsingRegularBoss","SherlockRegularBoss",
-        			"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss"]
+        			"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss","MarieAntoinetteBoss","GalahadRegularBoss","ArsenalRegularBoss"]
 			}
 		}
 	},
@@ -28187,7 +28239,7 @@
         		"SnowWhiteNewBoss","BeautyBeastRegularBoss","BeautyRegularBoss","BeastRegularBoss","KintaroRegularBoss",
         		"LudmillaBalletBoss","YandereMaidBalletBoss","VictoriaRegularBoss","LupinRegularBoss","JeanneFusionBoss","BasiliskRegularBoss","ManchesterRegularBoss",
         		"LuBuDarkBoss","WhiteSnakeGirlDarkBoss","XiaoLiRegularBoss","DraculaRegularBoss","VanHelsingRegularBoss","SherlockRegularBoss",
-        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss"],
+        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss","MarieAntoinetteBoss","GalahadRegularBoss","ArsenalRegularBoss"],
 			"or":{
 				"class": "MonsterConditions",
 				"buffStackNames": ["MirageMonster"]
@@ -28228,7 +28280,7 @@
         		"SnowWhiteNewBoss","BeautyBeastRegularBoss","BeautyRegularBoss","BeastRegularBoss","KintaroRegularBoss",
         		"LudmillaBalletBoss","YandereMaidBalletBoss","VictoriaRegularBoss","LupinRegularBoss","JeanneFusionBoss","BasiliskRegularBoss","ManchesterRegularBoss",
         		"LuBuDarkBoss","WhiteSnakeGirlDarkBoss","XiaoLiRegularBoss","DraculaRegularBoss","VanHelsingRegularBoss","SherlockRegularBoss",
-        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss"],
+        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss","MarieAntoinetteBoss","GalahadRegularBoss","ArsenalRegularBoss"],
 			"or":{
 				"class": "MonsterConditions",
 				"buffStackNames": ["MirageMonster"]
@@ -28269,7 +28321,7 @@
         		"SnowWhiteNewBoss","BeautyBeastRegularBoss","BeautyRegularBoss","BeastRegularBoss","KintaroRegularBoss",
         		"LudmillaBalletBoss","YandereMaidBalletBoss","VictoriaRegularBoss","LupinRegularBoss","JeanneFusionBoss","BasiliskRegularBoss","ManchesterRegularBoss",
         		"LuBuDarkBoss","WhiteSnakeGirlDarkBoss","XiaoLiRegularBoss","DraculaRegularBoss","VanHelsingRegularBoss","SherlockRegularBoss",
-        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss"],
+        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss","MarieAntoinetteBoss","GalahadRegularBoss","ArsenalRegularBoss"],
 			"or":{
 				"class": "MonsterConditions",
 				"buffStackNames": ["MirageMonster"]
@@ -29128,7 +29180,7 @@
         		"SnowWhiteNewBoss","BeautyBeastRegularBoss","BeautyRegularBoss","BeastRegularBoss","KintaroRegularBoss",
         		"LudmillaBalletBoss","YandereMaidBalletBoss","VictoriaRegularBoss","LupinRegularBoss","JeanneFusionBoss","BasiliskRegularBoss","ManchesterRegularBoss",
         		"LuBuDarkBoss","WhiteSnakeGirlDarkBoss","XiaoLiRegularBoss","DraculaRegularBoss","VanHelsingRegularBoss","SherlockRegularBoss",
-        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss"],
+        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss","MarieAntoinetteBoss","GalahadRegularBoss","ArsenalRegularBoss"],
 			"or":{
 				"class": "MonsterConditions",
 				"buffStackNames": ["MirageMonster"]
@@ -29255,7 +29307,7 @@
         		"SnowWhiteNewBoss","BeautyBeastRegularBoss","BeautyRegularBoss","BeastRegularBoss","KintaroRegularBoss",
         		"LudmillaBalletBoss","YandereMaidBalletBoss","VictoriaRegularBoss","LupinRegularBoss","JeanneFusionBoss","BasiliskRegularBoss","ManchesterRegularBoss",
         		"LuBuDarkBoss","WhiteSnakeGirlDarkBoss","XiaoLiRegularBoss","DraculaRegularBoss","VanHelsingRegularBoss","SherlockRegularBoss",
-        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss"],
+        		"AliceNewBoss","QueenHeartsRegularBoss","CupidRegularBoss","MarieAntoinetteBoss","GalahadRegularBoss","ArsenalRegularBoss"],
 			"or":{
 				"class": "MonsterConditions",
 				"buffStackNames": ["MirageMonster"]
@@ -29914,6 +29966,16 @@
 		"class": "MonsterConditions",
 		"checkEnemyTeamOfMonster": true,
 		"enemyTeamMonsterConditionMatchesNeeded": {
+			"IsWater": 1
+		},
+		"not": {
+			"class": "MonsterConditions",
+			"buffStackNames": ["DisableFallBackImmunity"]
+		}
+	},
+	"AtLeast1WaterAllyNotDisableFallBack": {
+		"class": "MonsterConditions",
+		"myTeamMonsterConditionMatchesNeeded": {
 			"IsWater": 1
 		},
 		"not": {
@@ -30942,6 +31004,13 @@
 			"IsBlockTurn": 1
 		}
 	},
+	"3EnemiesDisabled":{
+		"class": "MonsterConditions",
+		"checkEnemyTeamOfMonster": true,
+		"enemyTeamMonsterConditionMatchesNeeded":{
+			"IsBlockTurn": 3
+		}
+	},
 	"IsJeanneFusionBoss": {
 		"class": "MonsterConditions",
 		"families": ["JeanneFusionBoss"]
@@ -30975,7 +31044,27 @@
 			"IsBlockTurn": 2
 		}
 	},
+	"2EnemiesNotDisabled": {
+		"class": "MonsterConditions",
+		"not":{
+			"class": "MonsterConditions",
+			"checkEnemyTeamOfMonster": true,
+			"enemyTeamMonsterConditionMatchesNeeded": {
+				"IsBlockTurn": 2
+			}
+		}
+	},
 	"AllEnemiesDisabled":{
+		"class": "MonsterConditions",
+		"not":{
+			"class": "MonsterConditions",
+			"checkEnemyTeamOfMonster": true,
+			"enemyTeamMonsterConditionMatchesNeeded":{
+				"IsNotBlockTurn": 1
+			}
+		}
+	},
+	"AllEnemiesDisabledAlt":{
 		"class": "MonsterConditions",
 		"not":{
 			"class": "MonsterConditions",
@@ -32301,6 +32390,136 @@
 		"not": {
 			"class": "MonsterConditions",
 			"buffStackNames": ["FirstHitLOCKCupidRegular"]
+		}
+	},
+	"IsNotMarkedTargetMarieAntoinette": {
+		"class": "MonsterConditions",
+		"not":{
+			"class":"MonsterConditions",
+			"buffStackNames": ["SourceMarieAntoinette"]
+		}
+	},
+	"IsNotMarieAntoinettePassiveHitLock": {
+		"class": "MonsterConditions",
+		"not":{
+			"class":"MonsterConditions",
+			"buffStackNames": ["MarieAntoinettePassiveHitLock"]
+		}
+	},
+	"IsNotMarieAntoinetteFirstKillLock": {
+		"class": "MonsterConditions",
+		"not":{
+			"class":"MonsterConditions",
+			"buffStackNames": ["MarieAntoinetteFirstKillLock"]
+		}
+	},
+	"IsGalahadRegular":{
+		"class": "MonsterConditions",
+		"families": ["GalahadRegular"]
+	},
+	"NotAloneAndIsNotFortified": {
+		"class": "MonsterConditions",
+		"allyTeamSize": 2,
+		"not": {
+			"class": "MonsterConditions",
+			"monsterTags": ["Fortify"]
+		}
+	},
+	"IsNotGalahadRegularEndOfFirstTurnLock": {
+		"class": "MonsterConditions",
+		"not":{
+			"class": "MonsterConditions",
+			"buffStackNames": ["GalahadRegularEndOfFirstTurnLock"]
+		}
+	},
+	"IsChargedAtAllNotTUMinusLOCKEDArsenalRegular": {
+		"class": "MonsterConditions",
+		"buffStackNames": ["StoreEnergy"],
+		"not":{
+			"class": "MonsterConditions",
+			"buffStackNames": ["TUMinusLOCKEDArsenalRegular"]
+		}
+	},
+	"IsEnchantmentREADYArsenalRegularBossNOTLocked": {
+		"class": "MonsterConditions",
+		"buffStackNames": ["EnchantmentREADYArsenalRegular"],
+		"not":{
+			"class":"MonsterConditions",
+			"buffStackNames": ["ArsenalBossDisablePassiveTrigger"],
+			"buffStackCounts": [5]
+		}
+	},
+	"IsNotDoNotGiveChargeArsenalRegular": {
+		"class": "MonsterConditions",
+		"not":{
+			"class": "MonsterConditions",
+			"buffStackNames": ["DoNotGiveChargeArsenalRegular"]
+		}
+	},
+	"NoAlliesDisabled":{
+		"class": "MonsterConditions",
+		"not":{
+			"class": "MonsterConditions",
+			"myTeamMonsterConditionMatchesNeeded":{
+				"IsBlockTurn": 1
+			}
+		}
+	},
+	"NoEnemiesDisabled":{
+		"class": "MonsterConditions",
+		"not":{
+			"class": "MonsterConditions",
+			"checkEnemyTeamOfMonster": true,
+			"enemyTeamMonsterConditionMatchesNeeded":{
+				"IsBlockTurn": 1
+			}
+		}
+	},
+	"1AirEnemyNotDisableFallBack":{
+		"class": "MonsterConditions",
+		"checkEnemyTeamOfMonster": true,
+		"enemyTeamMonsterConditionMatchesNeeded": {
+			"IsAir": 1
+		},
+		"not": {
+			"class": "MonsterConditions",
+			"buffStackNames": ["DisableFallBackImmunity"]
+		}
+	},
+	"AtLeast2AirAllyOr1AirEnemyInBattle": {
+		"class": "MonsterConditions",
+		"myTeamMonsterConditionMatchesNeeded": {
+			"IsAir": 2
+		},
+		"or": {
+			"class": "MonsterConditions",
+			"checkEnemyTeamOfMonster": true,
+			"enemyTeamMonsterConditionMatchesNeeded": {
+				"IsAir": 1
+			}
+		}
+	},
+	"Not2AirAllyOr1AirEnemyInBattle": {
+		"class": "MonsterConditions",
+		"not": {
+			"class": "MonsterConditions",
+			"myTeamMonsterConditionMatchesNeeded": {
+				"IsAir": 2
+			},
+			"or": {
+				"class": "MonsterConditions",
+				"checkEnemyTeamOfMonster": true,
+				"enemyTeamMonsterConditionMatchesNeeded": {
+					"IsAir": 1
+				}
+			}
+		}
+	},
+	"IsNotActive2LOCKArsenalRegular":{
+		"class": "MonsterConditions",
+		"not":{
+			"class": "MonsterConditions",
+			"buffStackNames": ["Active2LOCKArsenalRegular"]
 		}
 	}
 }
