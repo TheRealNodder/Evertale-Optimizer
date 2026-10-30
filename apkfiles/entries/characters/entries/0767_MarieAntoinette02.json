@@ -1,0 +1,1393 @@
+{
+  "schemaVersion": 3,
+  "order": 767,
+  "id": "marie-antoinette",
+  "sourceId": "MarieAntoinette02",
+  "name": "Marie Antoinette",
+  "title": "White Lily of the Guillotine",
+  "secondName": "White Lily of the Guillotine",
+  "description": "Whenever Antoinette discovers a good bakery on her travels, she always makes a point of stopping by. Asked why, she merely laughs and changes the subject.\nBack when she was queen, she once shared a loaf of freshly baked bread with her faithful young servant while they strolled through the capital of her kingdom. The taste of the bread they ate together that day has been etched into her memory, and even now, she can remember it like yesterday.",
+  "category": "character",
+  "rarity": "SSR",
+  "stars": 6,
+  "evolvedStars": 6,
+  "element": "Earth",
+  "weaponType": "Axe",
+  "stats": {
+    "atk": 1419,
+    "hp": 7325,
+    "spd": 669,
+    "cost": 34
+  },
+  "hp": 7325,
+  "atk": 1419,
+  "spd": 669,
+  "cost": 34,
+  "image": "https://ik.imagekit.io/r8fsa98s9/characters/MarieAntoinette02.png",
+  "imageVariants": [
+    {
+      "state": "source",
+      "family": "MarieAntoinette",
+      "form": 2,
+      "sourceId": "MarieAntoinette02",
+      "image": "https://ik.imagekit.io/r8fsa98s9/characters/MarieAntoinette02.png"
+    }
+  ],
+  "forms": [
+    {
+      "state": "source",
+      "family": "MarieAntoinette",
+      "form": 2,
+      "sourceId": "MarieAntoinette02",
+      "image": "https://ik.imagekit.io/r8fsa98s9/characters/MarieAntoinette02.png"
+    }
+  ],
+  "activeSkills": [
+    "SingleAttackAMarieAntoinette",
+    "AllyBuffAMarieAntoinette",
+    "MultiBuffAMarieAntoinette",
+    "SpecialAttackAMarieAntoinette"
+  ],
+  "passiveSkills": [
+    "CakePassiveAMarieAntoinette",
+    "QueenyPassiveAMarieAntoinette",
+    "PlusAttackBoostLv3",
+    "PlusHPBoostLv3",
+    "AttackUpTargetEquippedGreatSwordLv3",
+    "AddWeaponPrefSword"
+  ],
+  "leaderSkills": [
+    "HPUpEarthD"
+  ],
+  "refs": {
+    "activeSkills": [
+      "SingleAttackAMarieAntoinette",
+      "AllyBuffAMarieAntoinette",
+      "MultiBuffAMarieAntoinette",
+      "SpecialAttackAMarieAntoinette"
+    ],
+    "passives": [
+      "CakePassiveAMarieAntoinette",
+      "QueenyPassiveAMarieAntoinette",
+      "PlusAttackBoostLv3",
+      "PlusHPBoostLv3",
+      "AttackUpTargetEquippedGreatSwordLv3",
+      "AddWeaponPrefSword"
+    ],
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderBuff": "HPUpEarthD",
+    "leaderBuffCondition": "IsEarth",
+    "summonableMonsters": null
+  },
+  "resolved": {
+    "activeSkills": {
+      "SingleAttackAMarieAntoinette": {
+        "id": "SingleAttackAMarieAntoinette",
+        "found": true,
+        "localization": {
+          "name": "The Guillotine",
+          "description": "250% damage to 1 enemy, plus 250% for each time another non-burning ally has gotten the turn since the user entered the battlefield (max of 1000% total damage after 3+ non-burning other ally turns). This attack ignores the Counter Stance status effect, and the effects of Skin passive skills.\n\nThen immediately give 1 other random ally the next turn by reducing their current TU to 0, and end any enemy effects that are currently disabling their Active Skills. Effects that influence TU order may interrupt the extra turn. Active skills that grant turns cannot be used on turns given by this skill. This skill can be used on such turns, but will not grant the extra turn or end any disabling effects.",
+          "selected": "250%+ damage, may grant turn & end disable"
+        },
+        "ability": {
+          "name": "SingleAttackAMarieAntoinette",
+          "class": "Ability",
+          "abilityScalor": 1.5,
+          "conditionalAbilityScalors": [
+            4,
+            6.5,
+            9
+          ],
+          "config": "SingleAttackAMarieAntoinette",
+          "tuCost": 50,
+          "useLimit": 0,
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "1Enemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "damageFlags": [
+                "IgnoreArmor",
+                "HardIgnoreBlockDeath",
+                "IgnoreSkin",
+                "DoNotWake"
+              ],
+              "applyToTargetType": "Enemy",
+              "drainPercent": 1.0,
+              "drainEffect": "VampireDrain1"
+            },
+            {
+              "buffs": [
+                "MarkedMarieAntoinette",
+                "RandomOtherAllyExtraTurnMarieAntoinette"
+              ],
+              "applyToSourceOnly": true,
+              "skipAbilityEffect": true,
+              "applyConditions": "IsNotJustGrantedTurn"
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Finish",
+          "abilityEffect": "MarieAntoinetteAttack1",
+          "attackScalors": [
+            "GoodIfCharged1",
+            "GoodIfCharged2",
+            "GoodIfCharged3"
+          ],
+          "conditionedAbilityEffects": [
+            "MarieAntoinetteAttack1",
+            "MarieAntoinetteAttack1",
+            "MarieAntoinetteAttack1"
+          ],
+          "recommendEffectWhenUsable": -1
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "enemyTargets": 1
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0.9,
+            0.8,
+            0,
+            0.1
+          ],
+          "prefabs": [
+            "batsfx_prefab/batsfx_sacrifice1",
+            "batfx_MarieAntoinette/batfx_Guillotine1",
+            "batfx_PeachGirl/batfx_chargepetal4",
+            "batfx_PeachGirl/batfx_chargepetal5",
+            "batsfx_prefab/batsfx_charge1",
+            "batsfx_prefab/batsfx_ring1",
+            "batfx_YandereBallet/batfx_BalletSlashPink1",
+            "batsfx_prefab/batsfx_slash1",
+            "batfx_PeachGirl/batfx_groundimpactpink"
+          ],
+          "sortOrderOffset": [
+            -2,
+            2,
+            5,
+            -1,
+            5,
+            5,
+            2,
+            2,
+            2
+          ],
+          "assetBundles": [
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            false,
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "MarkedMarieAntoinette": {
+            "class": "Buff",
+            "stackName": "SourceMarieAntoinette",
+            "duration": 0,
+            "isHiddenFromPlayers": true,
+            "showAsPermanent": false,
+            "showAsTimer": false
+          },
+          "RandomOtherAllyExtraTurnMarieAntoinette": {
+            "class": "Buff",
+            "behaviors": [
+              "EnterBattleBuff"
+            ],
+            "behaviorOverrides": [
+              {
+                "randomAllyBuffs": [
+                  "GiveTurn",
+                  "OnExtraTurn",
+                  "JustGivenTurn",
+                  "RemoveBlockGiveTurn"
+                ],
+                "numRandomToBuff": 1,
+                "spreadCondition": "IsNotMarkedTargetMarieAntoinette"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "showAsPermanent": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {
+          "GoodIfCharged1": {
+            "class": "AttackScalor",
+            "sourceCondition": "IsCharged1"
+          },
+          "GoodIfCharged2": {
+            "class": "AttackScalor",
+            "sourceCondition": "IsCharged2"
+          },
+          "GoodIfCharged3": {
+            "class": "AttackScalor",
+            "sourceCondition": "IsCharged3"
+          }
+        },
+        "conditions": {
+          "IsNotJustGrantedTurn": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "JustGivenTurnBuff"
+              ]
+            }
+          }
+        }
+      },
+      "AllyBuffAMarieAntoinette": {
+        "id": "AllyBuffAMarieAntoinette",
+        "found": true,
+        "localization": {
+          "name": "Rosey Wind",
+          "description": "Removes Poison and Sleep (including Deep Sleep, and Lethal Poison) from all allies on the battlefield.\n\nThen all non-burning allies are granted Sleep Thorns, and are Enraged. (This will overwrite the effects of other Enrage skills on those units. Enraged units have their Attack increased to 1.5x until the end of their next turn.) Usable if there are no Sleep Thorns on allies and the user is not burning.\n\nWhen a unit with Sleep Thorns is dealt damage by an attack, that unit's Sleep Thorns will be consumed to immediately grant the Cursed Sleep status effect for 200TU to the attacker. Burn or attacks that grant Burn will remove Sleep Thorns and prevent Cursed Sleep from applying. Cursed Sleep will overwrite status effects other than Burn, cannot be overwritten by Poison, can be applied repeatedly to units that have already slept while on the battlefield, and will not end from damage caused by Dream Hunter type active skills.",
+          "selected": "Removes Sleep & Poison from allies"
+        },
+        "ability": {
+          "name": "AllyBuffAMarieAntoinette",
+          "class": "Ability",
+          "config": "AllyBuffAMarieAntoinette",
+          "tuCost": 1,
+          "useLimit": 0,
+          "spiritGain": 1,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "AllAlly",
+          "components": [
+            "ApplyBuff",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "RemoveSleep",
+                "RemovePoison"
+              ],
+              "applyToTargetType": "Friendly"
+            },
+            {
+              "buffs": [
+                "SleepThorns",
+                "AttackPlus50Percent1TurnOnly"
+              ],
+              "applyToTargetType": "Friendly",
+              "applyConditions": "IsNotBurning",
+              "skipAbilityEffect": true,
+              "showMissConditions": "IsBurning"
+            }
+          ],
+          "friendlyEventType": "Finish",
+          "flags": [
+            "NoDamage"
+          ],
+          "abilityEffect": "MarieAntoinetteFlowreBuff",
+          "useCondition": "NoThornsOnAlliesNotBurning"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "allFriends": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0,
+            0.35,
+            0
+          ],
+          "prefabs": [
+            "batfx_MarieAntoinette/batfx_tailwindpetalOkita-1",
+            "batsfx_prefab/batsfx_casting1",
+            "batfx_MarieAntoinette/batfx_Pinkpetalcast1",
+            "batfx_MarieAntoinette/batfx_Pinkpetalcast2",
+            "batfx_MarieAntoinette/batfx_Pinkwhirl1",
+            "batsfx_prefab/batsfx_stealth1"
+          ],
+          "sortOrderOffset": [
+            -80,
+            0,
+            -2,
+            -2,
+            2,
+            0
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "audiobundle1"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            false,
+            false,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            true,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "AttackPlus50Percent1TurnOnly": {
+            "class": "Buff",
+            "stackName": "AttackPlus50Percent",
+            "behaviors": [
+              "RemoveAfterTurnsBehavior",
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "turnCount": 1,
+                "scalorStatBonuses": {
+                  "Attack": 0.5
+                }
+              },
+              {
+                "name": "AttackMinus25Percent"
+              }
+            ],
+            "iconSpriteName": "IconRedRage01",
+            "showAsTimer": true,
+            "duration": -1
+          },
+          "RemovePoison": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "Poison"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "RemoveSleep": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "Sleep"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "SleepThorns": {
+            "class": "Buff",
+            "behaviors": [
+              "BuffWhenMonsterHurt",
+              "RemoveOnHurt"
+            ],
+            "stackName": "SleepThorns",
+            "behaviorOverrides": [
+              {
+                "contextBuffs": [
+                  "NonBurnStatImmunityTempForRevenge",
+                  "SleepForcedThorns",
+                  "RemoveBuffsStackImmunityTemp"
+                ],
+                "cancelFromDamageTypes": [
+                  "BuffDamage"
+                ],
+                "cancelFromDamageFlags": [
+                  "AttackerIgnition"
+                ],
+                "spreadCondition": "IsNotBurningOrBurnSelfOnHit",
+                "removeAfterTriggers": 1
+              },
+              {
+                "cancelFromDamageTypes": [
+                  "BuffDamage",
+                  "Poison"
+                ],
+                "ignoreIfHurtBySelf": true
+              }
+            ],
+            "duration": -1,
+            "tags": [
+              "SleepThorns"
+            ],
+            "applyConditions": "IsNotBurning",
+            "showAsTimer": true,
+            "iconSpriteName": "IconGreenThorn01"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "IsBurning": {
+            "class": "MonsterConditions",
+            "buffStackNames": [
+              "Burn"
+            ]
+          },
+          "IsNotBurning": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "Burn"
+              ]
+            }
+          },
+          "NoThornsOnAlliesNotBurning": {
+            "class": "MonsterConditions",
+            "not": {
+              "class": "MonsterConditions",
+              "myTeamMonsterConditionMatchesNeeded": {
+                "IsThorned": 1
+              },
+              "or": {
+                "class": "MonsterConditions",
+                "buffStackNames": [
+                  "Burn"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "MultiBuffAMarieAntoinette": {
+        "id": "MultiBuffAMarieAntoinette",
+        "found": true,
+        "localization": {
+          "name": "Queen's Banquet",
+          "description": "The user is Fortified, granted Sleep Immunity for 50TU, and Poison Immunity for 50TU.\n\nLocked for 50TU after the user has entered the battlefield, and locks again for 50TU after each use. Usable 3 times per battle.\n\nA Fortified unit has 50% damage reduction from attacks. This reduction cannot be ignored by attacks that do not specifically ignore Fortify. Fortify will be removed after reducing damage 3 times since applying, and will be reset if reapplied. This is not a status effect.",
+          "selected": "Fortifies, grants Sleep & Poison Immunity"
+        },
+        "ability": {
+          "name": "MultiBuffAMarieAntoinette",
+          "class": "Ability",
+          "config": "MultiBuffAMarieAntoinette",
+          "tuCost": 25,
+          "useLimit": 3,
+          "spiritGain": 0,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "SelfOnly",
+          "components": [
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "buffs": [
+                "FortifyFor3Attacks",
+                "SleepImmunityFor50TU",
+                "PoisonImmunityFor50TU",
+                "MarieAntoinetteActive3Cooldown50"
+              ],
+              "applyToSourceOnly": true
+            }
+          ],
+          "sourceEventType": "Finish",
+          "abilityEffect": "MarieAntoinetteBreadSleep",
+          "useCondition": "TimeInCombat50NotInstantCooldown"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "selfOnly": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            1.1,
+            0,
+            0.3,
+            0,
+            0.5
+          ],
+          "prefabs": [
+            "batfx_MarieAntoinette/batfx_tailwindlove6-1",
+            "batsfx_prefab/batsfx_casting2",
+            "batfx_ossiadark1/batfx_purplebase1",
+            "batfx_MarieAntoinette/batfx_bread1",
+            "batsfx_prefab/batsfx_ludmillaballad1",
+            "batfx_jumpsmoke1/batfx_jumpsmoke1",
+            "batfx_rizettebride1/batfx_castspark3",
+            "batfx_mechasisBand/batfx_CastingLight1"
+          ],
+          "sortOrderOffset": [
+            -100,
+            0,
+            4,
+            1,
+            0,
+            2,
+            3,
+            -2
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle1",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle3"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "positionInBattlefieldCenter": [
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "FortifyFor3Attacks": {
+            "class": "Buff",
+            "behaviors": [
+              "EnterBattleBuff"
+            ],
+            "behaviorOverrides": [
+              {
+                "selfBuffs": [
+                  "FortifyFor3AttacksPart3",
+                  "FortifyFor3AttacksPart2",
+                  "FortifyFor3AttacksPart1"
+                ]
+              }
+            ],
+            "showAsPermanent": false,
+            "showAsTimer": false,
+            "duration": 0,
+            "isHiddenFromPlayers": true
+          },
+          "MarieAntoinetteActive3Cooldown50": {
+            "class": "Buff",
+            "stackName": "InstantCooldown",
+            "duration": 50,
+            "isHiddenFromPlayers": false,
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "iconSpriteName": "IconBlueCountdownClock3"
+          },
+          "PoisonImmunityFor50TU": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Poison"
+                ]
+              }
+            ],
+            "duration": 50,
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "tags": [
+              "PoisonImmune",
+              "PoisonImmuneTemp"
+            ],
+            "iconSpriteName": "IconRedPoisonInvalid01"
+          },
+          "SleepImmunityFor50TU": {
+            "class": "Buff",
+            "behaviors": [
+              "Immunity"
+            ],
+            "behaviorOverrides": [
+              {
+                "stackNamesToBlock": [
+                  "Sleep"
+                ]
+              }
+            ],
+            "duration": 50,
+            "showAsTimer": true,
+            "showAsPermanent": false,
+            "tags": [
+              "SleepImmune",
+              "SleepImmuneTemp"
+            ],
+            "iconSpriteName": "IconRedSleepInvalidZs01"
+          }
+        },
+        "attackScalors": {},
+        "conditions": {
+          "TimeInCombat50NotInstantCooldown": {
+            "class": "MonsterConditions",
+            "timeInCombat": 50,
+            "not": {
+              "class": "MonsterConditions",
+              "buffStackNames": [
+                "InstantCooldown"
+              ]
+            }
+          }
+        }
+      },
+      "SpecialAttackAMarieAntoinette": {
+        "id": "SpecialAttackAMarieAntoinette",
+        "found": true,
+        "localization": {
+          "name": "Cut the Cake",
+          "description": "Damages all enemies, 1250% damage instead to targets that are conjured.\n\nAll enemies hit have their Sleep Wards and Poison Wards removed.\n\nUsable only if there are at least 2 conjured enemies on the battlefield. Usable 10 times per battle.",
+          "selected": "Damage enemies, may remove Wards"
+        },
+        "ability": {
+          "name": "SpecialAttackAMarieAntoinette",
+          "class": "Ability",
+          "abilityScalor": 0,
+          "conditionalAbilityScalors": [
+            11.5
+          ],
+          "config": "SpecialAttackAMarieAntoinette",
+          "tuCost": 100,
+          "useLimit": 10,
+          "spiritCost": 2,
+          "blockTargetManipulation": 0,
+          "showConfirmation": 0
+        },
+        "config": {
+          "class": "AbilityConfig",
+          "targetingData": "AllEnemy",
+          "components": [
+            "Damage",
+            "ApplyBuff"
+          ],
+          "componentOverrides": [
+            {
+              "damageBoosts": [
+                "RegularAttackDamageBoost"
+              ],
+              "applyToTargetType": "Enemy",
+              "damageFlags": [
+                "IgnoreArmor",
+                "HardIgnoreBlockDeath",
+                "DoNotWake"
+              ],
+              "drainPercent": 1.0,
+              "drainEffect": "VampireDrain1"
+            },
+            {
+              "buffs": [
+                "RemoveSleepImmunityOnce",
+                "RemovePoisonImmunityOnce"
+              ],
+              "applyToTargetOnly": true,
+              "showMissConditions": "ShowNoMiss",
+              "skipAbilityEffect": true
+            }
+          ],
+          "enemyEventType": "Hit",
+          "sourceEventType": "Hit",
+          "abilityEffect": "MarieAntoinetteSpecial",
+          "attackScalors": [
+            "GoodVsSummonedEnemy"
+          ],
+          "conditionedAbilityEffects": [
+            "MarieAntoinetteSpecial",
+            "MarieAntoinetteSpecial"
+          ],
+          "useCondition": "EnemyTeamHas2ConjuredAllies"
+        },
+        "targetingData": {
+          "class": "TargetingData",
+          "allEnemies": true
+        },
+        "abilityEffect": {
+          "class": "AbilityEffect",
+          "delays": [
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0.7,
+            0.1,
+            0,
+            0.1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0.4,
+            0,
+            0,
+            0,
+            0,
+            0.1
+          ],
+          "prefabs": [
+            "batfx_Mermaid/batfx_blackout3",
+            "batsfx_prefab/batsfx_timestrike1",
+            "batfx_PeachGirl/batfx_tailwindPink2",
+            "batfx_MarieAntoinette/batfx_Cake1",
+            "batfx_Mermaid/batfx_blackout3",
+            "batfx_YandereBallet/batfx_quickchargePink1",
+            "batsfx_prefab/batsfx_accelerate1",
+            "batfx_MarieAntoinette/batfx_Guillotine2",
+            "batfx_YandereBallet/batfx_BalletSlashPink1",
+            "batsfx_prefab/batsfx_slash1",
+            "batfx_PeachGirl/batfx_groundimpactpink",
+            "batfx_Okita/batfx_burstPink",
+            "batfx_Okita/batfx_muzzleshotPink",
+            "batsfx_prefab/batsfx_slash1",
+            "batfx_PeachGirl/batfx_petalswirlPeach",
+            "batfx_MarieAntoinette/batfx_bgPink1",
+            "batfx_PeachGirl/batfx_groundimpactpink",
+            "batsfx_prefab/batsfx_bomb1",
+            "batfx_MarieAntoinette/batfx_ripplePinklow",
+            "batfx_MarieAntoinette/batfx_fanripplePink1",
+            "batfx_MarieAntoinette/batfx_PillarPinkBurst1",
+            "batfx_MarieAntoinette/batfx_PinkBlast1"
+          ],
+          "sortOrderOffset": [
+            -100,
+            0,
+            -60,
+            0,
+            -100,
+            0,
+            0,
+            0,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            -50,
+            2,
+            -2,
+            -2,
+            3,
+            1,
+            1
+          ],
+          "assetBundles": [
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle2",
+            "BattleEffectsBundle2",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "audiobundle1",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3",
+            "BattleEffectsBundle3"
+          ],
+          "damagePercents": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          "damageHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true
+          ],
+          "forceHitReactions": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "useEffectFinishedTimeDelay": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "isAbilityUserEffect": [
+            true,
+            true,
+            true,
+            false,
+            true,
+            true,
+            true,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            true,
+            false,
+            true,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false
+          ],
+          "positionInBattlefieldCenter": [
+            true,
+            false,
+            true,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        "components": {
+          "Damage": {
+            "class": "DamageAbilityComponent"
+          },
+          "ApplyBuff": {
+            "class": "ApplyBuffAbilityComponent"
+          }
+        },
+        "buffs": {
+          "RemovePoisonImmunityOnce": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "PoisonImmunityOnce"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          },
+          "RemoveSleepImmunityOnce": {
+            "class": "Buff",
+            "behaviors": [
+              "RemoveBuffs"
+            ],
+            "behaviorOverrides": [
+              {
+                "name": "SleepImmunityOnce"
+              }
+            ],
+            "duration": 0,
+            "showAsTimer": false,
+            "isHiddenFromPlayers": true
+          }
+        },
+        "attackScalors": {
+          "GoodVsSummonedEnemy": {
+            "class": "AttackScalor",
+            "targetCondition": "IsSummoned"
+          }
+        },
+        "conditions": {
+          "EnemyTeamHas2ConjuredAllies": {
+            "class": "MonsterConditions",
+            "checkEnemyTeamOfMonster": true,
+            "enemyTeamMonsterConditionMatchesNeeded": {
+              "IsSummoned": 2
+            }
+          }
+        }
+      }
+    },
+    "passives": {
+      "CakePassiveAMarieAntoinette": {
+        "id": "CakePassiveAMarieAntoinette",
+        "found": true,
+        "localization": {
+          "name": "White Lily",
+          "description": "After entering battle, this unit cannot be slept or poisoned for 50TU.\n\nUnless this unit is burning, this unit is immune to Stun effects, and cannot be immediately defeated without damage by a non-boss enemy.\n\nThe first time this unit defeats an enemy with an attack while on the battlefield, all allies are Fortified.\n\nThis unit can't have its Active Skills disabled by enemy passive skills.\n\nThis unit's attacks heal this unit for 100% of total damage dealt, will not wake sleeping enemies, ignore damage reduction effects, and any effects of non-boss enemies that would prevent targets from being defeated."
+        }
+      },
+      "QueenyPassiveAMarieAntoinette": {
+        "id": "QueenyPassiveAMarieAntoinette",
+        "found": true,
+        "localization": {
+          "name": "Let Them Eat Cake",
+          "description": "This unit enters battle Fortified. This unit cannot be sent to the reinforcements from the battlefield.\n\nIf this unit would be defeated by an enemy attack or a status effect while having more than 1 HP, it instead survives with 1 HP.\n\nAfter entering battle, for 100TU, whenever an enemy on the battlefield damages any allies with an attack, this unit's current TU is reduced by 50TU per non-burning unit hit. If this unit gets 3 turns within 10TU, this effect cannot trigger again until 20TU advances.\n\nEach time this unit takes damage from an attack and survives until after the end of the turn, this unit will heal for 50% of its max HP. Then, if the enemy team has 0 infections, a random non-burning enemy will be granted either the:\n- Lethal Poison status effect for 999TU, and become infected with it.\n- Cursed Sleep status effect for 200TU, and become infected with it.\n\nAfter the end of each turn, the granted infection will trigger to apply its status effect to a random non-burning unit on the infected unit's team that does not already have that status effect. Infection ends after 3 triggers (even if they find no valid target) or once the infected enemy is defeated or leaves the battlefield. Infection is not a status effect and cannot be prevented or purified, but the effect spread by the infection may be. A unit cannot get a new infection until their existing one ends. Lethal Poison deals 2 times the damage of normal Poison and ignores passive skills or effects of active skills that would prevent the target from being defeated, other than those which specifically prevent defeat from Poison or non-attack damage. Lethal Poison cannot apply to Burning units or Boss units."
+        }
+      },
+      "PlusAttackBoostLv3": {
+        "id": "PlusAttackBoostLv3",
+        "found": true,
+        "localization": {
+          "name": "Attack Up Lv3",
+          "description": "Adds 300 to this unit's Attack."
+        }
+      },
+      "PlusHPBoostLv3": {
+        "id": "PlusHPBoostLv3",
+        "found": true,
+        "localization": {
+          "name": "HP Up Lv3",
+          "description": "Adds 1200 to this unit's max HP."
+        }
+      },
+      "AttackUpTargetEquippedGreatSwordLv3": {
+        "id": "AttackUpTargetEquippedGreatSwordLv3",
+        "found": true,
+        "localization": {
+          "name": "G.sword Hunter Lv3",
+          "description": "10% bonus to attacks against units equipped with Greatswords."
+        }
+      },
+      "AddWeaponPrefSword": {
+        "id": "AddWeaponPrefSword",
+        "found": true,
+        "localization": {
+          "name": "Sword Mastery",
+          "description": "Can use weapon skills of Swords in addition to their original preferred weapon type."
+        }
+      }
+    },
+    "activeSkillsAI": {},
+    "aiSequence": null,
+    "leaderCondition": {
+      "class": "MonsterConditions",
+      "elements": [
+        "Earth"
+      ]
+    }
+  },
+  "effect": null,
+  "profile": null,
+  "internal": {
+    "sourceId": "MarieAntoinette02",
+    "family": "MarieAntoinette",
+    "source": "apk_extract",
+    "treatAsDuplicateOf": null
+  },
+  "raw": {
+    "name": "MarieAntoinette02",
+    "family": "MarieAntoinette",
+    "class": "Monster",
+    "leaderBuff": "HPUpEarthD",
+    "leaderBuffCondition": "IsEarth",
+    "activeSkills": {
+      "0": "SingleAttackAMarieAntoinette",
+      "1": "AllyBuffAMarieAntoinette",
+      "2": "MultiBuffAMarieAntoinette",
+      "3": "SpecialAttackAMarieAntoinette"
+    },
+    "passives": {
+      "0": "CakePassiveAMarieAntoinette",
+      "1": "QueenyPassiveAMarieAntoinette",
+      "2": "PlusAttackBoostLv3",
+      "3": "PlusHPBoostLv3",
+      "4": "AttackUpTargetEquippedGreatSwordLv3",
+      "5": "AddWeaponPrefSword"
+    },
+    "cost": 34,
+    "baseAttack": 1419,
+    "baseMaxHp": 7325,
+    "speed": 669,
+    "element": "Earth",
+    "weaponPref": "Axe",
+    "weaponPivotIndex": 0,
+    "secure": 1,
+    "evolveFrom": "MarieAntoinette01",
+    "aiTargetPickWeight": 1,
+    "stars": 6,
+    "evolvedStars": 6,
+    "goldMultiplier": 1,
+    "consolationMultiplier": 0,
+    "battleOrbImageFlip": 1,
+    "attackType": "Bash",
+    "cosmoName": "MarieAntoinette03",
+    "skillVoices": {
+      "0": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "1": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "2": [
+        9,
+        10,
+        11,
+        12
+      ],
+      "3": [
+        13,
+        14,
+        15,
+        16
+      ]
+    },
+    "damageVoices": [
+      17,
+      18,
+      19,
+      20
+    ],
+    "deathVoices": [
+      21,
+      22,
+      23,
+      24
+    ],
+    "victoryVoices": [
+      25,
+      26
+    ],
+    "lineupVoices": [
+      27,
+      28,
+      29,
+      30,
+      31,
+      32
+    ],
+    "evolutionVoices": [
+      38
+    ],
+    "trainVoices": [
+      33,
+      34,
+      35,
+      36,
+      37,
+      39,
+      40,
+      41,
+      42,
+      43
+    ],
+    "titleVoices": [
+      44
+    ],
+    "gachaVoices": [
+      45
+    ],
+    "loginVoices": [
+      46
+    ],
+    "tapVoices": [
+      47,
+      48,
+      49
+    ],
+    "idleVoices": [
+      50
+    ]
+  },
+  "_build": {
+    "scriptVersion": "8-semantic-authorities",
+    "sourceHash": "bb44c313564bb10f95bda59adf5c3876dd1596d2f6c498b9266be0576a39b7c7",
+    "dependencyHash": "b310c82e849476718850f14105c88fe0922fdcb2e7ee6c96dbe8eb62f9010834",
+    "generatedAt": 1793374778
+  }
+}

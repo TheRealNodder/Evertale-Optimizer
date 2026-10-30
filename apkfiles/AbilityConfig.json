@@ -1,6 +1,6 @@
 {
 	"Version": 23,
-	"Time": 1792737697,
+	"Time": 1793323898,
 	"AbilityConfig": {
 		"StunSingle200A": {
 			"class": "AbilityConfig",
@@ -49458,6 +49458,83 @@
 			"abilityEffect": "ArsenalAllStun",
 			"flags": ["NoDamage","GiveTurn"],
 			"useCondition": "IsCharged3"
+		},
+		"SingleAttackAMarieAntoinette":{
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage","ApplyBuff"],
+			"componentOverrides": [{
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"damageFlags": ["IgnoreArmor","HardIgnoreBlockDeath","IgnoreSkin","DoNotWake"],
+				"applyToTargetType": "Enemy",
+				"drainPercent": 1.0,
+				"drainEffect": "VampireDrain1"
+			},{
+				"buffs": ["MarkedMarieAntoinette","RandomOtherAllyExtraTurnMarieAntoinette"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"applyConditions": "IsNotJustGrantedTurn"
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "MarieAntoinetteAttack1",
+			"attackScalors": ["GoodIfCharged1","GoodIfCharged2","GoodIfCharged3"],
+			"conditionedAbilityEffects": ["MarieAntoinetteAttack1","MarieAntoinetteAttack1","MarieAntoinetteAttack1"],
+			"recommendEffectWhenUsable": -1
+		},
+		"AllyBuffAMarieAntoinette":{
+			"class": "AbilityConfig",
+			"targetingData": "AllAlly",
+			"components": ["ApplyBuff","ApplyBuff"],
+			"componentOverrides":[{
+				"buffs": ["RemoveSleep","RemovePoison"],
+				"applyToTargetType": "Friendly"
+			},{
+				"buffs": ["SleepThorns","AttackPlus50Percent1TurnOnly"],
+				"applyToTargetType": "Friendly",
+				"applyConditions": "IsNotBurning",
+				"skipAbilityEffect": true,
+				"showMissConditions": "IsBurning"
+			}],
+			"friendlyEventType": "Finish",
+			"flags": ["NoDamage"],
+			"abilityEffect": "MarieAntoinetteFlowreBuff",
+			"useCondition": "NoThornsOnAlliesNotBurning"
+		},
+		"MultiBuffAMarieAntoinette":{
+			"class": "AbilityConfig",
+			"targetingData": "SelfOnly",
+			"components": ["ApplyBuff"],
+			"componentOverrides":[{
+				"buffs": ["FortifyFor3Attacks","SleepImmunityFor50TU","PoisonImmunityFor50TU","MarieAntoinetteActive3Cooldown50"],
+				"applyToSourceOnly": true
+			}],
+			"sourceEventType": "Finish",
+			"abilityEffect": "MarieAntoinetteBreadSleep",
+			"useCondition": "TimeInCombat50NotInstantCooldown"
+		},
+		"SpecialAttackAMarieAntoinette":{
+			"class": "AbilityConfig",
+			"targetingData": "AllEnemy",
+			"components": ["Damage","ApplyBuff"],
+			"componentOverrides": [{
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"applyToTargetType": "Enemy",
+				"damageFlags": ["IgnoreArmor","HardIgnoreBlockDeath","DoNotWake"],
+				"drainPercent": 1.0,
+				"drainEffect": "VampireDrain1"
+			},{
+				"buffs": ["RemoveSleepImmunityOnce","RemovePoisonImmunityOnce"],
+				"applyToTargetOnly": true,
+				"showMissConditions": "ShowNoMiss",
+				"skipAbilityEffect": true
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Hit",
+			"abilityEffect": "MarieAntoinetteSpecial",
+			"attackScalors": ["GoodVsSummonedEnemy"],
+			"conditionedAbilityEffects": ["MarieAntoinetteSpecial","MarieAntoinetteSpecial"],
+			"useCondition": "EnemyTeamHas2ConjuredAllies"
 		}
 	}
 }

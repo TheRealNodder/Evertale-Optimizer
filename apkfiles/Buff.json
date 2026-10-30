@@ -1,6 +1,6 @@
 {
 	"Version": 23,
-	"Time": 1793154406,
+	"Time": 1793165703,
 	"Buff": {
 	"RelationshipFlatAttack50": {
 		"class": "Buff",
@@ -95479,6 +95479,278 @@
 			"class": "Buff",
 			"duration": 50,
 			"stackName": "InstantCooldown",
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"iconSpriteName": "IconBlueCountdownClock3"
+		},
+		"AttackUp4TargetIsDeath": {
+			"class": "Buff",
+			"behaviors": ["ExtraAttackScalor"],
+			"behaviorOverrides": [{
+				"targetCondition": "IsDeath",
+				"scalor": 0.15
+			}],
+			"iconSpriteName": "IconYellowAttackUpSword01",
+			"noIconShownOnBattleStatus": true,
+			"duration": -1,
+			"showAsTimer": false,
+			"isWeaponBuff": true
+		},
+		"AttackUp5TargetIsDeath": {
+			"class": "Buff",
+			"behaviors": ["ExtraAttackScalor"],
+			"behaviorOverrides": [{
+				"targetCondition": "IsDeath",
+				"scalor": 0.2
+			}],
+			"iconSpriteName": "IconYellowAttackUpSword01",
+			"noIconShownOnBattleStatus": true,
+			"duration": -1,
+			"showAsTimer": false,
+			"isWeaponBuff": true
+		},
+		"AttackUp6TargetIsDeath": {
+			"class": "Buff",
+			"behaviors": ["ExtraAttackScalor"],
+			"behaviorOverrides": [{
+				"targetCondition": "IsDeath",
+				"scalor": 0.25
+			}],
+			"iconSpriteName": "IconYellowAttackUpSword01",
+			"noIconShownOnBattleStatus": true,
+			"duration": -1,
+			"showAsTimer": false,
+			"isWeaponBuff": true
+		},
+		"CakePassiveAMarieAntoinette": {
+			"class": "Buff",
+			"stackName": "CakePassiveAMarieAntoinette",
+			"behaviors": ["EnterBattleBuff","BuffOnMonsterTurn","BuffWhenMonstersDie","BuffWhenMonstersDie","StunImmunityIfNotBurningFallback"],
+			"behaviorOverrides": [{
+				"sourceBuffs": ["PoisonImmunityFor50TU","SleepImmunityFor50TU","StunImmunityIfNotBurning","BlockInstantKillIfNotBurning","PassiveBlockGiveTurnImmunity"]
+			},{
+				"selfBuffs": ["StoreEnergyHidden"],
+				"sameTeam": true,
+				"activeMonsterConditions": "IsNotBurning",
+				"spreadCondition": "IsNotActing"
+			},{
+				"sourceBuffs": ["FortifyAllAlliesMarieAntoinetteEBB","MarieAntoinetteFirstKillLock"],
+				"sameTeam": false,
+				"spreadCondition": "KillsMoreThanSkillUsed",
+				"deadMonsterConditions": "NotTransformingOrMirage"
+			},{
+				"sourceBuffs": ["FudgeUsedAtEndOfTurn"],
+				"sameTeam": false,
+				"spreadCondition": "KillsMoreThanSkillUsed"
+			},{}],
+			"duration": -1,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true
+		},
+		"BlockInstantKillIfNotBurning": {
+			"class": "Buff",
+			"behaviors": ["Immunity","EnterBattleBuff","BuffOnMonsterTurn","BuffOnMonsterTurnEnd","BuffOnMonsterTurn"],
+			"stackName": "BlockInstantKill",
+				"behaviorOverrides": [{
+					"stackNamesToBlock": ["InstantKill"],
+					"activateCondition": "IsNotBurning"
+				},{
+					"selfBuffs": ["TagInstantKillImmune0Duration"],
+					"spreadCondition": "IsNotBurning"
+				},{
+					"selfBuffs": ["TagInstantKillImmune0Duration"],
+					"spreadCondition": "IsNotBurning",
+					"activeMonsterConditions": "AlwaysTrue"
+				},{
+					"selfBuffs": ["RemoveTagInstantKillImmune0Duration"],
+					"spreadCondition": "IsBurning",
+					"activeMonsterConditions": "AlwaysTrue"
+				},{
+					"selfBuffs": ["RemoveTagInstantKillImmune0Duration"],
+					"spreadCondition": "IsBurning",
+					"activeMonsterConditions": "AlwaysTrue"
+			}],
+			"duration": -1,
+			"showAsTimer": true,
+			"iconSpriteName": "IconInstantDefeatInvalid01"
+		},
+		"TagInstantKillImmune0Duration": {
+			"class": "Buff",
+			"stackName": "TagInstantKillImmune0Duration",
+			"duration": 0,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true,
+			"tags": ["InstantKillImmune"]
+		},
+		"RemoveTagInstantKillImmune0Duration": {
+			"class": "Buff",
+			"behaviors": ["RemoveBuffs"],
+			"behaviorOverrides": [{
+				"name": "TagInstantKillImmune0Duration"
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
+		"QueenyPassiveAMarieAntoinette": {
+			"class": "Buff",
+			"stackName": "QueenyPassiveAMarieAntoinette",
+			"behaviors": ["EnterBattleBuff","BuffOnMonsterTurn","BuffOnMonsterTurn","BuffWhenMonsterHurt","BuffOnMonsterTurnEnd"],
+			"behaviorOverrides": [{
+				"sourceBuffs": ["KnockbackImmunity","HoldGround","FortifyFor3Attacks","Hit50TUMinusMarieAntoinetteFor100TU"]
+			},{
+				"selfBuffs": ["HijikataCounterFuseAfterTime","HijikataCounter","MarieAntoinettePassiveHitLock"]
+			},{
+				"sourceBuffs": ["RandomGeneratorInfection1","RandomGeneratorInfection2"],
+				"sameTeam": false,
+				"activeMonsterConditions": "AlwaysTrue",
+				"spreadCondition": "NoEnemiesInfected"
+			},{
+				"selfBuffs": ["BrideHealOK"],
+				"cancelFromDamageTypes": ["BuffDamage"]
+			},{
+				"selfBuffs": ["InfectionONEMarieAntoinetteEBB","InfectionTWOMarieAntoinetteEBB","BrideHeal50PercentMarieAntoinette"],
+				"activeMonsterConditions": "NotAlwaysMyTurn",
+				"spreadCondition": "BrideHealReady"
+			}],
+			"duration": -1,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true
+		},
+		"MarieAntoinettePassiveHitLock":{
+			"class": "Buff",
+			"duration": 20,
+			"stackName": "MarieAntoinettePassiveHitLock",
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"iconSpriteName": "IconRedCountdownPassiveClock3",
+			"applyConditions": "IsHijikataCharged3"
+		},
+		"RandomGeneratorInfection1":{
+			"class": "Buff",
+			"duration": 0,
+			"stackName": "RandomGeneratorInfectionONE",
+			"applyConditions": "50PercentChance",
+			"isHiddenFromPlayers": true
+		},
+		"RandomGeneratorInfection2":{
+			"class": "Buff",
+			"duration": 0,
+			"stackName": "RandomGeneratorInfectionTWO",
+			"isHiddenFromPlayers": true,
+			"applyConditions": "IsNotRandomGeneratorInfectionONE"
+		},
+		"InfectionONEMarieAntoinetteEBB": {
+			"class": "Buff",
+			"behaviors": ["EnterBattleBuff"],
+			"behaviorOverrides": [{
+				"randomEnemyBuffs": ["LethalPoison","SpreadPlagueLethalPosion"],
+				"numRandomToBuff": 1,
+				"spreadCondition": "IsNotBurning"
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true,
+			"applyConditions": "0EnemyInfectionsIsRandomGeneratorInfectionONE"
+		},
+		"InfectionTWOMarieAntoinetteEBB": {
+			"class": "Buff",
+			"behaviors": ["EnterBattleBuff"],
+			"behaviorOverrides": [{
+				"randomEnemyBuffs": ["SleepForcedThorns","SpreadPlagueCursedSleep"],
+				"numRandomToBuff": 1,
+				"spreadCondition": "IsNotBurning"
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true,
+			"applyConditions": "0EnemyInfectionsIsRandomGeneratorInfectionTWO"
+		},
+		"Hit50TUMinusMarieAntoinetteFor100TU": {
+			"class": "Buff",
+			"behaviors": ["BuffOnMonsterTurn"],
+			"behaviorOverrides": [{
+				"enemyBuffs": ["GrantSource50TUMinusMarieAntoinette"],
+				"sameTeam": false,
+				"activeMonsterConditions": "AlwaysTrue"
+			}],
+			"duration": 100,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"iconSpriteName": "IconBrownCountdownClock01"
+		},
+		"GrantSource50TUMinusMarieAntoinette": {
+			"class": "Buff",
+			"behaviors": ["BuffChanceOnHit","RemoveOnSourceDeath"],
+			"behaviorOverrides": [{
+				"sourceBuffs": ["TUMinus50"],
+				"spreadCondition": "IsNotMarieAntoinettePassiveHitLock",
+				"targetCondition": "IsNotBurning"
+			},{}],
+			"duration": 0,
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
+		"BrideHeal50PercentMarieAntoinette": {
+			"class": "Buff",
+			"behaviors": ["AdjustHp","RemoveBuffs"],
+			"behaviorOverrides": [{
+				"percent": 0.50,
+				"abilityEffect": "Blank",
+				"hpboosts": [
+					"HealBoost"
+				]
+			},{
+				"name": "BrideHealOK"
+			}],
+			"duration": 0,
+			"effectToShowWhenApplied": "LargeHeal1",
+			"textKeyToShowWhenApplied": "HealDoubleANameKey",
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
+		"SpreadPlagueCursedSleep":{
+			"class": "Buff",
+			"stackName": "SpreadPlague",
+			"behaviors":["BuffOnMonsterTurnEnd"],
+			"behaviorOverrides":[{
+				"randomEnemyBuffs": ["SpreadingPlagueFX","SleepForcedThorns"],
+				"numRandomToBuff": 1,
+				"spreadCondition": "IsNotCursedSleepOrBurning",
+				"activeMonsterConditions": "AlwaysTrue",
+				"removeAfterTriggers": 3,
+				"forwardSource": true
+			}],
+			"duration": -1,
+			"iconSpriteName": "IconRedInfection01",
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"tags": ["SpreadPlagueCursedSleep"],
+			"applyConditions": "IsNotSpreadPlague"
+		},
+		"RandomOtherAllyExtraTurnMarieAntoinette": {
+			"class": "Buff",
+			"behaviors": ["EnterBattleBuff"],
+			"behaviorOverrides": [{
+				"randomAllyBuffs": ["GiveTurn","OnExtraTurn","JustGivenTurn","RemoveBlockGiveTurn"],
+				"numRandomToBuff": 1,
+				"spreadCondition": "IsNotMarkedTargetMarieAntoinette"
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true
+		},
+		"MarieAntoinetteActive3Cooldown50": {
+			"class": "Buff",
+			"stackName": "InstantCooldown",
+			"duration": 50,
+			"isHiddenFromPlayers": false,
 			"showAsTimer": true,
 			"showAsPermanent": false,
 			"iconSpriteName": "IconBlueCountdownClock3"
