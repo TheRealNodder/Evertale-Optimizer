@@ -1,6 +1,6 @@
 {
 	"Version": 23,
-    "Time": 1793091157,
+    "Time": 1793092148,
 	"MonsterConditions": {
 	"IsFire": {
 		"class": "MonsterConditions",
@@ -28360,6 +28360,41 @@
 			}
 		}
 	},
+	"IsNotBurningAndNotProtecting": {
+		"class": "MonsterConditions",
+		"not": {
+			"class": "MonsterConditions",
+			"buffStackNames": ["Burn"],
+			"or": {
+				"class": "MonsterConditions",
+				"buffStackNames": ["Protector"],
+				"or": {
+					"class": "MonsterConditions",
+					"buffStackNames": ["AutoProtect"],
+					"or": {
+						"class": "MonsterConditions",
+						"buffStackNames": ["TimedProtector"],
+						"or": {
+							"class": "MonsterConditions",
+							"buffStackNames": ["ConditionedProtector"],
+							"or": {
+								"class": "MonsterConditions",
+								"buffStackNames": ["Taunting"],
+								"checkEnemyTeamOfMonster": true,
+								"enemyTeamMonsterConditionMatchesNeeded":{
+									"IsTauntedTakingTurn": 1
+								},
+								"or":{
+									"class": "MonsterConditions",
+									"buffStackNames": ["SleepThorns","ThornProtector"]
+								}	
+							}
+						}
+					}
+				}
+			}
+		}
+	},
 	"IsNotTimeInCombat200": {
 		"class": "MonsterConditions",
 		"not":{
@@ -31782,6 +31817,16 @@
 			"buffStackNames": ["InstantCooldown2"]
 		}
 	},
+	"NoEnemiesIsInstantKillImmunityOnce":{
+		"class": "MonsterConditions",
+		"not":{
+			"class": "MonsterConditions",
+			"checkEnemyTeamOfMonster": true,
+			"enemyTeamMonsterConditionMatchesNeeded": {
+				"InstantKillImmunityOnce": 1
+			}
+		}
+	},
 	"AllEnemiesIsInstantKillImmunityOnce":{
 		"class": "MonsterConditions",
 		"not":{
@@ -32569,6 +32614,28 @@
 			"or": {
 				"class": "MonsterConditions",
 				"buffStackNames": ["Burn"]
+			}
+		}
+	},
+	"2AlliesHypnotizedDisabledSleepingOrCurrentTUGreaterThan150":{
+		"class": "MonsterConditions",
+		"myTeamMonsterConditionMatchesNeeded": {
+			"IsPloyedOrBlockTurnSleepingOrCurrentTUGreaterThan150": 2
+		}
+	},
+	"IsPloyedOrBlockTurnSleepingOrCurrentTUGreaterThan150": {
+		"class": "MonsterConditions",
+		"currentTUGreaterThan": 150,
+		"or":{
+			"class": "MonsterConditions",
+			"buffStackNames": ["Ploy"],
+			"or":{
+				"class": "MonsterConditions",
+				"monsterTags": ["BlockTurnTag"],
+				"or":{
+					"class": "MonsterConditions",
+					"buffStackNames": ["Sleep"]
+				}
 			}
 		}
 	}
