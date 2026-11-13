@@ -1,6 +1,6 @@
 {
 	"Version": 23,
-	"Time": 1793935391,
+	"Time": 1793941436,
 	"Buff": {
 	"RelationshipFlatAttack50": {
 		"class": "Buff",
@@ -96074,6 +96074,244 @@
 			"duration": 0,
 			"showAsTimer": false,
 			"isHiddenFromPlayers": true
+		},
+		"AttackUp4EnemiesIsDisabled2": {
+			"class": "Buff",
+			"behaviors": ["ExtraAttackScalor"],
+			"stackName": "AttackBoosted",
+			"behaviorOverrides": [{
+				"attackerCondition": "2EnemiesDisabled",
+				"scalor": 0.15
+			}],
+			"iconSpriteName": "IconYellowAttackUpSword01",
+			"noIconShownOnBattleStatus": true,
+			"duration": -1,
+			"showAsTimer": false,
+			"isWeaponBuff": true
+		},
+		"AttackUp5EnemiesIsDisabled2": {
+			"class": "Buff",
+			"behaviors": ["ExtraAttackScalor"],
+			"stackName": "AttackBoosted",
+			"behaviorOverrides": [{
+				"attackerCondition": "2EnemiesDisabled",
+				"scalor": 0.20
+			}],
+			"iconSpriteName": "IconYellowAttackUpSword01",
+			"noIconShownOnBattleStatus": true,
+			"duration": -1,
+			"showAsTimer": false,
+			"isWeaponBuff": true
+		},
+		"AttackUp6EnemiesIsDisabled2": {
+			"class": "Buff",
+			"behaviors": ["ExtraAttackScalor"],
+			"stackName": "AttackBoosted",
+			"behaviorOverrides": [{
+				"attackerCondition": "2EnemiesDisabled",
+				"scalor": 0.25
+			}],
+			"iconSpriteName": "IconYellowAttackUpSword01",
+			"noIconShownOnBattleStatus": true,
+			"duration": -1,
+			"showAsTimer": false,
+			"isWeaponBuff": true
+		},
+		"PassPassiveAArsenalRegular": {
+			"class": "Buff",
+			"stackName": "PassPassiveAArsenalRegular",
+			"behaviors": ["EnterBattleBuff","SleepImmunityIf1WaterEnemyFallback","SleepImmunityIf1WaterAllyFallback","StunImmunityIf2AirAlliesFallback","StunImmunityIf1AirEnemyFallback"],
+			"behaviorOverrides": [{
+				"sourceBuffs": ["StunImmunityIf2AirAlliesOr1AirEnemyUnitOnBattlefield","SleepImmunityIfWaterUnitOnBattlefield","KnockbackImmunity","BlockDeathByBuffDamage","Active2LOCKArsenalRegular","Charged1Icon","Charged2Icon","Charged3Icon","DisableFallBackImmunity"]
+			},{},{},{},{}],
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"duration": -1
+		},
+		"PassiveTUMinusLOCKEDArsenalRegular":{
+			"class": "Buff",
+			"stackName": "TUMinusLOCKEDArsenalRegular",
+			"duration": 50,
+			"isHiddenFromPlayers": false,
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"iconSpriteName": "IconRedCountdownPassiveClock3",
+			"applyConditions": "IsHijikataCharged3"
+		},
+		"KickToTheHeadPassiveAArsenalRegular": {
+			"class": "Buff",
+			"stackName": "KickToTheHeadPassiveAArsenalRegular",
+			"behaviors": ["EnterBattleBuff","EnterBattleBuff","EnterBattleBuff","BuffOnMonsterTurn","BuffWhenMonsterHurt","BuffOnMonsterTurnEnd","BuffOnMonsterTurnEnd","BuffOnMonsterTurnEnd"],
+			"behaviorOverrides": [{
+				"sourceBuffs": ["HoldGround","FortifyFor3Attacks","StoreEnergy"]
+			},{
+				"sourceBuffs": ["StoreEnergy"],
+				"spreadCondition": "AtLeast2AirAllies"
+			},{
+				"sourceBuffs": ["StoreEnergy"],
+				"spreadCondition": "AtLeast3AirAllies"
+			},{
+				"selfBuffs": ["BlockGiveTurnImmunityOneTurn"],
+				"spreadCondition": "IsNotBlockTurn"
+			},{
+				"selfBuffs": ["BrideHealOK"],
+				"cancelFromDamageTypes": ["BuffDamage"]
+			},{
+				"selfBuffs": ["IWasHurtArsenalRegular","BrideHeal50PercentArsenalRegular"],
+				"activeMonsterConditions": "NotAlwaysMyTurn",
+				"spreadCondition": "BrideHealReady"
+			},{
+				"sourceBuffs": ["EnchantmentREADYArsenalRegular"],
+				"spreadCondition": "2EnemiesNotDisabled"
+			},{
+				"sourceBuffs": ["ArsenalRegularEnchantmentLv1","ArsenalRegularEnchantmentLv2","ArsenalRegularEnchantmentLv3","ArsenalRegularEnchantmentLv4","ArsenalRegularEnchantmentLv5","RemoveEnchantmentREADYArsenalRegular"],
+				"spreadCondition": "IsEnchantmentREADYArsenalRegularNOTLocked"
+			}],
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"duration": -1
+		},
+		"ArsenalTriggerEnchantmentFXBuff": {
+			"class": "Buff",
+			"isHiddenFromPlayers": true,
+			"stackName": "ArsenalTriggerEnchantmentFXBuff",
+			"duration": 0,
+			"effectToShowWhenApplied": "ArsenalPassive",
+			"textKeyToShowWhenApplied": "KickToTheHeadPassiveAArsenalRegularNameKey",
+			"showAsTimer": false,
+			"showAsPermanent": false
+		},
+		"ArsenalRegularEnchantmentLv1":{
+				"class": "Buff",
+				"stackName": "ArsenalRegularEnchantment",
+				"behaviors": ["EnterBattleBuff","EnterBattleBuff"],
+				"behaviorOverrides": [{
+					"sourceBuffs": ["ArsenalDisablePassiveTrigger"]
+				},{
+					"randomEnemyBuffs": ["NoTurnsFor50TUPassiveArsenalRegularV1","ArsenalTriggerEnchantmentFXBuff"],
+					"numRandomToBuff": 1
+				}],
+			"duration": 0,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true,
+			"applyConditions": "NoAwakening20Percent"
+		},
+		"ArsenalRegularEnchantmentLv2":{
+				"class": "Buff",
+				"stackName": "ArsenalRegularEnchantment",
+				"behaviors": ["EnterBattleBuff","EnterBattleBuff"],
+				"behaviorOverrides": [{
+					"sourceBuffs": ["ArsenalDisablePassiveTrigger"]
+				},{
+					"randomEnemyBuffs": ["NoTurnsFor50TUPassiveArsenalRegularV1","ArsenalTriggerEnchantmentFXBuff"],
+					"numRandomToBuff": 1
+				}],
+			"duration": 0,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true,
+			"applyConditions": "1Awakening40Percent"
+		},
+		"ArsenalRegularEnchantmentLv3":{
+				"class": "Buff",
+				"stackName": "ArsenalRegularEnchantment",
+				"behaviors": ["EnterBattleBuff","EnterBattleBuff"],
+				"behaviorOverrides": [{
+					"sourceBuffs": ["ArsenalDisablePassiveTrigger"]
+				},{
+					"randomEnemyBuffs": ["NoTurnsFor50TUPassiveArsenalRegularV1","ArsenalTriggerEnchantmentFXBuff"],
+					"numRandomToBuff": 1
+				}],
+			"duration": 0,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true,
+			"applyConditions": "2Awakening60Percent"
+		},
+		"ArsenalRegularEnchantmentLv4":{
+				"class": "Buff",
+				"stackName": "ArsenalRegularEnchantment",
+				"behaviors": ["EnterBattleBuff","EnterBattleBuff"],
+				"behaviorOverrides": [{
+					"sourceBuffs": ["ArsenalDisablePassiveTrigger"]
+				},{
+					"randomEnemyBuffs": ["NoTurnsFor50TUPassiveArsenalRegularV1","ArsenalTriggerEnchantmentFXBuff"],
+					"numRandomToBuff": 1
+				}],
+			"duration": 0,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true,
+			"applyConditions": "3Awakening80Percent"
+		},
+		"ArsenalRegularEnchantmentLv5":{
+				"class": "Buff",
+				"stackName": "ArsenalRegularEnchantment",
+				"behaviors": ["EnterBattleBuff","EnterBattleBuff"],
+				"behaviorOverrides": [{
+					"sourceBuffs": ["ArsenalDisablePassiveTrigger"]
+				},{
+					"randomEnemyBuffs": ["NoTurnsFor50TUPassiveArsenalRegularV1","ArsenalTriggerEnchantmentFXBuff"],
+					"numRandomToBuff": 1
+				}],
+			"duration": 0,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"isHiddenFromPlayers": true,
+			"applyConditions": "Has4Awakenings"
+		},
+		"ArsenalDisablePassiveTrigger": {
+			"class": "Buff",
+			"stackName": "ArsenalDisablePassiveTrigger",
+			"stackLimit": 10,
+			"duration": -1,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"noIconShownOnBattleStatus": true,
+			"isHiddenFromPlayers": true
+		},
+		"IWasHurtArsenalRegular": {
+			"class": "Buff",
+			"behaviors": ["EnterBattleBuff","EnterBattleBuff"],
+			"behaviorOverrides": [{
+				"selfBuffs": ["PseudoGetTurn","OnExtraTurn","JustGivenTurn","DoNotGiveChargeArsenalRegular","RemoveEnergyCount2"],
+				"spreadCondition": "IsCharged3"
+			},{
+				"sourceBuffs": ["StoreEnergy"],
+				"spreadCondition": "IsNotDoNotGiveChargeArsenalRegular"
+			}],
+			"duration": 0,
+			"showAsTimer": false,
+			"showAsPermanent": false,
+			"noIconShownOnBattleStatus": true,
+			"isHiddenFromPlayers": true
+		},
+		"BrideHeal50PercentArsenalRegular": {
+			"class": "Buff",
+			"behaviors": ["AdjustHp","RemoveBuffs"],
+			"behaviorOverrides": [{
+				"percent": 0.50,
+				"abilityEffect": "Blank",
+				"hpboosts": [
+					"HealBoost"
+				]
+			},{
+				"name": "BrideHealOK"
+			}],
+			"duration": 0,
+			"effectToShowWhenApplied": "LargeHeal1",
+			"textKeyToShowWhenApplied": "HealDoubleANameKey",
+			"showAsTimer": false,
+			"isHiddenFromPlayers": true
+		},
+		"ArsenalRegularCooldown50":{
+			"class": "Buff",
+			"duration": 50,
+			"stackName": "InstantCooldown",
+			"showAsTimer": true,
+			"showAsPermanent": false,
+			"iconSpriteName": "IconBlueCountdownClock3"
 		}
     }
 }

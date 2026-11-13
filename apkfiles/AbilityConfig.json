@@ -1,6 +1,6 @@
 {
 	"Version": 23,
-	"Time": 1793756877,
+	"Time": 1793935220,
 	"AbilityConfig": {
 		"StunSingle200A": {
 			"class": "AbilityConfig",
@@ -49624,6 +49624,114 @@
 			"flags": ["Healer"],
 			"abilityEffect": "GalahadEtemyBuff",
 			"useCondition": "NotAloneAndIsNotFortified"
+		},
+		"SingleAttackAArsenalRegular": {
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage","ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"damageFlags": ["IgnoreArmor","HardIgnoreBlockDeath","IgnoreSkin"],
+				"applyToTargetType": "Enemy",
+				"drainPercent": 1.0,
+				"drainEffect": "MerlinSelfHeal1"
+			},{
+				"buffs": ["SpiritGainA"],
+				"applyConditions": "MoreThan0HP",
+				"applyToTargetOnly": true,
+				"buffBackMode": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs":["RemoveEnergyCount1","TUMinus50","HijikataCounter","HijikataCounterFuseAfterTime","PassiveTUMinusLOCKEDArsenalRegular"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"applyConditions": "IsChargedAtAllNotTUMinusLOCKEDArsenalRegular",
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs":["RemoveActive2LOCKArsenalRegular","LoseMomentum","GainMomentum"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "ArsenalTwinAttack",
+			"attackScalors": ["GoodWithMomentum"],
+			"conditionedAbilityEffects": ["ArsenalTwinAttack","ArsenalTwinAttack"],
+			"recommendEffectWhenUsable": -2
+		},
+		"AllyBuffAArsenalRegular": {
+			"class": "AbilityConfig",
+			"targetingData": "AllAlly",
+			"components": ["ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"buffs": ["SleepImmunityOnce"],
+				"applyToTargetType": "Friendly"
+			},{
+				"buffs": ["AttackPlus50Percent1TurnOnly"],
+				"applyToTargetType": "Friendly",
+				"applyConditions": "IsNotSleeping",
+				"skipAbilityEffect": true,
+				"showMissConditions": "IsSleeping"
+			},{
+				"buffs":["Active2LOCKArsenalRegular","StoreEnergy","StoreEnergy"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"friendlyEventType": "Finish",
+			"sourceEventType": "Finish",
+			"abilityEffect": "ArsenalCharge",
+			"useCondition": "IsNotActive2LOCKArsenalRegular"
+		},
+		"SpecialAttackAArsenalRegular":{
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage","ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"damageFlags": ["HardIgnoreBlockDeath"],
+				"applyToTargetType": "Enemy",
+				"drainPercent": 1.0,
+				"drainEffect": "MerlinSelfHeal1"
+			},{
+				"buffs": ["RemoveStealth"],
+				"applyToTargetType": "Enemy",
+				"showMissConditions": "ShowNoMiss",
+				"skipAbilityEffect": true
+			},{
+				"buffs":["RemoveEnergyCount1","TUMinus50","HijikataCounter","HijikataCounterFuseAfterTime","PassiveTUMinusLOCKEDArsenalRegular"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"applyConditions": "IsChargedAtAllNotTUMinusLOCKEDArsenalRegular",
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs":["ArsenalRegularCooldown50","RemoveActive2LOCKArsenalRegular"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "ArsenalSlash",
+			"recommendEffectWhenUsable": -2,
+			"useCondition": "IsChargedAtAllAndNotInstantCooldown"
+		},
+		"EnemyBuffAArsenalRegular": {
+			"class": "AbilityConfig",
+			"targetingData": "AllEnemy",
+			"components": ["ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"buffs": ["NoTurnsFor50TUArsenalRegularV1"],
+				"applyToTargetType": "Enemy"
+			},{
+				"buffs": ["GrantAllOtherAlliesTurnEBB","PurifyAllAlliesEBB","RemoveActive2LOCKArsenalRegular","RemoveEnergy"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			}],
+			"sourceEventType": "Finish",
+			"enemyEventType": "Finish",
+			"abilityEffect": "ArsenalAllStun",
+			"flags": ["NoDamage","GiveTurn"],
+			"useCondition": "IsCharged3"
 		}
 	}
 }
