@@ -1,0 +1,38 @@
+name: Python Authorities PR
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  python-authorities:
+    name: Python ${{ matrix.python }} authority tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.11", "3.12"]
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+    steps:
+      - name: Check out PR merge ref (credentials not persisted)
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Set up Python ${{ matrix.python }}
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Authority and warning-repair tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/new_structure/test_optimizer_foundation_authorities.py
+          python tools/new_structure/test_entry_warning_repairs.py

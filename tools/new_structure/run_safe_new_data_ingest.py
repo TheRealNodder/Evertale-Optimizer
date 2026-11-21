@@ -15,7 +15,13 @@ ROOT_MARKERS = ["apkfiles", "tools"]
 REPORT_REL = "apkfiles/entries/reports/safe_new_data_ingest_report.json"
 PIPELINE_SCRIPT = "run_entry_pipeline.py"
 
+PASSIVE_REGISTRY_STEP = "build_passive_definition_registry.py"
+PASSIVE_REGISTRY_REL = "apkfiles/entries/runtime/passive_definition_registry.json"
+
 FAST_POST_PIPELINE_STEPS = [
+    # Offline provenance sidecar first, so validate_entries.py checks a fresh file.
+    # It is not part of the runtime manifest and is never loaded by pages.
+    PASSIVE_REGISTRY_STEP,
     "extract_optimizer_knowledge.py",
     "build_optimizer_ability_graph.py",
     "build_optimizer_runtime_model.py",
@@ -137,6 +143,32 @@ def summarize_live_data_config(repo: Path) -> Dict[str, Any]:
     return read_json(repo / LIVE_DATA_CONFIG_REPORT, {}) or {"report": LIVE_DATA_CONFIG_REPORT, "status": "missing"}
 
 
+def passive_registry_freshness(steps: List[Dict[str, Any]], args: argparse.Namespace) -> Dict[str, Any]:
+    """Never let a skipped, partial or failed run imply the sidecar is current."""
+    step = next((s for s in steps if s.get("label") == PASSIVE_REGISTRY_STEP), None)
+    validation = next((s for s in steps if s.get("label") == "validate_entries.py"), None)
+    generated = bool(step and step.get("status") == "ok" and step.get("returnCode") == 0)
+    validated = bool(generated and validation and validation.get("status") == "ok" and validation.get("returnCode") == 0)
+    if args.dry_run:
+        state = "not_refreshed_dry_run"
+    elif args.skip_post_checks:
+        state = "not_refreshed_post_checks_skipped"
+    elif step is None:
+        state = "not_refreshed_pipeline_stopped_before_registry"
+    elif not generated:
+        state = "refresh_failed"
+    elif validation is None:
+        state = "generated_unvalidated"
+    elif not validated:
+        state = "validation_failed"
+    else:
+        state = "validated"
+    current = state == "validated"
+    return {"path": PASSIVE_REGISTRY_REL, "state": state,
+            "generated": generated and not args.dry_run and not args.skip_post_checks,
+            "validated": current, "refreshed": current}
+
+
 def step_command(tools_dir: Path, raw_step: str) -> List[str]:
     parts = raw_step.split()
     return [sys.executable, str(tools_dir / parts[0]), *parts[1:]]
@@ -160,6 +192,12 @@ def main() -> int:
     input_folder = resolve_repo_path(repo, args.raw, "apkfiles")
     should_extract = bool(args.extract or args.raw or args.force or args.no_resume)
 
+    # The sidecar can only certify repository raw data. Refuse before entry
+    # extraction, not after it has left entries/runtime at different generations.
+    if should_extract and input_folder.resolve() != (repo / "apkfiles").resolve() and not args.dry_run:
+        print("ERROR: external --raw cannot be certified; copy raw files into repository apkfiles before ingest. No pipeline steps ran.", file=sys.stderr)
+        return 2
+
     steps: List[Dict[str, Any]] = []
     pipeline_cmd = [sys.executable, str(tools_dir / PIPELINE_SCRIPT)]
     if should_extract:
@@ -181,7 +219,12 @@ def main() -> int:
     if final_code == 0 and not args.skip_post_checks:
         post_steps = list(FAST_POST_PIPELINE_STEPS)
         for raw_step in post_steps:
-            result = run_command(repo, step_command(tools_dir, raw_step), raw_step.split()[0], args.dry_run)
+            command = step_command(tools_dir, raw_step)
+            if raw_step == PASSIVE_REGISTRY_STEP and should_extract:
+                # Same raw source as extraction. The writer rejects an external
+                # source before it can replace the repository's trusted sidecar.
+                command += ["--input", str(input_folder)]
+            result = run_command(repo, command, raw_step.split()[0], args.dry_run)
             steps.append(result)
             if result["returnCode"] != 0:
                 final_code = result["returnCode"] or 1
@@ -210,6 +253,7 @@ def main() -> int:
             "Fresh game JSON files are expected in apkfiles by default when extraction is requested."
         ],
         "steps": steps,
+        "passiveDefinitionRegistry": passive_registry_freshness(steps, args),
         "entryPipelineReport": read_json(repo / ENTRY_PIPELINE_REPORT, {}) if not args.dry_run else {},
         "orderSummary": summarize_order_reports(repo) if not args.dry_run else {},
         "runtimeSummary": summarize_runtime_manifest(repo) if not args.dry_run else {},
@@ -236,6 +280,7 @@ def main() -> int:
         "report": str(report_path),
         "fullAudit": args.full_audit,
         "validationSummary": report["validationSummary"],
+        "passiveDefinitionRegistry": report["passiveDefinitionRegistry"],
         "fieldContractSummary": report["fieldContractSummary"],
         "liveDataConfigSummary": report["liveDataConfigSummary"],
     }, ensure_ascii=False, indent=2))

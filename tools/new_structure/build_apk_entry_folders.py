@@ -23,6 +23,7 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple, Set
 
 from entry_checkpoint import load_marker as load_entry_marker
 from entry_checkpoint import write_marker as write_entry_marker
+from passive_definition_sources import PASSIVE_DEPENDENCY_VERSION, passive_dependency_digests
 from path_utils import find_repo_root, resolve_repo_path
 
 SCRIPT_VERSION = "8-semantic-authorities"
@@ -373,7 +374,7 @@ def dependency_fingerprint_for_ability(ability_id: str, resolvers: Dict[str, Dic
     return fp
 
 
-def build_source_marker(item: Optional[Dict[str, Any]], category: str, internal_id: str, order_index: int, display_name: Optional[str], resolvers: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
+def build_source_marker(item: Optional[Dict[str, Any]], category: str, internal_id: str, order_index: int, display_name: Optional[str], resolvers: Dict[str, Dict[str, Any]], passive_dependency: Optional[str] = None) -> Dict[str, Any]:
     script_version = category_script_version(category)
     if item is None:
         material = {"placeholder": True, "category": category, "internalId": internal_id, "order": order_index, "displayName": display_name, "scriptVersion": script_version}
@@ -387,6 +388,12 @@ def build_source_marker(item: Optional[Dict[str, Any]], category: str, internal_
     }
     if category != "characters":
         dependency_material["displayAuthority"] = display_authority(item, category, resolvers)
+    if passive_ids and passive_dependency:
+        # Slice A: exact Buff/condition/stack closure digest computed from raw bytes by
+        # passive_definition_sources (Buff-ID passives are invisible to the Ability-only
+        # fingerprint above). Only entries with own passive refs get this material, so
+        # accessories and passive-less forms keep their existing dependencyHash.
+        dependency_material["passiveDependency"] = {"version": PASSIVE_DEPENDENCY_VERSION, "digest": passive_dependency}
     source_material = {"category": category, "internalId": internal_id, "order": order_index, "displayName": display_name, "raw": item, "scriptVersion": script_version}
     return {"scriptVersion": script_version, "sourceHash": sha256_data(source_material), "dependencyHash": sha256_data(dependency_material)}
 
@@ -808,6 +815,7 @@ def build_category(
     if category == "weapons":
         resolvers["WeaponFamilyDescriptions"] = weapon_family_descriptions(items, resolvers["Localizable"])
     by_id = {get_internal_id(item): item for item in items}
+    passive_digests = passive_dependency_digests(input_dir, category, repo_root)
     family_rarities = character_family_rarities(items) if category == "characters" else {}
     ordered: List[Tuple[str, Optional[str]]] = []
     seen: Set[str] = set()
@@ -850,7 +858,7 @@ def build_category(
         entry_path = entries_dir / filename
         item = by_id.get(internal_id)
         resolved_rarity = family_rarities.get(family_from_internal_id(internal_id)) if category == "characters" else None
-        marker = build_source_marker(item, category, internal_id, order_index, display_name, resolvers)
+        marker = build_source_marker(item, category, internal_id, order_index, display_name, resolvers, passive_digests.get(internal_id))
         if not start_allowed:
             if internal_id == effective_start_after:
                 start_allowed = True
