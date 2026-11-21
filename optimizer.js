@@ -44,6 +44,7 @@ const EQUIPMENT_AFFINITY_TERMS = ["burn","poison","sleep","stun","heal","turn","
 let equipmentTextCache = new WeakMap();
 let equipmentTagCache = new WeakMap();
 let equipmentRecommendationCache = new WeakMap();
+let equipmentLoadPromise = null;
 
 function resetEquipmentCaches() {
   equipmentTextCache = new WeakMap();
@@ -60,6 +61,7 @@ const state = {
   mode: "story",
   exampleMode: false, // when true, slots can show units not owned (greyed out)
   equipmentRuntime: { weapons: [], accessories: [], counts: {} },
+  equipmentLoading: false,
 };
 
 function el(id) { return document.getElementById(id); }
@@ -280,9 +282,27 @@ function normalizeRuntimeArray(chunk) {
 }
 
 async function loadOptimizerRuntimeIfAvailable() {
-  if (window.loadOptimizerRuntime && !window.OptimizerRuntime?.loaded) {
-    try { await window.loadOptimizerRuntime({ skipHeavy: true }); } catch (err) { console.warn("[Optimizer] Runtime load failed; equipment pairing disabled.", err); }
+  if (typeof window.loadOptimizerRuntime === "function") {
+    // Equipment suggestions are optional: a stalled request must not block teams.
+    if (!equipmentLoadPromise) {
+      state.equipmentLoading = true;
+      equipmentLoadPromise = window.loadOptimizerRuntime({ profile: "optimizer-equipment" })
+        .catch(err => console.warn("[Optimizer] Equipment load failed.", err))
+        .then(() => {
+          state.equipmentLoading = false;
+          hydrateEquipmentRuntime();
+          if (state.layout && state.locks) renderAll();
+        })
+        .catch(err => console.error("[Optimizer] Equipment display failed.", err))
+        .finally(() => { equipmentLoadPromise = null; });
+    }
+    try { await window.loadOptimizerRuntime({ profile: "optimizer-foundation" }); }
+    catch (err) { console.warn("[Optimizer] Character intelligence load failed.", err); }
   }
+  hydrateEquipmentRuntime();
+}
+
+function hydrateEquipmentRuntime() {
   const chunks = window.OptimizerRuntime?.chunks || {};
   const weapons = normalizeRuntimeArray(chunks.weapons);
   const accessories = normalizeRuntimeArray(chunks.accessories);
@@ -308,6 +328,14 @@ function updateOptimizerRuntimeStatus() {
     `skills ${counts.skillProfiles || normalizeRuntimeArray(chunks.skillProfiles).length || 0}`,
     `evidence ${counts.featureEvidence || normalizeRuntimeArray(chunks.featureEvidence).length || 0}`,
   ];
+  const contracts = window.OptimizerRuntime?.contracts || {};
+  const missingEquipment = ["weapons", "accessories"].filter(key =>
+    !Object.prototype.hasOwnProperty.call(chunks, key) || window.OptimizerRuntime?.errors?.[key]
+  );
+  if (missingEquipment.length) parts.push(state.equipmentLoading
+    ? "Equipment: loading..."
+    : `Equipment unavailable: ${missingEquipment.join(", ")}. Reload to retry.`);
+  if (contracts.optimizerFoundationReady !== true) parts.push("Character intelligence incomplete");
   status.textContent = `Runtime: ${parts.join(" • ")}`;
 }
 
