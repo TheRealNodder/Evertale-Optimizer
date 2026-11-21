@@ -25,6 +25,272 @@ EXCLUDED_PATH_PARTS = {"legacy", "Legacy", "_weapon_duplicate_quarantine", "_bos
 WEAPON_FAMILY_MODE = "weapon_family_handle_source_of_truth"
 
 
+PASSIVE_REGISTRY_FILE = "passive_definition_registry.json"
+PASSIVE_RAW_SOURCES = {"characters": ("Monster.json", "Monster"), "weapons": ("Weapon.json", "Weapon"), "bosses": ("Boss.json", "Monster")}
+
+
+def expected_passive_occurrences(repo_root: Path) -> List[tuple]:
+    """Exact occurrence tuples, including the selected raw field, independent of registry."""
+    from passive_definition_sources import ordered_passive_keys
+    out: List[tuple] = []
+    for category, (fname, root_key) in PASSIVE_RAW_SOURCES.items():
+        raw = load_json(repo_root / "apkfiles" / fname, {}) or {}
+        rows = raw.get(root_key, []) if isinstance(raw, dict) else []
+        keyed_rows = enumerate(rows) if isinstance(rows, list) else rows.items() if isinstance(rows, dict) else []
+        for index, row in keyed_rows:
+            if not isinstance(row, dict):
+                continue
+            raw_field = "passives" if "passives" in row else "passiveSkills"
+            passives = row.get(raw_field)
+            if isinstance(passives, dict):
+                pairs = [(k, passives[k]) for k in ordered_passive_keys(passives)]
+            elif isinstance(passives, list):
+                pairs = [(str(i), v) for i, v in enumerate(passives)]
+            else:
+                pairs = []
+            for position, pid in pairs:
+                if isinstance(pid, str):
+                    pointer = "/" + "/".join(str(p).replace("~", "~0").replace("/", "~1") for p in (root_key, index))
+                    sid = row.get("name")
+                    if not isinstance(sid, str):
+                        sid = index if isinstance(index, str) else None
+                    out.append((category, sid, pointer, str(position), pid, raw_field))
+    return out
+
+
+def occurrence_key(occ: Dict[str, Any]) -> tuple:
+    return (occ.get("category"), occ.get("sourceId"), occ.get("rawPointer"), str(occ.get("position")), occ.get("passiveId"), occ.get("rawField"))
+
+
+def _validate_passive_authority(repo_root: Path, path: Path, registry: Dict[str, Any], errors: List[str]) -> tuple:
+    """Recompute authority from raw files; registry claims never supply the expected values."""
+    import passive_definition_sources as pds
+
+    issues: List[str] = []
+    checked = failed = 0
+    try:
+        sources, graph = pds.load_sources(repo_root / "apkfiles", repo_root)
+        sources.ensure_valid()
+        exact_registry, duplicates, _ = pds.parse_exact(path.read_bytes())
+        if duplicates:
+            raise pds.ExactJSONError("registry contains duplicate object keys")
+        if registry.get("sourceFiles") != sources.files:
+            issues.append("sourceFiles must exactly cover the actual source files and their byte metadata")
+        for field, value in (("fingerprintContract", pds.FINGERPRINT_CONTRACT_VERSION),
+                             ("passiveDependencyVersion", pds.PASSIVE_DEPENDENCY_VERSION),
+                             ("producerVersion", pds.PRODUCER_VERSION),
+                             ("modelingScope", "new_structured_buff_registry_payload")):
+            if registry.get(field) != value:
+                issues.append(f"Unexpected {field}")
+        if registry.get("sourceDiagnostics") != sources.diagnostics:
+            issues.append("sourceDiagnostics differ from actual raw-source diagnostics")
+
+        expected_digests: Dict[str, Dict[str, str]] = {}
+        reached = {}
+        occurrence_counts = {c: 0 for c in pds.OCCURRENCE_TABLES}
+        resolution_counts = {k: 0 for k in ("resolved", "missing", "ambiguous")}
+        completeness_counts = {k: 0 for k in ("complete", "partial", "unresolved")}
+        expected_unresolved = set()
+        axes = {}
+        for category, rows in sources.occurrence_rows.items():
+            for key, row in rows:
+                sid = sources.row_identity(key, row)
+                refs = sources.passive_refs(row)
+                if not refs:
+                    if sid is not None:
+                        expected_digests.setdefault(category, {}).pop(sid, None)
+                    continue
+                digest, closure = graph.entry_digest(refs)
+                if sid is not None:
+                    expected_digests.setdefault(category, {})[sid] = digest
+                reached.update(closure["nodes"])
+                for kind, field in (("missing_reference", "missing"), ("ambiguous_definition", "ambiguous")):
+                    for node in closure[field]:
+                        expected_unresolved.add(json.dumps({"kind": kind, "node": node, "category": category, "sourceId": sid}, sort_keys=True))
+                for _, pid in refs:
+                    if pid not in axes:
+                        axes[pid] = (graph.resolution("Buff", pid), graph.closure([pid])["dependencyCompleteness"])
+                    resolution, completeness = axes[pid]
+                    occurrence_counts[category] += 1
+                    resolution_counts[resolution] += 1
+                    completeness_counts[completeness] += 1
+        actual_digests = registry.get("entryDependencyDigests")
+        # Ignore empty category maps only; every actual digest VALUE is compared.
+        if not isinstance(actual_digests, dict) or {k: v for k, v in actual_digests.items() if v} != {k: v for k, v in expected_digests.items() if v}:
+            issues.append("entryDependencyDigests keys or values differ from recomputed raw-source digests")
+
+        definitions = registry.get("definitions")
+        if not isinstance(definitions, dict) or any(not isinstance(g, dict) for g in definitions.values()):
+            raise pds.ExactJSONError("definitions must be namespace maps")
+        actual_nodes = {f"{ns}/{ident}": entry for ns, group in definitions.items() for ident, entry in group.items()}
+        if set(actual_nodes) != set(reached):
+            issues.append(f"Definition coverage differs from raw-source closure: missing={len(set(reached) - set(actual_nodes))} unexpected={len(set(actual_nodes) - set(reached))}")
+        from collections import Counter
+        expected_summary = {"occurrences": sum(occurrence_counts.values()), "occurrencesByCategory": occurrence_counts,
+                            "entriesWithPassiveDigest": {c: len(v) for c, v in expected_digests.items()},
+                            "definitionsReached": dict(Counter(n.split("/", 1)[0] for n in reached)),
+                            "dependencyCompleteness": completeness_counts, "definitionResolution": resolution_counts}
+        if json.dumps(registry.get("summary"), sort_keys=True) != json.dumps(expected_summary, sort_keys=True):
+            issues.append("summary differs from recomputed raw-source counts/status axes")
+        if registry.get("unresolved") != [json.loads(item) for item in sorted(expected_unresolved)]:
+            issues.append("unresolved differs from recomputed raw-source closures")
+        source_bytes = {loaded[2]: loaded[1] for loaded in sources._roots.values() if loaded is not None}
+        exact_definitions = exact_registry.get("definitions")
+        for nid, material in reached.items():
+            ns, ident = nid.split("/", 1)
+            entry = actual_nodes.get(nid)
+            if not isinstance(entry, dict):
+                continue  # Coverage error above; never counted as verified.
+            if entry.get("definitionResolution") != material["resolution"]:
+                issues.append(f"Wrong definitionResolution: {nid}")
+            if ns == "StackName":
+                if any(entry.get(k) != material[k] for k in ("members", "ambiguousMembers")):
+                    issues.append(f"Wrong stack membership: {nid}")
+                continue
+            if ns in ("Summon", "Weapon"):
+                continue
+            expected = graph.candidates(ns, ident)
+            candidates = entry.get("candidates")
+            if not isinstance(candidates, list) or len(candidates) != len(expected):
+                issues.append(f"Candidate coverage mismatch: {nid}")
+                continue
+            exact_entry = exact_definitions.get(ns).get(ident)
+            exact_candidates = exact_entry.get("candidates").items()
+            for index, (candidate, original) in enumerate(zip(candidates, expected)):
+                if not isinstance(candidate, dict):
+                    failed += 1
+                    issues.append(f"Invalid candidate: {nid}")
+                    continue
+                data = source_bytes.get(candidate.get("file"))
+                rng = candidate.get("byteRange")
+                if data is None or not isinstance(rng, list) or len(rng) != 2 or any(type(n) is not int for n in rng) or not 0 <= rng[0] < rng[1] <= len(data):
+                    failed += 1
+                    issues.append(f"Unverifiable candidate file/byteRange: {nid}")
+                    continue
+                checked += 1
+                expected_meta = {"file": original.file, "pointer": original.pointer, "ordinal": original.ordinal,
+                                 "byteRange": original.byte_range, "canonicalContentHash": original.canonical_content_hash(),
+                                 "rawTokenHash": original.raw_token_hash(), "tokenStreamHash": original.token_stream_hash()}
+                raw_source = exact_candidates[index].get("source")
+                if (type(candidate.get("ordinal")) is not int
+                        or any(candidate.get(k) != v for k, v in expected_meta.items())
+                        or pds.sha256_bytes(data[rng[0]:rng[1]]) != candidate.get("rawTokenHash")
+                        or raw_source is None or pds.source_text(raw_source) != pds.source_text(original.node)):
+                    failed += 1
+                    issues.append(f"Candidate provenance/hash/source mismatch: {nid}")
+            if ns in ("Buff", "MonsterConditions"):
+                expected_edges = [{"candidateOrdinal": ordinal, "fieldPointer": ptr, "targetNamespace": tns,
+                                   "targetId": tid, "role": role, "keyRef": key_ref}
+                                  for ordinal, ptr, tns, tid, role, key_ref in graph.edges_of(ns, ident)]
+                if entry.get("edges") != expected_edges:
+                    issues.append(f"Typed edges differ from raw source: {nid}")
+        # Localization is a legacy-entry assertion, not a Buff-definition assertion.
+        # Derive it from entry files independently of registry-provided flags.
+        localization = {}
+        for category in pds.OCCURRENCE_TABLES:
+            flags = localization.setdefault(category, {})
+            for entry_path in sorted((repo_root / "apkfiles" / "entries" / category / "entries").glob("*.json")):
+                legacy = load_json(entry_path, {})
+                if isinstance(legacy, dict) and isinstance(legacy.get("sourceId"), str):
+                    passives = (legacy.get("resolved") or {}).get("passives") or {}
+                    if isinstance(passives, dict):
+                        flags[legacy["sourceId"]] = {pid: bool((value or {}).get("found")) for pid, value in passives.items()}
+        for occurrence in registry.get("occurrences", []):
+            pid = occurrence.get("passiveId")
+            closure = graph.closure([pid])
+            if (occurrence.get("definitionResolution") != graph.resolution("Buff", pid)
+                    or occurrence.get("dependencyCompleteness") != closure["dependencyCompleteness"]
+                    or occurrence.get("buffDefinitionFound") != (graph.resolution("Buff", pid) != "missing")):
+                issues.append(f"Occurrence resolution/completeness differs from raw source: {pid}")
+            if (occurrence.get("modelingScope") != "new_structured_buff_registry_payload"
+                    or occurrence.get("legacyHeuristicBehavior") != "preserved"):
+                issues.append(f"Occurrence modeling/heuristic scope changed: {pid}")
+            legacy_flag = localization.get(occurrence.get("category"), {}).get(occurrence.get("sourceId"), {}).get(pid)
+            if occurrence.get("localizationFound") is not legacy_flag:
+                issues.append(f"Occurrence localizationFound differs from legacy entries: {pid}")
+    except (pds.ExactJSONError, OSError, UnicodeError, ValueError, TypeError, AttributeError, IndexError) as exc:
+        issues.append(f"Raw-source integrity cannot be verified: {exc}")
+    if issues:
+        errors.extend(f"[passive-registry] {issue}" for issue in issues[:10])
+        if len(issues) > 10:
+            errors.append(f"[passive-registry] {len(issues) - 10} additional integrity failures")
+    return checked, failed
+
+
+def validate_passive_registry(repo_root: Path, base: Path, errors: List[str], warnings: List[str]) -> Dict[str, Any]:
+    """Slice A sidecar: schema, freshness, joins, raw-slice integrity and loading isolation."""
+    initial_errors = len(errors)
+    path = base / "runtime" / PASSIVE_REGISTRY_FILE
+    registry = load_json(path, None)
+    if not isinstance(registry, dict):
+        errors.append(f"[passive-registry] Missing or unreadable {path}")
+        return {"status": "missing"}
+    if type(registry.get("schemaVersion")) is not int or registry.get("schemaVersion") != 1 or registry.get("mechanicModeled") is not False:
+        errors.append("[passive-registry] Unexpected schemaVersion or mechanicModeled flag")
+    diagnostics = registry.get("sourceDiagnostics")
+    if not isinstance(diagnostics, list) or any(not isinstance(d, dict) for d in diagnostics):
+        errors.append("[passive-registry] sourceDiagnostics must be an array of objects")
+        return {"status": "failed"}
+    if any(d.get("kind") in ("source_parse_error", "missing_source_file", "missing_root_key", "ambiguous_record_fields")
+           for d in diagnostics):
+        errors.append("[passive-registry] Fatal source diagnostics: registry cannot be certified")
+    # A2: the registry must describe the repository's own raw source (the data the
+    # committed entries were built from). An external --raw input cannot be verified here.
+    if registry.get("sourceRoot") != "apkfiles":
+        errors.append(f"[passive-registry] Registry sourceRoot is {registry.get('sourceRoot')!r}, not repository 'apkfiles'; freshness cannot be verified (copy raw files into apkfiles and rebuild)")
+    from passive_definition_sources import ExactJSONError
+    try:
+        expected_occ = expected_passive_occurrences(repo_root)
+    except ExactJSONError as exc:
+        errors.append(f"[passive-registry] Unsupported raw passive ordering: {exc}")
+        expected_occ = []
+    occurrences = registry.get("occurrences") or []
+    if not isinstance(occurrences, list) or any(not isinstance(o, dict) for o in occurrences):
+        errors.append("[passive-registry] occurrences must be an array of objects")
+        return {"status": "failed"}
+    actual_occ = [occurrence_key(o) for o in occurrences]
+    # A1: exact multiset match of (category, sourceId, rawPointer, position, passiveId), not just a count.
+    from collections import Counter
+    exp_c, act_c = Counter(expected_occ), Counter(actual_occ)
+    missing_occ = list((exp_c - act_c).elements())
+    extra_occ = list((act_c - exp_c).elements())
+    if missing_occ or extra_occ:
+        errors.append(f"[passive-registry] Occurrence mismatch vs raw passives: missing={len(missing_occ)} {missing_occ[:3]} unexpected={len(extra_occ)} {extra_occ[:3]}")
+    definitions = registry.get("definitions") or {}
+    if not isinstance(definitions, dict) or any(not isinstance(g, dict) for g in definitions.values()):
+        errors.append("[passive-registry] definitions must be namespace maps")
+        return {"status": "failed"}
+    buffs = definitions.get("Buff") or {}
+    required_occ_fields = ("category", "sourceId", "rawPointer", "rawField", "position", "passiveId", "ref", "definitionResolution", "dependencyCompleteness", "buffDefinitionFound", "localizationFound", "mechanicModeled", "modelingScope", "legacyHeuristicBehavior")
+    for occ in occurrences:
+        absent = [f for f in required_occ_fields if f not in occ]
+        if absent:
+            errors.append(f"[passive-registry] Occurrence missing provenance fields {absent}: {occurrence_key(occ)}")
+            break
+        pid = occ.get("passiveId")
+        if occ.get("ref") != f"Buff/{pid}":
+            errors.append(f"[passive-registry] Occurrence ref does not match passiveId: {occurrence_key(occ)}")
+            break
+        if occ.get("definitionResolution") != "missing" and pid not in buffs:
+            errors.append(f"[passive-registry] Occurrence references undefined Buff/{pid}")
+            break
+        if occ.get("mechanicModeled") is not False:
+            errors.append("[passive-registry] Occurrence claims mechanicModeled")
+            break
+    integrity_checked, integrity_failed = _validate_passive_authority(repo_root, path, registry, errors)
+    manifest_text = (base / "runtime" / "optimizer_runtime_manifest.json").read_text(encoding="utf-8", errors="replace") if (base / "runtime" / "optimizer_runtime_manifest.json").exists() else ""
+    sw_path = repo_root / "sw.js"
+    sw_text = sw_path.read_text(encoding="utf-8", errors="replace") if sw_path.exists() else ""
+    if PASSIVE_REGISTRY_FILE in manifest_text or PASSIVE_REGISTRY_FILE in sw_text:
+        errors.append("[passive-registry] Registry must stay out of the runtime manifest and service worker")
+    # Partial closures are a known source-data condition (dangling stack names), recorded in
+    # registry.unresolved and the summary below; they are not validator warnings.
+    summary = registry.get("summary") or {}
+    return {"status": "checked" if len(errors) == initial_errors else "failed", "occurrences": len(occurrences), "expectedOccurrences": len(expected_occ), "occurrenceMismatches": len(missing_occ) + len(extra_occ), "integrityChecked": integrity_checked, "integrityFailed": integrity_failed, "summary": summary,
+            "authorityScope": "source provenance, dependency digests, occurrence axes/localization, summary and unresolved closures",
+            "informationalFieldsNotCertified": ["canonicalization", "fieldRules", "loading", "observedBehaviorInventory"]}
+
+
 def find_repo_root(start: Path):
     current = start.resolve()
     for folder in [current] + list(current.parents):
@@ -850,8 +1116,9 @@ def validate(include_optimizer_semantics: bool = True) -> int:
             errors.append(f"[{category}] Duplicate sourceIds in index: {len(rows)}")
 
     semantic_summary = validate_optimizer_semantics(repo_root, base, errors, warnings) if include_optimizer_semantics else {"status": "deferred_until_runtime_rebuild"}
+    passive_registry_summary = validate_passive_registry(repo_root, base, errors, warnings) if include_optimizer_semantics else {"status": "deferred_until_post_pipeline"}
     status = "failed" if errors else "warning" if warnings else "ok"
-    report = {"validatorVersion": 10, "generatedAt": int(time.time()), "status": status, "repoRoot": str(repo_root), "entriesRoot": str(base), "checked": checked, "categoryCounts": category_counts, "bundleCounts": bundle_counts, "markerStatus": marker_status, "duplicateSourceIds": duplicate_source_ids, "semanticSummary": semantic_summary, "errors": errors, "warnings": warnings}
+    report = {"validatorVersion": 10, "generatedAt": int(time.time()), "status": status, "repoRoot": str(repo_root), "entriesRoot": str(base), "checked": checked, "categoryCounts": category_counts, "bundleCounts": bundle_counts, "markerStatus": marker_status, "duplicateSourceIds": duplicate_source_ids, "semanticSummary": semantic_summary, "passiveRegistrySummary": passive_registry_summary, "errors": errors, "warnings": warnings}
     reports_dir = base / "reports"
     write_json(reports_dir / "validation_report.json", report)
     write_json(base / "_markers" / "validate_entries.marker.json", {"schemaVersion": 2, "tool": "validate_entries", "category": "all", "status": status, "lastKey": "validation", "lastSourceId": "", "lastHandle": None, "lastFile": "apkfiles/entries/reports/validation_report.json", "processedCount": checked, "totalCount": checked, "updatedAt": int(time.time()), "extra": {"errors": len(errors), "warnings": len(warnings)}})

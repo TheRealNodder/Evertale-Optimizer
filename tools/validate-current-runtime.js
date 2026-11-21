@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const { createHash } = require('crypto');
 
 const root = path.resolve(__dirname, '..');
 const strict = process.argv.includes('--strict');
@@ -290,7 +291,8 @@ if (!exists(liveCharacterBundlePath)) {
 
 const dataWorkflows = ['.github/workflows/entry-safe-rebuild.yml', '.github/workflows/master-control.yml'];
 const nodeMaintenanceWorkflow = '.github/workflows/node-maintenance.yml';
-const workflows = [...dataWorkflows, nodeMaintenanceWorkflow];
+const pythonAuthoritiesWorkflow = '.github/workflows/python-authorities-pr.yml';
+const workflows = [...dataWorkflows, nodeMaintenanceWorkflow, pythonAuthoritiesWorkflow];
 const activeWorkflowFiles = fs.readdirSync(path.join(root, '.github', 'workflows')).filter(file => /\.ya?ml$/i.test(file));
 if (activeWorkflowFiles.length !== workflows.length) {
   errors.push(`Expected exactly ${workflows.length} active workflows, found ${activeWorkflowFiles.length}: ${activeWorkflowFiles.join(', ')}`);
@@ -328,6 +330,18 @@ if (!exists(nodeMaintenanceWorkflow)) {
   }
   if (/actions\/(?:checkout|setup-node)@v[1-5]\b/.test(yaml)) {
     errors.push(`${nodeMaintenanceWorkflow} still contains a pre-Node-24 action major`);
+  }
+}
+
+if (!exists(pythonAuthoritiesWorkflow)) {
+  errors.push(`Missing active workflow: ${pythonAuthoritiesWorkflow}`);
+} else {
+  // Pin the complete reviewed contract; any edit needs review and a new digest.
+  // Normalize checkout line endings so Windows and hosted Linux agree.
+  const yaml = read(pythonAuthoritiesWorkflow).replace(/\r\n/g, '\n');
+  const approvedHash = '8e6cd4da5e12cd3f2f3a4561df3390dfc8076ed20a1a8ade43fa4ba8d1f0bdb2';
+  if (createHash('sha256').update(yaml, 'utf8').digest('hex') !== approvedHash) {
+    errors.push(`${pythonAuthoritiesWorkflow} differs from the reviewed C3 contract; review the change and update its approved digest`);
   }
 }
 
