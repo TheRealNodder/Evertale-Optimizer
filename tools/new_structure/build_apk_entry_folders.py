@@ -28,6 +28,7 @@ from path_utils import find_repo_root, resolve_repo_path
 
 SCRIPT_VERSION = "8-semantic-authorities"
 LEGACY_CATEGORY_SCRIPT_VERSION = "8-generated-display-authority"
+ACCESSORY_STATS_VERSION = 1
 TOOL_NAME = "build_apk_entry_folders"
 IMAGEKIT_BASE = "https://ik.imagekit.io/r8fsa98s9"
 ROOT_MARKERS = ("apkfiles", "tools")
@@ -388,6 +389,10 @@ def build_source_marker(item: Optional[Dict[str, Any]], category: str, internal_
     }
     if category != "characters":
         dependency_material["displayAuthority"] = display_authority(item, category, resolvers)
+    if category == "accessories":
+        # Invalidate old null-filled normalized stats without changing raw-source
+        # identity or forcing unrelated character/weapon/boss entries to rebuild.
+        dependency_material["accessoryStatsNormalization"] = ACCESSORY_STATS_VERSION
     if passive_ids and passive_dependency:
         # Slice A: exact Buff/condition/stack closure digest computed from raw bytes by
         # passive_definition_sources (Buff-ID passives are invisible to the Ability-only
@@ -532,6 +537,20 @@ def display_authority(item: Dict[str, Any], category: str, resolvers: Dict[str, 
     return {"description": description, "rarity": rarity, "fieldSources": sources}
 
 
+def accessory_stats(item: Dict[str, Any]) -> Dict[str, Any]:
+    """Match the runtime stat engine's raw-first precedence, preserving zero."""
+    fields = {
+        "atk": ("flatAttack", "baseAttack", "atk"),
+        "hp": ("flatMaxHp", "baseMaxHp", "hp"),
+        "spd": ("flatSpeed", "speed", "spd"),
+        "cost": ("cost",),
+    }
+    return {
+        stat: next((item[field] for field in candidates if item.get(field) is not None), None)
+        for stat, candidates in fields.items()
+    }
+
+
 def normalize_entry(item: Dict[str, Any], category: str, order_index: int, display_name_override: Optional[str], resolvers: Dict[str, Dict[str, Any]], marker: Dict[str, Any], resolved_rarity: Optional[str] = None) -> Dict[str, Any]:
     internal_id = get_internal_id(item)
     localizable = resolvers["Localizable"]
@@ -548,6 +567,8 @@ def normalize_entry(item: Dict[str, Any], category: str, order_index: int, displ
     if isinstance(leader_buff, str) and leader_buff not in leader_skills:
         leader_skills.append(leader_buff)
     stats = {"atk": item.get("baseAttack") or item.get("atk"), "hp": item.get("baseMaxHp") or item.get("hp"), "spd": item.get("speed") or item.get("spd"), "cost": item.get("cost")}
+    if category == "accessories":
+        stats = accessory_stats(item)
     image_variants = image_variants_for_entry(category, internal_id)
     return {
         "schemaVersion": 3,
