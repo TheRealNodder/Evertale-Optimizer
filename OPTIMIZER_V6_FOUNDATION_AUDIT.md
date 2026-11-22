@@ -1,6 +1,6 @@
 # Optimizer V6 Foundation Audit
 
-Branch: `codex/optimizer-v6-foundation`  
+Branch: historical implementation checkpoint  
 Baseline: `main` at `b379d6a6`
 
 This checkpoint is limited to the data authorities required by a future V6

@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+from path_utils import display_path, display_report
+
 import json
 import re
 import time
@@ -308,7 +310,7 @@ def load_json(path: Path, fallback: Any = None) -> Any:
 
 def write_json(path: Path, data: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
+    path.write_text(json.dumps(display_report(data, path), indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
 
 
 def resolve_entry_path(base: Path, category_dir: Path, rel_file: str) -> Path:
@@ -1118,7 +1120,7 @@ def validate(include_optimizer_semantics: bool = True) -> int:
     semantic_summary = validate_optimizer_semantics(repo_root, base, errors, warnings) if include_optimizer_semantics else {"status": "deferred_until_runtime_rebuild"}
     passive_registry_summary = validate_passive_registry(repo_root, base, errors, warnings) if include_optimizer_semantics else {"status": "deferred_until_post_pipeline"}
     status = "failed" if errors else "warning" if warnings else "ok"
-    report = {"validatorVersion": 10, "generatedAt": int(time.time()), "status": status, "repoRoot": str(repo_root), "entriesRoot": str(base), "checked": checked, "categoryCounts": category_counts, "bundleCounts": bundle_counts, "markerStatus": marker_status, "duplicateSourceIds": duplicate_source_ids, "semanticSummary": semantic_summary, "passiveRegistrySummary": passive_registry_summary, "errors": errors, "warnings": warnings}
+    report = {"validatorVersion": 10, "generatedAt": int(time.time()), "status": status, "repoRoot": display_path(repo_root), "entriesRoot": display_path(base), "checked": checked, "categoryCounts": category_counts, "bundleCounts": bundle_counts, "markerStatus": marker_status, "duplicateSourceIds": duplicate_source_ids, "semanticSummary": semantic_summary, "passiveRegistrySummary": passive_registry_summary, "errors": errors, "warnings": warnings}
     reports_dir = base / "reports"
     write_json(reports_dir / "validation_report.json", report)
     write_json(base / "_markers" / "validate_entries.marker.json", {"schemaVersion": 2, "tool": "validate_entries", "category": "all", "status": status, "lastKey": "validation", "lastSourceId": "", "lastHandle": None, "lastFile": "apkfiles/entries/reports/validation_report.json", "processedCount": checked, "totalCount": checked, "updatedAt": int(time.time()), "extra": {"errors": len(errors), "warnings": len(warnings)}})

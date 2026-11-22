@@ -11,7 +11,7 @@
   // revision. Keeping them separate prevents a data rebuild from silently
   // removing a loader/cache fix made between game-data releases.
   const DATA_VERSION_BASE = 'entries-1795292921-e4b4885c0cba';
-  const RUNTIME_CACHE_REVISION = 'optimizer-v6-targets-v1';
+  const RUNTIME_CACHE_REVISION = 'optimizer-v6-path-hygiene-v1';
   const DATA_VERSION = `${DATA_VERSION_BASE}-${RUNTIME_CACHE_REVISION}`;
 
   window.EVERTALE_LIVE_CONFIG = Object.freeze({

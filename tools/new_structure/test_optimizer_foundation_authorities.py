@@ -9,6 +9,7 @@ from __future__ import annotations
 import json
 import re
 import unittest
+from test_display_paths import DisplayPathTests
 from pathlib import Path
 from typing import Any, Dict, Iterable, List
 
@@ -712,7 +713,23 @@ class PassiveDefinitionRegistryTests(unittest.TestCase):
             lines = [l for l in proc.stdout.splitlines() if l.startswith("COMMAND:") and "build_passive_definition_registry.py" in l]
             self.assertEqual(len(lines), 1, proc.stdout[-2000:])
             self.assertIn("--input", lines[0])
-            self.assertIn(str(Path(tmp)), lines[0])
+            from path_utils import display_path
+            self.assertIn(display_path(Path(tmp), REPO), lines[0])
+            self.assertNotIn(str(Path(tmp)), lines[0])
+            # Check actual forwarding separately from its sanitized log copy.
+            import run_safe_new_data_ingest as ingest
+            from unittest.mock import patch
+            from contextlib import redirect_stdout
+            import io
+            calls = []
+            def record(repo, command, label, dry_run):
+                calls.append(list(command))
+                return {"label": label, "command": "fixture", "status": "dry_run_skipped", "returnCode": 0}
+            with patch.object(ingest, "run_command", side_effect=record), patch.object(sys, "argv", ["safe-runner", "--extract", "--raw", tmp, "--dry-run"]), redirect_stdout(io.StringIO()):
+                self.assertEqual(ingest.main(), 0)
+            registry_calls = [cmd for cmd in calls if Path(cmd[1]).name == "build_passive_definition_registry.py"]
+            self.assertEqual(len(registry_calls), 1)
+            self.assertEqual(registry_calls[0][-2:], ["--input", str(Path(tmp).resolve())])
 
     def test_external_input_is_labeled_external_not_apkfiles(self) -> None:
         import tempfile

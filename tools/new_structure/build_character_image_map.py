@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+from path_utils import display_path, display_report
+
 import argparse
 import json
 import time
@@ -25,7 +27,7 @@ def load_json(path: Path, fallback: Any = None) -> Any:
 
 def write_json(path: Path, data: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
+    path.write_text(json.dumps(display_report(data, path), ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
 
 
 def image_url(source_id: str, image_base: str) -> str:
@@ -142,7 +144,7 @@ def build_from_families(entries_root: Path, image_base: str) -> Dict[str, Any]:
             result[built["family"]] = built
         else:
             missing.append(rel)
-    return {"map": result, "missing": missing, "skipped": skipped, "source": str(family_dir), "sourceCount": len(rows or [])}
+    return {"map": result, "missing": missing, "skipped": skipped, "source": display_path(family_dir), "sourceCount": len(rows or [])}
 
 
 def write_marker(entries_root: Path, report: Dict[str, Any]) -> None:
@@ -159,7 +161,7 @@ def main() -> int:
     built = build_from_families(entries_root, args.image_base)
     applied_overrides, blocked_overrides = apply_overrides(repo_root, built["map"])
     payload = {"schemaVersion": 3, "generatedAt": int(time.time()), "imageBase": args.image_base.rstrip("/"), "source": built["source"], "count": len(built["map"]), "families": built["map"]}
-    report = {"schemaVersion": 3, "generatedAt": payload["generatedAt"], "entriesRoot": str(entries_root), "output": str(entries_root / "maps" / "character_image_map.json"), "count": payload["count"], "sourceCount": built["sourceCount"], "missingCount": len(built["missing"]), "skippedCount": len(built["skipped"]), "missing": built["missing"], "skipped": built["skipped"], "appliedOverrides": applied_overrides, "blockedOverrides": blocked_overrides}
+    report = {"schemaVersion": 3, "generatedAt": payload["generatedAt"], "entriesRoot": display_path(entries_root), "output": display_path(entries_root / "maps" / "character_image_map.json"), "count": payload["count"], "sourceCount": built["sourceCount"], "missingCount": len(built["missing"]), "skippedCount": len(built["skipped"]), "missing": built["missing"], "skipped": built["skipped"], "appliedOverrides": applied_overrides, "blockedOverrides": blocked_overrides}
     write_json(entries_root / "maps" / "character_image_map.json", payload)
     write_json(entries_root / "reports" / "character_image_map_report.json", report)
     write_marker(entries_root, report)

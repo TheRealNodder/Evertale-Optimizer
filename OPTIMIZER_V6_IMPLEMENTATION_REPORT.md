@@ -1,6 +1,6 @@
 # Evertale Optimizer V6 Implementation Report
 
-Branch: `codex/optimizer-v6-foundation`
+Branch: historical implementation checkpoint
 
 V6 is the public optimizer. V5 remains loaded for comparison fixtures. V4 is
 present only as an explicitly loadable legacy module and is never activated by

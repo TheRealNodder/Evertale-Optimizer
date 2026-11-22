@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+from path_utils import display_command, display_path, display_report
+
 import argparse
 import json
 import subprocess
@@ -54,12 +56,12 @@ def read_json(path: Path, fallback: Any = None) -> Any:
 
 def write_json(path: Path, data: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    path.write_text(json.dumps(display_report(data, path), ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
 def run_command(repo: Path, command: List[str], label: str, dry_run: bool = False) -> Dict[str, Any]:
     started = int(time.time())
-    printable = " ".join(command)
+    printable = " ".join(display_command(command, repo))
     print("\n" + "=" * 78)
     print(f"STEP: {label}")
     print(f"COMMAND: {printable}")
@@ -238,7 +240,7 @@ def main() -> int:
         "status": "ok" if final_code == 0 else "failed",
         "dryRun": args.dry_run,
         "mode": "extract" if should_extract else "safe_rebuild",
-        "inputFolder": str(input_folder) if should_extract else None,
+        "inputFolder": display_path(input_folder) if should_extract else None,
         "force": args.force,
         "fullAudit": args.full_audit,
         "fullAuditDeprecated": bool(args.full_audit),

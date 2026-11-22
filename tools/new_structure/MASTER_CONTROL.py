@@ -6,6 +6,8 @@ keep their existing behavior, and CI/GitHub Actions never open the GUI.
 """
 from __future__ import annotations
 
+from path_utils import display_command, display_path, display_report, display_text
+
 import argparse
 import json
 import os
@@ -33,17 +35,17 @@ def subprocess_env() -> Dict[str, str]:
 
 def write_json(path: Path, data: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
+    path.write_text(json.dumps(display_report(data, path), ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
 
 
 def run_step(repo: Path, label: str, command: List[str], dry_run: bool = False) -> Dict[str, Any]:
     started = time.time()
     result: Dict[str, Any] = {
         "label": label,
-        "command": command,
+        "command": display_command(command, repo),
         "dryRun": dry_run,
         "startedAt": int(started),
-        "cwd": str(repo),
+        "cwd": display_path(repo),
         "encoding": "utf-8/errors=replace",
     }
     print(f"\n[MASTER CONTROL] {label}")
@@ -68,8 +70,8 @@ def run_step(repo: Path, label: str, command: List[str], dry_run: bool = False) 
     result.update({
         "returnCode": proc.returncode,
         "durationSeconds": round(time.time() - started, 3),
-        "stdoutTail": stdout[-6000:],
-        "stderrTail": stderr[-6000:],
+        "stdoutTail": display_text(stdout[-6000:], repo),
+        "stderrTail": display_text(stderr[-6000:], repo),
     })
     if stdout:
         print(stdout)
@@ -133,10 +135,10 @@ def run_master_control(repo: Path, args: argparse.Namespace) -> int:
     report: Dict[str, Any] = {
         "schemaVersion": MASTER_SCHEMA_VERSION,
         "generatedAt": int(time.time()),
-        "repoRoot": str(repo),
-        "launchedFrom": str(Path.cwd()),
+        "repoRoot": display_path(repo),
+        "launchedFrom": display_path(Path.cwd()),
         "mode": mode,
-        "inputFolder": str(resolve_repo_path(repo, args.input, "apkfiles")) if args.extract else None,
+        "inputFolder": display_path(resolve_repo_path(repo, args.input, "apkfiles")) if args.extract else None,
         "dryRun": bool(args.dry_run),
         "resume": not args.no_resume,
         "subprocessEncoding": "utf-8/errors=replace",

@@ -74,7 +74,7 @@ node tools/test-theme-runtime.mjs
 node tools/run_optimizer_v6_foundation_tests.js
 node tools/validate-recovered-formulas.mjs
 node tools/audit_optimizer_v6_catalog.js --intelligence probe
-node tools/audit_optimizer_v6_catalog.js --profile C:\Users\josue\Downloads\evertale-roster-profiles-2026-07-12T02-10-55-343Z.json --intelligence probe
+node tools/audit_optimizer_v6_catalog.js --profile ./external-roster-profile.json --intelligence probe
 ```
 
 Results: Python authority tests 13/13; warning-repair tests 11/11; V6 fixtures
