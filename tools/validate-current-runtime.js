@@ -235,7 +235,7 @@ for (const accessibilityContract of ['aria-pressed', 'aria-live="polite"', 'aria
 for (const behaviorContract of ['updateAdvancedControlsSummary', 'updateOwnedBuildAvailability', 'syncModeButtons']) {
   if (!optimizerSource.includes(behaviorContract)) errors.push(`Optimizer sidebar behavior is missing: ${behaviorContract}`);
 }
-if (!optimizerHtml.includes('optimizer-v6-loader.js?v=10') || !v6LoaderSource.includes('optimizer-v6-local-meta.js') || !v6LoaderSource.includes('optimizer-v6-skill-model.js')) {
+if (!optimizerHtml.includes('optimizer-v6-loader.js?v=12') || !v6LoaderSource.includes('optimizer-v6-local-meta.js') || !v6LoaderSource.includes('optimizer-v6-skill-model.js')) {
   errors.push('Optimizer V6 local-meta module is not in the current public loader chain');
 }
 for (const level of ['standard', 'deep', 'ultra']) {

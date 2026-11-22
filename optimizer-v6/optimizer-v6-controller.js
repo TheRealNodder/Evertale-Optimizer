@@ -54,7 +54,7 @@
     if(typeof Worker!=='function'){
       const result=root.engine.run(prepared,{...options,preparedV6:true,onProgress:progress=>emit(progress,options)});if(result?.diagnostics?.v6Failed)throw new Error(result.diagnostics.v6Error);writeCache(key,result);return result;
     }
-    const jobId=`v6-${Date.now()}-${++sequence}`,worker=new Worker('./optimizer-v6/optimizer-v6-worker.js?v=10');
+    const jobId=`v6-${Date.now()}-${++sequence}`,worker=new Worker('./optimizer-v6/optimizer-v6-worker.js?v=12');
     return new Promise((resolve,reject)=>{
       active={jobId,worker,reject};
       worker.onmessage=event=>{
