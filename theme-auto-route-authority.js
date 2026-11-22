@@ -109,7 +109,7 @@
     if(document.querySelector('script[src*="theme-motion.js"]'))return;
     const load=()=>{
       if(document.querySelector('script[src*="theme-motion.js"]'))return;
-      const script=document.createElement('script');script.src='./theme-motion.js?v=1';script.defer=true;
+      const script=document.createElement('script');script.src='./theme-motion.js?v=2';script.defer=true;
       document.head.appendChild(script);
     };
     if(window.EvertaleMotionProfiles){load();return;}

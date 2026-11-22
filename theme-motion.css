@@ -5,7 +5,38 @@
 .themeMotionScene[data-illustrated="true"]{opacity:1}
 .themeMotionArt{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:64% center;opacity:.74;pointer-events:none}
 @media(max-width:480px){.themeMotionArt{object-position:center}}
-.themeMotionScene[data-illustrated="true"]>.themeMotionLayer>svg{opacity:.42}
+.themeMotionScene[data-illustrated="true"]>.themeMotionLayer>svg{opacity:.72}
+/* The painting itself breathes: a slow pan/zoom, compositor-only. */
+.themeMotionArt{transform-origin:62% 50%;animation:theme-art-drift 40s ease-in-out infinite alternate}
+html[data-theme-illustrated] .pokemonEncounter__ambient{transform-origin:66% 45%;animation:theme-art-drift 34s ease-in-out infinite alternate}
+@keyframes theme-art-drift{from{transform:scale(1.03) translate3d(0,0,0)}to{transform:scale(1.11) translate3d(-2.4%,-1.6%,0)}}
+/* Ambient particles float above the page (never over menus), click-through. */
+.themeMotionParticles{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:5;contain:strict}
+.themeMotionParticles[hidden]{display:none!important}
+.themeMotionParticle{position:absolute;left:var(--x);top:0;width:var(--s);height:var(--s);border-radius:50%;background:var(--c);opacity:0;will-change:transform,opacity;
+  animation:theme-particle-fall var(--d) linear var(--delay) infinite}
+.themeMotionParticles:is([data-particles="embers"],[data-particles="bubbles"],[data-particles="fireflies"],[data-particles="motes"]) .themeMotionParticle{animation-name:theme-particle-rise}
+.themeMotionParticles[data-particles="embers"] .themeMotionParticle{box-shadow:0 0 8px 2px var(--c)}
+.themeMotionParticles[data-particles="fireflies"] .themeMotionParticle{width:5px;height:5px;box-shadow:0 0 10px 3px var(--c)}
+.themeMotionParticles[data-particles="motes"] .themeMotionParticle{width:3px;height:3px;box-shadow:0 0 6px 1px var(--c)}
+.themeMotionParticles[data-particles="bubbles"] .themeMotionParticle{background:transparent;border:1.5px solid var(--c);box-shadow:inset 0 0 4px var(--c)}
+.themeMotionParticles[data-particles="snow"] .themeMotionParticle{background:var(--site-theme-ink);box-shadow:0 0 4px rgba(255,255,255,.6)}
+.themeMotionParticles[data-particles="ash"] .themeMotionParticle{background:color-mix(in srgb,var(--c) 45%,#3b3b3b);border-radius:30%}
+.themeMotionParticles:is([data-particles="petals"],[data-particles="leaves"]) .themeMotionParticle{width:calc(var(--s) + 6px);height:calc(var(--s) + 2px);border-radius:70% 0 70% 0}
+.themeMotionParticles[data-particles="petals"] .themeMotionParticle{background:color-mix(in srgb,var(--c) 55%,#ffc1dc)}
+.themeMotionParticles[data-particles="confetti"] .themeMotionParticle{width:6px;height:11px;border-radius:1px}
+.themeMotionParticles[data-particles="rain"] .themeMotionParticle{width:1.5px;height:26px;border-radius:1px;background:linear-gradient(transparent,var(--site-theme-ink));animation-name:theme-particle-rain}
+.themeMotionParticles[data-particles="wind"] .themeMotionParticle{left:0;top:var(--y);width:calc(70px + var(--s) * 12);height:1.5px;border-radius:2px;background:linear-gradient(90deg,transparent,var(--c),transparent);animation-name:theme-particle-wind}
+.themeMotionParticles:is([data-particles="stars"],[data-particles="sparkles"]) .themeMotionParticle{top:var(--y);animation-name:theme-particle-twinkle;animation-timing-function:ease-in-out;box-shadow:0 0 6px 1px var(--c)}
+.themeMotionParticles[data-particles="sparkles"] .themeMotionParticle{border-radius:1px;rotate:45deg}
+@keyframes theme-particle-fall{0%{transform:translate3d(0,-12vh,0) rotate(0);opacity:0}8%,90%{opacity:var(--o)}100%{transform:translate3d(var(--dx),112vh,0) rotate(var(--r));opacity:0}}
+@keyframes theme-particle-rise{0%{transform:translate3d(0,112vh,0);opacity:0}10%,85%{opacity:var(--o)}100%{transform:translate3d(var(--dx),-12vh,0);opacity:0}}
+@keyframes theme-particle-rain{0%{transform:translate3d(0,-15vh,0) rotate(10deg);opacity:0}10%,95%{opacity:calc(var(--o) * .8)}100%{transform:translate3d(-6vw,115vh,0) rotate(10deg);opacity:0}}
+@keyframes theme-particle-wind{0%{transform:translate3d(-25vw,0,0);opacity:0}15%,80%{opacity:var(--o)}100%{transform:translate3d(125vw,var(--dx),0);opacity:0}}
+@keyframes theme-particle-twinkle{0%,100%{transform:scale(.5);opacity:.12}50%{transform:scale(1.25);opacity:var(--o)}}
+html[data-theme-motion="paused"] :is(.themeMotionParticle,.themeMotionArt,.pokemonEncounter__ambient){animation-play-state:paused!important}
+html[data-theme-still="true"] .themeMotionParticles{display:none!important}
+html[data-theme-still="true"] :is(.themeMotionArt,.pokemonEncounter__ambient){animation:none!important}
 html[data-theme-illustrated] #siteThemeFx>:is(.siteThemeFx__field,.siteThemeFx__particles){display:none!important}
 html[data-theme-illustrated] .pokemonEncounter__ambient{opacity:1;background:linear-gradient(90deg,var(--site-theme-bg) 0%,color-mix(in srgb,var(--site-theme-bg) 92%,transparent) 26%,transparent 74%),var(--theme-scene-image) 65% 42%/cover}
 html[data-theme-illustrated] .pokemonEncounter__ambient::after{display:none}
@@ -25,7 +56,10 @@ html[data-theme-still="true"] .themeMotionLayer{animation:none!important;transfo
 @media(max-width:700px){
   .themeMotionLayer[data-mobile="false"]{display:none}
   .pokemonEncounter>.themeMotionToggle{right:9px;bottom:9px;padding:6px 8px;font-size:10px}
+  .themeMotionParticle:nth-child(2n){display:none}
 }
 @media(prefers-reduced-motion:reduce){
   .themeMotionLayer{animation:none!important;transform:var(--motion-still-transform);opacity:var(--motion-still-opacity)}
+  .themeMotionParticles{display:none!important}
+  :is(.themeMotionArt,.pokemonEncounter__ambient){animation:none!important}
 }
