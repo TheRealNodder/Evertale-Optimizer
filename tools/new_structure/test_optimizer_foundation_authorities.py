@@ -1066,5 +1066,69 @@ class PassiveReviewRegressionTests(unittest.TestCase):
                     operation()
 
 
+class AccessoryFlatStatsTests(unittest.TestCase):
+    def normalized(self, item, category="accessories"):
+        from build_apk_entry_folders import normalize_entry
+        return normalize_entry(item, category, 1, None, {"Localizable": {}}, {})
+
+    def test_flat_stats_populate_normalized_and_top_level_without_mutating_raw(self):
+        raw = {"name": "Armor01", "flatAttack": 20, "flatMaxHp": 120, "flatSpeed": 4}
+        snapshot = dict(raw)
+        entry = self.normalized(raw)
+        self.assertEqual(entry["stats"], {"atk": 20, "hp": 120, "spd": 4, "cost": None})
+        self.assertEqual([entry[key] for key in ("atk", "hp", "spd")], [20, 120, 4])
+        self.assertEqual(raw, snapshot)
+        self.assertEqual(entry["raw"], snapshot)
+
+    def test_zero_precedence_and_null_fallback_match_raw_first_stat_engine(self):
+        raw = {"name": "Fixture", "flatAttack": 0, "baseAttack": 50, "flatMaxHp": None, "baseMaxHp": 60, "flatSpeed": 0, "speed": 7, "cost": 0}
+        self.assertEqual(self.normalized(raw)["stats"], {"atk": 0, "hp": 60, "spd": 0, "cost": 0})
+        self.assertEqual(self.normalized({"name": "Missing"})["stats"], {"atk": None, "hp": None, "spd": None, "cost": None})
+
+    def test_nonaccessory_normalization_stays_on_existing_base_fields(self):
+        raw = {"name": "Fixture", "flatAttack": 20, "flatMaxHp": 120, "flatSpeed": 4, "baseAttack": 1, "baseMaxHp": 2, "speed": 3}
+        for category in ("characters", "weapons", "bosses"):
+            self.assertEqual(self.normalized(raw, category)["stats"], {"atk": 1, "hp": 2, "spd": 3, "cost": None})
+
+    def test_only_accessory_dependency_changes_and_old_marker_is_invalidated(self):
+        import tempfile
+        from build_apk_entry_folders import build_source_marker, category_script_version, display_authority, existing_marker_matches, localize_character, sha256_data
+        raw = {"name": "Fixture", "flatAttack": 20}
+        resolvers = {"Localizable": {}}
+        for category in ("characters", "weapons", "accessories", "bosses"):
+            legacy_dependencies = {"abilities": {}, "characterLocalization": localize_character({}, "Fixture", "Fixture") if category == "characters" else None, "leaderCondition": None}
+            if category != "characters":
+                legacy_dependencies["displayAuthority"] = display_authority(raw, category, resolvers)
+            marker = build_source_marker(raw, category, "Fixture", 1, None, resolvers)
+            legacy_marker = {**marker, "dependencyHash": sha256_data(legacy_dependencies)}
+            expected_source = {"category": category, "internalId": "Fixture", "order": 1, "displayName": None, "raw": raw, "scriptVersion": category_script_version(category)}
+            self.assertEqual(marker["sourceHash"], sha256_data(expected_source))
+            self.assertEqual(marker != legacy_marker, category == "accessories")
+            with tempfile.TemporaryDirectory() as directory:
+                path = Path(directory) / "entry.json"
+                path.write_text(json.dumps({"_build": legacy_marker}), encoding="utf-8")
+                self.assertEqual(existing_marker_matches(path, marker, False), category != "accessories")
+                path.write_text(json.dumps({"_build": marker}), encoding="utf-8")
+                self.assertTrue(existing_marker_matches(path, marker, False))
+
+    def test_all_source_accessories_reach_entries_bundle_and_runtime_with_exact_stats(self):
+        from build_apk_entry_folders import extract_list
+        raw_rows = extract_list(read_json(REPO / "apkfiles" / "Equipment.json"), "accessories")
+        expected = {row["name"]: row for row in raw_rows}
+        index = read_json(ENTRIES / "accessories" / "index.json")["entries"]
+        entry_rows = [read_json(ENTRIES / "accessories" / row["file"]) for row in index]
+        bundles = bundle_entries("accessories.bundle.json")
+        runtime = read_json(ENTRIES / "runtime" / "optimizer_runtime_accessories.json")["data"]
+        for name, rows in (("entries", entry_rows), ("bundle", bundles), ("runtime", list(runtime.values()))):
+            self.assertEqual({row["sourceId"] for row in rows}, set(expected), name)
+            self.assertEqual(len(rows), len(expected), name)
+            for row in rows:
+                raw = expected[row["sourceId"]]
+                self.assertEqual(row["raw"], raw, (name, row["sourceId"]))
+                stats = {"atk": raw["flatAttack"], "hp": raw["flatMaxHp"], "spd": raw["flatSpeed"], "cost": raw.get("cost")}
+                self.assertEqual(row["stats"], stats, (name, row["sourceId"]))
+                self.assertEqual({key: row[key] for key in stats}, stats, (name, row["sourceId"]))
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

@@ -11,9 +11,10 @@
   const BASE_PATH=LIVE_CONFIG.runtimeBase||'./apkfiles/entries/runtime';
   const HEAVY_CHUNKS=new Set(['abilityGraph','characterEntries']);
   const OPTIMIZER_FOUNDATION_CHUNKS=new Set(['characters','featureEvidence','skillProfiles','leaderProfiles','optimizerKnowledge','tags']);
+  const OPTIMIZER_EQUIPMENT_CHUNKS=new Set(['weapons','accessories']);
 
   let manifestPromise=null;
-  let runtimeLoadPromise=null;
+  const chunkLoadPromises=new Map();
 
   window.OptimizerRuntime=window.OptimizerRuntime||{
     loaded:false,
@@ -52,6 +53,9 @@
         window.OptimizerRuntime.manifest=manifest;
         window.OptimizerRuntime.runtimeFlags=manifest.runtimeFlags||{};
         return manifest;
+      }).catch(err=>{
+        manifestPromise=null;
+        throw err;
       });
     }
     return manifestPromise;
@@ -59,19 +63,27 @@
 
   async function loadOptimizerRuntimeChunk(basePath,key,chunkInfo){
     if(Object.prototype.hasOwnProperty.call(window.OptimizerRuntime.chunks,key))return window.OptimizerRuntime.chunks[key];
+    if(chunkLoadPromises.has(key))return chunkLoadPromises.get(key);
     const file=chunkInfo&&chunkInfo.file;
     if(!file){window.OptimizerRuntime.errors[key]='Chunk is absent from runtime manifest';return null;}
-    try{
-      const payload=await fetchJson(`${basePath}/${file}`);
-      const data=payload&&Object.prototype.hasOwnProperty.call(payload,'data')?payload.data:payload;
-      window.OptimizerRuntime.chunks[key]=data;
-      delete window.OptimizerRuntime.errors[key];
-      return data;
-    }catch(err){
-      window.OptimizerRuntime.errors[key]=String(err&&err.message?err.message:err);
-      console.warn('[OptimizerRuntime] chunk failed:',key,err);
-      return null;
-    }
+    const promise=(async()=>{
+      try{
+        const payload=await fetchJson(`${basePath}/${file}`);
+        const data=payload&&Object.prototype.hasOwnProperty.call(payload,'data')?payload.data:payload;
+        if(OPTIMIZER_EQUIPMENT_CHUNKS.has(key)&&(!data||typeof data!=='object'))throw new Error('Invalid equipment payload');
+        window.OptimizerRuntime.chunks[key]=data;
+        delete window.OptimizerRuntime.errors[key];
+        return data;
+      }catch(err){
+        window.OptimizerRuntime.errors[key]=String(err&&err.message?err.message:err);
+        console.warn('[OptimizerRuntime] chunk failed:',key,err);
+        return null;
+      }finally{
+        chunkLoadPromises.delete(key);
+      }
+    })();
+    chunkLoadPromises.set(key,promise);
+    return promise;
   }
 
   function loadedChunk(key){return Object.prototype.hasOwnProperty.call(window.OptimizerRuntime.chunks,key)&&!window.OptimizerRuntime.errors[key];}
@@ -79,17 +91,22 @@
   function selectedChunkEntries(manifest,profile){
     const chunks=Object.entries(manifest.chunks||{});
     if(profile==='optimizer-foundation')return chunks.filter(([key])=>OPTIMIZER_FOUNDATION_CHUNKS.has(key));
+    if(profile==='optimizer-equipment')return chunks.filter(([key])=>OPTIMIZER_EQUIPMENT_CHUNKS.has(key));
     if(profile==='full')return chunks;
     return chunks.filter(([key])=>!HEAVY_CHUNKS.has(key));
   }
 
   function updateFoundationContract(){
     const missing=[...OPTIMIZER_FOUNDATION_CHUNKS].filter(key=>!loadedChunk(key));
+    const missingEquipment=[...OPTIMIZER_EQUIPMENT_CHUNKS].filter(key=>!loadedChunk(key));
     window.OptimizerRuntime.contracts={
       ...(window.OptimizerRuntime.contracts||{}),
       optimizerFoundationReady:missing.length===0,
       requiredFoundationChunks:[...OPTIMIZER_FOUNDATION_CHUNKS],
-      missingFoundationChunks:missing
+      missingFoundationChunks:missing,
+      optimizerEquipmentReady:missingEquipment.length===0,
+      requiredEquipmentChunks:[...OPTIMIZER_EQUIPMENT_CHUNKS],
+      missingEquipmentChunks:missingEquipment
     };
     return missing;
   }
@@ -100,10 +117,8 @@
     const selected=selectedChunkEntries(manifest,profile);
     if(selected.every(([key])=>loadedChunk(key))){updateFoundationContract();return window.OptimizerRuntime;}
 
-    if(runtimeLoadPromise)await runtimeLoadPromise;
     const remaining=selected.filter(([key])=>!loadedChunk(key));
-    runtimeLoadPromise=Promise.all(remaining.map(([key,info])=>loadOptimizerRuntimeChunk(BASE_PATH,key,info)));
-    try{await runtimeLoadPromise;}finally{runtimeLoadPromise=null;}
+    await Promise.all(remaining.map(([key,info])=>loadOptimizerRuntimeChunk(BASE_PATH,key,info)));
 
     const missingFoundation=updateFoundationContract();
     window.OptimizerRuntime.loaded=true;
@@ -114,7 +129,9 @@
       loaded:Object.keys(window.OptimizerRuntime.chunks),
       failures:{...window.OptimizerRuntime.errors},
       optimizerFoundationReady:missingFoundation.length===0,
-      missingFoundation
+      missingFoundation,
+      optimizerEquipmentReady:window.OptimizerRuntime.contracts.optimizerEquipmentReady,
+      missingEquipment:window.OptimizerRuntime.contracts.missingEquipmentChunks
     };
     window.OptimizerRuntime.loadReports.push(report);
     console.log('[OptimizerRuntime] loaded',report);
