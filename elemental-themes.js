@@ -29,7 +29,7 @@
     const link=d.createElement('link');
     link.id=CSS_ID;
     link.rel='stylesheet';
-    link.href='./elemental-themes.css?v=1';
+    link.href='./elemental-themes.css?v=2';
     d.head.appendChild(link);
   }
 
@@ -85,6 +85,7 @@
     particle.style.setProperty('--drift',`${(-90+seeded(seed+6)*180).toFixed(0)}px`);
     particle.style.setProperty('--spin',`${(-240+seeded(seed+7)*720).toFixed(0)}deg`);
     particle.style.setProperty('--stretch',`${(14+seeded(seed+8)*34).toFixed(0)}px`);
+    particle.style.setProperty('--still-y',`${(8+seeded(seed+9)*82).toFixed(1)}vh`);
     return particle;
   }
 
@@ -114,6 +115,7 @@
     const config=THEMES[key];
     const scene=createScene();
     if(!config){
+      stopDepth();
       activeTheme='';
       scene.hidden=true;
       scene.removeAttribute('data-element');
@@ -127,18 +129,31 @@
   }
 
   function onPointerMove(event){
-    if(!activeTheme||pointerFrame||g.matchMedia?.('(pointer:coarse)').matches)return;
+    if(!activeTheme||pointerFrame||motionPaused()||g.matchMedia?.('(pointer:coarse)').matches)return;
     const x=(event.clientX/Math.max(g.innerWidth,1)-.5)*2;
     const y=(event.clientY/Math.max(g.innerHeight,1)-.5)*2;
     pointerFrame=(g.requestAnimationFrame||g.setTimeout)(()=>{
       pointerFrame=0;
       const scene=d.getElementById(SCENE_ID);
-      if(!scene||scene.hidden)return;
+      if(!scene||scene.hidden||motionPaused())return;
       scene.style.setProperty('--elemental-depth-x',`${(-x*9).toFixed(2)}px`);
       scene.style.setProperty('--elemental-depth-y',`${(-y*7).toFixed(2)}px`);
       scene.style.setProperty('--elemental-front-x',`${(x*13).toFixed(2)}px`);
       scene.style.setProperty('--elemental-front-y',`${(y*10).toFixed(2)}px`);
     },16);
+  }
+
+  function motionPaused(){
+    return d.hidden||d.documentElement.getAttribute('data-theme-motion')==='paused'||g.matchMedia?.('(prefers-reduced-motion: reduce)').matches||d.body?.getAttribute('data-optimizer-searching')==='true';
+  }
+
+  function stopDepth(){
+    if(pointerFrame){
+      if(g.cancelAnimationFrame)g.cancelAnimationFrame(pointerFrame);else g.clearTimeout(pointerFrame);
+      pointerFrame=0;
+    }
+    const scene=d.getElementById(SCENE_ID);
+    if(scene)resetDepth(scene);
   }
 
   function onResize(){
@@ -154,13 +169,12 @@
     d.getElementById('frostbiteThemeScene')?.remove();
     d.getElementById('frostbiteThemeCrown')?.remove();
     d.addEventListener('evertale:theme-applied',sync,true);
+    d.addEventListener('evertale:theme-motion',()=>{if(motionPaused())stopDepth();});
+    d.addEventListener('visibilitychange',()=>{if(motionPaused())stopDepth();});
     g.addEventListener('popstate',sync);
     g.addEventListener('resize',onResize,{passive:true});
     g.addEventListener('pointermove',onPointerMove,{passive:true});
-    d.addEventListener('pointerleave',()=>{
-      const scene=d.getElementById(SCENE_ID);
-      if(scene)resetDepth(scene);
-    });
+    d.addEventListener('pointerleave',stopDepth);
     sync();
   }
 

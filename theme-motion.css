@@ -1,0 +1,31 @@
+/* A single visible stage carries each profile's composed environment and beat.
+   Legacy panel trim stays still, keeping motion away from reading surfaces. */
+.themeMotionScene[hidden]{display:none!important}
+.themeMotionScene{position:absolute;inset:0;overflow:hidden;pointer-events:none;contain:strict;z-index:0;opacity:.65}
+.themeMotionScene[data-illustrated="true"]{opacity:1}
+.themeMotionArt{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:64% center;opacity:.74;pointer-events:none}
+@media(max-width:480px){.themeMotionArt{object-position:center}}
+.themeMotionScene[data-illustrated="true"]>.themeMotionLayer>svg{opacity:.42}
+html[data-theme-illustrated] #siteThemeFx>:is(.siteThemeFx__field,.siteThemeFx__particles){display:none!important}
+html[data-theme-illustrated] .pokemonEncounter__ambient{opacity:1;background:linear-gradient(90deg,var(--site-theme-bg) 0%,color-mix(in srgb,var(--site-theme-bg) 92%,transparent) 26%,transparent 74%),var(--theme-scene-image) 65% 42%/cover}
+html[data-theme-illustrated] .pokemonEncounter__ambient::after{display:none}
+/* An opaque bottom paint under existing panel gradients isolates text from
+   every possible scene frame, including overlapping bright geometry. */
+html[data-theme-scene][data-theme-key][data-theme-material] body[data-theme-key][data-theme-material] :is(.topbar,.panel,.v2-panel,.v2-sidebar,.v2-grid-panel,.v2-detail-panel,.v2-filter-panel,.siteSideMenu){background-color:var(--site-theme-bg)!important}
+.themeMotionLayer,.themeMotionLayer>svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;transform-origin:center}
+.themeMotionLayer>svg{overflow:visible}
+.themeMotionToggle{position:relative;z-index:4;cursor:pointer;border:1px solid var(--site-theme-accent);border-radius:8px;padding:7px 10px;min-height:36px;background:var(--site-theme-bg);color:var(--site-theme-ink);font:700 11px/1.3 system-ui}
+.pokemonEncounter>.themeMotionToggle{position:absolute;right:12px;bottom:12px}
+.themeMotionToggle:focus-visible{outline:3px solid var(--site-theme-ink);outline-offset:3px}
+html[data-theme-scene] :is(.siteThemeFx__field,.siteThemeFx__particles,.legendaryScene *, .legendaryFrame,[data-pokemon-outline]){animation:none!important}
+html[data-theme-scene] .legendaryFrame{opacity:.8!important}
+html[data-theme-scene] .pokemonEncounter__art{animation:none!important;transform:translateY(-50%)}
+html[data-theme-motion="paused"] .themeMotionLayer{animation-play-state:paused!important}
+html[data-theme-still="true"] .themeMotionLayer{animation:none!important;transform:var(--motion-still-transform);opacity:var(--motion-still-opacity)}
+@media(max-width:700px){
+  .themeMotionLayer[data-mobile="false"]{display:none}
+  .pokemonEncounter>.themeMotionToggle{right:9px;bottom:9px;padding:6px 8px;font-size:10px}
+}
+@media(prefers-reduced-motion:reduce){
+  .themeMotionLayer{animation:none!important;transform:var(--motion-still-transform);opacity:var(--motion-still-opacity)}
+}

@@ -77,7 +77,7 @@
     }
 
     const script=document.createElement('script');
-    script.src='./elemental-themes.js?v=1';
+    script.src='./elemental-themes.js?v=2';
     script.defer=true;
     script.addEventListener('load',ready,{once:true});
     script.addEventListener('error',ready,{once:true});
@@ -96,11 +96,27 @@
   }
 
   function ensurePokemonPresence(){
-    if(window.EvertalePokemonPresence){window.EvertalePokemonPresence.sync();return;}
+    if(window.EvertalePokemonPresence){window.EvertalePokemonPresence.sync();ensureThemeMotion();return;}
     if(document.querySelector('script[src*="pokemon-theme-presence.js"]'))return;
     const script=document.createElement('script');script.src='./pokemon-theme-presence.js?v=1';script.defer=true;
+    script.addEventListener('load',ensureThemeMotion,{once:true});
     script.addEventListener('error',()=>console.warn('Pokémon identity layer failed to load; base theme remains available.'),{once:true});
     document.head.appendChild(script);
+  }
+
+  function ensureThemeMotion(){
+    if(window.EvertaleThemeMotion){window.EvertaleThemeMotion.sync();return;}
+    if(document.querySelector('script[src*="theme-motion.js"]'))return;
+    const load=()=>{
+      if(document.querySelector('script[src*="theme-motion.js"]'))return;
+      const script=document.createElement('script');script.src='./theme-motion.js?v=1';script.defer=true;
+      document.head.appendChild(script);
+    };
+    if(window.EvertaleMotionProfiles){load();return;}
+    const existing=document.querySelector('script[src*="theme-motion-profiles.js"]');
+    if(existing){existing.addEventListener('load',load,{once:true});return;}
+    const profiles=document.createElement('script');profiles.src='./theme-motion-profiles.js?v=1';profiles.defer=true;
+    profiles.addEventListener('load',load,{once:true});document.head.appendChild(profiles);
   }
 
   let scheduled=false;
