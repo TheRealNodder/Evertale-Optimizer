@@ -37,8 +37,11 @@ def display_path(value: str | Path, repo_root: str | Path | None = None) -> str:
         except ValueError:
             pass
         canonical, basename = ntpath.normcase(str(resolved)) if os.name == "nt" else str(resolved), resolved.name
-    if re.fullmatch(r"python(?:w)?(?:\d+(?:\.\d+)*)?(?:\.exe)?", basename, re.I):
-        return basename.lower()
+    # Name the interpreter as invoked: on Linux, resolving follows python -> python3.x.
+    raw_name = ntpath.basename(raw) if windows else Path(raw).name
+    for name in (raw_name, basename):
+        if re.fullmatch(r"python(?:w)?(?:\d+(?:\.\d+)*)?(?:\.exe)?", name, re.I):
+            return name.lower()
     # Outside the repo, keep only the filename. A bare user-profile folder name
     # (for example the segment after Users/ or home/) is never published.
     parts = [part for part in re.split(r"[\\/]+", canonical) if part]
