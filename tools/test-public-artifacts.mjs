@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
+import {inspectSceneArtwork} from './scene-artwork.mjs';
 
 const SELF='tools/test-public-artifacts.mjs';
 const ROOT=fileURLToPath(new URL('../',import.meta.url));
@@ -70,4 +71,9 @@ test('all tracked text files, including staged additions, satisfy publication hy
   const leaks=[];
   for(const name of names){const text=decodeText(readFileSync(path.join(ROOT,name)));if(text!==null)leaks.push(...findLeaks(text,name));}
   assert.deepEqual(leaks,[],JSON.stringify(leaks.slice(0,25)));
+});
+
+test('new illustrated scene assets contain no metadata chunks',()=>{
+  const names=execFileSync('git',['ls-files','--cached','-z','assets/themes/scenes'],{cwd:ROOT,encoding:'utf8'}).split('\0').filter(name=>name.endsWith('.webp'));
+  for(const name of names)assert.deepEqual(inspectSceneArtwork(readFileSync(path.join(ROOT,name))).metadata,[],name);
 });

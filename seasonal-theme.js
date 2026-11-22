@@ -22,7 +22,7 @@
     metallicrose:{effect:'dsi-xl',finish:'metallic-rose',hardware:'dsi-xl',aura:'Metallic pink shell with a luminous modern sheen'},
     bronzexl:{effect:'dsi-xl',finish:'bronze',hardware:'dsi-xl',aura:'Dark bronze upper shell with a warm matte base'},
     blackwhitedsi:{effect:'dsi-split',finish:'black-white',hardware:'dsi',aura:'Paired black and white DSi edition shells with restrained dual-dragon traces'},
-    galaxystyle:{effect:'galaxy-shell',finish:'galaxy',hardware:'new-3ds-xl',aura:'Deep navy and violet galaxy lid over a black inner shell'},
+    galaxystyle:{effect:'galaxy-shell',finish:'galaxy',hardware:'new-3ds-xl',aura:'Deep navy and violet galaxy lid over a metallic blue inner shell'},
     superfamicom:{effect:'super-famicom',finish:'warm-plastic',hardware:'new-3ds-ll',aura:'Warm grey hardware with the four Super Famicom button colors'}
   };
   const HANDHELD_KEYS=new Set(Object.keys(HANDHELD_META));
@@ -407,9 +407,42 @@
     return layer;
   }
   function syncThemeMotion(){
-    const value=document.hidden||window.matchMedia?.('(prefers-reduced-motion: reduce)').matches?'paused':'running';
+    const reduced=!!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    const still=reduced||motionPreference()==='off';
+    const value=document.hidden||still||document.body?.getAttribute('data-optimizer-searching')==='true'?'paused':'running';
+    const changed=document.documentElement.getAttribute('data-theme-motion')!==value||document.documentElement.getAttribute('data-theme-still')!==String(still);
     document.documentElement.setAttribute('data-theme-motion',value);
+    document.documentElement.setAttribute('data-theme-still',String(still));
     if(document.body)document.body.setAttribute('data-theme-motion',value);
+    syncMotionControls();
+    if(changed)document.dispatchEvent(new CustomEvent('evertale:theme-motion',{detail:{state:value,still}}));
+  }
+  let motionFallback=null;
+  function motionPreference(){
+    if(motionFallback!==null)return motionFallback;
+    try{return localStorage.getItem('evertale.theme.motion')==='off'?'off':'on';}catch{return'on';}
+  }
+  function motionState(){
+    return{preference:motionPreference(),systemReduced:!!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches};
+  }
+  function syncMotionControls(root=document){
+    const state=motionState(),enabled=state.preference==='on'&&!state.systemReduced;
+    const buttons=root.matches?.('.themeMotionToggle')?[root]:root.querySelectorAll('.themeMotionToggle');
+    buttons.forEach(button=>{
+      button.textContent=state.systemReduced?'Animations off (system setting)':'Animations';
+      button.setAttribute('aria-pressed',String(enabled));
+      button.setAttribute('aria-disabled',String(state.systemReduced));
+      button.removeAttribute('aria-label');
+      button.title=state.systemReduced?'Your device requests reduced motion.':`${enabled?'Disable':'Enable'} theme animations`;
+    });
+  }
+  function bindMotionControl(button){
+    if(!button)return;
+    if(!button.getAttribute('data-motion-bound')){
+      button.setAttribute('data-motion-bound','true');
+      button.addEventListener('click',()=>{if(!motionState().systemReduced)window.EvertaleTheme.setMotionPreference(motionPreference()==='on'?'off':'on');});
+    }
+    syncMotionControls(button);
   }
   function applyTheme(){
     ensureEffectLayer();
@@ -511,6 +544,16 @@
     normalizeThemeKey,
     chooseTheme,
     applyTheme,
+    getMotionPreference:motionPreference,
+    getMotionState:motionState,
+    syncMotionControls,
+    bindMotionControl,
+    setMotionPreference(value){
+      motionFallback=value==='off'?'off':'on';
+      try{localStorage.setItem('evertale.theme.motion',motionFallback);}catch{}
+      syncThemeMotion();
+      document.dispatchEvent(new CustomEvent('evertale:theme-motion'));
+    },
     syncThemeLinks,
     getPreference:pref,
     setPreference(value){
@@ -523,5 +566,8 @@
   document.readyState==='loading'?document.addEventListener('DOMContentLoaded',applyTheme,{once:true}):applyTheme();
   document.addEventListener('visibilitychange',()=>{syncThemeMotion();if(!document.hidden&&pref()===AUTO)applyTheme();});
   window.matchMedia?.('(prefers-reduced-motion: reduce)').addEventListener?.('change',syncThemeMotion);
+  const observeSearch=()=>{if(document.body&&window.MutationObserver)new MutationObserver(syncThemeMotion).observe(document.body,{attributes:true,attributeFilter:['data-optimizer-searching']});};
+  document.readyState==='loading'?document.addEventListener('DOMContentLoaded',observeSearch,{once:true}):observeSearch();
+  window.addEventListener?.('storage',event=>{if(event.key==='evertale.theme.motion'){motionFallback=null;syncThemeMotion();}});
   setInterval(()=>{if(pref()===AUTO)applyTheme();},30*60*1000);
 })();

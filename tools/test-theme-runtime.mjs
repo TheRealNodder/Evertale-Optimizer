@@ -22,12 +22,17 @@ function element(tagName='div'){
     setAttribute(name,value){attributes.set(name,String(value));},
     getAttribute(name){return attributes.get(name)??null;},
     removeAttribute(name){attributes.delete(name);},
-    append(...nodes){children.push(...nodes);this.firstChild=children[0]||null;},
-    appendChild(node){children.push(node);this.firstChild=children[0]||null;return node;},
-    insertBefore(node,before){const index=children.indexOf(before);if(index<0)children.unshift(node);else children.splice(index,0,node);this.firstChild=children[0]||null;return node;},
-    addEventListener(){},
+    append(...nodes){for(const node of nodes)this.appendChild(node);},
+    appendChild(node){node.remove?.();node.parentNode=this;children.push(node);this.firstChild=children[0]||null;return node;},
+    insertBefore(node,before){node.remove?.();node.parentNode=this;const index=children.indexOf(before);if(index<0)children.unshift(node);else children.splice(index,0,node);this.firstChild=children[0]||null;return node;},
+    remove(){if(this.parentNode){const siblings=this.parentNode.children,index=siblings.indexOf(this);if(index>=0)siblings.splice(index,1);this.parentNode=null;}},
+    replaceChildren(...nodes){for(const child of [...children])child.remove?.();children.length=0;this.append(...nodes);},
+    events:new Map(),
+    addEventListener(type,fn){if(!this.events.has(type))this.events.set(type,[]);this.events.get(type).push(fn);},
+    dispatchEvent(event){for(const fn of this.events.get(event.type)||[])fn(event);},
     contains(node){return children.includes(node)||children.some(child=>child.contains?.(node));},
     querySelectorAll(selector){const found=[];const walk=node=>{for(const child of node.children||[]){if(child.matches?.(selector))found.push(child);walk(child);}};walk(this);return found;},
+    querySelector(selector){return this.querySelectorAll(selector)[0]||null;},
     matches(selector){return selector.split(',').some(part=>part.startsWith('.')&&String(this.className).split(' ').includes(part.slice(1)));}
   };
 }
@@ -57,7 +62,8 @@ const document={
   dispatchEvent(event){for(const handler of listeners.get(event.type)||[])handler(event);return true;}
 };
 
-let frameMutations;
+let frameMutations,searchMutations;
+const windowListeners=new Map(),pendingFrames=new Map();let nextFrame=0;
 const context={
   window:null,document,location:{href:'https://example.test/optimizer.html',search:''},
   localStorage:{
@@ -67,10 +73,15 @@ const context={
   URL,URLSearchParams,Intl,Date,Math,Number,String,Object,Array,Set,Map,RegExp,JSON,
   CustomEvent:class CustomEvent{constructor(type,init={}){this.type=type;this.detail=init.detail;}},
   setInterval:()=>0,clearInterval:()=>{},console,
-  MutationObserver:class{constructor(callback){frameMutations=callback;}observe(){}}
+  addEventListener(type,handler){if(!windowListeners.has(type))windowListeners.set(type,[]);windowListeners.get(type).push(handler);},
+  requestAnimationFrame(callback){const id=++nextFrame;pendingFrames.set(id,callback);return id;},
+  cancelAnimationFrame:id=>pendingFrames.delete(id),
+  setTimeout:()=>0,clearTimeout:()=>{},innerWidth:1280,innerHeight:900,
+  MutationObserver:class{constructor(callback){this.callback=callback;}observe(target,options){if(options?.attributeFilter?.includes('data-optimizer-searching'))searchMutations=this.callback;else frameMutations=this.callback;}}
 };
 const reducedMotion={matches:false,addEventListener(type,handler){this.onchange=handler;}};
-context.matchMedia=()=>reducedMotion;
+const mobileMotion={matches:false,addEventListener(type,handler){this.onchange=handler;}};
+context.matchMedia=query=>query.includes('prefers-reduced-motion')?reducedMotion:query==='(max-width:480px)'?mobileMotion:{matches:false,addEventListener(){}};
 context.window=context;
 vm.createContext(context);
 vm.runInContext(source,context,{filename:'seasonal-theme.js'});
@@ -170,7 +181,7 @@ check(!/\balternate\b/i.test(elementalCss),'Elemental CSS contains a rubberbandi
 check(/elementalArtOrbit/.test(elementalCss)&&/elementalSpin/.test(elementalCss),'Elemental CSS is missing its closed-loop motion authorities');
 check(/elementalRise/.test(elementalCss)&&/elementalRain/.test(elementalCss)&&/elementalSnow/.test(elementalCss),'Elemental CSS is missing an off-screen particle loop');
 check(/requestAnimationFrame/.test(elementalSource),'Elemental depth response is not frame-scheduled');
-check(/elemental-themes\.js\?v=1/.test(routeSource),'Theme route authority does not load the elemental compositor');
+check(/elemental-themes\.js\?v=2/.test(routeSource),'Theme route authority does not load the elemental compositor');
 for(const key of expectedElemental){
   const asset=path.join(root,'assets','themes','elemental',`${key}.png`);
   check(fs.existsSync(asset),`Missing elemental background: ${key}.png`);
@@ -202,6 +213,76 @@ check(html.getAttribute('data-theme-motion')==='paused','OS reduced-motion prefe
 reducedMotion.matches=false;
 reducedMotion.onchange();
 check(html.getAttribute('data-theme-motion')==='running','Changing OS reduced-motion preference did not restore normal motion');
+
+// The shared pause state must preserve theme selection and routing authority.
+api.setPreference('auto');
+const autoKey=api.getActiveTheme().key;
+api.setMotionPreference('off');
+check(api.getPreference()==='auto'&&api.getActiveTheme().key===autoKey,'Motion preference changed Auto theme resolution');
+check(html.getAttribute('data-theme-still')==='true'&&html.getAttribute('data-theme-motion')==='paused','User pause did not select a composed still');
+api.setPreference('kyogre');
+check(html.getAttribute('data-theme-motion')==='paused','Theme switching discarded user pause');
+api.setMotionPreference('on');reducedMotion.matches=true;reducedMotion.onchange();
+check(html.getAttribute('data-theme-motion')==='paused','User enabled motion overrode the OS preference');
+reducedMotion.matches=false;reducedMotion.onchange();
+body.setAttribute('data-optimizer-searching','true');searchMutations();
+check(html.getAttribute('data-theme-motion')==='paused'&&html.getAttribute('data-theme-still')==='false','Search did not freeze the current frame');
+document.hidden=true;document.dispatchEvent(new context.CustomEvent('visibilitychange'));
+body.removeAttribute('data-optimizer-searching');searchMutations();
+check(html.getAttribute('data-theme-motion')==='paused','Ending a search resumed a hidden document');
+document.hidden=false;document.dispatchEvent(new context.CustomEvent('visibilitychange'));
+check(html.getAttribute('data-theme-motion')==='running','Visible, idle page did not resume');
+
+vm.runInContext(fs.readFileSync(path.join(root,'theme-motion-profiles.js'),'utf8'),context);
+document.baseURI='https://example.test/app/tools/theme-preview.html';
+document.currentScript={src:'https://example.test/app/theme-motion.js?v=1'};
+vm.runInContext(fs.readFileSync(path.join(root,'theme-motion.js'),'utf8'),context);
+const motion=context.EvertaleThemeMotion;
+check(JSON.stringify([...motion.keys].sort())===JSON.stringify(themes.filter(t=>t.material!=='elemental').map(t=>t.key).sort()),'Motion scenes do not cover the exact72 non-Elemental themes');
+const sceneNode=document.getElementById('themeMotionScene');
+const firstArt=sceneNode.children.find(x=>x.className==='themeMotionArt');
+check(firstArt?.getAttribute('src').startsWith('https://example.test/app/assets/'),'Illustration URL followed the preview directory instead of the shared script');
+mobileMotion.matches=true;mobileMotion.onchange();
+check(firstArt?.getAttribute('src').includes('-mobile.webp'),'Mobile viewport did not select the mobile illustration');
+mobileMotion.matches=false;mobileMotion.onchange();
+const pauseButton=document.querySelectorAll('.themeMotionToggle')[0];
+reducedMotion.matches=true;reducedMotion.onchange();
+check(pauseButton.getAttribute('aria-pressed')==='false'&&pauseButton.getAttribute('aria-disabled')==='true'&&pauseButton.textContent.includes('system setting'),'Motion control misrepresents the system-reduced state');
+pauseButton.dispatchEvent({type:'click'});
+check(api.getMotionPreference()==='on','System-disabled motion control changed the saved preference');
+reducedMotion.matches=false;reducedMotion.onchange();
+check(pauseButton.getAttribute('aria-pressed')==='true'&&pauseButton.getAttribute('aria-disabled')==='false','System preference restoration left the toggle disabled');
+const oldArt=firstArt;
+api.setPreference('groudon');api.setPreference('kyogre');
+const currentArt=sceneNode.children.find(x=>x.className==='themeMotionArt');
+oldArt.dispatchEvent({type:'load'});
+check(!html.getAttribute('data-theme-illustrated'),'A stale image callback exposed a different image generation');
+currentArt.dispatchEvent({type:'load'});oldArt.dispatchEvent({type:'error'});
+check(html.getAttribute('data-theme-illustrated')==='kyogre','A stale error callback hid the current illustration');
+for(let round=0;round<3;round++)for(const theme of themes){
+  api.setPreference(theme.key);
+  check(document.getElementById('themeMotionScene')===sceneNode,`Switching recreated the scene container: ${theme.key}`);
+  if(theme.material==='elemental')check(sceneNode.hidden&&sceneNode.children.length===0,'Elemental switch retained stale procedural scene nodes');
+  else check(!sceneNode.hidden&&sceneNode.children.length===context.EvertaleMotionProfiles[theme.key].layers.length+Number(!!context.EvertaleMotionProfiles[theme.key].art),`Stale or duplicate motion layers: ${theme.key}`);
+}
+check(body.children.filter(x=>x.id==='siteThemeFx').length===1,'Repeated79-theme cycles duplicated the background host');
+
+// Pending pointer work is cancelled on pause and cannot restart while paused.
+api.setPreference('cinderfall');
+vm.runInContext(elementalSource,context,{filename:'elemental-themes.js'});
+const pointer=event=>{for(const fn of windowListeners.get('pointermove')||[])fn(event);};
+pointer({clientX:1000,clientY:700});
+check(pendingFrames.size===1,'Elemental pointer response did not schedule one bounded frame');
+api.setMotionPreference('off');
+check(pendingFrames.size===0,'Pausing left an elemental pointer frame pending');
+pointer({clientX:100,clientY:100});
+check(pendingFrames.size===0,'Paused pointer movement scheduled work');
+api.setMotionPreference('on');pointer({clientX:1000,clientY:700});api.setPreference('winter');
+check(pendingFrames.size===0,'Leaving Elemental themes left pointer work pending');
+const saveStorage=context.localStorage.setItem;
+context.localStorage.setItem=()=>{throw new Error('Storage unavailable');};api.setMotionPreference('off');
+check(api.getMotionPreference()==='off'&&html.getAttribute('data-theme-motion')==='paused','A storage failure broke the in-session pause control');
+context.localStorage.setItem=saveStorage;api.setMotionPreference('on');
 
 if(failures.length){
   console.error(`Theme runtime validation failed (${failures.length}):`);
