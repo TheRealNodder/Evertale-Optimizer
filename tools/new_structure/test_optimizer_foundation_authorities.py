@@ -1130,5 +1130,48 @@ class AccessoryFlatStatsTests(unittest.TestCase):
                 self.assertEqual({key: row[key] for key in stats}, stats, (name, row["sourceId"]))
 
 
+class AllButSelfTargetTests(unittest.TestCase):
+    def test_exact_raw_fact_and_component_diagnostics_preserve_zero_false_and_conditions(self):
+        from build_optimizer_runtime_model import active_skill_target
+        payload = {"targetingData": {"allButSelf": True}}
+        override = {"applyToTargetType": "Friendly", "applyToSourceOnly": False, "applyConditions": "Condition", "chance": 0, "skipAbilityEffect": False, "buffs": ["DoNotInventRecipientRules"]}
+        result = active_skill_target(payload, {"targetingData": "AllButSelf", "componentOverrides": [override]})
+        self.assertEqual({key: result[key] for key in ("side", "count", "all", "random", "excludesSource", "authority")}, {"side": "mixed", "count": None, "all": True, "random": False, "excludesSource": True, "authority": "resolved.targetingData"})
+        self.assertEqual(result["componentRouting"], [{"index": 0, **{key: override[key] for key in ("applyToTargetType", "applyToSourceOnly", "applyConditions", "chance", "skipAbilityEffect")}}])
+        self.assertEqual(override["buffs"], ["DoNotInventRecipientRules"])
+
+    def test_non_allbutself_targets_do_not_gain_optional_fields(self):
+        from build_optimizer_runtime_model import active_skill_target
+        for targeting, expected in (({"selfOnly": True}, ("self", 1, False)), ({"allEnemies": True}, ("enemies", None, True)), ({"enemyTargets": 2}, ("enemies", 2, False)), ({"allButSelf": False}, ("unknown", None, False))):
+            result = active_skill_target({"targetingData": targeting}, {})
+            self.assertEqual((result["side"], result["count"], result["all"]), expected)
+            self.assertEqual(set(result), {"side", "count", "all", "random", "authority"})
+
+    def test_real_six_occurrences_and_three_routing_definitions_match_the_raw_configs(self):
+        entries = read_json(ENTRIES / "runtime/optimizer_runtime_character_entries.json")["data"]
+        profiles = read_json(ENTRIES / "runtime/optimizer_runtime_skill_profiles.json")["data"]
+        affected = []
+        fields = ("applyToTargetType", "applyToSourceOnly", "applyConditions", "chance", "skipAbilityEffect")
+        for source_id, row in entries.items():
+            for skill_id, payload in row.get("resolved", {}).get("activeSkills", {}).items():
+                if (payload.get("targetingData") or {}).get("allButSelf") is not True:
+                    continue
+                affected.append((source_id, skill_id))
+                skill = next(s for s in profiles[source_id]["skills"] if s["id"] == skill_id)
+                target = skill["target"]
+                self.assertEqual((target["side"], target["count"], target["all"], target["random"], target["excludesSource"]), ("mixed", None, True, False, True))
+                overrides = payload["config"]["componentOverrides"]
+                self.assertEqual(target["componentRouting"], [{"index": index, **{key: override[key] for key in fields if key in override}} for index, override in enumerate(overrides)])
+                self.assertEqual(len(target["componentRouting"]), len(payload["config"]["components"]))
+        self.assertEqual(len(affected), 6)
+        self.assertEqual(len({skill for _, skill in affected}), 3)
+        self.assertEqual({source for source, _ in affected}, {"RolotiaNew01", "RolotiaNew02", "IbarahimeSwimsuit01", "IbarahimeSwimsuit02", "LuBuRegular01", "LuBuRegular02"})
+        for source_id, profile in profiles.items():
+            for skill in profile["skills"]:
+                if (source_id, skill["id"]) not in affected:
+                    self.assertNotIn("excludesSource", skill["target"])
+                    self.assertNotIn("componentRouting", skill["target"])
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

@@ -49,6 +49,13 @@
     const exact=skill?.target&&typeof skill.target==='object'?skill.target:{};
     let side=P.key(exact.side)||'unknown',count=Number.isFinite(Number(exact.count))?Number(exact.count):null,all=exact.all===true,random=exact.random===true;
     const legacy=P.key(skill?.targeting);
+    if(exact.excludesSource===true||legacy==='allbutself'||legacy==='all_but_self'){
+      return{
+        side:'mixed',count:null,all:true,random:false,excludesSource:true,
+        authority:P.txt(exact.authority||'legacy-targeting'),
+        ...(Array.isArray(exact.componentRouting)?{componentRouting:exact.componentRouting.map(route=>({...route}))}:{})
+      };
+    }
     if(side==='unknown'){
       if(legacy.includes('enemy'))side='enemies';else if(legacy.includes('ally')||legacy.includes('friend'))side='allies';else if(legacy.includes('self'))side='self';else if(legacy==='all')side='mixed';
       if(legacy.startsWith('2'))count=2;else if(legacy.startsWith('1')||legacy.includes('one_ally'))count=1;

@@ -904,6 +904,19 @@ def finite_number(value: Any, fallback: Any = None) -> Any:
 def active_skill_target(payload: Dict[str, Any], config: Dict[str, Any]) -> Dict[str, Any]:
     """Return a compact, exact target contract for browser-side reasoning."""
     targeting = payload.get("targetingData") if isinstance(payload.get("targetingData"), dict) else {}
+    if targeting.get("allButSelf") is True:
+        # Global selection excludes the caster; component source-only overrides
+        # remain independent facts, not another globally selected target set.
+        routing_fields = ("applyToTargetType", "applyToSourceOnly", "applyConditions", "chance", "skipAbilityEffect")
+        overrides = config.get("componentOverrides") if isinstance(config.get("componentOverrides"), list) else []
+        return {
+            "side": "mixed", "count": None, "all": True, "random": False,
+            "authority": "resolved.targetingData", "excludesSource": True,
+            "componentRouting": [
+                {"index": index, **{field: override[field] for field in routing_fields if field in override}}
+                for index, override in enumerate(overrides) if isinstance(override, dict)
+            ],
+        }
     key = normalized(config.get("targetingData"))
     side, count, targets_all, random_target = "unknown", None, False, False
     if targeting.get("selfOnly") or key in {"selfonly", "sourceonly", "self", "user"}:
