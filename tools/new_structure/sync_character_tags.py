@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+from path_utils import display_path, display_report, display_text
+
 import json
 import time
 from pathlib import Path
@@ -20,18 +22,18 @@ def find_repo_root(start: Path) -> Path:
 
 def load_json_checked(path: Path) -> Tuple[Any, Dict[str, Any]]:
     if not path.exists():
-        return None, {"path": str(path), "status": "missing", "count": 0}
+        return None, {"path": display_path(path), "status": "missing", "count": 0}
     try:
         value = json.loads(path.read_text(encoding="utf-8-sig"))
     except Exception as exc:
-        return None, {"path": str(path), "status": "invalid", "count": 0, "error": str(exc)}
+        return None, {"path": display_path(path), "status": "invalid", "count": 0, "error": display_text(str(exc))}
     count = len(value) if isinstance(value, (dict, list)) else 0
-    return value, {"path": str(path), "status": "ok", "count": count}
+    return value, {"path": display_path(path), "status": "ok", "count": count}
 
 
 def write_json(path: Path, data: Any):
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
+    path.write_text(json.dumps(display_report(data, path), ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
 
 
 def is_excluded_path(path: Path) -> bool:

@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+from path_utils import display_path, display_report
+
 import argparse
 import hashlib
 import json
@@ -43,11 +45,11 @@ def load_json(path: Path) -> Any:
 
 def write_json(path: Path, data: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":")), encoding="utf-8", newline="\n")
+    path.write_text(json.dumps(display_report(data, path), ensure_ascii=False, separators=(",", ":")), encoding="utf-8", newline="\n")
 
 
 def write_json_if_changed(path: Path, data: Any) -> bool:
-    text = json.dumps(data, ensure_ascii=False, separators=(",", ":"))
+    text = json.dumps(display_report(data, path), ensure_ascii=False, separators=(",", ":"))
     if path.exists() and path.read_text(encoding="utf-8-sig") == text:
         return False
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -371,7 +373,7 @@ def build_category(entries_root: Path, bundles_dir: Path, category: str) -> Dict
         "entries": clean_rows,
     }
     write_json_if_changed(out_path, bundle)
-    return {"category": category, "status": "ok" if not errors else "warning", "sourceIndexCount": source_index_count, "count": len(clean_rows), "errors": len(errors), "discovery": discovery, "contentHash": bundle["contentHash"], "output": str(out_path)}
+    return {"category": category, "status": "ok" if not errors else "warning", "sourceIndexCount": source_index_count, "count": len(clean_rows), "errors": len(errors), "discovery": discovery, "contentHash": bundle["contentHash"], "output": display_path(out_path)}
 
 
 def build_character_live_bundle(bundles_dir: Path) -> Dict[str, Any]:
@@ -403,7 +405,7 @@ def build_character_live_bundle(bundles_dir: Path) -> Dict[str, Any]:
         "count": len(rows),
         "errors": len(bundle["errors"]),
         "contentHash": content_hash,
-        "output": str(out_path),
+        "output": display_path(out_path),
     }
 
 
@@ -436,7 +438,7 @@ def build_character_families(entries_root: Path, bundles_dir: Path) -> Dict[str,
     content_hash = stable_hash(rows)
     bundle = {"schemaVersion": 4, "category": "character_families", "generatedAt": stable_generated_at(out_path, content_hash), "sourceIndexCount": len(index_rows), "count": len(rows), "errors": errors, "contentHash": content_hash, "entries": rows}
     write_json_if_changed(out_path, bundle)
-    return {"category": "character_families", "status": "ok" if not errors else "warning", "sourceIndexCount": len(index_rows), "count": len(rows), "errors": len(errors), "contentHash": bundle["contentHash"], "output": str(out_path)}
+    return {"category": "character_families", "status": "ok" if not errors else "warning", "sourceIndexCount": len(index_rows), "count": len(rows), "errors": len(errors), "contentHash": bundle["contentHash"], "output": display_path(out_path)}
 
 
 def build_catalog_bundle(bundles_dir: Path) -> Dict[str, Any]:
@@ -459,7 +461,7 @@ def build_catalog_bundle(bundles_dir: Path) -> Dict[str, Any]:
     content_hash = stable_hash({"categories": categories, "characterFamilies": character_families})
     catalog = {"schemaVersion": 4, "generatedAt": stable_generated_at(out_path, content_hash), "categories": categories, "characterFamilies": character_families, "missingBundles": missing, "categoryCounts": {c: len(categories.get(c, [])) for c in CATEGORIES}, "characterFamilyCount": len(character_families), "contentHash": content_hash}
     write_json_if_changed(out_path, catalog)
-    return {"category": "catalog", "status": "ok" if not missing else "warning", "count": sum(len(v) for v in categories.values()), "characterFamilies": len(character_families), "missingBundles": missing, "categoryCounts": catalog["categoryCounts"], "contentHash": catalog["contentHash"], "output": str(out_path)}
+    return {"category": "catalog", "status": "ok" if not missing else "warning", "count": sum(len(v) for v in categories.values()), "characterFamilies": len(character_families), "missingBundles": missing, "categoryCounts": catalog["categoryCounts"], "contentHash": catalog["contentHash"], "output": display_path(out_path)}
 
 
 def main() -> int:
@@ -477,7 +479,7 @@ def main() -> int:
     results.append(build_character_families(entries_root, bundles_dir))
     results.append(build_catalog_bundle(bundles_dir))
 
-    report = {"schemaVersion": 4, "generatedAt": int(time.time()), "entriesRoot": str(entries_root), "bundlesRoot": str(bundles_dir), "categories": results}
+    report = {"schemaVersion": 4, "generatedAt": int(time.time()), "entriesRoot": display_path(entries_root), "bundlesRoot": display_path(bundles_dir), "categories": results}
     report_path = entries_root / "reports" / "bundle_build_report.json"
     write_json(report_path, report)
     print(json.dumps(report, ensure_ascii=False, indent=2))

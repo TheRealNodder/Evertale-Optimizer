@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+from path_utils import display_path, display_report
+
 import argparse
 import json
 import re
@@ -45,7 +47,7 @@ def load_json(path: Path, fallback: Any = None) -> Any:
 
 def write_json(path: Path, data: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
+    path.write_text(json.dumps(display_report(data, path), ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
 
 
 def norm(value: Any) -> str:
@@ -236,7 +238,7 @@ def sync_category(repo: Path, category: str, dry_run: bool) -> Dict[str, Any]:
         new_index["orderSource"] = "file-handle-prefix"
         new_index["orderLocked"] = True
         new_index["orderGeneratedAt"] = int(time.time())
-        report = {"schemaVersion": 2, "generatedAt": int(time.time()), "dryRun": dry_run, "category": category, "orderLocked": True, "seededCanonicalFromCurrentIndex": False, "canonicalFile": str(canonical_path), "indexFile": str(index_path), "orderMap": str(order_map_path), "canonicalExistingCount": len(canonical), "indexEntryCount": len(index_rows), "excludedIndexRows": len(excluded_rows), "orderedCount": len(ordered), "appendedNewEntries": 0, "blockedAppends": 0, "missingCanonicalEntries": 0, "appended": [], "blockedAppendRows": [], "missingCanonical": [], "orderAuthority": "file-handle-prefix: 0001 oldest, highest prefix newest"}
+        report = {"schemaVersion": 2, "generatedAt": int(time.time()), "dryRun": dry_run, "category": category, "orderLocked": True, "seededCanonicalFromCurrentIndex": False, "canonicalFile": display_path(canonical_path), "indexFile": display_path(index_path), "orderMap": display_path(order_map_path), "canonicalExistingCount": len(canonical), "indexEntryCount": len(index_rows), "excludedIndexRows": len(excluded_rows), "orderedCount": len(ordered), "appendedNewEntries": 0, "blockedAppends": 0, "missingCanonicalEntries": 0, "appended": [], "blockedAppendRows": [], "missingCanonical": [], "orderAuthority": "file-handle-prefix: 0001 oldest, highest prefix newest"}
         if not dry_run:
             write_text(canonical_path, "\n".join(format_order_line(r["key"], r["displayName"]) for r in new_canonical) + "\n")
             write_json(order_map_path, {"schemaVersion": 3, "source": "file-handle weapon order; 0001 oldest, highest prefix newest", "generatedAt": int(time.time()), "category": category, "count": len(order_rows), "order": order_rows})
@@ -297,7 +299,7 @@ def sync_category(repo: Path, category: str, dry_run: bool) -> Dict[str, Any]:
     new_index["orderLocked"] = order_locked
     new_index["orderGeneratedAt"] = int(time.time())
 
-    report = {"schemaVersion": 2, "generatedAt": int(time.time()), "dryRun": dry_run, "category": category, "orderLocked": order_locked, "seededCanonicalFromCurrentIndex": seeded, "canonicalFile": str(canonical_path), "indexFile": str(index_path), "orderMap": str(order_map_path), "canonicalExistingCount": len(canonical), "indexEntryCount": len(index_rows), "excludedIndexRows": len(excluded_rows), "orderedCount": len(ordered), "appendedNewEntries": len(appended), "blockedAppends": len(blocked_append), "missingCanonicalEntries": len(missing_canonical), "appended": appended, "blockedAppendRows": blocked_append, "missingCanonical": missing_canonical}
+    report = {"schemaVersion": 2, "generatedAt": int(time.time()), "dryRun": dry_run, "category": category, "orderLocked": order_locked, "seededCanonicalFromCurrentIndex": seeded, "canonicalFile": display_path(canonical_path), "indexFile": display_path(index_path), "orderMap": display_path(order_map_path), "canonicalExistingCount": len(canonical), "indexEntryCount": len(index_rows), "excludedIndexRows": len(excluded_rows), "orderedCount": len(ordered), "appendedNewEntries": len(appended), "blockedAppends": len(blocked_append), "missingCanonicalEntries": len(missing_canonical), "appended": appended, "blockedAppendRows": blocked_append, "missingCanonical": missing_canonical}
 
     if not dry_run:
         write_text(canonical_path, "\n".join(format_order_line(r["key"], r["displayName"]) for r in new_canonical) + "\n")

@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+from path_utils import display_path
+
 import argparse
 import json
 import re
@@ -257,7 +259,7 @@ def main() -> int:
 
     print(json.dumps({
         "status": "ok",
-        "output": str(out),
+        "output": display_path(out),
         "missingFiles": missing_files,
         "isHybridOptimizerStack": report["isHybridOptimizerStack"],
         "blockerCount": len(blockers),

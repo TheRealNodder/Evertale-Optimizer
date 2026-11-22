@@ -13,6 +13,8 @@ Run from repo root:
 """
 from __future__ import annotations
 
+from path_utils import display_path, display_report
+
 import argparse
 import hashlib
 import json
@@ -111,7 +113,7 @@ def try_load_json(path: Path) -> Optional[Any]:
 
 def write_json_if_changed(path: Path, data: Any) -> bool:
     path.parent.mkdir(parents=True, exist_ok=True)
-    text = json.dumps(data, ensure_ascii=False, indent=2) + "\n"
+    text = json.dumps(display_report(data, path), ensure_ascii=False, indent=2) + "\n"
     if path.exists() and path.read_text(encoding="utf-8", errors="replace") == text:
         return False
     path.write_text(text, encoding="utf-8", newline="\n")
@@ -796,7 +798,7 @@ def build_character_family_files(output_dir: Path, ordered: List[Tuple[str, Opti
         index_entries.append({"order": order_index, "family": family, "name": family_entry["name"], "title": family_entry["title"], "rarity": rarity, "file": f"families/{filename}", "states": len(states)})
 
     write_json_if_changed(output_dir / "characters" / "families" / "index.json", {"schemaVersion": 1, "count": len(index_entries), "entries": index_entries})
-    return {"familiesWritten": written, "familiesTotal": len(index_entries), "output": str(families_dir)}
+    return {"familiesWritten": written, "familiesTotal": len(index_entries), "output": display_path(families_dir)}
 
 
 def update_checkpoint(output_dir: Path, checkpoint: Dict[str, Any]) -> None:
@@ -925,7 +927,7 @@ def build_category(
             total_count=len(ordered),
             extra={"written": written, "skipped": skipped, "placeholders": placeholders, "force": force, "resume": resume},
         )
-    write_json_if_changed(category_dir / "index.json", {"schemaVersion": 2, "category": category, "count": len(index_entries), "source": str(raw_path), "entries": index_entries})
+    write_json_if_changed(category_dir / "index.json", {"schemaVersion": 2, "category": category, "count": len(index_entries), "source": display_path(raw_path), "entries": index_entries})
     family_report = None
     if category == "characters":
         family_report = build_character_family_files(output_dir, ordered, by_id, resolvers)
@@ -945,7 +947,7 @@ def build_category(
         total_count=len(ordered),
         extra={"written": written, "skipped": skipped, "placeholders": placeholders, "force": force, "resume": resume, "limitReached": limit_reached},
     )
-    return {"category": category, "status": "partial" if limit_reached else "ok", "rawFile": str(raw_path), "rawEntries": len(items), "totalEntries": len(ordered), "entriesWritten": written, "entriesSkipped": skipped, "processedThisRun": processed_this_run, "placeholdersWrittenOrUpdated": placeholders, "resumedFromMarker": bool(effective_start_after and not start_after), "effectiveStartAfter": effective_start_after, "limitReached": limit_reached, "familyReport": family_report}
+    return {"category": category, "status": "partial" if limit_reached else "ok", "rawFile": display_path(raw_path), "rawEntries": len(items), "totalEntries": len(ordered), "entriesWritten": written, "entriesSkipped": skipped, "processedThisRun": processed_this_run, "placeholdersWrittenOrUpdated": placeholders, "resumedFromMarker": bool(effective_start_after and not start_after), "effectiveStartAfter": effective_start_after, "limitReached": limit_reached, "familyReport": family_report}
 
 
 def main() -> int:
@@ -963,7 +965,7 @@ def main() -> int:
     output_dir = resolve_repo_path(repo_root, args.output, "apkfiles/entries")
     resolvers = load_resolvers(input_dir)
     categories = [args.category] if args.category else ["characters", "weapons", "accessories", "bosses"]
-    report = {"schemaVersion": 3, "scriptVersion": SCRIPT_VERSION, "generatedAt": now_int(), "input": str(input_dir), "output": str(output_dir), "force": args.force, "resume": not args.no_resume, "categories": []}
+    report = {"schemaVersion": 3, "scriptVersion": SCRIPT_VERSION, "generatedAt": now_int(), "input": display_path(input_dir), "output": display_path(output_dir), "force": args.force, "resume": not args.no_resume, "categories": []}
     for category in categories:
         report["categories"].append(build_category(repo_root, input_dir, output_dir, category, resolvers, args.force, args.limit, args.start_after, not args.no_resume))
     write_json_if_changed(output_dir / "reports" / "build_report.json", report)

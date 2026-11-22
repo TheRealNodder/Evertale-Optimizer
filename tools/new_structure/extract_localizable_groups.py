@@ -14,6 +14,8 @@ Leader-skill rule:
 """
 from __future__ import annotations
 
+from path_utils import display_path, display_report
+
 import argparse
 import json
 import re
@@ -59,7 +61,7 @@ def read_text(path: Path) -> str:
 
 def write_json(path: Path, data: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
+    path.write_text(json.dumps(display_report(data, path), ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
 
 
 def resolve_path(path_text: Optional[str], repo_root: Path, default_rel: str) -> Path:
@@ -335,7 +337,7 @@ def load_legacy_leader_skills(repo_root: Path) -> Dict[str, Any]:
         element = str(row.get("element") or "").strip()
         if not character or not (name or description):
             continue
-        clean = {"character": character, "element": element, "name": name, "description": description, "source": str(path)}
+        clean = {"character": character, "element": element, "name": name, "description": description, "source": display_path(path)}
         cleaned_rows.append(clean)
         by_character[character] = clean
         aliases[key_norm(character)] = character
@@ -344,7 +346,7 @@ def load_legacy_leader_skills(repo_root: Path) -> Dict[str, Any]:
             aliases[key_norm(parts[0])] = character
         if len(parts) >= 2:
             aliases[key_norm(" ".join(parts[:2]))] = character
-    return {"source": str(path), "skills": cleaned_rows, "byCharacter": by_character, "aliases": aliases}
+    return {"source": display_path(path), "skills": cleaned_rows, "byCharacter": by_character, "aliases": aliases}
 
 
 def build_leader_skill_map(grouped: Dict[str, Dict[str, Any]], repo_root: Path, leader_buff_ids: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
@@ -438,11 +440,11 @@ def main() -> int:
     report = {
         "schemaVersion": 6,
         "generatedAt": int(time.time()),
-        "repoRoot": str(repo_root),
-        "input": str(input_dir),
-        "entriesRoot": str(entries_root),
-        "output": str(output_dir),
-        "source": str(loc_path),
+        "repoRoot": display_path(repo_root),
+        "input": display_path(input_dir),
+        "entriesRoot": display_path(entries_root),
+        "output": display_path(output_dir),
+        "source": display_path(loc_path),
         "totalLocalizedKeys": len(rows),
         "totalGroups": len(grouped),
         "leaderSkillCount": leader_skills["count"],

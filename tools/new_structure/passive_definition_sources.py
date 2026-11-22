@@ -512,7 +512,7 @@ class SourceSet:
 
 
 # --------------------------------------------------------------------------
-# FIELD RULES (verified on raw APK data; see claude_passive_dependency_field_rules.md)
+# FIELD RULES (verified on raw APK data; see the passive dependency field rules note)
 # --------------------------------------------------------------------------
 
 BUFF_ID_FIELDS = frozenset({"selfBuffs", "sourceBuffs", "randomEnemyBuffs", "randomAllyBuffs", "allyBuffs", "enemyBuffs", "contextBuffs", "allAlliesButSelfBuffs"})

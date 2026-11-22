@@ -1,7 +1,7 @@
 # Evertale Optimizer Project State
 
 Updated: 2026-07-17  
-Active implementation branch: `codex/ai-reasoning-foundation`
+Active implementation branch: historical implementation checkpoint
 
 ## Current public architecture
 

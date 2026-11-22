@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+from path_utils import display_path
+
 import json
 import re
 import time
@@ -88,7 +90,7 @@ def main() -> int:
     print(json.dumps({
         "status": "ok",
         "sources": len(payload["sources"]),
-        "output": str(out)
+        "output": display_path(out)
     }, indent=2))
 
     return 0

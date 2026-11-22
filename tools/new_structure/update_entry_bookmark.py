@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+from path_utils import display_path, display_report
+
 import argparse
 import json
 import time
@@ -22,7 +24,7 @@ def load_json(path: Path, fallback: Any = None) -> Any:
 
 def write_json(path: Path, data: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8", newline="\n")
+    path.write_text(json.dumps(display_report(data, path), ensure_ascii=False, indent=2), encoding="utf-8", newline="\n")
 
 
 def normalize_rel(rel: str) -> str:
@@ -110,7 +112,7 @@ def build_bookmark(entries_root: Path) -> Dict[str, Any]:
     return {
         "schemaVersion": 1,
         "generatedAt": int(time.time()),
-        "entriesRoot": str(entries_root),
+        "entriesRoot": display_path(entries_root),
         "totalCount": len(all_source_ids),
         "categories": categories,
         "allSourceIds": all_source_ids,
@@ -133,14 +135,14 @@ def main() -> int:
         "schemaVersion": bookmark["schemaVersion"],
         "generatedAt": bookmark["generatedAt"],
         "entriesRoot": bookmark["entriesRoot"],
-        "output": str(output_path),
+        "output": display_path(output_path),
         "totalCount": bookmark["totalCount"],
         "categoryCounts": {k: v["count"] for k, v in bookmark["categories"].items()},
         "errorCount": len(bookmark["errors"]),
         "errors": bookmark["errors"],
     })
     print(json.dumps({
-        "output": str(output_path),
+        "output": display_path(output_path),
         "totalCount": bookmark["totalCount"],
         "categoryCounts": {k: v["count"] for k, v in bookmark["categories"].items()},
         "errorCount": len(bookmark["errors"]),

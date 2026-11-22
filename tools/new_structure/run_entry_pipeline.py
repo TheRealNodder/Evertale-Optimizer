@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+from path_utils import display_path, display_report
+
 import argparse
 import json
 import os
@@ -70,7 +72,7 @@ def subprocess_env() -> Dict[str, str]:
 
 def write_json(path: Path, data: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
+    path.write_text(json.dumps(display_report(data, path), ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
 
 
 def write_marker(repo_root: Path, status: str, step: str, processed_count: int, total_count: int, extra: Dict[str, Any] | None = None) -> None:
@@ -123,7 +125,7 @@ def run_step(repo_root: Path, tools_dir: Path, step: str, args: argparse.Namespa
     finished = int(time.time())
     return {
         "step": step,
-        "script": str(script_path),
+        "script": display_path(script_path),
         "status": "ok" if result.returncode == 0 else "failed",
         "returnCode": result.returncode,
         "startedAt": started,

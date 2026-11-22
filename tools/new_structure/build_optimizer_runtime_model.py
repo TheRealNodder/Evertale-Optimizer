@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+from path_utils import display_path, display_report, display_text
+
 import json
 import re
 import time
@@ -175,18 +177,29 @@ def load_json(path: Path, fallback: Any):
 
 def load_json_checked(path: Path) -> Tuple[Any, Dict[str, Any]]:
     if not path.exists():
-        return None, {"path": str(path), "status": "missing", "count": 0}
+        return None, {"path": display_path(path), "status": "missing", "count": 0}
     try:
         value = json.loads(path.read_text(encoding="utf-8-sig"))
     except Exception as exc:
-        return None, {"path": str(path), "status": "invalid", "count": 0, "error": str(exc)}
+        return None, {"path": display_path(path), "status": "invalid", "count": 0, "error": display_text(str(exc))}
     count = len(value) if isinstance(value, (dict, list)) else 0
-    return value, {"path": str(path), "status": "ok", "count": count}
+    return value, {"path": display_path(path), "status": "ok", "count": count}
+
+
+def distinct_source_counts(source_reports: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """Map display labels to counts; fail rather than merge two sources that share a label."""
+    counts: Dict[str, Any] = {}
+    for row in source_reports:
+        key = Path(row["path"]).as_posix()
+        if key in counts:
+            raise ValueError(f"Tag source label collision: {key}")
+        counts[key] = row.get("count", 0)
+    return counts
 
 
 def write_json(path: Path, data: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    content = json.dumps(data, ensure_ascii=False, indent=2) + "\n"
+    content = json.dumps(display_report(data, path), ensure_ascii=False, indent=2) + "\n"
     if path.exists() and path.read_text(encoding="utf-8-sig") == content:
         return
     path.write_text(content, encoding="utf-8", newline="\n")
@@ -1130,9 +1143,9 @@ def main() -> int:
         payload, source_report = load_json_checked(path)
         tag_sources.append(source_report)
         if source_report["status"] == "invalid":
-            errors.append(f"Invalid tag authority: {path}: {source_report.get('error')}")
+            errors.append(f"Invalid tag authority: {display_path(path)}: {source_report.get('error')}")
         elif source_report["status"] == "missing":
-            warnings.append(f"Missing optional tag authority: {path}")
+            warnings.append(f"Missing optional tag authority: {display_path(path)}")
         if payload is not None:
             tag_payloads.append(payload)
 
@@ -1281,7 +1294,7 @@ def main() -> int:
         "identityCollisions": collisions,
         "suspiciousFeatureEvidence": suspicious_evidence,
         "unresolvedLeaderProfiles": unresolved_leader_profiles,
-        "output": str(repo / OUT_REL),
+        "output": display_path(repo / OUT_REL),
     }
     write_json(repo / REPORT_REL, report)
     if errors:
@@ -1300,7 +1313,7 @@ def main() -> int:
         "tagRows": tag_rows,
         "tagAuthority": {
             "status": "ok" if tags else "warning",
-            "sourceCounts": {Path(row["path"]).as_posix(): row.get("count", 0) for row in tag_sources},
+            "sourceCounts": distinct_source_counts(tag_sources),
             "warnings": [warning for warning in warnings if "tag" in warning.lower()],
             "errors": [error for error in errors if "tag" in error.lower()],
         },
