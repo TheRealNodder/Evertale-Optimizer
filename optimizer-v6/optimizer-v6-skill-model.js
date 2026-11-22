@@ -104,7 +104,7 @@
   }
 
   function effectiveness(skill){
-    const damage=damageMagnitude(skill),support=rows(skill?.components).some(value=>P.key(value)==='apply_buff')?58:0;
+    const damage=damageMagnitude(skill),support=rows(skill?.components).some(value=>{const key=P.key(value);return key==='applybuff'||key==='apply_buff';})?58:0;
     return clamp(Math.max(damage,support)*.72+targetValue(skill)*.28);
   }
 

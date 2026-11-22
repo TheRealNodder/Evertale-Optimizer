@@ -93,3 +93,47 @@ test('controller and actual worker retain the target contract and use the loader
     assert.equal(workerContexts[0].OptimizerV6.skillModel.effectiveness(stored),S.effectiveness(skill));
   }
 });
+
+
+test('canonical ApplyBuff and existing alias activate the single existing support magnitude',()=>{
+  const skill=components=>({components,target:{side:'mixed',all:true,count:null}});
+  assert.equal(context.OptimizerV6.policy.key('ApplyBuff'),'applybuff');
+  assert.equal(S.effectiveness(skill(['ApplyBuff'])),67.52);
+  assert.equal(S.effectiveness(skill(['apply_buff'])),67.52);
+  assert.equal(S.effectiveness(skill(['ApplyBuff','ApplyBuff','apply_buff'])),67.52);
+  for(const components of [[],['RemoveBuff'],['PreApplyBuff'],['ApplyBuffExtra'],[null]])assert.equal(S.effectiveness(skill(components)),25.76);
+  for(const {skill:real} of affected)assert.equal(S.effectiveness(real),67.52);
+});
+
+test('support retains damage max, finite bounds and the existing 58 magnitude',()=>{
+  const base={components:['Damage'],target:{side:'enemies',all:true},baseMultiplier:4};
+  assert.equal(S.damageMagnitude(base),60);
+  assert.equal(S.effectiveness({...base,components:['Damage','ApplyBuff']}),S.effectiveness(base));
+  const low={...base,baseMultiplier:0,components:['Damage','ApplyBuff']};
+  assert.equal(S.effectiveness(low),58*.72+100*.28);
+  const capped={...base,baseMultiplier:10000,components:['Damage','ApplyBuff']};
+  assert.equal(S.effectiveness(capped),100);
+  assert.equal(S.effectiveness({components:['ApplyBuff']}),58*.72+50*.28);
+});
+
+test('new scoring revision invalidates a persisted prior result and still reuses a current result',async()=>{
+  const store=new Map(),key='evertale_optimizer_v6_cache_v4';
+  function controller(version){
+    let runs=0;
+    const c=vm.createContext({console,structuredClone,localStorage:{getItem:k=>store.get(k)||null,setItem:(k,v)=>store.set(k,v)}});c.window=c;
+    c.EVERTALE_LIVE_CONFIG={dataVersion:'unchanged-D-data-version'};
+    vm.runInContext(read('optimizer-v6/optimizer-v6-policy.js'),c);
+    if(version)c.OptimizerV6.policy.version=version;
+    c.OptimizerV6.engine={prepare:units=>units,run:()=>{runs++;return {scoringRevision:c.OptimizerV6.policy.version};}};
+    vm.runInContext(read('optimizer-v6/optimizer-v6-controller.js'),c);
+    return{controller:c.OptimizerV6.controller,runs:()=>runs,version:c.OptimizerV6.policy.version};
+  }
+  const legacy=controller('optimizer-v6-policy-10');
+  const oldResult=await legacy.controller.run([],{buildScope:'story'});
+  assert.equal(legacy.runs(),1);assert.ok(store.has(key));
+  const current=controller();assert.equal(current.version,'optimizer-v6-policy-12');
+  assert.notEqual(current.controller.cacheKey([],{buildScope:'story'}),legacy.controller.cacheKey([],{buildScope:'story'}));
+  const fresh=await current.controller.run([],{buildScope:'story'});
+  assert.equal(current.runs(),1);assert.notDeepEqual(json(fresh),json(oldResult));
+  const reload=controller();assert.deepEqual(json(await reload.controller.run([],{buildScope:'story'})),json(fresh));assert.equal(reload.runs(),0);
+});
