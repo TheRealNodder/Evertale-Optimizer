@@ -259,6 +259,7 @@ api.setPreference('zygarde');const firstCells=JSON.stringify(signatureSnapshot()
 check(signatureHost.children.filter(x=>x.getAttribute('data-primitive')==='hex').every(x=>x.innerHTML.includes('themeMotionCellA')&&x.innerHTML.includes('themeMotionCellB')),'Zygarde does not have separately opening cell edges');
 api.setPreference('miraidon');
 for(const item of signatureHost.children.filter(x=>x.getAttribute('data-primitive')==='trace')){
+  check(item.innerHTML.includes('viewBox="0 0 160 90"'),'Circuit geometry does not share the packet coordinate space');
   check(item.children.some(x=>x.className==='themeMotionPacket'),'A circuit track has no travelling packet');
   for(let i=1;i<6;i++){
     const value=(axis,index)=>item.style.values.get(`--p${index}${axis}`);
@@ -306,6 +307,10 @@ for(let round=0;round<3;round++)for(const theme of themes){
   check(document.getElementById('themeMotionParticles')===signatureHost,`Signature switching recreated its host: ${theme.key}`);
   if(theme.material==='elemental'&&theme.key!=='thunderwake')check(signatureHost.hidden&&signatureHost.children.length===0,`An Elemental theme retained another theme's signature: ${theme.key}`);
   else check(signatureHost.children.length===motion.signatures[theme.key].reduce((sum,part)=>sum+part.count,0),`Signature objects leaked or disappeared: ${theme.key}`);
+  for(const item of signatureHost.children.filter(x=>['fall','rise'].includes(x.getAttribute('data-primitive')))){
+    const x=parseFloat(item.style.values.get('--x')),drift=parseFloat(item.style.values.get('--dx'));
+    check((x<=.4&&drift<0)||(x>=98.8&&drift>0),`Foreground field can travel into central text: ${theme.key}`);
+  }
 }
 check(body.children.filter(x=>x.id==='siteThemeFx').length===1,'Repeated79-theme cycles duplicated the background host');
 

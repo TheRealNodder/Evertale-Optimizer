@@ -8,9 +8,11 @@ The eight version themes (`gold` through `platinum`) express Johto, Hoenn and Si
 
 ## Behavior and limits
 
+- Circuit SVGs and their HTML packets share a 160 by 90 coordinate space, including phone scaling. Endpoint and corner alignment is verified against rendered screen coordinates.
+- Falling and rising foreground fields stay in the outer gutters, with a small outward drift. They do not take arbitrary paths through the central reading area.
 - Circuits use static tracks and luminous packets that follow each authored corner. Keyframe travel offsets are proportional to segment lengths; propulsion profiles can accelerate within a segment.
 - Hex cells have two independently animated edge groups: they separate, then close. Positions and phases repeat deterministically after remounting.
-- Electrical branches use a localized, staggered charge/discharge envelope with a twelve-second cycle and no full-screen flash. Generator charging completes before discharge.
+- Electrical branches use a localized, staggered charge/discharge envelope with a eight-second cycle and no full-screen flash. Generator charging completes before discharge.
 - The new scene signatures reserve five existing animated art/layer surfaces on desktop and four on phones. Every independently animated cell edge, packet and branch is counted. The targets are at most 40 desktop and 16 phone animations in the complete 72-scene composition; the global ceiling is 60.
 - Standalone overlay periods are 6–30 seconds, plus 2.4-second continuous rain travel. The existing compiled SVG layer schema remains 6–24 seconds. These are separate schemas. Rain travel is not a luminance flash.
 - Hidden tabs and optimizer searches pause the existing controller. Animations off and system reduced motion stop movement, retain static cells/tracks, and hide travelling packets and drifting foreground particles. Existing artwork and composed static scene layers remain visible.
@@ -50,7 +52,7 @@ Counts are desktop / phone objects. A hex object contains two animated edges; an
 | ocean | swell: wave (4/2; 20s); ripple: foam (3/1; 14s) | 12 / 7 | [Identity](THEME_MOTION.md#ocean) |
 | ember | rise: ember (14/6; 11s); heat: coal (2/1; 18s) | 21 / 11 | [Identity](THEME_MOTION.md#ember) |
 | royal | prism: gold (4/2; 22s); ripple: water (3/1; 16s) | 12 / 7 | [Identity](THEME_MOTION.md#royal) |
-| cyber | trace: network (5/2; 10s); arc: electric (2/1; 12s) | 16 / 9 | [Identity](THEME_MOTION.md#cyber) |
+| cyber | trace: network (5/2; 10s); arc: electric (2/1; 8s) | 16 / 9 | [Identity](THEME_MOTION.md#cyber) |
 | forest | fall: leaf (10/4; 17s); glint: seed (8/3; 12s) | 23 / 11 | [Identity](THEME_MOTION.md#forest) |
 | cosmic | orbit: star (6/2; 26s); swell: nebula (3/1; 24s) | 14 / 7 | [Identity](THEME_MOTION.md#cosmic) |
 | quartz | prism: crystal (5/2; 21s); glint: facet (4/2; 18s) | 14 / 8 | [Identity](THEME_MOTION.md#quartz) |
@@ -88,8 +90,8 @@ Counts are desktop / phone objects. A hex object contains two animated edges; an
 | giratina | invert: shard (10/4; 14s); rift: fold (2/1; 21s) | 17 / 9 | [Identity](THEME_MOTION.md#giratina) |
 | arceus | heat: stair (3/1; 24s); invert: order (5/2; 24s) | 13 / 7 | [Identity](THEME_MOTION.md#arceus) |
 | reshiram | heat: turbine (3/1; 16s); rise: flame (10/4; 11s) | 18 / 9 | [Identity](THEME_MOTION.md#reshiram) |
-| zekrom | trace: generator (3/1; 12s); arc: generator (3/1; 12s) | 17 / 8 | [Identity](THEME_MOTION.md#zekrom) |
-| blackkyurem | arc: ice (3/1; 12s); fall: ice (10/4; 14s) | 24 / 11 | [Identity](THEME_MOTION.md#blackkyurem) |
+| zekrom | trace: generator (3/1; 8s); arc: generator (3/1; 8s) | 17 / 8 | [Identity](THEME_MOTION.md#zekrom) |
+| blackkyurem | arc: ice (3/1; 8s); fall: ice (10/4; 14s) | 24 / 11 | [Identity](THEME_MOTION.md#blackkyurem) |
 | whitekyurem | heat: iceheat (4/2; 16s); rise: steam (7/3; 14s) | 16 / 9 | [Identity](THEME_MOTION.md#whitekyurem) |
 | xerneas | burst: antler (5/2; 20s); glint: life (7/3; 13s) | 17 / 9 | [Identity](THEME_MOTION.md#xerneas) |
 | yveltal | invert: drain (10/4; 16s); heat: shadow (2/1; 22s) | 17 / 9 | [Identity](THEME_MOTION.md#yveltal) |
@@ -99,9 +101,9 @@ Counts are desktop / phone objects. A hex object contains two animated edges; an
 | ultranecrozma | prism: ray (5/2; 16s); burst: prism (4/1; 22s) | 14 / 7 | [Identity](THEME_MOTION.md#ultranecrozma) |
 | zacian | gust: blade (5/2; 10s); prism: blade (2/1; 19s) | 12 / 7 | [Identity](THEME_MOTION.md#zacian) |
 | zamazenta | ripple: shield (4/2; 15s); gust: deflect (2/1; 21s) | 11 / 7 | [Identity](THEME_MOTION.md#zamazenta) |
-| eternatus | heat: core (2/1; 18s); arc: energy (3/1; 12s) | 16 / 8 | [Identity](THEME_MOTION.md#eternatus) |
+| eternatus | heat: core (2/1; 18s); arc: energy (3/1; 8s) | 16 / 8 | [Identity](THEME_MOTION.md#eternatus) |
 | koraidon | gust: dust (6/3; 12s); swell: grass (3/1; 16s) | 14 / 8 | [Identity](THEME_MOTION.md#koraidon) |
-| miraidon | trace: propulsion (4/2; 12s); arc: junction (2/1; 12s) | 15 / 9 | [Identity](THEME_MOTION.md#miraidon) |
+| miraidon | trace: propulsion (4/2; 8s); arc: junction (2/1; 8s) | 15 / 9 | [Identity](THEME_MOTION.md#miraidon) |
 | terapagos | prism: stellar (5/2; 20s); orbit: facet (4/2; 24s) | 14 / 8 | [Identity](THEME_MOTION.md#terapagos) |
 | sunrise | heat: sunbeam (3/1; 22s); burst: sun (3/1; 26s) | 11 / 6 | [Identity](THEME_MOTION.md#sunrise) |
 
