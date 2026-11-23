@@ -370,9 +370,9 @@ Motion uses CSS transforms and opacity. System reduced motion and the Animations
 - NIST describes security architectures involving network assets and connections.
 - Animated packet routes are a visualization metaphor rather than literal physical network behavior.
 
-**Motion:** One packet moves node-to-node, pauses at a junction, then follows a branching route toward its destination.
+**Motion:** An original full-page motherboard stays softly energized: varied traces, vias, pads, chips with pin rows and transistor outlines, with luminous packets following the drawn routes. The character or console artwork remains unchanged.
 
-**Still:** Stable sparse circuit network with connected vertices.
+**Still:** The original environment and credited artwork remain visible behind a steady, energized circuit board. Travelling packets disappear when motion is off.
 
 - [NIST: Zero Trust Architecture](https://www.nist.gov/publications/zero-trust-architecture)
 - [NIST: Architecture guidance](https://pages.nist.gov/zero-trust-architecture/VolumeB/architecture.html)
@@ -623,9 +623,9 @@ Motion uses CSS transforms and opacity. System reduced motion and the Animations
 - Nintendo identified Crimson/Black as an established Nintendo DS Lite color combination.
 - Nintendo DS Lite uses a hinged dual-screen design with touchscreen input.
 
-**Motion:** An oblique gloss line sweeps across the upper crimson-finish panel while two abstract screen panes wake in sequence.
+**Motion:** An original full-page motherboard stays softly energized: varied traces, vias, pads, chips with pin rows and transistor outlines, with luminous packets following the drawn routes. The character or console artwork remains unchanged.
 
-**Still:** Fixed two-panel DS Lite geometry, crimson upper finish, dark lower housing, and hinge seam.
+**Still:** The original environment and credited artwork remain visible behind a steady, energized circuit board. Travelling packets disappear when motion is off.
 
 - [Nintendo Press Release: Cobalt/Black DS Lite](https://www.nintendoworldreport.com/pr/15216/cobalt-blueblack-ds-lite-in-february)
 - [Nintendo: DS Lite Hardware](https://www.nintendo.com/en-gb/Hardware/Nintendo-History/Nintendo-DS-Lite/Nintendo-DS-Lite-Nintendo-UK-s-official-site-627147.html)
@@ -639,9 +639,9 @@ Motion uses CSS transforms and opacity. System reduced motion and the Animations
 - Nintendo announced the Cobalt/Black Nintendo DS Lite colorway for February 10, 2008.
 - The model retains Nintendo DS Lite's dual-screen and touchscreen construction.
 
-**Motion:** A narrower diagonal highlight crosses the cobalt lid, followed by a subdued lower-screen awakening.
+**Motion:** An original full-page motherboard stays softly energized: varied traces, vias, pads, chips with pin rows and transistor outlines, with luminous packets following the drawn routes. The character or console artwork remains unchanged.
 
-**Still:** Blue-accented upper lid, black lower frame, fixed hinge and twin panels.
+**Still:** The original environment and credited artwork remain visible behind a steady, energized circuit board. Travelling packets disappear when motion is off.
 
 - [Nintendo Press Release: Cobalt/Black DS Lite](https://www.nintendoworldreport.com/pr/15216/cobalt-blueblack-ds-lite-in-february)
 - [Nintendo: DS Lite Hardware](https://www.nintendo.com/en-gb/Hardware/Nintendo-History/Nintendo-DS-Lite/Nintendo-DS-Lite-Nintendo-UK-s-official-site-627147.html)
@@ -655,9 +655,9 @@ Motion uses CSS transforms and opacity. System reduced motion and the Animations
 - Nintendo announced Metallic Rose as a Nintendo DSi XL finish for September 18, 2011.
 - The DSi XL has two 4.2-inch displays.
 
-**Motion:** A broad silky metallic reflection moves along the upper lid, then two imagined displays brighten gradually.
+**Motion:** An original full-page motherboard stays softly energized: varied traces, vias, pads, chips with pin rows and transistor outlines, with luminous packets following the drawn routes. The character or console artwork remains unchanged.
 
-**Still:** Large rose-colored upper panel, two screens, and matte lower casing.
+**Still:** The original environment and credited artwork remain visible behind a steady, energized circuit board. Travelling packets disappear when motion is off.
 
 - [Nintendo Press Release: Metallic Rose DSi XL](https://www.nintendoworldreport.com/pr/27744/newnnbspmetallicnnbsprose-nintendo-dsi-xl-set-to-bloom-sept-18)
 - [Nintendo: DSi XL Announcement](https://www.nintendo.com/en-gb/News/2010/New-Nintendo-DSi-XL-console-is-perfect-for-family-fun-252306.html)
@@ -671,9 +671,9 @@ Motion uses CSS transforms and opacity. System reduced motion and the Animations
 - Nintendo announced Bronze as a North American Nintendo DSi XL launch color in 2010.
 - Nintendo documented larger screens and wider viewing angles for the DSi XL.
 
-**Motion:** A broad warm reflection crosses the bronze-colored upper housing and stops at the hinge; the lower matte panel remains subdued.
+**Motion:** An original full-page motherboard stays softly energized: varied traces, vias, pads, chips with pin rows and transistor outlines, with luminous packets following the drawn routes. The character or console artwork remains unchanged.
 
-**Still:** Broad warm upper lid, dark underside, hinge, and dual rectangles.
+**Still:** The original environment and credited artwork remain visible behind a steady, energized circuit board. Travelling packets disappear when motion is off.
 
 - [Nintendo of America Launch Announcement](https://www.nintendoworldreport.com/news/22635/nintendo-reveals-upcoming-release-schedule)
 - [Nintendo: DSi XL Hardware](https://www.nintendo.com/en-gb/News/2010/New-Nintendo-DSi-XL-console-is-perfect-for-family-fun-252306.html)
@@ -687,9 +687,9 @@ Motion uses CSS transforms and opacity. System reduced motion and the Animations
 - Nintendo documents black and white DSi editions tied to Pokémon Black and White.
 - Official systems used licensed legendary designs, which this proposal deliberately does not reproduce.
 
-**Motion:** Two unbranded angular traces advance from opposing sides toward a central seam, pause, then fade away.
+**Motion:** An original full-page motherboard stays softly energized: varied traces, vias, pads, chips with pin rows and transistor outlines, with luminous packets following the drawn routes. The character or console artwork remains unchanged.
 
-**Still:** Balanced black-and-white split shell with dual opposed abstract traces.
+**Still:** The original environment and credited artwork remain visible behind a steady, energized circuit board. Travelling packets disappear when motion is off.
 
 - [Nintendo: Pokémon Black/White DSi editions](https://www.nintendo.com/en-gb/News/2011/Pokemon-Black-Version-and-Pokemon-White-Version-arrive-in-Europe-March-4th--253463.html)
 
@@ -700,9 +700,9 @@ Motion uses CSS transforms and opacity. System reduced motion and the Animations
 - Nintendo Japan identifies its Galaxy-spec New Nintendo 3DS LL body as a design previously sold in North America.
 - The Japanese limited package additionally included a branded microfiber cleaning pouch.
 
-**Motion:** A restrained crescent-shaped specular sweep crosses an original cosmic-print lid while small star points brighten in sequence.
+**Motion:** An original full-page motherboard stays softly energized: varied traces, vias, pads, chips with pin rows and transistor outlines, with luminous packets following the drawn routes. The character or console artwork remains unchanged.
 
-**Still:** Dark handheld lid with original navy-violet curved star field.
+**Still:** The original environment and credited artwork remain visible behind a steady, energized circuit board. Travelling packets disappear when motion is off.
 
 - [Nintendo Japan: Galaxy New Nintendo 3DS LL](https://www.nintendo.com/jp/topics/article/994f51d8-95cf-11e6-9b38-063b7ac45a6d)
 - [Nintendo: New Nintendo 3DS XL Hardware](https://www.nintendo.com/en-gb/Hardware/Nintendo-3DS-Family/New-Nintendo-3DS-XL/New-Nintendo-3DS-XL-955921.html)
@@ -716,9 +716,9 @@ Motion uses CSS transforms and opacity. System reduced motion and the Animations
 - Nintendo documents the special New Nintendo 3DS LL Super Famicom edition.
 - Nintendo describes the New 3DS family form; original geometry represents the four-button arrangement.
 
-**Motion:** A soft highlight passes sequentially over four abstract button positions while the upper panel gently wakes.
+**Motion:** An original full-page motherboard stays softly energized: varied traces, vias, pads, chips with pin rows and transistor outlines, with luminous packets following the drawn routes. The character or console artwork remains unchanged.
 
-**Still:** Warm-gray dual-panel housing with four distinguishable circular controls and no logos.
+**Still:** The original environment and credited artwork remain visible behind a steady, energized circuit board. Travelling packets disappear when motion is off.
 
 - [Nintendo Japan: Super Famicom edition](https://www.nintendo.com/jp/topics/article/69765b61-fc9c-11e5-8360-063b7ac45a6d)
 - [Nintendo: New 3DS family](https://www.nintendo.co.jp/corporate/release/en/2014/140829.html)
@@ -1004,9 +1004,9 @@ Motion uses CSS transforms and opacity. System reduced motion and the Animations
 - Zygarde consists of cells and cores.
 - Zygarde is associated with protecting the ecosystem.
 
-**Motion:** Individual hexagonal cells slide into a grid, align, and activate a final corrective perimeter.
+**Motion:** Filled organic hexagonal cells of varied sizes fade into existence while growing, then fade away while shrinking, with staggered deterministic phases across the page. No circuit links, technical outlines or form transformation.
 
-**Still:** A composed, visible arrangement of the identity geometry.
+**Still:** The original environment and credited artwork remain, with subdued filled cells at composed static sizes.
 
 - [Zygarde Pokédex](https://www.pokemon.com/us/pokedex/0718)
 - [Official Zygarde forms announcement](https://press.pokemon.com/en/DEBUT-OF-NINE-NEW-POKEMON-FOR-POKEMON-SUN-AND-POKEMON-MOON-)
@@ -1119,9 +1119,9 @@ Motion uses CSS transforms and opacity. System reduced motion and the Animations
 - Miraidon is associated with the distant future.
 - Miraidon can travel through Paldea.
 
-**Motion:** A smooth electric charge divides into parallel terrain tracks before reconverging below a stable hover ring.
+**Motion:** An original full-page motherboard stays softly energized: varied traces, vias, pads, chips with pin rows and transistor outlines, with luminous packets following the drawn routes. The character or console artwork remains unchanged.
 
-**Still:** A composed, visible arrangement of the identity geometry.
+**Still:** The original environment and credited artwork remain visible behind a steady, energized circuit board. Travelling packets disappear when motion is off.
 
 - [Koraidon and Miraidon announcement](https://press.pokemon.com/en/MEDIA-ALERT-DETAILS-REVEALED-ABOUT-THE-LEGENDARY-POKEMON-KORAIDON-AND-)
 - [Miraidon Pokédex](https://www.pokemon.com/us/pokedex/1008)

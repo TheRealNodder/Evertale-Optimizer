@@ -6,7 +6,9 @@
   if(!profiles||!g.EvertaleTheme)return;
   const assetBase=new URL('.',d.currentScript?.src||new URL('theme-motion.js',d.baseURI||g.location.href).href);
   const mobile=g.matchMedia?.('(max-width:480px)');
-  let scene=null,active='',artNode=null,particles=null,particleKey='';
+  const density=g.matchMedia?.('(max-width:700px)');
+  const technology=Object.freeze(['miraidon','cyber','crimsonblack','cobaltblack','metallicrose','bronzexl','blackwhitedsi','galaxystyle','superfamicom']);
+  let scene=null,active='',artNode=null,particles=null,particleKey='',moduleHost=null;
   /* Sixteen shared primitives, authored geometry and per-theme events. Counts include
      separately animated children; mobile keeps the signature before its atmosphere. */
   function part(type,shape,count,phone,duration,size,region='edges'){
@@ -33,7 +35,7 @@
     ocean:[P('swell','wave',4,2,20,170),P('ripple','foam',3,1,14,105)],
     ember:[P('rise','ember',14,6,11,6),P('heat','coal',2,1,18,60)],
     royal:[P('prism','gold',4,2,22,105),P('ripple','water',3,1,16,70)],
-    cyber:[P('trace','network',5,2,10,160),P('arc','electric',2,1,8,160)],
+    cyber:[P('arc','electric',2,1,8,160)],
     forest:[P('fall','leaf',10,4,17,11),P('glint','seed',8,3,12,5)],
     cosmic:[P('orbit','star',6,2,26,14,'top'),P('swell','nebula',3,1,24,145)],
     sunrise:[P('heat','sunbeam',3,1,22,140,'top'),P('burst','sun',3,1,26,95,'top')],
@@ -52,13 +54,13 @@
     jade:[P('prism','jade',3,1,25,120),P('ripple','water',3,1,20,65)],
     obsidian:[P('prism','fracture',4,2,24,130),P('heat','coal',2,1,24,30)],
     amethyst:[P('prism','cluster',5,2,22,90),P('glint','facet',5,2,16,7)],
-    crimsonblack:[P('trace','shell',4,2,12,160),P('prism','shell',2,1,20,80)],
-    cobaltblack:[P('trace','corner',4,2,13,160),P('gust','reflection',2,1,20,85)],
-    metallicrose:[P('trace','opposed',3,2,15,160),P('prism','rose',2,1,22,105)],
-    bronzexl:[P('trace','corner',3,2,17,160),P('prism','bronze',2,1,25,115)],
-    blackwhitedsi:[P('trace','opposed',4,2,12,160),P('prism','split',2,1,18,90)],
-    galaxystyle:[P('trace','network',3,2,15,160),P('glint','star',7,3,12,5,'top')],
-    superfamicom:[P('trace','retro',4,2,14,160),P('glint','button',4,2,22,9)],
+    crimsonblack:[P('prism','shell',2,1,20,80)],
+    cobaltblack:[P('gust','reflection',2,1,20,85)],
+    metallicrose:[P('prism','rose',2,1,22,105)],
+    bronzexl:[P('prism','bronze',2,1,25,115)],
+    blackwhitedsi:[P('prism','split',2,1,18,90)],
+    galaxystyle:[P('glint','star',7,3,12,5,'top')],
+    superfamicom:[P('glint','button',4,2,22,9)],
     hooh:[P('burst','feather',5,2,18,85,'top'),P('rise','feather',8,3,13,24)],
     lugia:[P('swell','pressure',3,1,22,175),P('gust','wing',5,2,9,145)],
     suicune:[P('swell','cleansing',3,1,12,130),P('swell','aurora',2,1,19,150)],
@@ -78,7 +80,7 @@
     whitekyurem:[P('heat','iceheat',4,2,16,90),P('rise','steam',7,3,14,32)],
     xerneas:[P('burst','antler',5,2,20,110,'top'),P('glint','life',7,3,13,7)],
     yveltal:[P('invert','drain',10,4,16,24),P('heat','shadow',2,1,22,90)],
-    zygarde:[P('hex','cell',8,4,12,60),P('trace','cell-link',2,1,18,160)],
+    zygarde:[],
     solgaleo:[P('heat','corona',3,1,18,125,'top'),P('burst','sun',4,2,22,105,'top')],
     lunala:[P('orbit','crescent',1,1,27,85,'top'),P('swell','moon-shadow',2,1,22,95,'top')],
     ultranecrozma:[P('prism','ray',5,2,16,125),P('burst','prism',4,1,22,110,'top')],
@@ -86,7 +88,7 @@
     zamazenta:[P('ripple','shield',4,2,15,95),P('gust','deflect',2,1,21,115)],
     eternatus:[P('heat','core',2,1,18,100),P('arc','energy',3,1,8,160)],
     koraidon:[P('gust','dust',6,3,12,55),P('swell','grass',3,1,16,90)],
-    miraidon:[P('trace','propulsion',4,2,8,160,'charge'),P('arc','junction',2,1,8,160,'charge')],
+    miraidon:[P('arc','junction',2,1,8,160,'charge')],
     terapagos:[P('prism','stellar',5,2,20,85,'top'),P('orbit','facet',4,2,24,20,'top')]
   };
   for(const value of Object.values(SIGNATURES))Object.freeze(value);
@@ -94,14 +96,27 @@
   const ROUTES=[[[0,20],[48,20],[48,64],[104,64],[104,30],[154,30]],[[0,64],[36,64],[36,20],[98,20],[98,64],[154,64]],[[0,36],[62,36],[62,70],[122,70],[122,12],[154,12]]];
   const SVG_OPEN='<svg viewBox="-8 -8 176 100" xmlns="http://www.w3.org/2000/svg" focusable="false" aria-hidden="true">';
   const TRACE_OPEN='<svg viewBox="0 0 160 90" xmlns="http://www.w3.org/2000/svg" focusable="false" aria-hidden="true">';
+  function clearModule(){
+    if(!moduleHost)return;
+    g.EvertaleMotherboard?.clear(moduleHost);g.EvertaleCells?.clear(moduleHost);
+    moduleHost.remove();moduleHost=null;
+  }
+  function mountModule(key){
+    const engine=technology.includes(key)?g.EvertaleMotherboard:key==='zygarde'?g.EvertaleCells:null;
+    if(!engine)return;
+    moduleHost=node('div','themeMotionModuleHost');moduleHost.setAttribute('data-engine',key==='zygarde'?'cells':'motherboard');
+    particles.appendChild(moduleHost);engine.render(moduleHost,{key,mobile:!!density?.matches});
+  }
   function seeded(key){let h=2166136261;for(const c of key)h=Math.imul(h^c.charCodeAt(0),16777619);return()=>{h=Math.imul(h^(h>>>15),2246822507);h=Math.imul(h^(h>>>13),3266489909);return((h^=h>>>16)>>>0)/4294967296;};}
   function syncParticles(key){
     const parts=key&&SIGNATURES[key];
-    if(!parts){if(particles){particles.hidden=true;particles.replaceChildren();}particleKey='';return;}
+    if(!parts){clearModule();if(particles){particles.hidden=true;particles.replaceChildren();}particleKey='';return;}
     if(!particles){particles=node('div','themeMotionParticles');particles.id='themeMotionParticles';particles.setAttribute('aria-hidden','true');}
     if(particles.parentNode!==d.body)d.body.appendChild(particles);
     particles.hidden=false;
-    if(particleKey===key)return;
+    const bucket=`${key}:${!!density?.matches}`;
+    if(particleKey===bucket)return;
+    clearModule();
     const rand=seeded(key),colors=['var(--site-theme-accent)','color-mix(in srgb,var(--site-theme-accent) 65%,var(--site-theme-ink))','var(--site-theme-ink)'],spans=[];
     parts.forEach((part,group)=>{
       for(let i=0;i<part.count;i++){
@@ -145,7 +160,7 @@
       }
     });
     particles.setAttribute('data-scene-key',key);
-    particles.replaceChildren(...spans);particleKey=key;
+    particles.replaceChildren(...spans);mountModule(key);particleKey=bucket;
   }
   function syncImage(){
     const profile=profiles[active];
@@ -202,8 +217,9 @@
     }
     syncImage();d.documentElement.setAttribute('data-theme-scene',cfg.key);syncParticles(cfg.key);syncButtons();
   }
-  g.EvertaleThemeMotion={keys:Object.freeze(Object.keys(profiles)),signatures:SIGNATURES,sync};
+  g.EvertaleThemeMotion={keys:Object.freeze(Object.keys(profiles)),signatures:SIGNATURES,technology,sync};
   d.addEventListener('evertale:theme-applied',sync);
   mobile?.addEventListener?.('change',syncImage);
+  density?.addEventListener?.('change',sync);
   d.readyState==='loading'?d.addEventListener('DOMContentLoaded',sync,{once:true}):sync();
 })(window,document);

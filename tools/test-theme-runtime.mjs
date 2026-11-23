@@ -18,7 +18,7 @@ function element(tagName='div'){
   const attributes=new Map();
   const children=[];
   return{
-    tagName:tagName.toUpperCase(),id:'',className:'',children,firstChild:null,textContent:'',
+    tagName:tagName.toUpperCase(),id:'',className:'',children,firstChild:null,textContent:'',clientWidth:1280,clientHeight:900,
     style:{values:new Map(),setProperty(name,value){this.values.set(name,String(value));}},
     setAttribute(name,value){attributes.set(name,String(value));},
     getAttribute(name){return attributes.get(name)??null;},
@@ -46,6 +46,7 @@ const head=element('head');
 const document={
   readyState:'complete',hidden:false,documentElement:html,body,head,
   createElement:tag=>element(tag),
+  createElementNS:(_,tag)=>element(tag),
   getElementById(id){
     const walk=node=>{
       if(node?.id===id)return node;
@@ -82,7 +83,8 @@ const context={
 };
 const reducedMotion={matches:false,addEventListener(type,handler){this.onchange=handler;}};
 const mobileMotion={matches:false,addEventListener(type,handler){this.onchange=handler;}};
-context.matchMedia=query=>query.includes('prefers-reduced-motion')?reducedMotion:query==='(max-width:480px)'?mobileMotion:{matches:false,addEventListener(){}};
+const densityMotion={matches:false,addEventListener(type,handler){this.onchange=handler;}};
+context.matchMedia=query=>query.includes('prefers-reduced-motion')?reducedMotion:query==='(max-width:480px)'?mobileMotion:query==='(max-width:700px)'?densityMotion:{matches:false,addEventListener(){}};
 context.window=context;
 vm.createContext(context);
 vm.runInContext(source,context,{filename:'seasonal-theme.js'});
@@ -251,6 +253,8 @@ check(html.getAttribute('data-theme-motion')==='running','Visible, idle page did
 vm.runInContext(fs.readFileSync(path.join(root,'theme-motion-profiles.js'),'utf8'),context);
 document.baseURI='https://example.test/app/tools/theme-preview.html';
 document.currentScript={src:'https://example.test/app/theme-motion.js?v=1'};
+vm.runInContext(fs.readFileSync(path.join(root,'theme-motherboard.js'),'utf8'),context);
+vm.runInContext(fs.readFileSync(path.join(root,'theme-cells.js'),'utf8'),context);
 vm.runInContext(fs.readFileSync(path.join(root,'theme-motion.js'),'utf8'),context);
 const motion=context.EvertaleThemeMotion;
 check(JSON.stringify([...motion.keys].sort())===JSON.stringify(themes.filter(t=>t.material!=='elemental').map(t=>t.key).sort()),'Motion scenes do not cover the exact72 non-Elemental themes');
@@ -258,6 +262,8 @@ check(JSON.stringify(Object.keys(motion.signatures).sort())===JSON.stringify([..
 const primitiveNames=new Set(['fall','rise','gust','glint','swell','ripple','orbit','heat','arc','trace','hex','clock','rift','invert','prism','burst']);
 for(const [key,parts] of Object.entries(motion.signatures)){
   let desktop=5,phone=4; // Existing three layers and two art surfaces; two layers on phones.
+  if(motion.technology.includes(key)){desktop+=12;phone+=5;}
+  if(key==='zygarde'){desktop+=24;phone+=10;}
   for(const part of parts){
     check(primitiveNames.has(part.type),`Unknown signature primitive: ${key}`);
     check(Number.isInteger(part.count)&&Number.isInteger(part.phone)&&part.phone>0&&part.phone<=part.count,`Invalid signature density: ${key}`);
@@ -268,16 +274,28 @@ for(const [key,parts] of Object.entries(motion.signatures)){
   check(desktop<=40&&phone<=16,`Whole-scene signature budget exceeded: ${key} (${desktop}/${phone})`);
 }
 const signatureHost=document.getElementById('themeMotionParticles');
-const signatureSnapshot=()=>signatureHost.children.map(x=>[x.getAttribute('data-primitive'),x.getAttribute('data-shape'),[...x.style.values]]);
+const snapshotNode=x=>[x.className,x.getAttribute('d'),x.getAttribute('data-mobile'),x.textContent,[...x.style.values],x.children.map(snapshotNode)];
+const signatureSnapshot=()=>signatureHost.children.map(snapshotNode);
 api.setPreference('zygarde');const firstCells=JSON.stringify(signatureSnapshot());
-check(signatureHost.children.filter(x=>x.getAttribute('data-primitive')==='hex').every(x=>x.innerHTML.includes('themeMotionCellA')&&x.innerHTML.includes('themeMotionCellB')),'Zygarde does not have separately opening cell edges');
+check(signatureHost.querySelector('.tcField')?.children.length===24,'Zygarde does not render its organic cell pool');
+check(signatureHost.querySelector('.tcField')?.children.filter(x=>x.getAttribute('data-mobile')==='true').length===10,'Zygarde phone cell budget changed');
+check(!signatureHost.querySelector('.themeMotionParticle'),'Zygarde retained technical hex/trace effects');
 api.setPreference('miraidon');
+const desktopPackets=signatureHost.querySelector('.tmbBoard')?.querySelectorAll('.tmbPulse').length;
+check(desktopPackets>0&&desktopPackets<=12,`Miraidon board packet budget failed: ${desktopPackets}`);
+const desktopModule=signatureHost.querySelector('.themeMotionModuleHost');
+densityMotion.matches=true;densityMotion.onchange();
+const phonePackets=signatureHost.querySelector('.tmbBoard')?.querySelectorAll('.tmbPulse').length;
+check(phonePackets>0&&phonePackets<=5,`Motion bucket board packet budget failed: ${phonePackets}`);
+check(!desktopModule.parentNode,'Motion bucket change left the old module host attached');
+densityMotion.matches=false;densityMotion.onchange();
+api.setPreference('zekrom');
 for(const item of signatureHost.children.filter(x=>x.getAttribute('data-primitive')==='trace')){
   check(item.innerHTML.includes('viewBox="0 0 160 90"'),'Circuit geometry does not share the packet coordinate space');
   check(item.children.some(x=>x.className==='themeMotionPacket'),'A circuit track has no travelling packet');
   for(let i=1;i<6;i++){
     const value=(axis,index)=>item.style.values.get(`--p${index}${axis}`);
-    check(value('x',i)===value('x',i-1)||value('y',i)===value('y',i-1),'Miraidon packet cuts a diagonal across a corner');
+    check(Number.isFinite(parseFloat(value('x',i)))&&Number.isFinite(parseFloat(value('y',i))),'Generator conductor waypoint is not finite');
   }
   const suffix=item.getAttribute('data-route')==='0'?'':item.getAttribute('data-route');
   const track=signatureCss.split('\n').find(line=>line.startsWith(`@keyframes theme-sig-packet${suffix}{`));
@@ -320,7 +338,8 @@ for(let round=0;round<3;round++)for(const theme of themes){
   else check(!sceneNode.hidden&&sceneNode.children.length===context.EvertaleMotionProfiles[theme.key].layers.length+Number(!!context.EvertaleMotionProfiles[theme.key].art),`Stale or duplicate motion layers: ${theme.key}`);
   check(document.getElementById('themeMotionParticles')===signatureHost,`Signature switching recreated its host: ${theme.key}`);
   if(theme.material==='elemental'&&theme.key!=='thunderwake')check(signatureHost.hidden&&signatureHost.children.length===0,`An Elemental theme retained another theme's signature: ${theme.key}`);
-  else check(signatureHost.children.length===motion.signatures[theme.key].reduce((sum,part)=>sum+part.count,0),`Signature objects leaked or disappeared: ${theme.key}`);
+  else check(signatureHost.children.length===motion.signatures[theme.key].reduce((sum,part)=>sum+part.count,0)+Number(motion.technology.includes(theme.key)||theme.key==='zygarde'),`Signature objects leaked or disappeared: ${theme.key}`);
+  check(signatureHost.querySelectorAll('.themeMotionModuleHost').length===Number(motion.technology.includes(theme.key)||theme.key==='zygarde'),`Module hosts leaked: ${theme.key}`);
   for(const item of signatureHost.children.filter(x=>['fall','rise'].includes(x.getAttribute('data-primitive')))){
     const x=parseFloat(item.style.values.get('--x')),drift=parseFloat(item.style.values.get('--dx'));
     check(item.style.values.get('--x').endsWith('%'),'Background field does not follow its clipped host');

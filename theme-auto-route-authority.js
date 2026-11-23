@@ -104,19 +104,26 @@
     document.head.appendChild(script);
   }
 
+  let motionRequested=false;
+  function motionAsset(file,api){
+    if(window[api])return Promise.resolve();
+    return new Promise(resolve=>{
+      const script=document.createElement('script');script.src='./'+file;script.defer=true;
+      script.addEventListener('load',resolve,{once:true});script.addEventListener('error',resolve,{once:true});
+      document.head.appendChild(script);
+    });
+  }
   function ensureThemeMotion(){
     if(window.EvertaleThemeMotion){window.EvertaleThemeMotion.sync();return;}
-    if(document.querySelector('script[src*="theme-motion.js"]'))return;
+    if(motionRequested||document.querySelector('script[src*="theme-motion.js"]'))return;
+    motionRequested=true;
     const load=()=>{
       if(document.querySelector('script[src*="theme-motion.js"]'))return;
       const script=document.createElement('script');script.src='./theme-motion.js?v=4';script.defer=true;
       document.head.appendChild(script);
     };
-    if(window.EvertaleMotionProfiles){load();return;}
-    const existing=document.querySelector('script[src*="theme-motion-profiles.js"]');
-    if(existing){existing.addEventListener('load',load,{once:true});return;}
-    const profiles=document.createElement('script');profiles.src='./theme-motion-profiles.js?v=1';profiles.defer=true;
-    profiles.addEventListener('load',load,{once:true});document.head.appendChild(profiles);
+    Promise.all([motionAsset('theme-motherboard.js?v=1','EvertaleMotherboard'),motionAsset('theme-cells.js?v=1','EvertaleCells')])
+      .then(()=>motionAsset('theme-motion-profiles.js?v=1','EvertaleMotionProfiles')).then(load);
   }
 
   let scheduled=false;

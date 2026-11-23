@@ -1,39 +1,40 @@
 # Theme animation signatures
 
-The 72 illustrated scene themes use one reusable peripheral overlay and sixteen shared primitives. Each profile selects authored shapes, trajectories, phases and densities. The seven Elemental themes retain their separate renderer and original artwork; particle densities are reduced, two phone atmosphere spins stop, and Thunderwake receives one localized branch accent. This pass changes animation, not optimizer behavior or artwork.
+The page paints three layers in order: original background art, decorative animation, then main content. The animation spans the page rather than being confined to foreground gutters. Navigation, dialogs and menus remain above it. The isolated body owns the two negative decorative stacking levels; no new stacking context is imposed on application content.
 
-Pokémon identities and form qualifications remain documented with primary references in [Theme visual references and motion](THEME_MOTION.md). The effects below are original visual interpretations, not canonical attack animations. Circuitry represents futuristic electrical motion; it does not assert that a Pokémon contains computer hardware. Shiny palettes do not imply shiny-exclusive powers. No form transformations are introduced.
+Reading panels use an 84% theme-colored backing. Controls and menus retain solid backings where needed. The primary ink at 90% opacity is checked against all eight RGB-corner underlays, including pure white, at a minimum 4.5:1 ratio. Secondary normal text uses the same theme ink. Mobile panel blur is disabled. Actual rendered styles and stacking are also checked; the numerical palette check is not a claim that every image pixel has been sampled.
 
-The eight version themes (`gold` through `platinum`) express Johto, Hoenn and Sinnoh environments. The six mineral themes express crystal and surface optics. Console finishes retain original orthogonal routes rather than copied circuitry or logos.
+## Dedicated motifs
 
-## Behavior and limits
+Nine technology themes use an original full-page motherboard: `miraidon`, `cyber`, and the seven console finishes. One static SVG contains varied trace widths, 45-degree bends, vias, pads, chip outlines with pin rows, transistor outlines and other passive components. Strokes without travelling packets stay energized. The SVG and HTML packets share host-pixel coordinates, with distance-proportional keyframes. No official schematics or logos are copied.
 
-- Circuit SVGs and their HTML packets share a 160 by 90 coordinate space, including phone scaling. Endpoint and corner alignment is verified against rendered screen coordinates.
-- Falling and rising foreground fields stay in the outer gutters, with a small outward drift. They do not take arbitrary paths through the central reading area.
-- Circuits use static tracks and luminous packets that follow each authored corner. Keyframe travel offsets are proportional to segment lengths; propulsion profiles can accelerate within a segment.
-- Hex cells have two independently animated edge groups: they separate, then close. Positions and phases repeat deterministically after remounting.
-- Electrical branches use a localized, staggered charge/discharge envelope with a eight-second cycle and no full-screen flash. Generator charging completes before discharge.
-- The new scene signatures reserve five existing animated art/layer surfaces on desktop and four on phones. Every independently animated cell edge, packet and branch is counted. The targets are at most 40 desktop and 16 phone animations in the complete 72-scene composition; the global ceiling is 60.
-- Standalone overlay periods are 6–30 seconds, plus 2.4-second continuous rain travel. The existing compiled SVG layer schema remains 6–24 seconds. These are separate schemas. Rain travel is not a luminance flash.
-- Hidden tabs and optimizer searches pause the existing controller. Animations off and system reduced motion stop movement, retain static cells/tracks, and hide travelling packets and drifting foreground particles. Existing artwork and composed static scene layers remain visible.
-- Shapes are decorative, non-focusable and click-through. Geometry, clipping, gradients and shadows are static. Animated properties are transform and opacity; no rendering loop or per-frame DOM allocation is added.
-- Browser frame timing, paint/compositing, readability and physical-phone performance require measurement; the property choices alone are not a performance certification.
+Zygarde uses filled organic cells, not a technical hex grid. Twenty-four cells (ten on phones) have deterministic positions and varied sizes from 18 to 110 pixels. Each grows while fading in and shrinks while fading out. The old outlined cells and circuit links are retired.
 
-Technical references: [Animation performance](https://web.dev/articles/animations-and-performance), [compositor layers](https://web.dev/articles/stick-to-compositor-only-properties-and-manage-layer-count), [flash thresholds](https://www.w3.org/WAI/WCAG21/Understanding/three-flashes-or-below-threshold.html).
+Both engines receive separate child hosts inside one shared animation stage. Theme switching clears the module, its resize observer and pending debounce timer. The controller owns the 700px density bucket; the motherboard owns bounded, debounced geometry redraws within that bucket. The separate 480px breakpoint selects artwork files.
 
-## Per-theme overlay catalog
+## Motion contract
 
-Counts are desktop / phone objects. A hex object contains two animated edges; an arc contains three animated branches. Other objects animate once. Static child geometry is additional DOM, not an additional moving object. Existing scene surfaces are included in the conservative total.
+- At most 40 desktop / 16 phone independently animated decorative objects, including existing environment layers and artwork. The static board paths do not count as moving objects, but their DOM/render cost is measured separately.
+- The motherboard contributes at most 12 / 5 packets; organic cells contribute 24 / 10 cells. Other signatures share sixteen primitive families with authored geometry, periods and phases.
+- Only transform and opacity animate. No continuous JavaScript render loop is added. One bounded resize debounce belongs to each active board and is cleared when it is removed.
+- Hidden tabs and optimizer searches pause the shared controller. Animations off and reduced motion stop movement; the board remains energized, packets hide, and cells hold a subdued static composition.
+- Original illustrations, credited character images, theme identities, optimizer scoring and source game data are preserved.
 
-| Theme | Primary and accent (objects; period) | Conservative total desktop / phone | References |
+Lore and form qualifications remain in [Theme visual references and motion](THEME_MOTION.md). Geometry and timing are original visual interpretations, not canonical attack animations. Performance on a physical phone must be measured separately from viewport emulation.
+
+## Per-theme catalog
+
+Counts below are conservative complete-scene desktop / phone bounds, including five / four existing scene surfaces. An arc object has three desktop animated segments and one phone segment; the conservative primitive budget reserves three on both.
+
+| Theme | Engine and accents | Conservative desktop / phone total | References |
 | --- | --- | --- | --- |
-| cinderfall | Dedicated Elemental renderer; 10 phone particles | 36 / 14 | [Identity](THEME_MOTION.md#cinderfall) |
-| undertow | Dedicated Elemental renderer; 10 phone particles | 34 / 14 | [Identity](THEME_MOTION.md#undertow) |
-| frostbite | Dedicated Elemental renderer; 10 phone particles | 36 / 14 | [Identity](THEME_MOTION.md#frostbite) |
-| thunderwake | Dedicated storm renderer; 24/10 rain particles and one localized electrical branch (3/1 animated segments) | 33 / 15 | [Identity](THEME_MOTION.md#thunderwake) |
-| worldroot | Dedicated Elemental renderer; 10 phone particles | 34 / 14 | [Identity](THEME_MOTION.md#worldroot) |
-| dawnspire | Dedicated Elemental renderer; 10 phone particles | 30 / 14 | [Identity](THEME_MOTION.md#dawnspire) |
-| voidcrown | Dedicated Elemental renderer; 10 phone particles | 34 / 14 | [Identity](THEME_MOTION.md#voidcrown) |
+| cinderfall | Preserved Elemental renderer | 36 / 14 | [Identity](THEME_MOTION.md#cinderfall) |
+| undertow | Preserved Elemental renderer | 34 / 14 | [Identity](THEME_MOTION.md#undertow) |
+| frostbite | Preserved Elemental renderer | 36 / 14 | [Identity](THEME_MOTION.md#frostbite) |
+| thunderwake | Preserved storm renderer + localized branch | 33 / 15 | [Identity](THEME_MOTION.md#thunderwake) |
+| worldroot | Preserved Elemental renderer | 34 / 14 | [Identity](THEME_MOTION.md#worldroot) |
+| dawnspire | Preserved Elemental renderer | 30 / 14 | [Identity](THEME_MOTION.md#dawnspire) |
+| voidcrown | Preserved Elemental renderer | 34 / 14 | [Identity](THEME_MOTION.md#voidcrown) |
 | spring | fall: petal (16/6; 13s); burst: flower (3/1; 22s) | 24 / 11 | [Identity](THEME_MOTION.md#spring) |
 | summer | heat: sunbeam (3/1; 19s); glint: droplet (8/3; 10s) | 16 / 8 | [Identity](THEME_MOTION.md#summer) |
 | autumn | fall: leaf (18/7; 13s); gust: leaf (3/1; 21s) | 26 / 12 | [Identity](THEME_MOTION.md#autumn) |
@@ -52,7 +53,7 @@ Counts are desktop / phone objects. A hex object contains two animated edges; an
 | ocean | swell: wave (4/2; 20s); ripple: foam (3/1; 14s) | 12 / 7 | [Identity](THEME_MOTION.md#ocean) |
 | ember | rise: ember (14/6; 11s); heat: coal (2/1; 18s) | 21 / 11 | [Identity](THEME_MOTION.md#ember) |
 | royal | prism: gold (4/2; 22s); ripple: water (3/1; 16s) | 12 / 7 | [Identity](THEME_MOTION.md#royal) |
-| cyber | trace: network (5/2; 10s); arc: electric (2/1; 8s) | 16 / 9 | [Identity](THEME_MOTION.md#cyber) |
+| cyber | Full-page motherboard (12/5 packet cap); arc: electric (2/1; 8s) | 23 / 12 | [Identity](THEME_MOTION.md#cyber) |
 | forest | fall: leaf (10/4; 17s); glint: seed (8/3; 12s) | 23 / 11 | [Identity](THEME_MOTION.md#forest) |
 | cosmic | orbit: star (6/2; 26s); swell: nebula (3/1; 24s) | 14 / 7 | [Identity](THEME_MOTION.md#cosmic) |
 | quartz | prism: crystal (5/2; 21s); glint: facet (4/2; 18s) | 14 / 8 | [Identity](THEME_MOTION.md#quartz) |
@@ -69,13 +70,13 @@ Counts are desktop / phone objects. A hex object contains two animated edges; an
 | topaz | prism: facet (4/2; 19s); heat: amber (2/1; 20s) | 11 / 7 | [Identity](THEME_MOTION.md#topaz) |
 | jade | prism: jade (3/1; 25s); ripple: water (3/1; 20s) | 11 / 6 | [Identity](THEME_MOTION.md#jade) |
 | obsidian | prism: fracture (4/2; 24s); heat: coal (2/1; 24s) | 11 / 7 | [Identity](THEME_MOTION.md#obsidian) |
-| crimsonblack | trace: shell (4/2; 12s); prism: shell (2/1; 20s) | 11 / 7 | [Identity](THEME_MOTION.md#crimsonblack) |
-| cobaltblack | trace: corner (4/2; 13s); gust: reflection (2/1; 20s) | 11 / 7 | [Identity](THEME_MOTION.md#cobaltblack) |
-| metallicrose | trace: opposed (3/2; 15s); prism: rose (2/1; 22s) | 10 / 7 | [Identity](THEME_MOTION.md#metallicrose) |
-| bronzexl | trace: corner (3/2; 17s); prism: bronze (2/1; 25s) | 10 / 7 | [Identity](THEME_MOTION.md#bronzexl) |
-| blackwhitedsi | trace: opposed (4/2; 12s); prism: split (2/1; 18s) | 11 / 7 | [Identity](THEME_MOTION.md#blackwhitedsi) |
-| galaxystyle | trace: network (3/2; 15s); glint: star (7/3; 12s) | 15 / 9 | [Identity](THEME_MOTION.md#galaxystyle) |
-| superfamicom | trace: retro (4/2; 14s); glint: button (4/2; 22s) | 13 / 8 | [Identity](THEME_MOTION.md#superfamicom) |
+| crimsonblack | Full-page motherboard (12/5 packet cap); prism: shell (2/1; 20s) | 19 / 10 | [Identity](THEME_MOTION.md#crimsonblack) |
+| cobaltblack | Full-page motherboard (12/5 packet cap); gust: reflection (2/1; 20s) | 19 / 10 | [Identity](THEME_MOTION.md#cobaltblack) |
+| metallicrose | Full-page motherboard (12/5 packet cap); prism: rose (2/1; 22s) | 19 / 10 | [Identity](THEME_MOTION.md#metallicrose) |
+| bronzexl | Full-page motherboard (12/5 packet cap); prism: bronze (2/1; 25s) | 19 / 10 | [Identity](THEME_MOTION.md#bronzexl) |
+| blackwhitedsi | Full-page motherboard (12/5 packet cap); prism: split (2/1; 18s) | 19 / 10 | [Identity](THEME_MOTION.md#blackwhitedsi) |
+| galaxystyle | Full-page motherboard (12/5 packet cap); glint: star (7/3; 12s) | 24 / 12 | [Identity](THEME_MOTION.md#galaxystyle) |
+| superfamicom | Full-page motherboard (12/5 packet cap); glint: button (4/2; 22s) | 21 / 11 | [Identity](THEME_MOTION.md#superfamicom) |
 | hooh | burst: feather (5/2; 18s); rise: feather (8/3; 13s) | 18 / 9 | [Identity](THEME_MOTION.md#hooh) |
 | lugia | swell: pressure (3/1; 22s); gust: wing (5/2; 9s) | 13 / 7 | [Identity](THEME_MOTION.md#lugia) |
 | suicune | swell: cleansing (3/1; 12s); swell: aurora (2/1; 19s) | 10 / 6 | [Identity](THEME_MOTION.md#suicune) |
@@ -95,7 +96,7 @@ Counts are desktop / phone objects. A hex object contains two animated edges; an
 | whitekyurem | heat: iceheat (4/2; 16s); rise: steam (7/3; 14s) | 16 / 9 | [Identity](THEME_MOTION.md#whitekyurem) |
 | xerneas | burst: antler (5/2; 20s); glint: life (7/3; 13s) | 17 / 9 | [Identity](THEME_MOTION.md#xerneas) |
 | yveltal | invert: drain (10/4; 16s); heat: shadow (2/1; 22s) | 17 / 9 | [Identity](THEME_MOTION.md#yveltal) |
-| zygarde | hex: cell (8/4; 12s); trace: cell-link (2/1; 18s) | 23 / 13 | [Identity](THEME_MOTION.md#zygarde) |
+| zygarde | Organic filled cells (24/10) | 29 / 14 | [Identity](THEME_MOTION.md#zygarde) |
 | solgaleo | heat: corona (3/1; 18s); burst: sun (4/2; 22s) | 12 / 7 | [Identity](THEME_MOTION.md#solgaleo) |
 | lunala | orbit: crescent (1/1; 27s); swell: moon-shadow (2/1; 22s) | 8 / 6 | [Identity](THEME_MOTION.md#lunala) |
 | ultranecrozma | prism: ray (5/2; 16s); burst: prism (4/1; 22s) | 14 / 7 | [Identity](THEME_MOTION.md#ultranecrozma) |
@@ -103,14 +104,8 @@ Counts are desktop / phone objects. A hex object contains two animated edges; an
 | zamazenta | ripple: shield (4/2; 15s); gust: deflect (2/1; 21s) | 11 / 7 | [Identity](THEME_MOTION.md#zamazenta) |
 | eternatus | heat: core (2/1; 18s); arc: energy (3/1; 8s) | 16 / 8 | [Identity](THEME_MOTION.md#eternatus) |
 | koraidon | gust: dust (6/3; 12s); swell: grass (3/1; 16s) | 14 / 8 | [Identity](THEME_MOTION.md#koraidon) |
-| miraidon | trace: propulsion (4/2; 8s); arc: junction (2/1; 8s) | 15 / 9 | [Identity](THEME_MOTION.md#miraidon) |
+| miraidon | Full-page motherboard (12/5 packet cap); arc: junction (2/1; 8s) | 23 / 12 | [Identity](THEME_MOTION.md#miraidon) |
 | terapagos | prism: stellar (5/2; 20s); orbit: facet (4/2; 24s) | 14 / 8 | [Identity](THEME_MOTION.md#terapagos) |
 | sunrise | heat: sunbeam (3/1; 22s); burst: sun (3/1; 26s) | 11 / 6 | [Identity](THEME_MOTION.md#sunrise) |
 
-## Specific identity checks
-
-Zygarde uses split cellular outlines rather than leaves. Miraidon uses coordinated orthogonal electrical travel; Cyber uses independent network phases. Zekrom uses irregular generator conductors followed by a branching discharge. Black Kyurem conducts electricity through visible ice fractures, while White Kyurem retains a cold shell around warm internal light and rising vapor. Koraidon uses dust and grass motion.
-
-Dialga combines stepped environmental light bands with one restrained tick-bearing ring. Palkia opens a spatial seam; Giratina uses opposing fragment directions. Xerneas grows branching light outward; Yveltal draws fragments inward. Arceus uses ordered stair illumination, Lunala a crescent and passing moon shadow, and Terapagos sequential crystal-face refraction.
-
-The official [Zygarde entry](https://sg.portal-pokemon.com/pokedex/0718/) describes its assembled pieces and ecosystem role. The official [Koraidon/Miraidon announcement](https://press.pokemon.com/en-AU/MEDIA-ALERT-DETAILS-REVEALED-ABOUT-THE-LEGENDARY-POKEMON-KORAIDON-AND-) establishes the sunlight/electric-terrain distinction. [Reshiram](https://sg.portal-pokemon.com/pokedex/0643/) and [Zekrom](https://sg.portal-pokemon.com/pokedex/0644/) distinguish fire/truth from lightning/ideals. Timing and geometry are design choices.
+Technical references: [animation performance](https://web.dev/articles/animations-and-performance), [compositor layers](https://web.dev/articles/stick-to-compositor-only-properties-and-manage-layer-count), [flash thresholds](https://www.w3.org/WAI/WCAG21/Understanding/three-flashes-or-below-threshold.html).
