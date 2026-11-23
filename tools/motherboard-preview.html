@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Motherboard and cells preview</title>
+<link rel="stylesheet" href="../theme-motherboard.css">
+<style>
+  html{--site-theme-bg:#0a071f;--site-theme-accent:#43d8e4;--site-theme-secondary:#f9ef80;--site-theme-ink:#f2f2ff}
+  html[data-mode="cells"]{--site-theme-bg:#080b07;--site-theme-accent:#a7db3d;--site-theme-secondary:#74d84d;--site-theme-ink:#f7ffe5}
+  body{margin:0;min-height:100vh;font:15px/1.5 system-ui;color:var(--site-theme-ink);background:var(--site-theme-bg)}
+  /* [Background] -> [Animation] -> [Main content] */
+  .bg{position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse at 70% 40%,color-mix(in srgb,var(--site-theme-accent) 16%,transparent),transparent 60%),var(--site-theme-bg)}
+  .fx{position:fixed;inset:0;z-index:1;pointer-events:none}
+  main{position:relative;z-index:2;max-width:980px;margin:40px auto;padding:0 16px;display:grid;gap:16px}
+  .panel{padding:18px 22px;border-radius:16px;border:1px solid color-mix(in srgb,var(--site-theme-accent) 40%,transparent);background:color-mix(in srgb,var(--site-theme-bg) 82%,transparent)}
+  .controls{display:flex;gap:8px;flex-wrap:wrap}
+  button{font:inherit;padding:6px 12px;border-radius:8px;border:1px solid var(--site-theme-accent);background:var(--site-theme-bg);color:var(--site-theme-ink);cursor:pointer}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="fx" id="fx"></div>
+<main>
+  <section class="panel"><h1>Signature layer preview</h1><p>Layering: background, then animation, then content. Panels are 82% opaque so the board and cells show through without covering text.</p>
+    <div class="controls">
+      <button data-mode="board" data-key="miraidon">Motherboard (Miraidon)</button>
+      <button data-mode="board" data-key="cyber">Motherboard (Cyber)</button>
+      <button data-mode="cells" data-key="zygarde">Cells (Zygarde)</button>
+      <button id="motion">Pause</button>
+    </div>
+  </section>
+  <section class="panel"><h2>Sample content</h2><p>Text and controls sit above the animation layer, so nothing moves across them.</p></section>
+  <section class="panel"><h2>More content</h2><p>Resize the window: the board redraws to the new size, and the cells keep their places.</p></section>
+</main>
+<script src="../theme-motherboard.js"></script>
+<script src="../theme-cells.js"></script>
+<script>
+  const fx=document.getElementById('fx');
+  function show(mode,key){
+    EvertaleMotherboard.clear(fx);EvertaleCells.clear(fx);
+    document.documentElement.dataset.mode=mode;
+    if(mode==='board')EvertaleMotherboard.render(fx,{key});else EvertaleCells.render(fx,{key});
+  }
+  document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.mode,b.dataset.key)));
+  document.getElementById('motion').addEventListener('click',e=>{
+    const paused=document.documentElement.dataset.themeMotion==='paused';
+    document.documentElement.dataset.themeMotion=paused?'running':'paused';e.target.textContent=paused?'Pause':'Resume';
+  });
+  const params=new URLSearchParams(location.search);
+  show(params.get('mode')||'board',params.get('key')||'miraidon');
+</script>
+</body>
+</html>

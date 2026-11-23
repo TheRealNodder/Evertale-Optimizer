@@ -47,6 +47,17 @@ test('new motion never adds a render loop or changes layout flow',()=>{
   assert.match(css,/data-theme-still="true"/);
 });
 
+test('signature keyframes animate only transforms and opacity',()=>{
+  const css=fs.readFileSync(path.join(root,'theme-motion.css'),'utf8');
+  const frames=css.split('\n').filter(line=>line.startsWith('@keyframes theme-sig-'));
+  assert.ok(frames.length>=16);
+  for(const frame of frames){
+    const properties=[...frame.matchAll(/\{([a-z-]+):|;([a-z-]+):/g)].map(match=>match[1]||match[2]);
+    assert.ok(properties.length>0);
+    assert.ok(properties.every(name=>['transform','opacity'].includes(name)),frame);
+  }
+});
+
 test('all72 illustrated environments have bounded, metadata-free desktop and mobile files',()=>{
   const receipts=JSON.parse(fs.readFileSync(path.join(root,'assets/themes/scene-artwork.json'),'utf8'));
   assert.equal(receipts.length,72);

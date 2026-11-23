@@ -10,39 +10,132 @@
 .themeMotionArt{transform-origin:62% 50%;animation:theme-art-drift 40s ease-in-out infinite alternate}
 html[data-theme-illustrated] .pokemonEncounter__ambient{transform-origin:66% 45%;animation:theme-art-drift 34s ease-in-out infinite alternate}
 @keyframes theme-art-drift{from{transform:scale(1.03) translate3d(0,0,0)}to{transform:scale(1.11) translate3d(-2.4%,-1.6%,0)}}
-/* Ambient particles float above the page (never over menus), click-through. */
-.themeMotionParticles{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:5;contain:strict}
+/* The isolated body paints art, animation, then ordinary page content.
+   Negative layers avoid creating a new stacking context around application dialogs. */
+html[data-theme-key] body::before,html[data-theme-key] body::after{z-index:-3}
+html[data-theme-key] #siteThemeFx{z-index:-2}
+.themeMotionParticles{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:-1;contain:strict}
 .themeMotionParticles[hidden]{display:none!important}
-.themeMotionParticle{position:absolute;left:var(--x);top:0;width:var(--s);height:var(--s);border-radius:50%;background:var(--c);opacity:0;will-change:transform,opacity;
-  animation:theme-particle-fall var(--d) linear var(--delay) infinite}
-.themeMotionParticles:is([data-particles="embers"],[data-particles="bubbles"],[data-particles="fireflies"],[data-particles="motes"]) .themeMotionParticle{animation-name:theme-particle-rise}
-.themeMotionParticles[data-particles="embers"] .themeMotionParticle{box-shadow:0 0 8px 2px var(--c)}
-.themeMotionParticles[data-particles="fireflies"] .themeMotionParticle{width:5px;height:5px;box-shadow:0 0 10px 3px var(--c)}
-.themeMotionParticles[data-particles="motes"] .themeMotionParticle{width:3px;height:3px;box-shadow:0 0 6px 1px var(--c)}
-.themeMotionParticles[data-particles="bubbles"] .themeMotionParticle{background:transparent;border:1.5px solid var(--c);box-shadow:inset 0 0 4px var(--c)}
-.themeMotionParticles[data-particles="snow"] .themeMotionParticle{background:var(--site-theme-ink);box-shadow:0 0 4px rgba(255,255,255,.6)}
-.themeMotionParticles[data-particles="ash"] .themeMotionParticle{background:color-mix(in srgb,var(--c) 45%,#3b3b3b);border-radius:30%}
-.themeMotionParticles:is([data-particles="petals"],[data-particles="leaves"]) .themeMotionParticle{width:calc(var(--s) + 6px);height:calc(var(--s) + 2px);border-radius:70% 0 70% 0}
-.themeMotionParticles[data-particles="petals"] .themeMotionParticle{background:color-mix(in srgb,var(--c) 55%,#ffc1dc)}
-.themeMotionParticles[data-particles="confetti"] .themeMotionParticle{width:6px;height:11px;border-radius:1px}
-.themeMotionParticles[data-particles="rain"] .themeMotionParticle{width:1.5px;height:26px;border-radius:1px;background:linear-gradient(transparent,var(--site-theme-ink));animation-name:theme-particle-rain}
-.themeMotionParticles[data-particles="wind"] .themeMotionParticle{left:0;top:var(--y);width:calc(70px + var(--s) * 12);height:1.5px;border-radius:2px;background:linear-gradient(90deg,transparent,var(--c),transparent);animation-name:theme-particle-wind}
-.themeMotionParticles:is([data-particles="stars"],[data-particles="sparkles"]) .themeMotionParticle{top:var(--y);animation-name:theme-particle-twinkle;animation-timing-function:ease-in-out;box-shadow:0 0 6px 1px var(--c)}
-.themeMotionParticles[data-particles="sparkles"] .themeMotionParticle{border-radius:1px;rotate:45deg}
-@keyframes theme-particle-fall{0%{transform:translate3d(0,-12vh,0) rotate(0);opacity:0}8%,90%{opacity:var(--o)}100%{transform:translate3d(var(--dx),112vh,0) rotate(var(--r));opacity:0}}
-@keyframes theme-particle-rise{0%{transform:translate3d(0,112vh,0);opacity:0}10%,85%{opacity:var(--o)}100%{transform:translate3d(var(--dx),-12vh,0);opacity:0}}
-@keyframes theme-particle-rain{0%{transform:translate3d(0,-15vh,0) rotate(10deg);opacity:0}10%,95%{opacity:calc(var(--o) * .8)}100%{transform:translate3d(-6vw,115vh,0) rotate(10deg);opacity:0}}
-@keyframes theme-particle-wind{0%{transform:translate3d(-25vw,0,0);opacity:0}15%,80%{opacity:var(--o)}100%{transform:translate3d(125vw,var(--dx),0);opacity:0}}
-@keyframes theme-particle-twinkle{0%,100%{transform:scale(.5);opacity:.12}50%{transform:scale(1.25);opacity:var(--o)}}
-html[data-theme-motion="paused"] :is(.themeMotionParticle,.themeMotionArt,.pokemonEncounter__ambient){animation-play-state:paused!important}
-html[data-theme-still="true"] .themeMotionParticles{display:none!important}
+.themeMotionModuleHost{position:absolute;inset:0;pointer-events:none;overflow:hidden;contain:strict}
+.themeMotionParticle{position:absolute;left:var(--x);top:var(--y);--anchor-x:var(--x);--anchor-y:var(--y);width:var(--s);height:var(--s);color:var(--c);opacity:0;
+  animation:theme-sig-glint var(--d) ease-in-out var(--delay) infinite;transform-origin:center;pointer-events:none}
+.themeMotionParticle svg{display:block;width:100%;height:100%;overflow:visible;fill:none;stroke:currentColor;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
+.themeMotionParticle:is([data-primitive="fall"],[data-primitive="rise"]){top:0;background:currentColor;border-radius:50%;animation-timing-function:linear}
+.themeMotionParticle[data-primitive="fall"]{animation-name:theme-sig-fall}
+.themeMotionParticle[data-primitive="rise"]{animation-name:theme-sig-rise}
+.themeMotionParticle[data-primitive="gust"]{width:calc(var(--s) * 1.5);height:calc(var(--s) * .4);animation-name:theme-sig-gust}
+.themeMotionParticle[data-primitive="swell"]{height:calc(var(--s) * .48);animation-name:theme-sig-swell}
+.themeMotionParticle[data-primitive="ripple"]{border:1.5px solid currentColor;border-radius:50%;height:calc(var(--s) * .5);animation-name:theme-sig-ripple}
+.themeMotionParticle[data-primitive="orbit"]{border:1px solid currentColor;border-radius:50%;animation-name:theme-sig-orbit}
+.themeMotionParticle[data-primitive="heat"]{height:calc(var(--s) * .7);animation-name:theme-sig-heat}
+.themeMotionParticle[data-primitive="rift"]{width:calc(var(--s) * .32);height:var(--s);animation-name:theme-sig-rift}
+.themeMotionParticle[data-primitive="invert"]{background:currentColor;clip-path:polygon(0 0,100% 24%,60% 100%,14% 70%);animation-name:theme-sig-invert;animation-timing-function:linear}
+.themeMotionParticle[data-primitive="invert"]:not([data-shape="drain"]):nth-child(even){animation-direction:reverse}
+.themeMotionParticle[data-primitive="prism"]{height:calc(var(--s) * .7);background:linear-gradient(120deg,transparent 20%,currentColor 48%,transparent 68%);clip-path:polygon(0 28%,65% 0,100% 62%,26% 100%);animation-name:theme-sig-prism}
+.themeMotionParticle[data-primitive="burst"]{animation-name:theme-sig-burst}
+.themeMotionParticle:is([data-shape="petal"],[data-shape="leaf"],[data-shape="feather"]){border-radius:85% 0 85% 0;aspect-ratio:1.8;height:calc(var(--s) * .55)}
+.themeMotionParticle[data-shape="petal"]{color:color-mix(in srgb,var(--c),#ffcee1 40%)}
+.themeMotionParticle[data-shape="blossom"]{background:currentColor;clip-path:polygon(50% 0,66% 28%,98% 31%,76% 56%,82% 90%,50% 75%,18% 90%,24% 56%,2% 31%,34% 28%)}
+.themeMotionParticle[data-shape="clover"]{background:radial-gradient(circle at 30% 30%,currentColor 0 26%,transparent 28%),radial-gradient(circle at 70% 30%,currentColor 0 26%,transparent 28%),radial-gradient(circle at 50% 67%,currentColor 0 29%,transparent 31%)}
+.themeMotionParticle[data-shape="heart"]{background:currentColor;clip-path:polygon(50% 90%,0 40%,8% 13%,30% 5%,50% 22%,70% 5%,92% 13%,100% 40%)}
+.themeMotionParticle[data-shape="confetti"]{border-radius:0;height:calc(var(--s) * 1.6)}
+.themeMotionParticle:is([data-shape="ice"],[data-shape="facet"]):is([data-primitive="fall"],[data-primitive="glint"],[data-primitive="orbit"]){clip-path:polygon(50% 0,100% 45%,50% 100%,0 45%);background:currentColor}
+.themeMotionParticle[data-shape="snow"]{background:var(--site-theme-ink);border-radius:50%;width:calc(var(--s) * .7)}
+.themeMotionParticle[data-shape="rain"]{width:1px;height:var(--s);border-radius:0;background:linear-gradient(transparent,var(--c));animation-name:theme-sig-rain;--d:2.4s!important}
+.themeMotionParticle[data-shape="steam"]{background:transparent;border:1px solid currentColor;border-left-color:transparent;border-bottom-color:transparent;border-radius:50%;width:calc(var(--s) * .5)}
+.themeMotionParticle[data-shape="flame"]{border-radius:0 90% 20% 80%;transform-origin:bottom}
+.themeMotionParticle:is([data-shape="star"],[data-shape="life"],[data-shape="seed"],[data-shape="light"],[data-shape="droplet"],[data-shape="soft"],[data-shape="button"],[data-shape="tick"]){background:currentColor;border-radius:50%}
+.themeMotionParticle[data-shape="star"]{clip-path:polygon(50% 0,61% 38%,100% 50%,61% 61%,50% 100%,38% 61%,0 50%,38% 38%)}
+.themeMotionParticle[data-shape="tick"]{border-radius:0;width:2px}
+.themeMotionParticle:is([data-shape="water"],[data-shape="foam"],[data-shape="pressure"]){border-radius:50%}
+.themeMotionParticle[data-shape="shield"]{height:var(--s);border-radius:10% 10% 50% 50%}
+.themeMotionParticle[data-shape="crescent"]{border-width:0 0 1px 5px;border-radius:50%;background:transparent}
+.themeMotionParticle[data-shape="order"]{border-style:double;border-width:3px}
+.themeMotionParticle:is([data-shape="aurora"],[data-shape="nebula"],[data-shape="fog"]){height:calc(var(--s) * 1.3);opacity:.08}
+.themeMotionParticle[data-shape="aurora"] svg{stroke-width:8;stroke-opacity:.25}
+.themeMotionParticle[data-shape="fog"] svg{stroke-width:10;stroke-opacity:.18}
+.themeMotionParticle[data-shape="terrain"] svg{stroke-width:6;stroke-opacity:.25}
+.themeMotionParticle[data-shape="terrace"]{animation-timing-function:steps(6,end)}
+.themeMotionParticle[data-shape="stair"]{animation-timing-function:steps(5,end)}
+.themeMotionParticle[data-shape="moon-shadow"]{background:radial-gradient(ellipse at 40% 50%,var(--site-theme-bg) 45%,transparent 65%);border:1px solid currentColor;border-radius:50%;height:var(--s)}
+.themeMotionParticle[data-shape="moon-shadow"] svg{display:none}
+.themeMotionParticle[data-shape="antler"]{animation-name:theme-sig-grow;transform-origin:bottom center}
+.themeMotionParticle[data-shape="fissure"]{animation-name:theme-sig-grow;transform-origin:left bottom}
+.themeMotionParticle[data-shape="corridor"]:nth-child(even){animation-direction:reverse}
+.themeMotionParticle[data-shape="blade"]{height:calc(var(--s) * .15);rotate:-25deg}
+.themeMotionParticle[data-shape="tendril"]{height:calc(var(--s) * .8)}
+.themeMotionParticle:is([data-shape="coal"],[data-shape="lantern"],[data-shape="shadow"],[data-shape="amber"]){border-radius:50%;background:radial-gradient(currentColor,transparent 70%)}
+.themeMotionParticle:is([data-shape="coal"],[data-shape="lantern"],[data-shape="shadow"],[data-shape="amber"]) svg{display:none}
+.themeMotionParticle:is([data-shape="opal"],[data-shape="jade"]){border-radius:50%;clip-path:none;background:radial-gradient(ellipse at 30% 45%,currentColor,transparent 67%)}
+.themeMotionParticle[data-shape="opal"]{background:radial-gradient(ellipse at 20% 25%,var(--site-theme-accent),transparent 55%),radial-gradient(ellipse at 70% 70%,var(--site-theme-secondary),transparent 52%)}
+.themeMotionParticle[data-shape="fracture"]{background:transparent;border-right:1px solid currentColor;border-radius:25% 70%;clip-path:none;height:calc(var(--s) * 1.2)}
+.themeMotionParticle[data-shape="cluster"]{clip-path:polygon(0 72%,15% 0,30% 60%,50% 10%,68% 75%,85% 20%,100% 85%)}
+.themeMotionParticle[data-shape="stellar"]{clip-path:polygon(50% 0,100% 25%,80% 85%,25% 100%,0 40%)}
+.themeMotionParticle[data-shape="ray"]{height:calc(var(--s) * .2)}
+/* Routes have fixed authored corners. Only the luminous packet moves. */
+.themeMotionParticle:is([data-primitive="trace"],[data-primitive="arc"]){width:160px;height:90px;opacity:1;animation:none}
+.themeMotionParticle[data-primitive="trace"] svg{opacity:.6;stroke-width:2}
+.themeMotionPacket{position:absolute;left:0;top:0;width:8px;height:8px;margin:-4px;border-radius:50%;background:var(--site-theme-ink);box-shadow:0 0 9px 1px var(--c);opacity:0;animation:theme-sig-packet var(--d) linear var(--delay) infinite}
+.themeMotionParticle[data-shape="propulsion"] .themeMotionPacket{animation-timing-function:cubic-bezier(.45,0,.8,1)}
+.themeMotionParticle[data-route="1"] .themeMotionPacket{animation-name:theme-sig-packet1}
+.themeMotionParticle[data-route="2"] .themeMotionPacket{animation-name:theme-sig-packet2}
+.themeMotionParticle[data-route="3"] .themeMotionPacket{animation-name:theme-sig-packet3}
+.themeMotionParticle[data-route="4"] .themeMotionPacket{animation-name:theme-sig-packet4}
+.themeMotionParticle[data-shape="opposed"]:nth-child(even) .themeMotionPacket{animation-direction:reverse}
+.themeMotionParticle[data-shape="cell-link"] svg{opacity:.12}
+.themeMotionArc{opacity:0;animation:theme-sig-discharge var(--d) ease-in-out var(--delay) infinite;stroke-width:1.8}
+.themeMotionArc--mid{animation-delay:calc(var(--delay) + .08s)}
+.themeMotionArc--branch{animation-delay:calc(var(--delay) + .16s)}
+.themeMotionIce{stroke:var(--site-theme-ink);stroke-width:1;opacity:.25}
+.themeMotionParticle[data-shape="iceheat"]{animation:none;opacity:1}
+.themeMotionWarm{stroke-width:6;opacity:0;animation:theme-sig-heat var(--d) ease-in-out var(--delay) infinite;transform-origin:center}
+/* Cells open into two three-edge groups, then close, at seeded phases. */
+.themeMotionParticle[data-primitive="hex"]{animation:none;opacity:.72}
+.themeMotionCellA,.themeMotionCellB{animation:theme-sig-cell-a var(--d) ease-in-out var(--delay) infinite;stroke-width:1.8;transform-origin:center}
+.themeMotionCellB{animation-name:theme-sig-cell-b}
+.themeMotionParticle[data-primitive="clock"]{border:1px solid currentColor;border-radius:50%;background:repeating-conic-gradient(currentColor 0 1deg,transparent 1deg 30deg);mask-image:radial-gradient(transparent 61%,#000 63%);animation:theme-sig-clock var(--d) steps(12,end) var(--delay) infinite}
+@keyframes theme-sig-fall{0%{transform:translate3d(0,-8vh,0) rotate(0deg);opacity:0}8%,85%{opacity:var(--o)}100%{transform:translate3d(var(--dx),108vh,0) rotate(var(--r));opacity:0}}
+@keyframes theme-sig-rise{0%{transform:translate3d(0,108vh,0) rotate(0deg);opacity:0}10%,85%{opacity:var(--o)}100%{transform:translate3d(var(--dx),-8vh,0) rotate(var(--r));opacity:0}}
+@keyframes theme-sig-rain{0%{transform:translate3d(0,-8vh,0) rotate(4deg);opacity:0}10%,90%{opacity:var(--o)}100%{transform:translate3d(var(--dx),108vh,0) rotate(4deg);opacity:0}}
+@keyframes theme-sig-glint{0%,100%{transform:scale(.7);opacity:.04}50%{transform:scale(1.15);opacity:var(--o)}}
+@keyframes theme-sig-gust{0%{transform:translate3d(-8vw,10px,0) rotate(-8deg);opacity:0}35%{opacity:var(--o)}65%{transform:translate3d(3vw,-10px,0) rotate(5deg);opacity:var(--o)}100%{transform:translate3d(12vw,-24px,0) rotate(12deg);opacity:0}}
+@keyframes theme-sig-swell{0%,100%{transform:translate3d(-25px,4px,0) scaleY(.9);opacity:0}40%{transform:translate3d(0,-5px,0) scaleY(1.08);opacity:var(--o)}70%{transform:translate3d(25px,1px,0) scaleY(1);opacity:calc(var(--o) * .7)}}
+@keyframes theme-sig-ripple{0%{transform:scale(.3);opacity:0}20%{opacity:var(--o)}100%{transform:scale(1.7);opacity:0}}
+@keyframes theme-sig-orbit{0%,100%{transform:translate3d(-20px,0,0) rotate(0deg);opacity:.08}25%{transform:translate3d(0,-12px,0) rotate(10deg);opacity:var(--o)}50%{transform:translate3d(20px,0,0) rotate(0deg);opacity:.14}75%{transform:translate3d(0,12px,0) rotate(-10deg);opacity:var(--o)}}
+@keyframes theme-sig-heat{0%,100%{transform:scale(.9) translateY(3px);opacity:.05}48%{transform:scale(1.06) translateY(-5px);opacity:var(--o)}75%{transform:scale(1.01) translateY(-2px);opacity:.13}}
+@keyframes theme-sig-rift{0%,100%{transform:scaleX(.12) scaleY(.65);opacity:0}40%,60%{transform:scaleX(1.4) scaleY(1.1);opacity:var(--o)}}
+@keyframes theme-sig-invert{0%{transform:translate3d(-12px,55px,0) rotate(-12deg);opacity:0}20%,75%{opacity:var(--o)}100%{transform:translate3d(24px,-70px,0) rotate(35deg);opacity:0}}
+.themeMotionParticle:is([data-shape="drain"],[data-shape="order"]){animation-name:theme-sig-drain;animation-direction:normal!important}
+@keyframes theme-sig-drain{0%{transform:translate3d(0,0,0) scale(1);opacity:0}20%{opacity:var(--o)}95%,100%{transform:translate3d(calc(83vw - var(--anchor-x)),calc(40vh - var(--anchor-y)),0) scale(.1);opacity:0}}
+@keyframes theme-sig-prism{0%,100%{transform:translate3d(-20px,8px,0) rotate(-6deg);opacity:0}35%{transform:translate3d(0,0,0) rotate(0);opacity:var(--o)}70%{transform:translate3d(22px,-8px,0) rotate(8deg);opacity:.1}}
+@keyframes theme-sig-burst{0%,65%,100%{transform:scale(.2);opacity:0}72%{opacity:var(--o)}87%{transform:scale(1.18);opacity:.1}95%{transform:scale(1.35);opacity:0}}
+@keyframes theme-sig-grow{0%,100%{transform:scaleY(.2);opacity:0}35%{transform:scaleY(.65);opacity:var(--o)}65%{transform:scaleY(1);opacity:var(--o)}85%{transform:scaleY(1);opacity:0}}
+@keyframes theme-sig-clock{0%{transform:rotate(0deg);opacity:.18}65%,75%{transform:rotate(calc(var(--direction) * 240deg));opacity:var(--o)}100%{transform:rotate(calc(var(--direction) * 360deg));opacity:.18}}
+/* Travel offsets are proportional to the lengths of the five fixed segments. */
+@keyframes theme-sig-packet{0%{transform:translate(var(--p0x),var(--p0y));opacity:0}10%{transform:translate(var(--p0x),var(--p0y));opacity:.7}24.483%{transform:translate(var(--p1x),var(--p1y));opacity:.7}37.759%{transform:translate(var(--p2x),var(--p2y));opacity:.7}54.655%{transform:translate(var(--p3x),var(--p3y));opacity:.7}64.914%{transform:translate(var(--p4x),var(--p4y));opacity:.7}80.000%{transform:translate(var(--p5x),var(--p5y));opacity:.7}84%,100%{transform:translate(var(--p5x),var(--p5y));opacity:0}}
+@keyframes theme-sig-packet1{0%{transform:translate(var(--p0x),var(--p0y));opacity:0}10%{transform:translate(var(--p0x),var(--p0y));opacity:.7}20.413%{transform:translate(var(--p1x),var(--p1y));opacity:.7}33.140%{transform:translate(var(--p2x),var(--p2y));opacity:.7}51.074%{transform:translate(var(--p3x),var(--p3y));opacity:.7}63.802%{transform:translate(var(--p4x),var(--p4y));opacity:.7}80.000%{transform:translate(var(--p5x),var(--p5y));opacity:.7}84%,100%{transform:translate(var(--p5x),var(--p5y));opacity:0}}
+@keyframes theme-sig-packet2{0%{transform:translate(var(--p0x),var(--p0y));opacity:0}10%{transform:translate(var(--p0x),var(--p0y));opacity:.7}27.642%{transform:translate(var(--p1x),var(--p1y));opacity:.7}37.317%{transform:translate(var(--p2x),var(--p2y));opacity:.7}54.390%{transform:translate(var(--p3x),var(--p3y));opacity:.7}70.894%{transform:translate(var(--p4x),var(--p4y));opacity:.7}80.000%{transform:translate(var(--p5x),var(--p5y));opacity:.7}84%,100%{transform:translate(var(--p5x),var(--p5y));opacity:0}}
+@keyframes theme-sig-packet3{0%{transform:translate(var(--p0x),var(--p0y));opacity:0}10%{transform:translate(var(--p0x),var(--p0y));opacity:.7}22.264%{transform:translate(var(--p1x),var(--p1y));opacity:.7}36.822%{transform:translate(var(--p2x),var(--p2y));opacity:.7}48.845%{transform:translate(var(--p3x),var(--p3y));opacity:.7}64.761%{transform:translate(var(--p4x),var(--p4y));opacity:.7}80.000%{transform:translate(var(--p5x),var(--p5y));opacity:.7}84%,100%{transform:translate(var(--p5x),var(--p5y));opacity:0}}
+@keyframes theme-sig-packet4{0%{transform:translate(var(--p0x),var(--p0y));opacity:0}10%{transform:translate(var(--p0x),var(--p0y));opacity:.7}24.122%{transform:translate(var(--p1x),var(--p1y));opacity:.7}37.939%{transform:translate(var(--p2x),var(--p2y));opacity:.7}52.061%{transform:translate(var(--p3x),var(--p3y));opacity:.7}66.184%{transform:translate(var(--p4x),var(--p4y));opacity:.7}80.000%{transform:translate(var(--p5x),var(--p5y));opacity:.7}84%,100%{transform:translate(var(--p5x),var(--p5y));opacity:0}}
+@keyframes theme-sig-discharge{0%,86%,94%,100%{transform:translate(0,0);opacity:0}88%{transform:translate(1px,-1px);opacity:.88}91%{transform:translate(0,0);opacity:.45}}
+@keyframes theme-sig-cell-a{0%,100%{transform:translate(0,0) scale(.8);opacity:.05}20%{transform:translate(0,0) scale(1);opacity:.45}45%,60%{transform:translate(-5px,-4px) scale(1.08);opacity:.7}82%{transform:translate(0,0) scale(1);opacity:.3}}
+@keyframes theme-sig-cell-b{0%,100%{transform:translate(0,0) scale(.8);opacity:.05}20%{transform:translate(0,0) scale(1);opacity:.45}45%,60%{transform:translate(5px,4px) scale(1.08);opacity:.7}82%{transform:translate(0,0) scale(1);opacity:.3}}
+html[data-theme-motion="paused"] :is(.themeMotionParticle,.themeMotionParticle *,.themeMotionArt,.pokemonEncounter__ambient){animation-play-state:paused!important}
+html[data-theme-still="true"] .themeMotionParticle{animation:none!important;transform:none!important;opacity:.2}
+html[data-theme-still="true"] .themeMotionParticle *{animation:none!important;transform:none!important;opacity:1}
+html[data-theme-still="true"] .themeMotionParticle:is([data-primitive="fall"],[data-primitive="rise"],[data-primitive="gust"]),html[data-theme-still="true"] .themeMotionPacket{display:none}
 html[data-theme-still="true"] :is(.themeMotionArt,.pokemonEncounter__ambient){animation:none!important}
 html[data-theme-illustrated] #siteThemeFx>:is(.siteThemeFx__field,.siteThemeFx__particles){display:none!important}
 html[data-theme-illustrated] .pokemonEncounter__ambient{opacity:1;background:linear-gradient(90deg,var(--site-theme-bg) 0%,color-mix(in srgb,var(--site-theme-bg) 92%,transparent) 26%,transparent 74%),var(--theme-scene-image) 65% 42%/cover}
 html[data-theme-illustrated] .pokemonEncounter__ambient::after{display:none}
-/* An opaque bottom paint under existing panel gradients isolates text from
-   every possible scene frame, including overlapping bright geometry. */
-html[data-theme-scene][data-theme-key][data-theme-material] body[data-theme-key][data-theme-material] :is(.topbar,.panel,.v2-panel,.v2-sidebar,.v2-grid-panel,.v2-detail-panel,.v2-filter-panel,.siteSideMenu){background-color:var(--site-theme-bg)!important}
+/* A bounded reading surface shows the scene without putting moving shapes over text.
+   Its contrast is checked against a white underlay, the brightest possible frame. */
+html[data-theme-key]{--theme-reading-alpha:84%}
+html[data-theme-key] body{--text:var(--site-theme-ink);--muted:var(--site-theme-ink)}
+html[data-theme-key][data-theme-material] body[data-theme-key][data-theme-material] :is(.panel,.controls,.v2-panel,.v2-sidebar,.v2-grid-panel,.v2-detail-panel,.v2-filter-panel,.v2-card-skill-panel,.slotCard,#catalogGrid .unitCard,#unitGrid .unitCard){background:color-mix(in srgb,var(--site-theme-bg) var(--theme-reading-alpha),transparent)!important}
+html[data-theme-key] body :is(.topbar,.siteSideMenu){background-color:var(--site-theme-bg)!important}
+html[data-theme-key] body :is(.muted,.brandSub,.footerHint,#statusText){opacity:.92}
+html[data-theme-key][data-theme-material] body[data-theme-key][data-theme-material] :is(.muted,.footerHint,#statusText){color:var(--site-theme-ink)!important}
 .themeMotionLayer,.themeMotionLayer>svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;transform-origin:center}
 .themeMotionLayer>svg{overflow:visible}
 .themeMotionToggle{position:relative;z-index:4;cursor:pointer;border:1px solid var(--site-theme-accent);border-radius:8px;padding:7px 10px;min-height:36px;background:var(--site-theme-bg);color:var(--site-theme-ink);font:700 11px/1.3 system-ui}
@@ -54,12 +147,20 @@ html[data-theme-scene] .pokemonEncounter__art{animation:none!important;transform
 html[data-theme-motion="paused"] .themeMotionLayer{animation-play-state:paused!important}
 html[data-theme-still="true"] .themeMotionLayer{animation:none!important;transform:var(--motion-still-transform);opacity:var(--motion-still-opacity)}
 @media(max-width:700px){
+  html[data-theme-key] body :is(.topbar,.panel,.controls,.v2-panel,.v2-sidebar,.v2-grid-panel,.v2-detail-panel,.v2-filter-panel,.unitCard,.slotCard,.siteSideMenu){backdrop-filter:none!important}
   .themeMotionLayer[data-mobile="false"]{display:none}
   .pokemonEncounter>.themeMotionToggle{right:9px;bottom:9px;padding:6px 8px;font-size:10px}
-  .themeMotionParticle:nth-child(2n){display:none}
+  .themeMotionParticle[data-mobile="false"]{display:none}
+  .themeMotionParticle[data-primitive="arc"] :is(.themeMotionArc--mid,.themeMotionArc--branch){display:none}
+  .themeMotionParticle{left:var(--mx);top:var(--my);--anchor-x:var(--mx);--anchor-y:var(--my)}
+  .themeMotionParticle:is([data-primitive="fall"],[data-primitive="rise"]){top:0}
+  .themeMotionParticle:is([data-primitive="trace"],[data-primitive="arc"]){scale:.65;transform-origin:left top}
+  .themeMotionParticle:not([data-primitive="trace"]):not([data-primitive="arc"]){max-width:85px;max-height:110px}
 }
 @media(prefers-reduced-motion:reduce){
   .themeMotionLayer{animation:none!important;transform:var(--motion-still-transform);opacity:var(--motion-still-opacity)}
-  .themeMotionParticles{display:none!important}
+  .themeMotionParticle{animation:none!important;transform:none!important;opacity:.2}
+  .themeMotionParticle *{animation:none!important;transform:none!important;opacity:1}
+  .themeMotionParticle:is([data-primitive="fall"],[data-primitive="rise"],[data-primitive="gust"]),.themeMotionPacket{display:none}
   :is(.themeMotionArt,.pokemonEncounter__ambient){animation:none!important}
 }
