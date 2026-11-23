@@ -119,10 +119,11 @@
     motionRequested=true;
     const load=()=>{
       if(document.querySelector('script[src*="theme-motion.js"]'))return;
-      const script=document.createElement('script');script.src='./theme-motion.js?v=4';script.defer=true;
+      const script=document.createElement('script');script.src='./theme-motion.js?v=5';script.defer=true;
       document.head.appendChild(script);
     };
-    Promise.all([motionAsset('theme-motherboard.js?v=1','EvertaleMotherboard'),motionAsset('theme-cells.js?v=1','EvertaleCells')])
+    Promise.all([motionAsset('theme-motherboard.js?v=1','EvertaleMotherboard'),motionAsset('theme-cells.js?v=1','EvertaleCells'),
+      motionAsset('theme-quake.js?v=1','EvertaleQuake'),motionAsset('theme-gems.js?v=1','EvertaleGems'),motionAsset('theme-wind.js?v=1','EvertaleWind')])
       .then(()=>motionAsset('theme-motion-profiles.js?v=1','EvertaleMotionProfiles')).then(load);
   }
 

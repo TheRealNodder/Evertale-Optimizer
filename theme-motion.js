@@ -40,14 +40,14 @@
     cosmic:[P('orbit','star',6,2,26,14,'top'),P('swell','nebula',3,1,24,145)],
     sunrise:[P('heat','sunbeam',3,1,22,140,'top'),P('burst','sun',3,1,26,95,'top')],
     /* Version identities are journeys through their regions, not mineral finishes. */
-    gold:[P('swell','sunlight',2,1,18,110,'top'),P('gust','leaf',4,2,13,35)],
-    silver:[P('swell','fog',2,1,18,160),P('ripple','water',2,1,12,90)],
-    ruby:[P('gust','dust',5,2,12,35),P('swell','terrain',2,1,18,150)],
-    sapphire:[P('swell','wave',3,1,18,145),P('ripple','foam',2,1,12,75)],
-    emerald:[P('swell','corridor',3,1,18,150),P('gust','leaf',4,2,12,45)],
-    diamond:[P('fall','snow',6,3,14,6),P('prism','frost',2,1,18,90)],
-    pearl:[P('ripple','water',3,1,16,90),P('swell','reflection',2,1,20,145)],
-    platinum:[P('swell','fog',2,1,22,130),P('fall','snow',4,2,15,7)],
+    gold:[P('swell','sunlight',2,1,18,110,'top')],
+    silver:[P('swell','fog',2,1,18,160)],
+    ruby:[P('swell','terrain',2,1,18,150)],
+    sapphire:[P('swell','wave',3,1,18,145)],
+    emerald:[P('swell','corridor',3,1,18,150)],
+    diamond:[P('prism','frost',2,1,18,90)],
+    pearl:[P('swell','reflection',2,1,20,145)],
+    platinum:[P('swell','fog',2,1,22,130)],
     quartz:[P('prism','crystal',5,2,21,105),P('glint','facet',4,2,18,8)],
     opal:[P('prism','opal',5,2,20,80),P('glint','soft',4,2,15,10)],
     topaz:[P('prism','facet',4,2,19,100),P('heat','amber',2,1,20,55)],
@@ -62,14 +62,14 @@
     galaxystyle:[P('glint','star',7,3,12,5,'top')],
     superfamicom:[P('glint','button',4,2,22,9)],
     hooh:[P('burst','feather',5,2,18,85,'top'),P('rise','feather',8,3,13,24)],
-    lugia:[P('swell','pressure',3,1,22,175),P('gust','wing',5,2,9,145)],
+    lugia:[P('swell','pressure',3,1,22,175)],
     suicune:[P('swell','cleansing',3,1,12,130),P('swell','aurora',2,1,19,150)],
-    groudon:[P('heat','fault',4,2,15,120),P('burst','fissure',3,1,20,90)],
+    groudon:[P('heat','fault',4,2,15,120)],
     kyogre:[P('swell','wave',4,2,22,170),P('fall','rain',14,6,11,22)],
-    rayquaza:[P('gust','serpent',7,3,8,165),P('orbit','air',3,1,18,75,'top')],
-    shinyprimalgroudon:[P('heat','magma',5,2,12,145),P('burst','fissure',4,1,18,105)],
+    rayquaza:[P('orbit','air',3,1,18,75,'top')],
+    shinyprimalgroudon:[P('heat','magma',5,2,12,145)],
     shinyprimalkyogre:[P('swell','pressure',4,2,22,180),P('prism','primal',3,1,18,100)],
-    shinymegarayquaza:[P('gust','tendril',7,3,12,190),P('burst','ray',4,1,20,115,'top')],
+    shinymegarayquaza:[P('burst','ray',4,1,20,115,'top')],
     dialga:[P('swell','terrace',3,1,20,100),P('clock','ticks',1,1,24,80,'top')],
     palkia:[P('rift','space',2,1,18,140),P('orbit','pearl',4,2,14,14)],
     giratina:[P('invert','shard',10,4,14,30),P('rift','fold',2,1,21,100)],
@@ -84,7 +84,7 @@
     solgaleo:[P('heat','corona',3,1,18,125,'top'),P('burst','sun',4,2,22,105,'top')],
     lunala:[P('orbit','crescent',1,1,27,85,'top'),P('swell','moon-shadow',2,1,22,95,'top')],
     ultranecrozma:[P('prism','ray',5,2,16,125),P('burst','prism',4,1,22,110,'top')],
-    zacian:[P('gust','blade',5,2,10,145),P('prism','blade',2,1,19,95)],
+    zacian:[P('prism','blade',2,1,19,95)],
     zamazenta:[P('ripple','shield',4,2,15,95),P('gust','deflect',2,1,21,115)],
     eternatus:[P('heat','core',2,1,18,100),P('arc','energy',3,1,8,160)],
     koraidon:[P('gust','dust',6,3,12,55),P('swell','grass',3,1,16,90)],
@@ -96,15 +96,25 @@
   const ROUTES=[[[0,20],[48,20],[48,64],[104,64],[104,30],[154,30]],[[0,64],[36,64],[36,20],[98,20],[98,64],[154,64]],[[0,36],[62,36],[62,70],[122,70],[122,12],[154,12]]];
   const SVG_OPEN='<svg viewBox="-8 -8 176 100" xmlns="http://www.w3.org/2000/svg" focusable="false" aria-hidden="true">';
   const TRACE_OPEN='<svg viewBox="0 0 160 90" xmlns="http://www.w3.org/2000/svg" focusable="false" aria-hidden="true">';
+  /* Full-page signature modules: each theme key maps to at most one engine. */
+  const MODULE_KEYS=Object.freeze({
+    motherboard:technology,
+    cells:Object.freeze(['zygarde']),
+    quake:Object.freeze(['groudon','shinyprimalgroudon']),
+    gems:Object.freeze(['ruby','sapphire','emerald','diamond','pearl','gold','silver','platinum']),
+    wind:Object.freeze(['lugia','rayquaza','shinymegarayquaza','zacian'])
+  });
+  const ENGINES={motherboard:'EvertaleMotherboard',cells:'EvertaleCells',quake:'EvertaleQuake',gems:'EvertaleGems',wind:'EvertaleWind'};
+  function moduleFor(key){return Object.keys(MODULE_KEYS).find(name=>MODULE_KEYS[name].includes(key))||null;}
   function clearModule(){
     if(!moduleHost)return;
-    g.EvertaleMotherboard?.clear(moduleHost);g.EvertaleCells?.clear(moduleHost);
+    for(const api of Object.values(ENGINES))g[api]?.clear(moduleHost);
     moduleHost.remove();moduleHost=null;
   }
   function mountModule(key){
-    const engine=technology.includes(key)?g.EvertaleMotherboard:key==='zygarde'?g.EvertaleCells:null;
+    const name=moduleFor(key),engine=name&&g[ENGINES[name]];
     if(!engine)return;
-    moduleHost=node('div','themeMotionModuleHost');moduleHost.setAttribute('data-engine',key==='zygarde'?'cells':'motherboard');
+    moduleHost=node('div','themeMotionModuleHost');moduleHost.setAttribute('data-engine',name);
     particles.appendChild(moduleHost);engine.render(moduleHost,{key,mobile:!!density?.matches});
   }
   function seeded(key){let h=2166136261;for(const c of key)h=Math.imul(h^c.charCodeAt(0),16777619);return()=>{h=Math.imul(h^(h>>>15),2246822507);h=Math.imul(h^(h>>>13),3266489909);return((h^=h>>>16)>>>0)/4294967296;};}
@@ -217,7 +227,7 @@
     }
     syncImage();d.documentElement.setAttribute('data-theme-scene',cfg.key);syncParticles(cfg.key);syncButtons();
   }
-  g.EvertaleThemeMotion={keys:Object.freeze(Object.keys(profiles)),signatures:SIGNATURES,technology,sync};
+  g.EvertaleThemeMotion={keys:Object.freeze(Object.keys(profiles)),signatures:SIGNATURES,technology,modules:MODULE_KEYS,moduleFor,sync};
   d.addEventListener('evertale:theme-applied',sync);
   mobile?.addEventListener?.('change',syncImage);
   density?.addEventListener?.('change',sync);
