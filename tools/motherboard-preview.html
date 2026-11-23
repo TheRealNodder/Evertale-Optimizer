@@ -7,6 +7,9 @@
 <style>
   html{--site-theme-bg:#0a071f;--site-theme-accent:#43d8e4;--site-theme-secondary:#f9ef80;--site-theme-ink:#f2f2ff}
   html[data-mode="cells"]{--site-theme-bg:#080b07;--site-theme-accent:#a7db3d;--site-theme-secondary:#74d84d;--site-theme-ink:#f7ffe5}
+  html[data-mode="quake"]{--site-theme-bg:#230605;--site-theme-accent:#e0b34b;--site-theme-secondary:#c99736;--site-theme-ink:#fff0ea}
+  html[data-mode="gems"]{--site-theme-bg:#0d121a;--site-theme-accent:#cbd5e1;--site-theme-secondary:#a5f3fc;--site-theme-ink:#f8fafc}
+  html[data-mode="wind"]{--site-theme-bg:#04180f;--site-theme-accent:#f2cf3f;--site-theme-secondary:#24754c;--site-theme-ink:#efffe9}
   body{margin:0;min-height:100vh;font:15px/1.5 system-ui;color:var(--site-theme-ink);background:var(--site-theme-bg)}
   /* [Background] -> [Animation] -> [Main content] */
   .bg{position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse at 70% 40%,color-mix(in srgb,var(--site-theme-accent) 16%,transparent),transparent 60%),var(--site-theme-bg)}
@@ -26,6 +29,14 @@
       <button data-mode="board" data-key="miraidon">Motherboard (Miraidon)</button>
       <button data-mode="board" data-key="cyber">Motherboard (Cyber)</button>
       <button data-mode="cells" data-key="zygarde">Cells (Zygarde)</button>
+      <button data-mode="quake" data-key="groudon">Earthquake (Groudon)</button>
+      <button data-mode="gems" data-key="ruby">Gems (Ruby)</button>
+      <button data-mode="gems" data-key="sapphire">Gems (Sapphire)</button>
+      <button data-mode="gems" data-key="emerald">Gems (Emerald)</button>
+      <button data-mode="gems" data-key="diamond">Gems (Diamond)</button>
+      <button data-mode="gems" data-key="pearl">Gems (Pearl)</button>
+      <button data-mode="gems" data-key="gold">Gems (Gold)</button>
+      <button data-mode="wind" data-key="rayquaza">Wind (Rayquaza)</button>
       <button id="motion">Pause</button>
     </div>
   </section>
@@ -34,12 +45,16 @@
 </main>
 <script src="../theme-motherboard.js"></script>
 <script src="../theme-cells.js"></script>
+<script src="../theme-quake.js"></script>
+<script src="../theme-gems.js"></script>
+<script src="../theme-wind.js"></script>
 <script>
   const fx=document.getElementById('fx');
+  const modules={board:EvertaleMotherboard,cells:EvertaleCells,quake:EvertaleQuake,gems:EvertaleGems,wind:EvertaleWind};
   function show(mode,key){
-    EvertaleMotherboard.clear(fx);EvertaleCells.clear(fx);
+    Object.values(modules).forEach(m=>m.clear(fx));
     document.documentElement.dataset.mode=mode;
-    if(mode==='board')EvertaleMotherboard.render(fx,{key});else EvertaleCells.render(fx,{key});
+    (modules[mode]||EvertaleMotherboard).render(fx,{key});
   }
   document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.mode,b.dataset.key)));
   document.getElementById('motion').addEventListener('click',e=>{

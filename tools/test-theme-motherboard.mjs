@@ -8,10 +8,10 @@ import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const context = vm.createContext({ Math, Object, Array, Uint8Array, String, Number, JSON });
 context.globalThis = context;
-for (const file of ['theme-motherboard.js', 'theme-cells.js']) {
+for (const file of ['theme-motherboard.js', 'theme-cells.js', 'theme-quake.js', 'theme-gems.js', 'theme-wind.js']) {
   vm.runInContext(fs.readFileSync(path.join(root, file), 'utf8'), context, { filename: file });
 }
-const { EvertaleMotherboard: board, EvertaleCells: cells } = context;
+const { EvertaleMotherboard: board, EvertaleCells: cells, EvertaleQuake: quake, EvertaleGems: gems, EvertaleWind: wind } = context;
 const sizes = [[1280, 800, false], [1920, 1080, false], [600, 900, false], [390, 844, true]];
 const numbers = text => (text.match(/-?\d+(\.\d+)?/g) || []).map(Number);
 
@@ -78,11 +78,52 @@ test('organic cells are filled, varied in size, bounded and phone-limited', () =
   assert.equal(JSON.stringify(list), JSON.stringify(cells.layout({ key: 'zygarde' })));
 });
 
-test('stylesheet animates only transform and opacity, and honours pause, still and reduced motion', () => {
+test('earthquakes: 5 (phone 3) varied quakes, banded cracks, staggered timing', () => {
+  for (const mobile of [false, true]) {
+    const list = quake.layout({ key: 'groudon', mobile });
+    assert.equal(list.length, mobile ? quake.limits.phone : quake.limits.desktop);
+    assert.equal(JSON.stringify(list), JSON.stringify(quake.layout({ key: 'groudon', mobile })));
+    const radii = list.map(q => q.radius);
+    assert.ok(Math.max(...radii) - Math.min(...radii) > 15, 'sizes vary');
+    for (const q of list) {
+      assert.equal(q.bands.length, quake.bands);
+      assert.ok(q.bands[0].length > 0, 'centre band has cracks');
+      for (const dpath of q.bands) { assert.doesNotMatch(dpath, /NaN|Infinity/); assert.ok(numbers(dpath).every(v => v >= -q.size * .5 && v <= q.size * 1.5)); }
+      assert.ok(q.duration >= 9 && q.duration <= 14 && q.delay <= 0 && q.x >= 5 && q.x <= 95 && q.y >= 8 && q.y <= 92);
+    }
+  }
+});
+
+test('gems: each version game shows its own cut, within budget', () => {
+  const cuts = { ruby: 'oval', sapphire: 'oval', emerald: 'emerald', diamond: 'brilliant', pearl: 'pearl', gold: 'ingot', silver: 'ingot', platinum: 'ingot' };
+  for (const [key, cut] of Object.entries(cuts)) {
+    for (const mobile of [false, true]) {
+      const list = gems.layout({ key, mobile });
+      assert.equal(list.length, mobile ? gems.limits.phone : gems.limits.desktop);
+      assert.ok(list.every(g => g.cut === cut && g.key === key && g.width >= 34 && g.width <= 90 && g.sweep >= 6 && g.delay <= 0));
+    }
+  }
+  assert.equal(gems.layout({ key: 'unknown' })[0].key, 'diamond');
+});
+
+test('wind: bounded streak lines with finite geometry', () => {
+  for (const [w, h, mobile] of sizes) {
+    const plan = wind.layout(w, h, { key: 'rayquaza', mobile });
+    assert.equal(plan.lines.length, mobile ? wind.limits.phone : wind.limits.desktop);
+    for (const line of plan.lines) {
+      assert.doesNotMatch(line.d, /NaN|Infinity/);
+      assert.ok(line.len > 0 && line.seg >= 60 && line.seg < line.len + 60 && line.duration > 3 && line.delay <= 0);
+    }
+  }
+});
+
+test('stylesheet animates only transform and opacity (wind dash offset excepted), and honours pause, still and reduced motion', () => {
   const css = fs.readFileSync(path.join(root, 'theme-motherboard.css'), 'utf8');
   for (const block of css.match(/@keyframes[^{]+\{(?:[^{}]*\{[^}]*\})+\s*\}/g) || []) {
-    for (const decl of block.match(/[a-z-]+(?=:)/g) || []) assert.ok(['transform', 'opacity'].includes(decl), `keyframe property ${decl}`);
+    const allowed = block.startsWith('@keyframes tw-gust') ? ['transform', 'opacity', 'stroke-dashoffset'] : ['transform', 'opacity'];
+    for (const decl of block.match(/[a-z-]+(?=:)/g) || []) assert.ok(allowed.includes(decl), `keyframe property ${decl}`);
   }
+  assert.doesNotMatch(css, /:is\([^)]*::/, 'no pseudo-elements inside :is()');
   assert.match(css, /data-theme-motion="paused"\] :is\(\.tmbPulse,\.tcCell\)\{animation-play-state:paused!important\}/);
   assert.match(css, /data-theme-still="true"\] \.tmbPulse\{display:none!important\}/);
   assert.match(css, /prefers-reduced-motion:reduce/);

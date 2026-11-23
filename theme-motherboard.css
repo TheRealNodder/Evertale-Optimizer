@@ -37,3 +37,60 @@ html[data-theme-still="true"] .tcCell{animation:none!important;opacity:calc(var(
   .tmbPulse{display:none!important}
   .tcCell{animation:none!important;opacity:calc(var(--o) * .55);transform:scale(.8) rotate(var(--turn))}
 }
+
+/* Earthquakes: crack bands open from the centre out, hold, then mend from the centre out. */
+.tqField,.tgField,.twField{position:absolute;inset:0;overflow:hidden;pointer-events:none;contain:strict}
+.tqQuake{position:absolute;left:var(--x);top:var(--y);width:var(--size);height:var(--size);margin:calc(var(--size) * -.5) 0 0 calc(var(--size) * -.5)}
+.tqQuake>svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.tqGlow{position:absolute;inset:0;border-radius:50%;opacity:0;transform:scale(.1);will-change:transform,opacity;
+  background:radial-gradient(circle,color-mix(in srgb,var(--site-theme-accent) 65%,#fff) 0%,color-mix(in srgb,var(--site-theme-accent) 55%,transparent) 24%,transparent 64%);
+  animation:tq-glow var(--d) ease-out var(--delay) infinite}
+.tqBand{opacity:0;animation:tq-band var(--d) ease-in-out calc(var(--delay) + var(--band) * var(--d) * .055) infinite}
+.tqCrack{fill:none;stroke:color-mix(in srgb,var(--site-theme-accent) 60%,#fff);stroke-width:2.2px;stroke-linecap:round;stroke-linejoin:round}
+.tqCrackGlow{fill:none;stroke:var(--site-theme-accent);stroke-opacity:.38;stroke-width:7px;stroke-linecap:round;stroke-linejoin:round}
+@keyframes tq-band{0%{opacity:0}5%{opacity:1}52%{opacity:1}60%{opacity:0}100%{opacity:0}}
+@keyframes tq-glow{0%{transform:scale(.1);opacity:0}18%{transform:scale(1);opacity:.75}50%{transform:scale(1.04);opacity:.5}70%{transform:scale(1.15);opacity:0}100%{transform:scale(.1);opacity:0}}
+
+/* Gems: faceted gem outlines with a light sweep across the facets and a star glint. */
+.tgGem{position:absolute;left:var(--x);top:var(--y);width:var(--w);height:var(--h);margin:calc(var(--h) * -.5) 0 0 calc(var(--w) * -.5);opacity:var(--o);
+  transform:rotate(var(--turn));will-change:transform;animation:tg-float var(--float) ease-in-out var(--delay) infinite alternate;
+  filter:drop-shadow(0 0 10px color-mix(in srgb,var(--site-theme-accent) 35%,transparent))}
+.tgGem>svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.tgFacets>*{fill:none;stroke:#fff;stroke-opacity:.38;stroke-width:1.2;vector-effect:non-scaling-stroke}
+.tgEdge>*{fill:none;stroke:#fff;stroke-opacity:.6;stroke-width:1.4;vector-effect:non-scaling-stroke}
+.tgSweep{position:absolute;inset:0;clip-path:var(--clip);overflow:hidden}
+.tgSweep::before{content:"";position:absolute;top:-20%;bottom:-20%;left:0;width:38%;will-change:transform;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.95) 50%,transparent);transform:translateX(-160%) skewX(-18deg);
+  animation:tg-sweep var(--sweep) ease-in-out var(--delay) infinite}
+.tgStar{position:absolute;right:10%;top:6%;width:14px;height:14px;background:#fff;opacity:0;transform:scale(.2);
+  clip-path:polygon(50% 0,60% 40%,100% 50%,60% 60%,50% 100%,40% 60%,0 50%,40% 40%);animation:tg-star var(--sweep) ease-out var(--delay) infinite}
+@keyframes tg-sweep{0%,52%{transform:translateX(-160%) skewX(-18deg)}78%,100%{transform:translateX(360%) skewX(-18deg)}}
+@keyframes tg-star{0%,70%{opacity:0;transform:scale(.2) rotate(0deg)}78%{opacity:1;transform:scale(1.1) rotate(20deg)}90%,100%{opacity:0;transform:scale(.3) rotate(45deg)}}
+@keyframes tg-float{from{transform:translateY(-4px) rotate(var(--turn))}to{transform:translateY(5px) rotate(var(--turn))}}
+
+/* Wind: transparent wind lines; a bright streak and soft glow travel along each one.
+   Exception to transform/opacity: the streak moves with stroke-dashoffset (it must follow the
+   curve), bounded to 10 lines on desktop and 4 on phones. */
+.twField>svg{position:absolute;left:0;top:0;overflow:visible}
+.twField path{fill:none;stroke-linecap:round}
+.twBase{stroke:transparent}
+.twStreak,.twGlow{stroke-width:var(--w);stroke-dasharray:var(--seg) var(--len);stroke-dashoffset:var(--seg);opacity:0;
+  animation:tw-gust var(--d) cubic-bezier(.45,.05,.4,1) var(--delay) infinite}
+.twStreak{stroke:var(--site-theme-ink)}
+.twGlow{stroke:var(--site-theme-accent)}
+@keyframes tw-gust{0%{stroke-dashoffset:var(--seg);opacity:0}10%{opacity:var(--o)}50%{opacity:var(--o)}62%{stroke-dashoffset:calc(var(--len) * -1);opacity:0}100%{stroke-dashoffset:calc(var(--len) * -1);opacity:0}}
+
+/* Shared motion state for the three effects above. */
+/* Pseudo-elements cannot sit inside :is(), so the sweep gets its own selectors. */
+html[data-theme-motion="paused"] :is(.tqGlow,.tqBand,.tgGem,.tgStar,.twStreak,.twGlow){animation-play-state:paused!important}
+html[data-theme-motion="paused"] .tgSweep::before{animation-play-state:paused!important}
+html[data-theme-still="true"] :is(.tqGlow,.tgStar,.twField){display:none!important}
+html[data-theme-still="true"] .tqBand{animation:none!important;opacity:.55}
+html[data-theme-still="true"] .tgGem{animation:none!important}
+html[data-theme-still="true"] .tgSweep::before{animation:none!important}
+@media(prefers-reduced-motion:reduce){
+  :is(.tqGlow,.tgStar,.twField){display:none!important}
+  .tqBand{animation:none!important;opacity:.55}
+  .tgGem{animation:none!important}
+  .tgSweep::before{animation:none!important}
+}

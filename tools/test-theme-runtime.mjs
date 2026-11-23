@@ -255,6 +255,7 @@ document.baseURI='https://example.test/app/tools/theme-preview.html';
 document.currentScript={src:'https://example.test/app/theme-motion.js?v=1'};
 vm.runInContext(fs.readFileSync(path.join(root,'theme-motherboard.js'),'utf8'),context);
 vm.runInContext(fs.readFileSync(path.join(root,'theme-cells.js'),'utf8'),context);
+for(const file of ['theme-quake.js','theme-gems.js','theme-wind.js'])vm.runInContext(fs.readFileSync(path.join(root,file),'utf8'),context);
 vm.runInContext(fs.readFileSync(path.join(root,'theme-motion.js'),'utf8'),context);
 const motion=context.EvertaleThemeMotion;
 check(JSON.stringify([...motion.keys].sort())===JSON.stringify(themes.filter(t=>t.material!=='elemental').map(t=>t.key).sort()),'Motion scenes do not cover the exact72 non-Elemental themes');
@@ -338,8 +339,8 @@ for(let round=0;round<3;round++)for(const theme of themes){
   else check(!sceneNode.hidden&&sceneNode.children.length===context.EvertaleMotionProfiles[theme.key].layers.length+Number(!!context.EvertaleMotionProfiles[theme.key].art),`Stale or duplicate motion layers: ${theme.key}`);
   check(document.getElementById('themeMotionParticles')===signatureHost,`Signature switching recreated its host: ${theme.key}`);
   if(theme.material==='elemental'&&theme.key!=='thunderwake')check(signatureHost.hidden&&signatureHost.children.length===0,`An Elemental theme retained another theme's signature: ${theme.key}`);
-  else check(signatureHost.children.length===motion.signatures[theme.key].reduce((sum,part)=>sum+part.count,0)+Number(motion.technology.includes(theme.key)||theme.key==='zygarde'),`Signature objects leaked or disappeared: ${theme.key}`);
-  check(signatureHost.querySelectorAll('.themeMotionModuleHost').length===Number(motion.technology.includes(theme.key)||theme.key==='zygarde'),`Module hosts leaked: ${theme.key}`);
+  else check(signatureHost.children.length===motion.signatures[theme.key].reduce((sum,part)=>sum+part.count,0)+Number(!!motion.moduleFor(theme.key)),`Signature objects leaked or disappeared: ${theme.key}`);
+  check(signatureHost.querySelectorAll('.themeMotionModuleHost').length===Number(!!motion.moduleFor(theme.key)),`Module hosts leaked: ${theme.key}`);
   for(const item of signatureHost.children.filter(x=>['fall','rise'].includes(x.getAttribute('data-primitive')))){
     const x=parseFloat(item.style.values.get('--x')),drift=parseFloat(item.style.values.get('--dx'));
     check(item.style.values.get('--x').endsWith('%'),'Background field does not follow its clipped host');
