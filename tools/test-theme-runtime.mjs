@@ -12,6 +12,7 @@ const routeSource=fs.readFileSync(path.join(root,'theme-auto-route-authority.js'
 const sceneSource=fs.readFileSync(path.join(root,'legendary-scenes.js'),'utf8');
 const presenceSource=fs.readFileSync(path.join(root,'pokemon-theme-presence.js'),'utf8');
 const effectCss=fs.readFileSync(path.join(root,'theme-effects.css'),'utf8');
+const signatureCss=fs.readFileSync(path.join(root,'theme-motion.css'),'utf8');
 
 function element(tagName='div'){
   const attributes=new Map();
@@ -181,7 +182,7 @@ check(!/\balternate\b/i.test(elementalCss),'Elemental CSS contains a rubberbandi
 check(/elementalArtOrbit/.test(elementalCss)&&/elementalSpin/.test(elementalCss),'Elemental CSS is missing its closed-loop motion authorities');
 check(/elementalRise/.test(elementalCss)&&/elementalRain/.test(elementalCss)&&/elementalSnow/.test(elementalCss),'Elemental CSS is missing an off-screen particle loop');
 check(/requestAnimationFrame/.test(elementalSource),'Elemental depth response is not frame-scheduled');
-check(/elemental-themes\.js\?v=2/.test(routeSource),'Theme route authority does not load the elemental compositor');
+check(/elemental-themes\.js\?v=3/.test(routeSource),'Theme route authority does not load the elemental compositor');
 for(const key of expectedElemental){
   const asset=path.join(root,'assets','themes','elemental',`${key}.png`);
   check(fs.existsSync(asset),`Missing elemental background: ${key}.png`);
@@ -239,7 +240,45 @@ document.currentScript={src:'https://example.test/app/theme-motion.js?v=1'};
 vm.runInContext(fs.readFileSync(path.join(root,'theme-motion.js'),'utf8'),context);
 const motion=context.EvertaleThemeMotion;
 check(JSON.stringify([...motion.keys].sort())===JSON.stringify(themes.filter(t=>t.material!=='elemental').map(t=>t.key).sort()),'Motion scenes do not cover the exact72 non-Elemental themes');
+check(JSON.stringify(Object.keys(motion.signatures).sort())===JSON.stringify([...motion.keys,'thunderwake'].sort()),'Signature effects do not cover the exact72 scenes and one storm accent');
+const primitiveNames=new Set(['fall','rise','gust','glint','swell','ripple','orbit','heat','arc','trace','hex','clock','rift','invert','prism','burst']);
+for(const [key,parts] of Object.entries(motion.signatures)){
+  let desktop=5,phone=4; // Existing three layers and two art surfaces; two layers on phones.
+  for(const part of parts){
+    check(primitiveNames.has(part.type),`Unknown signature primitive: ${key}`);
+    check(Number.isInteger(part.count)&&Number.isInteger(part.phone)&&part.phone>0&&part.phone<=part.count,`Invalid signature density: ${key}`);
+    check(part.duration>=6&&part.duration<=30,`Invalid standalone signature duration: ${key}`);
+    const weight=part.type==='hex'?2:part.type==='arc'?3:1;
+    desktop+=part.count*weight;phone+=part.phone*weight;
+  }
+  check(desktop<=40&&phone<=16,`Whole-scene signature budget exceeded: ${key} (${desktop}/${phone})`);
+}
+const signatureHost=document.getElementById('themeMotionParticles');
+const signatureSnapshot=()=>signatureHost.children.map(x=>[x.getAttribute('data-primitive'),x.getAttribute('data-shape'),[...x.style.values]]);
+api.setPreference('zygarde');const firstCells=JSON.stringify(signatureSnapshot());
+check(signatureHost.children.filter(x=>x.getAttribute('data-primitive')==='hex').every(x=>x.innerHTML.includes('themeMotionCellA')&&x.innerHTML.includes('themeMotionCellB')),'Zygarde does not have separately opening cell edges');
+api.setPreference('miraidon');
+for(const item of signatureHost.children.filter(x=>x.getAttribute('data-primitive')==='trace')){
+  check(item.children.some(x=>x.className==='themeMotionPacket'),'A circuit track has no travelling packet');
+  for(let i=1;i<6;i++){
+    const value=(axis,index)=>item.style.values.get(`--p${index}${axis}`);
+    check(value('x',i)===value('x',i-1)||value('y',i)===value('y',i-1),'Miraidon packet cuts a diagonal across a corner');
+  }
+  const suffix=item.getAttribute('data-route')==='0'?'':item.getAttribute('data-route');
+  const track=signatureCss.split('\n').find(line=>line.startsWith(`@keyframes theme-sig-packet${suffix}{`));
+  const offsets=[...track.matchAll(/([\d.]+)%\{transform:translate\(var\(--p([1-5])x\)/g)].slice(0,5).map(match=>Number(match[1]));
+  let prior=10,rate=null;
+  for(let i=1;i<6;i++){
+    const coordinate=(axis,index)=>parseFloat(item.style.values.get(`--p${index}${axis}`));
+    const distance=Math.hypot(coordinate('x',i)-coordinate('x',i-1),coordinate('y',i)-coordinate('y',i-1));
+    const segmentRate=(offsets[i-1]-prior)/distance;
+    check(Number.isFinite(segmentRate)&&(rate===null||Math.abs(segmentRate-rate)<.0001),'Circuit timings do not follow segment lengths');
+    rate=segmentRate;prior=offsets[i-1];
+  }
+}
+api.setPreference('zygarde');check(JSON.stringify(signatureSnapshot())===firstCells,'Signature positions/phases are not deterministic after remount');
 const sceneNode=document.getElementById('themeMotionScene');
+api.setPreference('terapagos');
 const firstArt=sceneNode.children.find(x=>x.className==='themeMotionArt');
 check(firstArt?.getAttribute('src').startsWith('https://example.test/app/assets/'),'Illustration URL followed the preview directory instead of the shared script');
 mobileMotion.matches=true;mobileMotion.onchange();
@@ -264,6 +303,9 @@ for(let round=0;round<3;round++)for(const theme of themes){
   check(document.getElementById('themeMotionScene')===sceneNode,`Switching recreated the scene container: ${theme.key}`);
   if(theme.material==='elemental')check(sceneNode.hidden&&sceneNode.children.length===0,'Elemental switch retained stale procedural scene nodes');
   else check(!sceneNode.hidden&&sceneNode.children.length===context.EvertaleMotionProfiles[theme.key].layers.length+Number(!!context.EvertaleMotionProfiles[theme.key].art),`Stale or duplicate motion layers: ${theme.key}`);
+  check(document.getElementById('themeMotionParticles')===signatureHost,`Signature switching recreated its host: ${theme.key}`);
+  if(theme.material==='elemental'&&theme.key!=='thunderwake')check(signatureHost.hidden&&signatureHost.children.length===0,`An Elemental theme retained another theme's signature: ${theme.key}`);
+  else check(signatureHost.children.length===motion.signatures[theme.key].reduce((sum,part)=>sum+part.count,0),`Signature objects leaked or disappeared: ${theme.key}`);
 }
 check(body.children.filter(x=>x.id==='siteThemeFx').length===1,'Repeated79-theme cycles duplicated the background host');
 

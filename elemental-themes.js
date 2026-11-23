@@ -10,13 +10,13 @@
   const SCENE_ID='elementalThemeScene';
   const MOBILE_QUERY='(max-width:700px)';
   const THEMES={
-    cinderfall:{particle:'ember',mobile:20,desktop:36},
-    undertow:{particle:'bubble',mobile:16,desktop:28},
-    frostbite:{particle:'snow',mobile:24,desktop:42},
-    thunderwake:{particle:'rain',mobile:30,desktop:50},
-    worldroot:{particle:'pollen',mobile:16,desktop:28},
-    dawnspire:{particle:'mote',mobile:14,desktop:24},
-    voidcrown:{particle:'shard',mobile:16,desktop:28}
+    cinderfall:{particle:'ember',mobile:10,desktop:30},
+    undertow:{particle:'bubble',mobile:10,desktop:28},
+    frostbite:{particle:'snow',mobile:10,desktop:30},
+    thunderwake:{particle:'rain',mobile:10,desktop:24},
+    worldroot:{particle:'pollen',mobile:10,desktop:28},
+    dawnspire:{particle:'mote',mobile:10,desktop:24},
+    voidcrown:{particle:'shard',mobile:10,desktop:28}
   };
 
   let activeTheme='';
@@ -29,7 +29,7 @@
     const link=d.createElement('link');
     link.id=CSS_ID;
     link.rel='stylesheet';
-    link.href='./elemental-themes.css?v=2';
+    link.href='./elemental-themes.css?v=3';
     d.head.appendChild(link);
   }
 

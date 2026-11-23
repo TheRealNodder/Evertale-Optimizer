@@ -77,7 +77,7 @@
     }
 
     const script=document.createElement('script');
-    script.src='./elemental-themes.js?v=2';
+    script.src='./elemental-themes.js?v=3';
     script.defer=true;
     script.addEventListener('load',ready,{once:true});
     script.addEventListener('error',ready,{once:true});
@@ -109,7 +109,7 @@
     if(document.querySelector('script[src*="theme-motion.js"]'))return;
     const load=()=>{
       if(document.querySelector('script[src*="theme-motion.js"]'))return;
-      const script=document.createElement('script');script.src='./theme-motion.js?v=2';script.defer=true;
+      const script=document.createElement('script');script.src='./theme-motion.js?v=3';script.defer=true;
       document.head.appendChild(script);
     };
     if(window.EvertaleMotionProfiles){load();return;}
