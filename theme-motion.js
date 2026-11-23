@@ -107,16 +107,13 @@
       for(let i=0;i<part.count;i++){
         const p=node('span','themeMotionParticle');
         p.setAttribute('data-primitive',part.type);p.setAttribute('data-shape',part.shape);p.setAttribute('data-mobile',String(i<part.phone));
-        const field=['fall','rise'].includes(part.type),right=i%2===0;
-        const feature=!field&&i===0&&group===0&&part.region==='edges';
-        const x=feature?70+rand()*8:part.region==='charge'?86:field?(right?98.8+rand()*.6:rand()*.4):right?84+rand()*11:1+rand()*9;
-        const y=feature?12+rand()*8:part.region==='top'?11+rand()*12:part.region==='charge'?18+i*19:!right&&!field?82+rand()*12:18+rand()*72;
+        const x=4+rand()*90;
+        const y=part.region==='top'?8+rand()*20:part.region==='charge'?18+i*19:8+rand()*80;
         const duration=['arc','clock'].includes(part.type)||part.region==='charge'||part.shape==='stellar'?part.duration:part.duration*(.9+rand()*.2);
         const phase=part.region==='charge'?-duration*.3:part.shape==='stellar'?-i*3:-rand()*duration;
-        const routeLike=['trace','arc'].includes(part.type);
-        const vars={'--x':routeLike&&right?(feature?'calc(100vw - 260px)':'calc(100vw - 180px)'):`${x.toFixed(2)}${field?'%':'vw'}`,'--y':`${y.toFixed(2)}vh`,'--mx':field?(right?'calc(100% - 10px)':'0px'):right?(routeLike?'calc(100vw - 112px)':'calc(100vw - 80px)'):'2vw','--my':`${(i%2?76+rand()*15:18+rand()*13).toFixed(2)}vh`,
+        const vars={'--x':`${x.toFixed(2)}%`,'--y':`${y.toFixed(2)}vh`,'--mx':`${(4+rand()*84).toFixed(2)}%`,'--my':`${(8+rand()*80).toFixed(2)}vh`,
           '--s':`${(part.size*(.85+rand()*.3)).toFixed(1)}px`,'--d':`${duration.toFixed(2)}s`,'--delay':`${phase.toFixed(2)}s`,
-          '--dx':`${(field?(right?1:-1)*(.3+rand()*.5):(rand()-.5)*18).toFixed(2)}vw`,'--r':`${Math.round((rand()-.5)*120)}deg`,'--o':(.5+rand()*.2).toFixed(2),
+          '--dx':`${((rand()-.5)*18).toFixed(2)}vw`,'--r':`${Math.round((rand()-.5)*120)}deg`,'--o':(.5+rand()*.2).toFixed(2),
           '--c':colors[(i+group)%3],'--direction':i%2?'-1':'1'};
         if(part.type==='trace'){
           const route=part.shape==='generator'?3:part.shape==='cell-link'?4:(i+key.length)%ROUTES.length;

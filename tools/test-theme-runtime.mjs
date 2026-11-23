@@ -100,6 +100,20 @@ const expectedElemental=['cinderfall','undertow','frostbite','thunderwake','worl
 const failures=[];
 const check=(condition,message)=>{if(!condition)failures.push(message);};
 
+const readingAlpha=Number(signatureCss.match(/--theme-reading-alpha:(\d+)%/)?.[1])/100;
+const rgbChannels=hex=>hex.replace('#','').match(/../g).map(x=>parseInt(x,16)/255);
+const luminance=rgb=>rgb.map(x=>x<=.04045?x/12.92:((x+.055)/1.055)**2.4).reduce((sum,x,i)=>sum+x*[.2126,.7152,.0722][i],0);
+check(readingAlpha>=.78&&readingAlpha<1,'Reading surfaces are opaque or lack a bounded alpha');
+for(const theme of themes)for(let corner=0;corner<8;corner++){
+  const bg=rgbChannels(theme.bg),ink=rgbChannels(theme.ink);
+  const behind=[0,1,2].map(i=>Number(!!(corner&(1<<i))));
+  const backing=bg.map((x,i)=>x*readingAlpha+behind[i]*(1-readingAlpha));
+  const foreground=ink.map((x,i)=>x*.9+backing[i]*.1);
+  const a=luminance(backing),b=luminance(foreground),ratio=(Math.max(a,b)+.05)/(Math.min(a,b)+.05);
+  check(ratio>=4.5,`Translucent reading contrast is below4.5:1: ${theme.key} (${ratio.toFixed(2)})`);
+}
+check(/#siteThemeFx\{z-index:-2\}/.test(signatureCss)&&/\.themeMotionParticles\{[^}]*z-index:-1/.test(signatureCss),'Art and animation are not below ordinary content');
+
 check(new Set(themes.map(theme=>theme.key)).size===themes.length,'Theme keys are not unique');
 function contrast(a,b){
   const lum=hex=>hex.replace('#','').match(/../g).map(x=>parseInt(x,16)/255).map(x=>x<=.04045?x/12.92:((x+.055)/1.055)**2.4).reduce((n,x,i)=>n+x*[.2126,.7152,.0722][i],0);
@@ -309,8 +323,8 @@ for(let round=0;round<3;round++)for(const theme of themes){
   else check(signatureHost.children.length===motion.signatures[theme.key].reduce((sum,part)=>sum+part.count,0),`Signature objects leaked or disappeared: ${theme.key}`);
   for(const item of signatureHost.children.filter(x=>['fall','rise'].includes(x.getAttribute('data-primitive')))){
     const x=parseFloat(item.style.values.get('--x')),drift=parseFloat(item.style.values.get('--dx'));
-    check(item.style.values.get('--x').endsWith('%'),'Field gutter follows viewport scrollbars instead of its clipped host');
-    check((x<=.4&&drift<0)||(x>=98.8&&drift>0),`Foreground field can travel into central text: ${theme.key}`);
+    check(item.style.values.get('--x').endsWith('%'),'Background field does not follow its clipped host');
+    check(x>=4&&x<=94&&Math.abs(drift)<=9,`Background field placement is not bounded: ${theme.key}`);
   }
 }
 check(body.children.filter(x=>x.id==='siteThemeFx').length===1,'Repeated79-theme cycles duplicated the background host');
