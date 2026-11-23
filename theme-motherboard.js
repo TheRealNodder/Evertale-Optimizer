@@ -109,24 +109,32 @@
       }
     }
 
-    /* Pulses: the longest traces carry travelling packets; everything else stays energized. */
-    const candidates=all.filter(t=>t.length>(phone?160:260)&&t.points.length>=2).sort((a,b)=>b.length-a.length);
+    /* Pulses: the longest drawn (fully in-bounds) traces carry travelling packets; everything
+       else stays energized. Filter to in-bounds BEFORE choosing and capping, and always keep at
+       least one packet when any drawn trace exists. */
+    const inside=([x,y])=>x>=-1&&y>=-1&&x<=width+1&&y<=height+1;
+    const drawn=all.filter(t=>t.points.length>=2&&t.length>0&&t.points.every(inside)).sort((a,b)=>b.length-a.length);
+    const long=drawn.filter(t=>t.length>(phone?160:260));
+    const candidates=long.length?long:drawn;
     const pulses=[];
+    const addPulse=t=>{
+      const speed=(phone?90:130)+rand()*70,travel=t.length/speed,cycle=Math.max(3.5,travel/.7);
+      pulses.push({points:t.points,length:t.length,duration:+cycle.toFixed(2),delay:+(-rand()*cycle).toFixed(2),reverse:rand()<.5});
+    };
     for(const t of candidates){
       if(pulses.length>=limits.pulses)break;
       if(rand()<.25)continue;
-      const speed=(phone?90:130)+rand()*70,travel=t.length/speed,cycle=Math.max(3.5,travel/.7);
-      pulses.push({points:t.points,length:t.length,duration:+cycle.toFixed(2),delay:+(-rand()*cycle).toFixed(2),reverse:rand()<.5});
+      addPulse(t);
     }
+    if(!pulses.length&&candidates.length)addPulse(candidates[0]);
 
-    const inside=([x,y])=>x>=-1&&y>=-1&&x<=width+1&&y<=height+1;
     return{
       width,height,phone,
       traces:traces.map(list=>list.filter(p=>p.every(inside)).map(line).join('')),
       parts:parts.join(''),
       pads:pads.map(([x,y])=>rect(x-2.5,y-2.5,5,5)).join(''),
       vias:vias.filter(inside).map(([x,y])=>circle(x,y,3)).join(''),
-      pulses:pulses.filter(p=>p.points.every(inside)),
+      pulses,
       counts:{chips:chipTarget,traces:all.length,pulses:pulses.length}
     };
   }

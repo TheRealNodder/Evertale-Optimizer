@@ -53,6 +53,17 @@ test('pulses stay within budget and travel only along drawn trace points inside 
   }
 });
 
+test('every technology theme gets 1..cap packets at phone, tablet and desktop sizes', () => {
+  const keys = ['miraidon', 'cyber', 'crimsonblack', 'cobaltblack', 'metallicrose', 'bronzexl', 'blackwhitedsi', 'galaxystyle', 'superfamicom'];
+  const cases = [[390, 844, true], [600, 800, true], [1280, 800, false]];
+  for (const key of keys) for (const [w, h, mobile] of cases) {
+    const plan = board.layout(w, h, { key, mobile });
+    const cap = mobile ? board.limits.phone.pulses : board.limits.desktop.pulses;
+    assert.ok(plan.pulses.length >= 1 && plan.pulses.length <= cap, `${key} ${w}x${h}: ${plan.pulses.length} packets`);
+    for (const pulse of plan.pulses) for (const [x, y] of pulse.points) assert.ok(x >= -1 && y >= -1 && x <= w + 1 && y <= h + 1, `${key} ${w}x${h} packet in bounds`);
+  }
+});
+
 test('organic cells are filled, varied in size, bounded and phone-limited', () => {
   const list = cells.layout({ key: 'zygarde' });
   assert.equal(list.length, cells.limits.desktop);
