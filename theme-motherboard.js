@@ -146,7 +146,8 @@
   const boards=new WeakMap();
   function draw(host,options){
     const width=Math.max(1,Math.round(host.clientWidth)),height=Math.max(1,Math.round(host.clientHeight));
-    const mobile=options.mobile??!!g.matchMedia?.('(max-width:480px)').matches;
+    /* 700px is the shared motion-density breakpoint; the integrator re-renders on bucket changes. */
+    const mobile=options.mobile??!!g.matchMedia?.('(max-width:700px)').matches;
     const plan=layout(width,height,{...options,mobile});
     const board=d.createElement('div');board.className='tmbBoard';board.setAttribute('aria-hidden','true');board.setAttribute('data-board-key',options.key||'');
     const svg=d.createElementNS(SVGNS,'svg');

@@ -75,4 +75,7 @@ test('stylesheet animates only transform and opacity, and honours pause, still a
   assert.match(css, /data-theme-motion="paused"\] :is\(\.tmbPulse,\.tcCell\)\{animation-play-state:paused!important\}/);
   assert.match(css, /data-theme-still="true"\] \.tmbPulse\{display:none!important\}/);
   assert.match(css, /prefers-reduced-motion:reduce/);
+  assert.match(css, /@media\(max-width:700px\)\{\.tcCell\[data-mobile="false"\]\{display:none\}\}/, 'cells use the shared 700px density breakpoint');
+  const js = fs.readFileSync(path.join(root, 'theme-motherboard.js'), 'utf8');
+  assert.match(js, /matchMedia\?\.\('\(max-width:700px\)'\)/, 'board uses the shared 700px density breakpoint');
 });
