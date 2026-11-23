@@ -114,7 +114,7 @@
         const duration=['arc','clock'].includes(part.type)||part.region==='charge'||part.shape==='stellar'?part.duration:part.duration*(.9+rand()*.2);
         const phase=part.region==='charge'?-duration*.3:part.shape==='stellar'?-i*3:-rand()*duration;
         const routeLike=['trace','arc'].includes(part.type);
-        const vars={'--x':routeLike&&right?(feature?'calc(100vw - 260px)':'calc(100vw - 180px)'):`${x.toFixed(2)}vw`,'--y':`${y.toFixed(2)}vh`,'--mx':field?(right?'calc(100vw - 10px)':'0px'):right?(routeLike?'calc(100vw - 112px)':'calc(100vw - 80px)'):'2vw','--my':`${(i%2?76+rand()*15:18+rand()*13).toFixed(2)}vh`,
+        const vars={'--x':routeLike&&right?(feature?'calc(100vw - 260px)':'calc(100vw - 180px)'):`${x.toFixed(2)}${field?'%':'vw'}`,'--y':`${y.toFixed(2)}vh`,'--mx':field?(right?'calc(100% - 10px)':'0px'):right?(routeLike?'calc(100vw - 112px)':'calc(100vw - 80px)'):'2vw','--my':`${(i%2?76+rand()*15:18+rand()*13).toFixed(2)}vh`,
           '--s':`${(part.size*(.85+rand()*.3)).toFixed(1)}px`,'--d':`${duration.toFixed(2)}s`,'--delay':`${phase.toFixed(2)}s`,
           '--dx':`${(field?(right?1:-1)*(.3+rand()*.5):(rand()-.5)*18).toFixed(2)}vw`,'--r':`${Math.round((rand()-.5)*120)}deg`,'--o':(.5+rand()*.2).toFixed(2),
           '--c':colors[(i+group)%3],'--direction':i%2?'-1':'1'};

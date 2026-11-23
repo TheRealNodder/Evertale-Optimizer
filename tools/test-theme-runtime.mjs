@@ -309,6 +309,7 @@ for(let round=0;round<3;round++)for(const theme of themes){
   else check(signatureHost.children.length===motion.signatures[theme.key].reduce((sum,part)=>sum+part.count,0),`Signature objects leaked or disappeared: ${theme.key}`);
   for(const item of signatureHost.children.filter(x=>['fall','rise'].includes(x.getAttribute('data-primitive')))){
     const x=parseFloat(item.style.values.get('--x')),drift=parseFloat(item.style.values.get('--dx'));
+    check(item.style.values.get('--x').endsWith('%'),'Field gutter follows viewport scrollbars instead of its clipped host');
     check((x<=.4&&drift<0)||(x>=98.8&&drift>0),`Foreground field can travel into central text: ${theme.key}`);
   }
 }
