@@ -1,0 +1,38 @@
+/* Full-page motherboard (technology themes) and organic cells (Zygarde).
+   Static board strokes stay softly energized; only packets and cells animate,
+   with transform/opacity, and they follow the site's shared motion state. */
+.tmbBoard,.tcField{position:absolute;inset:0;overflow:hidden;pointer-events:none;contain:strict}
+.tmbBoard>svg{position:absolute;left:0;top:0;overflow:visible}
+.tmbBoard path{fill:none;stroke-linecap:round;stroke-linejoin:round}
+.tmbGlow{stroke:var(--site-theme-accent);stroke-opacity:.16}
+.tmbLine{stroke:var(--site-theme-accent);stroke-opacity:.62}
+.tmbGlow.tmbW0{stroke-width:5px}.tmbLine.tmbW0{stroke-width:1.2px}
+.tmbGlow.tmbW1{stroke-width:6px}.tmbLine.tmbW1{stroke-width:1.8px}
+.tmbGlow.tmbW2{stroke-width:8px}.tmbLine.tmbW2{stroke-width:2.8px}
+.tmbPart{stroke:color-mix(in srgb,var(--site-theme-accent) 70%,var(--site-theme-ink));stroke-opacity:.7;stroke-width:1.4px}
+.tmbPad{stroke:var(--site-theme-ink);stroke-opacity:.55;stroke-width:1px}
+.tmbVia{stroke:var(--site-theme-ink);stroke-opacity:.6;stroke-width:1.3px}
+.tmbPulse{position:absolute;left:0;top:0;width:8px;height:8px;border-radius:50%;background:var(--site-theme-ink);
+  box-shadow:0 0 6px 2px var(--site-theme-accent),0 0 14px 4px color-mix(in srgb,var(--site-theme-accent) 55%,transparent);opacity:0;will-change:transform,opacity}
+
+/* Cells sit at fixed percentages of the page; only their scale and opacity animate. */
+.tcCell{position:absolute;left:var(--x);top:var(--y);width:var(--size);height:calc(var(--size) * .866);margin:calc(var(--size) * -.433) 0 0 calc(var(--size) * -.5);
+  opacity:0;will-change:transform,opacity;transform:scale(.15) rotate(var(--turn));
+  clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);
+  background:radial-gradient(circle at 50% 42%,color-mix(in srgb,var(--cell-color) 70%,#fff) 0%,var(--cell-color) 50%,color-mix(in srgb,var(--cell-color) 55%,transparent) 100%);
+  animation:tc-breathe var(--d) ease-in-out var(--delay) infinite}
+@keyframes tc-breathe{
+  0%{transform:scale(.15) rotate(var(--turn));opacity:0}
+  38%{transform:scale(1) rotate(var(--turn));opacity:var(--o)}
+  58%{transform:scale(.9) rotate(var(--turn));opacity:calc(var(--o) * .85)}
+  84%{transform:scale(.25) rotate(var(--turn));opacity:0}
+  100%{transform:scale(.15) rotate(var(--turn));opacity:0}}
+
+html[data-theme-motion="paused"] :is(.tmbPulse,.tcCell){animation-play-state:paused!important}
+html[data-theme-still="true"] .tmbPulse{display:none!important}
+html[data-theme-still="true"] .tcCell{animation:none!important;opacity:calc(var(--o) * .55);transform:scale(.8) rotate(var(--turn))}
+@media(max-width:480px){.tcCell[data-mobile="false"]{display:none}}
+@media(prefers-reduced-motion:reduce){
+  .tmbPulse{display:none!important}
+  .tcCell{animation:none!important;opacity:calc(var(--o) * .55);transform:scale(.8) rotate(var(--turn))}
+}
