@@ -278,10 +278,10 @@ for(const [key,parts] of Object.entries(motion.signatures)){
   }
   check(desktop<=40&&phone<=16,`Whole-scene signature budget exceeded: ${key} (${desktop}/${phone})`);
 }
-check(Object.keys(motion.motifs).length===22,'Expected 22 authored motifs plus dedicated wind/rain, board, cells and restored Terapagos');
+check(Object.keys(motion.motifs).length===23,'Expected 23 authored motifs including the three Hoenn marks');
 const motifShapes=new Set();
 for(const [key,[cycle,layers]] of Object.entries(motion.motifs)){
-  check(legendary.some(t=>t.key===key)&&layers.length>=2&&layers.length<=(key==='dialga'?8:key==='giratina'?5:key==='eternatus'?4:3),'Unexpected motif identity: '+key);
+  check(legendary.some(t=>t.key===key)&&layers.length>= (['shinyprimalgroudon','shinyprimalkyogre','shinymegarayquaza'].includes(key)?1:2)&&layers.length<=(key==='dialga'?8:key==='giratina'?5:key==='eternatus'?4:3),'Unexpected motif identity: '+key);
   for(const [role,behavior,color,markup] of layers){
     check(!motifShapes.has(key+':'+role),'Duplicate motif role: '+key+':'+role);motifShapes.add(key+':'+role);
     check(signatureCss.includes('@keyframes legendary-'+behavior+'{'),'Missing motion: '+behavior);
@@ -292,7 +292,13 @@ for(const [key,[cycle,layers]] of Object.entries(motion.motifs)){
   }
 }
 check(motion.moduleFor('suicune')==='wind'&&motion.signatures.suicune.length===1&&motion.signatures.suicune[0].shape==='rain'&&motion.signatures.suicune[0].count===14&&motion.signatures.suicune[0].phone===4,'Suicune needs wind and bounded rain');
-for(const key of ['rayquaza','shinymegarayquaza'])check(motion.moduleFor(key)==='wind'&&motion.signatures[key].length===0&&!motion.motifs[key],'Rayquaza retained abstract motifs: '+key);
+check(motion.moduleFor('rayquaza')==='wind'&&motion.signatures.rayquaza.length===0&&!motion.motifs.rayquaza,'Rayquaza retained abstract motifs');
+for(const [key,role] of Object.entries({shinyprimalgroudon:'omega-mark',shinyprimalkyogre:'alpha-mark',shinymegarayquaza:'delta-mark'})){
+  const layers=motion.motifs[key][1];
+  check(layers.length===1&&layers[0][0]===role&&layers[0][1]==='primalmark'&&layers[0][3].includes('fill-rule="evenodd"'),'Empowered Hoenn symbol missing: '+key);
+  check(motion.signatures[key].filter(p=>p.type==='motif').length===1,'Extra abstract motifs: '+key);
+}
+check(motion.moduleFor('shinyprimalgroudon')==='quake'&&motion.moduleFor('shinymegarayquaza')==='wind'&&motion.signatures.shinyprimalkyogre.some(p=>p.shape==='rain'&&p.count===18&&p.phone===7),'Empowered Hoenn weather regression');
 check(motion.moduleFor('ultranecrozma')==='cells'&&motion.signatures.ultranecrozma.length===0&&!motion.motifs.ultranecrozma,'Necrozma must use individual jewels, not clusters');
 check(motion.motifs.koraidon[1].some(x=>x[0]==='prehistoric-ferns'),'Missing prehistoric terrain vegetation');
 const signatureHost=document.getElementById('themeMotionParticles');

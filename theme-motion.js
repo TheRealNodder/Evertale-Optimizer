@@ -95,16 +95,10 @@
     18,
     [
       [
-        "desolate-sun",
-        "radiate",
-        "#ffe178",
-        "<circle cx=\"100\" cy=\"80\" r=\"39\"/><path d=\"M148.0 80.0L170.0 80.0M141.6 104.0L160.6 115.0M124.0 121.6L135.0 140.6M100.0 128.0L100.0 150.0M76.0 121.6L65.0 140.6M58.4 104.0L39.4 115.0M52.0 80.0L30.0 80.0M58.4 56.0L39.4 45.0M76.0 38.4L65.0 19.4M100.0 32.0L100.0 10.0M124.0 38.4L135.0 19.4M141.6 56.0L160.6 45.0\"/>"
-      ],
-      [
-        "magma-veins",
-        "reveal",
-        "#ffbd42",
-        "<path d=\"M16 135L44 87 72 95 99 42 127 96 163 73 188 135 M99 42L91 79 106 100 97 135 M44 87L64 124 83 105 M127 96L144 119 165 103\"/>"
+        "omega-mark",
+        "primalmark",
+        "#ed1721",
+        "<svg x=\"12\" y=\"7\" width=\"176\" height=\"146\" viewBox=\"0 0 623 574\" preserveAspectRatio=\"xMidYMid meet\"><defs><linearGradient id=\"MOTIFID-mark\" x1=\"10%\" y1=\"0%\" x2=\"80%\" y2=\"100%\"><stop offset=\"0\" stop-color=\"#ff8671\"/><stop offset=\".36\" stop-color=\"#ed1721\"/><stop offset=\".78\" stop-color=\"#ed1721\"/><stop offset=\"1\" stop-color=\"#a20919\"/></linearGradient></defs><path d=\"M309 47C178 47 71 139 71 255C71 290 80 326 98 355C66 362 35 377 8 394C51 389 83 389 108 407C147 432 181 466 203 500C208 449 229 413 274 389C203 375 153 322 153 257C153 182 223 122 309 122C395 122 464 182 464 257C464 322 414 375 342 389C386 413 410 449 416 500C440 466 473 432 512 407C536 389 570 389 615 394C588 377 553 362 520 355C538 326 548 291 548 255C548 139 441 47 309 47Z\" fill=\"url(#MOTIFID-mark)\" fill-rule=\"evenodd\" stroke=\"none\"/></svg>"
       ]
     ]
   ],
@@ -112,22 +106,10 @@
     18,
     [
       [
-        "primordial-sea",
-        "swell",
-        "#d3efff",
-        "<path d=\"M8 104Q36 55 70 92T135 85T192 70 M8 117Q40 75 72 108T138 103T192 89 M16 129Q51 100 78 119T155 114\"/>"
-      ],
-      [
-        "golden-pressure",
-        "radiate",
-        "#f8d76e",
-        "<ellipse cx=\"100\" cy=\"80\" rx=\"76\" ry=\"30\"/><ellipse cx=\"100\" cy=\"80\" rx=\"53\" ry=\"20\"/><ellipse cx=\"100\" cy=\"80\" rx=\"27\" ry=\"10\"/>"
-      ],
-      [
-        "primal-markings",
-        "compress",
-        "#e4a5df",
-        "<path d=\"M24 71L49 50 70 67 53 86 75 105 M176 71L151 50 130 67 147 86 125 105 M80 80H120\"/>"
+        "alpha-mark",
+        "primalmark",
+        "#1262ed",
+        "<svg x=\"12\" y=\"7\" width=\"176\" height=\"146\" viewBox=\"0 0 1215 1215\" preserveAspectRatio=\"xMidYMid meet\"><defs><linearGradient id=\"MOTIFID-mark\" x1=\"10%\" y1=\"0%\" x2=\"80%\" y2=\"100%\"><stop offset=\"0\" stop-color=\"#71c1ff\"/><stop offset=\".36\" stop-color=\"#1262ed\"/><stop offset=\".78\" stop-color=\"#1262ed\"/><stop offset=\"1\" stop-color=\"#0745b7\"/></linearGradient></defs><path d=\"M494 308L634 245L653 156L1058 15L1091 110L741 233L722 316L602 370A316 316 0 0 1 602 846L722 900L741 983L1091 1106L1058 1202L653 1060L634 972L494 909A316 316 0 1 1 494 308ZM391 391A217 217 0 1 0 391 825A217 217 0 1 0 391 391Z\" fill=\"url(#MOTIFID-mark)\" fill-rule=\"evenodd\" stroke=\"none\"/></svg>"
       ]
     ]
   ],
@@ -546,6 +528,17 @@
         "<defs><radialGradient id=\"MOTIFID-dust\"><stop offset=\"0\" stop-color=\"#edc28c\" stop-opacity=\"0.56\"/><stop offset=\"0.45\" stop-color=\"#b68154\" stop-opacity=\"0.37\"/><stop offset=\"1\" stop-color=\"#83533a\" stop-opacity=\"0\"/></radialGradient></defs><ellipse cx=\"119.78\" cy=\"117.3\" rx=\"32.81\" ry=\"11.72\" fill=\"url(#MOTIFID-dust)\" stroke=\"none\" /><ellipse cx=\"104.02\" cy=\"132.75\" rx=\"39.3\" ry=\"7.47\" fill=\"url(#MOTIFID-dust)\" stroke=\"none\" /><ellipse cx=\"94.75\" cy=\"117.94\" rx=\"23.29\" ry=\"12.59\" fill=\"url(#MOTIFID-dust)\" stroke=\"none\" /><ellipse cx=\"37.71\" cy=\"104.2\" rx=\"34.07\" ry=\"6.03\" fill=\"url(#MOTIFID-dust)\" stroke=\"none\" /><ellipse cx=\"86\" cy=\"102.7\" rx=\"21.59\" ry=\"12.8\" fill=\"url(#MOTIFID-dust)\" stroke=\"none\" /><ellipse cx=\"112.38\" cy=\"101.52\" rx=\"18.08\" ry=\"14.65\" fill=\"url(#MOTIFID-dust)\" stroke=\"none\" /><ellipse cx=\"12.99\" cy=\"112.73\" rx=\"40.83\" ry=\"9.86\" fill=\"url(#MOTIFID-dust)\" stroke=\"none\" /><ellipse cx=\"156.39\" cy=\"127.27\" rx=\"40.1\" ry=\"12.11\" fill=\"url(#MOTIFID-dust)\" stroke=\"none\" /><ellipse cx=\"143.51\" cy=\"108.56\" rx=\"38.08\" ry=\"11.76\" fill=\"url(#MOTIFID-dust)\" stroke=\"none\" /><ellipse cx=\"72.35\" cy=\"116.46\" rx=\"23.42\" ry=\"14.17\" fill=\"url(#MOTIFID-dust)\" stroke=\"none\" /><ellipse cx=\"97.2\" cy=\"146.55\" rx=\"41.51\" ry=\"7.68\" fill=\"url(#MOTIFID-dust)\" stroke=\"none\" /><ellipse cx=\"100.04\" cy=\"114.55\" rx=\"29.73\" ry=\"14.49\" fill=\"url(#MOTIFID-dust)\" stroke=\"none\" /><ellipse cx=\"103.99\" cy=\"116.5\" rx=\"39.32\" ry=\"5.56\" fill=\"url(#MOTIFID-dust)\" stroke=\"none\" /><ellipse cx=\"166.42\" cy=\"120.79\" rx=\"36.54\" ry=\"14.21\" fill=\"url(#MOTIFID-dust)\" stroke=\"none\" /><ellipse cx=\"117.58\" cy=\"132.6\" rx=\"33.3\" ry=\"15.2\" fill=\"url(#MOTIFID-dust)\" stroke=\"none\" /><ellipse cx=\"82.53\" cy=\"116.73\" rx=\"34.4\" ry=\"8.21\" fill=\"url(#MOTIFID-dust)\" stroke=\"none\" /><ellipse cx=\"127.9\" cy=\"121.58\" rx=\"40.12\" ry=\"10.21\" fill=\"url(#MOTIFID-dust)\" stroke=\"none\" /><ellipse cx=\"59.54\" cy=\"124.02\" rx=\"40.75\" ry=\"5.09\" fill=\"url(#MOTIFID-dust)\" stroke=\"none\" /><path d=\"M88.96 115.49000000000001l3.35 3.35 -2.3449999999999998 3.35 -3.35 -1.34Z\" fill=\"#e6b57c\" stroke=\"none\" opacity=\".75\"/><path d=\"M134.46 132l2.43 2.43 -1.701 2.43 -2.43 -0.9720000000000001Z\" fill=\"#774b34\" stroke=\"none\" opacity=\".75\"/><path d=\"M161.24 111.18l2.36 2.36 -1.652 2.36 -2.36 -0.944Z\" fill=\"#bd8958\" stroke=\"none\" opacity=\".75\"/><path d=\"M98.23 125.27000000000001l2.49 2.49 -1.743 2.49 -2.49 -0.9960000000000001Z\" fill=\"#774b34\" stroke=\"none\" opacity=\".75\"/><path d=\"M61.19 142.99l1.39 1.39 -0.9729999999999999 1.39 -1.39 -0.5559999999999999Z\" fill=\"#e6b57c\" stroke=\"none\" opacity=\".75\"/><path d=\"M77.1 102.64l3.5 3.5 -2.4499999999999997 3.5 -3.5 -1.4000000000000001Z\" fill=\"#bd8958\" stroke=\"none\" opacity=\".75\"/><path d=\"M89.75 135.89999999999998l0.77 0.77 -0.5389999999999999 0.77 -0.77 -0.30800000000000005Z\" fill=\"#bd8958\" stroke=\"none\" opacity=\".75\"/><path d=\"M47.11 103.99000000000001l1.85 1.85 -1.295 1.85 -1.85 -0.7400000000000001Z\" fill=\"#e6b57c\" stroke=\"none\" opacity=\".75\"/><path d=\"M83.81 107.61999999999999l1.93 1.93 -1.351 1.93 -1.93 -0.772Z\" fill=\"#774b34\" stroke=\"none\" opacity=\".75\"/><path d=\"M174.55 109.28l2.02 2.02 -1.414 2.02 -2.02 -0.808Z\" fill=\"#774b34\" stroke=\"none\" opacity=\".75\"/><path d=\"M36.76 109.72l1.3 1.3 -0.9099999999999999 1.3 -1.3 -0.52Z\" fill=\"#e6b57c\" stroke=\"none\" opacity=\".75\"/><path d=\"M103.07 114.44l3.03 3.03 -2.1209999999999996 3.03 -3.03 -1.212Z\" fill=\"#774b34\" stroke=\"none\" opacity=\".75\"/><path d=\"M177.22 132.06l2.66 2.66 -1.8619999999999999 2.66 -2.66 -1.064Z\" fill=\"#774b34\" stroke=\"none\" opacity=\".75\"/><path d=\"M78.89 128.82l3.15 3.15 -2.2049999999999996 3.15 -3.15 -1.26Z\" fill=\"#774b34\" stroke=\"none\" opacity=\".75\"/><path d=\"M165.84 143.08l1.23 1.23 -0.861 1.23 -1.23 -0.492Z\" fill=\"#e6b57c\" stroke=\"none\" opacity=\".75\"/><path d=\"M174.24 113.96000000000001l2.71 2.71 -1.8969999999999998 2.71 -2.71 -1.084Z\" fill=\"#e6b57c\" stroke=\"none\" opacity=\".75\"/><path d=\"M130.25 117.86l3.56 3.56 -2.492 3.56 -3.56 -1.4240000000000002Z\" fill=\"#774b34\" stroke=\"none\" opacity=\".75\"/><path d=\"M158.85 119.2l1.85 1.85 -1.295 1.85 -1.85 -0.7400000000000001Z\" fill=\"#774b34\" stroke=\"none\" opacity=\".75\"/><path d=\"M138.09 135.32999999999998l1.96 1.96 -1.3719999999999999 1.96 -1.96 -0.784Z\" fill=\"#774b34\" stroke=\"none\" opacity=\".75\"/><path d=\"M19.54 142.81l2.3 2.3 -1.6099999999999999 2.3 -2.3 -0.9199999999999999Z\" fill=\"#774b34\" stroke=\"none\" opacity=\".75\"/><path d=\"M148.25 110.08l1.92 1.92 -1.3439999999999999 1.92 -1.92 -0.768Z\" fill=\"#e6b57c\" stroke=\"none\" opacity=\".75\"/><path d=\"M108.01 108.77l1.14 1.14 -0.7979999999999999 1.14 -1.14 -0.45599999999999996Z\" fill=\"#bd8958\" stroke=\"none\" opacity=\".75\"/><path d=\"M100.16 142.07l1.25 1.25 -0.875 1.25 -1.25 -0.5Z\" fill=\"#774b34\" stroke=\"none\" opacity=\".75\"/><path d=\"M66.73 142.71l3.04 3.04 -2.1279999999999997 3.04 -3.04 -1.2160000000000002Z\" fill=\"#e6b57c\" stroke=\"none\" opacity=\".75\"/><path d=\"M141.24 143.26l1.97 1.97 -1.379 1.97 -1.97 -0.788Z\" fill=\"#bd8958\" stroke=\"none\" opacity=\".75\"/><path d=\"M102.89 104.57l1.42 1.42 -0.9939999999999999 1.42 -1.42 -0.568Z\" fill=\"#e6b57c\" stroke=\"none\" opacity=\".75\"/><path d=\"M142.44 137.19l2.81 2.81 -1.9669999999999999 2.81 -2.81 -1.124Z\" fill=\"#774b34\" stroke=\"none\" opacity=\".75\"/><path d=\"M20.58 111.32000000000001l1.13 1.13 -0.7909999999999999 1.13 -1.13 -0.45199999999999996Z\" fill=\"#774b34\" stroke=\"none\" opacity=\".75\"/><path d=\"M32 110.63l1.31 1.31 -0.9169999999999999 1.31 -1.31 -0.524Z\" fill=\"#774b34\" stroke=\"none\" opacity=\".75\"/>"
       ]
     ]
+  ],
+  "shinymegarayquaza": [
+    18,
+    [
+      [
+        "delta-mark",
+        "primalmark",
+        "#169b16",
+        "<svg x=\"12\" y=\"7\" width=\"176\" height=\"146\" viewBox=\"0 0 1088 1432\" preserveAspectRatio=\"xMidYMid meet\"><defs><linearGradient id=\"MOTIFID-mark\" x1=\"10%\" y1=\"0%\" x2=\"80%\" y2=\"100%\"><stop offset=\"0\" stop-color=\"#80e963\"/><stop offset=\".36\" stop-color=\"#169b16\"/><stop offset=\".78\" stop-color=\"#169b16\"/><stop offset=\"1\" stop-color=\"#076d23\"/></linearGradient></defs><path d=\"M0 265L379 317L253 364L507 1432ZM1088 265L709 317L835 364L581 1432ZM544 0L623 319L544 453L466 319Z\" fill=\"url(#MOTIFID-mark)\" fill-rule=\"evenodd\" stroke=\"none\"/></svg>"
+      ]
+    ]
   ]
 };
   for(const [cycle,layers] of Object.values(LEGENDARY_MOTIFS)){
@@ -606,9 +599,9 @@
     groudon:[...LEGENDARY_MOTIFS.groudon[1].map((_,i)=>P('motif',String(i),2,1,20,210,'legendary'))],
     kyogre:[P('fall','rain',14,6,11,22),...LEGENDARY_MOTIFS.kyogre[1].map((_,i)=>P('motif',String(i),2,1,20,210,'legendary'))],
     rayquaza:[],
-    shinyprimalgroudon:[...LEGENDARY_MOTIFS.shinyprimalgroudon[1].map((_,i)=>P('motif',String(i),2,1,18,210,'legendary'))],
-    shinyprimalkyogre:[P('fall','rain',18,7,11,25),...LEGENDARY_MOTIFS.shinyprimalkyogre[1].map((_,i)=>P('motif',String(i),2,1,18,210,'legendary'))],
-    shinymegarayquaza:[],
+    shinyprimalgroudon:[P('motif','0',2,1,18,210,'legendary')],
+    shinyprimalkyogre:[P('fall','rain',18,7,11,25),P('motif','0',2,1,18,210,'legendary')],
+    shinymegarayquaza:[P('motif','0',2,1,18,210,'legendary')],
     dialga:[...LEGENDARY_MOTIFS.dialga[1].map((_,i)=>P('motif',String(i),2,1,24,210,'legendary'))],
     palkia:[...LEGENDARY_MOTIFS.palkia[1].map((_,i)=>P('motif',String(i),2,1,23,210,'legendary'))],
     giratina:[...LEGENDARY_MOTIFS.giratina[1].map((_,i)=>P('motif',String(i),2,1,25,210,'legendary'))],
@@ -697,6 +690,7 @@
             Object.assign(vars,{'--x':left?'14%':'86%','--y':left?'28%':'73%',
               '--mx':'77%','--my':'58%'});
           }
+          if(motion==='primalmark')Object.assign(vars,{'--x':left?'13%':'87%','--y':left?'30%':'72%','--mx':'77%','--my':'30%'});
           if(key==='koraidon')Object.assign(vars,{'--y':left?'76%':'69%','--my':'71%'});
           if(["arceus","reshiram","zekrom","blackkyurem","whitekyurem","xerneas","yveltal","solgaleo","lunala","zacian","zamazenta","eternatus","koraidon"].includes(key))p.setAttribute('data-material-scene','true');
           for(const[k,v]of Object.entries(vars))p.style.setProperty(k,v);

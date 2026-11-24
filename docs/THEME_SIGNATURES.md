@@ -16,7 +16,7 @@ Both engines receive separate child hosts inside one shared animation stage. The
 
 ## Project Legendary
 
-Twenty-two Pokémon use original SVG vignettes with bounded independently animated layers (two or three for most, eight for Dialga, five for Giratina and four for Eternatus), duplicated at two desktop anchors and shown once on phones. The original wind and earthquake engines remain active; mobile quake rendering pairs the four geometry bands into two paint groups, retaining all cracks and three quake positions. Zygarde and Miraidon retain their dedicated engines; Ultra Necrozma uses the cell engine with individual faceted jewels; Terapagos retains its original gleams. No new network assets or application-state ownership. Animation direction and sequence are artistic interpretations, not reproduced canonical battle effects.
+Twenty-three Pokémon use original SVG vignettes with bounded independently animated layers (two or three for most, eight for Dialga, five for Giratina and four for Eternatus), duplicated at two desktop anchors and shown once on phones. The original wind and earthquake engines remain active; mobile quake rendering pairs the four geometry bands into two paint groups, retaining all cracks and three quake positions. Zygarde and Miraidon retain their dedicated engines; Ultra Necrozma uses the cell engine with individual faceted jewels; Terapagos retains its original gleams. No new network assets or application-state ownership. Animation direction and sequence are artistic interpretations, not reproduced canonical battle effects.
 
 ## Motion contract
 
@@ -89,9 +89,9 @@ Counts below are conservative complete-scene desktop / phone bounds, including f
 | groudon | drought, continental-rise; 20s cycle + retained signature engine/accents | 34 / 15 | [Identity](THEME_MOTION.md#groudon) |
 | kyogre | ocean-swell, pressure; 20s cycle + retained signature engine/accents | 23 / 12 | [Identity](THEME_MOTION.md#kyogre) |
 | rayquaza | Full-page atmospheric wind currents only | 25 / 12 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#weather-and-primal-refinements) |
-| shinyprimalgroudon | desolate-sun, magma-veins; 18s cycle + retained signature engine/accents | 34 / 15 | [Identity](THEME_MOTION.md#shinyprimalgroudon) |
-| shinyprimalkyogre | primordial-sea, golden-pressure, primal-markings; 18s cycle + retained signature engine/accents | 29 / 14 | [Identity](THEME_MOTION.md#shinyprimalkyogre) |
-| shinymegarayquaza | Full-page atmospheric wind currents only; existing shiny palette | 25 / 12 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#weather-and-primal-refinements) |
+| shinyprimalgroudon | Red Omega silhouette + earthquake engine | 32 / 14 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#empowered-hoenn-marks) |
+| shinyprimalkyogre | Blue Alpha silhouette + rain (18/7) | 25 / 12 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#empowered-hoenn-marks) |
+| shinymegarayquaza | Green Delta silhouette + wind engine | 27 / 13 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#empowered-hoenn-marks) |
 | dialga | Detailed Roman-numeral clocks, three hands, glass hourglasses and reversible sand; 24s / 37.2s cycles | 21 / 12 | [Identity](THEME_MOTION.md#dialga) |
 | palkia | Star-filled galaxy, luminous torn space and gravitational-lens-inspired arcs; 23s cycle | 11 / 7 | [Identity](THEME_MOTION.md#palkia) |
 | giratina | Filled viscous tar pools, stretching tendrils, falling/rising drops and irregular splatter; 25s cycle | 15 / 9 | [Identity](THEME_MOTION.md#giratina) |

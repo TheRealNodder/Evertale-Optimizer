@@ -74,3 +74,7 @@ The generated THEME_MOTION.md remains byte-identical to the canonical compiler o
 ## Ultra Necrozma individual jewels
 
 Following the owner's Z-Crystal reference, replace the clustered spires with separate slanted, four-sided faceted gems. Reuse the Zygarde cell engine's seeded positions, weighted size range (18–110px), individual 7–14s grow/fade lifetimes, reduced-motion and pause behavior, and 24/10 desktop/phone density. Eighteen colors echo the supplied type-crystal palette. Jewels have original static gradient facets, without copied type emblems or additional animated children. Zygarde's layout and animation remain unchanged.
+
+## Empowered Hoenn marks
+
+The owner supplied the red Omega, blue Alpha and green Delta reference silhouettes. Their original contours and negative space are traced into compact SVG marks, with restrained color gradients and a gradual opacity/scale cycle. Two desktop anchors and one phone anchor retain the existing decoration lifecycle. Primal Groudon keeps the quake engine, Primal Kyogre keeps its 18/7 rain, and Mega Rayquaza keeps its wind engine. Standard Groudon, Kyogre and Rayquaza are unchanged. No new weather engine or abstract emblem layer is added.
