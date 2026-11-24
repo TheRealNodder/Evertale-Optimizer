@@ -307,10 +307,10 @@ for(const [key,expected] of Object.entries(galarSprites)){
   check(!motion.motifs[key]&&JSON.stringify(motion.signatures[key].map(p=>[p.shape,p.count,p.phone,p.duration,p.size]))===JSON.stringify(expected)&&motion.signatures[key].every(p=>p.type==='sprite'),'Galar sprite configuration: '+key);
   for(const [shape] of expected)check(signatureCss.includes('url("assets/themes/marks/'+shape+'.webp")'),'Galar sprite asset missing: '+shape);
 }
-const kalosSprites={"xerneas":[["xerneas-emblem",1,1,14,700],["life-flow",5,2,24,280],["life-petal",12,4,15,28],["life-leaf",8,2,17,32],["life-aura",5,2,27,150]],"yveltal":[["yveltal-emblem",1,1,15,700],["dark-flow",4,1,24,270],["dark-feather",10,3,17,35],["dark-aura",3,1,27,135]]};
+const kalosSprites={"xerneas":[["xerneas-emblem",1,1,14,700],["life-diamond",5,2,24,42],["life-petal",12,4,15,28],["life-leaf",8,2,17,32],["life-aura",5,2,27,150]],"yveltal":[["yveltal-emblem",1,1,15,700],["dark-diamond",4,1,24,42],["dark-feather",10,3,17,35],["dark-aura",3,1,27,135]]};
 for(const [key,expected] of Object.entries(kalosSprites)){
   check(!motion.motifs[key]&&JSON.stringify(motion.signatures[key].map(p=>[p.shape,p.count,p.phone,p.duration,p.size]))===JSON.stringify(expected),'Kalos scene configuration: '+key);
-  for(const [shape] of expected)if(!shape.endsWith('-aura'))check(signatureCss.includes('url("assets/themes/marks/'+shape+'.webp")'),'Kalos art missing: '+shape);
+  for(const [shape] of expected)if(!shape.endsWith('-aura')&&!shape.endsWith('-diamond'))check(signatureCss.includes('url("assets/themes/marks/'+shape+'.webp")'),'Kalos art missing: '+shape);
 }
 check(motion.moduleFor('yveltal')==='quake','Yveltal decay fissures missing');
 check(signatureCss.includes('@keyframes kalos-emblem-pulse{0%,100%{transform:scale(.97);opacity:.24}50%{transform:scale(1.025);opacity:.58}}'),'Kalos emblem must remain visible');
@@ -409,6 +409,11 @@ for(let round=0;round<3;round++)for(const theme of themes){
       check(group.length===count&&group.filter(x=>x.getAttribute('data-mobile')==='true').length===phone,'Kalos sprite density: '+shape);
       if(count>1)check(new Set(group.map(x=>x.style.values.get('--s'))).size>=2&&new Set(group.map(x=>x.style.values.get('--delay'))).size>=2,'Kalos sprite variation: '+shape);
     }
+    const diamonds=nodes.filter(x=>x.getAttribute('data-kalos-role')==='diamond');
+    check(diamonds.length===(theme.key==='xerneas'?5:4),'Kalos diamond field count');
+    check(diamonds.every(x=>[1,2,3].every(j=>['x','y'].every(axis=>x.style.values.get('--spawn-'+axis+j)?.endsWith('%')))),'Kalos viewport positions missing');
+    check(diamonds.every(x=>x.innerHTML.includes('linearGradient')&&x.innerHTML.includes('kalos-'+theme.key+'-diamond-')),'Kalos faceted gradients missing');
+    check(diamonds.every(x=>x.innerHTML.includes(theme.key==='xerneas'?'#fffddf':'#10030d')),'Kalos palette regression');
     if(theme.key==='yveltal')check(signatureHost.querySelectorAll('.tqQuake').length===(densityMotion.matches?2:3),'Yveltal fissure density');
   }
   if(galarSprites[theme.key]){

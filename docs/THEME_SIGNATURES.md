@@ -100,8 +100,8 @@ Counts below are conservative complete-scene desktop / phone bounds, including f
 | zekrom | storm-cloud, branching-lightning, second-discharge; 16s material cycle | 11 / 7 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#other-material-revisions) |
 | blackkyurem | ice-spires, freeze-shock, frost; 19s material cycle | 11 / 7 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#other-material-revisions) |
 | whitekyurem | ice-spires, ice-burn, steam; 20s material cycle | 11 / 7 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#other-material-revisions) |
-| xerneas | Persistent life-antler emblem, flowing rainbow ribbons, falling petals/leaves, scattered restoration auras | 36 / 15 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#kalos-life-and-destruction) |
-| yveltal | Persistent destruction-wings emblem, drifting red energy, falling feathers, scattered auras and staged decay fissures | 38 / 16 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#kalos-life-and-destruction) |
+| xerneas | Persistent life-antler emblem, iridescent rainbow diamond glints, falling petals/leaves, scattered restoration auras | 36 / 15 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#kalos-life-and-destruction) |
+| yveltal | Persistent destruction-wings emblem, dark crimson diamond glints, falling feathers, scattered auras and staged decay fissures | 38 / 16 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#kalos-life-and-destruction) |
 | zygarde | Organic filled cells (24/10) | 29 / 14 | [Identity](THEME_MOTION.md#zygarde) |
 | solgaleo | solar-photosphere, solar-plasma, solar-rays; 24s material cycle | 11 / 7 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#other-material-revisions) |
 | lunala | cratered-moon, lunar-shadow, starlight; 26s material cycle | 11 / 7 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#other-material-revisions) |
