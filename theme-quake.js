@@ -26,7 +26,7 @@
 
   /* Pure layout, exposed for tests. Crack coordinates are in each quake's own box (2R x 2R). */
   function layout(options={}){
-    const phone=!!options.mobile,count=phone?LIMITS.phone:LIMITS.desktop;
+    const phone=!!options.mobile,count=options.key==='yveltal'?(phone?2:3):(phone?LIMITS.phone:LIMITS.desktop);
     const rand=random(hash(`${options.key||'quake'}:${options.seed||0}:${phone}`));
     const quakes=[];
     for(let q=0;q<count;q++){

@@ -158,3 +158,12 @@ test('Miraidon Hadron cycle coordinates actual drawn waypoint arrivals',()=>{
     assert.ok(plan.pulses.every(p=>p.start===undefined&&p.end===undefined));
   }
 });
+
+test('Yveltal has independently seeded and budgeted decay fissures',()=>{
+  for(const mobile of [false,true]){
+    const list=quake.layout({key:'yveltal',mobile});
+    assert.equal(list.length,mobile?2:3);
+    assert.equal(JSON.stringify(list),JSON.stringify(quake.layout({key:'yveltal',mobile})));
+    assert.ok(list.every(x=>x.bands.length===quake.bands));
+  }
+});

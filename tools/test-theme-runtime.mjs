@@ -266,7 +266,7 @@ for(const [key,parts] of Object.entries(motion.signatures)){
   if(motion.technology.includes(key)){desktop+=12;phone+=5;}
   if(key==='miraidon'){desktop+=4;phone+=2;} // two accents per Hadron waypoint
   if(motion.moduleFor(key)==='cells'){desktop+=24;phone+=10;}
-  if(motion.moduleFor(key)==='quake'){desktop+=25;phone+=9;}
+  if(motion.moduleFor(key)==='quake'){desktop+=key==='yveltal'?15:25;phone+=key==='yveltal'?6:9;}
   if(motion.moduleFor(key)==='wind'){desktop+=20;phone+=8;}
   if(motion.moduleFor(key)==='gems'){desktop+=21;phone+=9;}
   for(const part of parts){
@@ -278,7 +278,7 @@ for(const [key,parts] of Object.entries(motion.signatures)){
   }
   check(desktop<=40&&phone<=16,`Whole-scene signature budget exceeded: ${key} (${desktop}/${phone})`);
 }
-check(Object.keys(motion.motifs).length===20,'Expected 20 authored motifs plus Galar sprite fields');
+check(Object.keys(motion.motifs).length===18,'Expected 18 authored motifs plus Galar and Kalos sprite fields');
 const motifShapes=new Set();
 for(const [key,[cycle,layers]] of Object.entries(motion.motifs)){
   check(legendary.some(t=>t.key===key)&&layers.length>= (['shinyprimalgroudon','shinyprimalkyogre','shinymegarayquaza'].includes(key)?1:2)&&layers.length<=(key==='dialga'?8:key==='giratina'?5:key==='eternatus'?4:3),'Unexpected motif identity: '+key);
@@ -307,6 +307,13 @@ for(const [key,expected] of Object.entries(galarSprites)){
   check(!motion.motifs[key]&&JSON.stringify(motion.signatures[key].map(p=>[p.shape,p.count,p.phone,p.duration,p.size]))===JSON.stringify(expected)&&motion.signatures[key].every(p=>p.type==='sprite'),'Galar sprite configuration: '+key);
   for(const [shape] of expected)check(signatureCss.includes('url("assets/themes/marks/'+shape+'.webp")'),'Galar sprite asset missing: '+shape);
 }
+const kalosSprites={"xerneas":[["xerneas-emblem",1,1,14,700],["life-flow",5,2,24,280],["life-petal",12,4,15,28],["life-leaf",8,2,17,32],["life-aura",5,2,27,150]],"yveltal":[["yveltal-emblem",1,1,15,700],["dark-flow",4,1,24,270],["dark-feather",10,3,17,35],["dark-aura",3,1,27,135]]};
+for(const [key,expected] of Object.entries(kalosSprites)){
+  check(!motion.motifs[key]&&JSON.stringify(motion.signatures[key].map(p=>[p.shape,p.count,p.phone,p.duration,p.size]))===JSON.stringify(expected),'Kalos scene configuration: '+key);
+  for(const [shape] of expected)if(!shape.endsWith('-aura'))check(signatureCss.includes('url("assets/themes/marks/'+shape+'.webp")'),'Kalos art missing: '+shape);
+}
+check(motion.moduleFor('yveltal')==='quake','Yveltal decay fissures missing');
+check(signatureCss.includes('@keyframes kalos-emblem-pulse{0%,100%{transform:scale(.97);opacity:.24}50%{transform:scale(1.025);opacity:.58}}'),'Kalos emblem must remain visible');
 const signatureHost=document.getElementById('themeMotionParticles');
 const snapshotNode=x=>[x.className,x.getAttribute('d'),x.getAttribute('data-mobile'),x.textContent,[...x.style.values],x.children.map(snapshotNode)];
 const signatureSnapshot=()=>signatureHost.children.map(snapshotNode);
@@ -394,6 +401,16 @@ for(let round=0;round<3;round++)for(const theme of themes){
   if(theme.material==='elemental'&&theme.key!=='thunderwake')check(signatureHost.hidden&&signatureHost.children.length===0,`An Elemental theme retained another theme's signature: ${theme.key}`);
   else check(signatureHost.children.length===motion.signatures[theme.key].reduce((sum,part)=>sum+part.count,0)+Number(!!motion.moduleFor(theme.key)),`Signature objects leaked or disappeared: ${theme.key}`);
   check(signatureHost.querySelectorAll('.themeMotionModuleHost').length===Number(!!motion.moduleFor(theme.key)),`Module hosts leaked: ${theme.key}`);
+  if(kalosSprites[theme.key]){
+    const nodes=signatureHost.children.filter(x=>x.getAttribute('data-primitive')==='sprite');
+    check(nodes.filter(x=>x.getAttribute('data-kalos-role')==='emblem').length===1,'Kalos persistent emblem count');
+    for(const [shape,count,phone] of kalosSprites[theme.key]){
+      const group=nodes.filter(x=>x.getAttribute('data-shape')===shape);
+      check(group.length===count&&group.filter(x=>x.getAttribute('data-mobile')==='true').length===phone,'Kalos sprite density: '+shape);
+      if(count>1)check(new Set(group.map(x=>x.style.values.get('--s'))).size>=2&&new Set(group.map(x=>x.style.values.get('--delay'))).size>=2,'Kalos sprite variation: '+shape);
+    }
+    if(theme.key==='yveltal')check(signatureHost.querySelectorAll('.tqQuake').length===(densityMotion.matches?2:3),'Yveltal fissure density');
+  }
   if(galarSprites[theme.key]){
     const nodes=signatureHost.children.filter(x=>x.getAttribute('data-primitive')==='sprite');
     const expected=galarSprites[theme.key];
