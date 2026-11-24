@@ -281,11 +281,14 @@ for(const [key,parts] of Object.entries(motion.signatures)){
 check(Object.keys(motion.motifs).length===27,'Expected 27 authored motifs plus Miraidon and Zygarde engines');
 const motifShapes=new Set();
 for(const [key,[cycle,layers]] of Object.entries(motion.motifs)){
-  check(legendary.some(t=>t.key===key)&&layers.length>=2&&layers.length<=3,'Unexpected motif identity: '+key);
+  check(legendary.some(t=>t.key===key)&&layers.length>=2&&layers.length<=(key==='dialga'?8:key==='giratina'?5:3),'Unexpected motif identity: '+key);
   for(const [role,behavior,color,markup] of layers){
     check(!motifShapes.has(key+':'+role),'Duplicate motif role: '+key+':'+role);motifShapes.add(key+':'+role);
     check(signatureCss.includes('@keyframes legendary-'+behavior+'{'),'Missing motion: '+behavior);
-    check(/^#[0-9a-f]{6}$/i.test(color)&&!/<(?:script|image|foreignObject)|\bon\w+=|href=|url\(/i.test(markup),'Invalid motif geometry: '+key);
+    const localIds=[...markup.matchAll(/\bid="(MOTIFID-[a-z0-9-]+)"/g)].map(m=>m[1]);
+    const refs=[...markup.matchAll(/url\(#(MOTIFID-[a-z0-9-]+)\)/g)].map(m=>m[1]);
+    const safe=markup.replace(/url\(#MOTIFID-[a-z0-9-]+\)/g,'local');
+    check(/^#[0-9a-f]{6}$/i.test(color)&&!/<(?:script|image|foreignObject|use|animate|set)\b|\bon\w+=|href=|url\(/i.test(safe)&&new Set(localIds).size===localIds.length&&refs.every(id=>localIds.includes(id)),'Invalid motif geometry: '+key);
   }
 }
 const signatureHost=document.getElementById('themeMotionParticles');
@@ -368,6 +371,8 @@ for(let round=0;round<3;round++)for(const theme of themes){
     const layers=motion.motifs[theme.key][1],nodes=signatureHost.children.filter(x=>x.getAttribute('data-primitive')==='motif');
     check(nodes.length===layers.length*2&&nodes.filter(x=>x.getAttribute('data-mobile')==='true').length===layers.length,'Motif density: '+theme.key);
     check(nodes.every(x=>x.getAttribute('data-motif-key')===theme.key&&x.innerHTML.includes('viewBox="0 0 200 160"')),'Stale motif markup: '+theme.key);
+    const ids=nodes.flatMap(x=>[...x.innerHTML.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]));
+    check(new Set(ids).size===ids.length&&nodes.every(x=>!x.innerHTML.includes('MOTIFID-')&&[...x.innerHTML.matchAll(/url\(#([^)]+)\)/g)].every(m=>x.innerHTML.includes('id="'+m[1]+'"'))),'Motif local SVG references not isolated: '+theme.key);
     for(const x of nodes)check(x.style.values.get('--x').endsWith('%')&&x.style.values.get('--y').endsWith('%'),'Motif host-relative coordinates: '+theme.key);
   }
   for(const item of signatureHost.children.filter(x=>['fall','rise'].includes(x.getAttribute('data-primitive')))){

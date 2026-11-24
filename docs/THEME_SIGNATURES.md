@@ -16,7 +16,7 @@ Both engines receive separate child hosts inside one shared animation stage. The
 
 ## Project Legendary
 
-Twenty-seven Pokémon use original SVG vignettes with two or three co-located, independently animated layers, duplicated at two desktop anchors and shown once on phones. The original wind and earthquake engines remain active; mobile quake rendering pairs the four geometry bands into two paint groups, retaining all cracks and three quake positions. Zygarde and Miraidon retain their dedicated engines. No new network assets or application-state ownership. Animation direction and sequence are artistic interpretations, not reproduced canonical battle effects.
+Twenty-seven Pokémon use original SVG vignettes with bounded independently animated layers (two or three for most, eight for Dialga and five for Giratina), duplicated at two desktop anchors and shown once on phones. The original wind and earthquake engines remain active; mobile quake rendering pairs the four geometry bands into two paint groups, retaining all cracks and three quake positions. Zygarde and Miraidon retain their dedicated engines. No new network assets or application-state ownership. Animation direction and sequence are artistic interpretations, not reproduced canonical battle effects.
 
 ## Motion contract
 
@@ -92,9 +92,9 @@ Counts below are conservative complete-scene desktop / phone bounds, including f
 | shinyprimalgroudon | desolate-sun, magma-veins; 18s cycle + retained signature engine/accents | 34 / 15 | [Identity](THEME_MOTION.md#shinyprimalgroudon) |
 | shinyprimalkyogre | primordial-sea, golden-pressure, primal-markings; 18s cycle + retained signature engine/accents | 29 / 14 | [Identity](THEME_MOTION.md#shinyprimalkyogre) |
 | shinymegarayquaza | delta-vortex, gold-tendrils; 17s cycle + retained signature engine/accents | 29 / 14 | [Identity](THEME_MOTION.md#shinymegarayquaza) |
-| dialga | time-dial, rewinding-hand, time-echo; 24s cycle | 11 / 7 | [Identity](THEME_MOTION.md#dialga) |
-| palkia | space-grid, spatial-rift, spatial-plane; 23s cycle | 11 / 7 | [Identity](THEME_MOTION.md#palkia) |
-| giratina | inverted-terrain, distortion-seam, reversed-orbit; 25s cycle | 11 / 7 | [Identity](THEME_MOTION.md#giratina) |
+| dialga | Detailed Roman-numeral clocks, three hands, glass hourglasses and reversible sand; 24s / 37.2s cycles | 21 / 12 | [Identity](THEME_MOTION.md#dialga) |
+| palkia | Star-filled galaxy, luminous torn space and gravitational-lens-inspired arcs; 23s cycle | 11 / 7 | [Identity](THEME_MOTION.md#palkia) |
+| giratina | Filled viscous tar pools, stretching tendrils, falling/rising drops and irregular splatter; 25s cycle | 15 / 9 | [Identity](THEME_MOTION.md#giratina) |
 | arceus | creation-ring, gathering-light, formed-world; 26s cycle | 11 / 7 | [Identity](THEME_MOTION.md#arceus) |
 | reshiram | turboblaze, blue-flare, warm-plume; 19s cycle | 11 / 7 | [Identity](THEME_MOTION.md#reshiram) |
 | zekrom | teravolt-generator, bolt-strike; 16s cycle + retained signature engine/accents | 12 / 7 | [Identity](THEME_MOTION.md#zekrom) |
