@@ -260,7 +260,7 @@ vm.runInContext(fs.readFileSync(path.join(root,'theme-motion.js'),'utf8'),contex
 const motion=context.EvertaleThemeMotion;
 check(JSON.stringify([...motion.keys].sort())===JSON.stringify(themes.filter(t=>t.material!=='elemental').map(t=>t.key).sort()),'Motion scenes do not cover the exact72 non-Elemental themes');
 check(JSON.stringify(Object.keys(motion.signatures).sort())===JSON.stringify([...motion.keys,'thunderwake'].sort()),'Signature effects do not cover the exact72 scenes and one storm accent');
-const primitiveNames=new Set(['fall','rise','gust','glint','swell','ripple','orbit','heat','arc','trace','hex','clock','rift','invert','prism','burst','motif']);
+const primitiveNames=new Set(['fall','rise','gust','glint','swell','ripple','orbit','heat','arc','trace','hex','clock','rift','invert','prism','burst','motif','sprite']);
 for(const [key,parts] of Object.entries(motion.signatures)){
   let desktop=5,phone=4; // Existing three layers and two art surfaces; two layers on phones.
   if(motion.technology.includes(key)){desktop+=12;phone+=5;}
@@ -278,7 +278,7 @@ for(const [key,parts] of Object.entries(motion.signatures)){
   }
   check(desktop<=40&&phone<=16,`Whole-scene signature budget exceeded: ${key} (${desktop}/${phone})`);
 }
-check(Object.keys(motion.motifs).length===23,'Expected 23 authored motifs including the three Hoenn marks');
+check(Object.keys(motion.motifs).length===20,'Expected 20 authored motifs plus Galar sprite fields');
 const motifShapes=new Set();
 for(const [key,[cycle,layers]] of Object.entries(motion.motifs)){
   check(legendary.some(t=>t.key===key)&&layers.length>= (['shinyprimalgroudon','shinyprimalkyogre','shinymegarayquaza'].includes(key)?1:2)&&layers.length<=(key==='dialga'?8:key==='giratina'?5:key==='eternatus'?4:3),'Unexpected motif identity: '+key);
@@ -301,6 +301,12 @@ for(const [key,role] of Object.entries({shinyprimalgroudon:'omega-mark',shinypri
 check(motion.moduleFor('shinyprimalgroudon')==='quake'&&motion.moduleFor('shinymegarayquaza')==='wind'&&motion.signatures.shinyprimalkyogre.some(p=>p.shape==='rain'&&p.count===18&&p.phone===7),'Empowered Hoenn weather regression');
 check(motion.moduleFor('ultranecrozma')==='cells'&&motion.signatures.ultranecrozma.length===0&&!motion.motifs.ultranecrozma,'Necrozma must use individual jewels, not clusters');
 check(motion.motifs.koraidon[1].some(x=>x[0]==='prehistoric-ferns'),'Missing prehistoric terrain vegetation');
+check(motion.moduleFor('zacian')==='wind'&&motion.moduleFor('zamazenta')==='quake','Galar weather/impact engine regression');
+const galarSprites={"zacian":[["zacian-emblem",8,3,27,100]],"zamazenta":[["zamazenta-emblem",8,3,27,100]],"eternatus":[["eternatus-emblem",6,3,27,100],["orb-core",6,2,26,115],["orb-medium",6,2,24,85],["orb-small",6,2,23,58]]};
+for(const [key,expected] of Object.entries(galarSprites)){
+  check(!motion.motifs[key]&&JSON.stringify(motion.signatures[key].map(p=>[p.shape,p.count,p.phone,p.duration,p.size]))===JSON.stringify(expected)&&motion.signatures[key].every(p=>p.type==='sprite'),'Galar sprite configuration: '+key);
+  for(const [shape] of expected)check(signatureCss.includes('url("assets/themes/marks/'+shape+'.webp")'),'Galar sprite asset missing: '+shape);
+}
 const signatureHost=document.getElementById('themeMotionParticles');
 const snapshotNode=x=>[x.className,x.getAttribute('d'),x.getAttribute('data-mobile'),x.textContent,[...x.style.values],x.children.map(snapshotNode)];
 const signatureSnapshot=()=>signatureHost.children.map(snapshotNode);
@@ -388,6 +394,16 @@ for(let round=0;round<3;round++)for(const theme of themes){
   if(theme.material==='elemental'&&theme.key!=='thunderwake')check(signatureHost.hidden&&signatureHost.children.length===0,`An Elemental theme retained another theme's signature: ${theme.key}`);
   else check(signatureHost.children.length===motion.signatures[theme.key].reduce((sum,part)=>sum+part.count,0)+Number(!!motion.moduleFor(theme.key)),`Signature objects leaked or disappeared: ${theme.key}`);
   check(signatureHost.querySelectorAll('.themeMotionModuleHost').length===Number(!!motion.moduleFor(theme.key)),`Module hosts leaked: ${theme.key}`);
+  if(galarSprites[theme.key]){
+    const nodes=signatureHost.children.filter(x=>x.getAttribute('data-primitive')==='sprite');
+    const expected=galarSprites[theme.key];
+    for(const [shape,count,phone] of expected){
+      const group=nodes.filter(x=>x.getAttribute('data-shape')===shape);
+      check(group.length===count&&group.filter(x=>x.getAttribute('data-mobile')==='true').length===phone,'Galar sprite density: '+shape);
+      check(new Set(group.map(x=>x.style.values.get('--s'))).size>=count-1&&new Set(group.map(x=>x.style.values.get('--delay'))).size>=count-1,'Galar sprite variety: '+shape);
+    }
+    check(nodes.every(x=>[1,2,3].every(i=>['x','y'].every(axis=>x.style.values.get('--spawn-'+axis+i)?.endsWith('%')))),'Galar sprite spawn coordinates missing');
+  }
   if(motion.motifs[theme.key]){
     const layers=motion.motifs[theme.key][1],nodes=signatureHost.children.filter(x=>x.getAttribute('data-primitive')==='motif');
     const mark=layers[0][1]==='primalmark';

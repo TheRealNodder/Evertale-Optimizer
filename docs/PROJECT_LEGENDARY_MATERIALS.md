@@ -82,3 +82,7 @@ The owner supplied the red Omega, blue Alpha and green Delta reference silhouett
 ## Scattered spawn refinement
 
 Omega, Alpha and Delta marks use 8/3 independently sized and phased objects per desktop/phone, retaining the respective quake, rain and wind engines. Ultra Necrozma keeps 24/10 jewels and 18 hues, with a more visible 26–118px weighted size and .68–.91 peak opacity. Each object has three seeded host-relative positions and three different scale peaks in a 21–36s cycle. Relocation occurs exclusively at zero opacity, yielding roughly 7–12s between appearances. Positions repeat deterministically rather than using continuous random timers. All existing lifecycle and reduced-motion contracts remain in place.
+
+## Galar scattered emblems
+
+Three emblems are cropped from the owner-approved generated artwork, and three individually soft-masked Dynamax orbs are cropped from the owner's reference image. Each is a small alpha-preserving WebP, stored locally under assets/themes/marks. Zacian uses the wind engine, Zamazenta uses the earthquake crack engine, and Eternatus combines its emblem with three distinct orb sprites at overlapping but different size ranges. All sprites use independent seeded positions, scales, lifetimes and three invisible relocations, plus the existing paused/still and reduced-motion contracts. No optimizer or routing ownership changes.

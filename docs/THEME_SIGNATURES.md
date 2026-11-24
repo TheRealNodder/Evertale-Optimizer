@@ -16,7 +16,7 @@ Both engines receive separate child hosts inside one shared animation stage. The
 
 ## Project Legendary
 
-Twenty-three Pokémon use original SVG vignettes with bounded independently animated layers (two or three for most, eight for Dialga, five for Giratina and four for Eternatus), duplicated at two desktop anchors and shown once on phones. The original wind and earthquake engines remain active; mobile quake rendering pairs the four geometry bands into two paint groups, retaining all cracks and three quake positions. Zygarde and Miraidon retain their dedicated engines; Ultra Necrozma uses the cell engine with individual faceted jewels; Terapagos retains its original gleams. No new network assets or application-state ownership. Animation direction and sequence are artistic interpretations, not reproduced canonical battle effects.
+Twenty Pokémon use original SVG vignettes with bounded independently animated layers (two or three for most, eight for Dialga and five for Giratina), duplicated at two desktop anchors and shown once on phones. The original wind and earthquake engines remain active; mobile quake rendering pairs the four geometry bands into two paint groups, retaining all cracks and three quake positions. Zygarde and Miraidon retain their dedicated engines; Ultra Necrozma uses the cell engine with individual faceted jewels; Terapagos retains its original gleams. No new network assets or application-state ownership. Animation direction and sequence are artistic interpretations, not reproduced canonical battle effects.
 
 ## Motion contract
 
@@ -106,9 +106,9 @@ Counts below are conservative complete-scene desktop / phone bounds, including f
 | solgaleo | solar-photosphere, solar-plasma, solar-rays; 24s material cycle | 11 / 7 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#other-material-revisions) |
 | lunala | cratered-moon, lunar-shadow, starlight; 26s material cycle | 11 / 7 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#other-material-revisions) |
 | ultranecrozma | Scattered faceted jewels (24/10), 18 hues, variable sizes, three positions per cycle | 29 / 14 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#scattered-spawn-refinement) |
-| zacian | forged-sword, blade-wake, blade-sparks; 17s material cycle | 31 / 15 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#other-material-revisions) |
-| zamazenta | forged-shield, incoming-energy, deflection-sparks; 19s material cycle | 11 / 7 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#other-material-revisions) |
-| eternatus | dynamax-cloud, energy-core, energy-infall, cannon-release; 24s material cycle | 13 / 8 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#other-material-revisions) |
+| zacian | Scattered approved sword-wolf emblems (8/3) + wind | 33 / 15 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#galar-scattered-emblems) |
+| zamazenta | Scattered approved shield-wolf emblems (8/3) + earthquake cracks | 38 / 16 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#galar-scattered-emblems) |
+| eternatus | Scattered approved dragon emblems (6/3) + three cropped Dynamax orb variants (6/2 each) | 29 / 13 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#galar-scattered-emblems) |
 | koraidon | Ancient layered cliffs, prehistoric ferns and drifting impact dust; 20s | 11 / 7 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#weather-and-primal-refinements) |
 | miraidon | Full-page motherboard (12/5 packets); Hadron waypoint rings and trace releases (2+2/1+1) | 21 / 11 | [Identity](THEME_MOTION.md#miraidon) |
 | terapagos | Original stellar prism gleams and orbiting facets, 5/2 + 4/2 | 14 / 8 | [Identity](THEME_MOTION.md#terapagos) |
