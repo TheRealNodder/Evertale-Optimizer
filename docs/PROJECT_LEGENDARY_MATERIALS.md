@@ -78,3 +78,7 @@ Following the owner's Z-Crystal reference, replace the clustered spires with sep
 ## Empowered Hoenn marks
 
 The owner supplied the red Omega, blue Alpha and green Delta reference silhouettes. Their original contours and negative space are traced into compact SVG marks, with restrained color gradients and a gradual opacity/scale cycle. Two desktop anchors and one phone anchor retain the existing decoration lifecycle. Primal Groudon keeps the quake engine, Primal Kyogre keeps its 18/7 rain, and Mega Rayquaza keeps its wind engine. Standard Groudon, Kyogre and Rayquaza are unchanged. No new weather engine or abstract emblem layer is added.
+
+## Scattered spawn refinement
+
+Omega, Alpha and Delta marks use 8/3 independently sized and phased objects per desktop/phone, retaining the respective quake, rain and wind engines. Ultra Necrozma keeps 24/10 jewels and 18 hues, with a more visible 26–118px weighted size and .68–.91 peak opacity. Each object has three seeded host-relative positions and three different scale peaks in a 21–36s cycle. Relocation occurs exclusively at zero opacity, yielding roughly 7–12s between appearances. Positions repeat deterministically rather than using continuous random timers. All existing lifecycle and reduced-motion contracts remain in place.

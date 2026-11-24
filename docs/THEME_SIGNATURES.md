@@ -89,9 +89,9 @@ Counts below are conservative complete-scene desktop / phone bounds, including f
 | groudon | drought, continental-rise; 20s cycle + retained signature engine/accents | 34 / 15 | [Identity](THEME_MOTION.md#groudon) |
 | kyogre | ocean-swell, pressure; 20s cycle + retained signature engine/accents | 23 / 12 | [Identity](THEME_MOTION.md#kyogre) |
 | rayquaza | Full-page atmospheric wind currents only | 25 / 12 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#weather-and-primal-refinements) |
-| shinyprimalgroudon | Red Omega silhouette + earthquake engine | 32 / 14 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#empowered-hoenn-marks) |
-| shinyprimalkyogre | Blue Alpha silhouette + rain (18/7) | 25 / 12 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#empowered-hoenn-marks) |
-| shinymegarayquaza | Green Delta silhouette + wind engine | 27 / 13 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#empowered-hoenn-marks) |
+| shinyprimalgroudon | Scattered Omega marks (8/3) + earthquake engine | 38 / 16 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#scattered-spawn-refinement) |
+| shinyprimalkyogre | Scattered Alpha marks (8/3) + rain (18/7) | 31 / 14 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#scattered-spawn-refinement) |
+| shinymegarayquaza | Scattered Delta marks (8/3) + wind engine | 33 / 15 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#scattered-spawn-refinement) |
 | dialga | Detailed Roman-numeral clocks, three hands, glass hourglasses and reversible sand; 24s / 37.2s cycles | 21 / 12 | [Identity](THEME_MOTION.md#dialga) |
 | palkia | Star-filled galaxy, luminous torn space and gravitational-lens-inspired arcs; 23s cycle | 11 / 7 | [Identity](THEME_MOTION.md#palkia) |
 | giratina | Filled viscous tar pools, stretching tendrils, falling/rising drops and irregular splatter; 25s cycle | 15 / 9 | [Identity](THEME_MOTION.md#giratina) |
@@ -105,7 +105,7 @@ Counts below are conservative complete-scene desktop / phone bounds, including f
 | zygarde | Organic filled cells (24/10) | 29 / 14 | [Identity](THEME_MOTION.md#zygarde) |
 | solgaleo | solar-photosphere, solar-plasma, solar-rays; 24s material cycle | 11 / 7 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#other-material-revisions) |
 | lunala | cratered-moon, lunar-shadow, starlight; 26s material cycle | 11 / 7 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#other-material-revisions) |
-| ultranecrozma | Scattered slanted faceted jewels (24/10), 18 type-inspired hues, variable sizes and individual fade cycles | 29 / 14 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#weather-and-primal-refinements) |
+| ultranecrozma | Scattered faceted jewels (24/10), 18 hues, variable sizes, three positions per cycle | 29 / 14 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#scattered-spawn-refinement) |
 | zacian | forged-sword, blade-wake, blade-sparks; 17s material cycle | 31 / 15 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#other-material-revisions) |
 | zamazenta | forged-shield, incoming-energy, deflection-sparks; 19s material cycle | 11 / 7 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#other-material-revisions) |
 | eternatus | dynamax-cloud, energy-core, energy-infall, cannon-release; 24s material cycle | 13 / 8 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#other-material-revisions) |

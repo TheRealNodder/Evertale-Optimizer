@@ -368,9 +368,38 @@ html[data-theme-still="true"] .themeMotionParticle:is([data-motif-motion="ancien
 @media(prefers-reduced-motion:reduce){.themeMotionParticle:is([data-motif-motion="ancientdust"]){opacity:0}}
 
 /* Owner-supplied Omega, Alpha and Delta silhouettes; weather engines stay separate. */
-.themeMotionParticle[data-motif-motion="primalmark"]{--motif-size:clamp(140px,18vw,260px);animation-name:legendary-primalmark}
+.themeMotionParticle[data-motif-motion="primalmark"]{--motif-size:var(--s);animation-name:legendary-primalmark;animation-timing-function:ease-in-out}
 .themeMotionParticle[data-motif-motion="primalmark"]>svg{filter:drop-shadow(0 0 5px currentColor)}
-@keyframes legendary-primalmark{0%,100%{transform:scale(.94);opacity:.18}32%,63%{transform:scale(1.04);opacity:.48}85%{transform:scale(.98);opacity:.26}}
-@media(max-width:700px){.themeMotionParticle[data-motif-motion="primalmark"]{--motif-size:clamp(100px,32vw,170px)}}
+@keyframes legendary-primalmark{
+  0%{left:var(--spawn-x1);top:var(--spawn-y1);transform:scale(.35) rotate(var(--turn));opacity:0}
+  9%{left:var(--spawn-x1);top:var(--spawn-y1);transform:scale(1) rotate(var(--turn));opacity:var(--o)}
+  20%{left:var(--spawn-x1);top:var(--spawn-y1);transform:scale(.94) rotate(var(--turn));opacity:calc(var(--o) * .85)}
+  29%{left:var(--spawn-x1);top:var(--spawn-y1);transform:scale(.3) rotate(var(--turn));opacity:0;animation-timing-function:steps(1,end)}
+  32%{left:var(--spawn-x2);top:var(--spawn-y2);transform:scale(.3) rotate(var(--turn));opacity:0}
+  43%{left:var(--spawn-x2);top:var(--spawn-y2);transform:scale(.86) rotate(var(--turn));opacity:var(--o)}
+  54%{left:var(--spawn-x2);top:var(--spawn-y2);transform:scale(.82) rotate(var(--turn));opacity:calc(var(--o) * .85)}
+  62%{left:var(--spawn-x2);top:var(--spawn-y2);transform:scale(.25) rotate(var(--turn));opacity:0;animation-timing-function:steps(1,end)}
+  65%{left:var(--spawn-x3);top:var(--spawn-y3);transform:scale(.25) rotate(var(--turn));opacity:0}
+  76%{left:var(--spawn-x3);top:var(--spawn-y3);transform:scale(1.12) rotate(var(--turn));opacity:var(--o)}
+  87%{left:var(--spawn-x3);top:var(--spawn-y3);transform:scale(1.02) rotate(var(--turn));opacity:calc(var(--o) * .85)}
+  96%{left:var(--spawn-x3);top:var(--spawn-y3);transform:scale(.35) rotate(var(--turn));opacity:0;animation-timing-function:steps(1,end)}
+  100%{left:var(--spawn-x1);top:var(--spawn-y1);transform:scale(.35) rotate(var(--turn));opacity:0}
+}
+@keyframes legendary-scattered-spawn{
+  0%{left:var(--spawn-x1);top:var(--spawn-y1);transform:scale(.35) rotate(var(--turn));opacity:0}
+  9%{left:var(--spawn-x1);top:var(--spawn-y1);transform:scale(1) rotate(var(--turn));opacity:var(--o)}
+  20%{left:var(--spawn-x1);top:var(--spawn-y1);transform:scale(.94) rotate(var(--turn));opacity:calc(var(--o) * .85)}
+  29%{left:var(--spawn-x1);top:var(--spawn-y1);transform:scale(.3) rotate(var(--turn));opacity:0;animation-timing-function:steps(1,end)}
+  32%{left:var(--spawn-x2);top:var(--spawn-y2);transform:scale(.3) rotate(var(--turn));opacity:0}
+  43%{left:var(--spawn-x2);top:var(--spawn-y2);transform:scale(.86) rotate(var(--turn));opacity:var(--o)}
+  54%{left:var(--spawn-x2);top:var(--spawn-y2);transform:scale(.82) rotate(var(--turn));opacity:calc(var(--o) * .85)}
+  62%{left:var(--spawn-x2);top:var(--spawn-y2);transform:scale(.25) rotate(var(--turn));opacity:0;animation-timing-function:steps(1,end)}
+  65%{left:var(--spawn-x3);top:var(--spawn-y3);transform:scale(.25) rotate(var(--turn));opacity:0}
+  76%{left:var(--spawn-x3);top:var(--spawn-y3);transform:scale(1.12) rotate(var(--turn));opacity:var(--o)}
+  87%{left:var(--spawn-x3);top:var(--spawn-y3);transform:scale(1.02) rotate(var(--turn));opacity:calc(var(--o) * .85)}
+  96%{left:var(--spawn-x3);top:var(--spawn-y3);transform:scale(.35) rotate(var(--turn));opacity:0;animation-timing-function:steps(1,end)}
+  100%{left:var(--spawn-x1);top:var(--spawn-y1);transform:scale(.35) rotate(var(--turn));opacity:0}
+}
+@media(max-width:700px){.themeMotionParticle[data-motif-motion="primalmark"]{--motif-size:clamp(34px,var(--s),90px)}}
 html[data-theme-still="true"] .themeMotionParticle[data-motif-motion="primalmark"]{opacity:.34}
 @media(prefers-reduced-motion:reduce){.themeMotionParticle[data-motif-motion="primalmark"]{opacity:.34}}

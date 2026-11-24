@@ -314,6 +314,8 @@ check(jewels.length===24&&jewels.filter(x=>x.getAttribute('data-mobile')==='true
 check(jewels.every(x=>x.getAttribute('data-crystal')==='true'),'Necrozma jewel shape missing');
 check(new Set(jewels.map(x=>x.style.values.get('--cell-color'))).size===18,'Necrozma jewel palette incomplete');
 check(new Set(jewels.map(x=>x.style.values.get('--size'))).size>12&&new Set(jewels.map(x=>x.style.values.get('--delay'))).size>12,'Necrozma jewel sizes and phases not varied');
+check(jewels.every(x=>[1,2,3].every(i=>['x','y'].every(axis=>x.style.values.get('--spawn-'+axis+i)?.endsWith('%')))),'Necrozma spawn coordinates missing');
+check(signatureCss.includes('@keyframes legendary-scattered-spawn{')&&signatureCss.includes('96%{left:var(--spawn-x3);top:var(--spawn-y3)'),'Scattered spawn lifecycle missing');
 const firstJewels=JSON.stringify(signatureSnapshot());
 api.setPreference('zygarde');check(JSON.stringify(signatureSnapshot())===firstCells,'Zygarde changed after jewel scene');
 api.setPreference('ultranecrozma');check(JSON.stringify(signatureSnapshot())===firstJewels,'Necrozma remount is not deterministic');
@@ -388,7 +390,13 @@ for(let round=0;round<3;round++)for(const theme of themes){
   check(signatureHost.querySelectorAll('.themeMotionModuleHost').length===Number(!!motion.moduleFor(theme.key)),`Module hosts leaked: ${theme.key}`);
   if(motion.motifs[theme.key]){
     const layers=motion.motifs[theme.key][1],nodes=signatureHost.children.filter(x=>x.getAttribute('data-primitive')==='motif');
-    check(nodes.length===layers.length*2&&nodes.filter(x=>x.getAttribute('data-mobile')==='true').length===layers.length,'Motif density: '+theme.key);
+    const mark=layers[0][1]==='primalmark';
+    check(nodes.length===(mark?8:layers.length*2)&&nodes.filter(x=>x.getAttribute('data-mobile')==='true').length===(mark?3:layers.length),'Motif density: '+theme.key);
+    if(mark){
+      check(new Set(nodes.map(x=>x.style.values.get('--s'))).size>5,'Mark sizes not varied: '+theme.key);
+      check(new Set(nodes.map(x=>x.style.values.get('--delay'))).size>5,'Mark phases not varied: '+theme.key);
+      check(nodes.every(x=>[1,2,3].every(i=>['x','y'].every(axis=>x.style.values.get('--spawn-'+axis+i)?.endsWith('%')))),'Mark spawn coordinates missing: '+theme.key);
+    }
     check(nodes.every(x=>x.getAttribute('data-motif-key')===theme.key&&x.innerHTML.includes('viewBox="0 0 200 160"')),'Stale motif markup: '+theme.key);
     const ids=nodes.flatMap(x=>[...x.innerHTML.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]));
     check(new Set(ids).size===ids.length&&nodes.every(x=>!x.innerHTML.includes('MOTIFID-')&&[...x.innerHTML.matchAll(/url\(#([^)]+)\)/g)].every(m=>x.innerHTML.includes('id="'+m[1]+'"'))),'Motif local SVG references not isolated: '+theme.key);

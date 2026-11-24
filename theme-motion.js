@@ -599,9 +599,9 @@
     groudon:[...LEGENDARY_MOTIFS.groudon[1].map((_,i)=>P('motif',String(i),2,1,20,210,'legendary'))],
     kyogre:[P('fall','rain',14,6,11,22),...LEGENDARY_MOTIFS.kyogre[1].map((_,i)=>P('motif',String(i),2,1,20,210,'legendary'))],
     rayquaza:[],
-    shinyprimalgroudon:[P('motif','0',2,1,18,210,'legendary')],
-    shinyprimalkyogre:[P('fall','rain',18,7,11,25),P('motif','0',2,1,18,210,'legendary')],
-    shinymegarayquaza:[P('motif','0',2,1,18,210,'legendary')],
+    shinyprimalgroudon:[P('motif','0',8,3,27,100,'legendary')],
+    shinyprimalkyogre:[P('fall','rain',18,7,11,25),P('motif','0',8,3,27,100,'legendary')],
+    shinymegarayquaza:[P('motif','0',8,3,27,100,'legendary')],
     dialga:[...LEGENDARY_MOTIFS.dialga[1].map((_,i)=>P('motif',String(i),2,1,24,210,'legendary'))],
     palkia:[...LEGENDARY_MOTIFS.palkia[1].map((_,i)=>P('motif',String(i),2,1,23,210,'legendary'))],
     giratina:[...LEGENDARY_MOTIFS.giratina[1].map((_,i)=>P('motif',String(i),2,1,25,210,'legendary'))],
@@ -690,7 +690,18 @@
             Object.assign(vars,{'--x':left?'14%':'86%','--y':left?'28%':'73%',
               '--mx':'77%','--my':'58%'});
           }
-          if(motion==='primalmark')Object.assign(vars,{'--x':left?'13%':'87%','--y':left?'30%':'72%','--mx':'77%','--my':'30%'});
+          if(motion==='primalmark'){
+            // Seeded, independent locations and lifetimes; relocate only during invisibility.
+            const x=(8+rand()*84).toFixed(2)+'%',y=(9+rand()*82).toFixed(2)+'%';
+            const duration=21+rand()*15;
+            Object.assign(vars,{'--x':x,'--y':y,'--mx':x,'--my':y,
+              '--spawn-x1':x,'--spawn-y1':y,
+              '--spawn-x2':(8+rand()*84).toFixed(2)+'%','--spawn-y2':(9+rand()*82).toFixed(2)+'%',
+              '--spawn-x3':(8+rand()*84).toFixed(2)+'%','--spawn-y3':(9+rand()*82).toFixed(2)+'%',
+              '--s':(44+Math.pow(rand(),1.8)*92).toFixed(1)+'px','--d':duration.toFixed(2)+'s',
+              '--delay':(-rand()*duration).toFixed(2)+'s','--o':(.45+rand()*.28).toFixed(2),
+              '--turn':Math.round((rand()-.5)*12)+'deg'});
+          }
           if(key==='koraidon')Object.assign(vars,{'--y':left?'76%':'69%','--my':'71%'});
           if(["arceus","reshiram","zekrom","blackkyurem","whitekyurem","xerneas","yveltal","solgaleo","lunala","zacian","zamazenta","eternatus","koraidon"].includes(key))p.setAttribute('data-material-scene','true');
           for(const[k,v]of Object.entries(vars))p.style.setProperty(k,v);

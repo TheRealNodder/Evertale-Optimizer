@@ -23,10 +23,19 @@
         color:colors[i%colors.length],mobile:i<LIMITS.phone
       };
     });
-    if(options.key==='ultranecrozma')cells.forEach((c,i)=>{
-      c.color=CRYSTAL_COLORS[(i*7)%CRYSTAL_COLORS.length];
-      c.crystal=true;
-    });
+    if(options.key==='ultranecrozma'){
+      const spawn=random(hash('crystal-spawns:'+String(options.seed||0)));
+      cells.forEach((c,i)=>{
+        c.color=CRYSTAL_COLORS[(i*7)%CRYSTAL_COLORS.length];
+        c.crystal=true;
+        c.size=+(26+Math.pow(spawn(),1.8)*92).toFixed(1);
+        c.duration=+(21+spawn()*15).toFixed(2);
+        c.delay=+(-spawn()*c.duration).toFixed(2);
+        c.opacity=+(.68+spawn()*.23).toFixed(2);
+        c.x2=+(7+spawn()*86).toFixed(2);c.y2=+(8+spawn()*84).toFixed(2);
+        c.x3=+(7+spawn()*86).toFixed(2);c.y3=+(8+spawn()*84).toFixed(2);
+      });
+    }
     if(options.key==='zygarde')for(const c of cells){
       const centerX=c.x<50?25:75,centerY=c.y<50?25:75;
       c.gatherX=+(Math.max(-12,Math.min(12,(centerX-c.x)*.6))).toFixed(1);
@@ -45,6 +54,8 @@
       const cell=d.createElement('i');cell.className='tcCell';cell.setAttribute('data-mobile',String(c.mobile));
       if(c.crystal)cell.setAttribute('data-crystal','true');
       const vars={'--x':`${c.x}%`,'--y':`${c.y}%`,'--size':`${c.size}px`,'--d':`${c.duration}s`,'--delay':`${c.delay}s`,'--o':String(c.opacity),'--turn':`${c.turn}deg`,'--cell-color':c.color};
+      if(c.crystal)Object.assign(vars,{'--spawn-x1':vars['--x'],'--spawn-y1':vars['--y'],
+        '--spawn-x2':c.x2+'%','--spawn-y2':c.y2+'%','--spawn-x3':c.x3+'%','--spawn-y3':c.y3+'%'});
       if(c.gatherX!==undefined){vars['--gather-x']=`${c.gatherX}px`;vars['--gather-y']=`${c.gatherY}px`;}
       for(const[k,v]of Object.entries(vars))cell.style.setProperty(k,v);
       field.appendChild(cell);
