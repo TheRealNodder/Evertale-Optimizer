@@ -309,9 +309,10 @@ check(!desktopModule.parentNode,'Motion bucket change left the old module host a
 densityMotion.matches=false;densityMotion.onchange();
 api.setPreference('groudon');densityMotion.matches=true;densityMotion.onchange();
 const mobileQuakes=signatureHost.querySelectorAll('.tqQuake');
-check(mobileQuakes.length===3&&mobileQuakes.every(x=>x.querySelectorAll('.tqBand').length===2),'Mobile quake paint grouping failed');
+const quakeBands=x=>x.children.flatMap(child=>child.children||[]).filter(child=>child.getAttribute('class')==='tqBand');
+check(mobileQuakes.length===3&&mobileQuakes.every(x=>quakeBands(x).length===2),'Mobile quake paint grouping failed');
 densityMotion.matches=false;densityMotion.onchange();
-check(signatureHost.querySelectorAll('.tqQuake').every(x=>x.querySelectorAll('.tqBand').length===4),'Desktop quake paint changed');
+check(signatureHost.querySelectorAll('.tqQuake').every(x=>quakeBands(x).length===4),'Desktop quake paint changed');
 api.setPreference('zekrom');
 for(const item of signatureHost.children.filter(x=>x.getAttribute('data-primitive')==='trace')){
   check(item.innerHTML.includes('viewBox="0 0 160 90"'),'Circuit geometry does not share the packet coordinate space');
