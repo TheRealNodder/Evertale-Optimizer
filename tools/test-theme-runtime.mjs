@@ -260,12 +260,15 @@ vm.runInContext(fs.readFileSync(path.join(root,'theme-motion.js'),'utf8'),contex
 const motion=context.EvertaleThemeMotion;
 check(JSON.stringify([...motion.keys].sort())===JSON.stringify(themes.filter(t=>t.material!=='elemental').map(t=>t.key).sort()),'Motion scenes do not cover the exact72 non-Elemental themes');
 check(JSON.stringify(Object.keys(motion.signatures).sort())===JSON.stringify([...motion.keys,'thunderwake'].sort()),'Signature effects do not cover the exact72 scenes and one storm accent');
-const primitiveNames=new Set(['fall','rise','gust','glint','swell','ripple','orbit','heat','arc','trace','hex','clock','rift','invert','prism','burst']);
+const primitiveNames=new Set(['fall','rise','gust','glint','swell','ripple','orbit','heat','arc','trace','hex','clock','rift','invert','prism','burst','motif']);
 for(const [key,parts] of Object.entries(motion.signatures)){
   let desktop=5,phone=4; // Existing three layers and two art surfaces; two layers on phones.
   if(motion.technology.includes(key)){desktop+=12;phone+=5;}
   if(key==='miraidon'){desktop+=4;phone+=2;} // two accents per Hadron waypoint
   if(key==='zygarde'){desktop+=24;phone+=10;}
+  if(motion.moduleFor(key)==='quake'){desktop+=25;phone+=9;}
+  if(motion.moduleFor(key)==='wind'){desktop+=20;phone+=8;}
+  if(motion.moduleFor(key)==='gems'){desktop+=21;phone+=9;}
   for(const part of parts){
     check(primitiveNames.has(part.type),`Unknown signature primitive: ${key}`);
     check(Number.isInteger(part.count)&&Number.isInteger(part.phone)&&part.phone>0&&part.phone<=part.count,`Invalid signature density: ${key}`);
@@ -274,6 +277,16 @@ for(const [key,parts] of Object.entries(motion.signatures)){
     desktop+=part.count*weight;phone+=part.phone*weight;
   }
   check(desktop<=40&&phone<=16,`Whole-scene signature budget exceeded: ${key} (${desktop}/${phone})`);
+}
+check(Object.keys(motion.motifs).length===27,'Expected 27 authored motifs plus Miraidon and Zygarde engines');
+const motifShapes=new Set();
+for(const [key,[cycle,layers]] of Object.entries(motion.motifs)){
+  check(legendary.some(t=>t.key===key)&&layers.length>=2&&layers.length<=3,'Unexpected motif identity: '+key);
+  for(const [role,behavior,color,markup] of layers){
+    check(!motifShapes.has(key+':'+role),'Duplicate motif role: '+key+':'+role);motifShapes.add(key+':'+role);
+    check(signatureCss.includes('@keyframes legendary-'+behavior+'{'),'Missing motion: '+behavior);
+    check(/^#[0-9a-f]{6}$/i.test(color)&&!/<(?:script|image|foreignObject)|\bon\w+=|href=|url\(/i.test(markup),'Invalid motif geometry: '+key);
+  }
 }
 const signatureHost=document.getElementById('themeMotionParticles');
 const snapshotNode=x=>[x.className,x.getAttribute('d'),x.getAttribute('data-mobile'),x.textContent,[...x.style.values],x.children.map(snapshotNode)];
@@ -294,6 +307,11 @@ check(phonePackets>0&&phonePackets<=5,`Motion bucket board packet budget failed:
 check(signatureHost.querySelectorAll('.tmbHadronRing').length<=1,'Miraidon phone ring cap failed');
 check(!desktopModule.parentNode,'Motion bucket change left the old module host attached');
 densityMotion.matches=false;densityMotion.onchange();
+api.setPreference('groudon');densityMotion.matches=true;densityMotion.onchange();
+const mobileQuakes=signatureHost.querySelectorAll('.tqQuake');
+check(mobileQuakes.length===3&&mobileQuakes.every(x=>x.querySelectorAll('.tqBand').length===2),'Mobile quake paint grouping failed');
+densityMotion.matches=false;densityMotion.onchange();
+check(signatureHost.querySelectorAll('.tqQuake').every(x=>x.querySelectorAll('.tqBand').length===4),'Desktop quake paint changed');
 api.setPreference('zekrom');
 for(const item of signatureHost.children.filter(x=>x.getAttribute('data-primitive')==='trace')){
   check(item.innerHTML.includes('viewBox="0 0 160 90"'),'Circuit geometry does not share the packet coordinate space');
@@ -345,6 +363,12 @@ for(let round=0;round<3;round++)for(const theme of themes){
   if(theme.material==='elemental'&&theme.key!=='thunderwake')check(signatureHost.hidden&&signatureHost.children.length===0,`An Elemental theme retained another theme's signature: ${theme.key}`);
   else check(signatureHost.children.length===motion.signatures[theme.key].reduce((sum,part)=>sum+part.count,0)+Number(!!motion.moduleFor(theme.key)),`Signature objects leaked or disappeared: ${theme.key}`);
   check(signatureHost.querySelectorAll('.themeMotionModuleHost').length===Number(!!motion.moduleFor(theme.key)),`Module hosts leaked: ${theme.key}`);
+  if(motion.motifs[theme.key]){
+    const layers=motion.motifs[theme.key][1],nodes=signatureHost.children.filter(x=>x.getAttribute('data-primitive')==='motif');
+    check(nodes.length===layers.length*2&&nodes.filter(x=>x.getAttribute('data-mobile')==='true').length===layers.length,'Motif density: '+theme.key);
+    check(nodes.every(x=>x.getAttribute('data-motif-key')===theme.key&&x.innerHTML.includes('viewBox="0 0 200 160"')),'Stale motif markup: '+theme.key);
+    for(const x of nodes)check(x.style.values.get('--x').endsWith('%')&&x.style.values.get('--y').endsWith('%'),'Motif host-relative coordinates: '+theme.key);
+  }
   for(const item of signatureHost.children.filter(x=>['fall','rise'].includes(x.getAttribute('data-primitive')))){
     const x=parseFloat(item.style.values.get('--x')),drift=parseFloat(item.style.values.get('--dx'));
     check(item.style.values.get('--x').endsWith('%'),'Background field does not follow its clipped host');

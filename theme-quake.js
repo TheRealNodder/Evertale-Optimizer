@@ -57,8 +57,9 @@
       const glow=d.createElement('i');glow.className='tqGlow';box.appendChild(glow);
       const svg=d.createElementNS(SVGNS,'svg');
       svg.setAttribute('viewBox',`0 0 ${quake.size} ${quake.size}`);svg.setAttribute('focusable','false');svg.setAttribute('aria-hidden','true');
-      quake.bands.forEach((dpath,band)=>{
-        const group=d.createElementNS(SVGNS,'g');group.setAttribute('class','tqBand');group.style.setProperty('--band',String(band));
+      const paintBands=mobile?[quake.bands.slice(0,2).join(''),quake.bands.slice(2,4).join('')]:quake.bands;
+      paintBands.forEach((dpath,band)=>{
+        const group=d.createElementNS(SVGNS,'g');group.setAttribute('class','tqBand');group.style.setProperty('--band',String(mobile?band*2:band));
         for(const cls of ['tqCrackGlow','tqCrack']){const p=d.createElementNS(SVGNS,'path');p.setAttribute('class',cls);p.setAttribute('d',dpath||'M0 0');group.appendChild(p);}
         svg.appendChild(group);
       });

@@ -725,6 +725,10 @@ Motion uses CSS transforms and opacity. System reduced motion and the Animations
 
 **Original environment illustration:** [superfamicom](../assets/themes/scenes/superfamicom.webp)
 
+## Project Legendary: authored Pokémon vignettes
+
+The per-character implementation now uses distinct original SVG silhouettes, co-located roles and a shared cycle, with the updated animation and object counts in [Theme animation signatures](THEME_SIGNATURES.md). Prior descriptions below remain research anchors rather than precise frame-by-frame specifications. Existing art, exact forms and credits are retained. For the Sinnoh time/space distinction see the [official Sinnoh story](https://diamondpearl.pokemon.com/en-us/story/); for Paldea abilities and moves see the [official Koraidon and Miraidon announcement](https://press.pokemon.com/en-CA/MEDIA-ALERT-DETAILS-REVEALED-ABOUT-THE-LEGENDARY-POKEMON-KORAIDON-AND-).
+
 ## hooh
 
 - Ho-Oh is the Rainbow Pokémon.

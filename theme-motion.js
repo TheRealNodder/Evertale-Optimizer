@@ -15,6 +15,588 @@
     return Object.freeze({type,shape,count,phone,duration,size,region});
   }
   const P=part;
+  /* Original checked-in SVG silhouettes, no external markup or runtime data. */
+  const LEGENDARY_MOTIFS={
+  "hooh": [
+    22,
+    [
+      [
+        "rainbow",
+        "reveal",
+        "#f9dc8b",
+        "<path stroke=\"#f07575\" d=\"M20 108 A80 72 0 0 1 180 108\"/><path stroke=\"#f5ac64\" d=\"M27 108 A73 66 0 0 1 173 108\"/><path stroke=\"#f7d879\" d=\"M34 108 A66 60 0 0 1 166 108\"/><path stroke=\"#8ce2a3\" d=\"M41 108 A59 54 0 0 1 159 108\"/><path stroke=\"#79d8ef\" d=\"M48 108 A52 48 0 0 1 152 108\"/><path stroke=\"#9a9cf5\" d=\"M55 108 A45 42 0 0 1 145 108\"/><path stroke=\"#d59ced\" d=\"M62 108 A38 36 0 0 1 138 108\"/>"
+      ],
+      [
+        "sacred-feathers",
+        "ascend",
+        "#f4ad58",
+        "<path d=\"M30 111Q14 70 60 30Q77 64 30 111Z M30 111L57 44 M38 90L26 70 M45 76L62 69 M115 128Q90 81 144 47Q169 91 115 128Z M115 128L142 62 M123 107L110 91 M132 91L150 83\"/>"
+      ],
+      [
+        "sacred-fire",
+        "radiate",
+        "#ef7959",
+        "<path d=\"M100 145Q64 119 80 87L91 103Q121 65 107 21Q153 70 136 117Z M32 135Q13 109 42 72Q38 107 58 125 M162 135Q181 109 152 72Q156 107 136 125\"/>"
+      ]
+    ]
+  ],
+  "lugia": [
+    20,
+    [
+      [
+        "pressure",
+        "compress",
+        "#a7dfff",
+        "<ellipse cx=\"100\" cy=\"80\" rx=\"76\" ry=\"30\"/><ellipse cx=\"100\" cy=\"80\" rx=\"53\" ry=\"20\"/><ellipse cx=\"100\" cy=\"80\" rx=\"27\" ry=\"10\"/>"
+      ],
+      [
+        "aeroblast",
+        "sweep",
+        "#e1f3ff",
+        "<path d=\"M9 91C45 21 90 34 99 79S153 130 192 60 M12 110C54 52 81 52 95 94S155 145 190 84\"/>"
+      ]
+    ]
+  ],
+  "suicune": [
+    18,
+    [
+      [
+        "purification",
+        "sweep",
+        "#a4f6ff",
+        "<path d=\"M8 104Q36 55 70 92T135 85T192 70 M8 117Q40 75 72 108T138 103T192 89 M16 129Q51 100 78 119T155 114\"/>"
+      ],
+      [
+        "north-wind",
+        "ribbon",
+        "#b6a1f3",
+        "<path d=\"M10 78C35 24 76 115 105 52S165 26 190 71 M10 95C35 41 76 132 105 69S165 43 190 88\"/>"
+      ],
+      [
+        "cleared-water",
+        "radiate",
+        "#dbfbff",
+        "<ellipse cx=\"100\" cy=\"80\" rx=\"76\" ry=\"30\"/><ellipse cx=\"100\" cy=\"80\" rx=\"53\" ry=\"20\"/><ellipse cx=\"100\" cy=\"80\" rx=\"27\" ry=\"10\"/>"
+      ]
+    ]
+  ],
+  "groudon": [
+    20,
+    [
+      [
+        "drought",
+        "radiate",
+        "#ffc27a",
+        "<circle cx=\"100\" cy=\"80\" r=\"39\"/><path d=\"M148.0 80.0L170.0 80.0M141.6 104.0L160.6 115.0M124.0 121.6L135.0 140.6M100.0 128.0L100.0 150.0M76.0 121.6L65.0 140.6M58.4 104.0L39.4 115.0M52.0 80.0L30.0 80.0M58.4 56.0L39.4 45.0M76.0 38.4L65.0 19.4M100.0 32.0L100.0 10.0M124.0 38.4L135.0 19.4M141.6 56.0L160.6 45.0\"/>"
+      ],
+      [
+        "continental-rise",
+        "lift",
+        "#e46f52",
+        "<path d=\"M8 135H192 M18 131L45 79 70 92 96 38 126 94 152 66 183 131Z M45 79L55 106 70 92 M96 38L100 83 126 94\"/>"
+      ]
+    ]
+  ],
+  "kyogre": [
+    20,
+    [
+      [
+        "ocean-swell",
+        "swell",
+        "#5db9ff",
+        "<path d=\"M8 104Q36 55 70 92T135 85T192 70 M8 117Q40 75 72 108T138 103T192 89 M16 129Q51 100 78 119T155 114\"/>"
+      ],
+      [
+        "pressure",
+        "compress",
+        "#a8efff",
+        "<ellipse cx=\"100\" cy=\"80\" rx=\"76\" ry=\"30\"/><ellipse cx=\"100\" cy=\"80\" rx=\"53\" ry=\"20\"/><ellipse cx=\"100\" cy=\"80\" rx=\"27\" ry=\"10\"/>"
+      ]
+    ]
+  ],
+  "rayquaza": [
+    20,
+    [
+      [
+        "clear-sky",
+        "part",
+        "#baf8d8",
+        "<path d=\"M8 65Q42 22 87 62 M113 62Q158 22 192 65 M8 114Q40 74 87 112 M113 112Q160 74 192 114\"/>"
+      ],
+      [
+        "air-lock",
+        "orbit",
+        "#68e3a0",
+        "<path d=\"M25 115C5 35 156 0 174 57S86 134 64 88 132 36 148 78\"/>"
+      ]
+    ]
+  ],
+  "shinyprimalgroudon": [
+    18,
+    [
+      [
+        "desolate-sun",
+        "radiate",
+        "#ffe178",
+        "<circle cx=\"100\" cy=\"80\" r=\"39\"/><path d=\"M148.0 80.0L170.0 80.0M141.6 104.0L160.6 115.0M124.0 121.6L135.0 140.6M100.0 128.0L100.0 150.0M76.0 121.6L65.0 140.6M58.4 104.0L39.4 115.0M52.0 80.0L30.0 80.0M58.4 56.0L39.4 45.0M76.0 38.4L65.0 19.4M100.0 32.0L100.0 10.0M124.0 38.4L135.0 19.4M141.6 56.0L160.6 45.0\"/>"
+      ],
+      [
+        "magma-veins",
+        "reveal",
+        "#ffbd42",
+        "<path d=\"M16 135L44 87 72 95 99 42 127 96 163 73 188 135 M99 42L91 79 106 100 97 135 M44 87L64 124 83 105 M127 96L144 119 165 103\"/>"
+      ]
+    ]
+  ],
+  "shinyprimalkyogre": [
+    18,
+    [
+      [
+        "primordial-sea",
+        "swell",
+        "#d3efff",
+        "<path d=\"M8 104Q36 55 70 92T135 85T192 70 M8 117Q40 75 72 108T138 103T192 89 M16 129Q51 100 78 119T155 114\"/>"
+      ],
+      [
+        "golden-pressure",
+        "radiate",
+        "#f8d76e",
+        "<ellipse cx=\"100\" cy=\"80\" rx=\"76\" ry=\"30\"/><ellipse cx=\"100\" cy=\"80\" rx=\"53\" ry=\"20\"/><ellipse cx=\"100\" cy=\"80\" rx=\"27\" ry=\"10\"/>"
+      ],
+      [
+        "primal-markings",
+        "compress",
+        "#e4a5df",
+        "<path d=\"M24 71L49 50 70 67 53 86 75 105 M176 71L151 50 130 67 147 86 125 105 M80 80H120\"/>"
+      ]
+    ]
+  ],
+  "shinymegarayquaza": [
+    17,
+    [
+      [
+        "delta-vortex",
+        "orbit",
+        "#ffe171",
+        "<path d=\"M18 80C18 12 182 12 182 80S18 148 18 80 M47 80C47 36 153 36 153 80S47 124 47 80\"/>"
+      ],
+      [
+        "gold-tendrils",
+        "ribbon",
+        "#f6bc57",
+        "<path d=\"M10 132C88 130 35 28 104 30S159 103 190 9 M10 28C88 30 35 132 104 130S159 57 190 151\"/>"
+      ]
+    ]
+  ],
+  "dialga": [
+    24,
+    [
+      [
+        "time-dial",
+        "hold",
+        "#91e6ff",
+        "<circle cx=\"100\" cy=\"80\" r=\"60\"/><circle cx=\"100\" cy=\"80\" r=\"49\"/><path d=\"M151.0 80.0L159.0 80.0M144.2 105.5L151.1 109.5M125.5 124.2L129.5 131.1M100.0 131.0L100.0 139.0M74.5 124.2L70.5 131.1M55.8 105.5L48.9 109.5M49.0 80.0L41.0 80.0M55.8 54.5L48.9 50.5M74.5 35.8L70.5 28.9M100.0 29.0L100.0 21.0M125.5 35.8L129.5 28.9M144.2 54.5L151.1 50.5\"/>"
+      ],
+      [
+        "rewinding-hand",
+        "rewind",
+        "#e0f5ff",
+        "<path d=\"M100 80L100 28 M100 80L138 94\"/><circle cx=\"100\" cy=\"80\" r=\"4\"/>"
+      ],
+      [
+        "time-echo",
+        "echo",
+        "#588cfa",
+        "<circle cx=\"100\" cy=\"80\" r=\"69\"/><circle cx=\"100\" cy=\"80\" r=\"36\"/>"
+      ]
+    ]
+  ],
+  "palkia": [
+    23,
+    [
+      [
+        "space-grid",
+        "warp",
+        "#e3b4f5",
+        "<path d=\"M16 35Q100 5 184 35 M16 61Q100 37 184 61 M16 98Q100 119 184 98 M16 125Q100 155 184 125 M40 16Q8 80 40 144 M78 16Q62 80 78 144 M122 16Q138 80 122 144 M160 16Q192 80 160 144\"/>"
+      ],
+      [
+        "spatial-rift",
+        "open",
+        "#fba3de",
+        "<path d=\"M100 10L83 38 107 54 75 84 119 99 96 125 103 150 M94 10L73 38 97 54 65 84 109 99 86 125 97 150\"/>"
+      ],
+      [
+        "spatial-plane",
+        "part",
+        "#c5b4ff",
+        "<path d=\"M22 46L77 31V124L22 139Z M123 31L178 46V139L123 124Z\"/>"
+      ]
+    ]
+  ],
+  "giratina": [
+    25,
+    [
+      [
+        "inverted-terrain",
+        "invert",
+        "#a78bb9",
+        "<path d=\"M35 30L58 16 77 59 49 81Z M119 22L153 36 139 82 108 61Z M49 108L79 85 101 136 64 145Z M142 100L178 78 186 132 157 146Z\"/>"
+      ],
+      [
+        "distortion-seam",
+        "open",
+        "#f27685",
+        "<path d=\"M100 10L83 38 107 54 75 84 119 99 96 125 103 150 M94 10L73 38 97 54 65 84 109 99 86 125 97 150\"/>"
+      ],
+      [
+        "reversed-orbit",
+        "counter",
+        "#e5c477",
+        "<ellipse cx=\"100\" cy=\"80\" rx=\"71\" ry=\"31\"/>"
+      ]
+    ]
+  ],
+  "arceus": [
+    26,
+    [
+      [
+        "creation-ring",
+        "hold",
+        "#f6df86",
+        "<circle cx=\"100\" cy=\"80\" r=\"57\"/><path d=\"M150.0 80.0L169.0 80.0M135.4 115.4L148.8 128.8M100.0 130.0L100.0 149.0M64.6 115.4L51.2 128.8M50.0 80.0L31.0 80.0M64.6 44.6L51.2 31.2M100.0 30.0L100.0 11.0M135.4 44.6L148.8 31.2\"/>"
+      ],
+      [
+        "gathering-light",
+        "gather",
+        "#f9f3d0",
+        "<circle cx=\"167.0\" cy=\"80.0\" r=\"3\" fill=\"currentColor\"/><circle cx=\"158.0\" cy=\"107.5\" r=\"2\" fill=\"currentColor\"/><circle cx=\"133.5\" cy=\"127.6\" r=\"2\" fill=\"currentColor\"/><circle cx=\"100.0\" cy=\"135.0\" r=\"3\" fill=\"currentColor\"/><circle cx=\"66.5\" cy=\"127.6\" r=\"2\" fill=\"currentColor\"/><circle cx=\"42.0\" cy=\"107.5\" r=\"2\" fill=\"currentColor\"/><circle cx=\"33.0\" cy=\"80.0\" r=\"3\" fill=\"currentColor\"/><circle cx=\"42.0\" cy=\"52.5\" r=\"2\" fill=\"currentColor\"/><circle cx=\"66.5\" cy=\"32.4\" r=\"2\" fill=\"currentColor\"/><circle cx=\"100.0\" cy=\"25.0\" r=\"3\" fill=\"currentColor\"/><circle cx=\"133.5\" cy=\"32.4\" r=\"2\" fill=\"currentColor\"/><circle cx=\"158.0\" cy=\"52.5\" r=\"2\" fill=\"currentColor\"/>"
+      ],
+      [
+        "formed-world",
+        "radiate",
+        "#e0f1d4",
+        "<ellipse cx=\"100\" cy=\"80\" rx=\"46\" ry=\"23\"/><ellipse cx=\"100\" cy=\"80\" rx=\"23\" ry=\"46\"/><circle cx=\"100\" cy=\"80\" r=\"46\"/>"
+      ]
+    ]
+  ],
+  "reshiram": [
+    19,
+    [
+      [
+        "turboblaze",
+        "rotate",
+        "#f8e9d2",
+        "<circle cx=\"100\" cy=\"80\" r=\"51\"/><circle cx=\"100\" cy=\"80\" r=\"23\"/><path d=\"M100 80Q135.0 80.0 143.2 100.9M100 80Q117.5 110.3 103.5 127.9M100 80Q82.5 110.3 60.3 107.0M100 80Q65.0 80.0 56.8 59.1M100 80Q82.5 49.7 96.5 32.1M100 80Q117.5 49.7 139.7 53.0\"/>"
+      ],
+      [
+        "blue-flare",
+        "ascend",
+        "#78d8ff",
+        "<path d=\"M100 145Q64 119 80 87L91 103Q121 65 107 21Q153 70 136 117Z M32 135Q13 109 42 72Q38 107 58 125 M162 135Q181 109 152 72Q156 107 136 125\"/>"
+      ],
+      [
+        "warm-plume",
+        "radiate",
+        "#f5b26e",
+        "<circle cx=\"100\" cy=\"80\" r=\"64\"/>"
+      ]
+    ]
+  ],
+  "zekrom": [
+    16,
+    [
+      [
+        "teravolt-generator",
+        "rotate",
+        "#6bcfff",
+        "<circle cx=\"100\" cy=\"80\" r=\"51\"/><circle cx=\"100\" cy=\"80\" r=\"23\"/><path d=\"M100 80Q135.0 80.0 143.2 100.9M100 80Q117.5 110.3 103.5 127.9M100 80Q82.5 110.3 60.3 107.0M100 80Q65.0 80.0 56.8 59.1M100 80Q82.5 49.7 96.5 32.1M100 80Q117.5 49.7 139.7 53.0\"/>"
+      ],
+      [
+        "bolt-strike",
+        "release",
+        "#a9eaff",
+        "<path d=\"M12 83L49 65 43 91 94 54 86 83 137 48 126 79 186 56 M86 83L103 109 129 103 M49 65L61 40\"/>"
+      ]
+    ]
+  ],
+  "blackkyurem": [
+    19,
+    [
+      [
+        "frozen-plates",
+        "lock",
+        "#a5daef",
+        "<path d=\"M28 132L14 86 51 30 80 57 64 113Z M70 128L94 15 128 57 115 123Z M125 129L139 54 181 36 192 105Z M51 30L47 93 28 132 M94 15L100 97 115 123 M181 36L163 104 125 129\"/>"
+      ],
+      [
+        "freeze-shock",
+        "release",
+        "#59bfff",
+        "<path d=\"M12 83L49 65 43 91 94 54 86 83 137 48 126 79 186 56 M86 83L103 109 129 103 M49 65L61 40\"/>"
+      ],
+      [
+        "ice-pressure",
+        "radiate",
+        "#b9e9ff",
+        "<circle cx=\"100\" cy=\"80\" r=\"58\"/>"
+      ]
+    ]
+  ],
+  "whitekyurem": [
+    20,
+    [
+      [
+        "ice-shell",
+        "hold",
+        "#c4f0fa",
+        "<path d=\"M28 132L14 86 51 30 80 57 64 113Z M70 128L94 15 128 57 115 123Z M125 129L139 54 181 36 192 105Z M51 30L47 93 28 132 M94 15L100 97 115 123 M181 36L163 104 125 129\"/>"
+      ],
+      [
+        "ice-burn",
+        "reveal",
+        "#ffb16e",
+        "<path d=\"M18 110L53 87 70 105 100 48 124 95 151 77 184 100 M100 48L102 92 90 125\"/>"
+      ],
+      [
+        "steam",
+        "ascend",
+        "#f9e0cb",
+        "<path d=\"M45 119C12 91 72 65 42 24 M100 119C67 91 127 65 97 24 M155 119C122 91 182 65 152 24\"/>"
+      ]
+    ]
+  ],
+  "xerneas": [
+    24,
+    [
+      [
+        "life-branches",
+        "grow",
+        "#a4e4d2",
+        "<path d=\"M100 143V90L58 66 31 28 M58 66L61 31 M31 28L12 39 M100 90L142 66 169 28 M142 66L139 31 M169 28L188 39 M100 90V33\"/>"
+      ],
+      [
+        "seven-color-crown",
+        "reveal",
+        "#fff4c0",
+        "<circle cx=\"12\" cy=\"39\" r=\"5\" fill=\"#f07575\" stroke=\"#f07575\"/><circle cx=\"31\" cy=\"28\" r=\"5\" fill=\"#f5ac64\" stroke=\"#f5ac64\"/><circle cx=\"61\" cy=\"31\" r=\"5\" fill=\"#f7d879\" stroke=\"#f7d879\"/><circle cx=\"100\" cy=\"33\" r=\"5\" fill=\"#8ce2a3\" stroke=\"#8ce2a3\"/><circle cx=\"139\" cy=\"31\" r=\"5\" fill=\"#79d8ef\" stroke=\"#79d8ef\"/><circle cx=\"169\" cy=\"28\" r=\"5\" fill=\"#9a9cf5\" stroke=\"#9a9cf5\"/><circle cx=\"188\" cy=\"39\" r=\"5\" fill=\"#d59ced\" stroke=\"#d59ced\"/>"
+      ],
+      [
+        "life-dispersal",
+        "radiate",
+        "#b6f3db",
+        "<circle cx=\"167.0\" cy=\"80.0\" r=\"3\" fill=\"currentColor\"/><circle cx=\"158.0\" cy=\"107.5\" r=\"2\" fill=\"currentColor\"/><circle cx=\"133.5\" cy=\"127.6\" r=\"2\" fill=\"currentColor\"/><circle cx=\"100.0\" cy=\"135.0\" r=\"3\" fill=\"currentColor\"/><circle cx=\"66.5\" cy=\"127.6\" r=\"2\" fill=\"currentColor\"/><circle cx=\"42.0\" cy=\"107.5\" r=\"2\" fill=\"currentColor\"/><circle cx=\"33.0\" cy=\"80.0\" r=\"3\" fill=\"currentColor\"/><circle cx=\"42.0\" cy=\"52.5\" r=\"2\" fill=\"currentColor\"/><circle cx=\"66.5\" cy=\"32.4\" r=\"2\" fill=\"currentColor\"/><circle cx=\"100.0\" cy=\"25.0\" r=\"3\" fill=\"currentColor\"/><circle cx=\"133.5\" cy=\"32.4\" r=\"2\" fill=\"currentColor\"/><circle cx=\"158.0\" cy=\"52.5\" r=\"2\" fill=\"currentColor\"/>"
+      ]
+    ]
+  ],
+  "yveltal": [
+    24,
+    [
+      [
+        "oblivion",
+        "gather",
+        "#f48a9b",
+        "<circle cx=\"167.0\" cy=\"80.0\" r=\"3\" fill=\"currentColor\"/><circle cx=\"158.0\" cy=\"107.5\" r=\"2\" fill=\"currentColor\"/><circle cx=\"133.5\" cy=\"127.6\" r=\"2\" fill=\"currentColor\"/><circle cx=\"100.0\" cy=\"135.0\" r=\"3\" fill=\"currentColor\"/><circle cx=\"66.5\" cy=\"127.6\" r=\"2\" fill=\"currentColor\"/><circle cx=\"42.0\" cy=\"107.5\" r=\"2\" fill=\"currentColor\"/><circle cx=\"33.0\" cy=\"80.0\" r=\"3\" fill=\"currentColor\"/><circle cx=\"42.0\" cy=\"52.5\" r=\"2\" fill=\"currentColor\"/><circle cx=\"66.5\" cy=\"32.4\" r=\"2\" fill=\"currentColor\"/><circle cx=\"100.0\" cy=\"25.0\" r=\"3\" fill=\"currentColor\"/><circle cx=\"133.5\" cy=\"32.4\" r=\"2\" fill=\"currentColor\"/><circle cx=\"158.0\" cy=\"52.5\" r=\"2\" fill=\"currentColor\"/>"
+      ],
+      [
+        "y-shaped-drain",
+        "reveal",
+        "#e15175",
+        "<path d=\"M100 138V87L28 25 M100 87L172 25 M100 112L58 66 M100 112L142 66\"/>"
+      ],
+      [
+        "cocoon",
+        "compress",
+        "#b75c8a",
+        "<ellipse cx=\"100\" cy=\"80\" rx=\"34\" ry=\"52\"/><ellipse cx=\"100\" cy=\"80\" rx=\"21\" ry=\"43\"/>"
+      ]
+    ]
+  ],
+  "solgaleo": [
+    24,
+    [
+      [
+        "solar-core",
+        "hold",
+        "#fff1b8",
+        "<circle cx=\"100\" cy=\"80\" r=\"39\"/><path d=\"M148.0 80.0L170.0 80.0M141.6 104.0L160.6 115.0M124.0 121.6L135.0 140.6M100.0 128.0L100.0 150.0M76.0 121.6L65.0 140.6M58.4 104.0L39.4 115.0M52.0 80.0L30.0 80.0M58.4 56.0L39.4 45.0M76.0 38.4L65.0 19.4M100.0 32.0L100.0 10.0M124.0 38.4L135.0 19.4M141.6 56.0L160.6 45.0\"/>"
+      ],
+      [
+        "solar-prominences",
+        "radiate",
+        "#ffcc66",
+        "<path d=\"M40 61Q37 25 68 30Q83 6 97 32Q133 4 134 36Q166 24 162 55Q194 72 168 89Q187 124 148 124Q142 155 113 137Q78 157 69 128Q24 135 36 98Q5 79 40 61Z\"/>"
+      ],
+      [
+        "sunsteel-ray",
+        "release",
+        "#ffe9a1",
+        "<path d=\"M9 117L176 43 M25 132L185 55 M28 99L157 43\"/>"
+      ]
+    ]
+  ],
+  "lunala": [
+    26,
+    [
+      [
+        "lunar-disc",
+        "hold",
+        "#b8c6ff",
+        "<circle cx=\"100\" cy=\"80\" r=\"58\"/>"
+      ],
+      [
+        "moon-shadow",
+        "eclipse",
+        "#b091ec",
+        "<path fill=\"currentColor\" d=\"M100 22A58 58 0 1 0 100 138Q49 80 100 22Z\"/>"
+      ],
+      [
+        "moonlight-rays",
+        "orbit",
+        "#e9ddff",
+        "<path d=\"M17 27L29 43 17 59 5 43Z M175 93L187 109 175 125 163 109Z\"/>"
+      ]
+    ]
+  ],
+  "ultranecrozma": [
+    20,
+    [
+      [
+        "light-absorption",
+        "gather",
+        "#fff1b0",
+        "<circle cx=\"167.0\" cy=\"80.0\" r=\"3\" fill=\"currentColor\"/><circle cx=\"158.0\" cy=\"107.5\" r=\"2\" fill=\"currentColor\"/><circle cx=\"133.5\" cy=\"127.6\" r=\"2\" fill=\"currentColor\"/><circle cx=\"100.0\" cy=\"135.0\" r=\"3\" fill=\"currentColor\"/><circle cx=\"66.5\" cy=\"127.6\" r=\"2\" fill=\"currentColor\"/><circle cx=\"42.0\" cy=\"107.5\" r=\"2\" fill=\"currentColor\"/><circle cx=\"33.0\" cy=\"80.0\" r=\"3\" fill=\"currentColor\"/><circle cx=\"42.0\" cy=\"52.5\" r=\"2\" fill=\"currentColor\"/><circle cx=\"66.5\" cy=\"32.4\" r=\"2\" fill=\"currentColor\"/><circle cx=\"100.0\" cy=\"25.0\" r=\"3\" fill=\"currentColor\"/><circle cx=\"133.5\" cy=\"32.4\" r=\"2\" fill=\"currentColor\"/><circle cx=\"158.0\" cy=\"52.5\" r=\"2\" fill=\"currentColor\"/>"
+      ],
+      [
+        "ultra-prism",
+        "lock",
+        "#f8db74",
+        "<path d=\"M100 12L140 60 100 115 60 60Z M100 12V115 M60 60H140 M38 78L62 116 38 146 14 116Z M162 78L186 116 162 146 138 116Z\"/>"
+      ],
+      [
+        "photon-geyser",
+        "release",
+        "#fff7d7",
+        "<path d=\"M131.0 80.0L173.0 80.0M125.1 98.2L159.1 122.9M109.6 109.5L122.6 149.4M90.4 109.5L77.4 149.4M74.9 98.2L40.9 122.9M69.0 80.0L27.0 80.0M74.9 61.8L40.9 37.1M90.4 50.5L77.4 10.6M109.6 50.5L122.6 10.6M125.1 61.8L159.1 37.1\"/>"
+      ]
+    ]
+  ],
+  "zacian": [
+    17,
+    [
+      [
+        "crowned-sword",
+        "hold",
+        "#a6e8f0",
+        "<path d=\"M26 124L151 22 177 15 163 39 39 139Z M19 115L48 145 M35 139L15 156 M51 115L158 29\"/>"
+      ],
+      [
+        "behemoth-blade",
+        "slash",
+        "#ffe28b",
+        "<path d=\"M8 139L181 8 M32 153L192 29 M5 112L150 8\"/>"
+      ]
+    ]
+  ],
+  "zamazenta": [
+    19,
+    [
+      [
+        "crowned-shield",
+        "hold",
+        "#e8bf72",
+        "<path d=\"M100 16L158 39V86Q158 120 100 147Q42 120 42 86V39Z M100 30L145 48V85Q145 110 100 132Q55 110 55 85V48Z\"/>"
+      ],
+      [
+        "incoming-force",
+        "approach",
+        "#f4a4b6",
+        "<path d=\"M8 54H47 M4 80H47 M8 106H47\"/>"
+      ],
+      [
+        "deflection",
+        "deflect",
+        "#9fe6f1",
+        "<path d=\"M42 80Q98 29 191 15 M42 80Q98 131 191 145\"/>"
+      ]
+    ]
+  ],
+  "eternatus": [
+    24,
+    [
+      [
+        "dynamax-absorption",
+        "gather",
+        "#ef77c8",
+        "<circle cx=\"167.0\" cy=\"80.0\" r=\"3\" fill=\"currentColor\"/><circle cx=\"158.0\" cy=\"107.5\" r=\"2\" fill=\"currentColor\"/><circle cx=\"133.5\" cy=\"127.6\" r=\"2\" fill=\"currentColor\"/><circle cx=\"100.0\" cy=\"135.0\" r=\"3\" fill=\"currentColor\"/><circle cx=\"66.5\" cy=\"127.6\" r=\"2\" fill=\"currentColor\"/><circle cx=\"42.0\" cy=\"107.5\" r=\"2\" fill=\"currentColor\"/><circle cx=\"33.0\" cy=\"80.0\" r=\"3\" fill=\"currentColor\"/><circle cx=\"42.0\" cy=\"52.5\" r=\"2\" fill=\"currentColor\"/><circle cx=\"66.5\" cy=\"32.4\" r=\"2\" fill=\"currentColor\"/><circle cx=\"100.0\" cy=\"25.0\" r=\"3\" fill=\"currentColor\"/><circle cx=\"133.5\" cy=\"32.4\" r=\"2\" fill=\"currentColor\"/><circle cx=\"158.0\" cy=\"52.5\" r=\"2\" fill=\"currentColor\"/>"
+      ],
+      [
+        "skeletal-core",
+        "hold",
+        "#ce87f5",
+        "<path d=\"M100 18L143 46 143 114 100 142 57 114 57 46Z M100 18L100 142 M57 46L143 114 M143 46L57 114\"/><circle cx=\"100\" cy=\"80\" r=\"24\"/>"
+      ],
+      [
+        "dynamax-cannon",
+        "release",
+        "#f184ce",
+        "<path d=\"M100 80L186 17 M100 80L192 80 M100 80L186 143\"/>"
+      ]
+    ]
+  ],
+  "koraidon": [
+    18,
+    [
+      [
+        "orichalcum-sun",
+        "radiate",
+        "#ffca7b",
+        "<circle cx=\"100\" cy=\"80\" r=\"39\"/><path d=\"M148.0 80.0L170.0 80.0M141.6 104.0L160.6 115.0M124.0 121.6L135.0 140.6M100.0 128.0L100.0 150.0M76.0 121.6L65.0 140.6M58.4 104.0L39.4 115.0M52.0 80.0L30.0 80.0M58.4 56.0L39.4 45.0M76.0 38.4L65.0 19.4M100.0 32.0L100.0 10.0M124.0 38.4L135.0 19.4M141.6 56.0L160.6 45.0\"/>"
+      ],
+      [
+        "collision-course",
+        "impact",
+        "#f18060",
+        "<path d=\"M8 128L53 86 68 103 100 62 132 103 147 86 192 128 M28 139L58 118 M172 139L142 118\"/>"
+      ],
+      [
+        "primal-dust",
+        "sweep",
+        "#e5b58b",
+        "<path d=\"M9 118Q48 91 82 120T151 107T192 119 M17 139Q57 118 90 138T181 130\"/>"
+      ]
+    ]
+  ],
+  "terapagos": [
+    26,
+    [
+      [
+        "stellar-shell",
+        "lock",
+        "#c0f4f7",
+        "<path d=\"M128.0 80.0L114.0 104.2L86.0 104.2L72.0 80.0L86.0 55.8L114.0 55.8Z\"/><path d=\"M128.0 32.0L114.0 56.2L86.0 56.2L72.0 32.0L86.0 7.8L114.0 7.8Z\"/><path d=\"M170.0 56.0L156.0 80.2L128.0 80.2L114.0 56.0L128.0 31.8L156.0 31.8Z\"/><path d=\"M170.0 104.0L156.0 128.2L128.0 128.2L114.0 104.0L128.0 79.8L156.0 79.8Z\"/><path d=\"M128.0 128.0L114.0 152.2L86.0 152.2L72.0 128.0L86.0 103.8L114.0 103.8Z\"/><path d=\"M86.0 104.0L72.0 128.2L44.0 128.2L30.0 104.0L44.0 79.8L72.0 79.8Z\"/><path d=\"M86.0 56.0L72.0 80.2L44.0 80.2L30.0 56.0L44.0 31.8L72.0 31.8Z\"/>"
+      ],
+      [
+        "terastal-refraction",
+        "orbit",
+        "#c3a9f8",
+        "<path d=\"M100 12L140 60 100 115 60 60Z M100 12V115 M60 60H140 M38 78L62 116 38 146 14 116Z M162 78L186 116 162 146 138 116Z\"/>"
+      ],
+      [
+        "stellar-spectrum",
+        "radiate",
+        "#e9fbff",
+        "<path stroke=\"#f07575\" d=\"M100 80L170.0 80.0\"/><path stroke=\"#f5ac64\" d=\"M100 80L143.6 134.7\"/><path stroke=\"#f7d879\" d=\"M100 80L84.4 148.2\"/><path stroke=\"#8ce2a3\" d=\"M100 80L36.9 110.4\"/><path stroke=\"#79d8ef\" d=\"M100 80L36.9 49.6\"/><path stroke=\"#9a9cf5\" d=\"M100 80L84.4 11.8\"/><path stroke=\"#d59ced\" d=\"M100 80L143.6 25.3\"/>"
+      ]
+    ]
+  ]
+};
+  for(const [cycle,layers] of Object.values(LEGENDARY_MOTIFS)){
+    for(const layer of layers)Object.freeze(layer);
+    Object.freeze(layers);
+  }
+  for(const profile of Object.values(LEGENDARY_MOTIFS))Object.freeze(profile);
+  Object.freeze(LEGENDARY_MOTIFS);
   const SIGNATURES={
     thunderwake:[P('arc','storm',1,1,8,160)],
     spring:[P('fall','petal',16,6,13,12),P('burst','flower',3,1,22,64)],
@@ -61,35 +643,35 @@
     blackwhitedsi:[P('prism','split',2,1,18,90)],
     galaxystyle:[P('glint','star',7,3,12,5,'top')],
     superfamicom:[P('glint','button',4,2,22,9)],
-    hooh:[P('burst','feather',5,2,18,85,'top'),P('rise','feather',8,3,13,24)],
-    lugia:[P('swell','pressure',3,1,22,175)],
-    suicune:[P('swell','cleansing',3,1,12,130),P('swell','aurora',2,1,19,150)],
-    groudon:[P('heat','fault',4,2,15,120)],
-    kyogre:[P('swell','wave',4,2,22,170),P('fall','rain',14,6,11,22)],
-    rayquaza:[P('orbit','air',3,1,18,75,'top')],
-    shinyprimalgroudon:[P('heat','magma',5,2,12,145)],
-    shinyprimalkyogre:[P('swell','pressure',4,2,22,180),P('prism','primal',3,1,18,100)],
-    shinymegarayquaza:[P('burst','ray',4,1,20,115,'top')],
-    dialga:[P('swell','terrace',3,1,20,100),P('clock','ticks',1,1,24,80,'top')],
-    palkia:[P('rift','space',2,1,18,140),P('orbit','pearl',4,2,14,14)],
-    giratina:[P('invert','shard',10,4,14,30),P('rift','fold',2,1,21,100)],
-    arceus:[P('heat','stair',3,1,24,110,'top'),P('invert','order',5,2,24,8,'top')],
-    reshiram:[P('heat','turbine',3,1,16,95),P('rise','flame',10,4,11,22)],
-    zekrom:[P('trace','generator',3,1,8,160,'charge'),P('arc','generator',3,1,8,160,'charge')],
-    blackkyurem:[P('arc','ice',3,1,8,160),P('fall','ice',10,4,14,17)],
-    whitekyurem:[P('heat','iceheat',4,2,16,90),P('rise','steam',7,3,14,32)],
-    xerneas:[P('burst','antler',5,2,20,110,'top'),P('glint','life',7,3,13,7)],
-    yveltal:[P('invert','drain',10,4,16,24),P('heat','shadow',2,1,22,90)],
+    hooh:[...LEGENDARY_MOTIFS.hooh[1].map((_,i)=>P('motif',String(i),2,1,22,210,'legendary'))],
+    lugia:[...LEGENDARY_MOTIFS.lugia[1].map((_,i)=>P('motif',String(i),2,1,20,210,'legendary'))],
+    suicune:[...LEGENDARY_MOTIFS.suicune[1].map((_,i)=>P('motif',String(i),2,1,18,210,'legendary'))],
+    groudon:[...LEGENDARY_MOTIFS.groudon[1].map((_,i)=>P('motif',String(i),2,1,20,210,'legendary'))],
+    kyogre:[P('fall','rain',14,6,11,22),...LEGENDARY_MOTIFS.kyogre[1].map((_,i)=>P('motif',String(i),2,1,20,210,'legendary'))],
+    rayquaza:[...LEGENDARY_MOTIFS.rayquaza[1].map((_,i)=>P('motif',String(i),2,1,20,210,'legendary'))],
+    shinyprimalgroudon:[...LEGENDARY_MOTIFS.shinyprimalgroudon[1].map((_,i)=>P('motif',String(i),2,1,18,210,'legendary'))],
+    shinyprimalkyogre:[P('fall','rain',18,7,11,25),...LEGENDARY_MOTIFS.shinyprimalkyogre[1].map((_,i)=>P('motif',String(i),2,1,18,210,'legendary'))],
+    shinymegarayquaza:[...LEGENDARY_MOTIFS.shinymegarayquaza[1].map((_,i)=>P('motif',String(i),2,1,17,210,'legendary'))],
+    dialga:[...LEGENDARY_MOTIFS.dialga[1].map((_,i)=>P('motif',String(i),2,1,24,210,'legendary'))],
+    palkia:[...LEGENDARY_MOTIFS.palkia[1].map((_,i)=>P('motif',String(i),2,1,23,210,'legendary'))],
+    giratina:[...LEGENDARY_MOTIFS.giratina[1].map((_,i)=>P('motif',String(i),2,1,25,210,'legendary'))],
+    arceus:[...LEGENDARY_MOTIFS.arceus[1].map((_,i)=>P('motif',String(i),2,1,26,210,'legendary'))],
+    reshiram:[...LEGENDARY_MOTIFS.reshiram[1].map((_,i)=>P('motif',String(i),2,1,19,210,'legendary'))],
+    zekrom:[P('trace','generator',3,1,8,160,'charge'),...LEGENDARY_MOTIFS.zekrom[1].map((_,i)=>P('motif',String(i),2,1,16,210,'legendary'))],
+    blackkyurem:[...LEGENDARY_MOTIFS.blackkyurem[1].map((_,i)=>P('motif',String(i),2,1,19,210,'legendary'))],
+    whitekyurem:[...LEGENDARY_MOTIFS.whitekyurem[1].map((_,i)=>P('motif',String(i),2,1,20,210,'legendary'))],
+    xerneas:[...LEGENDARY_MOTIFS.xerneas[1].map((_,i)=>P('motif',String(i),2,1,24,210,'legendary'))],
+    yveltal:[...LEGENDARY_MOTIFS.yveltal[1].map((_,i)=>P('motif',String(i),2,1,24,210,'legendary'))],
     zygarde:[],
-    solgaleo:[P('heat','corona',3,1,18,125,'top'),P('burst','sun',4,2,22,105,'top')],
-    lunala:[P('orbit','crescent',1,1,27,85,'top'),P('swell','moon-shadow',2,1,22,95,'top')],
-    ultranecrozma:[P('prism','ray',5,2,16,125),P('burst','prism',4,1,22,110,'top')],
-    zacian:[P('prism','blade',2,1,19,95)],
-    zamazenta:[P('ripple','shield',4,2,15,95),P('gust','deflect',2,1,21,115)],
-    eternatus:[P('heat','core',2,1,18,100),P('arc','energy',3,1,8,160)],
-    koraidon:[P('gust','dust',6,3,12,55),P('swell','grass',3,1,16,90)],
+    solgaleo:[...LEGENDARY_MOTIFS.solgaleo[1].map((_,i)=>P('motif',String(i),2,1,24,210,'legendary'))],
+    lunala:[...LEGENDARY_MOTIFS.lunala[1].map((_,i)=>P('motif',String(i),2,1,26,210,'legendary'))],
+    ultranecrozma:[...LEGENDARY_MOTIFS.ultranecrozma[1].map((_,i)=>P('motif',String(i),2,1,20,210,'legendary'))],
+    zacian:[...LEGENDARY_MOTIFS.zacian[1].map((_,i)=>P('motif',String(i),2,1,17,210,'legendary'))],
+    zamazenta:[...LEGENDARY_MOTIFS.zamazenta[1].map((_,i)=>P('motif',String(i),2,1,19,210,'legendary'))],
+    eternatus:[...LEGENDARY_MOTIFS.eternatus[1].map((_,i)=>P('motif',String(i),2,1,24,210,'legendary'))],
+    koraidon:[...LEGENDARY_MOTIFS.koraidon[1].map((_,i)=>P('motif',String(i),2,1,18,210,'legendary'))],
     miraidon:[], // Hadron accents are synchronized to actual motherboard packet routes.
-    terapagos:[P('prism','stellar',5,2,20,85,'top'),P('orbit','facet',4,2,24,20,'top')]
+    terapagos:[...LEGENDARY_MOTIFS.terapagos[1].map((_,i)=>P('motif',String(i),2,1,26,210,'legendary'))],
   };
   for(const value of Object.values(SIGNATURES))Object.freeze(value);
   Object.freeze(SIGNATURES);
@@ -132,6 +714,18 @@
       for(let i=0;i<part.count;i++){
         const p=node('span','themeMotionParticle');
         p.setAttribute('data-primitive',part.type);p.setAttribute('data-shape',part.shape);p.setAttribute('data-mobile',String(i<part.phone));
+        if(part.type==='motif'){
+          const [cycle,layers]=LEGENDARY_MOTIFS[key],layer=layers[Number(part.shape)];
+          const [role,motion,color,markup]=layer;
+          p.setAttribute('data-motif-key',key);p.setAttribute('data-motif-role',role);
+          p.setAttribute('data-motif-motion',motion);
+          p.innerHTML='<svg viewBox="0 0 200 160" xmlns="http://www.w3.org/2000/svg" focusable="false" aria-hidden="true">'+markup+'</svg>';
+          const left=i===0,vars={'--x':left?'14%':'86%','--y':left?'31%':'69%',
+            '--mx':'79%','--my':'36%','--s':'210px','--d':cycle+'s',
+            '--delay':(left?-cycle*.12:-cycle*.60)+'s','--c':color};
+          for(const[k,v]of Object.entries(vars))p.style.setProperty(k,v);
+          spans.push(p);continue;
+        }
         const x=4+rand()*90;
         const y=part.region==='top'?8+rand()*20:part.region==='charge'?18+i*19:8+rand()*80;
         const duration=['arc','clock'].includes(part.type)||part.region==='charge'||part.shape==='stellar'?part.duration:part.duration*(.9+rand()*.2);
@@ -227,7 +821,7 @@
     }
     syncImage();d.documentElement.setAttribute('data-theme-scene',cfg.key);syncParticles(cfg.key);syncButtons();
   }
-  g.EvertaleThemeMotion={keys:Object.freeze(Object.keys(profiles)),signatures:SIGNATURES,technology,modules:MODULE_KEYS,moduleFor,sync};
+  g.EvertaleThemeMotion={keys:Object.freeze(Object.keys(profiles)),signatures:SIGNATURES,technology,modules:MODULE_KEYS,motifs:LEGENDARY_MOTIFS,moduleFor,sync};
   d.addEventListener('evertale:theme-applied',sync);
   mobile?.addEventListener?.('change',syncImage);
   density?.addEventListener?.('change',sync);

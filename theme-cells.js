@@ -11,7 +11,7 @@
   function layout(options={}){
     const rand=random(hash(`${options.key||'cells'}:${options.seed||0}`));
     const colors=['var(--site-theme-accent)','var(--site-theme-secondary)','color-mix(in srgb,var(--site-theme-accent) 55%,var(--site-theme-ink))'];
-    return Array.from({length:LIMITS.desktop},(_,i)=>{
+    const cells=Array.from({length:LIMITS.desktop},(_,i)=>{
       const size=18+Math.pow(rand(),2.2)*92;
       const duration=7+rand()*7;
       return{
@@ -21,6 +21,12 @@
         color:colors[i%colors.length],mobile:i<LIMITS.phone
       };
     });
+    if(options.key==='zygarde')for(const c of cells){
+      const centerX=c.x<50?25:75,centerY=c.y<50?25:75;
+      c.gatherX=+(Math.max(-12,Math.min(12,(centerX-c.x)*.6))).toFixed(1);
+      c.gatherY=+(Math.max(-12,Math.min(12,(centerY-c.y)*.6))).toFixed(1);
+    }
+    return cells;
   }
 
   const fields=new WeakMap();
@@ -32,6 +38,7 @@
     for(const c of cells){
       const cell=d.createElement('i');cell.className='tcCell';cell.setAttribute('data-mobile',String(c.mobile));
       const vars={'--x':`${c.x}%`,'--y':`${c.y}%`,'--size':`${c.size}px`,'--d':`${c.duration}s`,'--delay':`${c.delay}s`,'--o':String(c.opacity),'--turn':`${c.turn}deg`,'--cell-color':c.color};
+      if(c.gatherX!==undefined){vars['--gather-x']=`${c.gatherX}px`;vars['--gather-y']=`${c.gatherY}px`;}
       for(const[k,v]of Object.entries(vars))cell.style.setProperty(k,v);
       field.appendChild(cell);
     }

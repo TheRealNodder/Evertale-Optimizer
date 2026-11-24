@@ -10,9 +10,13 @@ Nine technology themes use an original full-page motherboard: `miraidon`, `cyber
 
 Miraidon alone uses a shared charge cycle with constant-distance packet travel and two desktop/one phone local releases at actual packet waypoints. Short trace highlights follow the same PCB geometry; field rings expand when their packet arrives. Cyber and the seven console profiles retain their independently phased original packets.
 
-Zygarde uses filled organic cells, not a technical hex grid. Twenty-four cells (ten on phones) have deterministic positions and varied sizes from 18 to 110 pixels. Each grows while fading in and shrinks while fading out. The old outlined cells and circuit links are retired.
+Zygarde uses filled organic cells, not a technical hex grid. Twenty-four cells (ten on phones) have deterministic positions and varied sizes from 18 to 110 pixels. Each grows while fading in and shrinks while fading out. The old outlined cells and circuit links are retired. Subtle local gathering now accompanies the original growth cycle.
 
 Both engines receive separate child hosts inside one shared animation stage. Theme switching clears the module, its resize observer and pending debounce timer. The controller owns the 700px density bucket; the motherboard owns bounded, debounced geometry redraws within that bucket. The separate 480px breakpoint selects artwork files.
+
+## Project Legendary
+
+Twenty-seven Pokémon use original SVG vignettes with two or three co-located, independently animated layers, duplicated at two desktop anchors and shown once on phones. The original wind and earthquake engines remain active; mobile quake rendering pairs the four geometry bands into two paint groups, retaining all cracks and three quake positions. Zygarde and Miraidon retain their dedicated engines. No new network assets or application-state ownership. Animation direction and sequence are artistic interpretations, not reproduced canonical battle effects.
 
 ## Motion contract
 
@@ -79,35 +83,35 @@ Counts below are conservative complete-scene desktop / phone bounds, including f
 | blackwhitedsi | Full-page motherboard (12/5 packet cap); prism: split (2/1; 18s) | 19 / 10 | [Identity](THEME_MOTION.md#blackwhitedsi) |
 | galaxystyle | Full-page motherboard (12/5 packet cap); glint: star (7/3; 12s) | 24 / 12 | [Identity](THEME_MOTION.md#galaxystyle) |
 | superfamicom | Full-page motherboard (12/5 packet cap); glint: button (4/2; 22s) | 21 / 11 | [Identity](THEME_MOTION.md#superfamicom) |
-| hooh | burst: feather (5/2; 18s); rise: feather (8/3; 13s) | 18 / 9 | [Identity](THEME_MOTION.md#hooh) |
-| lugia | swell: pressure (3/1; 22s); gust: wing (5/2; 9s) | 13 / 7 | [Identity](THEME_MOTION.md#lugia) |
-| suicune | swell: cleansing (3/1; 12s); swell: aurora (2/1; 19s) | 10 / 6 | [Identity](THEME_MOTION.md#suicune) |
-| groudon | heat: fault (4/2; 15s); burst: fissure (3/1; 20s) | 12 / 7 | [Identity](THEME_MOTION.md#groudon) |
-| kyogre | swell: wave (4/2; 22s); fall: rain (14/6; 11s) | 23 / 12 | [Identity](THEME_MOTION.md#kyogre) |
-| rayquaza | gust: serpent (7/3; 8s); orbit: air (3/1; 18s) | 15 / 8 | [Identity](THEME_MOTION.md#rayquaza) |
-| shinyprimalgroudon | heat: magma (5/2; 12s); burst: fissure (4/1; 18s) | 14 / 7 | [Identity](THEME_MOTION.md#shinyprimalgroudon) |
-| shinyprimalkyogre | swell: pressure (4/2; 22s); prism: primal (3/1; 18s) | 12 / 7 | [Identity](THEME_MOTION.md#shinyprimalkyogre) |
-| shinymegarayquaza | gust: tendril (7/3; 12s); burst: ray (4/1; 20s) | 16 / 8 | [Identity](THEME_MOTION.md#shinymegarayquaza) |
-| dialga | swell: terrace (3/1; 20s); clock: ticks (1/1; 24s) | 9 / 6 | [Identity](THEME_MOTION.md#dialga) |
-| palkia | rift: space (2/1; 18s); orbit: pearl (4/2; 14s) | 11 / 7 | [Identity](THEME_MOTION.md#palkia) |
-| giratina | invert: shard (10/4; 14s); rift: fold (2/1; 21s) | 17 / 9 | [Identity](THEME_MOTION.md#giratina) |
-| arceus | heat: stair (3/1; 24s); invert: order (5/2; 24s) | 13 / 7 | [Identity](THEME_MOTION.md#arceus) |
-| reshiram | heat: turbine (3/1; 16s); rise: flame (10/4; 11s) | 18 / 9 | [Identity](THEME_MOTION.md#reshiram) |
-| zekrom | trace: generator (3/1; 8s); arc: generator (3/1; 8s) | 17 / 8 | [Identity](THEME_MOTION.md#zekrom) |
-| blackkyurem | arc: ice (3/1; 8s); fall: ice (10/4; 14s) | 24 / 11 | [Identity](THEME_MOTION.md#blackkyurem) |
-| whitekyurem | heat: iceheat (4/2; 16s); rise: steam (7/3; 14s) | 16 / 9 | [Identity](THEME_MOTION.md#whitekyurem) |
-| xerneas | burst: antler (5/2; 20s); glint: life (7/3; 13s) | 17 / 9 | [Identity](THEME_MOTION.md#xerneas) |
-| yveltal | invert: drain (10/4; 16s); heat: shadow (2/1; 22s) | 17 / 9 | [Identity](THEME_MOTION.md#yveltal) |
+| hooh | rainbow, sacred-feathers, sacred-fire; 22s cycle | 11 / 7 | [Identity](THEME_MOTION.md#hooh) |
+| lugia | pressure, aeroblast; 20s cycle + retained signature engine/accents | 29 / 14 | [Identity](THEME_MOTION.md#lugia) |
+| suicune | purification, north-wind, cleared-water; 18s cycle | 11 / 7 | [Identity](THEME_MOTION.md#suicune) |
+| groudon | drought, continental-rise; 20s cycle + retained signature engine/accents | 34 / 15 | [Identity](THEME_MOTION.md#groudon) |
+| kyogre | ocean-swell, pressure; 20s cycle + retained signature engine/accents | 23 / 12 | [Identity](THEME_MOTION.md#kyogre) |
+| rayquaza | clear-sky, air-lock; 20s cycle + retained signature engine/accents | 29 / 14 | [Identity](THEME_MOTION.md#rayquaza) |
+| shinyprimalgroudon | desolate-sun, magma-veins; 18s cycle + retained signature engine/accents | 34 / 15 | [Identity](THEME_MOTION.md#shinyprimalgroudon) |
+| shinyprimalkyogre | primordial-sea, golden-pressure, primal-markings; 18s cycle + retained signature engine/accents | 29 / 14 | [Identity](THEME_MOTION.md#shinyprimalkyogre) |
+| shinymegarayquaza | delta-vortex, gold-tendrils; 17s cycle + retained signature engine/accents | 29 / 14 | [Identity](THEME_MOTION.md#shinymegarayquaza) |
+| dialga | time-dial, rewinding-hand, time-echo; 24s cycle | 11 / 7 | [Identity](THEME_MOTION.md#dialga) |
+| palkia | space-grid, spatial-rift, spatial-plane; 23s cycle | 11 / 7 | [Identity](THEME_MOTION.md#palkia) |
+| giratina | inverted-terrain, distortion-seam, reversed-orbit; 25s cycle | 11 / 7 | [Identity](THEME_MOTION.md#giratina) |
+| arceus | creation-ring, gathering-light, formed-world; 26s cycle | 11 / 7 | [Identity](THEME_MOTION.md#arceus) |
+| reshiram | turboblaze, blue-flare, warm-plume; 19s cycle | 11 / 7 | [Identity](THEME_MOTION.md#reshiram) |
+| zekrom | teravolt-generator, bolt-strike; 16s cycle + retained signature engine/accents | 12 / 7 | [Identity](THEME_MOTION.md#zekrom) |
+| blackkyurem | frozen-plates, freeze-shock, ice-pressure; 19s cycle | 11 / 7 | [Identity](THEME_MOTION.md#blackkyurem) |
+| whitekyurem | ice-shell, ice-burn, steam; 20s cycle | 11 / 7 | [Identity](THEME_MOTION.md#whitekyurem) |
+| xerneas | life-branches, seven-color-crown, life-dispersal; 24s cycle | 11 / 7 | [Identity](THEME_MOTION.md#xerneas) |
+| yveltal | oblivion, y-shaped-drain, cocoon; 24s cycle | 11 / 7 | [Identity](THEME_MOTION.md#yveltal) |
 | zygarde | Organic filled cells (24/10) | 29 / 14 | [Identity](THEME_MOTION.md#zygarde) |
-| solgaleo | heat: corona (3/1; 18s); burst: sun (4/2; 22s) | 12 / 7 | [Identity](THEME_MOTION.md#solgaleo) |
-| lunala | orbit: crescent (1/1; 27s); swell: moon-shadow (2/1; 22s) | 8 / 6 | [Identity](THEME_MOTION.md#lunala) |
-| ultranecrozma | prism: ray (5/2; 16s); burst: prism (4/1; 22s) | 14 / 7 | [Identity](THEME_MOTION.md#ultranecrozma) |
-| zacian | gust: blade (5/2; 10s); prism: blade (2/1; 19s) | 12 / 7 | [Identity](THEME_MOTION.md#zacian) |
-| zamazenta | ripple: shield (4/2; 15s); gust: deflect (2/1; 21s) | 11 / 7 | [Identity](THEME_MOTION.md#zamazenta) |
-| eternatus | heat: core (2/1; 18s); arc: energy (3/1; 8s) | 16 / 8 | [Identity](THEME_MOTION.md#eternatus) |
-| koraidon | gust: dust (6/3; 12s); swell: grass (3/1; 16s) | 14 / 8 | [Identity](THEME_MOTION.md#koraidon) |
+| solgaleo | solar-core, solar-prominences, sunsteel-ray; 24s cycle | 11 / 7 | [Identity](THEME_MOTION.md#solgaleo) |
+| lunala | lunar-disc, moon-shadow, moonlight-rays; 26s cycle | 11 / 7 | [Identity](THEME_MOTION.md#lunala) |
+| ultranecrozma | light-absorption, ultra-prism, photon-geyser; 20s cycle | 11 / 7 | [Identity](THEME_MOTION.md#ultranecrozma) |
+| zacian | crowned-sword, behemoth-blade; 17s cycle + retained signature engine/accents | 29 / 14 | [Identity](THEME_MOTION.md#zacian) |
+| zamazenta | crowned-shield, incoming-force, deflection; 19s cycle | 11 / 7 | [Identity](THEME_MOTION.md#zamazenta) |
+| eternatus | dynamax-absorption, skeletal-core, dynamax-cannon; 24s cycle | 11 / 7 | [Identity](THEME_MOTION.md#eternatus) |
+| koraidon | orichalcum-sun, collision-course, primal-dust; 18s cycle | 11 / 7 | [Identity](THEME_MOTION.md#koraidon) |
 | miraidon | Full-page motherboard (12/5 packets); Hadron waypoint rings and trace releases (2+2/1+1) | 21 / 11 | [Identity](THEME_MOTION.md#miraidon) |
-| terapagos | prism: stellar (5/2; 20s); orbit: facet (4/2; 24s) | 14 / 8 | [Identity](THEME_MOTION.md#terapagos) |
+| terapagos | stellar-shell, terastal-refraction, stellar-spectrum; 26s cycle | 11 / 7 | [Identity](THEME_MOTION.md#terapagos) |
 | sunrise | heat: sunbeam (3/1; 22s); burst: sun (3/1; 26s) | 11 / 6 | [Identity](THEME_MOTION.md#sunrise) |
 
 Technical references: [animation performance](https://web.dev/articles/animations-and-performance), [compositor layers](https://web.dev/articles/stick-to-compositor-only-properties-and-manage-layer-count), [flash thresholds](https://www.w3.org/WAI/WCAG21/Understanding/three-flashes-or-below-threshold.html).

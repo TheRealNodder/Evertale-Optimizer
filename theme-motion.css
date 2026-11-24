@@ -164,3 +164,69 @@ html[data-theme-still="true"] .themeMotionLayer{animation:none!important;transfo
   .themeMotionParticle:is([data-primitive="fall"],[data-primitive="rise"],[data-primitive="gust"]),.themeMotionPacket{display:none}
   :is(.themeMotionArt,.pokemonEncounter__ambient){animation:none!important}
 }
+
+/* Project Legendary: two or three co-located layers per vignette; fixed host-relative anchors.
+   No animation touches interface content or properties other than transform/opacity. */
+.themeMotionParticle[data-primitive="motif"]{--motif-size:clamp(120px,17vw,230px);width:var(--motif-size);height:calc(var(--motif-size) * .8);margin-left:calc(var(--motif-size) * -.5);margin-top:calc(var(--motif-size) * -.4);animation-timing-function:ease-in-out;transform-origin:center}
+.themeMotionParticle[data-primitive="motif"] svg{stroke-width:1.65;overflow:visible}
+.themeMotionParticle[data-motif-motion="grow"]{transform-origin:50% 85%}
+.themeMotionParticle[data-motif-motion="rewind"]{animation-timing-function:steps(8,end)}
+.themeMotionParticle[data-motif-motion="rotate"],.themeMotionParticle[data-motif-motion="orbit"],.themeMotionParticle[data-motif-motion="counter"]{animation-timing-function:linear}
+.themeMotionParticle[data-motif-motion="hold"]{animation-name:legendary-hold}
+@keyframes legendary-hold{0%,100%{transform:scale(.94);opacity:.20}30%,70%{transform:scale(1);opacity:.42}}
+.themeMotionParticle[data-motif-motion="reveal"]{animation-name:legendary-reveal}
+@keyframes legendary-reveal{0%,15%,100%{transform:scale(.94);opacity:0}35%,65%{transform:scale(1);opacity:.58}85%{opacity:.12}}
+.themeMotionParticle[data-motif-motion="ascend"]{animation-name:legendary-ascend}
+@keyframes legendary-ascend{0%,10%{transform:translateY(25px) scale(.75);opacity:0}35%{opacity:.48}68%{transform:translateY(-20px) scale(1.04);opacity:.52}90%,100%{transform:translateY(-42px) scale(.85);opacity:0}}
+.themeMotionParticle[data-motif-motion="radiate"]{animation-name:legendary-radiate}
+@keyframes legendary-radiate{0%,28%{transform:scale(.45);opacity:0}48%{transform:scale(.95);opacity:.57}72%{transform:scale(1.15);opacity:.16}88%,100%{transform:scale(1.26);opacity:0}}
+.themeMotionParticle[data-motif-motion="compress"]{animation-name:legendary-compress}
+@keyframes legendary-compress{0%,100%{transform:scale(1.14);opacity:0}20%{opacity:.42}48%{transform:scale(.65);opacity:.62}70%{transform:scale(.84);opacity:.15}}
+.themeMotionParticle[data-motif-motion="sweep"]{animation-name:legendary-sweep}
+@keyframes legendary-sweep{0%,100%{transform:translateX(-30px);opacity:0}20%{opacity:.36}65%{transform:translateX(28px);opacity:.57}86%{transform:translateX(45px);opacity:0}}
+.themeMotionParticle[data-motif-motion="ribbon"]{animation-name:legendary-ribbon}
+@keyframes legendary-ribbon{0%,100%{transform:translate(-12px,8px) rotate(-8deg);opacity:.10}38%{transform:translate(8px,-9px) rotate(5deg);opacity:.56}72%{transform:translate(18px,3px) rotate(-4deg);opacity:.22}}
+.themeMotionParticle[data-motif-motion="lift"]{animation-name:legendary-lift}
+@keyframes legendary-lift{0%,100%{transform:translateY(10px) scaleY(.86);opacity:.12}24%{transform:translateY(5px) scaleY(.9);opacity:.23}50%,67%{transform:translateY(-8px) scaleY(1);opacity:.58}}
+.themeMotionParticle[data-motif-motion="swell"]{animation-name:legendary-swell}
+@keyframes legendary-swell{0%,100%{transform:translateY(13px) scaleY(.72);opacity:.12}38%{transform:translateY(-8px) scaleY(1.15);opacity:.58}68%{transform:translateY(4px) scaleY(.95);opacity:.35}}
+.themeMotionParticle[data-motif-motion="part"]{animation-name:legendary-part}
+@keyframes legendary-part{0%,100%{transform:scaleX(.62);opacity:.12}38%,63%{transform:scaleX(1.16);opacity:.52}}
+.themeMotionParticle[data-motif-motion="orbit"]{animation-name:legendary-orbit}
+@keyframes legendary-orbit{0%{transform:rotate(0deg) scale(.9);opacity:.22}45%{opacity:.58}100%{transform:rotate(360deg) scale(.9);opacity:.22}}
+.themeMotionParticle[data-motif-motion="counter"]{animation-name:legendary-counter}
+@keyframes legendary-counter{0%{transform:rotate(0deg);opacity:.22}50%{opacity:.53}100%{transform:rotate(-360deg);opacity:.22}}
+.themeMotionParticle[data-motif-motion="rewind"]{animation-name:legendary-rewind}
+@keyframes legendary-rewind{0%{transform:rotate(0deg);opacity:.55}32%,43%{transform:rotate(160deg);opacity:.62}62%,72%{transform:rotate(72deg);opacity:.48}100%{transform:rotate(360deg);opacity:.55}}
+.themeMotionParticle[data-motif-motion="echo"]{animation-name:legendary-echo}
+@keyframes legendary-echo{0%,20%,100%{transform:scale(.86);opacity:0}33%,44%{transform:scale(1.04);opacity:.48}62%{transform:scale(.91);opacity:.30}83%{transform:scale(1.12);opacity:0}}
+.themeMotionParticle[data-motif-motion="warp"]{animation-name:legendary-warp}
+@keyframes legendary-warp{0%,100%{transform:scale(1) skewX(0deg);opacity:.16}36%{transform:scale(.76,1.12) skewX(12deg);opacity:.45}62%{transform:scale(1.12,.84) skewX(-10deg);opacity:.50}}
+.themeMotionParticle[data-motif-motion="open"]{animation-name:legendary-open}
+@keyframes legendary-open{0%,100%{transform:scaleX(.12) scaleY(.85);opacity:0}32%,62%{transform:scaleX(1.1) scaleY(1);opacity:.60}82%{opacity:.13}}
+.themeMotionParticle[data-motif-motion="invert"]{animation-name:legendary-invert}
+@keyframes legendary-invert{0%,100%{transform:translateY(22px) rotate(-12deg);opacity:0}20%{opacity:.38}62%{transform:translateY(-26px) rotate(20deg);opacity:.54}87%{opacity:0}}
+.themeMotionParticle[data-motif-motion="gather"]{animation-name:legendary-gather}
+@keyframes legendary-gather{0%,100%{transform:scale(1.2);opacity:0}16%{opacity:.45}50%{transform:scale(.26);opacity:.62}68%{transform:scale(.12);opacity:0}}
+.themeMotionParticle[data-motif-motion="rotate"]{animation-name:legendary-rotate}
+@keyframes legendary-rotate{0%{transform:rotate(0deg);opacity:.22}40%,62%{opacity:.55}100%{transform:rotate(360deg);opacity:.22}}
+.themeMotionParticle[data-motif-motion="release"]{animation-name:legendary-release}
+@keyframes legendary-release{0%,40%,100%{transform:scale(.82);opacity:0}50%{transform:scale(.98);opacity:.62}63%{transform:scale(1.06);opacity:.38}80%{opacity:0}}
+.themeMotionParticle[data-motif-motion="lock"]{animation-name:legendary-lock}
+@keyframes legendary-lock{0%,100%{transform:scale(1.12);opacity:.13}36%,68%{transform:scale(.92);opacity:.54}}
+.themeMotionParticle[data-motif-motion="grow"]{animation-name:legendary-grow}
+@keyframes legendary-grow{0%,100%{transform:scaleY(.25);opacity:0}18%{opacity:.28}45%,68%{transform:scaleY(1);opacity:.58}85%{opacity:.13}}
+.themeMotionParticle[data-motif-motion="eclipse"]{animation-name:legendary-eclipse}
+@keyframes legendary-eclipse{0%,100%{transform:translateX(-18px);opacity:.1}35%{transform:translateX(8px);opacity:.51}67%{transform:translateX(18px);opacity:.31}}
+.themeMotionParticle[data-motif-motion="slash"]{animation-name:legendary-slash}
+@keyframes legendary-slash{0%,35%{transform:translate(-23px,18px) scale(.82);opacity:0}48%{opacity:.66}63%,100%{transform:translate(30px,-24px) scale(1.12);opacity:0}}
+.themeMotionParticle[data-motif-motion="approach"]{animation-name:legendary-approach}
+@keyframes legendary-approach{0%,14%{transform:translateX(-34px);opacity:0}25%{opacity:.50}42%,100%{transform:translateX(0);opacity:0}}
+.themeMotionParticle[data-motif-motion="deflect"]{animation-name:legendary-deflect}
+@keyframes legendary-deflect{0%,39%{transform:scale(.65);opacity:0}48%{opacity:.63}75%,100%{transform:translateX(26px) scale(1.15);opacity:0}}
+.themeMotionParticle[data-motif-motion="impact"]{animation-name:legendary-impact}
+@keyframes legendary-impact{0%,35%{transform:scale(.7) translateY(14px);opacity:0}46%{transform:scale(1);opacity:.62}68%,100%{transform:scale(1.2) translateY(4px);opacity:0}}
+.themeMotionParticles[data-scene-key="shinyprimalkyogre"] .themeMotionParticle[data-shape="rain"]{--d:1.9s!important;width:1.5px}
+html[data-theme-still="true"] .themeMotionParticle[data-primitive="motif"]{opacity:.23}
+@media(max-width:700px){.themeMotionParticle[data-primitive="motif"]{--motif-size:clamp(86px,29vw,140px);max-width:none;max-height:none}}
+@media(prefers-reduced-motion:reduce){.themeMotionParticle[data-primitive="motif"]{opacity:.23}}
