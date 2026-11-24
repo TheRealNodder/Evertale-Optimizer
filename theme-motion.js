@@ -88,7 +88,7 @@
     zamazenta:[P('ripple','shield',4,2,15,95),P('gust','deflect',2,1,21,115)],
     eternatus:[P('heat','core',2,1,18,100),P('arc','energy',3,1,8,160)],
     koraidon:[P('gust','dust',6,3,12,55),P('swell','grass',3,1,16,90)],
-    miraidon:[P('arc','junction',2,1,8,160,'charge')],
+    miraidon:[], // Hadron accents are synchronized to actual motherboard packet routes.
     terapagos:[P('prism','stellar',5,2,20,85,'top'),P('orbit','facet',4,2,24,20,'top')]
   };
   for(const value of Object.values(SIGNATURES))Object.freeze(value);

@@ -8,6 +8,8 @@ Reading panels use an 84% theme-colored backing. Controls and menus retain solid
 
 Nine technology themes use an original full-page motherboard: `miraidon`, `cyber`, and the seven console finishes. One static SVG contains varied trace widths, 45-degree bends, vias, pads, chip outlines with pin rows, transistor outlines and other passive components. Strokes without travelling packets stay energized. The SVG and HTML packets share host-pixel coordinates, with distance-proportional keyframes. No official schematics or logos are copied.
 
+Miraidon alone uses a shared charge cycle with constant-distance packet travel and two desktop/one phone local releases at actual packet waypoints. Short trace highlights follow the same PCB geometry; field rings expand when their packet arrives. Cyber and the seven console profiles retain their independently phased original packets.
+
 Zygarde uses filled organic cells, not a technical hex grid. Twenty-four cells (ten on phones) have deterministic positions and varied sizes from 18 to 110 pixels. Each grows while fading in and shrinks while fading out. The old outlined cells and circuit links are retired.
 
 Both engines receive separate child hosts inside one shared animation stage. Theme switching clears the module, its resize observer and pending debounce timer. The controller owns the 700px density bucket; the motherboard owns bounded, debounced geometry redraws within that bucket. The separate 480px breakpoint selects artwork files.
@@ -104,7 +106,7 @@ Counts below are conservative complete-scene desktop / phone bounds, including f
 | zamazenta | ripple: shield (4/2; 15s); gust: deflect (2/1; 21s) | 11 / 7 | [Identity](THEME_MOTION.md#zamazenta) |
 | eternatus | heat: core (2/1; 18s); arc: energy (3/1; 8s) | 16 / 8 | [Identity](THEME_MOTION.md#eternatus) |
 | koraidon | gust: dust (6/3; 12s); swell: grass (3/1; 16s) | 14 / 8 | [Identity](THEME_MOTION.md#koraidon) |
-| miraidon | Full-page motherboard (12/5 packet cap); arc: junction (2/1; 8s) | 23 / 12 | [Identity](THEME_MOTION.md#miraidon) |
+| miraidon | Full-page motherboard (12/5 packets); Hadron waypoint rings and trace releases (2+2/1+1) | 21 / 11 | [Identity](THEME_MOTION.md#miraidon) |
 | terapagos | prism: stellar (5/2; 20s); orbit: facet (4/2; 24s) | 14 / 8 | [Identity](THEME_MOTION.md#terapagos) |
 | sunrise | heat: sunbeam (3/1; 22s); burst: sun (3/1; 26s) | 11 / 6 | [Identity](THEME_MOTION.md#sunrise) |
 

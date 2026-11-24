@@ -264,6 +264,7 @@ const primitiveNames=new Set(['fall','rise','gust','glint','swell','ripple','orb
 for(const [key,parts] of Object.entries(motion.signatures)){
   let desktop=5,phone=4; // Existing three layers and two art surfaces; two layers on phones.
   if(motion.technology.includes(key)){desktop+=12;phone+=5;}
+  if(key==='miraidon'){desktop+=4;phone+=2;} // two accents per Hadron waypoint
   if(key==='zygarde'){desktop+=24;phone+=10;}
   for(const part of parts){
     check(primitiveNames.has(part.type),`Unknown signature primitive: ${key}`);
@@ -284,10 +285,13 @@ check(!signatureHost.querySelector('.themeMotionParticle'),'Zygarde retained tec
 api.setPreference('miraidon');
 const desktopPackets=signatureHost.querySelector('.tmbBoard')?.querySelectorAll('.tmbPulse').length;
 check(desktopPackets>0&&desktopPackets<=12,`Miraidon board packet budget failed: ${desktopPackets}`);
+check(!signatureHost.querySelector('.themeMotionParticle'),'Miraidon retained detached generic arcs');
+check(signatureHost.querySelectorAll('.tmbHadronRing').length<=2,'Miraidon desktop ring cap failed');
 const desktopModule=signatureHost.querySelector('.themeMotionModuleHost');
 densityMotion.matches=true;densityMotion.onchange();
 const phonePackets=signatureHost.querySelector('.tmbBoard')?.querySelectorAll('.tmbPulse').length;
 check(phonePackets>0&&phonePackets<=5,`Motion bucket board packet budget failed: ${phonePackets}`);
+check(signatureHost.querySelectorAll('.tmbHadronRing').length<=1,'Miraidon phone ring cap failed');
 check(!desktopModule.parentNode,'Motion bucket change left the old module host attached');
 densityMotion.matches=false;densityMotion.onchange();
 api.setPreference('zekrom');

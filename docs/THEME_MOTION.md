@@ -370,7 +370,7 @@ Motion uses CSS transforms and opacity. System reduced motion and the Animations
 - NIST describes security architectures involving network assets and connections.
 - Animated packet routes are a visualization metaphor rather than literal physical network behavior.
 
-**Motion:** An original full-page motherboard stays softly energized: varied traces, vias, pads, chips with pin rows and transistor outlines, with luminous packets following the drawn routes. The character or console artwork remains unchanged.
+**Motion:** Keep the original PCB geometry, including chips, vias, pads and traces. A shared charge cycle sends packets along the existing routes at distance-proportional speed; restrained cyan trace highlights and expanding field rings mark actual waypoint arrivals. The eight other technology profiles retain their existing packet motion. Character artwork remains unchanged.
 
 **Still:** The original environment and credited artwork remain visible behind a steady, energized circuit board. Travelling packets disappear when motion is off.
 
@@ -1118,6 +1118,7 @@ Motion uses CSS transforms and opacity. System reduced motion and the Animations
 
 - Miraidon is associated with the distant future.
 - Miraidon can travel through Paldea.
+- Hadron Engine creates Electric Terrain; Electro Drift is described as a zigzagging electric attack. These are identity references, not a claim that PCB graphics are canonical.
 
 **Motion:** An original full-page motherboard stays softly energized: varied traces, vias, pads, chips with pin rows and transistor outlines, with luminous packets following the drawn routes. The character or console artwork remains unchanged.
 

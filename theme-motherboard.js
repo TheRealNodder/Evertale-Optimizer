@@ -26,6 +26,33 @@
     return horizontalFirst?[a,[a[0]+Math.sign(dx)*bend,a[1]+Math.sign(dy)*bend],b]:[a,[a[0]+Math.sign(dx)*bend,a[1]+Math.sign(dy)*bend],b];
   }
 
+  /* Miraidon only: coordinated charge along the existing PCB geometry. */
+  function hadronCycle(pulses,width,height,phone){
+    if(!pulses.length)return{cycle:16,nodes:[]};
+    const speed=phone?125:180;
+    const cycle=Math.ceil(Math.max(16,...pulses.map(p=>p.length/speed/.52))*100)/100;
+    const nodes=[],margin=phone?18:24,cap=phone?1:2;
+    pulses.forEach((p,i)=>{
+      p.duration=cycle;p.delay=-cycle*.18;p.start=12+(i%5)*4;
+      p.end=p.start+100*p.length/speed/cycle;
+      if(nodes.length>=cap)return;
+      const pts=p.reverse?[...p.points].reverse():p.points;
+      let travelled=0;
+      for(let k=1;k<pts.length;k++){
+        const a=pts[k-1],b=pts[k],leg=Math.hypot(b[0]-a[0],b[1]-a[1]);
+        travelled+=leg;
+        if(leg<18||b[0]<margin||b[0]>width-margin||b[1]<margin||b[1]>height-margin||
+           nodes.some(n=>Math.hypot(n.x-b[0],n.y-b[1])<margin*2))continue;
+        const fraction=Math.min(1,34/leg);
+        const from=[b[0]+(a[0]-b[0])*fraction,b[1]+(a[1]-b[1])*fraction];
+        nodes.push({pulse:i,waypoint:k,x:b[0],y:b[1],from,to:b,
+          at:p.start+(p.end-p.start)*travelled/p.length});
+        break;
+      }
+    });
+    return{cycle,nodes};
+  }
+
   /* Pure layout: returns path data and pulse routes for a w x h board. Exposed for tests. */
   function layout(width,height,options={}){
     const phone=!!options.mobile,limits=phone?LIMITS.phone:LIMITS.desktop,cell=limits.cell;
@@ -128,7 +155,9 @@
     }
     if(!pulses.length&&candidates.length)addPulse(candidates[0]);
 
+    const hadron=options.key==='miraidon'?hadronCycle(pulses,width,height,phone):null;
     return{
+      ...(hadron?{hadron}:{}),
       width,height,phone,
       traces:traces.map(list=>list.filter(p=>p.every(inside)).map(line).join('')),
       parts:parts.join(''),
@@ -144,11 +173,22 @@
   function keyframes(name,pulse){
     const pts=pulse.reverse?[...pulse.points].reverse():pulse.points;
     const t=p=>`translate(${fx(p[0]-4)}px,${fx(p[1]-4)}px)`;
-    let run=0;const steps=[`0%{transform:${t(pts[0])};opacity:0}`,`4%{transform:${t(pts[0])};opacity:1}`];
-    for(let i=1;i<pts.length;i++){run+=Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]);steps.push(`${(4+66*run/pulse.length).toFixed(3)}%{transform:${t(pts[i])};opacity:1}`);}
+    const start=pulse.start??4,endAt=pulse.end??70;
+    let run=0;const steps=[`0%{transform:${t(pts[0])};opacity:0}`];
+    if(pulse.start!==undefined)steps.push(`${(start-2).toFixed(3)}%{transform:${t(pts[0])};opacity:0}`);
+    steps.push(`${start}%{transform:${t(pts[0])};opacity:1}`);
+    for(let i=1;i<pts.length;i++){run+=Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]);steps.push(`${(start+(endAt-start)*run/pulse.length).toFixed(3)}%{transform:${t(pts[i])};opacity:1}`);}
     const end=t(pts[pts.length-1]);
-    steps.push(`74%{transform:${end};opacity:0}`,`100%{transform:${end};opacity:0}`);
+    steps.push(`${pulse.end===undefined?74:(endAt+4).toFixed(3)}%{transform:${end};opacity:0}`,`100%{transform:${end};opacity:0}`);
     return`@keyframes ${name}{${steps.join('')}}`;
+  }
+
+  function hadronFrames(id,node){
+    const at=node.at,fmt=v=>v.toFixed(3);
+    return [
+      `@keyframes ${id}-trace{0%,${fmt(at-3)}%{opacity:0}${fmt(at)}%{opacity:.82}${fmt(at+4)}%,100%{opacity:0}}`,
+      `@keyframes ${id}-ring{0%,${fmt(at-2)}%{transform:scale(.35);opacity:0}${fmt(at)}%{transform:scale(.65);opacity:.7}${fmt(at+8)}%,100%{transform:scale(1.3);opacity:0}}`
+    ].join('\n');
   }
 
   const boards=new WeakMap();
@@ -168,6 +208,18 @@
     const id=`tmb${hash(`${options.key}:${width}x${height}:${mobile}`).toString(36)}`;
     const style=d.createElement('style');
     style.textContent=plan.pulses.map((pulse,i)=>keyframes(`${id}-${i}`,pulse)).join('\n');
+    if(plan.hadron){
+      const cycle=plan.hadron.cycle,delay=-cycle*.18;
+      plan.hadron.nodes.forEach((n,i)=>{
+        const name=`${id}-hadron-${i}`;
+        style.textContent+='\n'+hadronFrames(name,n);
+        const trace=d.createElementNS(SVGNS,'path');trace.setAttribute('class','tmbHadronTrace');
+        trace.setAttribute('d',line([n.from,n.to]));trace.style.animation=`${name}-trace ${cycle}s linear ${delay}s infinite`;svg.appendChild(trace);
+        const ring=d.createElement('i');ring.className='tmbHadronRing';
+        ring.style.setProperty('left',`${fx(n.x)}px`);ring.style.setProperty('top',`${fx(n.y)}px`);
+        ring.style.animation=`${name}-ring ${cycle}s ease-out ${delay}s infinite`;board.appendChild(ring);
+      });
+    }
     board.appendChild(style);
     plan.pulses.forEach((pulse,i)=>{
       const packet=d.createElement('i');packet.className='tmbPulse';

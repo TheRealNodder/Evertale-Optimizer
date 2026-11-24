@@ -131,3 +131,30 @@ test('stylesheet animates only transform and opacity (wind dash offset excepted)
   const js = fs.readFileSync(path.join(root, 'theme-motherboard.js'), 'utf8');
   assert.match(js, /matchMedia\?\.\('\(max-width:700px\)'\)/, 'board uses the shared 700px density breakpoint');
 });
+
+test('Miraidon Hadron cycle coordinates actual drawn waypoint arrivals',()=>{
+  for(const [w,h,mobile] of sizes){
+    const plan=board.layout(w,h,{key:'miraidon',mobile});
+    assert.ok(plan.hadron.cycle>=16);
+    assert.ok(plan.hadron.nodes.length>=1&&plan.hadron.nodes.length<=(mobile?1:2));
+    for(const p of plan.pulses){
+      assert.equal(p.duration,plan.hadron.cycle);
+      assert.ok(Math.abs(p.delay+p.duration*.18)<1e-8);
+      assert.ok(p.start>=12&&p.end>p.start&&p.end<=80.001);
+    }
+    for(const n of plan.hadron.nodes){
+      const p=plan.pulses[n.pulse],pts=p.reverse?[...p.points].reverse():p.points;
+      const a=pts[n.waypoint-1],b=pts[n.waypoint];
+      assert.equal(n.x,b[0]);assert.equal(n.y,b[1]);
+      const dist=pts.slice(1,n.waypoint+1).reduce((s,pt,i)=>s+Math.hypot(pt[0]-pts[i][0],pt[1]-pts[i][1]),0);
+      assert.ok(Math.abs(n.at-(p.start+(p.end-p.start)*dist/p.length))<1e-8);
+      assert.ok(Math.abs((n.from[0]-a[0])*(b[1]-a[1])-(n.from[1]-a[1])*(b[0]-a[0]))<1e-6);
+      assert.ok(Math.hypot(n.from[0]-b[0],n.from[1]-b[1])<=34.00001);
+    }
+  }
+  for(const key of ['cyber','crimsonblack','cobaltblack','metallicrose','bronzexl','blackwhitedsi','galaxystyle','superfamicom']){
+    const plan=board.layout(1280,800,{key});
+    assert.equal(plan.hadron,undefined);
+    assert.ok(plan.pulses.every(p=>p.start===undefined&&p.end===undefined));
+  }
+});
