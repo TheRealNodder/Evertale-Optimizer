@@ -63,3 +63,10 @@ Physical references and Pokémon lore inform original artwork; these are not phy
 - Terapagos: exactly restore the pre-Project-Legendary prism/stellar and orbit/facet signatures; original generated background and artwork remain unchanged.
 
 The generated THEME_MOTION.md remains byte-identical to the canonical compiler output. This separately maintained file documents the additional runtime signatures.
+
+## Weather and primal refinements
+
+- Suicune: rain driven diagonally by the existing atmospheric wind engine; a restrained blue-white palette evokes the north wind and purification lore. [Suicune](https://www.pokemon.com/us/pokedex/suicune).
+- Rayquaza and Shiny Mega Rayquaza: retain the original painted sky, character art and wind engine; remove added emblem-like motifs completely. [Rayquaza](https://www.pokemon.com/us/pokedex/rayquaza).
+- Koraidon: layered sandstone-like formations, fern-like vegetation and impact dust evoke ancient environments rather than symbolic sun icons. [Koraidon](https://www.pokemon.com/us/pokedex/koraidon).
+- Ultra Necrozma: seven gradient-shaded crystal spires in different hues, prismatic light and subtle tip gleams, inspired by the visual variety of Z-Crystals. This is an artistic palette, not a claim that Necrozma consists of Z-Crystals. [Necrozma](https://www.pokemon.com/us/pokedex/necrozma).

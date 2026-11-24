@@ -16,7 +16,7 @@ Both engines receive separate child hosts inside one shared animation stage. The
 
 ## Project Legendary
 
-Twenty-six Pokémon use original SVG vignettes with bounded independently animated layers (two or three for most, eight for Dialga, five for Giratina and four for Eternatus), duplicated at two desktop anchors and shown once on phones. The original wind and earthquake engines remain active; mobile quake rendering pairs the four geometry bands into two paint groups, retaining all cracks and three quake positions. Zygarde and Miraidon retain their dedicated engines; Terapagos retains its original gleams. No new network assets or application-state ownership. Animation direction and sequence are artistic interpretations, not reproduced canonical battle effects.
+Twenty-three Pokémon use original SVG vignettes with bounded independently animated layers (two or three for most, eight for Dialga, five for Giratina and four for Eternatus), duplicated at two desktop anchors and shown once on phones. The original wind and earthquake engines remain active; mobile quake rendering pairs the four geometry bands into two paint groups, retaining all cracks and three quake positions. Zygarde and Miraidon retain their dedicated engines; Terapagos retains its original gleams. No new network assets or application-state ownership. Animation direction and sequence are artistic interpretations, not reproduced canonical battle effects.
 
 ## Motion contract
 
@@ -85,13 +85,13 @@ Counts below are conservative complete-scene desktop / phone bounds, including f
 | superfamicom | Full-page motherboard (12/5 packet cap); glint: button (4/2; 22s) | 21 / 11 | [Identity](THEME_MOTION.md#superfamicom) |
 | hooh | rainbow, sacred-feathers, sacred-fire; 22s cycle | 11 / 7 | [Identity](THEME_MOTION.md#hooh) |
 | lugia | pressure, aeroblast; 20s cycle + retained signature engine/accents | 29 / 14 | [Identity](THEME_MOTION.md#lugia) |
-| suicune | purification, north-wind, cleared-water; 18s cycle | 11 / 7 | [Identity](THEME_MOTION.md#suicune) |
+| suicune | Wind module and slanted rain (14/4) | 39 / 16 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#weather-and-primal-refinements) |
 | groudon | drought, continental-rise; 20s cycle + retained signature engine/accents | 34 / 15 | [Identity](THEME_MOTION.md#groudon) |
 | kyogre | ocean-swell, pressure; 20s cycle + retained signature engine/accents | 23 / 12 | [Identity](THEME_MOTION.md#kyogre) |
-| rayquaza | clear-sky, air-lock; 20s cycle + retained signature engine/accents | 29 / 14 | [Identity](THEME_MOTION.md#rayquaza) |
+| rayquaza | Full-page atmospheric wind currents only | 25 / 12 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#weather-and-primal-refinements) |
 | shinyprimalgroudon | desolate-sun, magma-veins; 18s cycle + retained signature engine/accents | 34 / 15 | [Identity](THEME_MOTION.md#shinyprimalgroudon) |
 | shinyprimalkyogre | primordial-sea, golden-pressure, primal-markings; 18s cycle + retained signature engine/accents | 29 / 14 | [Identity](THEME_MOTION.md#shinyprimalkyogre) |
-| shinymegarayquaza | delta-vortex, gold-tendrils; 17s cycle + retained signature engine/accents | 29 / 14 | [Identity](THEME_MOTION.md#shinymegarayquaza) |
+| shinymegarayquaza | Full-page atmospheric wind currents only; existing shiny palette | 25 / 12 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#weather-and-primal-refinements) |
 | dialga | Detailed Roman-numeral clocks, three hands, glass hourglasses and reversible sand; 24s / 37.2s cycles | 21 / 12 | [Identity](THEME_MOTION.md#dialga) |
 | palkia | Star-filled galaxy, luminous torn space and gravitational-lens-inspired arcs; 23s cycle | 11 / 7 | [Identity](THEME_MOTION.md#palkia) |
 | giratina | Filled viscous tar pools, stretching tendrils, falling/rising drops and irregular splatter; 25s cycle | 15 / 9 | [Identity](THEME_MOTION.md#giratina) |
@@ -105,11 +105,11 @@ Counts below are conservative complete-scene desktop / phone bounds, including f
 | zygarde | Organic filled cells (24/10) | 29 / 14 | [Identity](THEME_MOTION.md#zygarde) |
 | solgaleo | solar-photosphere, solar-plasma, solar-rays; 24s material cycle | 11 / 7 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#other-material-revisions) |
 | lunala | cratered-moon, lunar-shadow, starlight; 26s material cycle | 11 / 7 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#other-material-revisions) |
-| ultranecrozma | golden-crystal, light-infall, photon-release; 20s material cycle | 11 / 7 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#other-material-revisions) |
+| ultranecrozma | Seven shaded Z-Crystal-inspired hues, spectral refraction and tip gleams; 20s | 11 / 7 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#weather-and-primal-refinements) |
 | zacian | forged-sword, blade-wake, blade-sparks; 17s material cycle | 31 / 15 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#other-material-revisions) |
 | zamazenta | forged-shield, incoming-energy, deflection-sparks; 19s material cycle | 11 / 7 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#other-material-revisions) |
 | eternatus | dynamax-cloud, energy-core, energy-infall, cannon-release; 24s material cycle | 13 / 8 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#other-material-revisions) |
-| koraidon | scorching-sun, earth-dust, impact-debris; 18s material cycle | 11 / 7 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#other-material-revisions) |
+| koraidon | Ancient layered cliffs, prehistoric ferns and drifting impact dust; 20s | 11 / 7 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#weather-and-primal-refinements) |
 | miraidon | Full-page motherboard (12/5 packets); Hadron waypoint rings and trace releases (2+2/1+1) | 21 / 11 | [Identity](THEME_MOTION.md#miraidon) |
 | terapagos | Original stellar prism gleams and orbiting facets, 5/2 + 4/2 | 14 / 8 | [Identity](THEME_MOTION.md#terapagos) |
 | sunrise | heat: sunbeam (3/1; 22s); burst: sun (3/1; 26s) | 11 / 6 | [Identity](THEME_MOTION.md#sunrise) |

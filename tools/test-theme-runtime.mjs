@@ -278,7 +278,7 @@ for(const [key,parts] of Object.entries(motion.signatures)){
   }
   check(desktop<=40&&phone<=16,`Whole-scene signature budget exceeded: ${key} (${desktop}/${phone})`);
 }
-check(Object.keys(motion.motifs).length===26,'Expected 26 authored motifs plus Miraidon, Zygarde and restored Terapagos');
+check(Object.keys(motion.motifs).length===23,'Expected 23 authored motifs plus dedicated wind/rain, board, cells and restored Terapagos');
 const motifShapes=new Set();
 for(const [key,[cycle,layers]] of Object.entries(motion.motifs)){
   check(legendary.some(t=>t.key===key)&&layers.length>=2&&layers.length<=(key==='dialga'?8:key==='giratina'?5:key==='eternatus'?4:3),'Unexpected motif identity: '+key);
@@ -291,6 +291,10 @@ for(const [key,[cycle,layers]] of Object.entries(motion.motifs)){
     check(/^#[0-9a-f]{6}$/i.test(color)&&!/<(?:script|image|foreignObject|use|animate|set)\b|\bon\w+=|href=|url\(/i.test(safe)&&new Set(localIds).size===localIds.length&&refs.every(id=>localIds.includes(id)),'Invalid motif geometry: '+key);
   }
 }
+check(motion.moduleFor('suicune')==='wind'&&motion.signatures.suicune.length===1&&motion.signatures.suicune[0].shape==='rain'&&motion.signatures.suicune[0].count===14&&motion.signatures.suicune[0].phone===4,'Suicune needs wind and bounded rain');
+for(const key of ['rayquaza','shinymegarayquaza'])check(motion.moduleFor(key)==='wind'&&motion.signatures[key].length===0&&!motion.motifs[key],'Rayquaza retained abstract motifs: '+key);
+check(motion.motifs.ultranecrozma[1].some(x=>x[0]==='z-crystal-spectrum'&&x[3].includes('MOTIFID-crystal6')),'Missing spectral crystal cluster');
+check(motion.motifs.koraidon[1].some(x=>x[0]==='prehistoric-ferns'),'Missing prehistoric terrain vegetation');
 const signatureHost=document.getElementById('themeMotionParticles');
 const snapshotNode=x=>[x.className,x.getAttribute('d'),x.getAttribute('data-mobile'),x.textContent,[...x.style.values],x.children.map(snapshotNode)];
 const signatureSnapshot=()=>signatureHost.children.map(snapshotNode);
