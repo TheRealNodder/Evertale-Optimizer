@@ -490,7 +490,7 @@
     blackkyurem:[...LEGENDARY_MOTIFS.blackkyurem[1].map((_,i)=>P('motif',String(i),2,1,19,210,'legendary'))],
     whitekyurem:[...LEGENDARY_MOTIFS.whitekyurem[1].map((_,i)=>P('motif',String(i),2,1,20,210,'legendary'))],
     xerneas:[P('sprite','xerneas-emblem',1,1,14,700,'legendary'),P('sprite','life-diamond',5,2,24,42,'legendary'),P('sprite','life-petal',12,4,15,28,'legendary'),P('sprite','life-leaf',8,2,17,32,'legendary'),P('sprite','life-aura',5,2,27,150,'legendary')],
-    yveltal:[P('sprite','yveltal-emblem',1,1,15,700,'legendary'),P('sprite','dark-diamond',4,1,24,42,'legendary'),P('sprite','dark-feather',10,3,17,35,'legendary'),P('sprite','dark-aura',3,1,27,135,'legendary')],
+    yveltal:[P('sprite','yveltal-emblem',1,1,15,700,'legendary'),P('sprite','dark-diamond',12,5,18,60,'legendary'),P('sprite','dark-feather',10,3,17,35,'legendary'),P('sprite','dark-aura',3,1,27,135,'legendary')],
     zygarde:[],
     solgaleo:[...LEGENDARY_MOTIFS.solgaleo[1].map((_,i)=>P('motif',String(i),2,1,24,210,'legendary'))],
     lunala:[...LEGENDARY_MOTIFS.lunala[1].map((_,i)=>P('motif',String(i),2,1,26,210,'legendary'))],
@@ -547,16 +547,18 @@
           const shape=part.shape,role=shape.endsWith('-emblem')?'emblem':shape.endsWith('-diamond')?'diamond':shape.endsWith('-aura')?'aura':'fall';
           p.setAttribute('data-kalos-role',role);
           const emblem=role==='emblem',fall=role==='fall',diamond=role==='diamond';
-          const x=emblem?'50%':(7+rand()*86).toFixed(2)+'%',y=emblem?'50%':(9+rand()*82).toFixed(2)+'%';
-          const duration=emblem?part.duration:part.duration*(.75+rand()*.5);
-          const size=emblem?part.size:part.size*(.45+Math.pow(rand(),1.4)*.95);
+          const extraDark=key==='yveltal'&&diamond&&i>=4;
+          const sample=extraDark?seeded(key+':extra-diamond:'+i):rand;
+          const x=emblem?'50%':(7+sample()*86).toFixed(2)+'%',y=emblem?'50%':(9+sample()*82).toFixed(2)+'%';
+          const duration=emblem?part.duration:part.duration*(.75+sample()*.5);
+          const size=emblem?part.size:part.size*(.45+Math.pow(sample(),1.4)*.95);
           const vars={'--x':x,'--y':y,'--mx':x,'--my':y,'--spawn-x1':x,'--spawn-y1':y,
-            '--spawn-x2':(8+rand()*84).toFixed(2)+'%','--spawn-y2':(9+rand()*82).toFixed(2)+'%',
-            '--spawn-x3':(8+rand()*84).toFixed(2)+'%','--spawn-y3':(9+rand()*82).toFixed(2)+'%',
-            '--s':size.toFixed(1)+'px','--d':duration.toFixed(2)+'s','--delay':(emblem?0:-rand()*duration).toFixed(2)+'s',
-            '--o':(emblem?.6:fall?.56+rand()*.34:diamond?.78+rand()*.17:.38+rand()*.3).toFixed(2),
-            '--turn':Math.round((rand()-.5)*(fall?220:20))+'deg',
-            '--dx':((rand()-.5)*15).toFixed(2)+'vw','--sway':((rand()-.5)*9).toFixed(2)+'vw',
+            '--spawn-x2':(8+sample()*84).toFixed(2)+'%','--spawn-y2':(9+sample()*82).toFixed(2)+'%',
+            '--spawn-x3':(8+sample()*84).toFixed(2)+'%','--spawn-y3':(9+sample()*82).toFixed(2)+'%',
+            '--s':size.toFixed(1)+'px','--d':duration.toFixed(2)+'s','--delay':(emblem?0:-sample()*duration).toFixed(2)+'s',
+            '--o':(emblem?.6:fall?.56+sample()*.34:diamond?.78+sample()*.17:.38+sample()*.3).toFixed(2),
+            '--turn':Math.round((sample()-.5)*(fall?220:20))+'deg',
+            '--dx':((sample()-.5)*15).toFixed(2)+'vw','--sway':((sample()-.5)*9).toFixed(2)+'vw',
             '--c':key==='xerneas'?['#a8ed8c','#c6a3ff','#8bdbff','#ffe99a'][i%4]:'#ee3d68'};
           if(diamond){
             // Separate seed: other environmental sprites keep their original layouts.
@@ -564,11 +566,11 @@
             const life=key==='xerneas',palette=['#8bffff','#99b3ff','#dca4ff','#ff8fd9','#fff299','#adffbb','#ffb38d'];
             const colors=life?palette:['#790b29','#b91536','#521025','#a30e47'];
             const color=colors[i%colors.length],count=part.count;
-            // Three groups of three independent facets per node. Every group
-            // occupies a distinct viewport region, with staggered timing.
-            // One SVG is the existing particle; no additional animation nodes.
+            // Each diamond has three staggered, host-relative spawn positions.
+            // Dark diamonds cover a stratified 3-by-3 grid.
             const positions=Array.from({length:3},(_,j)=>{
-              const col=(i+j*2)%3,row=(Math.floor(i/3)+j)%3;
+              const cell=([0,8,4,2,6,1,3,5,7,0,4,8][i]+j*4)%9;
+              const col=life?(i+j*2)%3:cell%3,row=life?(Math.floor(i/3)+j)%3:Math.floor(cell/3);
               return [(col*32+2+rng()*30).toFixed(2)+'%',(row*32+2+rng()*30).toFixed(2)+'%'];
             });
             for(let j=0;j<3;j++){
@@ -576,13 +578,14 @@
               vars['--spawn-y'+(j+1)]=positions[j][1];
             }
             vars['--x']=vars['--mx']=positions[0][0];vars['--y']=vars['--my']=positions[0][1];
-            vars['--s']=(12+Math.pow(rng(),1.8)*38).toFixed(1)+'px';
+            vars['--s']=(life?12+Math.pow(rng(),1.8)*38:25+Math.pow(rng(),1.4)*43).toFixed(1)+'px';
             vars['--c']=color;vars['--turn']='0deg';
-            vars['--o']=(life?.92+rng()*.08:.7+rng()*.24).toFixed(2);
+            vars['--o']=(life?.92+rng()*.08:.88+rng()*.12).toFixed(2);
+            if(!life)vars['--delay']=(-duration*((i%5+.25+rng()*.5)/5)).toFixed(2)+'s';
             const id='kalos-'+key+'-diamond-'+i;
-            const stops=life?['#fffddf',palette[i%7],palette[(i+2)%7],'#ffffff',palette[(i+4)%7],palette[(i+5)%7]]:['#e63b60','#690c29','#10030d','#290512','#760e31','#c21a40'];
+            const stops=life?['#fffddf',palette[i%7],palette[(i+2)%7],'#ffffff',palette[(i+4)%7],palette[(i+5)%7]]:['#ff5978','#8f1238','#10030d','#290512','#a41640','#ed3558'];
             const offsets=life?[0,.16,.35,.56,.73,1]:[0,.16,.43,.62,.85,1];
-            p.innerHTML='<svg viewBox="0 0 60 100" focusable="false" aria-hidden="true"><defs><linearGradient id="'+id+'" x1="0%" y1="0%" x2="100%" y2="100%">'+stops.map((c,j)=>'<stop offset="'+offsets[j]+'" stop-color="'+c+'"/>').join('')+'</linearGradient></defs><path d="M30 0 Q34 36 60 50 Q34 64 30 100 Q26 64 0 50 Q26 36 30 0Z" fill="url(#'+id+')" stroke="'+(life?'#efffff':'#b82043')+'" stroke-width="'+(life?.8:1.2)+'"/><path d="M30 0L30 50L0 50Z" fill="'+(life?palette[(i+3)%7]:'#4a081b')+'" opacity=".65"/><path d="M30 0L60 50L30 50Z" fill="'+(life?'#ffffff':'#090309')+'" opacity="'+(life?.48:.75)+'"/><path d="M30 50L60 50L30 100Z" fill="'+(life?palette[(i+1)%7]:'#12040c')+'" opacity=".6"/><path d="M30 10L34 46L48 50L34 54L30 90L26 54L12 50L26 46Z" fill="'+(life?'#ffffff':'#44081c')+'" opacity="'+(life?.95:.92)+'"/><path d="M30 0V100M0 50H60" stroke="'+(life?'#ffffff':'#e12d4b')+'" stroke-width="'+(life?.6:.35)+'" opacity="'+(life?.8:.58)+'"/></svg>';
+            p.innerHTML='<svg viewBox="0 0 60 100" focusable="false" aria-hidden="true"><defs><linearGradient id="'+id+'" x1="0%" y1="0%" x2="100%" y2="100%">'+stops.map((c,j)=>'<stop offset="'+offsets[j]+'" stop-color="'+c+'"/>').join('')+'</linearGradient></defs><path d="M30 0 Q34 36 60 50 Q34 64 30 100 Q26 64 0 50 Q26 36 30 0Z" fill="url(#'+id+')" stroke="'+(life?'#efffff':'#ff5978')+'" stroke-width="'+(life?.8:2.1)+'"/><path d="M30 0L30 50L0 50Z" fill="'+(life?palette[(i+3)%7]:'#4a081b')+'" opacity=".65"/><path d="M30 0L60 50L30 50Z" fill="'+(life?'#ffffff':'#090309')+'" opacity="'+(life?.48:.75)+'"/><path d="M30 50L60 50L30 100Z" fill="'+(life?palette[(i+1)%7]:'#12040c')+'" opacity=".6"/><path d="M30 10L34 46L48 50L34 54L30 90L26 54L12 50L26 46Z" fill="'+(life?'#ffffff':'#76132f')+'" opacity="'+(life?.95:.92)+'"/><path d="M30 0V100M0 50H60" stroke="'+(life?'#ffffff':'#fa4265')+'" stroke-width="'+(life?.6:.9)+'" opacity="'+(life?.8:.8)+'"/></svg>';
           }
           for(const[k,v]of Object.entries(vars))p.style.setProperty(k,v);
           spans.push(p);continue;

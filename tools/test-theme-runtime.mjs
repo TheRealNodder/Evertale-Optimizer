@@ -276,7 +276,8 @@ for(const [key,parts] of Object.entries(motion.signatures)){
     const weight=part.type==='hex'?2:part.type==='arc'?3:1;
     desktop+=part.count*weight;phone+=part.phone*weight;
   }
-  check(desktop<=40&&phone<=16,`Whole-scene signature budget exceeded: ${key} (${desktop}/${phone})`);
+  // Explicit, narrowly scoped visibility allowance for Yveltal's single-glow diamonds.
+  check(desktop<=(key==='yveltal'?46:40)&&phone<=(key==='yveltal'?20:16),`Whole-scene signature budget exceeded: ${key} (${desktop}/${phone})`);
 }
 check(Object.keys(motion.motifs).length===18,'Expected 18 authored motifs plus Galar and Kalos sprite fields');
 const motifShapes=new Set();
@@ -307,7 +308,7 @@ for(const [key,expected] of Object.entries(galarSprites)){
   check(!motion.motifs[key]&&JSON.stringify(motion.signatures[key].map(p=>[p.shape,p.count,p.phone,p.duration,p.size]))===JSON.stringify(expected)&&motion.signatures[key].every(p=>p.type==='sprite'),'Galar sprite configuration: '+key);
   for(const [shape] of expected)check(signatureCss.includes('url("assets/themes/marks/'+shape+'.webp")'),'Galar sprite asset missing: '+shape);
 }
-const kalosSprites={"xerneas":[["xerneas-emblem",1,1,14,700],["life-diamond",5,2,24,42],["life-petal",12,4,15,28],["life-leaf",8,2,17,32],["life-aura",5,2,27,150]],"yveltal":[["yveltal-emblem",1,1,15,700],["dark-diamond",4,1,24,42],["dark-feather",10,3,17,35],["dark-aura",3,1,27,135]]};
+const kalosSprites={"xerneas":[["xerneas-emblem",1,1,14,700],["life-diamond",5,2,24,42],["life-petal",12,4,15,28],["life-leaf",8,2,17,32],["life-aura",5,2,27,150]],"yveltal":[["yveltal-emblem",1,1,15,700],["dark-diamond",12,5,18,60],["dark-feather",10,3,17,35],["dark-aura",3,1,27,135]]};
 for(const [key,expected] of Object.entries(kalosSprites)){
   check(!motion.motifs[key]&&JSON.stringify(motion.signatures[key].map(p=>[p.shape,p.count,p.phone,p.duration,p.size]))===JSON.stringify(expected),'Kalos scene configuration: '+key);
   for(const [shape] of expected)if(!shape.endsWith('-aura')&&!shape.endsWith('-diamond'))check(signatureCss.includes('url("assets/themes/marks/'+shape+'.webp")'),'Kalos art missing: '+shape);
@@ -410,11 +411,18 @@ for(let round=0;round<3;round++)for(const theme of themes){
       if(count>1)check(new Set(group.map(x=>x.style.values.get('--s'))).size>=2&&new Set(group.map(x=>x.style.values.get('--delay'))).size>=2,'Kalos sprite variation: '+shape);
     }
     const diamonds=nodes.filter(x=>x.getAttribute('data-kalos-role')==='diamond');
-    check(diamonds.length===(theme.key==='xerneas'?5:4),'Kalos diamond field count');
+    check(diamonds.length===(theme.key==='xerneas'?5:12),'Kalos diamond field count');
     check(diamonds.every(x=>[1,2,3].every(j=>['x','y'].every(axis=>x.style.values.get('--spawn-'+axis+j)?.endsWith('%')))),'Kalos viewport positions missing');
     check(diamonds.every(x=>x.innerHTML.includes('linearGradient')&&x.innerHTML.includes('kalos-'+theme.key+'-diamond-')),'Kalos faceted gradients missing');
     check(diamonds.every(x=>x.innerHTML.includes(theme.key==='xerneas'?'#fffddf':'#10030d')),'Kalos palette regression');
-    if(theme.key==='yveltal')check(signatureHost.querySelectorAll('.tqQuake').length===(densityMotion.matches?2:3),'Yveltal fissure density');
+    if(theme.key==='yveltal'){
+      check(signatureHost.querySelectorAll('.tqQuake').length===(densityMotion.matches?2:3),'Yveltal fissure density');
+      const mobile=diamonds.filter(x=>x.getAttribute('data-mobile')==='true');
+      check(mobile.length===5,'Yveltal mobile diamond visibility');
+      const cells=new Set(diamonds.flatMap(x=>[1,2,3].map(j=>Math.min(2,Math.floor(parseFloat(x.style.values.get('--spawn-x'+j))/33.34))+3*Math.min(2,Math.floor(parseFloat(x.style.values.get('--spawn-y'+j))/33.34)))));
+      check(cells.size===9,'Yveltal diamond field must span all viewport regions');
+      check(diamonds.every(x=>parseFloat(x.style.values.get('--s'))>=25&&parseFloat(x.style.values.get('--o'))>=.88&&x.innerHTML.includes('#ff5978')&&x.innerHTML.includes('#10030d')),'Yveltal contrast regression');
+    }
   }
   if(galarSprites[theme.key]){
     const nodes=signatureHost.children.filter(x=>x.getAttribute('data-primitive')==='sprite');

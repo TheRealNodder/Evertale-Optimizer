@@ -452,5 +452,16 @@ html[data-theme-still="true"] .themeMotionParticle[data-primitive="sprite"]:is([
    invisible-relocation lifecycle and full host-relative positions. */
 .themeMotionParticle[data-primitive="sprite"][data-kalos-role="diamond"]{width:var(--s);height:calc(var(--s)*1.65);margin:calc(var(--s)*-.825) 0 0 calc(var(--s)*-.5);max-width:none;max-height:none;background:none;animation-name:legendary-scattered-spawn;animation-timing-function:ease-in-out}
 .themeMotionParticle[data-kalos-role="diamond"] svg{display:block;width:100%;height:100%;overflow:visible;filter:drop-shadow(0 0 4px var(--c)) drop-shadow(0 0 12px var(--c))}
-.themeMotionParticle[data-shape="dark-diamond"] svg{filter:drop-shadow(0 0 3px #a4002b) drop-shadow(0 0 10px #65001f)}
+.themeMotionParticle[data-shape="dark-diamond"] svg{filter:drop-shadow(0 0 5px #d62850)}
 @media(max-width:700px){.themeMotionParticle[data-primitive="sprite"][data-kalos-role="diamond"]{--diamond-size:clamp(12px,var(--s),38px);width:var(--diamond-size);height:calc(var(--diamond-size)*1.65);margin:calc(var(--diamond-size)*-.825) 0 0 calc(var(--diamond-size)*-.5)}}
+
+/* Yveltal visibility: larger crimson-rimmed diamonds with near-black interiors.
+   A single glow pass limits the cost of the denser field. Keep a still subset
+   visible when motion is disabled, without overriding phone density. */
+@media(max-width:700px){
+.themeMotionParticle[data-primitive="sprite"][data-shape="dark-diamond"]{--diamond-size:clamp(25px,var(--s),50px)}
+}
+html[data-theme-still="true"] .themeMotionParticle[data-primitive="sprite"][data-shape="dark-diamond"][data-mobile="true"]{display:block;opacity:.62}
+@media(prefers-reduced-motion:reduce){
+.themeMotionParticle[data-primitive="sprite"][data-shape="dark-diamond"][data-mobile="true"]{display:block;opacity:.62}
+}

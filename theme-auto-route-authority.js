@@ -119,7 +119,7 @@
     motionRequested=true;
     const load=()=>{
       if(document.querySelector('script[src*="theme-motion.js"]'))return;
-      const script=document.createElement('script');script.src='./theme-motion.js?v=15';script.defer=true;
+      const script=document.createElement('script');script.src='./theme-motion.js?v=16';script.defer=true;
       document.head.appendChild(script);
     };
     Promise.all([motionAsset('theme-motherboard.js?v=2','EvertaleMotherboard'),motionAsset('theme-cells.js?v=4','EvertaleCells'),
