@@ -16,7 +16,7 @@ Both engines receive separate child hosts inside one shared animation stage. The
 
 ## Project Legendary
 
-Twenty-three Pokémon use original SVG vignettes with bounded independently animated layers (two or three for most, eight for Dialga, five for Giratina and four for Eternatus), duplicated at two desktop anchors and shown once on phones. The original wind and earthquake engines remain active; mobile quake rendering pairs the four geometry bands into two paint groups, retaining all cracks and three quake positions. Zygarde and Miraidon retain their dedicated engines; Terapagos retains its original gleams. No new network assets or application-state ownership. Animation direction and sequence are artistic interpretations, not reproduced canonical battle effects.
+Twenty-two Pokémon use original SVG vignettes with bounded independently animated layers (two or three for most, eight for Dialga, five for Giratina and four for Eternatus), duplicated at two desktop anchors and shown once on phones. The original wind and earthquake engines remain active; mobile quake rendering pairs the four geometry bands into two paint groups, retaining all cracks and three quake positions. Zygarde and Miraidon retain their dedicated engines; Ultra Necrozma uses the cell engine with individual faceted jewels; Terapagos retains its original gleams. No new network assets or application-state ownership. Animation direction and sequence are artistic interpretations, not reproduced canonical battle effects.
 
 ## Motion contract
 
@@ -105,7 +105,7 @@ Counts below are conservative complete-scene desktop / phone bounds, including f
 | zygarde | Organic filled cells (24/10) | 29 / 14 | [Identity](THEME_MOTION.md#zygarde) |
 | solgaleo | solar-photosphere, solar-plasma, solar-rays; 24s material cycle | 11 / 7 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#other-material-revisions) |
 | lunala | cratered-moon, lunar-shadow, starlight; 26s material cycle | 11 / 7 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#other-material-revisions) |
-| ultranecrozma | Seven shaded Z-Crystal-inspired hues, spectral refraction and tip gleams; 20s | 11 / 7 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#weather-and-primal-refinements) |
+| ultranecrozma | Scattered slanted faceted jewels (24/10), 18 type-inspired hues, variable sizes and individual fade cycles | 29 / 14 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#weather-and-primal-refinements) |
 | zacian | forged-sword, blade-wake, blade-sparks; 17s material cycle | 31 / 15 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#other-material-revisions) |
 | zamazenta | forged-shield, incoming-energy, deflection-sparks; 19s material cycle | 11 / 7 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#other-material-revisions) |
 | eternatus | dynamax-cloud, energy-core, energy-infall, cannon-release; 24s material cycle | 13 / 8 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#other-material-revisions) |

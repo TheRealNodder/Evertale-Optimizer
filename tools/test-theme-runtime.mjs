@@ -265,7 +265,7 @@ for(const [key,parts] of Object.entries(motion.signatures)){
   let desktop=5,phone=4; // Existing three layers and two art surfaces; two layers on phones.
   if(motion.technology.includes(key)){desktop+=12;phone+=5;}
   if(key==='miraidon'){desktop+=4;phone+=2;} // two accents per Hadron waypoint
-  if(key==='zygarde'){desktop+=24;phone+=10;}
+  if(motion.moduleFor(key)==='cells'){desktop+=24;phone+=10;}
   if(motion.moduleFor(key)==='quake'){desktop+=25;phone+=9;}
   if(motion.moduleFor(key)==='wind'){desktop+=20;phone+=8;}
   if(motion.moduleFor(key)==='gems'){desktop+=21;phone+=9;}
@@ -278,7 +278,7 @@ for(const [key,parts] of Object.entries(motion.signatures)){
   }
   check(desktop<=40&&phone<=16,`Whole-scene signature budget exceeded: ${key} (${desktop}/${phone})`);
 }
-check(Object.keys(motion.motifs).length===23,'Expected 23 authored motifs plus dedicated wind/rain, board, cells and restored Terapagos');
+check(Object.keys(motion.motifs).length===22,'Expected 22 authored motifs plus dedicated wind/rain, board, cells and restored Terapagos');
 const motifShapes=new Set();
 for(const [key,[cycle,layers]] of Object.entries(motion.motifs)){
   check(legendary.some(t=>t.key===key)&&layers.length>=2&&layers.length<=(key==='dialga'?8:key==='giratina'?5:key==='eternatus'?4:3),'Unexpected motif identity: '+key);
@@ -293,7 +293,7 @@ for(const [key,[cycle,layers]] of Object.entries(motion.motifs)){
 }
 check(motion.moduleFor('suicune')==='wind'&&motion.signatures.suicune.length===1&&motion.signatures.suicune[0].shape==='rain'&&motion.signatures.suicune[0].count===14&&motion.signatures.suicune[0].phone===4,'Suicune needs wind and bounded rain');
 for(const key of ['rayquaza','shinymegarayquaza'])check(motion.moduleFor(key)==='wind'&&motion.signatures[key].length===0&&!motion.motifs[key],'Rayquaza retained abstract motifs: '+key);
-check(motion.motifs.ultranecrozma[1].some(x=>x[0]==='z-crystal-spectrum'&&x[3].includes('MOTIFID-crystal6')),'Missing spectral crystal cluster');
+check(motion.moduleFor('ultranecrozma')==='cells'&&motion.signatures.ultranecrozma.length===0&&!motion.motifs.ultranecrozma,'Necrozma must use individual jewels, not clusters');
 check(motion.motifs.koraidon[1].some(x=>x[0]==='prehistoric-ferns'),'Missing prehistoric terrain vegetation');
 const signatureHost=document.getElementById('themeMotionParticles');
 const snapshotNode=x=>[x.className,x.getAttribute('d'),x.getAttribute('data-mobile'),x.textContent,[...x.style.values],x.children.map(snapshotNode)];
@@ -302,6 +302,15 @@ api.setPreference('zygarde');const firstCells=JSON.stringify(signatureSnapshot()
 check(signatureHost.querySelector('.tcField')?.children.length===24,'Zygarde does not render its organic cell pool');
 check(signatureHost.querySelector('.tcField')?.children.filter(x=>x.getAttribute('data-mobile')==='true').length===10,'Zygarde phone cell budget changed');
 check(!signatureHost.querySelector('.themeMotionParticle'),'Zygarde retained technical hex/trace effects');
+api.setPreference('ultranecrozma');
+const jewels=signatureHost.querySelector('.tcField')?.children||[];
+check(jewels.length===24&&jewels.filter(x=>x.getAttribute('data-mobile')==='true').length===10,'Necrozma jewel density');
+check(jewels.every(x=>x.getAttribute('data-crystal')==='true'),'Necrozma jewel shape missing');
+check(new Set(jewels.map(x=>x.style.values.get('--cell-color'))).size===18,'Necrozma jewel palette incomplete');
+check(new Set(jewels.map(x=>x.style.values.get('--size'))).size>12&&new Set(jewels.map(x=>x.style.values.get('--delay'))).size>12,'Necrozma jewel sizes and phases not varied');
+const firstJewels=JSON.stringify(signatureSnapshot());
+api.setPreference('zygarde');check(JSON.stringify(signatureSnapshot())===firstCells,'Zygarde changed after jewel scene');
+api.setPreference('ultranecrozma');check(JSON.stringify(signatureSnapshot())===firstJewels,'Necrozma remount is not deterministic');
 api.setPreference('miraidon');
 const desktopPackets=signatureHost.querySelector('.tmbBoard')?.querySelectorAll('.tmbPulse').length;
 check(desktopPackets>0&&desktopPackets<=12,`Miraidon board packet budget failed: ${desktopPackets}`);

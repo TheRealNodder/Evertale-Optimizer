@@ -4,6 +4,8 @@
 (function(g,d){
   'use strict';
   const LIMITS={desktop:24,phone:10};
+  // Eighteen type-inspired jewel hues, interleaved so the phone subset is varied.
+  const CRYSTAL_COLORS=Object.freeze(["#54b86d","#477ebf","#8bdce9","#e5d748","#e65252","#a375c7","#a4c94a","#e99c38","#29a9d4","#865e46","#d6dae0","#e75c87","#c79569","#969878","#838e9d","#83638f","#f491b9","#6655be"]);
   function hash(text){let h=2166136261;for(const c of String(text))h=Math.imul(h^c.charCodeAt(0),16777619);return h>>>0;}
   function random(seed){let a=seed>>>0;return()=>{a=(a+0x6D2B79F5)>>>0;let t=a;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return((t^(t>>>14))>>>0)/4294967296;};}
 
@@ -21,6 +23,10 @@
         color:colors[i%colors.length],mobile:i<LIMITS.phone
       };
     });
+    if(options.key==='ultranecrozma')cells.forEach((c,i)=>{
+      c.color=CRYSTAL_COLORS[(i*7)%CRYSTAL_COLORS.length];
+      c.crystal=true;
+    });
     if(options.key==='zygarde')for(const c of cells){
       const centerX=c.x<50?25:75,centerY=c.y<50?25:75;
       c.gatherX=+(Math.max(-12,Math.min(12,(centerX-c.x)*.6))).toFixed(1);
@@ -37,6 +43,7 @@
     const cells=layout(options);
     for(const c of cells){
       const cell=d.createElement('i');cell.className='tcCell';cell.setAttribute('data-mobile',String(c.mobile));
+      if(c.crystal)cell.setAttribute('data-crystal','true');
       const vars={'--x':`${c.x}%`,'--y':`${c.y}%`,'--size':`${c.size}px`,'--d':`${c.duration}s`,'--delay':`${c.delay}s`,'--o':String(c.opacity),'--turn':`${c.turn}deg`,'--cell-color':c.color};
       if(c.gatherX!==undefined){vars['--gather-x']=`${c.gatherX}px`;vars['--gather-y']=`${c.gatherY}px`;}
       for(const[k,v]of Object.entries(vars))cell.style.setProperty(k,v);

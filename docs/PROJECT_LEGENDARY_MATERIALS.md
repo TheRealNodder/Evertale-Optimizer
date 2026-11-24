@@ -70,3 +70,7 @@ The generated THEME_MOTION.md remains byte-identical to the canonical compiler o
 - Rayquaza and Shiny Mega Rayquaza: retain the original painted sky, character art and wind engine; remove added emblem-like motifs completely. [Rayquaza](https://www.pokemon.com/us/pokedex/rayquaza).
 - Koraidon: layered sandstone-like formations, fern-like vegetation and impact dust evoke ancient environments rather than symbolic sun icons. [Koraidon](https://www.pokemon.com/us/pokedex/koraidon).
 - Ultra Necrozma: seven gradient-shaded crystal spires in different hues, prismatic light and subtle tip gleams, inspired by the visual variety of Z-Crystals. This is an artistic palette, not a claim that Necrozma consists of Z-Crystals. [Necrozma](https://www.pokemon.com/us/pokedex/necrozma).
+
+## Ultra Necrozma individual jewels
+
+Following the owner's Z-Crystal reference, replace the clustered spires with separate slanted, four-sided faceted gems. Reuse the Zygarde cell engine's seeded positions, weighted size range (18–110px), individual 7–14s grow/fade lifetimes, reduced-motion and pause behavior, and 24/10 desktop/phone density. Eighteen colors echo the supplied type-crystal palette. Jewels have original static gradient facets, without copied type emblems or additional animated children. Zygarde's layout and animation remain unchanged.
