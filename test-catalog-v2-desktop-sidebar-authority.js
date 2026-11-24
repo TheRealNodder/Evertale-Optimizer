@@ -10,17 +10,40 @@
     style.id='v2-desktop-sidebar-authority-style';
     style.textContent=`
       @media (min-width:821px){
+        /* The encounter banner is an in-flow sibling of the shell. Allocate
+           remaining height, not a second full viewport. The topbar sizes itself. */
         body.page-catalog-v2.v2-desktop-info-layout-active{
+          display:flex!important;
+          flex-direction:column!important;
+          height:100vh!important;
+          height:100dvh!important;
+          min-height:0!important;
           overflow:hidden!important;
         }
-        body.page-catalog-v2.v2-desktop-info-layout-active .page{
-          height:calc(100dvh - 72px)!important;
-          max-height:calc(100dvh - 72px)!important;
+        body.page-catalog-v2.v2-desktop-info-layout-active > .topbar{
+          flex:0 0 auto!important;
+        }
+        body.page-catalog-v2.v2-desktop-info-layout-active > main.page{
+          display:flex!important;
+          flex-direction:column!important;
+          flex:1 1 0!important;
+          width:100%!important;
+          height:auto!important;
+          min-height:0!important;
+          max-height:none!important;
+          margin:0 auto!important;
+          padding-bottom:12px!important;
           overflow:hidden!important;
+        }
+        body.page-catalog-v2.v2-desktop-info-layout-active > main.page > .pokemonEncounter{
+          flex:0 0 auto!important;
         }
         body.page-catalog-v2 .v2-shell.v2-desktop-info-layout{
-          height:100%!important;
+          flex:1 1 0!important;
+          height:auto!important;
+          min-height:0!important;
           max-height:100%!important;
+          grid-template-rows:minmax(0,1fr)!important;
           overflow:hidden!important;
           align-items:stretch!important;
         }
@@ -111,10 +134,10 @@
           isolation:isolate!important;
           border-radius:20px!important;
           border:1px solid color-mix(in srgb,var(--element-primary,#a855f7) 42%,rgba(255,255,255,.18))!important;
-          min-height:170px!important;
-          height:clamp(180px,28dvh,270px)!important;
+          min-height:72px!important;
+          height:clamp(110px,25dvh,270px)!important;
           max-height:34%!important;
-          flex:0 0 auto!important;
+          flex:0 1 auto!important;
           background:radial-gradient(circle at 50% 18%,rgba(255,255,255,.16),rgba(0,0,0,.20) 64%,rgba(0,0,0,.42))!important;
         }
         body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-feature-art img,
@@ -209,7 +232,7 @@
         }
         body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-detail-scroll-panel{
           flex:1 1 auto!important;
-          min-height:120px!important;
+          min-height:64px!important;
           overflow:auto!important;
           overscroll-behavior:contain!important;
           border-radius:16px!important;
@@ -222,6 +245,64 @@
         }
         body.page-catalog-v2 .v2-shell.v2-desktop-info-layout .v2-detail-scroll-panel p{
           margin:0 0 10px!important;
+        }
+        /* On very short desktop windows, the sidebar can scroll instead of
+           clipping the controls or skill content. Catalog scrolling stays local. */
+        body.page-catalog-v2.v2-desktop-info-layout-active .v2-shell.v2-desktop-info-layout .v2-sidebar .v2-selected-card{
+          overflow:auto!important;
+          overscroll-behavior:contain!important;
+          scrollbar-width:thin;
+        }
+        body.page-catalog-v2.v2-desktop-info-layout-active .v2-shell.v2-desktop-info-layout .v2-sidebar .v2-description{
+          min-height:104px!important;
+        }
+      }
+      @media (min-width:821px) and (max-height:850px){
+        body.page-catalog-v2.v2-desktop-info-layout-active > main.page{
+          padding-top:10px!important;
+          padding-bottom:8px!important;
+        }
+        body.page-catalog-v2.v2-desktop-info-layout-active > main.page > .pokemonEncounter{
+          height:clamp(108px,19dvh,160px)!important;
+          margin-bottom:12px!important;
+        }
+        body.page-catalog-v2.v2-desktop-info-layout-active > main.page > .pokemonEncounter .pokemonEncounter__copy{
+          padding:12px 20px!important;
+        }
+        body.page-catalog-v2.v2-desktop-info-layout-active > main.page > .pokemonEncounter .pokemonEncounter__name{
+          font-size:clamp(23px,3.8dvh,33px)!important;
+        }
+        body.page-catalog-v2.v2-desktop-info-layout-active > main.page > .pokemonEncounter .pokemonEncounter__group{
+          margin-bottom:4px!important;
+        }
+        body.page-catalog-v2.v2-desktop-info-layout-active > main.page > .pokemonEncounter .pokemonEncounter__line{
+          margin-top:4px!important;
+        }
+        body.page-catalog-v2.v2-desktop-info-layout-active > main.page > .pokemonEncounter .pokemonEncounter__credits{
+          margin-top:6px!important;
+        }
+        body.page-catalog-v2.v2-desktop-info-layout-active > main.page > .pokemonEncounter .pokemonEncounter__art{
+          width:clamp(150px,30dvh,245px)!important;
+          height:clamp(150px,30dvh,245px)!important;
+        }
+        body.page-catalog-v2.v2-desktop-info-layout-active .v2-shell.v2-desktop-info-layout .v2-hero{
+          margin-bottom:0!important;
+        }
+        body.page-catalog-v2.v2-desktop-info-layout-active .v2-shell.v2-desktop-info-layout .v2-filter-panel{
+          padding:9px 12px!important;
+          gap:6px!important;
+        }
+        body.page-catalog-v2.v2-desktop-info-layout-active .v2-shell.v2-desktop-info-layout #catalogGrid .unitCard{
+          min-height:0!important;
+          gap:7px!important;
+        }
+        body.page-catalog-v2.v2-desktop-info-layout-active .v2-shell.v2-desktop-info-layout #catalogGrid .unitCard .unitThumb{
+          height:clamp(108px,calc(100dvh - 535px),215px)!important;
+          min-height:0!important;
+        }
+        body.page-catalog-v2.v2-desktop-info-layout-active .v2-shell.v2-desktop-info-layout #catalogGrid .unitCard .stateRow,
+        body.page-catalog-v2.v2-desktop-info-layout-active .v2-shell.v2-desktop-info-layout #catalogGrid .unitCard .chipCol{
+          margin-top:4px!important;
         }
       }
     `;

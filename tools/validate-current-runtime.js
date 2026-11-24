@@ -134,6 +134,14 @@ for (const page of pages) {
 
 const catalogHtml = read('index.html');
 const desktopCatalogSource = read('test-catalog-v2-desktop-structure.js');
+const desktopViewportAuthority = read('test-catalog-v2-desktop-sidebar-authority.js');
+if (!catalogHtml.includes('test-catalog-v2-desktop-sidebar-authority.js?v=3') ||
+    !desktopViewportAuthority.includes('> main.page > .pokemonEncounter') ||
+    !desktopViewportAuthority.includes('grid-template-rows:minmax(0,1fr)!important') ||
+    !desktopViewportAuthority.includes('flex:1 1 0!important') ||
+    desktopViewportAuthority.includes('height:calc(100dvh - 72px)!important')) {
+  errors.push('Desktop catalog must allocate remaining viewport height after the encounter banner');
+}
 const mobileCatalogDockSource = read('catalog-mobile-command-dock.js');
 const mobileCatalogDockStyles = read('catalog-mobile-command-dock.css');
 if (!catalogHtml.includes('test-catalog-v2-desktop-structure.js?v=13')) {
