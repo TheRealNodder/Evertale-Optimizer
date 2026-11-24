@@ -16,7 +16,7 @@ Both engines receive separate child hosts inside one shared animation stage. The
 
 ## Project Legendary
 
-Twenty-seven Pokémon use original SVG vignettes with bounded independently animated layers (two or three for most, eight for Dialga and five for Giratina), duplicated at two desktop anchors and shown once on phones. The original wind and earthquake engines remain active; mobile quake rendering pairs the four geometry bands into two paint groups, retaining all cracks and three quake positions. Zygarde and Miraidon retain their dedicated engines. No new network assets or application-state ownership. Animation direction and sequence are artistic interpretations, not reproduced canonical battle effects.
+Twenty-six Pokémon use original SVG vignettes with bounded independently animated layers (two or three for most, eight for Dialga, five for Giratina and four for Eternatus), duplicated at two desktop anchors and shown once on phones. The original wind and earthquake engines remain active; mobile quake rendering pairs the four geometry bands into two paint groups, retaining all cracks and three quake positions. Zygarde and Miraidon retain their dedicated engines; Terapagos retains its original gleams. No new network assets or application-state ownership. Animation direction and sequence are artistic interpretations, not reproduced canonical battle effects.
 
 ## Motion contract
 
@@ -95,23 +95,23 @@ Counts below are conservative complete-scene desktop / phone bounds, including f
 | dialga | Detailed Roman-numeral clocks, three hands, glass hourglasses and reversible sand; 24s / 37.2s cycles | 21 / 12 | [Identity](THEME_MOTION.md#dialga) |
 | palkia | Star-filled galaxy, luminous torn space and gravitational-lens-inspired arcs; 23s cycle | 11 / 7 | [Identity](THEME_MOTION.md#palkia) |
 | giratina | Filled viscous tar pools, stretching tendrils, falling/rising drops and irregular splatter; 25s cycle | 15 / 9 | [Identity](THEME_MOTION.md#giratina) |
-| arceus | creation-ring, gathering-light, formed-world; 26s cycle | 11 / 7 | [Identity](THEME_MOTION.md#arceus) |
-| reshiram | turboblaze, blue-flare, warm-plume; 19s cycle | 11 / 7 | [Identity](THEME_MOTION.md#reshiram) |
-| zekrom | teravolt-generator, bolt-strike; 16s cycle + retained signature engine/accents | 12 / 7 | [Identity](THEME_MOTION.md#zekrom) |
-| blackkyurem | frozen-plates, freeze-shock, ice-pressure; 19s cycle | 11 / 7 | [Identity](THEME_MOTION.md#blackkyurem) |
-| whitekyurem | ice-shell, ice-burn, steam; 20s cycle | 11 / 7 | [Identity](THEME_MOTION.md#whitekyurem) |
-| xerneas | life-branches, seven-color-crown, life-dispersal; 24s cycle | 11 / 7 | [Identity](THEME_MOTION.md#xerneas) |
-| yveltal | oblivion, y-shaped-drain, cocoon; 24s cycle | 11 / 7 | [Identity](THEME_MOTION.md#yveltal) |
+| arceus | creation-cloud, forming-world, creation-rays; 28s material cycle | 11 / 7 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#other-material-revisions) |
+| reshiram | blue-fire, hot-convection, embers; 19s material cycle | 11 / 7 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#other-material-revisions) |
+| zekrom | storm-cloud, branching-lightning, second-discharge; 16s material cycle | 11 / 7 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#other-material-revisions) |
+| blackkyurem | ice-spires, freeze-shock, frost; 19s material cycle | 11 / 7 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#other-material-revisions) |
+| whitekyurem | ice-spires, ice-burn, steam; 20s material cycle | 11 / 7 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#other-material-revisions) |
+| xerneas | living-tree, fresh-leaves, life-pollen; 25s material cycle | 11 / 7 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#other-material-revisions) |
+| yveltal | withering-tree, dead-leaves, absorbed-life; 25s material cycle | 11 / 7 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#other-material-revisions) |
 | zygarde | Organic filled cells (24/10) | 29 / 14 | [Identity](THEME_MOTION.md#zygarde) |
-| solgaleo | solar-core, solar-prominences, sunsteel-ray; 24s cycle | 11 / 7 | [Identity](THEME_MOTION.md#solgaleo) |
-| lunala | lunar-disc, moon-shadow, moonlight-rays; 26s cycle | 11 / 7 | [Identity](THEME_MOTION.md#lunala) |
-| ultranecrozma | light-absorption, ultra-prism, photon-geyser; 20s cycle | 11 / 7 | [Identity](THEME_MOTION.md#ultranecrozma) |
-| zacian | crowned-sword, behemoth-blade; 17s cycle + retained signature engine/accents | 29 / 14 | [Identity](THEME_MOTION.md#zacian) |
-| zamazenta | crowned-shield, incoming-force, deflection; 19s cycle | 11 / 7 | [Identity](THEME_MOTION.md#zamazenta) |
-| eternatus | dynamax-absorption, skeletal-core, dynamax-cannon; 24s cycle | 11 / 7 | [Identity](THEME_MOTION.md#eternatus) |
-| koraidon | orichalcum-sun, collision-course, primal-dust; 18s cycle | 11 / 7 | [Identity](THEME_MOTION.md#koraidon) |
+| solgaleo | solar-photosphere, solar-plasma, solar-rays; 24s material cycle | 11 / 7 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#other-material-revisions) |
+| lunala | cratered-moon, lunar-shadow, starlight; 26s material cycle | 11 / 7 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#other-material-revisions) |
+| ultranecrozma | golden-crystal, light-infall, photon-release; 20s material cycle | 11 / 7 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#other-material-revisions) |
+| zacian | forged-sword, blade-wake, blade-sparks; 17s material cycle | 31 / 15 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#other-material-revisions) |
+| zamazenta | forged-shield, incoming-energy, deflection-sparks; 19s material cycle | 11 / 7 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#other-material-revisions) |
+| eternatus | dynamax-cloud, energy-core, energy-infall, cannon-release; 24s material cycle | 13 / 8 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#other-material-revisions) |
+| koraidon | scorching-sun, earth-dust, impact-debris; 18s material cycle | 11 / 7 | [Identity](PROJECT_LEGENDARY_MATERIALS.md#other-material-revisions) |
 | miraidon | Full-page motherboard (12/5 packets); Hadron waypoint rings and trace releases (2+2/1+1) | 21 / 11 | [Identity](THEME_MOTION.md#miraidon) |
-| terapagos | stellar-shell, terastal-refraction, stellar-spectrum; 26s cycle | 11 / 7 | [Identity](THEME_MOTION.md#terapagos) |
+| terapagos | Original stellar prism gleams and orbiting facets, 5/2 + 4/2 | 14 / 8 | [Identity](THEME_MOTION.md#terapagos) |
 | sunrise | heat: sunbeam (3/1; 22s); burst: sun (3/1; 26s) | 11 / 6 | [Identity](THEME_MOTION.md#sunrise) |
 
 Technical references: [animation performance](https://web.dev/articles/animations-and-performance), [compositor layers](https://web.dev/articles/stick-to-compositor-only-properties-and-manage-layer-count), [flash thresholds](https://www.w3.org/WAI/WCAG21/Understanding/three-flashes-or-below-threshold.html).

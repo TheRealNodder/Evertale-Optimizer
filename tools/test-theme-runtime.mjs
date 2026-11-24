@@ -278,10 +278,10 @@ for(const [key,parts] of Object.entries(motion.signatures)){
   }
   check(desktop<=40&&phone<=16,`Whole-scene signature budget exceeded: ${key} (${desktop}/${phone})`);
 }
-check(Object.keys(motion.motifs).length===27,'Expected 27 authored motifs plus Miraidon and Zygarde engines');
+check(Object.keys(motion.motifs).length===26,'Expected 26 authored motifs plus Miraidon, Zygarde and restored Terapagos');
 const motifShapes=new Set();
 for(const [key,[cycle,layers]] of Object.entries(motion.motifs)){
-  check(legendary.some(t=>t.key===key)&&layers.length>=2&&layers.length<=(key==='dialga'?8:key==='giratina'?5:3),'Unexpected motif identity: '+key);
+  check(legendary.some(t=>t.key===key)&&layers.length>=2&&layers.length<=(key==='dialga'?8:key==='giratina'?5:key==='eternatus'?4:3),'Unexpected motif identity: '+key);
   for(const [role,behavior,color,markup] of layers){
     check(!motifShapes.has(key+':'+role),'Duplicate motif role: '+key+':'+role);motifShapes.add(key+':'+role);
     check(signatureCss.includes('@keyframes legendary-'+behavior+'{'),'Missing motion: '+behavior);

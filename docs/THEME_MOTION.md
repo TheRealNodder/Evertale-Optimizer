@@ -370,7 +370,7 @@ Motion uses CSS transforms and opacity. System reduced motion and the Animations
 - NIST describes security architectures involving network assets and connections.
 - Animated packet routes are a visualization metaphor rather than literal physical network behavior.
 
-**Motion:** Keep the original PCB geometry, including chips, vias, pads and traces. A shared charge cycle sends packets along the existing routes at distance-proportional speed; restrained cyan trace highlights and expanding field rings mark actual waypoint arrivals. The eight other technology profiles retain their existing packet motion. Character artwork remains unchanged.
+**Motion:** An original full-page motherboard stays softly energized: varied traces, vias, pads, chips with pin rows and transistor outlines, with luminous packets following the drawn routes. The character or console artwork remains unchanged.
 
 **Still:** The original environment and credited artwork remain visible behind a steady, energized circuit board. Travelling packets disappear when motion is off.
 
@@ -725,10 +725,6 @@ Motion uses CSS transforms and opacity. System reduced motion and the Animations
 
 **Original environment illustration:** [superfamicom](../assets/themes/scenes/superfamicom.webp)
 
-## Project Legendary: authored Pokémon vignettes
-
-The per-character implementation now uses distinct original SVG silhouettes, co-located roles and a shared cycle, with the updated animation and object counts in [Theme animation signatures](THEME_SIGNATURES.md). Prior descriptions below remain research anchors rather than precise frame-by-frame specifications. Existing art, exact forms and credits are retained. For the Sinnoh time/space distinction see the [official Sinnoh story](https://diamondpearl.pokemon.com/en-us/story/); for Paldea abilities and moves see the [official Koraidon and Miraidon announcement](https://press.pokemon.com/en-CA/MEDIA-ALERT-DETAILS-REVEALED-ABOUT-THE-LEGENDARY-POKEMON-KORAIDON-AND-).
-
 ## hooh
 
 - Ho-Oh is the Rainbow Pokémon.
@@ -868,11 +864,9 @@ The per-character implementation now uses distinct original SVG silhouettes, co-
 - Dialga is associated with time.
 - Dialga's lore links its existence to time's flow.
 
-**Motion:** Two detailed chronometer faces use distinct hour, minute and exaggerated seconds-hand movement. One set runs more slowly than the other, both stop and reverse in a repeatable sequence. Separate glass hourglasses visually transfer sand from one chamber to the other and back. The hour and minute hands preserve their relative 12:1 angular progression; the seconds hand is an artistic, slowed depiction rather than a functioning clock. Clock rates are not a quantitative relativity simulation. The face includes a lunar inset, referencing astronomical timekeeping.
+**Motion:** A segmented temporal dial advances in deliberate steps while a slender inner hand glides and pauses.
 
-**Research:** [NIST: celestial, flow and mechanical clocks](https://www.nist.gov/publications/first-series-evolution-time-measurement-celestial-flow-and-mechanical-clocks); [NIST: atomic clocks and oscillator-based timekeeping](https://www.nist.gov/atomic-clocks/how-do-atomic-clocks-work); [NIST: measured gravitational time dilation](https://www.nist.gov/education/more-graphics-about-einsteins-general-relativity-and-your-age); [Einstein Online: light clocks and special relativity](https://www.einstein-online.info/en/spotlight/light-clocks-time-dilation/); [NASA: lunar phases](https://science.nasa.gov/moon/moon-phases/); [thermodynamic arrow of time](https://journals.aps.org/pre/abstract/10.1103/PhysRevE.94.022135); [official Dialga Origin Forme lore](https://legends.arceus.pokemon.com/en-us/pokemon/dialga/). Reversal of time is fictional Pokémon behavior, not observed physics.
-
-**Still:** Legible clock faces with frozen hands and an upper-filled hourglass.
+**Still:** A composed, visible arrangement of the identity geometry.
 
 - [Dialga Pokédex](https://www.pokemon.com/us/pokedex/0483)
 - [Official Sinnoh story](https://diamondpearl.pokemon.com/en-us/story/)
@@ -884,11 +878,9 @@ The per-character implementation now uses distinct original SVG silhouettes, co-
 - Palkia is associated with space.
 - Palkia is a legendary Pokémon of Sinnoh.
 
-**Motion:** Original dense star and spiral-galaxy textures drift within soft violet and rose nebula clouds. A filled, irregular tear opens to reveal a second dark starfield with luminous torn edges, while curved arcs distort and brighten near the opening. The decorative lenses and portal move independently of the real interface.
+**Motion:** A curved spatial seam bows open, separates two decorative planes, then closes without moving interface panels.
 
-**Research:** [NASA: gravitational lenses](https://science.nasa.gov/mission/hubble/science/science-behind-the-discoveries/hubble-gravitational-lenses/); [NASA: black hole anatomy](https://science.nasa.gov/universe/black-holes/anatomy/); [NASA: Whirlpool Galaxy](https://science.nasa.gov/mission/hubble/science/explore-the-night-sky/hubble-messier-catalog/messier-51/); [NASA: nebulae](https://science.nasa.gov/mission/hubble/science/universe-uncovered/hubble-nebulae/); [NASA: hypothetical wormholes](https://science.gsfc.nasa.gov/attic/cosmicopia.gsfc.nasa.gov/qa_sp_sl.html); [official Palkia Origin Forme lore](https://legends.arceus.pokemon.com/en-us/pokemon/palkia/). Lensing and astronomical structures are observed; the literal portal is a fictional Spacial Rend interpretation.
-
-**Still:** The galaxy and torn space remain visible without motion.
+**Still:** A composed, visible arrangement of the identity geometry.
 
 - [Palkia Pokédex](https://www.pokemon.com/us/pokedex/0484)
 - [Official Sinnoh story](https://diamondpearl.pokemon.com/en-us/story/)
@@ -900,11 +892,9 @@ The per-character implementation now uses distinct original SVG silhouettes, co-
 - Giratina is associated with the Distortion World.
 - Giratina plays a prominent role in Platinum.
 
-**Motion:** Irregular black-purple pools swell and settle with burgundy edges and wet highlights. Thick strands stretch out of them, while dark droplets move down and up in different layers. A spreading, irregular splatter then contracts into the pool. There are no geometric shards or orbit symbols.
+**Motion:** Broken background planes counter-rotate while angular fragments appear to fall upward.
 
-**Research:** [official Giratina Pokédex](https://www.pokemon.com/us/pokedex/giratina); [Giratina media depictions and shadowy tar-like form](https://bulbapedia.bulbagarden.net/wiki/Giratina); [Distortion World and altered gravity](https://bulbapedia.bulbagarden.net/wiki/Distortion_World); [CERN: antimatter](https://home.cern/science/physics/antimatter/). The black fluid is inspired by the character's fictional shadow appearance, not a scientifically accurate depiction of antimatter, which annihilates upon contact with corresponding matter.
-
-**Still:** A stationary dark pool and glossy strands remain; free-moving drops and splatters disappear.
+**Still:** A composed, visible arrangement of the identity geometry.
 
 - [Giratina Pokédex](https://www.pokemon.com/us/pokedex/0487)
 - [Pokémon Platinum Version](https://www.nintendo.com/en-gb/Games/Nintendo-DS/Pokemon-Platinum-Version-272321.html)
@@ -1128,7 +1118,6 @@ The per-character implementation now uses distinct original SVG silhouettes, co-
 
 - Miraidon is associated with the distant future.
 - Miraidon can travel through Paldea.
-- Hadron Engine creates Electric Terrain; Electro Drift is described as a zigzagging electric attack. These are identity references, not a claim that PCB graphics are canonical.
 
 **Motion:** An original full-page motherboard stays softly energized: varied traces, vias, pads, chips with pin rows and transistor outlines, with luminous packets following the drawn routes. The character or console artwork remains unchanged.
 
