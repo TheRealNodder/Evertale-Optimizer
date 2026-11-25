@@ -535,7 +535,7 @@ def display_authority(item: Dict[str, Any], category: str, resolvers: Dict[str, 
     elif category == "weapons" and item.get("evolvedStars") is not None:
         # Weapon rarity is the maximum evolution tier, independent of current stars.
         maximum = safe_int(item["evolvedStars"])
-        rarity = "SSR" if maximum >= 6 else "SR" if maximum == 5 else "R" if maximum == 4 else "N"
+        rarity = "SSR" if maximum >= 6 else "SR" if maximum == 5 else "R" if maximum >= 3 else "N"
         sources["rarity"] = {"source": "raw.evolvedStars", "transform": "weapon_max_evolution_rarity_mapping"}
     elif category != "characters":
         # Preserve the existing non-weapon mapping and fallback for missing weapon data.

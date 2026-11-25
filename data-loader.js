@@ -58,7 +58,7 @@
     const maximum = raw?.evolvedStars ?? entry?.evolvedStars;
     if (maximum !== null && maximum !== undefined && maximum !== '' && Number.isFinite(Number(maximum))) {
       const stars = Number(maximum);
-      return stars >= 6 ? 'SSR' : stars === 5 ? 'SR' : stars === 4 ? 'R' : 'N';
+      return stars >= 6 ? 'SSR' : stars === 5 ? 'SR' : stars >= 3 ? 'R' : 'N';
     }
     return inferRarity(raw, entry);
   }

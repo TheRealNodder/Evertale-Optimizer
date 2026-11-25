@@ -147,7 +147,7 @@ const mobileCatalogDockStyles = read('catalog-mobile-command-dock.css');
 if (!catalogHtml.includes('test-catalog-v2-desktop-structure.js?v=13')) {
   errors.push('index.html does not use the current desktop catalog state-sync cache token');
 }
-if (!catalogHtml.includes('catalog-mobile-command-dock.css?v=9') || !catalogHtml.includes('catalog-mobile-command-dock.js?v=7')) {
+if (!catalogHtml.includes('catalog-mobile-command-dock.css?v=9') || !catalogHtml.includes('catalog-mobile-command-dock.js?v=8')) {
   errors.push('index.html does not load the mobile catalog command dock authority');
 }
 for (const label of ['Return to Top', 'All', 'Characters', 'Weapons', 'Bosses', 'Accessories']) {

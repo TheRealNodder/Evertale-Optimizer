@@ -5,7 +5,7 @@ import test from 'node:test';
 
 const source = readFileSync(new URL('../data-loader.js', import.meta.url), 'utf8');
 test('weapon family tier ignores stale rarity and preserves current stars and stats', async () => {
-  const cases = [[0,0,'N'], [3,3,'N'], [3,4,'R'], [4,4,'R'], [4,5,'SR'], [5,5,'SR'], [4,6,'SSR'], [5,6,'SSR'], [6,6,'SSR']];
+  const cases = [[0,0,'N'], [3,3,'R'], [3,4,'R'], [4,4,'R'], [4,5,'SR'], [5,5,'SR'], [4,6,'SSR'], [5,6,'SSR'], [6,6,'SSR']];
   const entries = cases.map(([stars,evolvedStars],i) => ({
     id: 'weapon-'+i, name: 'Weapon '+i, rarity: 'SR', stars, evolvedStars,
     raw: { name: 'Weapon'+i, stars, evolvedStars }, stats: { atk: 123, hp: 456 }

@@ -57,7 +57,7 @@ class EntryWarningRepairTests(unittest.TestCase):
 
     def test_weapon_rarity_uses_maximum_evolution_and_preserves_other_categories(self):
         resolvers = {"Localizable": {}}
-        for stars, maximum, rarity in [(0, 0, "N"), (3, 3, "N"), (3, 4, "R"), (4, 4, "R"), (4, 5, "SR"), (5, 5, "SR"), (4, 6, "SSR"), (5, 6, "SSR"), (6, 6, "SSR")]:
+        for stars, maximum, rarity in [(0, 0, "N"), (3, 3, "R"), (3, 4, "R"), (4, 4, "R"), (4, 5, "SR"), (5, 5, "SR"), (4, 6, "SSR"), (5, 6, "SSR"), (6, 6, "SSR")]:
             result = display_authority({"name": "Item", "stars": stars, "evolvedStars": maximum}, "weapons", resolvers)
             self.assertEqual(result["rarity"], rarity)
             self.assertEqual(result["fieldSources"]["rarity"]["source"], "raw.evolvedStars")
