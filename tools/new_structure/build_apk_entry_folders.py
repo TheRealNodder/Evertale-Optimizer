@@ -30,6 +30,7 @@ from path_utils import find_repo_root, resolve_repo_path
 
 SCRIPT_VERSION = "8-semantic-authorities"
 LEGACY_CATEGORY_SCRIPT_VERSION = "8-generated-display-authority"
+WEAPON_CATEGORY_SCRIPT_VERSION = "9-weapon-evolved-rarity"
 ACCESSORY_STATS_VERSION = 1
 TOOL_NAME = "build_apk_entry_folders"
 IMAGEKIT_BASE = "https://ik.imagekit.io/r8fsa98s9"
@@ -86,6 +87,8 @@ def now_int() -> int:
 
 def category_script_version(category: str) -> str:
     """Limit character-authority invalidation to character outputs."""
+    if category == "weapons":
+        return WEAPON_CATEGORY_SCRIPT_VERSION
     return SCRIPT_VERSION if category == "characters" else LEGACY_CATEGORY_SCRIPT_VERSION
 
 
@@ -529,9 +532,13 @@ def display_authority(item: Dict[str, Any], category: str, resolvers: Dict[str, 
     rarity = item.get("rarity")
     if rarity:
         sources["rarity"] = {"source": "raw.rarity"}
+    elif category == "weapons" and item.get("evolvedStars") is not None:
+        # Weapon rarity is the maximum evolution tier, independent of current stars.
+        maximum = safe_int(item["evolvedStars"])
+        rarity = "SSR" if maximum >= 6 else "SR" if maximum == 5 else "R" if maximum == 4 else "N"
+        sources["rarity"] = {"source": "raw.evolvedStars", "transform": "weapon_max_evolution_rarity_mapping"}
     elif category != "characters":
-        # Preserve exactly the existing frontend display mapping, not evolvedStars
-        # and not the separate character-family rarity rule.
+        # Preserve the existing non-weapon mapping and fallback for missing weapon data.
         field = "stars" if item.get("stars") is not None else "accessoryStars"
         if item.get(field) is not None:
             rarity = stars_to_rarity(safe_int(item[field]))

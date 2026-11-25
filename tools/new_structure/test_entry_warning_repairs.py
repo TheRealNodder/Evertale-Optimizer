@@ -55,10 +55,14 @@ class EntryWarningRepairTests(unittest.TestCase):
         loc["Sword02DescriptionKey"] = "Form-specific description."
         self.assertEqual(display_authority(items[1], "weapons", resolvers)["description"], "Form-specific description.")
 
-    def test_equipment_rarity_matches_existing_frontend_not_evolved_stars(self):
+    def test_weapon_rarity_uses_maximum_evolution_and_preserves_other_categories(self):
         resolvers = {"Localizable": {}}
-        for stars, rarity in [(0, "N"), (1, "N"), (2, "N"), (3, "R"), (4, "SR"), (5, "SSR"), (6, "SSR")]:
-            self.assertEqual(display_authority({"name": "Item", "stars": stars, "evolvedStars": 6}, "weapons", resolvers)["rarity"], rarity)
+        for stars, maximum, rarity in [(0, 0, "N"), (3, 3, "N"), (3, 4, "R"), (4, 4, "R"), (4, 5, "SR"), (5, 5, "SR"), (4, 6, "SSR"), (5, 6, "SSR"), (6, 6, "SSR")]:
+            result = display_authority({"name": "Item", "stars": stars, "evolvedStars": maximum}, "weapons", resolvers)
+            self.assertEqual(result["rarity"], rarity)
+            self.assertEqual(result["fieldSources"]["rarity"]["source"], "raw.evolvedStars")
+        self.assertEqual(display_authority({"name": "Item", "stars": 4}, "weapons", resolvers)["rarity"], "SR")
+        self.assertEqual(display_authority({"name": "Item", "rarity": "SR", "stars": 4, "evolvedStars": 6}, "weapons", resolvers)["rarity"], "SR")
         self.assertIsNone(display_authority({"name": "Item"}, "accessories", resolvers)["rarity"])
         self.assertEqual(display_authority({"name": "Item", "accessoryStars": 4}, "accessories", resolvers)["rarity"], "SR")
 
