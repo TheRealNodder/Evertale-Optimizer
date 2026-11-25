@@ -5,7 +5,7 @@
   const CATEGORIES=['characters','weapons','accessories','bosses'];
   const CATEGORY_LABELS={characters:'Characters',weapons:'Weapons',accessories:'Accessories',bosses:'Bosses'};
   const NON_DUO_FAMILIES=new Set(['jeannefusion']);
-  const state={items:[],filtered:[],q:'',type:'characters',sort:'newest',rendered:0,token:0,pageSize:24,selectedId:'',observer:null,raw:Object.create(null),loading:Object.create(null),registry:null,registryPromise:null,warming:false};
+  const state={items:[],filtered:[],q:'',type:'characters',sort:'newest',rarities:new Set(),elements:new Set(),rendered:0,token:0,pageSize:24,selectedId:'',observer:null,raw:Object.create(null),loading:Object.create(null),registry:null,registryPromise:null,warming:false};
   const $=id=>document.getElementById(id);
   const safe=s=>String(s??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
   const pick=(...vals)=>{for(const v of vals){if(v!==undefined&&v!==null&&v!=='')return v;}return''};
@@ -36,7 +36,7 @@
   function kindLabel(k){return k==='characters'?'Character':k==='weapons'?'Weapon':k==='accessories'?'Accessory':k==='bosses'?'Boss':k;}
   function skillRows(e,type){const key=type==='active'?'activeSkills':'passiveSkillDetails';if(Array.isArray(e?.[key]))return e[key];const src=type==='active'?e?.resolved?.activeSkills:e?.resolved?.passives;const out=[];if(src&&typeof src==='object'){for(const [id,d]of Object.entries(src)){const loc=d?.localization||{};out.push({id,name:loc.name||id,description:loc.description||'',tu:d?.tu,sp:d?.sp});}}return out;}
   function charImgs(u){const raw=Array.isArray(u.imageVariants)?u.imageVariants.map(v=>v&&v.url):Array.isArray(u.imagesLarge)?u.imagesLarge:(u.image?[u.image]:[]);return [...new Set((raw||[]).filter(Boolean))].slice(0,3);}
-  function base(kind,e){const raw=e?.raw||{};const sourceId=String(pick(e?.sourceId,e?.internal?.sourceId,e?.internal?.weaponId,e?.internal?.bossId,raw.name,e?.name,e?.id));const family=String(pick(e?.family,e?.internal?.family,raw.family,sourceFamily(sourceId)));const id=kind==='characters'?String(pick(family,sourceFamily(sourceId),sourceId,e?.id)):String(pick(e?.id,family,sourceId));return{kind,id,sourceId,family,file:file(e),order:order(e),name:pick(e?.displayName,e?.title,e?.name,sourceId),subtitle:pick(e?.weaponType,raw.weaponPref,e?.category,e?.subtitle,kindLabel(kind)),description:pick(e?.description,e?.flavorText,e?.profile,e?.effect,raw.profile,''),rarity:pick(e?.rarity,e?.stars,raw.stars,raw.accessoryStars,''),element:displayEl(pick(e?.element,raw.element,'')),stats:{atk:val(e,raw,'atk',raw.flatAttack,raw.baseAttack,raw.attack),hp:val(e,raw,'hp',raw.flatMaxHp,raw.baseMaxHp,raw.hp),spd:val(e,raw,'spd',raw.flatSpeed,raw.speed),cost:val(e,raw,'cost',raw.cost)},statsByForm:Array.isArray(e?.statsByForm)?e.statsByForm:[],imageVariants:Array.isArray(e?.imageVariants)?e.imageVariants:[],forms:Array.isArray(e?.forms)?e.forms:[],activeSkills:skillRows(e,'active'),passiveSkillDetails:skillRows(e,'passive'),descriptionByForm:Array.isArray(e?.descriptionByForm)?e.descriptionByForm:[],leaderSkillName:pick(e?.leaderSkill?.name,''),leaderSkillDesc:pick(e?.leaderSkill?.description,'')};}
+  function base(kind,e){const raw=e?.raw||{};const sourceId=String(pick(e?.sourceId,e?.internal?.sourceId,e?.internal?.weaponId,e?.internal?.bossId,raw.name,e?.name,e?.id));const family=String(pick(e?.family,e?.internal?.family,raw.family,sourceFamily(sourceId)));const id=kind==='characters'?String(pick(family,sourceFamily(sourceId),sourceId,e?.id)):String(pick(e?.id,family,sourceId));return{kind,id,sourceId,family,testLike:kind==='weapons'&&(e?._testLike===true||/(test|debug|prototype|internal|placeholder|sandbox|experimental)/i.test(`${sourceId} ${family}`)),file:file(e),order:order(e),name:pick(e?.displayName,e?.title,e?.name,sourceId),subtitle:pick(e?.weaponType,raw.weaponPref,e?.category,e?.subtitle,kindLabel(kind)),description:pick(e?.description,e?.flavorText,e?.profile,e?.effect,raw.profile,''),rarity:pick(e?.rarity,e?.stars,raw.stars,raw.accessoryStars,''),element:displayEl(pick(e?.element,raw.element,'')),stats:{atk:val(e,raw,'atk',raw.flatAttack,raw.baseAttack,raw.attack),hp:val(e,raw,'hp',raw.flatMaxHp,raw.baseMaxHp,raw.hp),spd:val(e,raw,'spd',raw.flatSpeed,raw.speed),cost:val(e,raw,'cost',raw.cost)},statsByForm:Array.isArray(e?.statsByForm)?e.statsByForm:[],imageVariants:Array.isArray(e?.imageVariants)?e.imageVariants:[],forms:Array.isArray(e?.forms)?e.forms:[],activeSkills:skillRows(e,'active'),passiveSkillDetails:skillRows(e,'passive'),descriptionByForm:Array.isArray(e?.descriptionByForm)?e.descriptionByForm:[],leaderSkillName:pick(e?.leaderSkill?.name,''),leaderSkillDesc:pick(e?.leaderSkill?.description,'')};}
   function characterStateRoot(item){return famKey(item.sourceId||item.family||item.id||item.name);}
   function collapseCharacterStates(chars){
     const groups=new Map();
@@ -59,7 +59,7 @@
   }
   function byNewest(a,b){return Number(b.order||0)-Number(a.order||0)||String(a.name||'').localeCompare(String(b.name||''));}
   function byOldest(a,b){return Number(a.order||0)-Number(b.order||0)||String(a.name||'').localeCompare(String(b.name||''));}
-  function sortRows(rows){const copy=[...rows];if(state.sort==='az')return copy.sort((a,b)=>String(a.name||'').localeCompare(String(b.name||''))||byNewest(a,b));if(state.sort==='za')return copy.sort((a,b)=>String(b.name||'').localeCompare(String(a.name||''))||byNewest(a,b));if(state.sort==='oldest')return copy.sort(byOldest);return copy.sort(byNewest);}
+  function sortRows(rows,sort='newest'){const compare=sort==='az'?(a,b)=>String(a.name||'').localeCompare(String(b.name||''))||byNewest(a,b):sort==='za'?(a,b)=>String(b.name||'').localeCompare(String(a.name||''))||byNewest(a,b):sort==='oldest'?byOldest:byNewest;return [...rows].sort((a,b)=>Number(Boolean(a.testLike))-Number(Boolean(b.testLike))||compare(a,b));}
   function normalize(entries){
     const chars=collapseCharacterStates((entries.characters||[]).map(e=>({...base('characters',e),name:pick(e.name,e.family,e.sourceId),subtitle:pick(e.title,e.subtitle,''),image:pick(e.image,charImgs(e)[0],''),images:charImgs(e)})));
     const weapons=(entries.weapons||[]).map(e=>{const x=base('weapons',e);return{...x,image:pick(e.image,x.sourceId?`https://ik.imagekit.io/r8fsa98s9/weapons/${x.sourceId}.png`:'')}});
@@ -181,7 +181,39 @@
     const detailId=detailIdFor(item);
     return `<div class="unitCard ${elClass(item.element)}${selected}" data-kind="${item.kind}" data-id="${safe(item.id)}" data-source-id="${safe(item.sourceId)}" data-family="${safe(item.family)}" data-file="${safe(item.file)}" data-order="${safe(item.order)}" data-source-order="${safe(item.order)}" data-file-handle-order="${safe(item.order)}" data-description="${safe(initial.description||'')}" data-state-rows="${attrJson(states)}" data-active-skills="${attrJson(item.activeSkills)}" data-passive-skills="${attrJson(item.passiveSkillDetails)}"><div class="unitLeft"><div class="unitThumb">${img}</div></div><div class="meta"><div class="metaHeader"><div class="metaMain"><div class="nameBlock"><button type="button" class="v2-detail-btn" popovertarget="${detailId}">Details</button><div class="unitName">${safe(item.name)}</div><div class="unitTitle">${safe(initial.title||item.subtitle)}</div>${stateBtns(states)}${duoBtn(item)}</div><div class="chipCol">${chips.join('')}</div></div></div><div class="unitDetails"><div class="statLine">${statHtml}</div>${leader}<div class="skillMini"><button type="button" data-v2-skill="active">Active Skill</button><button type="button" data-v2-skill="passive">Passive Skill</button><button type="button" class="v2-detail-btn" popovertarget="${detailId}">Description</button></div><div class="descriptionPanel" data-descriptions="${attrJson(states)}" hidden>${safe(initial.description||'')}</div></div></div><div id="${detailId}" class="v2-detail-backdrop" popover></div></div>`;
   }
-  function filter(){const q=state.q.toLowerCase();let rows=state.items;if(state.type!=='all')rows=rows.filter(i=>i.kind===state.type);if(q)rows=rows.filter(i=>`${i.name} ${i.subtitle} ${i.description} ${i.rarity} ${i.element} ${i.kind} ${i.sourceId}`.toLowerCase().includes(q));return sortRows(rows);}
+  function filterRows(items,{type='all',q='',rarities=new Set(),elements=new Set(),sort='newest'}={}){
+    q=String(q).trim().toLowerCase();
+    let rows=items.filter(i=>type==='all'||i.kind===type);
+    if(rarities.size)rows=rows.filter(i=>rarities.has(String(i.rarity||'').toUpperCase()));
+    if(elements.size&&['all','characters','bosses'].includes(type))rows=rows.filter(i=>elements.has(elClass(i.element).replace(/^el-/,'')));
+    if(q)rows=rows.filter(i=>`${i.name} ${i.subtitle} ${i.description} ${i.rarity} ${i.element} ${i.kind} ${i.sourceId}`.toLowerCase().includes(q));
+    return sortRows(rows,sort);
+  }
+  function filter(){return filterRows(state.items,state);}
+  function syncFilters(){
+    const elementGroup=$('catalogElementFilters');
+    if(elementGroup)elementGroup.hidden=!['all','characters','bosses'].includes(state.type);
+    const host=$('catalogExtraFilters');
+    if(!host)return;
+    host.querySelectorAll('[data-filter-rarity]').forEach(b=>b.setAttribute('aria-pressed',String(state.rarities.has(b.dataset.filterRarity))));
+    host.querySelectorAll('[data-filter-element]').forEach(b=>b.setAttribute('aria-pressed',String(state.elements.has(b.dataset.filterElement))));
+    const clear=$('catalogClearFilters');
+    if(clear)clear.disabled=!state.rarities.size&&!state.elements.size;
+  }
+  function attachFilters(){
+    const host=$('catalogExtraFilters');
+    if(!host)return;
+    host.addEventListener('click',event=>{
+      const button=event.target.closest('button');
+      if(!button)return;
+      const rarity=button.dataset.filterRarity,element=button.dataset.filterElement;
+      if(button.id==='catalogClearFilters'){state.rarities.clear();state.elements.clear();}
+      else if(rarity||element){const set=rarity?state.rarities:state.elements;const value=rarity||element;set.has(value)?set.delete(value):set.add(value);}
+      else return;
+      syncFilters();render();
+    });
+    syncFilters();
+  }
   function ensureSentinel(){const grid=$('catalogGrid');if(!grid)return null;let s=$('v2AutoLoadSentinel');if(!s){s=document.createElement('div');s.id='v2AutoLoadSentinel';grid.insertAdjacentElement('afterend',s);}return s;}
   function loadedKinds(){return CATEGORIES.filter(k=>Array.isArray(state.raw[k]));}
   function coldKinds(){return CATEGORIES.filter(k=>!Array.isArray(state.raw[k]));}
@@ -264,12 +296,13 @@
       sort.addEventListener('change',()=>{state.sort=sort.value||'newest';render();});
     }
     search?.addEventListener('input',()=>{clearTimeout(search._t);search._t=setTimeout(()=>{state.q=search.value||'';render();},160);});
-    type?.addEventListener('change',()=>{state.type=type.value||'characters';if(state.type==='all')hydrateAll(true);else hydrateCategory(state.type,true);});
+    type?.addEventListener('change',()=>{state.type=type.value||'characters';syncFilters();render();if(state.type==='all')hydrateAll(true);else hydrateCategory(state.type,true);});
+    attachFilters();
     attach();
     await hydrateCategory(state.type,false);
     render();
     warmColdCategories();
   }
-  window.EvertaleCatalogV2={applyState,readStateRows,selectCard,selectedCard,openDetail,getSelectedId:()=>state.selectedId};
+  window.EvertaleCatalogV2={filterRows,applyState,readStateRows,selectCard,selectedCard,openDetail,getSelectedId:()=>state.selectedId};
   document.addEventListener('DOMContentLoaded',()=>init().catch(err=>{console.error(err);const s=$('statusText');if(s)s.textContent=`Error: ${err.message||err}`;}));
 })();

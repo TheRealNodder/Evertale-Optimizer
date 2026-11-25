@@ -171,6 +171,9 @@
     const typeLabel=dock.querySelector('#mobileCatalogTypeLabel');
     const menu=dock.querySelector('#mobileCatalogTypeMenu');
     const menuButtons=Array.from(menu.querySelectorAll('[data-catalog-type]'));
+    const extraFilters=document.getElementById('catalogExtraFilters');
+    const originalFiltersParent=extraFilters?.parentNode;
+    const grid=document.getElementById('catalogGrid');
     const originalSearchParent=sourceSearch.parentNode;
     const originalSearchNext=sourceSearch.nextSibling;
     const originalSearchPlaceholder=sourceSearch.getAttribute('placeholder')||'';
@@ -179,6 +182,7 @@
     function updateLayoutState(){
       const active=isMobileLayout();
       if(active){
+        if(extraFilters&&grid?.parentNode&&extraFilters.parentNode!==grid.parentNode)grid.parentNode.insertBefore(extraFilters,grid);
         if(sourceSearch.parentNode!==searchHost)searchHost.appendChild(sourceSearch);
         sourceSearch.classList.add('mobileCatalogDock__input');
         sourceSearch.setAttribute('inputmode','search');
@@ -186,6 +190,7 @@
         sourceSearch.setAttribute('placeholder','Search the catalog...');
         sourceSearch.setAttribute('aria-label','Search the catalog');
       }else{
+        if(extraFilters&&originalFiltersParent&&extraFilters.parentNode!==originalFiltersParent)originalFiltersParent.appendChild(extraFilters);
         if(sourceSearch.parentNode!==originalSearchParent){
           if(originalSearchNext&&originalSearchNext.parentNode===originalSearchParent)originalSearchParent.insertBefore(sourceSearch,originalSearchNext);
           else originalSearchParent.appendChild(sourceSearch);
