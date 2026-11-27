@@ -1,6 +1,6 @@
 {
 	"Version": 23,
-	"Time": 1793935220,
+	"Time": 1795569948,
 	"AbilityConfig": {
 		"StunSingle200A": {
 			"class": "AbilityConfig",
@@ -49732,6 +49732,348 @@
 			"abilityEffect": "ArsenalAllStun",
 			"flags": ["NoDamage","GiveTurn"],
 			"useCondition": "IsCharged3"
+		},
+		"SingleAttackAKingArthurModernBoss":{
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"damageFlags": ["HardIgnoreBlockDeath","IgnoreArmor","DoNotWake"],
+				"applyToTargetType": "Enemy"
+			},{
+				"buffs": ["TUMinus100","RemovePowerCharge"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss",
+				"applyConditions": "HasPowerCharge"
+			},{
+				"buffs": ["GoodGirlBuffCounter"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "ArthurModernAttack1",
+			"attackScalors": ["GoodIfGain1GoodBuff","GoodIfGain2GoodBuff","GoodIfGain3GoodBuff","GoodIfGain4GoodBuff","GoodIfGain5GoodBuff"],
+			"conditionedAbilityEffects": ["ArthurModernAttack1","ArthurModernAttack1","ArthurModernAttack1","ArthurModernAttack1","ArthurModernAttack1"],
+			"recommendEffectWhenUsable": -2
+		},
+		"BigSelfBuffAKingArthurModernBoss":{
+			"class": "AbilityConfig",
+			"targetingData": "AllAlly",
+			"components": ["ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"buffs": ["SleepImmunityOnce","StunImmunityOnce","PoisonImmunityOnce"],
+				"applyToTargetType": "Friendly"
+			},{
+				"buffs": ["KingArthurModernBossCooldown50","PowerCharge"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"friendlyEventType": "Finish",
+			"sourceEventType": "Finish",
+			"abilityEffect": "ArthurModernEnemyBuff",
+			"flags": ["NoDamage"],
+			"useCondition": "NotInstantCooldown"
+		},
+		"SelfBuffAKingArthurModernBoss": {
+			"class": "AbilityConfig",
+			"targetingData": "SelfOnly",
+			"components": ["ApplyBuff"],
+			"componentOverrides": [{
+				"buffs": ["SpiritGainI","SpiritGainI","HealHalf","HoldGroundOnceForHoldGroundPlusBoss","BlockDeathUntilNextTurnForHoldGroundPlusBoss","PowerCharge"],
+				"applyToTargetType": "Source"
+			}],
+			"sourceEventType": "Finish",
+			"abilityEffect": "ArthurModernallyBuff",
+			"flags": ["Healer"],
+			"useCondition": "NotHoldGroundOnceForHoldGroundPlus"
+		},
+		"SpecialAttackAKingArthurModernBoss":{
+			"class": "AbilityConfig",
+			"targetingData": "2Enemy",
+			"components": ["Damage","ApplyBuff"],
+			"componentOverrides":[{
+				"applyToTargetType": "Enemy",
+				"damageFlags": ["HardIgnoreBlockDeath"]
+			},{
+				"buffs": ["PowerCharge","RemoveEnergy","Active4LOCKKingArthurModernBoss"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "ArthurModernShot",
+			"recommendEffectWhenUsable": -1,
+			"flags": ["IgnoreStealth"],
+			"useCondition": "IsNotActive4LOCKKingArthurModern"
+		},
+		"SingleAttackARoundTableModernBoss":{
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"applyToTargetType": "Enemy",
+				"damageFlags": ["HardIgnoreBlockDeath"]
+			},{
+				"buffs": ["AttackMinus25Percent1TurnOnly"],
+				"applyToTargetType": "Enemy",
+				"skipAbilityEffect": true,
+				"showMissConditions": "IsNotBurning",
+				"applyConditions": "IsBurning"
+			},{
+				"buffs":["DecreaseActive4LOCKRoundTableModernBoss"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "RoundTableModernXSlash",
+			"flags": ["BurnChance"],
+			"recommendEffectWhenUsable": -2
+		},
+		"AllBuffARoundTableModernBoss": {
+			"class": "AbilityConfig",
+			"targetingData": "All",
+			"components": ["ApplyBuff","ApplyBuff","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"buffs": ["SpiritDrainD"],
+				"applyToTargetType": "Enemy",
+				"applyConditions": "IsBurning",
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs": ["HasteUp30Percent"],
+				"applyToTargetType": "Friendly",
+				"applyConditions": "IsBurning",
+				"skipAbilityEffect": true
+			},{
+				"buffs": ["Burn"],
+				"applyToTargetType": "Enemy"
+			},{
+				"buffs": ["TUMinus50AllBurningAlliesEBB","RoundTableModernBossActive2Cooldown50"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			}],
+			"enemyEventType": "Hit",
+			"friendlyEventType": "Finish",
+			"sourceEventType": "Finish",
+			"abilityEffect": "RoundTableModernBuff",
+			"flags": ["NoDamage","Burn","ApplyStatusToSelf"],
+			"useCondition": "NotInstantCooldown2"
+		},
+		"BigAttackARoundTableModernBoss":{
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage","ApplyBuff"],
+			"componentOverrides": [{
+				"applyToTargetType": "Enemy",
+				"damageFlags": ["HardIgnoreBlockDeath","IgnoreArmor"]
+			},{
+				"buffs":["DecreaseActive4LOCKRoundTableModernBoss"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "RoundTableModernFire",
+			"attackScalors": ["GoodVs1NotSleepingOrBurningEnemy","GoodVs2NotSleepingOrBurningEnemy","GoodVs3NotSleepingOrBurningEnemy","GoodVs4NotSleepingOrBurningEnemy"],
+			"conditionedAbilityEffects": ["RoundTableModernFire","RoundTableModernFire","RoundTableModernFire","RoundTableModernFire","RoundTableModernFire"],
+			"flags": ["BurnBlast"],
+			"recommendEffectWhenUsable": -2,
+			"useCondition": "AtLeast1AllyIsBurning"
+		},
+		"SpecialAttackARoundTableModernBoss":{
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage","ApplyBuff"],
+			"componentOverrides": [{
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"damageFlags": ["HardIgnoreBlockDeath","IgnoreArmor","IgnoreSkin"],
+				"applyToTargetType": "Enemy"
+			},{
+				"buffs": ["Active4LockARoundTableModernBoss","Active4LockARoundTableModernBoss","Active4LockARoundTableModernBoss"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "RoundTableModernSP",
+			"recommendEffectWhenUsable": -1,
+			"useCondition": "IsNotActive4LockARoundTableModern"
+		},
+		"EnemyBuffAMerlinModernBoss": {
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"buffs": ["Burn","AttackMinus25Percent1TurnOnly"],
+				"applyToTargetType": "Enemy"
+			},{
+				"buffs": ["Active1LOCKMerlinModernBoss","RemoveActive2LOCKMerlinModernBoss"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "MerlinModernFire",
+			"flags": ["NoDamage","Burn"],
+			"useCondition": "IsNotActive1LOCKMerlinModern"
+		},
+		"AllBuffAMerlinModernBoss": {
+			"class": "AbilityConfig",
+			"targetingData": "All",
+			"components": ["ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"buffs": ["Burn","BurnShieldOnce"],
+				"applyToTargetType": "Friendly"
+			},{
+				"buffs": ["MerlinModernBossActive2BigBuff","Active2LOCKMerlinModernBoss","RemoveActive3LOCKMerlinModernBoss"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			}],
+			"enemyEventType": "Hit",
+			"friendlyEventType": "Finish",
+			"sourceEventType": "Finish",
+			"abilityEffect": "MerlinModernBuff",
+			"flags": ["NoDamage","BurnChance"],
+			"useCondition": "IsNotActive2LOCKMerlinModern"
+		},
+		"SingleAttackAMerlinModernBoss":{
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"damageFlags": ["HardIgnoreBlockDeath","IgnoreArmor"],
+				"applyToTargetType": "Enemy"
+			},{
+				"buffs": ["TUMinus50ONotMeMerlinModernEBB"],
+				"applyConditions": "MoreThan0HP",
+				"applyToTargetOnly": true,
+				"buffBackMode": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			},{
+				"buffs": ["Active3LOCKMerlinModernBoss","RemoveActive1LOCKMerlinModernBoss"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "MerlinModernSmashFire",
+			"attackScalors": ["GoodWith1BurningUnit","GoodWith2BurningsUnits","GoodWith3BurningsUnits","GoodWith4BurningsUnits"],
+			"conditionedAbilityEffects": ["MerlinModernSmashFire","MerlinModernSmashFire","MerlinModernSmashFire","MerlinModernSmashFire"],
+			"recommendEffectWhenUsable": -2,
+			"useCondition": "IsNotActive3LOCKMerlinModern"
+		},
+		"SpecialAttackAMerlinModernBoss":{
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage","ApplyBuff"],
+			"componentOverrides": [{
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"damageFlags": ["HardIgnoreBlockDeath","IgnoreArmor"],
+				"applyToTargetType": "Enemy"
+			},{
+				"buffs": ["TUMinus50AllEnemiesEBB"],
+				"applyConditions": "MoreThan0HP",
+				"applyToTargetOnly": true,
+				"buffBackMode": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss"
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "MerlinModernFinalCrush1",
+			"recommendEffectWhenUsable": -2,
+			"useCondition": "IsNotBurningOrAllEnemiesBurning"
+		},
+		"SingleAttackAKingArthurModern":{
+			"class": "AbilityConfig",
+			"targetingData": "1Enemy",
+			"components": ["Damage","ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"damageBoosts": ["RegularAttackDamageBoost"],
+				"damageFlags": ["HardIgnoreBlockDeath","IgnoreArmor","DoNotWake"],
+				"applyToTargetType": "Enemy",
+				"drainPercent": 1.0,
+				"drainEffect": "MerlinSelfHeal1"
+			},{
+				"buffs": ["TUMinus100","RemovePowerCharge"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true,
+				"showMissConditions": "ShowNoMiss",
+				"applyConditions": "HasPowerCharge"
+			},{
+				"buffs": ["GoodGirlBuffCounter"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "ArthurModernAttack1",
+			"attackScalors": ["GoodIfGain1GoodBuff","GoodIfGain2GoodBuff","GoodIfGain3GoodBuff","GoodIfGain4GoodBuff","GoodIfGain5GoodBuff"],
+			"conditionedAbilityEffects": ["ArthurModernAttack1","ArthurModernAttack1","ArthurModernAttack1","ArthurModernAttack1","ArthurModernAttack1"],
+			"recommendEffectWhenUsable": -2
+		},
+		"BigSelfBuffAKingArthurModern":{
+			"class": "AbilityConfig",
+			"targetingData": "AllAlly",
+			"components": ["ApplyBuff","ApplyBuff"],
+			"componentOverrides": [{
+				"buffs": ["SleepImmunityOnce","StunImmunityOnce","PoisonImmunityOnce"],
+				"applyToTargetType": "Friendly"
+			},{
+				"buffs": ["KingArthurModernCooldown50","InstantKillImmunityOnce","PowerCharge"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"friendlyEventType": "Finish",
+			"sourceEventType": "Finish",
+			"abilityEffect": "ArthurModernEnemyBuff",
+			"flags": ["NoDamage"],
+			"useCondition": "NotInstantCooldown"
+		},
+		"SelfBuffAKingArthurModern": {
+			"class": "AbilityConfig",
+			"targetingData": "SelfOnly",
+			"components": ["ApplyBuff"],
+			"componentOverrides": [{
+				"buffs": ["SpiritGainI","SpiritGainI","HealFull","HoldGroundOnceForHoldGroundPlus","BlockDeathUntilNextTurnForHoldGroundPlus","PowerCharge"],
+				"applyToTargetType": "Source"
+			}],
+			"sourceEventType": "Finish",
+			"abilityEffect": "ArthurModernallyBuff",
+			"flags": ["Healer"],
+			"useCondition": "AllySpirit3OrLessORNotHoldGroundOnceForHoldGroundPlus"
+		},
+		"SpecialAttackAKingArthurModern":{
+			"class": "AbilityConfig",
+			"targetingData": "2Enemy",
+			"components": ["Damage","ApplyBuff"],
+			"componentOverrides":[{
+				"applyToTargetType": "Enemy",
+				"damageFlags": ["HardIgnoreBlockDeath"],
+				"drainPercent": 1.0,
+				"drainEffect": "MerlinSelfHeal1"
+			},{
+				"buffs": ["PowerCharge","RemoveEnergy","Active4LOCKKingArthurModern"],
+				"applyToSourceOnly": true,
+				"skipAbilityEffect": true
+			}],
+			"enemyEventType": "Hit",
+			"sourceEventType": "Finish",
+			"abilityEffect": "ArthurModernShot",
+			"recommendEffectWhenUsable": -1,
+			"flags": ["IgnoreStealth"],
+			"useCondition": "IsNotActive4LOCKKingArthurModern"
 		}
 	}
 }

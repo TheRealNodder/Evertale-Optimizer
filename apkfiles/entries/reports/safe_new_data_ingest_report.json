@@ -1,12 +1,12 @@
 {
   "schemaVersion": 4,
   "purpose": "Single safe runner for append-only new game data ingest and post-ingest checks.",
-  "startedAt": 1794545382,
-  "finishedAt": 1794545438,
+  "startedAt": 1795756724,
+  "finishedAt": 1795756927,
   "status": "ok",
   "dryRun": false,
   "mode": "extract",
-  "inputFolder": "historical/apkfiles",
+  "inputFolder": "apkfiles",
   "force": false,
   "fullAudit": false,
   "fullAuditDeprecated": false,
@@ -23,203 +23,219 @@
   "steps": [
     {
       "label": "safe_entry_pipeline",
-      "command": "python.exe historical\\tools\\new_structure\\run_entry_pipeline.py --extract --raw historical\\apkfiles",
+      "command": "python.exe tools/new_structure/run_entry_pipeline.py --extract --raw apkfiles",
       "status": "ok",
       "returnCode": 0,
-      "startedAt": 1794545382,
-      "finishedAt": 1794545427,
-      "durationSeconds": 45
+      "startedAt": 1795756724,
+      "finishedAt": 1795756856,
+      "durationSeconds": 132
+    },
+    {
+      "label": "build_passive_definition_registry.py",
+      "command": "python.exe tools/new_structure/build_passive_definition_registry.py --input apkfiles",
+      "status": "ok",
+      "returnCode": 0,
+      "startedAt": 1795756856,
+      "finishedAt": 1795756893,
+      "durationSeconds": 37
     },
     {
       "label": "extract_optimizer_knowledge.py",
-      "command": "python.exe historical\\tools\\new_structure\\extract_optimizer_knowledge.py",
+      "command": "python.exe tools/new_structure/extract_optimizer_knowledge.py",
       "status": "ok",
       "returnCode": 0,
-      "startedAt": 1794545427,
-      "finishedAt": 1794545428,
+      "startedAt": 1795756893,
+      "finishedAt": 1795756894,
       "durationSeconds": 1
     },
     {
       "label": "build_optimizer_ability_graph.py",
-      "command": "python.exe historical\\tools\\new_structure\\build_optimizer_ability_graph.py",
+      "command": "python.exe tools/new_structure/build_optimizer_ability_graph.py",
       "status": "ok",
       "returnCode": 0,
-      "startedAt": 1794545428,
-      "finishedAt": 1794545429,
-      "durationSeconds": 1
+      "startedAt": 1795756894,
+      "finishedAt": 1795756896,
+      "durationSeconds": 2
     },
     {
       "label": "build_optimizer_runtime_model.py",
-      "command": "python.exe historical\\tools\\new_structure\\build_optimizer_runtime_model.py",
+      "command": "python.exe tools/new_structure/build_optimizer_runtime_model.py",
       "status": "ok",
       "returnCode": 0,
-      "startedAt": 1794545429,
-      "finishedAt": 1794545432,
-      "durationSeconds": 3
+      "startedAt": 1795756896,
+      "finishedAt": 1795756902,
+      "durationSeconds": 6
     },
     {
       "label": "split_optimizer_runtime_model.py",
-      "command": "python.exe historical\\tools\\new_structure\\split_optimizer_runtime_model.py",
+      "command": "python.exe tools/new_structure/split_optimizer_runtime_model.py",
       "status": "ok",
       "returnCode": 0,
-      "startedAt": 1794545432,
-      "finishedAt": 1794545434,
-      "durationSeconds": 2
+      "startedAt": 1795756902,
+      "finishedAt": 1795756905,
+      "durationSeconds": 3
     },
     {
       "label": "runtime_optimizer_trace.py",
-      "command": "python.exe historical\\tools\\new_structure\\runtime_optimizer_trace.py",
+      "command": "python.exe tools/new_structure/runtime_optimizer_trace.py",
       "status": "ok",
       "returnCode": 0,
-      "startedAt": 1794545434,
-      "finishedAt": 1794545435,
-      "durationSeconds": 1
-    },
-    {
-      "label": "validate_entries.py",
-      "command": "python.exe historical\\tools\\new_structure\\validate_entries.py",
-      "status": "ok",
-      "returnCode": 0,
-      "startedAt": 1794545435,
-      "finishedAt": 1794545437,
+      "startedAt": 1795756905,
+      "finishedAt": 1795756907,
       "durationSeconds": 2
     },
     {
-      "label": "audit_master_field_contract.py",
-      "command": "python.exe historical\\tools\\new_structure\\audit_master_field_contract.py",
+      "label": "validate_entries.py",
+      "command": "python.exe tools/new_structure/validate_entries.py",
       "status": "ok",
       "returnCode": 0,
-      "startedAt": 1794545437,
-      "finishedAt": 1794545438,
-      "durationSeconds": 1
+      "startedAt": 1795756907,
+      "finishedAt": 1795756924,
+      "durationSeconds": 17
+    },
+    {
+      "label": "audit_master_field_contract.py",
+      "command": "python.exe tools/new_structure/audit_master_field_contract.py",
+      "status": "ok",
+      "returnCode": 0,
+      "startedAt": 1795756924,
+      "finishedAt": 1795756927,
+      "durationSeconds": 3
     }
   ],
+  "passiveDefinitionRegistry": {
+    "path": "apkfiles/entries/runtime/passive_definition_registry.json",
+    "state": "validated",
+    "generated": true,
+    "validated": true,
+    "refreshed": true
+  },
   "entryPipelineReport": {
     "pipelineVersion": 10,
     "mode": "extract",
-    "startedAt": 1794545382,
+    "startedAt": 1795756724,
     "steps": [
       {
         "step": "bookmark_before",
-        "script": "historical/tools/new_structure/update_entry_bookmark.py",
+        "script": "tools/new_structure/update_entry_bookmark.py",
         "status": "ok",
         "returnCode": 0,
-        "startedAt": 1794545382,
-        "finishedAt": 1794545390,
-        "durationSeconds": 8
+        "startedAt": 1795756724,
+        "finishedAt": 1795756740,
+        "durationSeconds": 16
       },
       {
         "step": "extract_entries",
-        "script": "historical/tools/new_structure/run_universal_apk_builder.py",
+        "script": "tools/new_structure/run_universal_apk_builder.py",
         "status": "ok",
         "returnCode": 0,
-        "startedAt": 1794545390,
-        "finishedAt": 1794545402,
-        "durationSeconds": 12
+        "startedAt": 1795756740,
+        "finishedAt": 1795756808,
+        "durationSeconds": 68
       },
       {
         "step": "extract_localization",
-        "script": "historical/tools/new_structure/extract_localizable_groups.py",
+        "script": "tools/new_structure/extract_localizable_groups.py",
         "status": "ok",
         "returnCode": 0,
-        "startedAt": 1794545402,
-        "finishedAt": 1794545420,
-        "durationSeconds": 18
+        "startedAt": 1795756809,
+        "finishedAt": 1795756835,
+        "durationSeconds": 26
       },
       {
         "step": "sync_category_order",
-        "script": "historical/tools/new_structure/sync_category_order_canonical.py",
+        "script": "tools/new_structure/sync_category_order_canonical.py",
         "status": "ok",
         "returnCode": 0,
-        "startedAt": 1794545420,
-        "finishedAt": 1794545420,
-        "durationSeconds": 0
+        "startedAt": 1795756835,
+        "finishedAt": 1795756837,
+        "durationSeconds": 2
       },
       {
         "step": "repair_character_order_tail",
-        "script": "historical/tools/new_structure/repair_character_order_tail.py",
+        "script": "tools/new_structure/repair_character_order_tail.py",
         "status": "ok",
         "returnCode": 0,
-        "startedAt": 1794545420,
-        "finishedAt": 1794545420,
+        "startedAt": 1795756837,
+        "finishedAt": 1795756837,
         "durationSeconds": 0
       },
       {
         "step": "sync_category_order",
-        "script": "historical/tools/new_structure/sync_category_order_canonical.py",
+        "script": "tools/new_structure/sync_category_order_canonical.py",
         "status": "ok",
         "returnCode": 0,
-        "startedAt": 1794545420,
-        "finishedAt": 1794545420,
-        "durationSeconds": 0
+        "startedAt": 1795756837,
+        "finishedAt": 1795756840,
+        "durationSeconds": 3
       },
       {
         "step": "build_character_image_map",
-        "script": "historical/tools/new_structure/build_character_image_map.py",
+        "script": "tools/new_structure/build_character_image_map.py",
         "status": "ok",
         "returnCode": 0,
-        "startedAt": 1794545420,
-        "finishedAt": 1794545421,
-        "durationSeconds": 1
+        "startedAt": 1795756840,
+        "finishedAt": 1795756840,
+        "durationSeconds": 0
       },
       {
         "step": "sync_character_tags",
-        "script": "historical/tools/new_structure/sync_character_tags.py",
+        "script": "tools/new_structure/sync_character_tags.py",
         "status": "ok",
         "returnCode": 0,
-        "startedAt": 1794545421,
-        "finishedAt": 1794545421,
+        "startedAt": 1795756840,
+        "finishedAt": 1795756840,
         "durationSeconds": 0
       },
       {
         "step": "build_parent_child_map",
-        "script": "historical/tools/new_structure/build_parent_child_map.py",
+        "script": "tools/new_structure/build_parent_child_map.py",
         "status": "ok",
         "returnCode": 0,
-        "startedAt": 1794545421,
-        "finishedAt": 1794545421,
-        "durationSeconds": 0
+        "startedAt": 1795756840,
+        "finishedAt": 1795756841,
+        "durationSeconds": 1
       },
       {
         "step": "build_bundles",
-        "script": "historical/tools/new_structure/build_entry_bundles.py",
+        "script": "tools/new_structure/build_entry_bundles.py",
         "status": "ok",
         "returnCode": 0,
-        "startedAt": 1794545421,
-        "finishedAt": 1794545425,
-        "durationSeconds": 4
+        "startedAt": 1795756841,
+        "finishedAt": 1795756849,
+        "durationSeconds": 8
       },
       {
         "step": "update_live_data_config",
-        "script": "historical/tools/new_structure/update_live_data_config_version.py",
+        "script": "tools/new_structure/update_live_data_config_version.py",
         "status": "ok",
         "returnCode": 0,
-        "startedAt": 1794545425,
-        "finishedAt": 1794545425,
-        "durationSeconds": 0
+        "startedAt": 1795756849,
+        "finishedAt": 1795756850,
+        "durationSeconds": 1
       },
       {
         "step": "validate",
-        "script": "historical/tools/new_structure/validate_entries.py",
+        "script": "tools/new_structure/validate_entries.py",
         "status": "ok",
         "returnCode": 0,
-        "startedAt": 1794545425,
-        "finishedAt": 1794545427,
-        "durationSeconds": 2
+        "startedAt": 1795756850,
+        "finishedAt": 1795756854,
+        "durationSeconds": 4
       },
       {
         "step": "bookmark_after",
-        "script": "historical/tools/new_structure/update_entry_bookmark.py",
+        "script": "tools/new_structure/update_entry_bookmark.py",
         "status": "ok",
         "returnCode": 0,
-        "startedAt": 1794545427,
-        "finishedAt": 1794545427,
-        "durationSeconds": 0
+        "startedAt": 1795756854,
+        "finishedAt": 1795756856,
+        "durationSeconds": 2
       }
     ],
     "stepOrderReason": "build_parent_child_map can update indexes; bundles rebuild afterward, then the shared cache token and all page references update before validation.",
     "subprocessEncoding": "PYTHONIOENCODING=utf-8",
-    "finishedAt": 1794545427,
+    "finishedAt": 1795756856,
     "status": "ok"
   },
   "orderSummary": {
@@ -227,9 +243,9 @@
       "report": "apkfiles/entries/reports/character_order_sync_report.json",
       "appendedNewEntries": 1,
       "missingCanonicalEntries": 0,
-      "orderedCount": 438,
-      "canonicalExistingCount": 438,
-      "indexEntryCount": 438,
+      "orderedCount": 439,
+      "canonicalExistingCount": 439,
+      "indexEntryCount": 439,
       "appended": [
         {
           "key": "Crescent",
@@ -241,27 +257,27 @@
       "report": "apkfiles/entries/reports/weapon_order_sync_report.json",
       "appendedNewEntries": 0,
       "missingCanonicalEntries": 0,
-      "orderedCount": 878,
-      "canonicalExistingCount": 878,
-      "indexEntryCount": 878,
+      "orderedCount": 881,
+      "canonicalExistingCount": 881,
+      "indexEntryCount": 881,
       "appended": []
     },
     "accessories": {
       "report": "apkfiles/entries/reports/accessory_order_sync_report.json",
       "appendedNewEntries": 0,
       "missingCanonicalEntries": 0,
-      "orderedCount": 111,
-      "canonicalExistingCount": 111,
-      "indexEntryCount": 111,
+      "orderedCount": 112,
+      "canonicalExistingCount": 112,
+      "indexEntryCount": 112,
       "appended": []
     },
     "bosses": {
       "report": "apkfiles/entries/reports/boss_order_sync_report.json",
       "appendedNewEntries": 0,
       "missingCanonicalEntries": 213,
-      "orderedCount": 443,
-      "canonicalExistingCount": 656,
-      "indexEntryCount": 443,
+      "orderedCount": 449,
+      "canonicalExistingCount": 662,
+      "indexEntryCount": 449,
       "appended": []
     }
   },
@@ -283,23 +299,23 @@
     "chunks": {
       "characters": {
         "file": "optimizer_runtime_characters.json",
-        "count": 438
+        "count": 439
       },
       "characterEntries": {
         "file": "optimizer_runtime_character_entries.json",
-        "count": 771
+        "count": 773
       },
       "weapons": {
         "file": "optimizer_runtime_weapons.json",
-        "count": 370
+        "count": 371
       },
       "accessories": {
         "file": "optimizer_runtime_accessories.json",
-        "count": 111
+        "count": 112
       },
       "bosses": {
         "file": "optimizer_runtime_bosses.json",
-        "count": 443
+        "count": 449
       },
       "tags": {
         "file": "optimizer_runtime_tags.json",
@@ -307,15 +323,15 @@
       },
       "featureEvidence": {
         "file": "optimizer_runtime_feature_evidence.json",
-        "count": 771
+        "count": 773
       },
       "skillProfiles": {
         "file": "optimizer_runtime_skill_profiles.json",
-        "count": 771
+        "count": 773
       },
       "leaderProfiles": {
         "file": "optimizer_runtime_leader_profiles.json",
-        "count": 595
+        "count": 597
       },
       "optimizerKnowledge": {
         "file": "optimizer_runtime_knowledge.json",
@@ -339,43 +355,43 @@
     "report": "apkfiles/entries/reports/master_field_contract_audit_report.json",
     "status": "warning",
     "errorCount": 0,
-    "warningCount": 623,
+    "warningCount": 629,
     "entrySummary": {
       "characters": {
         "index": "apkfiles/entries/characters/index.json",
-        "indexCount": 771,
-        "checked": 771,
+        "indexCount": 773,
+        "checked": 773,
         "placeholders": 0
       },
       "weapons": {
         "index": "apkfiles/entries/weapons/index.json",
-        "indexCount": 878,
-        "checked": 878,
+        "indexCount": 881,
+        "checked": 881,
         "placeholders": 0
       },
       "accessories": {
         "index": "apkfiles/entries/accessories/index.json",
-        "indexCount": 111,
-        "checked": 111,
+        "indexCount": 112,
+        "checked": 112,
         "placeholders": 0
       },
       "bosses": {
         "index": "apkfiles/entries/bosses/index.json",
-        "indexCount": 443,
-        "checked": 443,
+        "indexCount": 449,
+        "checked": 449,
         "placeholders": 0
       }
     },
     "runtimeSummary": {
       "present": true,
       "schemaVersion": 6,
-      "characters": 438,
-      "characterEntries": 771,
-      "weapons": 370,
-      "accessories": 111,
-      "bosses": 443,
+      "characters": 439,
+      "characterEntries": 773,
+      "weapons": 371,
+      "accessories": 112,
+      "bosses": 449,
       "tags": 0,
-      "featureEvidence": 771
+      "featureEvidence": 773
     },
     "errors": [],
     "warnings": [
@@ -483,14 +499,14 @@
   },
   "liveDataConfigSummary": {
     "schemaVersion": 2,
-    "generatedAt": 1794545425,
+    "generatedAt": 1795756850,
     "status": "updated",
     "config": "live-data-config.js",
     "catalog": "apkfiles\\entries\\bundles\\catalog.bundle.json",
-    "oldBaseVersion": "entries-1793979986-b612ca5ff2ae",
-    "newBaseVersion": "entries-1794545424-3039ae07fe46",
-    "runtimeRevision": "optimizer-v6-synergy-v2",
-    "newVersion": "entries-1794545424-3039ae07fe46-optimizer-v6-synergy-v2",
+    "oldBaseVersion": "entries-1795292921-e4b4885c0cba",
+    "newBaseVersion": "entries-1795756848-4515af9e603b",
+    "runtimeRevision": "optimizer-v6-path-hygiene-v1",
+    "newVersion": "entries-1795756848-4515af9e603b-optimizer-v6-path-hygiene-v1",
     "pageReferences": [
       "index.html",
       "roster.html",
